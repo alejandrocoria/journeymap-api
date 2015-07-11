@@ -10,15 +10,8 @@ package journeymap.client.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -26,6 +19,13 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
@@ -52,7 +52,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     String jm_version;
     String latest_journeymap_version;
     String mc_version;
-    String mod_name = JourneyMap.MOD_NAME;
+    String mod_name = JourneymapClient.MOD_NAME;
     String iconSetName;
     String[] iconSetNames;
     int browser_poll;
@@ -78,7 +78,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Couldn't get service name: " + LogFormatter.toString(t));
             // Fallback
             return getLegacyServerName();
         }
@@ -101,7 +101,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
         }
         return "server";
     }
@@ -183,16 +183,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
             HashMap<Integer, WorldProvider> dimProviders = new HashMap<Integer, WorldProvider>();
 
             Level logLevel = Level.DEBUG;
-            JourneyMap.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
+            JourneymapClient.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
 
             // DimensionIDs works for local servers
             Integer[] dims = DimensionManager.getIDs();
-            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has dims: %s", Arrays.asList(dims)));
+            JourneymapClient.getLogger().log(logLevel, String.format("DimensionManager has dims: %s", Arrays.asList(dims)));
             requiredDims.addAll(Arrays.asList(dims));
 
             // StaticDimensionIDs works for remote servers
             dims = DimensionManager.getStaticDimensionIDs();
-            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager has static dims: %s", Arrays.asList(dims)));
+            JourneymapClient.getLogger().log(logLevel, String.format("DimensionManager has static dims: %s", Arrays.asList(dims)));
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
@@ -200,7 +200,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             int dimId = ForgeHelper.INSTANCE.getDimension(playerProvider);
             dimProviders.put(dimId, playerProvider);
             requiredDims.remove(dimId);
-            JourneyMap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
+            JourneymapClient.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
 
             // Get a provider for the rest
             for (int dim : requiredDims)
@@ -214,7 +214,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                             WorldProvider dimProvider = DimensionManager.getProvider(dim);
                             dimProvider.getDimensionName(); // Force the name error
                             dimProviders.put(dim, dimProvider);
-                            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
+                            JourneymapClient.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
                         }
                         catch (Throwable t)
                         {
@@ -230,7 +230,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                             provider.getDimensionName(); // Force the name error
                             provider.setDimension(dim);
                             dimProviders.put(dim, provider);
-                            JourneyMap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
+                            JourneymapClient.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
                         }
                         catch (Throwable t)
                         {
@@ -250,7 +250,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 {
                     WorldProvider provider = new FakeDimensionProvider(dim);
                     dimProviders.put(dim, provider);
-                    JourneyMap.getLogger().warn(String.format("Used FakeDimensionProvider for required dim: %s", dim));
+                    JourneymapClient.getLogger().warn(String.format("Used FakeDimensionProvider for required dim: %s", dim));
                 }
             }
 
@@ -269,7 +269,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Unexpected error in WorldData.getDimensionProviders(): ", t);
+            JourneymapClient.getLogger().error("Unexpected error in WorldData.getDimensionProviders(): ", t);
             return Collections.emptyList();
         }
     }
@@ -307,13 +307,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
         time = mc.theWorld.getWorldTime() % 24000L;
         features = FeatureManager.getAllowedFeatures();
 
-        mod_name = JourneyMap.MOD_NAME;
-        jm_version = JourneyMap.JM_VERSION.toString();
+        mod_name = JourneymapClient.MOD_NAME;
+        jm_version = JourneymapClient.JM_VERSION.toString();
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneyMap.getCoreProperties().browserPoll.get());
+        browser_poll = Math.max(1000, JourneymapClient.getCoreProperties().browserPoll.get());
 
-        iconSetName = JourneyMap.getFullMapProperties().getEntityIconSetName().get();
+        iconSetName = JourneymapClient.getFullMapProperties().getEntityIconSetName().get();
         iconSetNames = IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
 
         return this;

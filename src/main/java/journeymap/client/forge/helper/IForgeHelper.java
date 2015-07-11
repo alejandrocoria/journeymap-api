@@ -8,6 +8,7 @@
 
 package journeymap.client.forge.helper;
 
+import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,7 +26,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import journeymap.client.model.BlockMD;
 
 import java.net.SocketAddress;
 import java.util.Iterator;

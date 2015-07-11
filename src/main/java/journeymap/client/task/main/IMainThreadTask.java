@@ -8,15 +8,15 @@
 
 package journeymap.client.task.main;
 
+import journeymap.client.JourneymapClient;
 import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
 
 /**
  * Created by Mark on 3/21/2015.
  */
 public interface IMainThreadTask
 {
-    public IMainThreadTask perform(Minecraft mc, JourneyMap jm);
+    public IMainThreadTask perform(Minecraft mc, JourneymapClient jm);
 
     public String getName();
 }

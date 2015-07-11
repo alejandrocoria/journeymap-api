@@ -8,12 +8,12 @@
 
 package journeymap.client.forge.event;
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.feature.FeatureManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.JourneyMap;
-import journeymap.client.feature.FeatureManager;
 
 import java.util.EnumSet;
 
@@ -36,7 +36,7 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void invoke(WorldEvent.Unload event)
     {
-        JourneyMap.getInstance().stopMapping();
+        JourneymapClient.getInstance().stopMapping();
         FeatureManager.instance().reset();
     }
 }

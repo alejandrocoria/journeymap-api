@@ -11,7 +11,7 @@ package journeymap.client.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.JMLogger;
 import org.apache.logging.log4j.Logger;
 import se.rupy.http.Event;
@@ -52,7 +52,7 @@ public abstract class BaseService extends Service
     protected void throwEventException(int code, String message, Event event, boolean isError) throws Event, Exception
     {
 
-        Logger logger = JourneyMap.getLogger();
+        Logger logger = JourneymapClient.getLogger();
 
         // Log the issue depending on severity
         String out = code + " " + message; //$NON-NLS-1$ //$NON-NLS-2$
@@ -67,7 +67,7 @@ public abstract class BaseService extends Service
         }
         else if (logger.isTraceEnabled())
         {
-            JourneyMap.getLogger().trace(out);
+            JourneymapClient.getLogger().trace(out);
         }
 
         // Set the error code on the response
@@ -129,7 +129,7 @@ public abstract class BaseService extends Service
     protected void reportMalformedRequest(Event event) throws Event, Exception
     {
         String error = "Bad Request: " + event.query().path(); //$NON-NLS-1$
-        JourneyMap.getLogger().error(error);
+        JourneymapClient.getLogger().error(error);
         throwEventException(400, error, event, false);
     }
 
@@ -167,7 +167,7 @@ public abstract class BaseService extends Service
             }
             catch (NumberFormatException e)
             {
-                JourneyMap.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
+                JourneymapClient.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
             }
         }
         return (intVal != null) ? intVal : defaultValue;
@@ -193,7 +193,7 @@ public abstract class BaseService extends Service
             }
             catch (NumberFormatException e)
             {
-                JourneyMap.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
+                JourneymapClient.getLogger().warn("Didn't get numeric query parameter for '" + key + "': " + val);
             }
         }
         return (longVal != null) ? longVal : defaultValue;
@@ -312,7 +312,7 @@ public abstract class BaseService extends Service
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warn("Failed to UTF8 encode: " + data);
+            JourneymapClient.getLogger().warn("Failed to UTF8 encode: " + data);
             return null;
         }
     }
@@ -339,7 +339,7 @@ public abstract class BaseService extends Service
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warn("Failed to gzip encode: " + Arrays.toString(data));
+            JourneymapClient.getLogger().warn("Failed to gzip encode: " + Arrays.toString(data));
             return null;
         }
     }
@@ -397,7 +397,7 @@ public abstract class BaseService extends Service
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().warn("No ContentType match for file: " + name); //$NON-NLS-1$
+                JourneymapClient.getLogger().warn("No ContentType match for file: " + name); //$NON-NLS-1$
                 return null;
             }
         }
@@ -513,7 +513,7 @@ public abstract class BaseService extends Service
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().warn("Couldn't get content length for FileInputStream"); //$NON-NLS-1$
+                JourneymapClient.getLogger().warn("Couldn't get content length for FileInputStream"); //$NON-NLS-1$
             }
             return this;
         }

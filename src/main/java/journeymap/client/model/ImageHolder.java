@@ -9,7 +9,7 @@
 package journeymap.client.model;
 
 import com.google.common.base.Objects;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.BaseRenderer;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ImageHolder
 {
-    final static Logger logger = JourneyMap.getLogger();
+    final static Logger logger = JourneymapClient.getLogger();
     final MapType mapType;
     final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;

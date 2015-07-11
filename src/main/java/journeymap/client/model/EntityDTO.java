@@ -10,6 +10,7 @@ package journeymap.client.model;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
+import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,7 +20,6 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StringUtils;
-import journeymap.client.forge.helper.ForgeHelper;
 
 import java.io.Serializable;
 import java.util.UUID;

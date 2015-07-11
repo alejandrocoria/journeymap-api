@@ -13,7 +13,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
@@ -53,7 +53,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
+            JourneymapClient.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -112,7 +112,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
+            JourneymapClient.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
             waypointFile.deleteOnExit();
         }
     }
@@ -122,7 +122,7 @@ public class WaypointStore
         cache.invalidateAll();
         dimensions.clear();
         loaded = false;
-        if (JourneyMap.getWaypointProperties().managerEnabled.get())
+        if (JourneymapClient.getWaypointProperties().managerEnabled.get())
         {
             load();
         }
@@ -145,11 +145,11 @@ public class WaypointStore
 
                 load(waypoints, false);
 
-                JourneyMap.getLogger().info(String.format("Loaded %s waypoints from %s", cache.size(), waypointDir));
+                JourneymapClient.getLogger().info(String.format("Loaded %s waypoints from %s", cache.size(), waypointDir));
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().error(String.format("Error loading waypoints from %s: %s", waypointDir, LogFormatter.toString(e)));
+                JourneymapClient.getLogger().error(String.format("Error loading waypoints from %s: %s", waypointDir, LogFormatter.toString(e)));
             }
         }
     }

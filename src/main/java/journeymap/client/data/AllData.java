@@ -10,7 +10,7 @@ package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableMap;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.model.Waypoint;
 
 import java.util.*;
@@ -39,7 +39,7 @@ public class AllData extends CacheLoader<Long, Map>
         props.put(Key.player, cache.getPlayer(false));
         props.put(Key.images, new ImagesData(since));
 
-        if (JourneyMap.getWebMapProperties().showWaypoints.get())
+        if (JourneymapClient.getWebMapProperties().showWaypoints.get())
         {
             int currentDimension = cache.getPlayer(false).dimension;
             Collection<Waypoint> waypoints = cache.getWaypoints(false);
@@ -60,7 +60,7 @@ public class AllData extends CacheLoader<Long, Map>
 
         if (!WorldData.isHardcoreAndMultiplayer())
         {
-            if (JourneyMap.getWebMapProperties().showAnimals.get() || JourneyMap.getWebMapProperties().showPets.get())
+            if (JourneymapClient.getWebMapProperties().showAnimals.get() || JourneymapClient.getWebMapProperties().showPets.get())
             {
                 props.put(Key.animals, cache.getAnimals(false));
             }
@@ -69,7 +69,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.animals, Collections.emptyMap());
             }
 
-            if (JourneyMap.getWebMapProperties().showMobs.get())
+            if (JourneymapClient.getWebMapProperties().showMobs.get())
             {
                 props.put(Key.mobs, cache.getMobs(false));
             }
@@ -78,7 +78,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.mobs, Collections.emptyMap());
             }
 
-            if (JourneyMap.getWebMapProperties().showPlayers.get())
+            if (JourneymapClient.getWebMapProperties().showPlayers.get())
             {
                 props.put(Key.players, cache.getPlayers(false));
             }
@@ -87,7 +87,7 @@ public class AllData extends CacheLoader<Long, Map>
                 props.put(Key.players, Collections.emptyMap());
             }
 
-            if (JourneyMap.getWebMapProperties().showVillagers.get())
+            if (JourneymapClient.getWebMapProperties().showVillagers.get())
             {
                 props.put(Key.villagers, cache.getVillagers(false));
             }
@@ -105,7 +105,7 @@ public class AllData extends CacheLoader<Long, Map>
      */
     public long getTTL()
     {
-        return JourneyMap.getCoreProperties().renderDelay.get() * 2000;
+        return JourneymapClient.getCoreProperties().renderDelay.get() * 2000;
     }
 
     public static enum Key

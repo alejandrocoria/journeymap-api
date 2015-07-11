@@ -12,7 +12,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.Version;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.LogFormatter;
@@ -83,13 +83,13 @@ public abstract class PropertiesBase
             boolean sourceChanged = (properties == null) || properties.isWorldConfig() != reloadedProperties.isWorldConfig();
             if (sourceChanged)
             {
-                JourneyMap.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
+                JourneymapClient.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
             }
             return reloadedProperties;
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
             return (properties != null) ? properties : reloadedProperties;
         }
     }
@@ -192,7 +192,7 @@ public abstract class PropertiesBase
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
             }
             return false;
         }
@@ -220,7 +220,7 @@ public abstract class PropertiesBase
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
                 return false;
             }
         }
@@ -237,7 +237,7 @@ public abstract class PropertiesBase
      */
     public boolean isCurrent()
     {
-        return JourneyMap.JM_VERSION.equals(configVersion);
+        return JourneymapClient.JM_VERSION.equals(configVersion);
     }
 
     /**
@@ -257,7 +257,7 @@ public abstract class PropertiesBase
 
                 if (!propFile.exists())
                 {
-                    JourneyMap.getLogger().info(String.format("Creating config file: %s", propFile));
+                    JourneymapClient.getLogger().info(String.format("Creating config file: %s", propFile));
                     if (!propFile.getParentFile().exists())
                     {
                         propFile.getParentFile().mkdirs();
@@ -265,8 +265,8 @@ public abstract class PropertiesBase
                 }
                 else if (!isCurrent())
                 {
-                    JourneyMap.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, JourneyMap.JM_VERSION, propFile));
-                    configVersion = JourneyMap.JM_VERSION;
+                    JourneymapClient.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, JourneymapClient.JM_VERSION, propFile));
+                    configVersion = JourneymapClient.JM_VERSION;
                 }
 
                 // Header
@@ -284,13 +284,13 @@ public abstract class PropertiesBase
                 // Write to file
                 Files.write(header + json, propFile, UTF8);
 
-                JourneyMap.getLogger().debug("Saved " + getFileName());
+                JourneymapClient.getLogger().debug("Saved " + getFileName());
 
                 return true;
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().error(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
+                JourneymapClient.getLogger().error(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
                 return false;
             }
         }
@@ -323,7 +323,7 @@ public abstract class PropertiesBase
                 saveNeeded = !instance.isCurrent();
                 if (saveNeeded)
                 {
-                    JourneyMap.getLogger().info(String.format("Config file needs to be updated: %s", propFile.getName()));
+                    JourneymapClient.getLogger().info(String.format("Config file needs to be updated: %s", propFile.getName()));
                 }
             }
             else
@@ -333,7 +333,7 @@ public abstract class PropertiesBase
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
+            JourneymapClient.getLogger().error(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
 
             try
             {
@@ -342,7 +342,7 @@ public abstract class PropertiesBase
             }
             catch (Exception e3)
             {
-                JourneyMap.getLogger().error(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
+                JourneymapClient.getLogger().error(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
             }
 
         }
@@ -399,7 +399,7 @@ public abstract class PropertiesBase
         {
             saveNeeded = true;
             configFormatChanged.set(false);
-            JourneyMap.getLogger().info("File format will be updated for " + this.getFileName());
+            JourneymapClient.getLogger().info("File format will be updated for " + this.getFileName());
         }
 
         return saveNeeded;

@@ -9,7 +9,7 @@
 package journeymap.client.io.migrate;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.Version;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.LogFormatter;
@@ -24,7 +24,7 @@ import java.io.FileFilter;
  */
 public class Migrate5_0_0 implements Migration.Task
 {
-    Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
+    Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
 
     protected Migrate5_0_0()
     {

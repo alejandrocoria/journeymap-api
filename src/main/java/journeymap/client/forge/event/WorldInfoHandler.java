@@ -9,6 +9,8 @@
 package journeymap.client.forge.event;
 
 import io.netty.buffer.ByteBuf;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -22,8 +24,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
 
 /**
  * Sample Forge Client class for handling World Info custom packets.
@@ -62,13 +62,13 @@ public class WorldInfoHandler
             if (channel != null)
             {
                 channel.registerMessage(WorldIdListener.class, WorldIdMessage.class, PACKET_WORLDID, Side.CLIENT);
-                JourneyMap.getLogger().info(String.format("Registered channel: %s", CHANNEL_NAME));
+                JourneymapClient.getLogger().info(String.format("Registered channel: %s", CHANNEL_NAME));
                 MinecraftForge.EVENT_BUS.register(this);
             }
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(String.format("Failed to register channel %s: %s", CHANNEL_NAME, t));
+            JourneymapClient.getLogger().error(String.format("Failed to register channel %s: %s", CHANNEL_NAME, t));
         }
     }
 
@@ -82,7 +82,7 @@ public class WorldInfoHandler
             long now = System.currentTimeMillis();
             if (lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
             {
-                JourneyMap.getLogger().info("Requesting World ID");
+                JourneymapClient.getLogger().info("Requesting World ID");
                 channel.sendToServer(new WorldIdMessage());
                 lastRequest = System.currentTimeMillis();
             }
@@ -123,8 +123,8 @@ public class WorldInfoHandler
         public IMessage onMessage(WorldIdMessage message, MessageContext ctx)
         {
             lastResponse = System.currentTimeMillis();
-            JourneyMap.getLogger().info(String.format("Got the World ID from server: %s", message.worldUid));
-            JourneyMap.getInstance().setCurrentWorldId(message.worldUid);
+            JourneymapClient.getLogger().info(String.format("Got the World ID from server: %s", message.worldUid));
+            JourneymapClient.getInstance().setCurrentWorldId(message.worldUid);
             return null;
         }
     }
@@ -155,7 +155,7 @@ public class WorldInfoHandler
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
+                JourneymapClient.getLogger().error(String.format("Failed to read message: %s", t));
             }
         }
 
@@ -171,7 +171,7 @@ public class WorldInfoHandler
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().error(String.format("Failed to read message: %s", t));
+                JourneymapClient.getLogger().error(String.format("Failed to read message: %s", t));
             }
         }
     }

@@ -9,15 +9,8 @@
 package journeymap.client.ui.fullscreen;
 
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
@@ -49,6 +42,13 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeButton;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.client.ui.theme.ThemeToolbar;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -72,12 +72,12 @@ public class Fullscreen extends JmUI
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
-    FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+    FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
     boolean firstLayoutPass = true;
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
     int msx, msy, mx, my;
-    Logger logger = JourneyMap.getLogger();
+    Logger logger = JourneymapClient.getLogger();
     MapChat chat;
     ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
     ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
@@ -101,7 +101,7 @@ public class Fullscreen extends JmUI
     {
         super(null);
         mc = ForgeHelper.INSTANCE.getClient();
-        fullMapProperties = JourneyMap.getFullMapProperties();
+        fullMapProperties = JourneymapClient.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
         gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
@@ -123,7 +123,7 @@ public class Fullscreen extends JmUI
     @Override
     public void initGui()
     {
-        fullMapProperties = JourneyMap.getFullMapProperties();
+        fullMapProperties = JourneymapClient.getFullMapProperties();
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
@@ -135,13 +135,13 @@ public class Fullscreen extends JmUI
         initButtons();
 
         // Check for first-time use
-        if (!JourneyMap.getCoreProperties().splashViewed.get().equals(JourneyMap.JM_VERSION.toString()))
+        if (!JourneymapClient.getCoreProperties().splashViewed.get().equals(JourneymapClient.JM_VERSION.toString()))
         {
             UIManager.getInstance().openSplash(this);
         }
 
         // Check for first-time use
-        if (!JourneyMap.getCoreProperties().optionsManagerViewed.get().equals(JourneyMap.JM_VERSION.toString()))
+        if (!JourneymapClient.getCoreProperties().optionsManagerViewed.get().equals(JourneymapClient.JM_VERSION.toString()))
         {
             UIManager.getInstance().openOptionsManager(this, Config.Category.Cartography);
         }
@@ -991,7 +991,7 @@ public class Fullscreen extends JmUI
         timer.start();
 
         // Update the state first
-        fullMapProperties = JourneyMap.getFullMapProperties();
+        fullMapProperties = JourneymapClient.getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
 
         if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)

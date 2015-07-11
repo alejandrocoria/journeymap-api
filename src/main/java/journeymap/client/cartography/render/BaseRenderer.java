@@ -11,9 +11,7 @@ package journeymap.client.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.ChunkCoordIntPair;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
@@ -23,6 +21,8 @@ import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.ChunkCoordIntPair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
@@ -117,7 +117,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     protected void updateOptions()
     {
-        coreProperties = JourneyMap.getCoreProperties();
+        coreProperties = JourneymapClient.getCoreProperties();
         mapBathymetry = coreProperties.mapBathymetry.get();
         mapTransparency = coreProperties.mapTransparency.get();
         mapAntialiasing = coreProperties.mapAntialiasing.get();
@@ -187,7 +187,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         long count = badBlockCount.incrementAndGet();
         if (count == 1 || count % 10240 == 0)
         {
-            JourneyMap.getLogger().warn(
+            JourneymapClient.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             + ". Total bad blocks: " + count
             ); //$NON-NLS-1$
@@ -422,7 +422,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if (slope == null || slope.isNaN())
         {
-            JourneyMap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+            JourneymapClient.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
             slope = 1f;
         }
         return slope;
@@ -522,7 +522,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            JourneymapClient.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
         //why is height 4 set on a chunk to the left?
@@ -580,7 +580,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     private CacheBuilder<Object, Object> getCacheBuilder()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
-        if (JourneyMap.getCoreProperties().recordCacheStats.get())
+        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }
@@ -623,7 +623,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(e.getMessage());
+            JourneymapClient.getLogger().warn(e.getMessage());
             return null;
         }
     }

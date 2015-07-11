@@ -8,7 +8,7 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.WebMapProperties;
@@ -36,7 +36,7 @@ public class JMServer
     private final static int MAXFAILS = 5;
     private static volatile JMServer instance;
 
-    private final Logger logger = JourneyMap.getLogger();
+    private final Logger logger = JourneymapClient.getLogger();
 
     private Daemon rupy;
     private int port;
@@ -44,13 +44,13 @@ public class JMServer
 
     private JMServer()
     {
-        port = JourneyMap.getWebMapProperties().port.get();
+        port = JourneymapClient.getWebMapProperties().port.get();
         validatePort();
     }
 
     public static void setEnabled(Boolean enable, boolean forceAnnounce)
     {
-        WebMapProperties webMapProperties = JourneyMap.getWebMapProperties();
+        WebMapProperties webMapProperties = JourneymapClient.getWebMapProperties();
         webMapProperties.enabled.set(enable);
         webMapProperties.save();
 
@@ -62,7 +62,7 @@ public class JMServer
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
             }
         }
 
@@ -82,12 +82,12 @@ public class JMServer
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
                 enable = false;
             }
             if (!enable)
             {
-                JourneyMap.getLogger().error("Unexpected error, JMServer couldn't be started.");
+                JourneymapClient.getLogger().error("Unexpected error, JMServer couldn't be started.");
             }
         }
 
@@ -197,7 +197,7 @@ public class JMServer
         props.put("threads", Integer.toString(5)); //$NON-NLS-1$
 
         // Rupy logging is spammy.  Only enable it if you really need to.
-        Level logLevel = Level.toLevel(JourneyMap.getCoreProperties().logLevel.get(), Level.INFO);
+        Level logLevel = Level.toLevel(JourneymapClient.getCoreProperties().logLevel.get(), Level.INFO);
         if (logLevel.intLevel() >= (Level.TRACE.intLevel()))
         {
             props.put("debug", Boolean.TRUE.toString()); //$NON-NLS-1$

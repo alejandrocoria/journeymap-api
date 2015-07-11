@@ -8,10 +8,7 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.chunk.Chunk;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -24,6 +21,9 @@ import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
@@ -208,7 +208,7 @@ public class WaypointLayer implements LayerDelegate.Layer
 
     private int getProximity()
     {
-        FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+        FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
         int blockSize = (int) Math.max(1, Math.pow(2, fullMapProperties.zoomLevel.get()));
         return Math.max(1, 8 / blockSize);
     }

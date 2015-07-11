@@ -8,12 +8,12 @@
 
 package journeymap.client.service;
 
-import net.minecraftforge.fml.common.registry.GameData;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.*;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -90,7 +90,7 @@ public class DataService extends BaseService
             if (!path.equals("/data/messages"))
             {
                 // Ensure JourneyMap and World is loaded
-                if (!JourneyMap.getInstance().isMapping())
+                if (!JourneymapClient.getInstance().isMapping())
                 {
                     throwEventException(503, "JourneyMap not mapping", event, false);
                 }
@@ -114,7 +114,7 @@ public class DataService extends BaseService
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().warn("Bad value for images.since: " + sinceVal);
+                    JourneymapClient.getLogger().warn("Bad value for images.since: " + sinceVal);
                     since = new Date().getTime();
                 }
             }
@@ -210,7 +210,7 @@ public class DataService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(String.format("Unexpected error in data service: %s", LogFormatter.toString(t)));
+            JourneymapClient.getLogger().error(String.format("Unexpected error in data service: %s", LogFormatter.toString(t)));
             throwEventException(500, "Error retrieving " + path, event, true);
         }
     }

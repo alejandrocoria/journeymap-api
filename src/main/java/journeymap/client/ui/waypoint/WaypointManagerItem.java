@@ -8,11 +8,6 @@
 
 package journeymap.client.ui.waypoint;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumChatFormatting;
 import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -27,6 +22,11 @@ import journeymap.client.ui.component.ScrollListPane;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.awt.*;
 import java.util.Collection;

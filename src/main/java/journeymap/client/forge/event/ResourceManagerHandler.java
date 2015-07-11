@@ -8,15 +8,15 @@
 
 package journeymap.client.forge.event;
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.ColorCache;
+import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.JourneyMap;
-import journeymap.client.cartography.ColorCache;
-import journeymap.client.forge.helper.ForgeHelper;
 
 /**
  * Handle reloads/changes to resource packs.
@@ -35,7 +35,7 @@ public class ResourceManagerHandler implements IResourceManagerReloadListener
         }
         else
         {
-            JourneyMap.getLogger().warn("Could not register ResourceManagerHandler.  Changing resource packs will require restart.");
+            JourneymapClient.getLogger().warn("Could not register ResourceManagerHandler.  Changing resource packs will require restart.");
         }
     }
 

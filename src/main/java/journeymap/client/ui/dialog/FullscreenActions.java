@@ -8,9 +8,8 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.MapSaver;
@@ -29,6 +28,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import net.minecraft.client.gui.GuiButton;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
@@ -55,14 +55,14 @@ public class FullscreenActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneyMap.getWebMapProperties().port.get();
+        String url = "http://localhost:" + JourneymapClient.getWebMapProperties().port.get();
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
         }
     }
 
@@ -75,7 +75,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
         }
     }
 
@@ -91,11 +91,11 @@ public class FullscreenActions extends JmUI
         buttonSave = new Button(Constants.getString("jm.common.save_map"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonBrowser = new Button(Constants.getString("jm.common.use_browser"));
-        buttonBrowser.setEnabled(JourneyMap.getWebMapProperties().enabled.get());
+        buttonBrowser.setEnabled(JourneymapClient.getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
-        buttonAutomap.setEnabled(ForgeHelper.INSTANCE.getClient().isSingleplayer() && JourneyMap.getCoreProperties().mappingEnabled.get());
+        buttonAutomap.setEnabled(ForgeHelper.INSTANCE.getClient().isSingleplayer() && JourneymapClient.getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));
@@ -109,8 +109,8 @@ public class FullscreenActions extends JmUI
 
         buttonEnableMapping = new BooleanPropertyButton(Constants.getString("jm.common.enable_mapping_false"),
                 Constants.getString("jm.common.enable_mapping_true"),
-                JourneyMap.getCoreProperties(),
-                JourneyMap.getCoreProperties().mappingEnabled);
+                JourneymapClient.getCoreProperties(),
+                JourneymapClient.getCoreProperties().mappingEnabled);
 
         buttonList.add(buttonAbout);
         buttonList.add(buttonAutomap);
@@ -140,7 +140,7 @@ public class FullscreenActions extends JmUI
             initGui();
         }
 
-        buttonSave.setEnabled(!JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class));
+        buttonSave.setEnabled(!JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class));
 
         final int hgap = 4;
         final int vgap = 3;
@@ -217,7 +217,7 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonEnableMapping)
         {
             buttonEnableMapping.toggle();
-            if (JourneyMap.getCoreProperties().mappingEnabled.get())
+            if (JourneymapClient.getCoreProperties().mappingEnabled.get())
             {
                 UIManager.getInstance().openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
@@ -225,7 +225,7 @@ public class FullscreenActions extends JmUI
             }
             else
             {
-                JourneyMap.getInstance().stopMapping();
+                JourneymapClient.getInstance().stopMapping();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
                 UIManager.getInstance().openFullscreenMap();
                 return;
@@ -237,12 +237,12 @@ public class FullscreenActions extends JmUI
     void save()
     {
         final MapState state = Fullscreen.state();
-        boolean showCaves = JourneyMap.getFullMapProperties().showCaves.get();
+        boolean showCaves = JourneymapClient.getFullMapProperties().showCaves.get();
         final MapType mapType = state.getMapType(showCaves);
         final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType);
         if (mapSaver.isValid())
         {
-            JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+            JourneymapClient.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
             ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
         }
         closeAndReturn();

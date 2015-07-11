@@ -8,8 +8,6 @@
 
 package journeymap.client.ui.waypoint;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -22,6 +20,8 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 

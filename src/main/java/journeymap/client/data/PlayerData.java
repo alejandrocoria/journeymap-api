@@ -10,14 +10,14 @@ package journeymap.client.data;
 
 
 import com.google.common.cache.CacheLoader;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.ChunkMD;
+import journeymap.client.model.EntityDTO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.ChunkMD;
-import journeymap.client.model.EntityDTO;
 
 /**
  * Provides game-related properties in a Map.
@@ -109,6 +109,6 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
 
     public long getTTL()
     {
-        return JourneyMap.getCoreProperties().cachePlayerData.get();
+        return JourneymapClient.getCoreProperties().cachePlayerData.get();
     }
 }

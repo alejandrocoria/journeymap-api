@@ -8,7 +8,7 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
@@ -53,8 +53,8 @@ public class PropertyService extends BaseService
     {
         if (propMap.isEmpty())
         {
-            fullMapProperties = JourneyMap.getFullMapProperties();
-            webMapProperties = JourneyMap.getWebMapProperties();
+            fullMapProperties = JourneymapClient.getFullMapProperties();
+            webMapProperties = JourneymapClient.getWebMapProperties();
             propMap.put("showCaves", fullMapProperties.showCaves);
             propMap.put("showGrid", fullMapProperties.showGrid);
             propMap.put("showAnimals", webMapProperties.showAnimals);
@@ -122,7 +122,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error trying " + path, event, true);
         }
     }
@@ -157,7 +157,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error trying " + path, event, true);
         }
     }

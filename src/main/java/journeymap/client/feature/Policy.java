@@ -8,9 +8,9 @@
 
 package journeymap.client.feature;
 
+import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
-import journeymap.client.forge.helper.ForgeHelper;
 
 import java.util.EnumSet;
 import java.util.HashSet;

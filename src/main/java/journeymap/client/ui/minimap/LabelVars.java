@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.minimap;
 
-import net.minecraft.client.gui.FontRenderer;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.theme.Theme;
+import net.minecraft.client.gui.FontRenderer;
 
 import java.awt.*;
 

@@ -9,13 +9,8 @@
 package journeymap.client.forge.event;
 
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
@@ -23,6 +18,11 @@ import journeymap.client.render.map.Tile;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
@@ -53,7 +53,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
+                JourneymapClient.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
             }
         }
 
@@ -67,7 +67,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    JourneyMap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+                    JourneymapClient.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
                 }
             }
             catch (Throwable t)

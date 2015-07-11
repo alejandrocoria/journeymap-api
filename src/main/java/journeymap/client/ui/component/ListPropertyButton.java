@@ -8,9 +8,9 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import journeymap.client.properties.PropertiesBase;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;

@@ -8,14 +8,14 @@
 
 package journeymap.client.ui.option;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumChatFormatting;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.IPropertyHolder;
 import journeymap.client.ui.component.IntSliderButton;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.ArrayList;
 import java.util.List;

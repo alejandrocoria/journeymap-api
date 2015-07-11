@@ -9,10 +9,12 @@
 package journeymap.client.waypoint;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -20,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -44,34 +47,34 @@ public class ReiReader
         ArrayList<Waypoint> converted = new ArrayList<Waypoint>();
         try
         {
-//            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
-//            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
-//            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
-//            if (reiWaypoints == null || reiWaypoints.isEmpty())
-//            {
-//                return Collections.EMPTY_LIST;
-//            }
-//
-//            EntityPlayer player = ForgeHelper.INSTANCE.getClient().thePlayer;
-//            int dimension = player != null ? player.dimension : 0;
-//            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
-//            {
-//                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
-//                        (int) (reiWp.red * 255.0F) & 255,
-//                        (int) (reiWp.green * 255.0F) & 255,
-//                        (int) (reiWp.blue * 255.0F) & 255,
-//                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
-//                        Waypoint.Origin.ReiMinimap,
-//                        dimension,
-//                        Arrays.asList(dimension));
-//                jmWp.setReadOnly(true);
-//                converted.add(jmWp);
-//            }
+            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
+            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
+            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
+            if (reiWaypoints == null || reiWaypoints.isEmpty())
+            {
+                return Collections.EMPTY_LIST;
+            }
+
+            EntityPlayer player = ForgeHelper.INSTANCE.getClient().thePlayer;
+            int dimension = player != null ? player.dimension : 0;
+            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
+            {
+                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
+                        (int) (reiWp.red * 255.0F) & 255,
+                        (int) (reiWp.green * 255.0F) & 255,
+                        (int) (reiWp.blue * 255.0F) & 255,
+                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
+                        Waypoint.Origin.ReiMinimap,
+                        dimension,
+                        Arrays.asList(dimension));
+                jmWp.setReadOnly(true);
+                converted.add(jmWp);
+            }
             return converted;
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
+            JourneymapClient.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
             if (!(e instanceof ClassNotFoundException))
             {
                 ChatLog.announceI18N("jm.waypoint.import_rei_version");
@@ -113,7 +116,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Could not derive Rei filename: " + e.getMessage());
+            JourneymapClient.getLogger().warn("Could not derive Rei filename: " + e.getMessage());
         }
 
         if (worldName == null)
@@ -172,7 +175,7 @@ public class ReiReader
             catch (Exception e)
             {
                 ChatLog.announceError(Constants.getString("jm.waypoint.import_rei_file_error", pointsFile.getName()));
-                JourneyMap.getLogger().error(LogFormatter.toString(e));
+                JourneymapClient.getLogger().error(LogFormatter.toString(e));
                 fileErrors++;
             }
         }
@@ -246,7 +249,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
+            JourneymapClient.getLogger().warn("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

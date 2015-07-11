@@ -8,8 +8,6 @@
 
 package journeymap.client.ui.waypoint;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.io.FileHandler;
@@ -19,6 +17,8 @@ import journeymap.client.ui.component.JmUI;
 import journeymap.client.waypoint.ReiReader;
 import journeymap.client.waypoint.VoxelReader;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
 

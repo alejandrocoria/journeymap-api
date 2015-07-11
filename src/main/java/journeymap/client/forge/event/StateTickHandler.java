@@ -8,6 +8,12 @@
 
 package journeymap.client.forge.event;
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.model.Waypoint;
+import journeymap.client.properties.WaypointProperties;
+import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,12 +23,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.model.Waypoint;
-import journeymap.client.properties.WaypointProperties;
-import journeymap.client.waypoint.WaypointStore;
 
 import java.util.EnumSet;
 
@@ -79,16 +79,16 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             if (counter == 20)
             {
                 mc.mcProfiler.startSection("mainTasks");
-                JourneyMap.getInstance().performMainThreadTasks();
+                JourneymapClient.getInstance().performMainThreadTasks();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
             else if (counter == 10)
             {
                 mc.mcProfiler.startSection("multithreadTasks");
-                if (JourneyMap.getInstance().isMapping() && mc.theWorld != null)
+                if (JourneymapClient.getInstance().isMapping() && mc.theWorld != null)
                 {
-                    JourneyMap.getInstance().performMultithreadTasks();
+                    JourneymapClient.getInstance().performMultithreadTasks();
                 }
                 counter++;
                 mc.mcProfiler.endSection();
@@ -100,7 +100,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Error during performMainThreadTasks: " + e);
+            JourneymapClient.getLogger().warn("Error during performMainThreadTasks: " + e);
         }
         finally
         {
@@ -115,11 +115,11 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             EntityPlayer player = mc.thePlayer;
             if (player == null)
             {
-                JourneyMap.getLogger().error("Lost reference to player before Deathpoint could be created");
+                JourneymapClient.getLogger().error("Lost reference to player before Deathpoint could be created");
                 return;
             }
 
-            WaypointProperties waypointProperties = JourneyMap.getWaypointProperties();
+            WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
             boolean doCreate = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
 
             if (doCreate)
@@ -128,7 +128,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 WaypointStore.instance().save(deathpoint);
             }
 
-            JourneyMap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
+            JourneymapClient.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
                     ForgeHelper.INSTANCE.getEntityName(player),
                     MathHelper.floor_double(player.posX),
                     MathHelper.floor_double(player.posY),
@@ -138,7 +138,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
         }
     }
 
@@ -156,13 +156,13 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 String error = I18n.format("jm.error.java6");
                 ForgeHelper.INSTANCE.getClient().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(error));
-                JourneyMap.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
+                JourneymapClient.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
             }
             catch (Exception e2)
             {
                 e2.printStackTrace();
             }
-            JourneyMap.disable();
+            JourneymapClient.disable();
         }
     }
 }

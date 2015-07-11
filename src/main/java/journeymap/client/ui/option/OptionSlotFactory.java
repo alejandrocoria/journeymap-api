@@ -12,7 +12,7 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.*;
@@ -43,12 +43,12 @@ public class OptionSlotFactory
     {
         HashMap<Config.Category, List<SlotMetadata>> mergedMap = new HashMap<Config.Category, List<SlotMetadata>>();
 
-        addSlots(mergedMap, Config.Category.MiniMap1, JourneyMap.getMiniMapProperties1());
-        addSlots(mergedMap, Config.Category.MiniMap2, JourneyMap.getMiniMapProperties2());
-        addSlots(mergedMap, Config.Category.FullMap, JourneyMap.getFullMapProperties());
-        addSlots(mergedMap, Config.Category.WebMap, JourneyMap.getWebMapProperties());
-        addSlots(mergedMap, Config.Category.Waypoint, JourneyMap.getWaypointProperties());
-        addSlots(mergedMap, Config.Category.Advanced, JourneyMap.getCoreProperties());
+        addSlots(mergedMap, Config.Category.MiniMap1, JourneymapClient.getMiniMapProperties1());
+        addSlots(mergedMap, Config.Category.MiniMap2, JourneymapClient.getMiniMapProperties2());
+        addSlots(mergedMap, Config.Category.FullMap, JourneymapClient.getFullMapProperties());
+        addSlots(mergedMap, Config.Category.WebMap, JourneymapClient.getWebMapProperties());
+        addSlots(mergedMap, Config.Category.Waypoint, JourneymapClient.getWaypointProperties());
+        addSlots(mergedMap, Config.Category.Advanced, JourneymapClient.getCoreProperties());
 
         List<CategorySlot> categories = new ArrayList<CategorySlot>();
         for (Map.Entry<Config.Category, List<SlotMetadata>> entry : mergedMap.entrySet())
@@ -195,7 +195,7 @@ public class OptionSlotFactory
                 }
                 else
                 {
-                    JourneyMap.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), config));
+                    JourneymapClient.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), config));
                 }
             }
         }
@@ -384,7 +384,7 @@ public class OptionSlotFactory
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
+                JourneymapClient.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
             }
             String defaultTip = Constants.getString("jm.config.default", defaultEnumValue);
             boolean advanced = annotation.category() == Config.Category.Advanced;

@@ -8,9 +8,6 @@
 
 package journeymap.client.ui.minimap;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
@@ -22,6 +19,9 @@ import journeymap.client.ui.option.LocationFormat;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeCompassPoints;
 import journeymap.client.ui.theme.ThemeMinimapFrame;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

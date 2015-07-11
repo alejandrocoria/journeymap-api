@@ -8,13 +8,13 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
+import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
 public class AutoMapConfirmation extends JmUI
@@ -40,7 +40,7 @@ public class AutoMapConfirmation extends JmUI
         buttonNone = new Button(Constants.getString("jm.common.automap_dialog_none"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
 
-        boolean enable = !JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        boolean enable = !JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
         buttonAll.setEnabled(enable);
         buttonMissing.setEnabled(enable);
         buttonNone.setEnabled(!enable);
@@ -77,15 +77,15 @@ public class AutoMapConfirmation extends JmUI
     {
         if (guibutton == buttonAll)
         {
-            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
+            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
         }
         if (guibutton == buttonMissing)
         {
-            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
+            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
         }
         if (guibutton == buttonNone)
         {
-            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
+            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
         }
         if (guibutton == buttonClose)
         {

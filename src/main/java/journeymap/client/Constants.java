@@ -11,13 +11,13 @@ package journeymap.client;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.LogFormatter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class Constants
     public static String JOURNEYMAP_DIR_BACKUP = "journeymap_bak";
     public static String JOURNEYMAP_DIR = "journeymap";
     public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
-    public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", JourneyMap.JM_VERSION.toMajorMinorString(), END);
+    public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", JourneymapClient.JM_VERSION.toMajorMinorString(), END);
     public static String CACHE_DIR = path.join(JOURNEYMAP_DIR, "cache", END);
     public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
     public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
@@ -77,7 +77,7 @@ public class Constants
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
+            JourneymapClient.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
         }
         return locale;
     }
@@ -87,7 +87,7 @@ public class Constants
         String result = I18n.format(key);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: " + key);
+            JourneymapClient.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
@@ -97,7 +97,7 @@ public class Constants
         String result = I18n.format(key, params);
         if (result.equals(key))
         {
-            JourneyMap.getLogger().warn("Message key not found: " + key);
+            JourneymapClient.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
@@ -138,7 +138,7 @@ public class Constants
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
+            JourneymapClient.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
         }
 
         String packs;

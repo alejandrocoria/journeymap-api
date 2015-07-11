@@ -9,8 +9,8 @@
 package journeymap.client.model;
 
 import com.google.common.cache.Cache;
-import net.minecraft.world.ChunkCoordIntPair;
 import journeymap.client.data.DataCache;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import java.io.File;
 import java.nio.file.Path;

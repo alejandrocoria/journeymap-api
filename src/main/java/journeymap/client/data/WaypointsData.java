@@ -9,7 +9,7 @@
 package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.ReiReader;
@@ -44,7 +44,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
      */
     public static boolean isManagerEnabled()
     {
-        return JourneyMap.getWaypointProperties().managerEnabled.get();
+        return JourneymapClient.getWaypointProperties().managerEnabled.get();
     }
 
     /**
@@ -63,11 +63,11 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             catch (Throwable t)
             {
                 ReiReader.modLoaded = false;
-                JourneyMap.getLogger().warn("Rei's Minimap Waypoints can't be used: " + LogFormatter.toString(t));
+                JourneymapClient.getLogger().warn("Rei's Minimap Waypoints can't be used: " + LogFormatter.toString(t));
             }
             if (ReiReader.modLoaded)
             {
-                JourneyMap.getLogger().info("Rei's Minimap Waypoints enabled.");
+                JourneymapClient.getLogger().info("Rei's Minimap Waypoints enabled.");
             }
         }
         return ReiReader.modLoaded;
@@ -89,12 +89,12 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             catch (Throwable t)
             {
                 VoxelReader.modLoaded = false;
-                JourneyMap.getLogger().warn("VoxelMap Waypoints can't be used: " + t.getMessage());
+                JourneymapClient.getLogger().warn("VoxelMap Waypoints can't be used: " + t.getMessage());
             }
 
             if (VoxelReader.modLoaded)
             {
-                JourneyMap.getLogger().info("VoxelMap Waypoints enabled.");
+                JourneymapClient.getLogger().info("VoxelMap Waypoints enabled.");
             }
         }
         return VoxelReader.modLoaded;
@@ -148,7 +148,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
                 loaded = false;
                 Class.forName(name);
                 loaded = true;
-                JourneyMap.getLogger().debug("Class found: " + name);
+                JourneymapClient.getLogger().debug("Class found: " + name);
             }
             catch (NoClassDefFoundError e)
             {
@@ -156,7 +156,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             }
             catch (ClassNotFoundException e)
             {
-                JourneyMap.getLogger().debug("Class not found: " + name);
+                JourneymapClient.getLogger().debug("Class not found: " + name);
             }
             catch (VerifyError v)
             {

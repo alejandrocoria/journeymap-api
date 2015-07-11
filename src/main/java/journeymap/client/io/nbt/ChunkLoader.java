@@ -9,15 +9,15 @@
 package journeymap.client.io.nbt;
 
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.ChunkMD;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.ChunkMD;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -26,7 +26,7 @@ import java.io.IOException;
 public class ChunkLoader
 {
 
-    private static Logger logger = JourneyMap.getLogger();
+    private static Logger logger = JourneymapClient.getLogger();
 
     public static AnvilChunkLoader getAnvilChunkLoader(Minecraft mc)
     {

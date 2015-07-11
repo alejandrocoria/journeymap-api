@@ -8,6 +8,10 @@
 
 package journeymap.client.log;
 
+import journeymap.client.Constants;
+import journeymap.client.JourneymapClient;
+import journeymap.client.VersionCheck;
+import journeymap.client.service.JMServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -15,10 +19,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StringUtils;
-import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
-import journeymap.client.VersionCheck;
-import journeymap.client.server.JMServer;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -78,7 +78,7 @@ public class ChatLog
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
         }
         queueAnnouncement(chat);
     }
@@ -119,7 +119,7 @@ public class ChatLog
         if (!initialized)
         {
             // Announce mod?
-            enableAnnounceMod = JourneyMap.getCoreProperties().announceMod.get();
+            enableAnnounceMod = JourneymapClient.getCoreProperties().announceMod.get();
             announceMod(false);
 
             // Check for newer version online
@@ -138,12 +138,12 @@ public class ChatLog
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
+                    JourneymapClient.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
                 }
                 finally
                 {
                     Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.ERROR : Level.INFO;
-                    JourneyMap.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
+                    JourneymapClient.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
                 }
             }
         }
@@ -154,11 +154,11 @@ public class ChatLog
         if (enableAnnounceMod)
         {
             //ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
-            if (JourneyMap.getWebMapProperties().enabled.get())
+            if (JourneymapClient.getWebMapProperties().enabled.get())
             {
                 try
                 {
-                    JMServer jmServer = JourneyMap.getInstance().getJmServer();
+                    JMServer jmServer = JourneymapClient.getInstance().getJmServer();
                     String keyName = Constants.getKeyName(Constants.KB_MAP);
                     String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
@@ -166,7 +166,7 @@ public class ChatLog
                 }
                 catch (Throwable t)
                 {
-                    JourneyMap.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
+                    JourneymapClient.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
                 }
             }
             else
@@ -175,7 +175,7 @@ public class ChatLog
                 ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
             }
 
-            if (!JourneyMap.getCoreProperties().mappingEnabled.get())
+            if (!JourneymapClient.getCoreProperties().mappingEnabled.get())
             {
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
             }

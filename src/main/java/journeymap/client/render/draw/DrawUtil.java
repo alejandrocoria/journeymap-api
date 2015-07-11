@@ -9,12 +9,12 @@
 package journeymap.client.render.draw;
 
 
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.render.texture.TextureImpl;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 

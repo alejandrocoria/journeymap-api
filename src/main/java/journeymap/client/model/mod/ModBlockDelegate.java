@@ -9,12 +9,12 @@
 package journeymap.client.model.mod;
 
 import com.google.common.base.Joiner;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class ModBlockDelegate
 
     private static final HashMap<GameRegistry.UniqueIdentifier, AtomicInteger> Errors = new HashMap<GameRegistry.UniqueIdentifier, AtomicInteger>();
     private static final int ERROR_LIMIT = 25;
-    private static Logger logger = JourneyMap.getLogger();
+    private static Logger logger = JourneymapClient.getLogger();
 
     /**
      * Register a special block handler.

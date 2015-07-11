@@ -10,7 +10,7 @@ package journeymap.client.properties;
 
 import journeymap.client.model.MapType;
 import journeymap.client.properties.config.Config;
-import journeymap.client.server.MapApiService;
+import journeymap.client.service.MapApiService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;

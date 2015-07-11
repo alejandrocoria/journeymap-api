@@ -8,6 +8,10 @@
 
 package journeymap.client.model.mod;
 
+import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,10 +19,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.BlockMD;
-import journeymap.client.model.ChunkMD;
 
 import java.util.ArrayList;
 import java.util.Arrays;

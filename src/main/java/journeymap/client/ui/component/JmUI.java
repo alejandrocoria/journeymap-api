@@ -9,18 +9,18 @@
 package journeymap.client.ui.component;
 
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.TextureCache;
+import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.RenderHelper;
-import journeymap.client.JourneyMap;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.TextureCache;
-import journeymap.client.render.texture.TextureImpl;
-import journeymap.client.ui.UIManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -36,7 +36,7 @@ public abstract class JmUI extends GuiScreen
 
     protected final String title;
     protected final int headerHeight = 35;
-    protected final Logger logger = JourneyMap.getLogger();
+    protected final Logger logger = JourneymapClient.getLogger();
     protected JmUI returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
@@ -212,7 +212,7 @@ public abstract class JmUI extends GuiScreen
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Error in UI: " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Error in UI: " + LogFormatter.toString(t));
             closeAndReturn();
         }
     }
@@ -229,7 +229,7 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
-        JourneyMap.getCoreProperties().splashViewed.set(JourneyMap.JM_VERSION.toString());
+        JourneymapClient.getCoreProperties().splashViewed.set(JourneymapClient.JM_VERSION.toString());
 
         if (returnDisplay == null)
         {

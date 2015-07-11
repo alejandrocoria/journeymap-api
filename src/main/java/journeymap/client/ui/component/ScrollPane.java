@@ -8,11 +8,11 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
-import journeymap.client.render.draw.DrawUtil;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 

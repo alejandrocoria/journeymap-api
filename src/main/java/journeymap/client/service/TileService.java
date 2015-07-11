@@ -8,16 +8,16 @@
 
 package journeymap.client.service;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.World;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.render.map.Tile;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -70,7 +70,7 @@ public class TileService extends FileService
         }
 
         // Ensure world is loaded
-        if (!JourneyMap.getInstance().isMapping())
+        if (!JourneymapClient.getInstance().isMapping())
         {
             throwEventException(503, "JourneyMap not started", event, false);
         }
@@ -130,7 +130,7 @@ public class TileService extends FileService
                 final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX, minChunkZ);
                 final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX, maxChunkZ);
 
-                boolean showGrid = JourneyMap.getFullMapProperties().showGrid.get();
+                boolean showGrid = JourneymapClient.getFullMapProperties().showGrid.get();
                 MapType mapType = new MapType(mapTypeName, vSlice, dimension);
                 final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
 
@@ -139,9 +139,9 @@ public class TileService extends FileService
             }
 
             final long stop = System.currentTimeMillis();
-            if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+            if (JourneymapClient.getLogger().isEnabled(Level.DEBUG))
             {
-                JourneyMap.getLogger().debug((stop - start) + "ms to serve tile");
+                JourneymapClient.getLogger().debug((stop - start) + "ms to serve tile");
             }
 
         }

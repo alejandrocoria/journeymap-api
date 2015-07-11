@@ -8,13 +8,13 @@
 
 package journeymap.client.ui.option;
 
-import net.minecraft.client.Minecraft;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ScrollListPane;
+import net.minecraft.client.Minecraft;
 
 import java.awt.*;
 import java.util.*;

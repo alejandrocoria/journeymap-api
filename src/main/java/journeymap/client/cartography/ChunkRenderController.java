@@ -9,7 +9,7 @@
 package journeymap.client.cartography;
 
 import com.google.common.base.Objects;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.*;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
@@ -52,7 +52,7 @@ public class ChunkRenderController
 
         if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getDimension() != mapType.dimension)
         {
-            JourneyMap.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
+            JourneymapClient.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
             return false;
         }
 
@@ -122,12 +122,12 @@ public class ChunkRenderController
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
-            JourneyMap.getLogger().log(Level.WARN, LogFormatter.toString(e));
+            JourneymapClient.getLogger().log(Level.WARN, LogFormatter.toString(e));
             return false; // Can happen when server isn't connected, just wait for next tick
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
+            JourneymapClient.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
         }
         finally
         {
@@ -147,9 +147,9 @@ public class ChunkRenderController
 
         if (!renderOkay)
         {
-            if (JourneyMap.getLogger().isDebugEnabled())
+            if (JourneymapClient.getLogger().isDebugEnabled())
             {
-                JourneyMap.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
+                JourneymapClient.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
             }
         }
 

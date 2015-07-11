@@ -9,15 +9,15 @@
 package journeymap.client.io;
 
 
-import net.minecraft.world.ChunkCoordIntPair;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.map.TileDrawStep;
 import journeymap.client.render.map.TileDrawStepCache;
+import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
@@ -105,7 +105,7 @@ public class RegionImageHandler
             catch (Exception e)
             {
                 String error = "Region file produced error: " + regionFile + ": " + LogFormatter.toString(e);
-                JourneyMap.getLogger().error(error);
+                JourneymapClient.getLogger().error(error);
             }
         }
 
@@ -128,7 +128,7 @@ public class RegionImageHandler
         catch (IOException e)
         {
             String error = "Could not get image from file: " + file + ": " + (e.getMessage());
-            JourneyMap.getLogger().error(error);
+            JourneymapClient.getLogger().error(error);
             return null;
         }
     }
@@ -233,10 +233,10 @@ public class RegionImageHandler
 
         g2D.dispose();
 
-        if (JourneyMap.getLogger().isEnabled(Level.DEBUG))
+        if (JourneymapClient.getLogger().isEnabled(Level.DEBUG))
         {
             stop = System.currentTimeMillis();
-            JourneyMap.getLogger().debug("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+            JourneymapClient.getLogger().debug("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (allowNullImage && !imageDrawn)
@@ -319,7 +319,7 @@ public class RegionImageHandler
             }
             catch (IOException e)
             {
-                JourneyMap.getLogger().error("Could not create blank temp file " + tmpFile + ": " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("Could not create blank temp file " + tmpFile + ": " + LogFormatter.toString(e));
             }
         }
         return tmpFile;

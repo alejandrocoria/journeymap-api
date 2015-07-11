@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.ui.option.SlotMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
-import journeymap.client.ui.option.SlotMetadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;

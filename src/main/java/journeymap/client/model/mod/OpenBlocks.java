@@ -8,16 +8,16 @@
 
 package journeymap.client.model.mod;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.util.Arrays;

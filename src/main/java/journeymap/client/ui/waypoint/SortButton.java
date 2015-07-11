@@ -8,8 +8,8 @@
 
 package journeymap.client.ui.waypoint;
 
-import net.minecraft.client.Minecraft;
 import journeymap.client.ui.component.OnOffButton;
+import net.minecraft.client.Minecraft;
 
 /**
  * Created by Mark on 10/12/2014.

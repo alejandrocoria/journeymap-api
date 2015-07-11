@@ -8,9 +8,7 @@
 
 package journeymap.client.render.map;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.MathHelper;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
@@ -19,6 +17,8 @@ import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -46,7 +46,7 @@ public class GridRenderer
     private static HashMap<String, String> messages = new HashMap<String, String>();
     // Update pixel offsets for center
     private final TilePos centerPos = new TilePos(0, 0);
-    private final Logger logger = JourneyMap.getLogger();
+    private final Logger logger = JourneymapClient.getLogger();
     private final boolean debug = logger.isDebugEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
@@ -379,7 +379,7 @@ public class GridRenderer
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
-            GridSpec gridSpec = showGrid ? JourneyMap.getCoreProperties().gridSpecs.getSpec(mapType) : null;
+            GridSpec gridSpec = showGrid ? JourneymapClient.getCoreProperties().gridSpecs.getSpec(mapType) : null;
 
             boolean somethingDrew = false;
             for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
@@ -570,7 +570,7 @@ public class GridRenderer
 
     private Tile findTile(final int tileX, final int tileZ, final int zoom)
     {
-        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneyMap.getCoreProperties().tileHighDisplayQuality.get());
+        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneymapClient.getCoreProperties().tileHighDisplayQuality.get());
     }
 
     public void setContext(File worldDir, MapType mapType)

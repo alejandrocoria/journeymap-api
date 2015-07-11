@@ -8,11 +8,11 @@
 
 package journeymap.client.model;
 
-import net.minecraft.client.renderer.OpenGlHelper;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;

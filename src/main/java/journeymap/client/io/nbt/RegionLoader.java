@@ -8,16 +8,16 @@
 
 package journeymap.client.io.nbt;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.ChunkCoord;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class RegionLoader
 
     private static final Pattern anvilPattern = Pattern.compile("r\\.([^\\.]+)\\.([^\\.]+)\\.mca");
 
-    final Logger logger = JourneyMap.getLogger();
+    final Logger logger = JourneymapClient.getLogger();
 
     final MapType mapType;
     final Stack<RegionCoord> regions;

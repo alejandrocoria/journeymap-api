@@ -8,11 +8,8 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.World;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
@@ -20,6 +17,9 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -34,7 +34,7 @@ public class MapPlayerTask extends BaseMapTask
     private static volatile long lastTaskCompleted;
     private static long lastTaskTime;
     private static double lastTaskAvgChunkTime;
-    private final int maxRuntime = JourneyMap.getCoreProperties().renderDelay.get() * 3000;
+    private final int maxRuntime = JourneymapClient.getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
     private long startNs;
     private long elapsedNs;
@@ -86,14 +86,14 @@ public class MapPlayerTask extends BaseMapTask
 
         if (underground)
         {
-            if (worldHasSky && JourneyMap.getCoreProperties().alwaysMapSurface.get())
+            if (worldHasSky && JourneymapClient.getCoreProperties().alwaysMapSurface.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.day(player), new ArrayList<ChunkCoordIntPair>()));
             }
         }
         else
         {
-            if (cavesAllowed && JourneyMap.getCoreProperties().alwaysMapCaves.get())
+            if (cavesAllowed && JourneymapClient.getCoreProperties().alwaysMapCaves.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.underground(player), new ArrayList<ChunkCoordIntPair>()));
             }
@@ -109,12 +109,12 @@ public class MapPlayerTask extends BaseMapTask
             boolean showLastUnderground = false;
             boolean showLastSurface = false;
 
-            if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+            if (DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapCaves.get())
             {
                 showLastUnderground = true;
             }
 
-            if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+            if (!DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapSurface.get())
             {
                 showLastSurface = true;
             }
@@ -150,7 +150,7 @@ public class MapPlayerTask extends BaseMapTask
         int secondaryRenderSize = 0;
         int totalChunks = 0;
 
-        if (DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapCaves.get())
+        if (DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapCaves.get())
         {
             RenderSpec spec = RenderSpec.getUndergroundSpec();
             if (spec != null)
@@ -161,7 +161,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        if (!DataCache.getPlayer().underground || JourneyMap.getCoreProperties().alwaysMapSurface.get())
+        if (!DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapSurface.get())
         {
             RenderSpec spec = RenderSpec.getSurfaceSpec();
             if (spec != null)
@@ -186,7 +186,7 @@ public class MapPlayerTask extends BaseMapTask
     }
 
     @Override
-    public void initTask(Minecraft minecraft, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    public void initTask(Minecraft minecraft, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         startNs = System.nanoTime();
 
@@ -214,7 +214,7 @@ public class MapPlayerTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneyMap.getCoreProperties().renderDelay.get() * 1000;
+        final int mapTaskDelay = JourneymapClient.getCoreProperties().renderDelay.get() * 1000;
 
         boolean enabled;
 
@@ -251,7 +251,7 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if ((System.currentTimeMillis() - lastTaskCompleted) >= mapTaskDelay)
                 {
-                    ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
+                    ChunkRenderController chunkRenderController = JourneymapClient.getInstance().getChunkRenderController();
                     return MapPlayerTask.create(chunkRenderController, DataCache.getPlayer());
                 }
             }
@@ -275,7 +275,7 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         @Override
-        public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+        public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
         {
             startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
@@ -306,7 +306,7 @@ public class MapPlayerTask extends BaseMapTask
                 }
                 else
                 {
-                    JourneyMap.getLogger().warn("Unexpected task in batch: " + task);
+                    JourneymapClient.getLogger().warn("Unexpected task in batch: " + task);
                 }
             }
             lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;

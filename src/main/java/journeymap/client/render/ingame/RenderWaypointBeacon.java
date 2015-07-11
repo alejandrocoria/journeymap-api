@@ -8,6 +8,15 @@
 
 package journeymap.client.render.ingame;
 
+import journeymap.client.Constants;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.model.Waypoint;
+import journeymap.client.properties.WaypointProperties;
+import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -17,15 +26,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.model.Waypoint;
-import journeymap.client.properties.WaypointProperties;
-import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.TextureImpl;
-import journeymap.client.waypoint.WaypointStore;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -55,7 +55,7 @@ public class RenderWaypointBeacon
     {
         try
         {
-            waypointProperties = JourneyMap.getWaypointProperties();
+            waypointProperties = JourneymapClient.getWaypointProperties();
 
             Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
             //allTimer.start();
@@ -70,7 +70,7 @@ public class RenderWaypointBeacon
                     }
                     catch (Throwable t)
                     {
-                        JourneyMap.getLogger().error("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
+                        JourneymapClient.getLogger().error("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
                     }
                 }
             }
@@ -78,7 +78,7 @@ public class RenderWaypointBeacon
         catch (Throwable t)
         {
             //allTimer.cancel();
-            JourneyMap.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
         }
         finally
         {

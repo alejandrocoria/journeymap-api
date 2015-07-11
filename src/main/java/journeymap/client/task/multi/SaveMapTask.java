@@ -8,9 +8,9 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.MapSaver;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -18,7 +18,7 @@ import java.io.File;
 public class SaveMapTask implements ITask
 {
 
-    private static final Logger logger = JourneyMap.getLogger();
+    private static final Logger logger = JourneymapClient.getLogger();
 
     MapSaver mapSaver;
 
@@ -34,7 +34,7 @@ public class SaveMapTask implements ITask
     }
 
     @Override
-    public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging)
+    public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging)
     {
         mapSaver.saveMap();
     }

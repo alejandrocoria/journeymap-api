@@ -24,6 +24,7 @@ public class ButtonList extends ArrayList<Button>
     private Layout layout = Layout.Horizontal;
     private Direction direction = Direction.LeftToRight;
     private String label;
+
     public ButtonList()
     {
 
