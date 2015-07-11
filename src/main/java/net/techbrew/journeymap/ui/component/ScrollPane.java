@@ -60,7 +60,7 @@ public class ScrollPane extends GuiSlot
         return this.slotHeight;
     }
 
-    public void position(int width, int height, int marginTop, int marginBottom, int x, int y)
+    public void setDimensions(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
         // 1.7
         // super.func_148122_a(width, height, marginTop, height - marginBottom);

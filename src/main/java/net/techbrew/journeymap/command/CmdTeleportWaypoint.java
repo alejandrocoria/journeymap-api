@@ -41,7 +41,12 @@ public class CmdTeleportWaypoint
             {
                 profile = new GameProfile(mc.thePlayer.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.thePlayer));
                 configurationManager = mcServer.getConfigurationManager();
-                return configurationManager.canSendCommands(profile); // 1.7 func_152596_g
+
+                // 1.7
+                //return configurationManager.func_152596_g(profile);
+
+                // 1.8
+                return configurationManager.canSendCommands(profile);
             }
             catch (Exception e)
             {

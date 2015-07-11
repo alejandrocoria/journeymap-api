@@ -10,6 +10,7 @@ package net.techbrew.journeymap.ui.waypoint;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.techbrew.journeymap.Constants;
@@ -288,8 +289,13 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         return null;
     }
 
-    @Override
-    // 1.7 public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // 1.7
+    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    {
+        return drawSlot(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+    }
+
+    // 1.8
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         Minecraft mc = manager.getMinecraft();

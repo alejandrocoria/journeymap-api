@@ -109,11 +109,7 @@ public class Constants
 
     private static int getKeyCode(KeyBinding keyBinding)
     {
-        // 1.7.2
         return keyBinding.getKeyCode();
-
-        // 1.6.4
-        //return keyBinding.keyCode;
     }
 
     public static boolean isPressed(KeyBinding keyBinding)

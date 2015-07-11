@@ -186,7 +186,7 @@ public class WaypointManager extends JmUI
             }
             else
             {
-                itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30); // 1.7 func_148122_a
+                itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30);
                 itemScrollPane.updateSlots();
             }
 
@@ -237,7 +237,11 @@ public class WaypointManager extends JmUI
 
         try
         {
-            itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30); // 1.7 func_148122_a
+            // 1.7
+            // itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
+
+            // 1.8
+            itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30);
             String[] lastTooltip = itemScrollPane.lastTooltip;
             long lastTooltipTime = itemScrollPane.lastTooltipTime;
             itemScrollPane.lastTooltip = null;
@@ -309,10 +313,14 @@ public class WaypointManager extends JmUI
     }
 
     @Override
-    // 1.7 mouseMovedOrUp
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         super.mouseReleased(mouseX, mouseY, state);
+
+        // 1.7
+        // itemScrollPane.mouseMovedOrUp(mouseX, mouseY, state);
+
+        // 1.8
         itemScrollPane.mouseReleased(mouseX, mouseY, state);
     }
 

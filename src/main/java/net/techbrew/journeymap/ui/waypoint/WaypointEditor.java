@@ -322,7 +322,7 @@ public class WaypointEditor extends JmUI
 
         // Dimension buttons in the scroll pane
         int scrollHeight = (buttonReset.getY() + buttonReset.getHeight() - 2) - rightRow;
-        dimScrollPane.position(dcw, scrollHeight, 0, 0, rightX, rightRow);
+        dimScrollPane.setDimensions(dcw, scrollHeight, 0, 0, rightX, rightRow);
 
         // Remove(Cancel) / Save
         int totalRow = Math.max(leftRowY + vgap, rightRow + vgap);

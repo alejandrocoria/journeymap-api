@@ -476,7 +476,7 @@ public class GridRenderer
     /**
      * This is a pixel-based area check, not a location check
      *
-     * @param pos tile position in grid
+     * @param pos tile setDimensions in grid
      * @return true if on screen
      */
     private boolean isOnScreen(TilePos pos)

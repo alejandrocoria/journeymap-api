@@ -248,7 +248,10 @@ public class OptionsManager extends JmUI
             }
             else
             {
-                // 1.7 func_148122_a
+                // 1.7
+                // optionsListPane.func_148122_a(width, height, headerHeight, this.height - 30);
+
+                // 1.8
                 optionsListPane.setDimensions(width, height, headerHeight, this.height - 30);
                 optionsListPane.updateSlots();
             }
@@ -304,7 +307,13 @@ public class OptionsManager extends JmUI
             optionsListPane.lastTooltip = null;
 
             // Pre-scroll options list pane so we can double the distance covered
-            if (!(Mouse.isButtonDown(0) && optionsListPane.getEnabled())) // 1.7 func_148125_i
+
+            // 1.7
+            // boolean isEnabled = optionsListPane.func_148125_i();
+
+            // 1.8
+            boolean isEnabled = optionsListPane.getEnabled();
+            if (!(Mouse.isButtonDown(0) && isEnabled))
             {
                 for (; !this.mc.gameSettings.touchscreen && Mouse.next(); this.mc.currentScreen.handleMouseInput())
                 {
@@ -443,12 +452,18 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    // 1.7 mouseMovedOrUp
+    // 1.7
+    // protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
+    // 1.8
     protected void mouseReleased(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseReleased(mouseX, mouseY, mouseEvent);
-        optionsListPane.mouseReleased(mouseX, mouseY, mouseEvent);
 
+        // 1.7
+        // optionsListPane.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
+
+        // 1.8
+        optionsListPane.mouseReleased(mouseX, mouseY, mouseEvent);
     }
 
     @Override

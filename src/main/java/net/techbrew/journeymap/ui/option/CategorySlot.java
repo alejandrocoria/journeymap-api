@@ -194,7 +194,9 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     }
 
     @Override
-    // 1.7 public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // 1.7
+    // public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
+    // 1.8
     public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         currentSlotIndex = slotIndex;
