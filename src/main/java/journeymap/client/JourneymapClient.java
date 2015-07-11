@@ -48,8 +48,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
+/**
+ * Client-side, strong-side!
+ */
 @SideOnly(Side.CLIENT)
-public class JourneymapClient_ implements CommonProxy
+public class JourneymapClient implements CommonProxy
 {
     public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
@@ -60,7 +63,7 @@ public class JourneymapClient_ implements CommonProxy
     public static final String MOD_NAME = CommonProxy.SHORT_MOD_NAME + " " + EDITION;
     public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
 
-    private static JourneymapClient_ INSTANCE;
+    private static JourneymapClient INSTANCE;
 
     public ModInfo modInfo;
 
@@ -89,7 +92,7 @@ public class JourneymapClient_ implements CommonProxy
     /**
      * Constructor.
      */
-    public JourneymapClient_()
+    public JourneymapClient()
     {
         if (INSTANCE != null)
         {
@@ -98,7 +101,7 @@ public class JourneymapClient_ implements CommonProxy
         INSTANCE = this;
     }
 
-    public static JourneymapClient_ getInstance()
+    public static JourneymapClient getInstance()
     {
         return INSTANCE;
     }
@@ -123,7 +126,7 @@ public class JourneymapClient_ implements CommonProxy
      */
     public static Logger getLogger()
     {
-        return LogManager.getLogger(JourneymapClient_.MOD_ID);
+        return LogManager.getLogger(JourneymapClient.MOD_ID);
     }
 
     public static CoreProperties getCoreProperties()
@@ -253,7 +256,7 @@ public class JourneymapClient_ implements CommonProxy
         {
             if (logger == null)
             {
-                logger = LogManager.getLogger(JourneymapClient_.MOD_ID);
+                logger = LogManager.getLogger(JourneymapClient.MOD_ID);
             }
             logger.error(LogFormatter.toString(t));
             throw t;
@@ -300,7 +303,7 @@ public class JourneymapClient_ implements CommonProxy
         {
             if (logger == null)
             {
-                logger = LogManager.getLogger(JourneymapClient_.MOD_ID);
+                logger = LogManager.getLogger(JourneymapClient.MOD_ID);
             }
             logger.error(LogFormatter.toString(t));
         }
