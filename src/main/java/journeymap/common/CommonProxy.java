@@ -12,15 +12,22 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 /**
- * Proxy prevents servers from using client-side code.
+ * Proxy to provide a common interface for initializing client-side or server-side.
  */
 public interface CommonProxy
 {
-    public static final String MOD_ID = "journeymap";
-    public static final String SHORT_MOD_NAME = "JourneyMap";
-
+    /**
+     * Initialize the side.
+     * @param event
+     * @throws Throwable
+     */
     public void initialize(FMLInitializationEvent event) throws Throwable;
 
+    /**
+     * Post-initialize the side.
+     * @param event
+     * @throws Throwable
+     */
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable;
 
 }

@@ -20,6 +20,7 @@ import journeymap.client.properties.config.AtomicBooleanSerializer;
 import journeymap.client.properties.config.AtomicIntegerSerializer;
 import journeymap.client.properties.config.AtomicReferenceSerializer;
 import journeymap.client.properties.config.ConfigValidation;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.io.IOException;
@@ -237,7 +238,7 @@ public abstract class PropertiesBase
      */
     public boolean isCurrent()
     {
-        return JourneymapClient.JM_VERSION.equals(configVersion);
+        return Journeymap.JM_VERSION.equals(configVersion);
     }
 
     /**
@@ -265,8 +266,8 @@ public abstract class PropertiesBase
                 }
                 else if (!isCurrent())
                 {
-                    JourneymapClient.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, JourneymapClient.JM_VERSION, propFile));
-                    configVersion = JourneymapClient.JM_VERSION;
+                    JourneymapClient.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, Journeymap.JM_VERSION, propFile));
+                    configVersion = Journeymap.JM_VERSION;
                 }
 
                 // Header

@@ -18,7 +18,7 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.JMServer;
+import journeymap.client.service.WebServer;
 import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
@@ -31,6 +31,7 @@ import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.OptionSlotFactory;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -84,7 +85,7 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
-        super(String.format("JourneyMap %s %s", JourneymapClient.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
+        super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
         this.inGameMinimapId = JourneymapClient.getActiveMinimapId();
     }
@@ -664,7 +665,7 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        JourneymapClient.getCoreProperties().optionsManagerViewed.set(JourneymapClient.JM_VERSION.toString());
+        JourneymapClient.getCoreProperties().optionsManagerViewed.set(Journeymap.JM_VERSION.toString());
 
         // Just in case a property changed but wasn't saved.
         JourneymapClient.getCoreProperties().ensureValid();
@@ -701,7 +702,7 @@ public class OptionsManager extends JmUI
                 case WebMap:
                 {
                     DataCache.instance().resetRadarCaches();
-                    JMServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
+                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
                     break;
                 }
                 case Waypoint:
@@ -724,7 +725,7 @@ public class OptionsManager extends JmUI
                 case Advanced:
                 {
                     SoftResetTask.queue();
-                    JMServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
+                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
                     break;
                 }
             }

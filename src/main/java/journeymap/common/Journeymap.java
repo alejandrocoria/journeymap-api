@@ -8,6 +8,7 @@
 
 package journeymap.common;
 
+import journeymap.client.Version;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -20,28 +21,50 @@ import java.util.Map;
 /**
  * Forge Mod entry point
  */
-@Mod(modid = CommonProxy.MOD_ID, name = CommonProxy.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
+@Mod(modid = Journeymap.MOD_ID, name = Journeymap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
 public class Journeymap
 {
-    @Mod.Instance(CommonProxy.MOD_ID)
+    public static final String MOD_ID = "journeymap";
+    public static final String SHORT_MOD_NAME = "JourneyMap";
+    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 1, "dev"));
+    public static final String FORGE_VERSION = "@FORGEVERSION@";
+    public static final String WEBSITE_URL = "http://journeymap.info/";
+    public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
+    public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
+
+    @Mod.Instance(Journeymap.MOD_ID)
     public static Journeymap instance;
 
     @SidedProxy(clientSide = "journeymap.client.JourneymapClient", serverSide = "journeymap.server.JourneymapServer")
     public static CommonProxy proxy;
 
+    /**
+     * Whether this side will accept being connected to the other side.
+     * Since we don't care if the other side has JourneyMap or some other mod, the answer is yes.
+     */
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        // Don't require anything on either side
+        // Don't require JourneyMap to be on either side
         return true;
     }
 
+    /**
+     * Initialize the sided proxy.
+     * @param event
+     * @throws Throwable
+     */
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
         proxy.initialize(event);
     }
 
+    /**
+     * Post-initialize the sided proxy.
+     * @param event
+     * @throws Throwable
+     */
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
     {

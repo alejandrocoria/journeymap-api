@@ -10,6 +10,7 @@ package journeymap.client.log;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.common.Journeymap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -59,7 +60,7 @@ public class LogFormatter
                     if (thrown instanceof LinkageError)
                     {
                         LinkageErrorWarnings++;
-                        String error = Constants.getString("jm.error.compatability", JourneymapClient.MOD_NAME, JourneymapClient.FORGE_VERSION);
+                        String error = Constants.getString("jm.error.compatability", JourneymapClient.MOD_NAME, Journeymap.FORGE_VERSION);
                         thrown.printStackTrace(System.err);
                         ChatLog.announceError(error);
                         thrown.printStackTrace(System.err);

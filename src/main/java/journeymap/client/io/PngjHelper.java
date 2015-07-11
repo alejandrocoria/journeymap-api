@@ -11,6 +11,7 @@ package journeymap.client.io;
 import ar.com.hjg.pngj.*;
 import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
 import journeymap.client.JourneymapClient;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.util.Arrays;
@@ -37,8 +38,8 @@ public class PngjHelper
         final PngReader[] readers = new PngReader[tileColumns];
         final ImageInfo destImgInfo = new ImageInfo(tileSize * tileColumns, tileSize * tileRows, 8, true); // bitdepth, alpha
         final PngWriter pngw = FileHelper.createPngWriter(destFile, destImgInfo, true);
-        pngw.getMetadata().setText("Author", "JourneyMap" + JourneymapClient.JM_VERSION);
-        pngw.getMetadata().setText("Comment", JourneymapClient.WEBSITE_URL);
+        pngw.getMetadata().setText("Author", "JourneyMap" + Journeymap.JM_VERSION);
+        pngw.getMetadata().setText("Comment", Journeymap.WEBSITE_URL);
 
         final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
         final int lineLen = tileSize * 4; // 4=bytesPixel
