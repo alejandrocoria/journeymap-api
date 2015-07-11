@@ -8,11 +8,11 @@
 
 package journeymap.client.model;
 
-import net.minecraft.client.gui.FontRenderer;
 import journeymap.client.Constants;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.Button;
+import net.minecraft.client.gui.FontRenderer;
 
 /**
  * Created by Mark on 5/8/2015.

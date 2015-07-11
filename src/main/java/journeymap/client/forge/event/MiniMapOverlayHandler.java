@@ -8,6 +8,13 @@
 
 package journeymap.client.forge.event;
 
+import journeymap.client.Constants;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.StatTimer;
+import journeymap.client.task.multi.MapPlayerTask;
+import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -15,13 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.JMLogger;
-import journeymap.client.log.StatTimer;
-import journeymap.client.task.multi.MapPlayerTask;
-import journeymap.client.ui.UIManager;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -38,14 +38,14 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     private static RenderGameOverlayEvent.ElementType EVENT_TYPE = RenderGameOverlayEvent.ElementType.ALL;
     private static boolean EVENT_PRE = true;
     private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
-    private JourneyMap jm;
+    private JourneymapClient jm;
     private long statTimerCheck;
     private List<String> statTimerReport = Collections.EMPTY_LIST;
 
     public static void checkEventConfig()
     {
-        EVENT_TYPE = JourneyMap.getCoreProperties().getRenderOverlayEventType();
-        EVENT_PRE = JourneyMap.getCoreProperties().renderOverlayPreEvent.get();
+        EVENT_TYPE = JourneymapClient.getCoreProperties().getRenderOverlayEventType();
+        EVENT_PRE = JourneymapClient.getCoreProperties().renderOverlayPreEvent.get();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
             if (mc.gameSettings.showDebugInfo)
             {
                 event.left.add(null);
-                if (JourneyMap.getCoreProperties().mappingEnabled.get())
+                if (JourneymapClient.getCoreProperties().mappingEnabled.get())
                 {
                     for (String line : MapPlayerTask.getDebugStats())
                     {
@@ -106,9 +106,9 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
             {
                 if (jm == null)
                 {
-                    jm = JourneyMap.getInstance();
+                    jm = JourneymapClient.getInstance();
                 }
-                if (jm.isMapping() || !JourneyMap.getCoreProperties().mappingEnabled.get())
+                if (jm.isMapping() || !JourneymapClient.getCoreProperties().mappingEnabled.get())
                 {
                     mc.mcProfiler.startSection("journeymap");
 

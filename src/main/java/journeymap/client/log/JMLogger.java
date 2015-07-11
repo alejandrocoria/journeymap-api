@@ -8,14 +8,14 @@
 
 package journeymap.client.log;
 
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.ForgeVersion;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.option.StringListProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.ForgeVersion;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +44,7 @@ public class JMLogger
 
     public static Logger init()
     {
-        final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
+        final Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
 
         if (!logger.isInfoEnabled())
         {
@@ -121,8 +121,8 @@ public class JMLogger
     {
         try
         {
-            final Logger logger = LogManager.getLogger(JourneyMap.MOD_ID);
-            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(JourneyMap.getCoreProperties().logLevel.get(), Level.INFO));
+            final Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
+            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(JourneymapClient.getCoreProperties().logLevel.get(), Level.INFO));
         }
         catch (Throwable t)
         {
@@ -135,7 +135,7 @@ public class JMLogger
      */
     public static void logProperties()
     {
-        LogEvent record = new Log4jLogEvent(JourneyMap.MOD_NAME, MarkerManager.getMarker(JourneyMap.MOD_NAME), null, Level.INFO, new SimpleMessage(getPropertiesSummary()), null);
+        LogEvent record = new Log4jLogEvent(JourneymapClient.MOD_NAME, MarkerManager.getMarker(JourneymapClient.MOD_NAME), null, Level.INFO, new SimpleMessage(getPropertiesSummary()), null);
         if (fileAppender != null)
         {
             fileAppender.append(record);
@@ -150,7 +150,7 @@ public class JMLogger
         LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
 
         // Versions
-        props.put("Version", JourneyMap.MOD_NAME + ", built with Forge " + JourneyMap.FORGE_VERSION);
+        props.put("Version", JourneymapClient.MOD_NAME + ", built with Forge " + JourneymapClient.FORGE_VERSION);
         props.put("Forge", ForgeVersion.getVersion());
 
         // Environment
@@ -179,14 +179,14 @@ public class JMLogger
         sb.append(LogFormatter.LINEBREAK).append(FeatureManager.getPolicyDetails());
 
         // Add config files
-        JourneyMap jm = JourneyMap.getInstance();
+        JourneymapClient jm = JourneymapClient.getInstance();
         List<? extends PropertiesBase> configs = Arrays.asList(
-                JourneyMap.getMiniMapProperties1(),
-                JourneyMap.getMiniMapProperties2(),
-                JourneyMap.getFullMapProperties(),
-                JourneyMap.getWaypointProperties(),
-                JourneyMap.getWebMapProperties(),
-                JourneyMap.getCoreProperties()
+                JourneymapClient.getMiniMapProperties1(),
+                JourneymapClient.getMiniMapProperties2(),
+                JourneymapClient.getFullMapProperties(),
+                JourneymapClient.getWaypointProperties(),
+                JourneymapClient.getWebMapProperties(),
+                JourneymapClient.getCoreProperties()
         );
 
         for (PropertiesBase config : configs)
@@ -213,10 +213,10 @@ public class JMLogger
         if (!singletonErrors.contains(text.hashCode()))
         {
             singletonErrors.add(text.hashCode());
-            JourneyMap.getLogger().error(text + " (SUPPRESSED)");
+            JourneymapClient.getLogger().error(text + " (SUPPRESSED)");
             if (throwable != null)
             {
-                JourneyMap.getLogger().error(LogFormatter.toString(throwable));
+                JourneymapClient.getLogger().error(LogFormatter.toString(throwable));
             }
         }
         else

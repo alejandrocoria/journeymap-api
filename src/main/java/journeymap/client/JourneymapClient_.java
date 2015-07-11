@@ -8,16 +8,8 @@
 
 package journeymap.client;
 
-import modinfo.ModInfo;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorCache;
-import journeymap.common.CommonProxy;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.FeatureManager;
@@ -43,14 +35,21 @@ import journeymap.client.task.multi.TaskController;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.common.CommonProxy;
+import modinfo.ModInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-
 @SideOnly(Side.CLIENT)
-public class JourneyMapClient implements CommonProxy
+public class JourneymapClient_ implements CommonProxy
 {
     public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
@@ -61,7 +60,7 @@ public class JourneyMapClient implements CommonProxy
     public static final String MOD_NAME = CommonProxy.SHORT_MOD_NAME + " " + EDITION;
     public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
 
-    private static JourneyMapClient INSTANCE;
+    private static JourneymapClient_ INSTANCE;
 
     public ModInfo modInfo;
 
@@ -90,7 +89,7 @@ public class JourneyMapClient implements CommonProxy
     /**
      * Constructor.
      */
-    public JourneyMapClient()
+    public JourneymapClient_()
     {
         if (INSTANCE != null)
         {
@@ -99,7 +98,7 @@ public class JourneyMapClient implements CommonProxy
         INSTANCE = this;
     }
 
-    public static JourneyMapClient getInstance()
+    public static JourneymapClient_ getInstance()
     {
         return INSTANCE;
     }
@@ -124,7 +123,7 @@ public class JourneyMapClient implements CommonProxy
      */
     public static Logger getLogger()
     {
-        return LogManager.getLogger(JourneyMapClient.MOD_ID);
+        return LogManager.getLogger(JourneymapClient_.MOD_ID);
     }
 
     public static CoreProperties getCoreProperties()
@@ -254,7 +253,7 @@ public class JourneyMapClient implements CommonProxy
         {
             if (logger == null)
             {
-                logger = LogManager.getLogger(JourneyMapClient.MOD_ID);
+                logger = LogManager.getLogger(JourneymapClient_.MOD_ID);
             }
             logger.error(LogFormatter.toString(t));
             throw t;
@@ -301,7 +300,7 @@ public class JourneyMapClient implements CommonProxy
         {
             if (logger == null)
             {
-                logger = LogManager.getLogger(JourneyMapClient.MOD_ID);
+                logger = LogManager.getLogger(JourneymapClient_.MOD_ID);
             }
             logger.error(LogFormatter.toString(t));
         }

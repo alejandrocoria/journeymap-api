@@ -8,9 +8,9 @@
 
 package journeymap.client.task.main;
 
-import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.render.texture.TextureImpl;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -28,7 +28,7 @@ public class ExpireTextureTask implements IMainThreadTask
 {
     private static final int MAX_FAILS = 5;
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
-    private static Logger LOGGER = JourneyMap.getLogger();
+    private static Logger LOGGER = JourneymapClient.getLogger();
     private final List<TextureImpl> textures;
     private final int textureId;
     private volatile int fails;
@@ -56,22 +56,22 @@ public class ExpireTextureTask implements IMainThreadTask
     {
         if (textureId != -1)
         {
-            JourneyMap.getInstance().queueMainThreadTask(new ExpireTextureTask(textureId));
+            JourneymapClient.getInstance().queueMainThreadTask(new ExpireTextureTask(textureId));
         }
     }
 
     public static void queue(TextureImpl texture)
     {
-        JourneyMap.getInstance().queueMainThreadTask(new ExpireTextureTask(texture));
+        JourneymapClient.getInstance().queueMainThreadTask(new ExpireTextureTask(texture));
     }
 
     public static void queue(Collection<TextureImpl> textureCollection)
     {
-        JourneyMap.getInstance().queueMainThreadTask(new ExpireTextureTask(textureCollection));
+        JourneymapClient.getInstance().queueMainThreadTask(new ExpireTextureTask(textureCollection));
     }
 
     @Override
-    public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
+    public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
     {
         boolean success = deleteTextures();
         if (!success && textures != null && !textures.isEmpty())

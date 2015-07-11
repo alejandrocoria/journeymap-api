@@ -9,9 +9,8 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
-import net.minecraft.world.ChunkCoordIntPair;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.GridSpec;
@@ -20,6 +19,7 @@ import journeymap.client.model.RegionImageCache;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -43,7 +43,7 @@ public class Tile
     final Point ulBlock;
     final Point lrBlock;
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
-    private final Logger logger = JourneyMap.getLogger();
+    private final Logger logger = JourneymapClient.getLogger();
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
@@ -87,7 +87,7 @@ public class Tile
     public static void switchTileRenderType()
     {
         // Switch Tile Render Type
-        CoreProperties coreProperties = JourneyMap.getCoreProperties();
+        CoreProperties coreProperties = JourneymapClient.getCoreProperties();
         int type = coreProperties.tileRenderType.incrementAndGet();
         if (type > 4)
         {
@@ -102,7 +102,7 @@ public class Tile
 
     public static void switchTileDisplayQuality()
     {
-        CoreProperties coreProperties = JourneyMap.getCoreProperties();
+        CoreProperties coreProperties = JourneymapClient.getCoreProperties();
         boolean high = !coreProperties.tileHighDisplayQuality.get();
         coreProperties.tileHighDisplayQuality.set(high);
         coreProperties.save();
@@ -149,7 +149,7 @@ public class Tile
 
     private void updateRenderType()
     {
-        this.renderType = JourneyMap.getCoreProperties().tileRenderType.get();
+        this.renderType = JourneymapClient.getCoreProperties().tileRenderType.get();
         switch (renderType)
         {
             case (4):

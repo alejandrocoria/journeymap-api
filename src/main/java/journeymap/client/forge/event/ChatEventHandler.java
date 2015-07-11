@@ -9,16 +9,16 @@
 package journeymap.client.forge.event;
 
 import com.google.common.base.Strings;
+import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
+import journeymap.client.feature.FeatureManager;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.ui.UIManager;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import journeymap.client.JourneyMap;
-import journeymap.client.data.DataCache;
-import journeymap.client.feature.FeatureManager;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.ui.UIManager;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
             }
             catch (Exception e)
             {
-                JourneyMap.getLogger().warn("Unexpected exception on ClientChatReceivedEvent: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().warn("Unexpected exception on ClientChatReceivedEvent: " + LogFormatter.toString(e));
             }
         }
     }

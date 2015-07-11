@@ -8,8 +8,7 @@
 
 package journeymap.client.task.main;
 
-import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.io.ThemeFileHandler;
@@ -19,6 +18,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 public class SoftResetTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + SoftResetTask.class.getSimpleName();
-    Logger logger = JourneyMap.getLogger();
+    Logger logger = JourneymapClient.getLogger();
 
     private SoftResetTask()
     {
@@ -35,11 +35,11 @@ public class SoftResetTask implements IMainThreadTask
 
     public static void queue()
     {
-        JourneyMap.getInstance().queueMainThreadTask(new SoftResetTask());
+        JourneymapClient.getInstance().queueMainThreadTask(new SoftResetTask());
     }
 
     @Override
-    public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
+    public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
     {
         jm.loadConfigProperties();
         JMLogger.setLevelFromProperties();

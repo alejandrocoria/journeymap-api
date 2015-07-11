@@ -8,9 +8,8 @@
 
 package journeymap.client.io;
 
-import net.minecraft.client.Minecraft;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
@@ -19,6 +18,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -68,7 +68,7 @@ public class MapSaver
 
             if (!isValid())
             {
-                JourneyMap.getLogger().warn("No images found in " + getImageDir());
+                JourneymapClient.getLogger().warn("No images found in " + getImageDir());
                 return null;
             }
 
@@ -82,7 +82,7 @@ public class MapSaver
             PngjHelper.mergeFiles(fileArray, saveFile, outputColumns, 512);
 
             timer.stop();
-            JourneyMap.getLogger().info("Map filesize:" + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
+            JourneymapClient.getLogger().info("Map filesize:" + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
 
             String message = Constants.getString("jm.common.map_saved", saveFile);
             ChatLog.announceFile(message, saveFile);
@@ -92,13 +92,13 @@ public class MapSaver
         catch (java.lang.OutOfMemoryError e)
         {
             String error = "Out Of Memory: Increase Java Heap Size for Minecraft to save large maps.";
-            JourneyMap.getLogger().error(error);
+            JourneymapClient.getLogger().error(error);
             ChatLog.announceError(error);
             timer.cancel();
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             timer.cancel();
             return null;
         }
@@ -197,7 +197,7 @@ public class MapSaver
 
             if (minX == null || maxX == null || minZ == null || maxZ == null)
             {
-                JourneyMap.getLogger().warn("No region files to save in " + imageDir);
+                JourneymapClient.getLogger().warn("No region files to save in " + imageDir);
                 return;
             }
             // Create blank
@@ -230,7 +230,7 @@ public class MapSaver
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().log(Level.ERROR, LogFormatter.toString(t));
+            JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(t));
         }
 
     }

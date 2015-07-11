@@ -8,9 +8,9 @@
 
 package journeymap.client.ui.component;
 
-import net.minecraft.client.gui.FontRenderer;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
+import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 
@@ -112,7 +112,7 @@ public class OnOffButton extends Button
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
             allowChange = false;
         }
 

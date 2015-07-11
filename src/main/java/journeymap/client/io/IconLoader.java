@@ -8,17 +8,17 @@
 
 package journeymap.client.io;
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
+import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
-import journeymap.client.JourneyMap;
-import journeymap.client.data.DataCache;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
-import journeymap.client.model.BlockMD;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -31,7 +31,7 @@ import java.util.HashSet;
 public class IconLoader
 {
     final BufferedImage blocksTexture;
-    Logger logger = JourneyMap.getLogger();
+    Logger logger = JourneymapClient.getLogger();
     DataCache dataCache = DataCache.instance();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 

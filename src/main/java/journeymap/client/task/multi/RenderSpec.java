@@ -11,14 +11,14 @@ package journeymap.client.task.multi;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.ChunkCoordIntPair;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.option.KeyedEnum;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class RenderSpec
     private RenderSpec(Minecraft minecraft, boolean underground)
     {
         this.player = minecraft.thePlayer;
-        final CoreProperties props = JourneyMap.getCoreProperties();
+        final CoreProperties props = JourneymapClient.getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
         final int mapRenderDistanceMin = underground ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
         final int mapRenderDistanceMax = underground ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
@@ -68,7 +68,7 @@ public class RenderSpec
 
         this.primaryRenderDistance = rdMin;
         this.maxSecondaryRenderDistance = rdMax;
-        this.revealShape = JourneyMap.getCoreProperties().revealShape.get();
+        this.revealShape = JourneymapClient.getCoreProperties().revealShape.get();
 
         lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
         lastSecondaryRenderDistance = this.primaryRenderDistance;

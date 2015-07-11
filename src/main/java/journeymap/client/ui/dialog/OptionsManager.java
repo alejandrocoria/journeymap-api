@@ -8,12 +8,8 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.RenderHelper;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeFileHandler;
@@ -22,7 +18,7 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.server.JMServer;
+import journeymap.client.service.JMServer;
 import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
@@ -35,6 +31,10 @@ import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.OptionSlotFactory;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -84,9 +84,9 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
-        super(String.format("JourneyMap %s %s", JourneyMap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
+        super(String.format("JourneyMap %s %s", JourneymapClient.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
-        this.inGameMinimapId = JourneyMap.getActiveMinimapId();
+        this.inGameMinimapId = JourneymapClient.getActiveMinimapId();
     }
 
     @Override
@@ -370,7 +370,7 @@ public class OptionsManager extends JmUI
                 CategorySlot categorySlot = (CategorySlot) rootSlot;
                 if (categorySlot.getCategory() == Config.Category.Cartography)
                 {
-                    CoreProperties coreProperties = JourneyMap.getCoreProperties();
+                    CoreProperties coreProperties = JourneymapClient.getCoreProperties();
                     for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
                     {
                         if (slotMetadata.getButton() instanceof IPropertyHolder)
@@ -379,7 +379,7 @@ public class OptionsManager extends JmUI
                             boolean limitButtonRange = false;
                             if (property == coreProperties.renderDistanceCaveMax)
                             {
-                                boolean valid = JourneyMap.getCoreProperties().hasValidCaveRenderDistances();
+                                boolean valid = JourneymapClient.getCoreProperties().hasValidCaveRenderDistances();
                                 limitButtonRange = true;
                                 if (valid)
                                 {
@@ -392,7 +392,7 @@ public class OptionsManager extends JmUI
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
-                                boolean valid = JourneyMap.getCoreProperties().hasValidSurfaceRenderDistances();
+                                boolean valid = JourneymapClient.getCoreProperties().hasValidSurfaceRenderDistances();
                                 limitButtonRange = true;
                                 if (valid)
                                 {
@@ -427,7 +427,7 @@ public class OptionsManager extends JmUI
             }
         }
 
-        renderStatsButton.displayString = JourneyMap.getCoreProperties().mappingEnabled.get()
+        renderStatsButton.displayString = JourneymapClient.getCoreProperties().mappingEnabled.get()
                 ? MapPlayerTask.getSimpleStats()
                 : Constants.getString("jm.common.enable_mapping_false_text");
 
@@ -552,7 +552,7 @@ public class OptionsManager extends JmUI
             // If the button is Cartography-related, ensure valid
             if (category == Config.Category.Cartography)
             {
-                JourneyMap.getCoreProperties().save();
+                JourneymapClient.getCoreProperties().save();
                 RenderSpec.resetRenderSpecs();
             }
         }
@@ -664,18 +664,18 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        JourneyMap.getCoreProperties().optionsManagerViewed.set(JourneyMap.JM_VERSION.toString());
+        JourneymapClient.getCoreProperties().optionsManagerViewed.set(JourneymapClient.JM_VERSION.toString());
 
         // Just in case a property changed but wasn't saved.
-        JourneyMap.getCoreProperties().ensureValid();
-        JourneyMap.getWebMapProperties().ensureValid();
-        JourneyMap.getFullMapProperties().ensureValid();
-        JourneyMap.getMiniMapProperties1().ensureValid();
-        JourneyMap.getMiniMapProperties2().ensureValid();
-        JourneyMap.getWaypointProperties().ensureValid();
+        JourneymapClient.getCoreProperties().ensureValid();
+        JourneymapClient.getWebMapProperties().ensureValid();
+        JourneymapClient.getFullMapProperties().ensureValid();
+        JourneymapClient.getMiniMapProperties1().ensureValid();
+        JourneymapClient.getMiniMapProperties2().ensureValid();
+        JourneymapClient.getWaypointProperties().ensureValid();
 
         // Ensure minimap is back to the one used before this opened
-        UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneyMap.getMiniMapProperties(this.inGameMinimapId));
+        UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
 
         for (Config.Category category : changedCategories)
         {
@@ -701,7 +701,7 @@ public class OptionsManager extends JmUI
                 case WebMap:
                 {
                     DataCache.instance().resetRadarCaches();
-                    JMServer.setEnabled(JourneyMap.getWebMapProperties().enabled.get(), true);
+                    JMServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
                     break;
                 }
                 case Waypoint:
@@ -724,7 +724,7 @@ public class OptionsManager extends JmUI
                 case Advanced:
                 {
                     SoftResetTask.queue();
-                    JMServer.setEnabled(JourneyMap.getWebMapProperties().enabled.get(), false);
+                    JMServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
                     break;
                 }
             }

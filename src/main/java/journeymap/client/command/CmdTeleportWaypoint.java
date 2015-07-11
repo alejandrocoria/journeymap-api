@@ -9,13 +9,13 @@
 package journeymap.client.command;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.ServerConfigurationManager;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 
 /**
  * Created by mwoodman on 4/8/2014.
@@ -61,12 +61,12 @@ public class CmdTeleportWaypoint
                     }
                     else
                     {
-                        JourneyMap.getLogger().warn("Failed to check teleport permission both ways: " + LogFormatter.toString(e) + ", and profile or configManager were null.");
+                        JourneymapClient.getLogger().warn("Failed to check teleport permission both ways: " + LogFormatter.toString(e) + ", and profile or configManager were null.");
                     }
                 }
                 catch (Exception e2)
                 {
-                    JourneyMap.getLogger().warn("Failed to check teleport permission. Both ways failed: " + LogFormatter.toString(e) + ", and " + LogFormatter.toString(e2));
+                    JourneymapClient.getLogger().warn("Failed to check teleport permission. Both ways failed: " + LogFormatter.toString(e) + ", and " + LogFormatter.toString(e2));
                 }
             }
         }

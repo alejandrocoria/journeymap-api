@@ -9,7 +9,7 @@
 package journeymap.client.properties.config;
 
 import com.google.gson.*;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -65,14 +65,14 @@ public class AtomicReferenceSerializer implements JsonSerializer<AtomicReference
             }
             catch (Exception t)
             {
-                JourneyMap.getLogger().warn("Could not get enum value for " + refClass + " using: " + value);
+                JourneymapClient.getLogger().warn("Could not get enum value for " + refClass + " using: " + value);
                 Enum enumValue = (Enum) EnumSet.allOf((Class<? extends Enum>) refClass).iterator().next();
                 return new AtomicReference<Enum>(enumValue);
             }
         }
         else
         {
-            JourneyMap.getLogger().warn("Could not get AtomicReference type for " + refClass + " using: " + value);
+            JourneymapClient.getLogger().warn("Could not get AtomicReference type for " + refClass + " using: " + value);
             return new AtomicReference(null);
         }
     }

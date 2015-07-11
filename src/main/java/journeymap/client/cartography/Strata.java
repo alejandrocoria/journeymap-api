@@ -8,11 +8,11 @@
 
 package journeymap.client.cartography;
 
-import net.minecraft.world.ChunkCoordIntPair;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import java.util.Stack;
 
@@ -26,8 +26,8 @@ public class Strata
     final int initialPoolSize;
     final int poolGrowthIncrement;
     private final boolean underground;
-    private boolean mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
-    private boolean mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
+    private boolean mapCaveLighting = JourneymapClient.getCoreProperties().mapCaveLighting.get();
+    private boolean mapBathymetry = JourneymapClient.getCoreProperties().mapBathymetry.get();
     private Integer topY = null;
     private Integer bottomY = null;
     private Integer topWaterY = null;
@@ -57,7 +57,7 @@ public class Strata
         {
             int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            JourneyMap.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
+            JourneymapClient.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
         }
 
         stack.push(unusedStack.pop());
@@ -86,8 +86,8 @@ public class Strata
         setLightAttenuation(0);
         setBlocksFound(false);
 
-        mapCaveLighting = JourneyMap.getCoreProperties().mapCaveLighting.get();
-        mapBathymetry = JourneyMap.getCoreProperties().mapBathymetry.get();
+        mapCaveLighting = JourneymapClient.getCoreProperties().mapCaveLighting.get();
+        mapBathymetry = JourneymapClient.getCoreProperties().mapBathymetry.get();
 
         while (!stack.isEmpty())
         {
@@ -99,7 +99,7 @@ public class Strata
     {
         if (stratum == null)
         {
-            JourneyMap.getLogger().warn("Null stratum in pool.");
+            JourneymapClient.getLogger().warn("Null stratum in pool.");
             return;
         }
         else
@@ -152,7 +152,7 @@ public class Strata
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Couldn't push Stratum into stack: " + t);
+            JourneymapClient.getLogger().error("Couldn't push Stratum into stack: " + t);
             return null;
         }
     }

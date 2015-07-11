@@ -8,12 +8,7 @@
 
 package journeymap.client.ui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.settings.KeyBinding;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
@@ -27,19 +22,24 @@ import journeymap.client.ui.minimap.MiniMapHotkeysHelp;
 import journeymap.client.ui.waypoint.WaypointEditor;
 import journeymap.client.ui.waypoint.WaypointHelp;
 import journeymap.client.ui.waypoint.WaypointManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 public class UIManager
 {
-    private final Logger logger = JourneyMap.getLogger();
+    private final Logger logger = JourneymapClient.getLogger();
     private final MiniMap miniMap;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
     {
-        int preset = JourneyMap.getMiniMapProperties1().isActive() ? 1 : 2;
-        miniMap = new MiniMap(JourneyMap.getMiniMapProperties(preset));
+        int preset = JourneymapClient.getMiniMapProperties1().isActive() ? 1 : 2;
+        miniMap = new MiniMap(JourneymapClient.getMiniMapProperties(preset));
     }
 
     public static UIManager getInstance()
@@ -149,7 +149,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
         }
     }
 
@@ -177,7 +177,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
     }
 
@@ -234,7 +234,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
             }
         }
     }
@@ -250,7 +250,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
             }
         }
     }
@@ -264,7 +264,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneyMap.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
+            JourneymapClient.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
         }
     }
 
@@ -282,7 +282,7 @@ public class UIManager
 
     public void switchMiniMapPreset(int which)
     {
-        miniMap.setMiniMapProperties(JourneyMap.getMiniMapProperties(which));
+        miniMap.setMiniMapProperties(JourneymapClient.getMiniMapProperties(which));
     }
 
     private static class Holder

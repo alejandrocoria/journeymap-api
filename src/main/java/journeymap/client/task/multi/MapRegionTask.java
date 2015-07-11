@@ -8,11 +8,7 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
@@ -23,6 +19,10 @@ import journeymap.client.io.nbt.RegionLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.List;
 public class MapRegionTask extends BaseMapTask
 {
     private static final int MAX_RUNTIME = 30000;
-    private static final Logger logger = JourneyMap.getLogger();
+    private static final Logger logger = JourneymapClient.getLogger();
     private static volatile long lastTaskCompleted;
 
     final RegionCoord rCoord;
@@ -75,7 +75,7 @@ public class MapRegionTask extends BaseMapTask
     }
 
     @Override
-    public final void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         AnvilChunkLoader loader = ChunkLoader.getAnvilChunkLoader(mc);
 
@@ -180,7 +180,7 @@ public class MapRegionTask extends BaseMapTask
                 return false;
             }
 
-            if ((System.currentTimeMillis() - lastTaskCompleted) < JourneyMap.getCoreProperties().autoMapPoll.get())
+            if ((System.currentTimeMillis() - lastTaskCompleted) < JourneymapClient.getCoreProperties().autoMapPoll.get())
             {
                 return false;
             }
@@ -271,7 +271,7 @@ public class MapRegionTask extends BaseMapTask
             }
 
             RegionCoord rCoord = regionLoader.getRegions().peek();
-            ChunkRenderController chunkRenderController = JourneyMap.getInstance().getChunkRenderController();
+            ChunkRenderController chunkRenderController = JourneymapClient.getInstance().getChunkRenderController();
             BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, regionLoader.getMapType(), minecraft);
             return baseMapTask;
         }

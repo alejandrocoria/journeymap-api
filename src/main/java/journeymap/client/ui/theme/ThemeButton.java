@@ -8,14 +8,14 @@
 
 package journeymap.client.ui.theme;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
 import journeymap.client.Constants;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.BooleanPropertyButton;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 

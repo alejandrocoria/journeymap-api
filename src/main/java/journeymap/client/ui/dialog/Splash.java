@@ -8,11 +8,8 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;
@@ -23,6 +20,9 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -51,7 +51,7 @@ public class Splash extends JmUI
 
     public Splash(JmUI returnDisplay)
     {
-        super(Constants.getString("jm.common.splash_title", JourneyMap.EDITION), returnDisplay);
+        super(Constants.getString("jm.common.splash_title", JourneymapClient.EDITION), returnDisplay);
 
         // Get splash strings
         info = FileHandler.getMessageModel(SplashInfo.class, "splash");

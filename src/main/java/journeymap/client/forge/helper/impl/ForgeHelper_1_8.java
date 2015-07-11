@@ -9,6 +9,9 @@
 package journeymap.client.forge.helper.impl;
 
 import com.google.common.base.Strings;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -31,9 +34,6 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.registry.GameData;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.model.BlockMD;
 
 import java.net.SocketAddress;
 import java.util.Iterator;

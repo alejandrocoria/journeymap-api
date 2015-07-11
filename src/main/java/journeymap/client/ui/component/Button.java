@@ -8,14 +8,14 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.Constants;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;
-import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.render.draw.DrawUtil;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;

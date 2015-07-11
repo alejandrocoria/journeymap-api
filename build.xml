@@ -4,11 +4,11 @@
     <!-- Update when new version is going to be released -->
     <property name="jm_major" value="5"/>
     <property name="jm_minor" value="1"/>
-    <property name="jm_micro" value="0"/>
-    <property name="jm_patch" value="RC5"/>
+    <property name="jm_micro" value="1"/>
+    <property name="jm_patch" value="b1"/>
     <property name="jmversion" value="${jm_major}.${jm_minor}.${jm_micro}${jm_patch}"/>
-    <property name="mcversion" value="1.7.10"/>
-    <property name="forgeversion" value="10.13.2.1291"/>
+    <property name="mcversion" value="1.8"/>
+    <property name="forgeversion" value="11.14.3.1486"/>
     <property name="unlimited" value="Unlimited"/>
     <property name="fairplay" value="FairPlay"/>
     <property name="noradar" value="NoRadar"/>
@@ -39,7 +39,7 @@
         <stage edition="${unlimited}"/>
 
         <delete>
-            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java"
+            <fileset dir="${forge.src.dir}/journeymap/client/feature/impl/" includes="*.java"
                      excludes="Unlimited.java"/>
         </delete>
 
@@ -51,7 +51,7 @@
         <stage edition="${fairplay}"/>
 
         <delete>
-            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java"/>
+            <fileset dir="${forge.src.dir}/journeymap/client/feature/impl/" includes="*.java"/>
         </delete>
 
         <dist edition="${fairplay}"/>
@@ -62,7 +62,7 @@
         <stage edition="${noradar}"/>
 
         <delete>
-            <fileset dir="${forge.src.dir}/net/techbrew/journeymap/feature/impl/" includes="*.java"
+            <fileset dir="${forge.src.dir}/journeymap/client/feature/impl/" includes="*.java"
                      excludes="NoRadar.java"/>
         </delete>
 
@@ -114,7 +114,7 @@
             </copy>
 
             <!-- Replace params in JourneyMap class -->
-            <replace file="${forge.src.dir}/net/techbrew/journeymap/JourneyMap.java">
+            <replace file="${forge.src.dir}/journeymap/common/Journeymap.java">
                 <replacefilter token="@JMVERSION@" value="${jmversion}"/>
                 <replacefilter token="@MCVERSION@" value="${mcversion}"/>
                 <replacefilter token="@FORGEVERSION@" value="${forgeversion}"/>
@@ -200,8 +200,8 @@
     <target name="minify">
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
             <classpath>
-                <pathelement path="${basedir}/lib/yuicompressor-2.4.7.jar"/>
-                <pathelement path="${basedir}/lib/YUIAnt.jar"/>
+                <pathelement path="${basedir}/libs/yuicompressor-2.4.7.jar"/>
+                <pathelement path="${basedir}/libs/YUIAnt.jar"/>
             </classpath>
         </taskdef>
         <yuicompress linebreak="16000" warn="false" munge="no" preserveallsemicolons="true"

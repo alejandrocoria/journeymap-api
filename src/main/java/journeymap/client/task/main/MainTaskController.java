@@ -9,10 +9,10 @@
 package journeymap.client.task.main;
 
 import com.google.common.collect.Queues;
-import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -27,14 +27,14 @@ public class MainTaskController
     private final ConcurrentLinkedQueue<IMainThreadTask> deferredQueue = Queues.newConcurrentLinkedQueue();
 
     private Minecraft minecraft;
-    private JourneyMap journeyMap;
+    private JourneymapClient journeyMap;
     private Logger logger;
 
-    public MainTaskController(Minecraft mc, JourneyMap jm)
+    public MainTaskController(Minecraft mc, JourneymapClient jm)
     {
         this.minecraft = mc;
         this.journeyMap = jm;
-        this.logger = JourneyMap.getLogger();
+        this.logger = JourneymapClient.getLogger();
     }
 
     public void addTask(IMainThreadTask task)

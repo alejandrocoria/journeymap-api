@@ -8,9 +8,7 @@
 
 package journeymap.client.service;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.World;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.MapSaver;
@@ -18,6 +16,8 @@ import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapType;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.task.multi.SaveMapTask;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -66,7 +66,7 @@ public class ActionService extends BaseService
         }
 
         // Ensure world is loaded
-        if (!JourneyMap.getInstance().isMapping())
+        if (!JourneymapClient.getInstance().isMapping())
         {
             throwEventException(503, "JourneyMap not mapping", event, false);
         }
@@ -149,7 +149,7 @@ public class ActionService extends BaseService
             {
                 throwEventException(403, "No image files to save.", event, true);
             }
-            JourneyMap.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+            JourneymapClient.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
 
             Properties response = new Properties();
             response.put("filename", mapSaver.getSaveFileName());
@@ -166,7 +166,7 @@ public class ActionService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Unexpected error handling path: " + (path), event, true);
         }
     }
@@ -181,7 +181,7 @@ public class ActionService extends BaseService
     private void autoMap(Event event) throws Event, Exception
     {
 
-        boolean enabled = JourneyMap.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        boolean enabled = JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
         String scope = getParameter(event.query(), "scope", "stop");
 
         HashMap responseObj = new HashMap();
@@ -190,14 +190,14 @@ public class ActionService extends BaseService
         {
             if (enabled)
             {
-                JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);
+                JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);
                 responseObj.put("message", "automap_complete");
             }
         }
         else if (!enabled)
         {
             boolean doAll = "all".equals(scope);
-            JourneyMap.getInstance().toggleTask(MapRegionTask.Manager.class, true, doAll);
+            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, doAll);
             responseObj.put("message", "automap_started");
         }
         else

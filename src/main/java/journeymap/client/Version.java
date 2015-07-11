@@ -43,7 +43,7 @@ public class Version implements Comparable<Version>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
+            JourneymapClient.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
             if (defaultVersion == null)
             {
                 defaultVersion = new Version(0, 0, 0);
@@ -67,7 +67,7 @@ public class Version implements Comparable<Version>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().warn(String.format("Version had problems when parsed: %s", versionString));
+            JourneymapClient.getLogger().warn(String.format("Version had problems when parsed: %s", versionString));
             if (defaultVersion == null)
             {
                 defaultVersion = new Version(0, 0, 0);

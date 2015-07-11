@@ -8,15 +8,15 @@
 
 package journeymap.client.render.draw;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Vec3;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class WaypointDrawStepFactory
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
-        int maxDistance = JourneyMap.getWaypointProperties().maxDistance.get();
+        int maxDistance = JourneymapClient.getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
         Vec3 playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
         drawStepList.clear();
@@ -68,7 +68,7 @@ public class WaypointDrawStepFactory
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

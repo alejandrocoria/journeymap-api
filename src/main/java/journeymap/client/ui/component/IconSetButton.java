@@ -8,9 +8,9 @@
 
 package journeymap.client.ui.component;
 
-import net.minecraft.client.gui.FontRenderer;
 import journeymap.client.Constants;
 import journeymap.client.properties.PropertiesBase;
+import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 import java.util.List;

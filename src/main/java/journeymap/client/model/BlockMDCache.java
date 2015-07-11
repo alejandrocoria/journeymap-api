@@ -10,15 +10,15 @@ package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import journeymap.client.JourneymapClient;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
+import journeymap.client.model.mod.ModBlockDelegate;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import journeymap.client.JourneyMap;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
-import journeymap.client.model.mod.ModBlockDelegate;
 
 import java.util.*;
 
@@ -75,7 +75,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         setAlpha(Blocks.water, .3F);
 
         // Set optional flags
-        if (JourneyMap.getCoreProperties().caveIgnoreGlass.get())
+        if (JourneymapClient.getCoreProperties().caveIgnoreGlass.get())
         {
             setFlags(Blocks.glass, OpenToSky);
             setFlags(Blocks.glass_pane, OpenToSky);
@@ -181,7 +181,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             if (block instanceof BlockCrops)
             {
                 setFlags(block, Side2Texture, Crop, NoTopo);
-                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
+                if (!JourneymapClient.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
                 }
@@ -189,7 +189,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             else if (block instanceof BlockBush || block instanceof BlockCactus || block instanceof BlockDeadBush)
             {
                 setFlags(block, Side2Texture, Plant, NoTopo);
-                if (!JourneyMap.getCoreProperties().mapPlantShadows.get())
+                if (!JourneymapClient.getCoreProperties().mapPlantShadows.get())
                 {
                     setFlags(block, NoShadow);
                 }
@@ -256,7 +256,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
+            JourneymapClient.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -306,7 +306,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            JourneymapClient.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -327,7 +327,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         EnumSet<BlockMD.Flag> eset = getFlags(block);
         eset.addAll(flags);
         blockFlags.put(block, eset);
-        JourneyMap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
+        JourneymapClient.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
     }
 
     public boolean hasFlag(Block block, BlockMD.Flag flag)

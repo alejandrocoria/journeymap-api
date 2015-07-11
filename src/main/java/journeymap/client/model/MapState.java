@@ -10,9 +10,7 @@ package journeymap.client.model;
 
 
 import com.google.common.base.Objects;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -27,6 +25,8 @@ import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.task.multi.MapPlayerTask;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class MapState
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
-        highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
+        highQuality = JourneymapClient.getCoreProperties().tileHighDisplayQuality.get();
 
         if (player.dimension != this.getCurrentMapType().dimension)
         {

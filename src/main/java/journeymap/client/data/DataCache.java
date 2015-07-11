@@ -10,17 +10,17 @@ package journeymap.client.data;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.fml.common.registry.GameData;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.block.Block;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -147,7 +147,7 @@ public class DataCache
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
         builder.concurrencyLevel(defaultConcurrencyLevel);
-        if (JourneyMap.getCoreProperties().recordCacheStats.get())
+        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }
@@ -158,7 +158,7 @@ public class DataCache
     {
         if (privateCaches.containsValue(name))
         {
-            JourneyMap.getLogger().warn("Overriding private cache: " + name);
+            JourneymapClient.getLogger().warn("Overriding private cache: " + name);
         }
         privateCaches.put(cache, name);
     }
@@ -185,7 +185,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getAll: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getAll: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -205,7 +205,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getAnimals: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getAnimals: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -225,7 +225,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getMobs: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getMobs: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -245,7 +245,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getPlayers: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getPlayers: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -265,7 +265,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getPlayer: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getPlayer: " + LogFormatter.toString(e));
                 return null;
             }
         }
@@ -285,7 +285,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -323,7 +323,7 @@ public class DataCache
                 }
                 catch (ExecutionException e)
                 {
-                    JourneyMap.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
+                    JourneymapClient.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
                     return Collections.EMPTY_LIST;
                 }
             }
@@ -353,7 +353,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getMessages: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getMessages: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
@@ -373,7 +373,7 @@ public class DataCache
             }
             catch (ExecutionException e)
             {
-                JourneyMap.getLogger().error("ExecutionException in getWorld: " + LogFormatter.toString(e));
+                JourneymapClient.getLogger().error("ExecutionException in getWorld: " + LogFormatter.toString(e));
                 return new WorldData();
             }
         }
@@ -448,7 +448,7 @@ public class DataCache
             }
             catch (Throwable e)
             {
-                JourneyMap.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
+                JourneymapClient.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
             }
 
             return chunkMD;
@@ -562,7 +562,7 @@ public class DataCache
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().warn("Couldn't purge managed cache: " + cache);
+                    JourneymapClient.getLogger().warn("Couldn't purge managed cache: " + cache);
                 }
             }
         }
@@ -577,7 +577,7 @@ public class DataCache
                 }
                 catch (Exception e)
                 {
-                    JourneyMap.getLogger().warn("Couldn't purge private cache: " + cache);
+                    JourneymapClient.getLogger().warn("Couldn't purge private cache: " + cache);
                 }
             }
 
@@ -588,7 +588,7 @@ public class DataCache
     public String getDebugHtml()
     {
         StringBuffer sb = new StringBuffer();
-        if (JourneyMap.getCoreProperties().recordCacheStats.get())
+        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
         {
             appendDebugHtml(sb, "Managed Caches", managedCaches);
             appendDebugHtml(sb, "Private Caches", privateCaches);
@@ -647,7 +647,7 @@ public class DataCache
         {
             if (delegates.containsKey(delegate))
             {
-                JourneyMap.getLogger().warn("RemovalListener already added: " + delegate.getClass());
+                JourneymapClient.getLogger().warn("RemovalListener already added: " + delegate.getClass());
             }
             else
             {

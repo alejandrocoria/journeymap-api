@@ -8,10 +8,10 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.client.Minecraft;
 
 import java.io.File;
 import java.util.List;
@@ -44,7 +44,7 @@ public class TaskBatch implements ITask
     }
 
     @Override
-    public void performTask(final Minecraft mc, final JourneyMap jm, final File jmWorldDir, final boolean threadLogging) throws InterruptedException
+    public void performTask(final Minecraft mc, final JourneymapClient jm, final File jmWorldDir, final boolean threadLogging) throws InterruptedException
     {
         if (startNs == 0)
         {
@@ -53,14 +53,14 @@ public class TaskBatch implements ITask
 
         if (threadLogging)
         {
-            JourneyMap.getLogger().debug("START batching tasks");
+            JourneymapClient.getLogger().debug("START batching tasks");
         }
 
         while (!taskList.isEmpty())
         {
             if (Thread.interrupted())
             {
-                JourneyMap.getLogger().warn("TaskBatch thread interrupted: " + this);
+                JourneymapClient.getLogger().warn("TaskBatch thread interrupted: " + this);
                 throw new InterruptedException();
             }
 
@@ -69,23 +69,23 @@ public class TaskBatch implements ITask
             {
                 if (threadLogging)
                 {
-                    JourneyMap.getLogger().debug("Batching task: " + task);
+                    JourneymapClient.getLogger().debug("Batching task: " + task);
                 }
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
             }
             catch (ChunkMD.ChunkMissingException e)
             {
-                JourneyMap.getLogger().warn(e.getMessage());
+                JourneymapClient.getLogger().warn(e.getMessage());
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
+                JourneymapClient.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
             }
         }
 
         if (threadLogging)
         {
-            JourneyMap.getLogger().debug("DONE batching tasks");
+            JourneymapClient.getLogger().debug("DONE batching tasks");
         }
 
         elapsedNs = System.nanoTime() - startNs;

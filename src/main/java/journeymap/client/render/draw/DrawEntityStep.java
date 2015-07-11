@@ -9,16 +9,16 @@
 package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
+import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.EntityDTO;
+import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
-import journeymap.client.JourneyMap;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.EntityDTO;
-import journeymap.client.render.map.GridRenderer;
-import journeymap.client.render.texture.TextureImpl;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -32,7 +32,7 @@ public class DrawEntityStep implements DrawStep
     static final int labelBgAlpha = 180;
     static final Color labelFg = Color.white;
     static final int labelFgAlpha = 225;
-    boolean hideSneaks = JourneyMap.getCoreProperties().hideSneakingEntities.get();
+    boolean hideSneaks = JourneymapClient.getCoreProperties().hideSneakingEntities.get();
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
     EntityDTO entityDTO;

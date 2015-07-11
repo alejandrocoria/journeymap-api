@@ -8,11 +8,8 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.world.chunk.Chunk;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockCoordIntPair;
@@ -22,6 +19,9 @@ import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.option.LocationFormat;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.world.chunk.Chunk;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     {
         if (!blockCoord.equals(lastCoord))
         {
-            FullMapProperties fullMapProperties = JourneyMap.getFullMapProperties();
+            FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
 
             locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
 
@@ -94,7 +94,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
     private double getMapFontScale()
     {
-        return JourneyMap.getFullMapProperties().fontScale.get();
+        return JourneymapClient.getFullMapProperties().fontScale.get();
     }
 
     @Override

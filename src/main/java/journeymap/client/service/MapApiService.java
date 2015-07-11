@@ -8,7 +8,7 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.ui.option.StringListProvider;
 import se.rupy.http.Event;
 
@@ -42,7 +42,7 @@ public class MapApiService extends FileService
     @Override
     public void filter(Event event) throws Event, Exception
     {
-        String domain = JourneyMap.getWebMapProperties().googleMapApiDomain.get();
+        String domain = JourneymapClient.getWebMapProperties().googleMapApiDomain.get();
         String apiUrl = String.format("http://maps.google%s/maps/api/js?libraries=geometry&sensor=false", domain);
 
         ResponseHeader.on(event).setHeader("Location", apiUrl).noCache();

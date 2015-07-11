@@ -8,12 +8,12 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
 import journeymap.client.task.main.DeleteMapTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
+import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
 public class DeleteMapConfirmation extends JmUI

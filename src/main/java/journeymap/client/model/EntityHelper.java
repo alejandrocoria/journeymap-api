@@ -9,6 +9,12 @@
 package journeymap.client.model;
 
 import com.google.common.collect.ImmutableSortedMap;
+import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
@@ -26,12 +32,6 @@ import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
-import journeymap.client.JourneyMap;
-import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
 
 import java.util.*;
 
@@ -83,7 +83,7 @@ public class EntityHelper
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().warn("Failed to " + timerName + ": " + LogFormatter.toString(t));
+            JourneymapClient.getLogger().warn("Failed to " + timerName + ": " + LogFormatter.toString(t));
         }
 
         timer.stop();
@@ -92,17 +92,17 @@ public class EntityHelper
 
     public static List<EntityDTO> getMobsNearby()
     {
-        return getEntitiesNearby("getMobsNearby", JourneyMap.getCoreProperties().maxMobsData.get(), true, IMob.class);
+        return getEntitiesNearby("getMobsNearby", JourneymapClient.getCoreProperties().maxMobsData.get(), true, IMob.class);
     }
 
     public static List<EntityDTO> getVillagersNearby()
     {
-        return getEntitiesNearby("getVillagersNearby", JourneyMap.getCoreProperties().maxVillagersData.get(), false, EntityVillager.class);
+        return getEntitiesNearby("getVillagersNearby", JourneymapClient.getCoreProperties().maxVillagersData.get(), false, EntityVillager.class);
     }
 
     public static List<EntityDTO> getAnimalsNearby()
     {
-        return getEntitiesNearby("getAnimalsNearby", JourneyMap.getCoreProperties().maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
+        return getEntitiesNearby("getAnimalsNearby", JourneymapClient.getCoreProperties().maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
     public static boolean isPassive(EntityLiving entityLiving)
@@ -139,7 +139,7 @@ public class EntityHelper
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
         allPlayers.remove(mc.thePlayer);
 
-        int max = JourneyMap.getCoreProperties().maxPlayersData.get();
+        int max = JourneymapClient.getCoreProperties().maxPlayersData.get();
         if (allPlayers.size() > max)
         {
             entityDistanceComparator.player = mc.thePlayer;
@@ -168,8 +168,8 @@ public class EntityHelper
      */
     private static AxisAlignedBB getBB(EntityPlayerSP player)
     {
-        int lateralDistance = JourneyMap.getCoreProperties().radarLateralDistance.get();
-        int verticalDistance = JourneyMap.getCoreProperties().radarVerticalDistance.get();
+        int lateralDistance = JourneymapClient.getCoreProperties().radarLateralDistance.get();
+        int verticalDistance = JourneymapClient.getCoreProperties().radarVerticalDistance.get();
         return ForgeHelper.INSTANCE.getBoundingBox(player, lateralDistance, verticalDistance);
     }
 

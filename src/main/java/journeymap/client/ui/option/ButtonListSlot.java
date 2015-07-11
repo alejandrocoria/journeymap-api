@@ -9,13 +9,13 @@
 package journeymap.client.ui.option;
 
 import com.google.common.base.Strings;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.ScrollListPane;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 
 import java.awt.*;
 import java.util.Collection;

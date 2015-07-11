@@ -9,10 +9,10 @@
 package journeymap.client.render.texture;
 
 import com.google.common.base.Objects;
+import journeymap.client.JourneymapClient;
+import journeymap.client.task.main.ExpireTextureTask;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
-import journeymap.client.JourneyMap;
-import journeymap.client.task.main.ExpireTextureTask;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
@@ -168,7 +168,7 @@ public class TextureImpl extends AbstractTexture
                 int glErr = GL11.glGetError();
                 if (glErr != GL11.GL_NO_ERROR)
                 {
-                    JourneyMap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    JourneymapClient.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
                 }
                 else
                 {
@@ -178,7 +178,7 @@ public class TextureImpl extends AbstractTexture
             }
             catch (Throwable t)
             {
-                JourneyMap.getLogger().warn("Can't bind texture: " + t);
+                JourneymapClient.getLogger().warn("Can't bind texture: " + t);
                 buffer = null;
             }
             finally
@@ -334,7 +334,7 @@ public class TextureImpl extends AbstractTexture
     {
         if (isBound())
         {
-            JourneyMap.getLogger().warn("TextureImpl disposed without deleting texture glID: " + this);
+            JourneymapClient.getLogger().warn("TextureImpl disposed without deleting texture glID: " + this);
             ExpireTextureTask.queue(this.glTextureId);
         }
     }

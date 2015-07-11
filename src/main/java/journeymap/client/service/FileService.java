@@ -8,7 +8,7 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.ColorPalette;
 import journeymap.client.io.FileHandler;
@@ -62,13 +62,13 @@ public class FileService extends BaseService
     public FileService()
     {
 
-        URL resourceDir = JourneyMap.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
+        URL resourceDir = JourneymapClient.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
 
         String testPath = null;
 
         if (resourceDir == null)
         {
-            JourneyMap.getLogger().error("Can't determine path to webroot!");
+            JourneymapClient.getLogger().error("Can't determine path to webroot!");
         }
         else
         {
@@ -186,7 +186,7 @@ public class FileService extends BaseService
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
                     fileStream = FileHandler.getIconStream(ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
-                    JourneyMap.getLogger().warn("Couldn't get theme file for " + path);
+                    JourneymapClient.getLogger().warn("Couldn't get theme file for " + path);
                 }
                 else
                 {
@@ -221,7 +221,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error: " + path, event, true);
         }
     }
@@ -309,7 +309,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
         }
 
         return in;
@@ -392,7 +392,7 @@ public class FileService extends BaseService
         }
         catch (IOException e)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(e));
+            JourneymapClient.getLogger().error(LogFormatter.toString(e));
             throw event;
         }
         finally
@@ -427,7 +427,7 @@ public class FileService extends BaseService
         }
         catch (Exception ex)
         {
-            JourneyMap.getLogger().warn("Failed to gzip encode: " + data);
+            JourneymapClient.getLogger().warn("Failed to gzip encode: " + data);
             return null;
         }
     }

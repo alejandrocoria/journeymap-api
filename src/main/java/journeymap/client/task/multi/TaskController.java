@@ -8,13 +8,13 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.profiler.Profiler;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.thread.JMThreadFactory;
 import journeymap.client.thread.RunnableTask;
+import net.minecraft.client.Minecraft;
+import net.minecraft.profiler.Profiler;
 import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TaskController
 {
-    final static Logger logger = JourneyMap.getLogger();
+    final static Logger logger = JourneymapClient.getLogger();
     final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
     final Minecraft minecraft = ForgeHelper.INSTANCE.getClient();

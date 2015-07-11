@@ -8,13 +8,13 @@
 
 package journeymap.client.ui.waypoint;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.world.WorldProvider;
 import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
 import journeymap.client.waypoint.WaypointStore;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.world.WorldProvider;
 
 import java.util.List;
 

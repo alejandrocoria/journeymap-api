@@ -12,19 +12,19 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.io.File;
@@ -81,7 +81,7 @@ public class ColorPalette
     ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Color> basicColorMap, HashMap<String, HashMap<BlockMD, Color>> biomeColorMap)
     {
         this.name = Constants.getString("jm.colorpalette.file_title");
-        this.generated = String.format("Generated using %s for %s on %s", JourneyMap.MOD_NAME, Loader.MC_VERSION, new Date());
+        this.generated = String.format("Generated using %s for %s on %s", JourneymapClient.MOD_NAME, Loader.MC_VERSION, new Date());
         this.resourcePacks = resourcePacks;
         this.modNames = modNames;
 
@@ -127,7 +127,7 @@ public class ColorPalette
             {
                 if (palette.isPermanent())
                 {
-                    JourneyMap.getLogger().info("Existing color palette is set to be permanent.");
+                    JourneymapClient.getLogger().info("Existing color palette is set to be permanent.");
                     return palette;
                 }
 
@@ -135,19 +135,19 @@ public class ColorPalette
                 {
                     if (modNames.equals(palette.modNames))
                     {
-                        JourneyMap.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
+                        JourneymapClient.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
                         return palette;
                     }
                     else
                     {
-                        JourneyMap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
-                        JourneyMap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
+                        JourneymapClient.getLogger().warn("Existing color palette's mods no longer match current loadout.");
+                        JourneymapClient.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
                     }
                 }
                 else
                 {
-                    JourneyMap.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
-                    JourneyMap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
+                    JourneymapClient.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
+                    JourneymapClient.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
                 }
             }
         }
@@ -188,7 +188,7 @@ public class ColorPalette
             }
             catch (Exception e2)
             {
-                JourneyMap.getLogger().error("Couldn't rename bad palette file: " + e2);
+                JourneymapClient.getLogger().error("Couldn't rename bad palette file: " + e2);
             }
             return null;
         }
@@ -227,7 +227,7 @@ public class ColorPalette
         }
         catch (Exception e)
         {
-            JourneyMap.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
+            JourneymapClient.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -242,7 +242,7 @@ public class ColorPalette
             Block block = GameRegistry.findBlock(uid.modId, uid.name);
             if (block == null)
             {
-                JourneyMap.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
+                JourneymapClient.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
                 continue;
             }
             BlockMD blockMD = DataCache.instance().getBlockMD(block, blockColor.meta);
@@ -307,7 +307,7 @@ public class ColorPalette
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error("Can't get colorpalette.html: " + t);
+            JourneymapClient.getLogger().error("Can't get colorpalette.html: " + t);
         }
         return null;
     }

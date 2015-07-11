@@ -8,10 +8,7 @@
 
 package journeymap.client.task.multi;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.World;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -21,6 +18,9 @@ import journeymap.client.model.ChunkCoord;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
@@ -30,7 +30,7 @@ import java.util.Iterator;
 
 public abstract class BaseMapTask implements ITask
 {
-    static final Logger logger = JourneyMap.getLogger();
+    static final Logger logger = JourneymapClient.getLogger();
     protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
     private static BufferedImage blankChunkImage = null;
     private static BufferedImage blankChunkImageUnderground = null;
@@ -51,14 +51,14 @@ public abstract class BaseMapTask implements ITask
         this.elapsedLimit = elapsedLimit;
     }
 
-    public void initTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    public void initTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
 
     }
 
 
     @Override
-    public void performTask(Minecraft mc, JourneyMap jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
+    public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
         StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask", 5, elapsedLimit).start();
 
@@ -152,14 +152,14 @@ public abstract class BaseMapTask implements ITask
         }
         catch (InterruptedException t)
         {
-            JourneyMap.getLogger().warn("Task thread interrupted: " + this);
+            JourneymapClient.getLogger().warn("Task thread interrupted: " + this);
             timer.cancel();
             throw t;
         }
         catch (Throwable t)
         {
             String error = "Unexpected error in BaseMapTask: " + (LogFormatter.toString(t));
-            JourneyMap.getLogger().error(error);
+            JourneymapClient.getLogger().error(error);
             this.complete(false, true);
             timer.cancel();
         }

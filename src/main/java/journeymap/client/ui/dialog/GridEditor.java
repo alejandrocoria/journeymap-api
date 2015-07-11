@@ -8,9 +8,8 @@
 
 package journeymap.client.ui.dialog;
 
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.GridSpec;
@@ -24,6 +23,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.*;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeToggle;
+import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL12;
 
@@ -68,7 +68,7 @@ public class GridEditor extends JmUI
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
 
-        this.gridSpecs = JourneyMap.getCoreProperties().gridSpecs.clone();
+        this.gridSpecs = JourneymapClient.getCoreProperties().gridSpecs.clone();
 
         MapType mapType = MapType.day(0);
         activeMapType = mapType;
@@ -134,7 +134,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            JourneyMap.getLogger().error(LogFormatter.toString(t));
+            JourneymapClient.getLogger().error(LogFormatter.toString(t));
             UIManager.getInstance().closeAll();
         }
     }
@@ -427,8 +427,8 @@ public class GridEditor extends JmUI
     protected void saveAndClose()
     {
         updateGridSpecs();
-        JourneyMap.getCoreProperties().gridSpecs.updateFrom(this.gridSpecs);
-        JourneyMap.getCoreProperties().save();
+        JourneymapClient.getCoreProperties().gridSpecs.updateFrom(this.gridSpecs);
+        JourneymapClient.getCoreProperties().save();
         closeAndReturn();
     }
 

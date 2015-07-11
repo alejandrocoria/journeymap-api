@@ -8,11 +8,11 @@
 
 package journeymap.client.ui.minimap;
 
-import net.minecraft.client.gui.GuiButton;
 import journeymap.client.Constants;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
+import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
 

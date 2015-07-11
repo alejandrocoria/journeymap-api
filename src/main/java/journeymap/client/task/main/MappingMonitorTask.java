@@ -8,12 +8,12 @@
 
 package journeymap.client.task.main;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.*;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -22,11 +22,11 @@ import org.apache.logging.log4j.Logger;
 public class MappingMonitorTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
-    Logger logger = JourneyMap.getLogger();
+    Logger logger = JourneymapClient.getLogger();
     private int lastDimension = 0;
 
     @Override
-    public IMainThreadTask perform(Minecraft mc, JourneyMap jm)
+    public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
     {
         //long start = System.nanoTime();
         try
@@ -69,7 +69,7 @@ public class MappingMonitorTask implements IMainThreadTask
             }
             else
             {
-                if (!jm.isMapping() && !isDead && JourneyMap.getCoreProperties().mappingEnabled.get())
+                if (!jm.isMapping() && !isDead && JourneymapClient.getCoreProperties().mappingEnabled.get())
                 {
                     jm.startMapping();
                 }
@@ -91,7 +91,7 @@ public class MappingMonitorTask implements IMainThreadTask
             }
 
             // Start Mapping
-            if (!jm.isMapping() && JourneyMap.getCoreProperties().mappingEnabled.get())
+            if (!jm.isMapping() && JourneymapClient.getCoreProperties().mappingEnabled.get())
             {
                 jm.startMapping();
             }

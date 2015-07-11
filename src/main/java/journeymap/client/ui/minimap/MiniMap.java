@@ -8,11 +8,7 @@
 
 package journeymap.client.ui.minimap;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.MathHelper;
-import journeymap.client.JourneyMap;
+import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
@@ -30,6 +26,10 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -49,7 +49,7 @@ public class MiniMap
     private static final long labelRefreshRate = 400;
     private final static GridRenderer gridRenderer = new GridRenderer(3);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private final Logger logger = JourneyMap.getLogger();
+    private final Logger logger = JourneymapClient.getLogger();
     private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
@@ -102,7 +102,7 @@ public class MiniMap
         gridRenderer.setContext(state.getWorldDir(), mapType);
         gridRenderer.center(mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
 
-        boolean highQuality = JourneyMap.getCoreProperties().tileHighDisplayQuality.get();
+        boolean highQuality = JourneymapClient.getCoreProperties().tileHighDisplayQuality.get();
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
     }
 
@@ -181,7 +181,7 @@ public class MiniMap
 
             if (doStateRefresh)
             {
-                boolean checkWaypointDistance = JourneyMap.getWaypointProperties().maxDistance.get() > 0;
+                boolean checkWaypointDistance = JourneymapClient.getWaypointProperties().maxDistance.get() > 0;
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
             }
