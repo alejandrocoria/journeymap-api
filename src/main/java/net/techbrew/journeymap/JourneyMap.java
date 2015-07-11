@@ -424,7 +424,7 @@ public class JourneyMap implements CommonProxy
     {
         if (mc != null && mc.thePlayer != null)
         {
-            playerName = mc.thePlayer.getName();
+            playerName = ForgeHelper.INSTANCE.getEntityName(mc.thePlayer);
         }
 
         if (!mc.isSingleplayer() && currentWorldId == null)
