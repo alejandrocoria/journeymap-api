@@ -39,7 +39,10 @@ public class TextField extends GuiTextField
 
     public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
     {
-        // 1.8 adds an (id?) to the first constructor param
+        // 1.7
+        // super(0, fontRenderer, 0, 0, width, height);
+
+        // 1.8
         super(0, fontRenderer, 0, 0, width, height);
         setText(text.toString());
         numeric = isNumeric;
