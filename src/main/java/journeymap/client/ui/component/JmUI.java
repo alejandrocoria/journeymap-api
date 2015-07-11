@@ -15,6 +15,7 @@ import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -229,7 +230,7 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
-        JourneymapClient.getCoreProperties().splashViewed.set(JourneymapClient.JM_VERSION.toString());
+        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
 
         if (returnDisplay == null)
         {

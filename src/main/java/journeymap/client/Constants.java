@@ -13,6 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
@@ -23,6 +24,10 @@ import org.lwjgl.input.Keyboard;
 import java.io.File;
 import java.util.*;
 
+/**
+ * Constants and Keybindings... and other stuff that are squatting here for some reason.
+ * TODO: The localization stuff should probably be moved, or possibly removed altogether.
+ */
 public class Constants
 {
     public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast(); // or nullsFirst()
@@ -33,7 +38,7 @@ public class Constants
     public static String JOURNEYMAP_DIR_BACKUP = "journeymap_bak";
     public static String JOURNEYMAP_DIR = "journeymap";
     public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
-    public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", JourneymapClient.JM_VERSION.toMajorMinorString(), END);
+    public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", Journeymap.JM_VERSION.toMajorMinorString(), END);
     public static String CACHE_DIR = path.join(JOURNEYMAP_DIR, "cache", END);
     public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
     public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
@@ -53,6 +58,15 @@ public class Constants
     public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
     public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
 
+    public enum WorldType
+    {
+        mp, sp
+    }
+
+    /**
+     * Initialize the keybindings, return them as a list.
+     * @return
+     */
     public static List<KeyBinding> initKeybindings()
     {
         CONTROL_KEYNAME_COMBO = "Ctrl,";
@@ -67,6 +81,10 @@ public class Constants
         return Arrays.asList(KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_PRESET, KB_WAYPOINT);
     }
 
+    /**
+     * Get the current locale
+     * @return
+     */
     public static Locale getLocale()
     {
         Locale locale = Locale.getDefault();
@@ -82,6 +100,11 @@ public class Constants
         return locale;
     }
 
+    /**
+     * Get the localized string for a given key.
+     * @param key
+     * @return
+     */
     public static String getString(String key)
     {
         String result = I18n.format(key);
@@ -92,6 +115,12 @@ public class Constants
         return result;
     }
 
+    /**
+     * Get the localized string for a key and parameters.
+     * @param key
+     * @param params
+     * @return
+     */
     public static String getString(String key, Object... params)
     {
         String result = I18n.format(key, params);
@@ -102,21 +131,50 @@ public class Constants
         return result;
     }
 
+    /**
+     * Get the key name for a binding.
+     * @param keyBinding
+     * @return
+     */
     public static String getKeyName(KeyBinding keyBinding)
     {
         return Keyboard.getKeyName(getKeyCode(keyBinding));
     }
 
+    /**
+     * Get the keycode for a binding.
+     * @param keyBinding
+     * @return
+     */
     private static int getKeyCode(KeyBinding keyBinding)
     {
         return keyBinding.getKeyCode();
     }
 
+    /**
+     * Whether a keybinding is pressed.
+     * @param keyBinding
+     * @return
+     */
     public static boolean isPressed(KeyBinding keyBinding)
     {
-        return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
+        try
+        {
+            return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
+        }
+        catch(Throwable t)
+        {
+            JourneymapClient.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
+            return false;
+        }
     }
 
+    /**
+     * Safely check two strings for case-insensitive equality.
+     * @param first
+     * @param second
+     * @return
+     */
     public static boolean safeEqual(String first, String second)
     {
         int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second);
@@ -127,6 +185,11 @@ public class Constants
         return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(first, second) == 0;
     }
 
+    /**
+     * Get a list of all resource pack names.
+     * TODO:  Why did this end up here?
+     * @return
+     */
     public static String getResourcePackNames()
     {
         ArrayList<ResourcePackRepository.Entry> entries = new ArrayList<ResourcePackRepository.Entry>();
@@ -159,6 +222,11 @@ public class Constants
         return packs;
     }
 
+    /**
+     * Get a list of all loaded mod names.
+     * TODO:  Why did this end up here?
+     * @return
+     */
     public static String getModNames()
     {
         ArrayList<String> list = new ArrayList<String>();
@@ -173,9 +241,6 @@ public class Constants
         return Joiner.on(", ").join(list);
     }
 
-    public enum WorldType
-    {
-        mp, sp
-    }
+
 
 }

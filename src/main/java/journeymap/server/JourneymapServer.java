@@ -11,21 +11,37 @@ package journeymap.server;
 import journeymap.common.CommonProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Does nothing.
+ * Coming soon to a codebase near you.
  */
+@SideOnly(Side.SERVER)
 public class JourneymapServer implements CommonProxy
 {
+    /**
+     * Constructor.
+     */
     public JourneymapServer()
     {
     }
 
+    /**
+     * Initialize the server.
+     * @param event
+     */
+    @SideOnly(Side.SERVER)
     @Override
     public void initialize(FMLInitializationEvent event)
     {
     }
 
+    /**
+     * Post-initialize the server
+     * @param event
+     */
+    @SideOnly(Side.SERVER)
     @Override
     public void postInitialize(FMLPostInitializationEvent event)
     {

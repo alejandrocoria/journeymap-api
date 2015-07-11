@@ -16,11 +16,12 @@ import net.minecraft.util.ResourceLocation;
  */
 public class RenderFacade extends Render
 {
-    /**
-     * Unused.
-     */
-    public RenderFacade(Render render)
+    // 1.7
+    // public RenderFacade(Render unused)
+    // 1.8
+    public RenderFacade(RenderManager unused)
     {
+        super(unused);
     }
 
     /**

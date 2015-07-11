@@ -9,10 +9,10 @@
 package journeymap.client.io.migrate;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.Version;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +24,7 @@ import java.io.FileFilter;
  */
 public class Migrate5_0_0 implements Migration.Task
 {
-    Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
+    Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
 
     protected Migrate5_0_0()
     {
@@ -48,7 +48,6 @@ public class Migrate5_0_0 implements Migration.Task
     {
         try
         {
-
             File[] files = FileHandler.MinecraftDirectory.listFiles();
             if (files != null)
             {

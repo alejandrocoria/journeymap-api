@@ -11,7 +11,7 @@ package journeymap.client.log;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
-import journeymap.client.service.JMServer;
+import journeymap.client.service.WebServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -158,9 +158,9 @@ public class ChatLog
             {
                 try
                 {
-                    JMServer jmServer = JourneymapClient.getInstance().getJmServer();
+                    WebServer webServer = JourneymapClient.getInstance().getJmServer();
                     String keyName = Constants.getKeyName(Constants.KB_MAP);
-                    String port = jmServer.getPort() == 80 ? "" : ":" + Integer.toString(jmServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
+                    String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                     ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
                 }

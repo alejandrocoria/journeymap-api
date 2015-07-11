@@ -8,8 +8,6 @@
 
 package modinfo;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
 import modinfo.mp.v1.Client;
 import modinfo.mp.v1.Message;
 import modinfo.mp.v1.Payload;
@@ -17,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.Language;
 import net.minecraft.client.resources.Locale;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraftforge.fml.common.Loader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +35,7 @@ public class ModInfo
     public static final String VERSION = "0.1";
     public static final Logger LOGGER = LogManager.getLogger("modinfo");
 
-    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
+    private final Minecraft minecraft = Minecraft.getMinecraft();
     private final String trackingId;
     private final String modId;
     private final String modName;
@@ -282,7 +281,7 @@ public class ModInfo
         String salt = config.getSalt();
         String username = minecraft.getSession().getUsername();
         UUID clientId = createUUID(salt, username, modId);
-        return new Client(trackingId, clientId, config, FMLClientHandler.instance().getCurrentLanguage());
+        return new Client(trackingId, clientId, config, Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode());
     }
 
     private Map<Payload.Parameter, String> minecraftParams()

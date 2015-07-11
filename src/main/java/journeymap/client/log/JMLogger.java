@@ -14,6 +14,7 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.option.StringListProvider;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import org.apache.logging.log4j.Level;
@@ -44,7 +45,7 @@ public class JMLogger
 
     public static Logger init()
     {
-        final Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
+        final Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
 
         if (!logger.isInfoEnabled())
         {
@@ -121,7 +122,7 @@ public class JMLogger
     {
         try
         {
-            final Logger logger = LogManager.getLogger(JourneymapClient.MOD_ID);
+            final Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
             ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(JourneymapClient.getCoreProperties().logLevel.get(), Level.INFO));
         }
         catch (Throwable t)
@@ -150,7 +151,7 @@ public class JMLogger
         LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
 
         // Versions
-        props.put("Version", JourneymapClient.MOD_NAME + ", built with Forge " + JourneymapClient.FORGE_VERSION);
+        props.put("Version", JourneymapClient.MOD_NAME + ", built with Forge " + Journeymap.FORGE_VERSION);
         props.put("Forge", ForgeVersion.getVersion());
 
         // Environment

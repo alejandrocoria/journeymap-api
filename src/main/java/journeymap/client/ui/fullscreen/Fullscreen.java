@@ -42,6 +42,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeButton;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.client.ui.theme.ThemeToolbar;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
@@ -135,13 +136,13 @@ public class Fullscreen extends JmUI
         initButtons();
 
         // Check for first-time use
-        if (!JourneymapClient.getCoreProperties().splashViewed.get().equals(JourneymapClient.JM_VERSION.toString()))
+        if (!JourneymapClient.getCoreProperties().splashViewed.get().equals(Journeymap.JM_VERSION.toString()))
         {
             UIManager.getInstance().openSplash(this);
         }
 
         // Check for first-time use
-        if (!JourneymapClient.getCoreProperties().optionsManagerViewed.get().equals(JourneymapClient.JM_VERSION.toString()))
+        if (!JourneymapClient.getCoreProperties().optionsManagerViewed.get().equals(Journeymap.JM_VERSION.toString()))
         {
             UIManager.getInstance().openOptionsManager(this, Config.Category.Cartography);
         }

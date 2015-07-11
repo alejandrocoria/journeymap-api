@@ -14,6 +14,7 @@ import com.google.gson.GsonBuilder;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.thread.JMThreadFactory;
+import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.Loader;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -24,6 +25,9 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Checks to see if a newer released version of JourneyMap is available.
+ */
 public class VersionCheck
 {
     private static volatile ExecutorService executorService;
@@ -32,6 +36,10 @@ public class VersionCheck
     private static volatile Boolean versionIsChecked;
     private static volatile String versionAvailable;
 
+    /**
+     * Whether this build is the current version available.
+     * @return
+     */
     public static Boolean getVersionIsCurrent()
     {
         if (versionIsChecked == null)
@@ -41,6 +49,10 @@ public class VersionCheck
         return versionIsCurrent;
     }
 
+    /**
+     * Whether the current version available has been checked.
+     * @return
+     */
     public static Boolean getVersionIsChecked()
     {
         if (versionIsChecked == null)
@@ -50,6 +62,10 @@ public class VersionCheck
         return versionIsChecked;
     }
 
+    /**
+     * Gets the current version available.
+     * @return
+     */
     public static String getVersionAvailable()
     {
         if (versionIsChecked == null)
@@ -59,6 +75,10 @@ public class VersionCheck
         return versionAvailable;
     }
 
+    /**
+     * Check for the current version by querying a JSON file that is
+     * manually updated when a new version is released.
+     */
     private static synchronized void checkVersion()
     {
         versionIsChecked = false;
@@ -77,13 +97,13 @@ public class VersionCheck
                 @Override
                 public void run()
                 {
-                    JourneymapClient.getLogger().info("Checking for updated version: " + JourneymapClient.VERSION_URL); //$NON-NLS-1$
+                    JourneymapClient.getLogger().info("Checking for updated version: " + Journeymap.VERSION_URL); //$NON-NLS-1$
                     InputStreamReader in = null;
                     HttpsURLConnection connection = null;
                     String rawResponse = null;
                     try
                     {
-                        URL uri = URI.create(JourneymapClient.VERSION_URL).toURL();
+                        URL uri = URI.create(Journeymap.VERSION_URL).toURL();
                         connection = (HttpsURLConnection) uri.openConnection();
                         connection.setConnectTimeout(6000);
                         connection.setReadTimeout(6000);
@@ -102,7 +122,7 @@ public class VersionCheck
                                 if (Loader.MC_VERSION.equals(versionLine.minecraft))
                                 {
                                     versionAvailable = versionLine.journeymap;
-                                    versionIsCurrent = isCurrent(JourneymapClient.JM_VERSION.toString(), versionAvailable);
+                                    versionIsCurrent = isCurrent(Journeymap.JM_VERSION.toString(), versionAvailable);
                                     versionIsChecked = true;
                                     break;
                                 }
@@ -113,7 +133,7 @@ public class VersionCheck
                             JourneymapClient.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
                         }
 
-                        JourneymapClient.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, JourneymapClient.DOWNLOAD_URL));
+                        JourneymapClient.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, Journeymap.DOWNLOAD_URL));
                     }
                     catch (Throwable e)
                     {
@@ -146,6 +166,12 @@ public class VersionCheck
         }
     }
 
+    /**
+     * Whether this instance's version is current (equal or newer) to one avaialable.
+     * @param thisVersionStr
+     * @param availableVersionStr
+     * @return
+     */
     private static boolean isCurrent(String thisVersionStr, String availableVersionStr)
     {
         if (thisVersionStr.equals(availableVersionStr))
@@ -159,6 +185,10 @@ public class VersionCheck
         return !availableVersion.isNewerThan(thisVersion);
     }
 
+    /**
+     * Create the user agent string used by the HTTP connection.
+     * @return
+     */
     private static String createUserAgent()
     {
         String agent = null;
@@ -221,9 +251,12 @@ public class VersionCheck
         return agent;
     }
 
+    /**
+     * Launch the JourneyMap website in the native OS.
+     */
     public static void launchWebsite()
     {
-        String url = JourneymapClient.DOWNLOAD_URL;
+        String url = Journeymap.DOWNLOAD_URL;
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -234,11 +267,17 @@ public class VersionCheck
         }
     }
 
+    /**
+     * Object model representing the JSON document.
+     */
     class VersionData
     {
         VersionLine[] versions;
     }
 
+    /**
+     * Object model representing a version line in the JSON document.
+     */
     class VersionLine
     {
         String minecraft;

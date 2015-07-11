@@ -30,11 +30,11 @@ import java.util.concurrent.Executors;
  *
  * @author mwoodman
  */
-public class JMServer
+public class WebServer
 {
     private final static int MAXPORT = 9990;
     private final static int MAXFAILS = 5;
-    private static volatile JMServer instance;
+    private static volatile WebServer instance;
 
     private final Logger logger = JourneymapClient.getLogger();
 
@@ -42,7 +42,7 @@ public class JMServer
     private int port;
     private boolean ready = false;
 
-    private JMServer()
+    private WebServer()
     {
         port = JourneymapClient.getWebMapProperties().port.get();
         validatePort();
@@ -70,7 +70,7 @@ public class JMServer
         {
             try
             {
-                instance = new JMServer();
+                instance = new WebServer();
                 if (instance.isReady())
                 {
                     instance.start();
@@ -98,7 +98,7 @@ public class JMServer
         ChatLog.announceMod(forceAnnounce);
     }
 
-    public static JMServer getInstance()
+    public static WebServer getInstance()
     {
         return instance;
     }

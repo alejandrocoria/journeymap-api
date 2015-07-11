@@ -13,7 +13,8 @@ import com.google.common.base.Joiner;
 import java.util.Arrays;
 
 /**
- * Created by Mark on 10/18/2014.
+ * Object model for representing a software version:
+ * MAJOR.MINOR.MICRO.PATCH, where the first three are numbers and patch may be a string. (a1, b2, rc1)
  */
 public class Version implements Comparable<Version>
 {
@@ -22,11 +23,24 @@ public class Version implements Comparable<Version>
     public final int micro;
     public final String patch;
 
+    /**
+     * Constructor without a patch modifier.
+     * @param major
+     * @param minor
+     * @param micro
+     */
     public Version(int major, int minor, int micro)
     {
         this(major, minor, micro, "");
     }
 
+    /**
+     * Constructor with a patch modifier.
+     * @param major
+     * @param minor
+     * @param micro
+     * @param patch
+     */
     public Version(int major, int minor, int micro, String patch)
     {
         this.major = major;
@@ -35,6 +49,15 @@ public class Version implements Comparable<Version>
         this.patch = patch != null ? patch : "";
     }
 
+    /**
+     * Creates a Version using parameters and a default Version if the parameters can't be parsed.
+     * @param major
+     * @param minor
+     * @param micro
+     * @param patch
+     * @param defaultVersion
+     * @return
+     */
     public static Version from(String major, String minor, String micro, String patch, Version defaultVersion)
     {
         try
@@ -52,6 +75,12 @@ public class Version implements Comparable<Version>
         }
     }
 
+    /**
+     * Converts a version string to a Version.
+     * @param versionString
+     * @param defaultVersion
+     * @return
+     */
     public static Version from(String versionString, Version defaultVersion)
     {
         try
@@ -76,6 +105,11 @@ public class Version implements Comparable<Version>
         }
     }
 
+    /**
+     * Converts a numeric string to an int.
+     * @param number
+     * @return
+     */
     private static int parseInt(String number)
     {
         if (number == null)
@@ -85,15 +119,30 @@ public class Version implements Comparable<Version>
         return Integer.parseInt(number);
     }
 
+    /**
+     * Creates a MAJOR.MINOR string from this instance.
+     * @return
+     */
+    public String toMajorMinorString()
+    {
+        return Joiner.on(".").join(major, minor);
+    }
+
+    /**
+     * Whether this is a newer version than the other.
+     * @param other
+     * @return
+     */
+    public boolean isNewerThan(Version other)
+    {
+        return compareTo(other) > 0;
+    }
+
+
     @Override
     public String toString()
     {
         return Joiner.on(".").join(major, minor, micro + patch);
-    }
-
-    public String toMajorMinorString()
-    {
-        return Joiner.on(".").join(major, minor);
     }
 
     @Override
@@ -138,11 +187,6 @@ public class Version implements Comparable<Version>
         result = 31 * result + micro;
         result = 31 * result + patch.hashCode();
         return result;
-    }
-
-    public boolean isNewerThan(Version other)
-    {
-        return compareTo(other) > 0;
     }
 
     @Override

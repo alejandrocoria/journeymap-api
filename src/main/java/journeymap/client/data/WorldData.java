@@ -19,6 +19,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -308,7 +309,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         features = FeatureManager.getAllowedFeatures();
 
         mod_name = JourneymapClient.MOD_NAME;
-        jm_version = JourneymapClient.JM_VERSION.toString();
+        jm_version = Journeymap.JM_VERSION.toString();
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
         browser_poll = Math.max(1000, JourneymapClient.getCoreProperties().browserPoll.get());
