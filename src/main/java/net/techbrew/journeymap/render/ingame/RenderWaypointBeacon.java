@@ -104,8 +104,8 @@ public class RenderWaypointBeacon
             // Player coords
             Vec3 playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
 
-            // Get waypoint coords for dimension, raise Y to eye level for icon
-            Vec3 waypointVec = waypoint.getPosition().add(ForgeHelper.INSTANCE.newVec3(0, .118, 0));
+            // Move y up to put icon at eye height
+            Vec3 waypointVec = waypoint.getPosition().addVector(0, .118, 0);
 
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
