@@ -10,7 +10,6 @@ package modinfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Level;
 
@@ -93,7 +92,7 @@ public class Config implements Serializable
 
     private static File getFile(String modId)
     {
-        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        Minecraft minecraft = Minecraft.getMinecraft();
         File dir = new File(minecraft.mcDataDir, PARENT_DIR);
         if (!dir.exists())
         {
