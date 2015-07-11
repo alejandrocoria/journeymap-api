@@ -17,6 +17,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -44,6 +45,14 @@ import java.util.Random;
  */
 public class ForgeHelper_1_8 implements IForgeHelper
 {
+    private IRenderHelper renderHelper = new ForgeHelper_1_8.RenderHelper();
+
+    @Override
+    public IRenderHelper getRenderHelper()
+    {
+        return renderHelper;
+    }
+
     @Override
     public Minecraft getClient()
     {
@@ -495,5 +504,81 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return netManager.getRemoteAddress();
+    }
+
+    /**
+     * Encapsulates setting up vertices for a Tesselator
+     */
+    public class RenderHelper implements IRenderHelper
+    {
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        @Override
+        public void startDrawingQuads()
+        {
+            // 1.7
+            // tessellator.startDrawingQuads();
+
+            // 1.8
+            worldrenderer.startDrawingQuads();
+        }
+
+        @Override
+        public void addVertex(double x, double y, double z)
+        {
+            // 1.7
+            // tessellator.addVertex(x,y,z);
+
+            // 1.8
+            worldrenderer.addVertex(x,y,z);
+        }
+
+        @Override
+        public void addVertexWithUV(double x, double y, double z, double u, double v)
+        {
+            // 1.7
+            // tessellator.addVertexWithUV(x,y,z,u,v);
+
+            // 1.8
+            worldrenderer.addVertexWithUV(x,y,z,u,v);
+        }
+
+        @Override
+        public void setColorRGBA_F(float r, float g, float b, float a)
+        {
+            // 1.7
+            // tessellator.setColorRGBA_F(x,y,z);
+
+            // 1.8
+            worldrenderer.setColorRGBA_F(r,g,b,a);
+        }
+
+        @Override
+        public void setColorRGBA(int r, int g, int b, int a)
+        {
+            // 1.7
+            // tessellator.setColorRGBA_F(x,y,z);
+
+            // 1.8
+            worldrenderer.setColorRGBA_F(r,g,b,a);
+        }
+
+        @Override
+        public void setColorRGBA_I(int rgb, int a)
+        {
+            // 1.7
+            // tessellator.setColorRGBA_I(rgb, a);
+
+            // 1.8
+            worldrenderer.setColorRGBA_I(rgb, a);
+        }
+
+        @Override
+        public void draw()
+        {
+            tessellator.draw();
+        }
     }
 }

@@ -11,6 +11,7 @@ package journeymap.client.render.ingame;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
@@ -20,7 +21,6 @@ import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
@@ -303,7 +303,7 @@ public class RenderWaypointBeacon
     {
         float f1 = 1f;
 
-        Tessellator tessellator = Tessellator.instance;
+        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         mc.renderEngine.bindTexture(beam);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
@@ -326,8 +326,8 @@ public class RenderWaypointBeacon
         {
             byte b0 = 1;
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
-            tessellator.startDrawingQuads();
-            tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
+            renderHelper.startDrawingQuads();
+            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
             double d5 = Math.cos(d3 + 2.356194490192345D) * d4;
             double d6 = Math.sin(d3 + 2.356194490192345D) * d4;
@@ -342,23 +342,23 @@ public class RenderWaypointBeacon
             double d15 = 1.0D;
             double d16 = (double) (-1.0F + texOffset);
             double d17 = (double) (256.0F * f1) * (0.5D / d4) + d16;
-            tessellator.addVertexWithUV(x + d5, y + d13, z + d6, d15, d17);
-            tessellator.addVertexWithUV(x + d5, y, z + d6, d15, d16);
-            tessellator.addVertexWithUV(x + d7, y, z + d8, d14, d16);
-            tessellator.addVertexWithUV(x + d7, y + d13, z + d8, d14, d17);
-            tessellator.addVertexWithUV(x + d11, y + d13, z + d12, d15, d17);
-            tessellator.addVertexWithUV(x + d11, y, z + d12, d15, d16);
-            tessellator.addVertexWithUV(x + d9, y, z + d10, d14, d16);
-            tessellator.addVertexWithUV(x + d9, y + d13, z + d10, d14, d17);
-            tessellator.addVertexWithUV(x + d7, y + d13, z + d8, d15, d17);
-            tessellator.addVertexWithUV(x + d7, y, z + d8, d15, d16);
-            tessellator.addVertexWithUV(x + d11, y, z + d12, d14, d16);
-            tessellator.addVertexWithUV(x + d11, y + d13, z + d12, d14, d17);
-            tessellator.addVertexWithUV(x + d9, y + d13, z + d10, d15, d17);
-            tessellator.addVertexWithUV(x + d9, y, z + d10, d15, d16);
-            tessellator.addVertexWithUV(x + d5, y, z + d6, d14, d16);
-            tessellator.addVertexWithUV(x + d5, y + d13, z + d6, d14, d17);
-            tessellator.draw();
+            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d15, d17);
+            renderHelper.addVertexWithUV(x + d5, y, z + d6, d15, d16);
+            renderHelper.addVertexWithUV(x + d7, y, z + d8, d14, d16);
+            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d14, d17);
+            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d15, d17);
+            renderHelper.addVertexWithUV(x + d11, y, z + d12, d15, d16);
+            renderHelper.addVertexWithUV(x + d9, y, z + d10, d14, d16);
+            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d14, d17);
+            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d15, d17);
+            renderHelper.addVertexWithUV(x + d7, y, z + d8, d15, d16);
+            renderHelper.addVertexWithUV(x + d11, y, z + d12, d14, d16);
+            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d14, d17);
+            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d15, d17);
+            renderHelper.addVertexWithUV(x + d9, y, z + d10, d15, d16);
+            renderHelper.addVertexWithUV(x + d5, y, z + d6, d14, d16);
+            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d14, d17);
+            renderHelper.draw();
         }
 
         if (staticBeam)
@@ -372,25 +372,25 @@ public class RenderWaypointBeacon
             x -= .5;
             z -= .5;
 
-            tessellator.startDrawingQuads();
-            tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
-            tessellator.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
-            tessellator.addVertexWithUV(x + .2, y, z + .2, 1, d29);
-            tessellator.addVertexWithUV(x + .8, y, z + .2, 0, d29);
-            tessellator.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
-            tessellator.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
-            tessellator.addVertexWithUV(x + .8, y, z + .8, 1, d29);
-            tessellator.addVertexWithUV(x + .2, y, z + .8, 0, d29);
-            tessellator.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
-            tessellator.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
-            tessellator.addVertexWithUV(x + .8, y, z + .2, 1, d29);
-            tessellator.addVertexWithUV(x + .8, y, z + .8, 0, d29);
-            tessellator.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
-            tessellator.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
-            tessellator.addVertexWithUV(x + .2, y, z + .8, 1, d29);
-            tessellator.addVertexWithUV(x + .2, y, z + .2, 0, d29);
-            tessellator.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
-            tessellator.draw();
+            renderHelper.startDrawingQuads();
+            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
+            renderHelper.draw();
         }
 
         GL11.glEnable(GL11.GL_LIGHTING);

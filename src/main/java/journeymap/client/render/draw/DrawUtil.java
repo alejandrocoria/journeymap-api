@@ -10,11 +10,11 @@ package journeymap.client.render.draw;
 
 
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -313,13 +313,13 @@ public class DrawUtil
 
         final int direction = flip ? -1 : 1;
 
-        Tessellator tessellator = ForgeHelper.INSTANCE.getTessellator();
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        tessellator.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
-        tessellator.addVertexWithUV(x + width, y, zLevel, direction, 0);
-        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
-        tessellator.draw();
+        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        renderHelper.startDrawingQuads();
+        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
+        renderHelper.addVertexWithUV(x + width, y, zLevel, direction, 0);
+        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+        renderHelper.draw();
 
         // Ensure normal alpha blending afterward, just in case
         if (blend)
@@ -340,14 +340,14 @@ public class DrawUtil
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        tessellator.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
-        tessellator.addVertexWithUV(x + width, y, zLevel, 1, 0);
-        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
-        tessellator.draw();
+        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        renderHelper.startDrawingQuads();
+        renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
+        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
+        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+        renderHelper.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_BLEND);
@@ -366,15 +366,15 @@ public class DrawUtil
 
         GL11.glShadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_I(endColor.getRGB(), endAlpha);
-        tessellator.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        tessellator.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
-        tessellator.setColorRGBA_I(startColor.getRGB(), startAlpha);
-        tessellator.addVertexWithUV(x + width, y, zLevel, 1, 0);
-        tessellator.addVertexWithUV(x, y, zLevel, 0, 0);
-        tessellator.draw();
+        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        renderHelper.startDrawingQuads();
+        renderHelper.setColorRGBA_I(endColor.getRGB(), endAlpha);
+        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
+        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
+        renderHelper.setColorRGBA_I(startColor.getRGB(), startAlpha);
+        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
+        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+        renderHelper.draw();
 
         GL11.glShadeModel(GL11.GL_FLAT);
 
@@ -385,13 +385,13 @@ public class DrawUtil
 
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(startX, endY, z, startU, endV);
-        tessellator.addVertexWithUV(endX, endY, z, endU, endV);
-        tessellator.addVertexWithUV(endX, startY, z, endU, startV);
-        tessellator.addVertexWithUV(startX, startY, z, startU, startV);
-        tessellator.draw();
+        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        renderHelper.startDrawingQuads();
+        renderHelper.addVertexWithUV(startX, endY, z, startU, endV);
+        renderHelper.addVertexWithUV(endX, endY, z, endU, endV);
+        renderHelper.addVertexWithUV(endX, startY, z, endU, startV);
+        renderHelper.addVertexWithUV(startX, startY, z, startU, startV);
+        renderHelper.draw();
     }
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float alpha, float scale, double rotation)

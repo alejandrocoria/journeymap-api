@@ -35,6 +35,22 @@ import java.util.Iterator;
  */
 public interface IForgeHelper
 {
+    /**
+     * Encapsulates setting up vertices for a Tesselator.
+     */
+    public interface IRenderHelper
+    {
+        public void startDrawingQuads();
+        public void addVertex(double x, double y, double z);
+        public void addVertexWithUV(double x, double y, double z, double u, double v);
+        public void setColorRGBA_F(float r, float g, float b, float a);
+        public void setColorRGBA(int r, int g, int b, int a);
+        public void setColorRGBA_I(int rgb, int a);
+        public void draw();
+    }
+
+    public IRenderHelper getRenderHelper();
+
     public Minecraft getClient();
 
     public EnumSkyBlock getSkyBlock();
