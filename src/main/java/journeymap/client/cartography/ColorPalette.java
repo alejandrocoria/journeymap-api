@@ -365,7 +365,7 @@ public class ColorPalette
         {
             this.name = blockMD.getName();
             // 1.8 needs the cast
-            this.uid = (String) GameData.getBlockRegistry().getNameForObject(blockMD.getBlock());
+            this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
             this.meta = blockMD.meta;
             this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());
             if (blockMD.getAlpha() < 1f)
