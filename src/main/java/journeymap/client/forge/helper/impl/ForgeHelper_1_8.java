@@ -231,7 +231,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return entity.boundingBox
 
         // 1.8
-        return entity.getBoundingBox();
+        return entity.getEntityBoundingBox();
     }
 
     /**
