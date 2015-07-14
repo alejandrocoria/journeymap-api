@@ -13,7 +13,6 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
@@ -146,36 +145,36 @@ public class ModBlockDelegate
         return delegatedBlockMD;
     }
 
-    /**
-     * Provide special handling of getting a block icon.  Return nulls if not necessary,
-     *
-     * @param blockMD
-     * @return
-     */
-    public IIcon getIcon(BlockMD blockMD)
-    {
-        try
-        {
-            IModBlockHandler handler = Blocks.get(blockMD.uid);
-            if (handler != null)
-            {
-                return handler.getIcon(blockMD);
-            }
-        }
-        catch (Throwable t)
-        {
-            int count = Errors.get(blockMD.uid).incrementAndGet();
-            String message = String.format("Error (%s) from getIcon() on block '%s': %s", count, blockMD.uid, LogFormatter.toString(t));
-            logger.error(message);
-            if (count >= ERROR_LIMIT)
-            {
-                logger.warn(String.format("Deregistering problematic IModBlockHandler for '%s'.", blockMD.uid));
-                Blocks.remove(blockMD.uid);
-            }
-        }
-
-        return null;
-    }
+//    /**
+//     * Provide special handling of getting a block icon.  Return nulls if not necessary,
+//     *
+//     * @param blockMD
+//     * @return
+//     */
+//    public IIcon getIcon(BlockMD blockMD)
+//    {
+//        try
+//        {
+//            IModBlockHandler handler = Blocks.get(blockMD.uid);
+//            if (handler != null)
+//            {
+//                return handler.getIcon(blockMD);
+//            }
+//        }
+//        catch (Throwable t)
+//        {
+//            int count = Errors.get(blockMD.uid).incrementAndGet();
+//            String message = String.format("Error (%s) from getIcon() on block '%s': %s", count, blockMD.uid, LogFormatter.toString(t));
+//            logger.error(message);
+//            if (count >= ERROR_LIMIT)
+//            {
+//                logger.warn(String.format("Deregistering problematic IModBlockHandler for '%s'.", blockMD.uid));
+//                Blocks.remove(blockMD.uid);
+//            }
+//        }
+//
+//        return null;
+//    }
 
     public static interface IModBlockHandler
     {
@@ -192,7 +191,7 @@ public class ModBlockDelegate
          * @param blockMD
          * @return
          */
-        public IIcon getIcon(BlockMD blockMD);
+//        public IIcon getIcon(BlockMD blockMD);
 
         /**
          * Provide special handling of a block in-situ when encountered during a mapping task.

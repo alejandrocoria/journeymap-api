@@ -12,8 +12,8 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.io.IconLoader;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
@@ -41,7 +41,7 @@ public class ColorCache
     private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
     private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private volatile IconLoader iconLoader;
+    private volatile IColorHelper colorHelper;
     private volatile ColorPalette currentPalette;
     private String lastResourcePackNames;
     private String lastModNames;
@@ -74,7 +74,7 @@ public class ColorCache
             boolean resourcePackSame = false;
             boolean modPackSame = false;
 
-            if (currentResourcePackNames.equals(lastResourcePackNames) && iconLoader != null)
+            if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
             {
                 JourneymapClient.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
                 resourcePackSame = true;
@@ -236,7 +236,7 @@ public class ColorCache
 
     public Integer getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        if (iconLoader == null)
+        if (colorHelper == null)
         {
             return null;
         }
@@ -442,7 +442,7 @@ public class ColorCache
         Color baseColor = null;
 
         // Get the color from the texture
-        baseColor = iconLoader.loadBlockColor(blockMD);
+        baseColor = colorHelper.loadBlockColor(blockMD);
 
         // Non-biome block colors get multiplied by their render color.
         // Some blocks may have custom biome-based tints as well.
@@ -478,7 +478,7 @@ public class ColorCache
             {
 
             }
-            else if (iconLoader.failedFor(blockMD))
+            else if (colorHelper.failedFor(blockMD))
             {
                 JourneymapClient.getLogger().warn("Iconloader failed to get base color for " + blockMD);
             }
@@ -492,7 +492,7 @@ public class ColorCache
 
     public void reset()
     {
-        iconLoader = new IconLoader();
+        colorHelper = ForgeHelper.INSTANCE.getColorHelper();
         biomeColors.clear();
         baseColors.clear();
     }

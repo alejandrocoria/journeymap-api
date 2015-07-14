@@ -748,7 +748,7 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    public void keyTyped(char c, int i)
+    public void keyTyped(char c, int i) throws IOException
     {
         if (chat != null && !chat.isHidden())
         {

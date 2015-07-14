@@ -41,7 +41,7 @@ public class ResourceManagerHandler implements IResourceManagerReloadListener
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void onResourceManagerReload(IResourceManager p_110549_1_)
+    public void onResourceManagerReload(IResourceManager resourceManager)
     {
         if (mc.theWorld == null)
         {

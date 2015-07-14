@@ -11,6 +11,8 @@ package journeymap.client.ui.fullscreen;
 import net.minecraft.client.gui.GuiChat;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
+
 
 public class MapChat extends GuiChat
 {
@@ -54,7 +56,7 @@ public class MapChat extends GuiChat
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-    public void keyTyped(char par1, int par2)
+    public void keyTyped(char par1, int par2) throws IOException
     {
         if (hidden)
         {
@@ -67,7 +69,7 @@ public class MapChat extends GuiChat
      * Handles mouse input.
      */
     @Override
-    public void handleMouseInput()
+    public void handleMouseInput() throws IOException
     {
         if (hidden)
         {
@@ -80,7 +82,7 @@ public class MapChat extends GuiChat
      * Called when the mouse is clicked.
      */
     //@Override
-    public void mouseClicked(int par1, int par2, int par3)
+    public void mouseClicked(int par1, int par2, int par3) throws IOException
     {
         if (hidden)
         {

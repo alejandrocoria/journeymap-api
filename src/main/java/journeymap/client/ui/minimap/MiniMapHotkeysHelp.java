@@ -15,6 +15,7 @@ import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
+import java.io.IOException;
 
 public class MiniMapHotkeysHelp extends JmUI
 {
@@ -118,7 +119,7 @@ public class MiniMapHotkeysHelp extends JmUI
     }
 
     @Override
-    protected void keyTyped(char c, int i)
+    protected void keyTyped(char c, int i) throws IOException
     {
         super.keyTyped(c, i);
         KeyEventHandler.onKeypress(true);

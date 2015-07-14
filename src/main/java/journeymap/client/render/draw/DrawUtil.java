@@ -10,7 +10,7 @@ package journeymap.client.render.draw;
 
 
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -313,7 +313,7 @@ public class DrawUtil
 
         final int direction = flip ? -1 : 1;
 
-        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
         renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
@@ -340,7 +340,7 @@ public class DrawUtil
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
@@ -366,7 +366,7 @@ public class DrawUtil
 
         GL11.glShadeModel(GL11.GL_SMOOTH);
 
-        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.setColorRGBA_I(endColor.getRGB(), endAlpha);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
@@ -385,7 +385,7 @@ public class DrawUtil
 
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
-        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.addVertexWithUV(startX, endY, z, startU, endV);
         renderHelper.addVertexWithUV(endX, endY, z, endU, endV);

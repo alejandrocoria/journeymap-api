@@ -6,19 +6,20 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.io;
+package journeymap.client.forge.helper.impl;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.IIcon;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -28,7 +29,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 
-public class IconLoader
+/**
+ * IColorHelper implementation for 1.8.   Formerly IconLoader.
+ */
+public class ColorHelper_1_8 implements IColorHelper
 {
     final BufferedImage blocksTexture;
     Logger logger = JourneymapClient.getLogger();
@@ -38,11 +42,12 @@ public class IconLoader
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.
      */
-    public IconLoader()
+    public ColorHelper_1_8()
     {
         blocksTexture = initBlocksTexture();
     }
 
+    @Override
     public boolean failedFor(BlockMD blockMD)
     {
         return failed.contains(blockMD);
@@ -54,6 +59,7 @@ public class IconLoader
      * @param blockMD
      * @return
      */
+    @Override
     public Color loadBlockColor(BlockMD blockMD)
     {
 
@@ -73,7 +79,7 @@ public class IconLoader
         try
         {
 
-            IIcon blockIcon = getDirectIcon(blockMD);
+            TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
 
             if (blockIcon == null)
             {
@@ -109,54 +115,56 @@ public class IconLoader
         }
     }
 
-    private IIcon getDirectIcon(BlockMD blockMD)
+    private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-        IIcon blockIcon = null;
+        TextureAtlasSprite blockIcon = null;
 
-        if (blockMD.getBlock() instanceof BlockDoublePlant)
-        {
-            BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+//        if (blockMD.getBlock() instanceof BlockDoublePlant)
+//        {
+//            BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
+//
+//            // Get the top icon
+//            try
+//            {
+//                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
+//            }
+//            catch (Throwable t)
+//            {
+//                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
+//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
+//            }
+//
+//            if (blockIcon.getIconName().contains("sunflower"))
+//            {
+//                // Sunflower front
+//                blockIcon = blockDoublePlant.sunflowerIcons[0];
+//            }
+//        }
+//        else
+//        {
+//            if (blockMD.hasFlag(BlockMD.Flag.SpecialHandling))
+//            {
+//                blockIcon = DataCache.instance().getModBlockDelegate().getIcon(blockMD);
+//            }
+//
+//            if (blockIcon == null)
+//            {
+//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                while (blockIcon == null && side >= 0)
+//                {
+//                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
+//                    side--;
+//                }
+//            }
+//        }
 
-            // Get the top icon
-            try
-            {
-                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
-            }
-            catch (Throwable t)
-            {
-                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
-                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
-                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
-            }
-
-            if (blockIcon.getIconName().contains("sunflower"))
-            {
-                // Sunflower front
-                blockIcon = blockDoublePlant.sunflowerIcons[0];
-            }
-        }
-        else
-        {
-            if (blockMD.hasFlag(BlockMD.Flag.SpecialHandling))
-            {
-                blockIcon = DataCache.instance().getModBlockDelegate().getIcon(blockMD);
-            }
-
-            if (blockIcon == null)
-            {
-                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
-                while (blockIcon == null && side >= 0)
-                {
-                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
-                    side--;
-                }
-            }
-        }
-
-        return blockIcon;
+        IBlockState state = blockMD.getBlock().getStateFromMeta(blockMD.meta);
+        return ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
 
-    Color getColorForIcon(BlockMD blockMD, IIcon icon)
+    Color getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
         Color color = null;
 
@@ -279,12 +287,12 @@ public class IconLoader
                 {
                     blockAlpha = dataCache.getBlockMetadata().getAlpha(block);
                 }
-                else if (block.getRenderBlockPass() > 0)
+                else if (block.getRenderType() > 0)
                 {
                     blockAlpha = a * 1.0f / 255; // try to use texture alpha
                     if (blockAlpha == 1f)
                     { // try to use light opacity
-                        blockAlpha = block.getLightOpacity(ForgeHelper.INSTANCE.getClient().theWorld, 0, 65, 0) / 255f;
+                        blockAlpha = block.getLightOpacity() / 255f;
                     }
                 }
             }

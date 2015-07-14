@@ -15,8 +15,6 @@ import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
@@ -40,11 +38,11 @@ public class OpenBlocks
             return Arrays.asList(UID);
         }
 
-        @Override
-        public IIcon getIcon(BlockMD blockMD)
-        {
-            return null;
-        }
+//        @Override
+//        public IIcon getIcon(BlockMD blockMD)
+//        {
+//            return null;
+//        }
 
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
@@ -74,7 +72,7 @@ public class OpenBlocks
                     playerName = "";
                 }
 
-                Waypoint waypoint = new Waypoint(playerName + " " + blockMD.getName(), new ChunkCoordinates(blockX, y, blockZ), Color.red, Waypoint.Type.Death, chunkMd.getDimension());
+                Waypoint waypoint = new Waypoint(playerName + " " + blockMD.getName(), blockX, y, blockZ, Color.red, Waypoint.Type.Death, chunkMD.getDimension());
                 WaypointStore.instance().add(waypoint);
             }
 

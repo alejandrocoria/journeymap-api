@@ -11,7 +11,7 @@ package journeymap.client.render.ingame;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
@@ -303,7 +303,7 @@ public class RenderWaypointBeacon
     {
         float f1 = 1f;
 
-        IForgeHelper.IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         mc.renderEngine.bindTexture(beam);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);

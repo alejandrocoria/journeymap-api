@@ -9,15 +9,15 @@
 package journeymap.client.forge.helper.impl;
 
 import com.google.common.base.Strings;
-import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -34,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.GameData;
 
 import java.net.SocketAddress;
@@ -45,7 +46,7 @@ import java.util.Random;
  */
 public class ForgeHelper_1_8 implements IForgeHelper
 {
-    private IRenderHelper renderHelper = new ForgeHelper_1_8.RenderHelper();
+    private IRenderHelper renderHelper = new RenderHelper_1_8();
 
     @Override
     public IRenderHelper getRenderHelper()
@@ -54,9 +55,15 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
+    public IColorHelper getColorHelper()
+    {
+        return new ColorHelper_1_8();
+    }
+
+    @Override
     public Minecraft getClient()
     {
-        return ForgeHelper.INSTANCE.getClient();
+        return FMLClientHandler.instance().getClient();
     }
 
     @Override
@@ -506,79 +513,4 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return netManager.getRemoteAddress();
     }
 
-    /**
-     * Encapsulates setting up vertices for a Tesselator
-     */
-    public class RenderHelper implements IRenderHelper
-    {
-
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-
-        @Override
-        public void startDrawingQuads()
-        {
-            // 1.7
-            // tessellator.startDrawingQuads();
-
-            // 1.8
-            worldrenderer.startDrawingQuads();
-        }
-
-        @Override
-        public void addVertex(double x, double y, double z)
-        {
-            // 1.7
-            // tessellator.addVertex(x,y,z);
-
-            // 1.8
-            worldrenderer.addVertex(x,y,z);
-        }
-
-        @Override
-        public void addVertexWithUV(double x, double y, double z, double u, double v)
-        {
-            // 1.7
-            // tessellator.addVertexWithUV(x,y,z,u,v);
-
-            // 1.8
-            worldrenderer.addVertexWithUV(x,y,z,u,v);
-        }
-
-        @Override
-        public void setColorRGBA_F(float r, float g, float b, float a)
-        {
-            // 1.7
-            // tessellator.setColorRGBA_F(x,y,z);
-
-            // 1.8
-            worldrenderer.setColorRGBA_F(r,g,b,a);
-        }
-
-        @Override
-        public void setColorRGBA(int r, int g, int b, int a)
-        {
-            // 1.7
-            // tessellator.setColorRGBA_F(x,y,z);
-
-            // 1.8
-            worldrenderer.setColorRGBA_F(r,g,b,a);
-        }
-
-        @Override
-        public void setColorRGBA_I(int rgb, int a)
-        {
-            // 1.7
-            // tessellator.setColorRGBA_I(rgb, a);
-
-            // 1.8
-            worldrenderer.setColorRGBA_I(rgb, a);
-        }
-
-        @Override
-        public void draw()
-        {
-            tessellator.draw();
-        }
-    }
 }

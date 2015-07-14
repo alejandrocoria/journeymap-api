@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -243,7 +244,7 @@ public abstract class JmUI extends GuiScreen
     }
 
     @Override
-    protected void keyTyped(char c, int i)
+    protected void keyTyped(char c, int i) throws IOException
     {
         switch (i)
         {
