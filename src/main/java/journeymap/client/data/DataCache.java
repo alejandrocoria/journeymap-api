@@ -261,7 +261,7 @@ public class DataCache
                 {
                     player.invalidateAll();
                 }
-                return player.get(PlayersData.class);
+                return player.get(PlayerData.class);
             }
             catch (ExecutionException e)
             {
