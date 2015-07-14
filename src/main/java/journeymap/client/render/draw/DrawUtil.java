@@ -9,11 +9,13 @@
 package journeymap.client.render.draw;
 
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -336,21 +338,44 @@ public class DrawUtil
 
     public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
     {
-        GL11.glEnable(GL11.GL_BLEND);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        float[] rgb = RGB.floats(color.getRGB());
+
+        // 1.7
+//        GL11.glEnable(GL11.GL_BLEND);
+//        GL11.glDisable(GL11.GL_TEXTURE_2D);
+//        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+//        GL11.glDisable(GL11.GL_ALPHA_TEST);
+//        GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha/255f);
+
+        // 1.8
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(rgb[0], rgb[1], rgb[2], alpha/255f);
+
+        // Common
         IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
-        renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        // this was in 1.7, but perhaps the color assignment above will suffice?
+        //renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
         renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
         renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
         renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
         renderHelper.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glDisable(GL11.GL_BLEND);
+
+        // 1.7
+//        GL11.glColor4f(1,1,1,1);
+//        GL11.glEnable(GL11.GL_TEXTURE_2D);
+//        GL11.glEnable(GL11.GL_ALPHA_TEST);
+//        GL11.glDisable(GL11.GL_BLEND);
+
+        // 1.8
+        GlStateManager.color(1,1,1,1); // TODO: better to use resetColor() ?
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableBlend();
     }
 
     /**
