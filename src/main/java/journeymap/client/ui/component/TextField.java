@@ -10,7 +10,6 @@ package journeymap.client.ui.component;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.awt.*;
 
@@ -20,10 +19,11 @@ import java.awt.*;
 public class TextField extends GuiTextField
 {
     // ReflectionHelper field indices
-    protected static final int INDEX_X = 1;
-    protected static final int INDEX_Y = 2;
-    protected static final int INDEX_WIDTH = 3;
-    protected static final int INDEX_HEIGHT = 4;
+    // 1.7 only
+    //protected static final int INDEX_X = 1;
+    //protected static final int INDEX_Y = 2;
+    //protected static final int INDEX_WIDTH = 3;
+    //protected static final int INDEX_HEIGHT = 4;
 
     protected final String numericRegex;
     protected final boolean numeric;
@@ -196,37 +196,65 @@ public class TextField extends GuiTextField
 
     public int getX()
     {
-        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_X);
+        // 1.7
+        // return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_X);
+
+        // 1.8
+        return xPosition;
     }
 
     public void setX(int x)
     {
-        ReflectionHelper.setPrivateValue(GuiTextField.class, this, x, INDEX_X);
+        // 1.7
+        // ReflectionHelper.setPrivateValue(GuiTextField.class, this, x, INDEX_X);
+
+        // 1.8
+        xPosition = x;
     }
 
     public int getY()
     {
-        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_Y);
+        // 1.7
+        // return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_Y);
+
+        // 1.8
+        return yPosition;
     }
 
     public void setY(int y)
     {
-        ReflectionHelper.setPrivateValue(GuiTextField.class, this, y, INDEX_Y);
+        // 1.7
+        // ReflectionHelper.setPrivateValue(GuiTextField.class, this, y, INDEX_Y);
+
+        // 1.8
+        yPosition = y;
     }
 
     public int getWidth()
     {
-        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_WIDTH);
+        // 1.7
+        // return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_WIDTH);
+
+        // 1.8
+        return width;
     }
 
     public void setWidth(int w)
     {
-        ReflectionHelper.setPrivateValue(GuiTextField.class, this, w, INDEX_WIDTH);
+        // 1.7
+        // ReflectionHelper.setPrivateValue(GuiTextField.class, this, w, INDEX_WIDTH);
+
+        // 1.8
+        width = w;
     }
 
     public int getHeight()
     {
-        return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
+        // 1.7
+        // return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
+
+        // 1.8
+        return height;
     }
 
     public int getCenterX()
