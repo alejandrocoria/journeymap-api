@@ -16,7 +16,6 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected String[] tooltip;
 
     FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
-    private boolean enabled;
 
     public Button(String label)
     {
@@ -92,7 +90,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean isActive()
     {
-        return enabled;
+        return isEnabled();
     }
 
     public int getFitWidth(FontRenderer fr)
@@ -134,7 +132,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         // field_146123_n = hover;
 
         // 1.8
-        this.hovered = hover;
+        this.setHovered(hover);
     }
 
     @Override
@@ -164,10 +162,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
         if (defaultStyle)
         {
-            if (!enabled)
-            {
-                enabled = false;
-            }
+//            if (!isEnabled())
+//            {
+//                setEnabled(false);
+//            }
             // Use resource pack texture
             super.drawButton(minecraft, mouseX, mouseY);
         }
@@ -175,8 +173,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             // Use small button colors
             minecraft.getTextureManager().bindTexture(buttonTextures);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.enabled = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            ForgeHelper.INSTANCE.getRenderHelper().glColor4f(1, 1, 1, 1);
+
+            this.setHovered(mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height);
+            int hoverState = this.getHoverState(this.isHovered());
 
             if (isDrawFrame())
             {
@@ -187,13 +187,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 255); // Right
             }
 
-            int k = this.getHoverState(this.enabled);
-
             if (isDrawBackground())
             {
-                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, k == 2 ? smallBgHoverColor : smallBgColor, 255);
+                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 255);
             }
-            else if (this.enabled && enabled)
+            else if (this.isEnabled() && isHovered())
             {
                 DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, 128);
             }
@@ -214,7 +212,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
             else
             {
-                if (this.enabled)
+                if (this.isHovered())
                 {
                     varLabelColor = hoverLabelColor;
                 }
@@ -283,7 +281,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             return list;
         }
 
-        if (!this.enabled && showDisabledHoverText)
+        if (!this.isEnabled() && showDisabledHoverText)
         {
             list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
         }
@@ -512,12 +510,12 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean isEnabled()
     {
-        return enabled;
+        return super.enabled;
     }
 
     public void setEnabled(boolean enabled)
     {
-        this.enabled = enabled;
+        super.enabled = enabled;
     }
 
     public boolean isDrawButton()
@@ -598,5 +596,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public Color getLabelColor()
     {
         return labelColor;
+    }
+
+    public boolean isHovered()
+    {
+        return super.hovered;
+    }
+
+    public void setHovered(boolean hovered)
+    {
+        super.hovered = hovered;
     }
 }
