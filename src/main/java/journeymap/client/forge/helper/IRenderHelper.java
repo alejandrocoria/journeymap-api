@@ -8,6 +8,8 @@
 
 package journeymap.client.forge.helper;
 
+import java.awt.*;
+
 /**
  * Encapsulates setting up vertices for a Tesselator.
  */
@@ -20,4 +22,16 @@ public interface IRenderHelper
     public void setColorRGBA(int r, int g, int b, int a);
     public void setColorRGBA_I(int rgb, int a);
     public void draw();
+
+    public void glEnableBlend();
+    public void glDisableBlend();
+    public void glEnableTexture2D();
+    public void glDisableTexture2D();
+    public void glEnableAlpha();
+    public void glDisableAlpha();
+    public void glBlendFunc(int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
+    public void glColor(Color color, int alpha);
+    public void glColor4f(float r, float g, float b, float a);
+    public void glShadeModel(int model);
+    public void glBindTexture(int glid);
 }

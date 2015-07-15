@@ -13,10 +13,7 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -28,6 +25,8 @@ import java.awt.*;
 public class DrawUtil
 {
     public static double zLevel = 0;
+
+    public static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
@@ -116,7 +115,6 @@ public class DrawUtil
             return;
         }
 
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         final boolean drawRect = (bgColor != null && alpha > 0);
         final int width = fontRenderer.getStringWidth(text);
@@ -271,23 +269,23 @@ public class DrawUtil
 
         if (blend)
         {
-            GL11.glEnable(GL11.GL_BLEND);
-            OpenGlHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
+            renderHelper.glEnableBlend();
+            renderHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
         }
 
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
+        renderHelper.glEnableTexture2D();
+        renderHelper.glBindTexture(texture.getGlTextureId());
 
         if (blend)
         {
             if (color != null)
             {
                 float[] c = color.getColorComponents(null);
-                GL11.glColor4f(c[0], c[1], c[2], alpha);
+                renderHelper.glColor4f(c[0], c[1], c[2], alpha);
             }
             else
             {
-                GL11.glColor4f(1, 1, 1, alpha);
+                renderHelper.glColor4f(1, 1, 1, alpha);
             }
         }
 
@@ -315,7 +313,6 @@ public class DrawUtil
 
         final int direction = flip ? -1 : 1;
 
-        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
         renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
@@ -328,8 +325,8 @@ public class DrawUtil
         {
             if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
             {
-                GL11.glEnable(GL11.GL_BLEND);
-                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                renderHelper.glEnableBlend();
+                renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
             }
         }
 
@@ -340,22 +337,14 @@ public class DrawUtil
     {
         float[] rgb = RGB.floats(color.getRGB());
 
-        // 1.7
-//        GL11.glEnable(GL11.GL_BLEND);
-//        GL11.glDisable(GL11.GL_TEXTURE_2D);
-//        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-//        GL11.glDisable(GL11.GL_ALPHA_TEST);
-//        GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha/255f);
+        // Prep
+        renderHelper.glEnableBlend();
+        renderHelper.glDisableTexture2D();
+        renderHelper.glDisableAlpha();
+        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        renderHelper.glColor(color, alpha);
 
-        // 1.8
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableAlpha();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.color(rgb[0], rgb[1], rgb[2], alpha/255f);
-
-        // Common
-        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+        // Draw
         renderHelper.startDrawingQuads();
         // this was in 1.7, but perhaps the color assignment above will suffice?
         //renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
@@ -365,17 +354,11 @@ public class DrawUtil
         renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
         renderHelper.draw();
 
-        // 1.7
-//        GL11.glColor4f(1,1,1,1);
-//        GL11.glEnable(GL11.GL_TEXTURE_2D);
-//        GL11.glEnable(GL11.GL_ALPHA_TEST);
-//        GL11.glDisable(GL11.GL_BLEND);
-
-        // 1.8
-        GlStateManager.color(1,1,1,1); // TODO: better to use resetColor() ?
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableAlpha();
-        GlStateManager.disableBlend();
+        // Clean up
+        renderHelper.glColor4f(1, 1, 1, 1); // TODO: better to use resetColor() ?
+        renderHelper.glEnableTexture2D();
+        renderHelper.glEnableAlpha();
+        renderHelper.glDisableBlend();
     }
 
     /**
@@ -384,14 +367,14 @@ public class DrawUtil
      */
     public static void drawGradientRect(double x, double y, double width, double height, Color startColor, int startAlpha, Color endColor, int endAlpha)
     {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        renderHelper.glDisableTexture2D();
+        renderHelper.glEnableBlend();
+        renderHelper.glDisableAlpha();
+        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        renderHelper.glShadeModel(GL11.GL_SMOOTH);
 
-        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+
         renderHelper.startDrawingQuads();
         renderHelper.setColorRGBA_I(endColor.getRGB(), endAlpha);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
@@ -401,16 +384,15 @@ public class DrawUtil
         renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
         renderHelper.draw();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
+        renderHelper.glShadeModel(GL11.GL_FLAT);
 
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glDisable(GL11.GL_BLEND);
+        renderHelper.glEnableTexture2D();
+        renderHelper.glEnableAlpha();
+        renderHelper.glEnableBlend();
     }
 
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
-        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         renderHelper.startDrawingQuads();
         renderHelper.addVertexWithUV(startX, endY, z, startU, endV);
         renderHelper.addVertexWithUV(endX, endY, z, endU, endV);
