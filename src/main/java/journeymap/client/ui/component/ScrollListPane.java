@@ -108,6 +108,14 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     }
 
     /**
+     * Handles mouse input.
+     */
+    public void handleMouseInput()
+    {
+        super.handleMouseInput();
+    }
+
+    /**
      * The element in the slot that was clicked, boolean for whether it was double clicked or not
      */
     protected void elementClicked(int index, boolean doubleClick, int mouseX, int mouseY)

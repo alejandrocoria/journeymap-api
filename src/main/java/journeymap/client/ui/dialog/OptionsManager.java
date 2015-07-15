@@ -37,7 +37,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.io.IOException;
@@ -306,28 +305,6 @@ public class OptionsManager extends JmUI
             String[] lastTooltip = optionsListPane.lastTooltip;
             long lastTooltipTime = optionsListPane.lastTooltipTime;
             optionsListPane.lastTooltip = null;
-
-            // Pre-scroll options list pane so we can double the distance covered
-
-            // 1.7
-            // boolean isEnabled = optionsListPane.func_148125_i();
-
-            // 1.8
-            boolean isEnabled = optionsListPane.getEnabled();
-            if (!(Mouse.isButtonDown(0) && isEnabled))
-            {
-                for (; !this.mc.gameSettings.touchscreen && Mouse.next(); this.mc.currentScreen.handleMouseInput())
-                {
-                    int j1 = Mouse.getEventDWheel();
-
-                    if (j1 != 0)
-                    {
-                        j1 = (j1 > 0) ? -2 : 2;
-                        optionsListPane.scrollBy(j1 * optionsListPane.slotHeight);
-                    }
-                }
-            }
-
             optionsListPane.drawScreen(x, y, par3);
 
             super.drawScreen(x, y, par3);
@@ -355,6 +332,15 @@ public class OptionsManager extends JmUI
         {
             JMLogger.logOnce("Error in OptionsManager.drawScreen(): " + t, t);
         }
+    }
+
+    /**
+     * Handles mouse input.
+     */
+    public void handleMouseInput() throws IOException
+    {
+        super.handleMouseInput();
+        optionsListPane.handleMouseInput();
     }
 
     private void updateRenderStats()
