@@ -29,7 +29,6 @@ src/minecraft/paulscode/
 
 /temp/
 .gradle/
-gradle/
 tmp/
 .idea/
 eclipse/
