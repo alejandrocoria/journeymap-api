@@ -58,4 +58,3 @@ The end result will be in `journeymap/dist/journeymap*.jar`
 [1]: https://bitbucket.org/TeamJM/journeymap
 [2]: http://journeymap.info
 [3]: http://files.minecraftforge.net/
-
