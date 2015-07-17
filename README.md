@@ -11,10 +11,10 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 ### 1. Git the JourneyMap source
 
-Check out the JourneyMap GIT repo to a directory called journeymap.  For example:
+Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
     git config core.ignorecase false
-    git clone https://USERNAME@bitbucket.org/TeamJM/journeymap.git
+    git clone https://USERNAME@bitbucket.org/TeamJM/journeymap/branch/5.1.1_1.8 journeymap
 
 ### 2. Download Forge Source (http://files.minecraftforge.net/)
 
