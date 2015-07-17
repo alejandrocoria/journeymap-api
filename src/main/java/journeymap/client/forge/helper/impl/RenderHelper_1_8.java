@@ -162,6 +162,16 @@ public class RenderHelper_1_8 implements IRenderHelper
     }
 
     @Override
+    public void glBlendFunc(int sfactorRGB, int dfactorRGB)
+    {
+        // 1.7
+        // OpenGlHelper.glBlendFunc(sfactorRGB, dfactorRGB);
+
+        // 1.8
+        GlStateManager.blendFunc(sfactorRGB, dfactorRGB);
+    }
+
+    @Override
     public void glColor(Color color, int alpha)
     {
         float[] rgb = RGB.floats(color.getRGB());
@@ -201,5 +211,95 @@ public class RenderHelper_1_8 implements IRenderHelper
 
         // 1.8
         GlStateManager.bindTexture(glid);
+    }
+
+    @Override
+    public void glDisableDepth()
+    {
+        // 1.7
+        // GL11.glDisable(GL11.GL_DEPTH_TEST);
+
+        // 1.8
+        GlStateManager.disableDepth();
+    }
+
+    @Override
+    public void glEnableDepth()
+    {
+        // 1.7
+        // GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+        // 1.8
+        GlStateManager.enableDepth();
+    }
+
+    @Override
+    public void glDepthMask(boolean enable)
+    {
+        // 1.7
+        // GL11.glBindTexture(GL11.GL_TEXTURE_2D, glid);
+
+        // 1.8
+        GlStateManager.depthMask(enable);
+    }
+
+    @Override
+    public void glEnableLighting()
+    {
+        // 1.7
+        // GL11.glEnable(GL11.GL_LIGHTING);
+
+        // 1.8
+        GlStateManager.enableLighting();
+    }
+
+    @Override
+    public void glDisableLighting()
+    {
+        // 1.7
+        // GL11.glDisable(GL11.GL_LIGHTING);
+
+        // 1.8
+        GlStateManager.disableLighting();
+    }
+
+    @Override
+    public void glEnableFog()
+    {
+        // 1.7
+        // GL11.glEnable(GL11.GL_FOG);
+
+        // 1.8
+        GlStateManager.enableFog();
+    }
+
+    @Override
+    public void glDisableFog()
+    {
+        // 1.7
+        // GL11.glDisable(GL11.GL_FOG);
+
+        // 1.8
+        GlStateManager.disableFog();
+    }
+
+    @Override
+    public void glEnableCull()
+    {
+        // 1.7
+        // GL11.glEnable(GL11.GL_CULL_FACE);
+
+        // 1.8
+        GlStateManager.enableCull();
+    }
+
+    @Override
+    public void glDisableCull()
+    {
+        // 1.7
+        // GL11.glDisable(GL11.GL_CULL_FACE);
+
+        // 1.8
+        GlStateManager.disableCull();
     }
 }

@@ -30,8 +30,18 @@ public interface IRenderHelper
     public void glEnableAlpha();
     public void glDisableAlpha();
     public void glBlendFunc(int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
+    public void glBlendFunc(int sfactorRGB, int dfactorRGB);
     public void glColor(Color color, int alpha);
     public void glColor4f(float r, float g, float b, float a);
     public void glShadeModel(int model);
     public void glBindTexture(int glid);
+    public void glDisableDepth();
+    public void glEnableDepth();
+    public void glDepthMask(boolean enable);
+    public void glEnableLighting();
+    public void glDisableLighting();
+    public void glEnableFog();
+    public void glDisableFog();
+    public void glEnableCull();
+    public void glDisableCull();
 }
