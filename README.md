@@ -22,9 +22,15 @@ Check out the JourneyMap GIT repo to a directory called journeymap.  For example
 * Run journeymap/setupforge.bat (or setupforge.sh)
 * Or manually:
 
+
+```
+#!dos
+
     cd forge
     gradlew.bat setupDecompWorkspace
     gradlew.bat idea
+```
+
 
 ### 3. Update IDEA Project
 
