@@ -20,7 +20,7 @@ Check out the JourneyMap GIT repo to a directory called journeymap.  For example
 
 * Unzip the forge source zip to a directory called 'forge' as a sibling directory of journeymap
 * Run journeymap/setupforge.bat (or setupforge.sh)
-* or manually:
+* Or manually:
 
     cd forge
     gradlew.bat setupDecompWorkspace
