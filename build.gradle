@@ -49,8 +49,8 @@ minecraft {
 }
 
 dependencies {
-    provided files('libs/[1.7.2]ReiMinimap_v3.4_03beta.zip')
-    provided files('libs/voxelmap-1.7.2-1.0.jar')
+    compile files('libs/[1.7.2]ReiMinimap_v3.4_03beta.zip')
+    compile files('libs/voxelmap-1.7.2-1.0.jar')
 }
 
 processResources {

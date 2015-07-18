@@ -17,14 +17,15 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 
 ### 2. Setup JourneyMap with Forge for IntelliJ IDEA
 
-In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
+* In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
 
 ```
 #!dos
     gradlew.bat setupDecompWorkspace idea
 ```
 
-Open journeymap.ipr in IDEA and you're good to go.
+* Open journeymap.ipr in IDEA
+* Import Project from Gradle when prompted
 
 ### 3. Build the jars
 
