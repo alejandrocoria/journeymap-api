@@ -4,60 +4,33 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 ## Requirements
 
-* Java 6 or later
-* [Forge 1.7.2 or later][3]
+* Java 1.7 JDK
+* IntelliJ IDEA
 
 ## Environment Setup
 
 ### 1. Git the JourneyMap source
 
-Check out the JourneyMap GIT repo to a directory called journeymap.  For example:
+Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
-    git config core.ignorecase false
-    git clone https://techbrew@bitbucket.org/techbrew/journeymap.git
+    git clone -b 5.1.1_1.8 --single-branch https://USERNAME@bitbucket.org/TeamJM/journeymap.git journeymap
 
-### 2. Download Forge Source (http://files.minecraftforge.net/)
+### 2. Setup JourneyMap with Forge for IntelliJ IDEA
 
-* Unzip the forge source zip to a directory called 'forge' as a sibling directory of journeymap
-* Run journeymap/setupforge.bat (or setupforge.sh)
-* or manually:
+In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
 
-    cd forge
-    gradlew.bat setupDecompWorkspace
-    gradlew.bat idea
+```
+#!dos
+    gradlew.bat setupDecompWorkspace idea
+```
 
-### 3. Update IDEA Project
+Open journeymap.ipr in IDEA and you're good to go.
 
-* Open IDEA project created in new forge directory:  
+### 3. Build the jars
 
-    forge/forge.ipr
-    
-* Set the project SDK to 1.7
-
-    File > Project Structure... > Project > Project SDK
-
-* Import the JourneyMap module file: 
-
-    journeymap/journeymap.iml
-
-* Update the Client run configuration to use JourneyMap's classpath
-
-    Run > Edit Configurations > Minecraft Client > Use classpath of module: journeymap
-
-## Build the distributable JourneyMap.zip mod
-
-### 1. Checklist before you build
-
-* Update `build.xml` version info
-* Update `resources/changelog.txt` version info and details
-
-### 2. Build using Ant from IDEA
-
-Using IDEA, run the build.xml script. It will invoke the gradle scripts and do the assembly magic to package the mod into a .jar file for distrobution.
-
-The end result will be in `journeymap/dist/JourneyMap*.zip`
+* Update `project.properties` version info
+* Build using Gradle (build.gradle) > build
+* The end result will be in `build/libs/journeymap*.jar`
 
 [1]: https://bitbucket.org/TeamJM/journeymap
 [2]: http://journeymap.info
-[3]: http://files.minecraftforge.net/
-

@@ -33,3 +33,6 @@ tmp/
 .idea/
 eclipse/
 out/
+journeymap.iml
+journeymap.ipr
+journeymap.iws
