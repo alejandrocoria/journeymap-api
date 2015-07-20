@@ -29,8 +29,10 @@ src/minecraft/paulscode/
 
 /temp/
 .gradle/
-gradle/
 tmp/
 .idea/
 eclipse/
 out/
+journeymap.iml
+journeymap.ipr
+journeymap.iws
