@@ -20,6 +20,7 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.EnumChatFormatting;
@@ -42,6 +43,7 @@ public class RenderWaypointBeacon
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
     static Minecraft mc = ForgeHelper.INSTANCE.getClient();
     static RenderManager renderManager = ForgeHelper.INSTANCE.getRenderManager();
+    static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
 
@@ -99,8 +101,6 @@ public class RenderWaypointBeacon
 
         try
         {
-            final int dimension = renderManager.livingPlayer.dimension;
-
             // Player coords
             Vec3 playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
 
@@ -217,7 +217,7 @@ public class RenderWaypointBeacon
                     GL11.glPushMatrix();
 
                     // Lighting
-                    GL11.glDisable(GL11.GL_LIGHTING);
+                    renderHelper.glDisableLighting();
                     GL11.glNormal3d(0, 0, -1.0F * scale);
 
                     // Position
@@ -226,8 +226,8 @@ public class RenderWaypointBeacon
                     GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
                     GL11.glScaled(-scale, -scale, scale);
 
-                    GL11.glDepthMask(true);
-                    GL11.glEnable(GL11.GL_DEPTH_TEST);
+                    renderHelper.glDepthMask(true);
+                    renderHelper.glEnableDepth();
 
                     final int fontScale = waypointProperties.fontScale.get();
 
@@ -237,8 +237,8 @@ public class RenderWaypointBeacon
                     // Depth label
                     DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
 
-                    GL11.glDisable(GL11.GL_DEPTH_TEST);
-                    GL11.glDepthMask(false);
+                    renderHelper.glDisableDepth();
+                    renderHelper.glDepthMask(false);
 
                     // Front label
                     DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
@@ -254,11 +254,11 @@ public class RenderWaypointBeacon
 
                 GL11.glPushMatrix();
 
-                GL11.glDisable(GL11.GL_LIGHTING);
+                renderHelper.glDisableLighting();
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
-                GL11.glDepthMask(false);
+                renderHelper.glDisableDepth();
+                renderHelper.glDepthMask(false);
 
                 scale = scale * (waypointProperties.textureSmall.get() ? 1 : 2);
 
@@ -277,20 +277,13 @@ public class RenderWaypointBeacon
         finally
         {
 
-            GL11.glDepthMask(true);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            // GL11.glEnable(GL11.GL_ALPHA_TEST);
-
-            // Reset GL
-
-
-            //timer.stop();
-
-            GL11.glDepthMask(true);
-            GL11.glEnable(GL11.GL_CULL_FACE);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glDisable(GL11.GL_FOG);
+            renderHelper.glDepthMask(true);
+            renderHelper.glEnableDepth();
+            renderHelper.glEnableLighting();
+            renderHelper.glDepthMask(true);
+            renderHelper.glEnableCull();
+            renderHelper.glDisableBlend();
+            renderHelper.glDisableFog();
 
             RenderHelper.disableStandardItemLighting();
         }
@@ -308,10 +301,12 @@ public class RenderWaypointBeacon
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDepthMask(false);
+        GlStateManager.disableLighting();
+        GlStateManager.disableCull();
+        GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+        GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0);
+        //renderHelper.glDepthMask(false);
 
         float time = (float) mc.theWorld.getTotalWorldTime();
         if (mc.isGamePaused())
@@ -326,6 +321,7 @@ public class RenderWaypointBeacon
         {
             byte b0 = 1;
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
+            //double d3 = (double) time * 0.025D * -1.5D;
             renderHelper.startDrawingQuads();
             renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
@@ -361,44 +357,44 @@ public class RenderWaypointBeacon
             renderHelper.draw();
         }
 
-        if (staticBeam)
-        {
-            GL11.glDisable(GL11.GL_CULL_FACE);
+//        if (staticBeam)
+//        {
+//            renderHelper.glDisableCull();
+//
+//            double d26 = (double) (256.0F * f1);
+//            double d29 = (double) (-1.0F + texOffset);
+//            double d30 = (double) (256.0F * f1) + d29;
+//
+//            x -= .5;
+//            z -= .5;
+//
+//            renderHelper.startDrawingQuads();
+//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
+//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
+//            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
+//            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
+//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
+//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
+//            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
+//            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
+//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
+//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
+//            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
+//            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
+//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
+//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
+//            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
+//            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
+//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
+//            renderHelper.draw();
+//        }
 
-            double d26 = (double) (256.0F * f1);
-            double d29 = (double) (-1.0F + texOffset);
-            double d30 = (double) (256.0F * f1) + d29;
+        renderHelper.glEnableLighting();
+        renderHelper.glEnableTexture2D();
 
-            x -= .5;
-            z -= .5;
-
-            renderHelper.startDrawingQuads();
-            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
-            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
-            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
-            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
-            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
-            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
-            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
-            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
-            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
-            renderHelper.draw();
-        }
-
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        renderHelper.glEnableLighting();
+        renderHelper.glEnableCull();
+        renderHelper.glEnableDepth();
     }
 
 }
