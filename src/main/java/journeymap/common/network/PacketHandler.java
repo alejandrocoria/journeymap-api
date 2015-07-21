@@ -11,13 +11,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 
-public class PacketHandler {
+public class PacketHandler
+{
 
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.WORLD_ID_CHANNEL);
     //public static final SimpleNetworkWrapper JM_PERMS = NetworkRegistry.INSTANCE.newSimpleChannel("jm_perms");
 
-    public void init() {
-        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, Side.SERVER);
+    public void init(Side side) {
+        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
         //JM_PERMS.registerMessage(PermissionsPacket.PermissionsListener.class, PermissionsPacket.class, 0, Side.SERVER);
     }
 
@@ -55,7 +56,8 @@ public class PacketHandler {
 //                ), player);
 //    }
 
-    private static int toInt(boolean val) {
+    private static int toInt(boolean val)
+    {
         int intVal;
         if (val) {
             intVal = 1;

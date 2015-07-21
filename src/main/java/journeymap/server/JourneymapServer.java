@@ -36,8 +36,8 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event)
     {
-        PacketHandler packetHandler = new PacketHandler();
-        packetHandler.init();
+//        PacketHandler packetHandler = new PacketHandler();
+//        packetHandler.init(Side.SERVER);
     }
 
     /**
