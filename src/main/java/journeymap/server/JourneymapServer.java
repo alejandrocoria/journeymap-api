@@ -9,6 +9,7 @@
 package journeymap.server;
 
 import journeymap.common.CommonProxy;
+import journeymap.common.network.PacketHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -35,6 +36,8 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event)
     {
+        PacketHandler packetHandler = new PacketHandler();
+        packetHandler.init();
     }
 
     /**

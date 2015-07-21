@@ -6,14 +6,14 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client;
+package journeymap.common;
 
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
+import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
-import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
@@ -57,6 +57,10 @@ public class Constants
     public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
     public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
     public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
+
+    // Network Channel IDs
+
+    public static final String WORLD_ID_CHANNEL= "world_info";
 
     public enum WorldType
     {

@@ -11,7 +11,7 @@ package journeymap.client.render.map;
 import com.google.common.base.Objects;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.StatTimer;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;

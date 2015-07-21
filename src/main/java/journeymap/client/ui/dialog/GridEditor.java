@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.model.MapType;

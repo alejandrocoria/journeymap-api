@@ -9,7 +9,7 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.ChatLog;
+import journeymap.common.log.ChatLog;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.task.multi.MapPlayerTask;

@@ -9,7 +9,7 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.render.draw.DrawStep;
 import net.minecraft.client.Minecraft;

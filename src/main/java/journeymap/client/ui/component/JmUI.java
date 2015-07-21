@@ -10,7 +10,7 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;

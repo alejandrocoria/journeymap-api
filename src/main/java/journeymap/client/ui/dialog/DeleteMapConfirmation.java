@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.task.main.DeleteMapTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;

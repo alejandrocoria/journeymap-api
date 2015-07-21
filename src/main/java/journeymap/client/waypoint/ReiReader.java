@@ -8,13 +8,11 @@
 
 package journeymap.client.waypoint;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.ChatLog;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.ChatLog;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.Waypoint;
-import net.minecraft.entity.player.EntityPlayer;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -22,7 +20,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -45,43 +42,44 @@ public class ReiReader
     public static java.util.List<Waypoint> loadWaypoints()
     {
         ArrayList<Waypoint> converted = new ArrayList<Waypoint>();
-        try
-        {
-            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
-            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
-            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
-            if (reiWaypoints == null || reiWaypoints.isEmpty())
-            {
-                return Collections.EMPTY_LIST;
-            }
-
-            EntityPlayer player = ForgeHelper.INSTANCE.getClient().thePlayer;
-            int dimension = player != null ? player.dimension : 0;
-            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
-            {
-                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
-                        (int) (reiWp.red * 255.0F) & 255,
-                        (int) (reiWp.green * 255.0F) & 255,
-                        (int) (reiWp.blue * 255.0F) & 255,
-                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
-                        Waypoint.Origin.ReiMinimap,
-                        dimension,
-                        Arrays.asList(dimension));
-                jmWp.setReadOnly(true);
-                converted.add(jmWp);
-            }
-            return converted;
-        }
-        catch (Throwable e)
-        {
-            JourneymapClient.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
-            if (!(e instanceof ClassNotFoundException))
-            {
-                ChatLog.announceI18N("jm.waypoint.import_rei_version");
-            }
-            modLoaded = false;
-            return Collections.EMPTY_LIST;
-        }
+        return Collections.EMPTY_LIST;
+//        try
+//        {
+//            Class.forName("reifnsk.minimap.ReiMinimap").getDeclaredField("instance");
+//            reifnsk.minimap.ReiMinimap reiMinimap = reifnsk.minimap.ReiMinimap.instance;
+//            java.util.List<reifnsk.minimap.Waypoint> reiWaypoints = reiMinimap.getWaypoints();
+//            if (reiWaypoints == null || reiWaypoints.isEmpty())
+//            {
+//                return Collections.EMPTY_LIST;
+//            }
+//
+//            EntityPlayer player = ForgeHelper.INSTANCE.getClient().thePlayer;
+//            int dimension = player != null ? player.dimension : 0;
+//            for (reifnsk.minimap.Waypoint reiWp : reiWaypoints)
+//            {
+//                Waypoint jmWp = new Waypoint(reiWp.name, reiWp.x, reiWp.y, reiWp.z, reiWp.enable,
+//                        (int) (reiWp.red * 255.0F) & 255,
+//                        (int) (reiWp.green * 255.0F) & 255,
+//                        (int) (reiWp.blue * 255.0F) & 255,
+//                        reiWp.type == 1 ? Waypoint.Type.Death : Waypoint.Type.Normal,
+//                        Waypoint.Origin.ReiMinimap,
+//                        dimension,
+//                        Arrays.asList(dimension));
+//                jmWp.setReadOnly(true);
+//                converted.add(jmWp);
+//            }
+//            return converted;
+//        }
+//        catch (Throwable e)
+//        {
+//            JourneymapClient.getLogger().warn("Incompatible version of Reijm.minimap. Tried reifnsk.jm.minimap.Reijm.minimap.instance.getWaypoints(): " + e);
+//            if (!(e instanceof ClassNotFoundException))
+//            {
+//                ChatLog.announceI18N("jm.waypoint.import_rei_version");
+//            }
+//            modLoaded = false;
+//            return Collections.EMPTY_LIST;
+//        }
     }
 
     public static String getPointsFilename()

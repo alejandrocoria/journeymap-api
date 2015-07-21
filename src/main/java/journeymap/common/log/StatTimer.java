@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.log;
+package journeymap.common.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.JourneymapClient;

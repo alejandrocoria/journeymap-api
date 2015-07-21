@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.waypoint;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.io.FileHandler;
 import journeymap.client.ui.component.Button;

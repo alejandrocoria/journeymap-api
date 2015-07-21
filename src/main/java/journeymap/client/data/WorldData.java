@@ -10,15 +10,15 @@ package journeymap.client.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.IconSetFileHandler;
-import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.JMLogger;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;

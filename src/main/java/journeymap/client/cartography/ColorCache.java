@@ -8,14 +8,14 @@
 
 package journeymap.client.cartography;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.task.multi.MapPlayerTask;

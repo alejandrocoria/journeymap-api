@@ -9,10 +9,10 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.log.ChatLog;
+import journeymap.common.log.ChatLog;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;

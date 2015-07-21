@@ -12,7 +12,7 @@ import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.thread.JMThreadFactory;
 import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.Loader;

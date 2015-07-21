@@ -9,10 +9,10 @@
 package journeymap.client.forge.event;
 
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.ChatLog;
+import journeymap.common.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.Tile;
 import journeymap.client.ui.UIManager;

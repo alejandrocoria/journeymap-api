@@ -9,7 +9,7 @@
 package journeymap.client.model;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.JmUI;

@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.ui.UIManager;

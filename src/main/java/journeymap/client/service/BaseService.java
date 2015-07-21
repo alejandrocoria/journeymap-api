@@ -10,9 +10,9 @@ package journeymap.client.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.JMLogger;
+import journeymap.common.log.JMLogger;
 import org.apache.logging.log4j.Logger;
 import se.rupy.http.Event;
 import se.rupy.http.Query;

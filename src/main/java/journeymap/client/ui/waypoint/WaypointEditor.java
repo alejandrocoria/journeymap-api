@@ -8,12 +8,12 @@
 
 package journeymap.client.ui.waypoint;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.JMLogger;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawUtil;

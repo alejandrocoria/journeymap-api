@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.forge.event;
+package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.client.JourneymapClient;

@@ -12,7 +12,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.log.JMLogger;
+import journeymap.common.log.JMLogger;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;

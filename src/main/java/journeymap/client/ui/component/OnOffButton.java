@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;

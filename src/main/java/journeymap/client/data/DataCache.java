@@ -11,7 +11,7 @@ package journeymap.client.data;
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.*;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.render.draw.DrawEntityStep;

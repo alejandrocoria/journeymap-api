@@ -10,7 +10,7 @@ package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.StatTimer;
 import journeymap.client.thread.JMThreadFactory;
 import journeymap.client.thread.RunnableTask;
 import net.minecraft.client.Minecraft;

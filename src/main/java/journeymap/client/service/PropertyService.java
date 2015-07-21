@@ -9,7 +9,7 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
 import se.rupy.http.Event;

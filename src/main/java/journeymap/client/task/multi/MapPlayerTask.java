@@ -8,7 +8,7 @@
 
 package journeymap.client.task.multi;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;

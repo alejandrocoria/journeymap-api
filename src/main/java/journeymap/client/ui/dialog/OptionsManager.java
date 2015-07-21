@@ -8,12 +8,12 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.log.JMLogger;
+import journeymap.common.log.JMLogger;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;

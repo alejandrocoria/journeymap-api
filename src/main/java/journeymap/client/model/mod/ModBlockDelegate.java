@@ -10,7 +10,7 @@ package journeymap.client.model.mod;
 
 import com.google.common.base.Joiner;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraftforge.fml.common.registry.GameRegistry;

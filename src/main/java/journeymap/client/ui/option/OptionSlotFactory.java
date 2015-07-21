@@ -11,7 +11,7 @@ package journeymap.client.ui.option;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.properties.config.Config;

@@ -12,9 +12,9 @@ import com.google.common.io.CharStreams;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.data.DataCache;
-import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.JMLogger;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.log.StatTimer;
 import se.rupy.http.Event;
 
 import java.io.InputStream;

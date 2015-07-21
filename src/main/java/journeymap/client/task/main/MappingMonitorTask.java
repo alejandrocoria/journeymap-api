@@ -9,8 +9,8 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.ChatLog;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.ChatLog;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;

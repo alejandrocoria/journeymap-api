@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.theme;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;

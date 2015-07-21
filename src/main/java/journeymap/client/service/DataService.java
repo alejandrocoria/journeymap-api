@@ -11,7 +11,7 @@ package journeymap.client.service;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.*;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;

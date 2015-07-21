@@ -10,8 +10,8 @@ package journeymap.client.task.main;
 
 import com.google.common.collect.Queues;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.log.StatTimer;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 

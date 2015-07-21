@@ -8,10 +8,10 @@
 
 package journeymap.client.io;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.ui.option.StringListProvider;
 
 import java.io.File;

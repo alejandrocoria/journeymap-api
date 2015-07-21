@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.option;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.component.ListPropertyButton;

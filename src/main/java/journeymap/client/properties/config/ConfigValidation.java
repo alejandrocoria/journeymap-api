@@ -9,9 +9,9 @@
 package journeymap.client.properties.config;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.option.StringListProvider;
 

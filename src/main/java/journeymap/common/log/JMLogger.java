@@ -6,9 +6,9 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.log;
+package journeymap.common.log;
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;

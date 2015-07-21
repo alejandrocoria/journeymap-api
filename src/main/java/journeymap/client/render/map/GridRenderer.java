@@ -10,7 +10,7 @@ package journeymap.client.render.map;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;

@@ -10,7 +10,7 @@ package journeymap.client.io.migrate;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.Version;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 
 import java.util.concurrent.Callable;
 

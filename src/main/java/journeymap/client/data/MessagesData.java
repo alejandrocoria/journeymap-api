@@ -10,7 +10,7 @@ package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableMap;
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 

@@ -11,7 +11,7 @@ package journeymap.client.render.draw;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
 import net.minecraft.client.Minecraft;

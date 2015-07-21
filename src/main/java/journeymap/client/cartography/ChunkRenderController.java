@@ -12,7 +12,7 @@ import com.google.common.base.Objects;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.*;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.*;
 import org.apache.logging.log4j.Level;
 

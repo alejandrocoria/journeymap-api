@@ -11,7 +11,7 @@ package journeymap.client.properties;
 import com.google.common.base.Objects;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.log.JMLogger;
+import journeymap.common.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.properties.config.Config;
 import journeymap.client.task.multi.RenderSpec;

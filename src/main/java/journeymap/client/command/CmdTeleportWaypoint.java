@@ -11,7 +11,7 @@ package journeymap.client.command;
 import com.mojang.authlib.GameProfile;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
+import journeymap.common.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;

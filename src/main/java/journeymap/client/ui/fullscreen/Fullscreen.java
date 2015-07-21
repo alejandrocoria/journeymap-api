@@ -9,7 +9,7 @@
 package journeymap.client.ui.fullscreen;
 
 
-import journeymap.client.Constants;
+import journeymap.common.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.VersionCheck;
 import journeymap.client.data.WaypointsData;
@@ -17,8 +17,8 @@ import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
