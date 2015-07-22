@@ -26,7 +26,7 @@ public class StatTimer
     public static final double NS = 1000000D;
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
-    private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
+    private static final int MAX_ELAPSED_LIMIT_WARNINGS = 10;
     private static final int ELAPSED_LIMIT_DEFAULT = 1000;
     private static final Logger logger = Journeymap.getLogger();
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
@@ -281,7 +281,12 @@ public class StatTimer
 
             if (started == null)
             {
-                logger.warn(name + " is not running.");
+                // If counter == 0, timer was reset while running.
+                // Otherwise it's being used improperly.
+                if (counter.get() > 0)
+                {
+                    logger.warn(name + " is not running.");
+                }
                 return 0;
             }
 
@@ -309,9 +314,15 @@ public class StatTimer
                         String msg = this.getName() + " was slow: " + elapsedMs;
                         if (--elapsedLimitWarnings == 0)
                         {
-                            msg += " (last warning)";
+                            msg += " (Warning limit reached)";
+                            logger.warn(msg);
+                            // TODO: when report strings fixed to be JSON, this mess won't be needed
+                            logger.warn(getReportString().replaceAll("<b>", "").replaceAll("</b>", "").trim());
                         }
-                        logger.warn(msg);
+                        else
+                        {
+                            logger.debug(msg);
+                        }
                     }
                 }
                 return elapsedMs;
@@ -412,7 +423,8 @@ public class StatTimer
     }
 
     /**
-     * Get the timer's stats as a string.
+     * Get the timer's stats as a HTML string.
+     * TODO: Yes, this is horrible, it should be in JSON
      *
      * @return
      */
@@ -443,7 +455,7 @@ public class StatTimer
     }
 
     /**
-     * Gets a simplified report of the timer stats.
+     * Gets a simplified report of the timer stats with color formatting for Shift-F3 display.
      *
      * @return
      */
