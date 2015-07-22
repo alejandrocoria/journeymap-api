@@ -18,10 +18,15 @@ buildscript {
 apply plugin: 'forge'
 apply plugin: 'java'
 
+// Fixes bug in IDEA 14 that wasn't putting resources into build/classes
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}
+
 ext {
     configFile = file "project.properties"
     srcWebDir = "src/main/resources/assets/journeymap/web/"
-    implSrc = "build/resources/java/net/techbrew/journeymap/feature/impl/"
+    implSrc = "build/resources/java/journeymap/feature/impl/"
 }
 
 configFile.withReader {
