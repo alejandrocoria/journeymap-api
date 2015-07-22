@@ -13,19 +13,25 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
+```
     git clone -b 5.1.1_1.8 --single-branch https://USERNAME@bitbucket.org/TeamJM/journeymap.git journeymap
+```
 
 ### 2. Setup JourneyMap with Forge for IntelliJ IDEA
 
 * In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
 
 ```
-#!dos
     gradlew.bat setupDecompWorkspace idea
 ```
 
 * Open journeymap.ipr in IDEA
 * Import Project from Gradle when prompted
+* Edit the Minecraft Client run configuration, add your credentials to `Program Arguments`: 
+
+```
+    --username name@email.address --password foo
+```
 
 ### 3. Build the jars
 
