@@ -16,9 +16,10 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.io.nbt.RegionLoader;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -34,7 +35,7 @@ import java.util.List;
 public class MapRegionTask extends BaseMapTask
 {
     private static final int MAX_RUNTIME = 30000;
-    private static final Logger logger = JourneymapClient.getLogger();
+    private static final Logger logger = Journeymap.getLogger();
     private static volatile long lastTaskCompleted;
 
     final RegionCoord rCoord;

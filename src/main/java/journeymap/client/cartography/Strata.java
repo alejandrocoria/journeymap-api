@@ -12,6 +12,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.util.Stack;
@@ -57,7 +58,7 @@ public class Strata
         {
             int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            JourneymapClient.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
+            Journeymap.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
         }
 
         stack.push(unusedStack.pop());
@@ -99,7 +100,7 @@ public class Strata
     {
         if (stratum == null)
         {
-            JourneymapClient.getLogger().warn("Null stratum in pool.");
+            Journeymap.getLogger().warn("Null stratum in pool.");
             return;
         }
         else
@@ -152,7 +153,7 @@ public class Strata
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Couldn't push Stratum into stack: " + t);
+            Journeymap.getLogger().error("Couldn't push Stratum into stack: " + t);
             return null;
         }
     }

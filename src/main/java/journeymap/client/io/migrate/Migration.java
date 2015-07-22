@@ -8,9 +8,9 @@
 
 package journeymap.client.io.migrate;
 
-import journeymap.client.JourneymapClient;
-import journeymap.client.Version;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
+import journeymap.common.version.Version;
 
 import java.util.concurrent.Callable;
 
@@ -33,13 +33,13 @@ public class Migration
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().fatal(LogFormatter.toString(t));
+            Journeymap.getLogger().fatal(LogFormatter.toString(t));
             success = false;
         }
 
         if (!success)
         {
-            JourneymapClient.getLogger().fatal("Migration failed! JourneyMap is likely to experience significant errors.");
+            Journeymap.getLogger().fatal("Migration failed! JourneyMap is likely to experience significant errors.");
         }
 
         return success;

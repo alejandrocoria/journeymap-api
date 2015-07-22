@@ -8,13 +8,13 @@
 
 package journeymap.client.waypoint;
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
+import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import journeymap.common.Journeymap;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -57,7 +57,7 @@ public class VoxelReader
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
+            Journeymap.getLogger().warn("Incompatible version of VoxelMap. Tried com.thevoxelbox.voxelmap.VoxelMap.instance.waypointManager.wayPts: " + e);
             if (!(e instanceof ClassNotFoundException))
             {
                 ChatLog.announceI18N("jm.waypoint.import_vox_version");
@@ -99,7 +99,7 @@ public class VoxelReader
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Exception getting VoxelMap waypoints: " + LogFormatter.toString(e));
             modLoaded = false;
             return Collections.EMPTY_LIST;
         }
@@ -152,7 +152,7 @@ public class VoxelReader
             catch (Exception e)
             {
                 ChatLog.announceError(Constants.getString("jm.waypoint.import_vox_file_error", pointsFile.getName()));
-                JourneymapClient.getLogger().error(LogFormatter.toString(e));
+                Journeymap.getLogger().error(LogFormatter.toString(e));
                 fileErrors++;
             }
         }
@@ -249,7 +249,7 @@ public class VoxelReader
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't parse \"" + line + "\" because: " + e.getMessage());
+            Journeymap.getLogger().warn("Couldn't parse \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

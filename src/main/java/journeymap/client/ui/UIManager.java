@@ -11,7 +11,7 @@ package journeymap.client.ui;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.JmUI;
@@ -22,6 +22,7 @@ import journeymap.client.ui.minimap.MiniMapHotkeysHelp;
 import journeymap.client.ui.waypoint.WaypointEditor;
 import journeymap.client.ui.waypoint.WaypointHelp;
 import journeymap.client.ui.waypoint.WaypointManager;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -32,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 public class UIManager
 {
-    private final Logger logger = JourneymapClient.getLogger();
+    private final Logger logger = Journeymap.getLogger();
     private final MiniMap miniMap;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
@@ -149,7 +150,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
         }
     }
 
@@ -177,7 +178,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
     }
 
@@ -234,7 +235,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneymapClient.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
             }
         }
     }
@@ -250,7 +251,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                JourneymapClient.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
             }
         }
     }
@@ -264,7 +265,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
         }
     }
 

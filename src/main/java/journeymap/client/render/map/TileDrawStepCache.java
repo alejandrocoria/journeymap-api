@@ -12,9 +12,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
-import journeymap.client.JourneymapClient;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
+import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TileDrawStepCache
 {
-    private final Logger logger = JourneymapClient.getLogger();
+    private final Logger logger = Journeymap.getLogger();
     private final Cache<Integer, TileDrawStep> drawStepCache;
     private Path lastDimDir;
 

@@ -14,17 +14,16 @@ import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.EventHandlerManager;
-import journeymap.common.Constants;
-import journeymap.common.network.WorldInfoHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.io.migrate.Migration;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
+import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.*;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.client.service.WebServer;
@@ -49,6 +48,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Client-side, strong-side!
@@ -100,6 +100,122 @@ public class JourneymapClient implements CommonProxy
     public static JourneymapClient getInstance()
     {
         return instance;
+    }
+
+    /**
+     * Build the edition string.
+     *
+     * @return
+     */
+    private static String getEdition()
+    {
+        String ed = null;
+        try
+        {
+            ed = Journeymap.JM_VERSION + " " + FeatureManager.getPolicySetName();
+        }
+        catch (Throwable t)
+        {
+            ed = Journeymap.JM_VERSION + " ?";
+            t.printStackTrace(System.err);
+        }
+        return ed;
+    }
+
+    /**
+     * Get the core properties.
+     */
+    public static CoreProperties getCoreProperties()
+    {
+        return instance.coreProperties;
+    }
+
+    /**
+     * Get the fullmap properties.
+     */
+    public static FullMapProperties getFullMapProperties()
+    {
+        return instance.fullMapProperties;
+    }
+
+    /**
+     * Disable the mod.
+     */
+    public static void disable()
+    {
+        instance.initialized = false;
+        EventHandlerManager.unregisterAll();
+        instance.stopMapping();
+        DataCache.instance().purge();
+    }
+
+    /**
+     * Get the minimap properties for the active minimap.
+     */
+    public static MiniMapProperties getMiniMapProperties(int which)
+    {
+        switch (which)
+        {
+            case 2:
+            {
+                instance.miniMapProperties2.setActive(true);
+                instance.miniMapProperties1.setActive(false);
+                return getMiniMapProperties2();
+            }
+            default:
+            {
+                instance.miniMapProperties1.setActive(true);
+                instance.miniMapProperties2.setActive(false);
+                return getMiniMapProperties1();
+            }
+        }
+    }
+
+    /**
+     * Get the active minimap id.
+     */
+    public static int getActiveMinimapId()
+    {
+        if (instance.miniMapProperties1.isActive())
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
+    /**
+     * Get properties for minimap 1.
+     */
+    public static MiniMapProperties getMiniMapProperties1()
+    {
+        return instance.miniMapProperties1;
+    }
+
+    /**
+     * Get properties for minimap 2.
+     */
+    public static MiniMapProperties getMiniMapProperties2()
+    {
+        return instance.miniMapProperties2;
+    }
+
+    /**
+     * Get the webmap properties.
+     */
+    public static WebMapProperties getWebMapProperties()
+    {
+        return instance.webMapProperties;
+    }
+
+    /**
+     * Get the waypoint properties.
+     */
+    public static WaypointProperties getWaypointProperties()
+    {
+        return instance.waypointProperties;
     }
 
     /**
@@ -214,126 +330,22 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Build the edition string.
+     * Accept any modlist on server
+     * @param modList
+     * @param side
      * @return
      */
-    private static String getEdition()
+    @Override
+    public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        String ed = null;
-        try
-        {
-            ed = Journeymap.JM_VERSION + " " + FeatureManager.getPolicySetName();
-        }
-        catch (Throwable t)
-        {
-            ed = Journeymap.JM_VERSION + " ?";
-            t.printStackTrace(System.err);
-        }
-        return ed;
+        // TODO: Check for JMServer and enable/disable worldid checking, etc.
+        return true;
     }
 
-    /**
-     * Get the client logger.
-     */
-    public static Logger getLogger()
+    @Override
+    public boolean isUpdateCheckEnabled()
     {
-        return LogManager.getLogger(Journeymap.MOD_ID);
-    }
-
-    /**
-     * Get the core properties.
-     */
-    public static CoreProperties getCoreProperties()
-    {
-        return instance.coreProperties;
-    }
-
-    /**
-     * Get the fullmap properties.
-     */
-    public static FullMapProperties getFullMapProperties()
-    {
-        return instance.fullMapProperties;
-    }
-
-    /**
-     * Disable the mod.
-     */
-    public static void disable()
-    {
-        instance.initialized = false;
-        EventHandlerManager.unregisterAll();
-        instance.stopMapping();
-        DataCache.instance().purge();
-    }
-
-    /**
-     * Get the minimap properties for the active minimap.
-     */
-    public static MiniMapProperties getMiniMapProperties(int which)
-    {
-        switch (which)
-        {
-            case 2:
-            {
-                instance.miniMapProperties2.setActive(true);
-                instance.miniMapProperties1.setActive(false);
-                return getMiniMapProperties2();
-            }
-            default:
-            {
-                instance.miniMapProperties1.setActive(true);
-                instance.miniMapProperties2.setActive(false);
-                return getMiniMapProperties1();
-            }
-        }
-    }
-
-    /**
-     * Get the active minimap id.
-     */
-    public static int getActiveMinimapId()
-    {
-        if (instance.miniMapProperties1.isActive())
-        {
-            return 1;
-        }
-        else
-        {
-            return 2;
-        }
-    }
-
-    /**
-     * Get properties for minimap 1.
-     */
-    public static MiniMapProperties getMiniMapProperties1()
-    {
-        return instance.miniMapProperties1;
-    }
-
-    /**
-     * Get properties for minimap 2.
-     */
-    public static MiniMapProperties getMiniMapProperties2()
-    {
-        return instance.miniMapProperties2;
-    }
-
-    /**
-     * Get the webmap properties.
-     */
-    public static WebMapProperties getWebMapProperties()
-    {
-        return instance.webMapProperties;
-    }
-
-    /**
-     * Get the waypoint properties.
-     */
-    public static WaypointProperties getWaypointProperties()
-    {
-        return instance.waypointProperties;
+        return getCoreProperties().checkUpdates.get();
     }
 
     /**
@@ -589,7 +601,7 @@ public class JourneymapClient implements CommonProxy
 
             if (worldIdUnchanged && directoryUnchanged && worldId != null)
             {
-                getLogger().info("World UID hasn't changed: " + worldId);
+                Journeymap.getLogger().info("World UID hasn't changed: " + worldId);
                 return;
             }
 
@@ -600,7 +612,7 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.currentWorldId = worldId;
-            getLogger().info("World UID is set to: " + worldId);
+            Journeymap.getLogger().info("World UID is set to: " + worldId);
         }
     }
 }

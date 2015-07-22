@@ -9,9 +9,10 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 public class MappingMonitorTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
-    Logger logger = JourneymapClient.getLogger();
+    Logger logger = Journeymap.getLogger();
     private int lastDimension = 0;
 
     @Override

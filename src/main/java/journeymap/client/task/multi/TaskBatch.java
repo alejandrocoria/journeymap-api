@@ -9,8 +9,9 @@
 package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
@@ -53,14 +54,14 @@ public class TaskBatch implements ITask
 
         if (threadLogging)
         {
-            JourneymapClient.getLogger().debug("START batching tasks");
+            Journeymap.getLogger().debug("START batching tasks");
         }
 
         while (!taskList.isEmpty())
         {
             if (Thread.interrupted())
             {
-                JourneymapClient.getLogger().warn("TaskBatch thread interrupted: " + this);
+                Journeymap.getLogger().warn("TaskBatch thread interrupted: " + this);
                 throw new InterruptedException();
             }
 
@@ -69,23 +70,23 @@ public class TaskBatch implements ITask
             {
                 if (threadLogging)
                 {
-                    JourneymapClient.getLogger().debug("Batching task: " + task);
+                    Journeymap.getLogger().debug("Batching task: " + task);
                 }
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
             }
             catch (ChunkMD.ChunkMissingException e)
             {
-                JourneymapClient.getLogger().warn(e.getMessage());
+                Journeymap.getLogger().warn(e.getMessage());
             }
             catch (Throwable t)
             {
-                JourneymapClient.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
+                Journeymap.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
             }
         }
 
         if (threadLogging)
         {
-            JourneymapClient.getLogger().debug("DONE batching tasks");
+            Journeymap.getLogger().debug("DONE batching tasks");
         }
 
         elapsedNs = System.nanoTime() - startNs;

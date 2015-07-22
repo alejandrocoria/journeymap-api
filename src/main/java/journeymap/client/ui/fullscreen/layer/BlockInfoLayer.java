@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;

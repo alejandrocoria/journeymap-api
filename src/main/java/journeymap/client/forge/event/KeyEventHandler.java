@@ -9,15 +9,15 @@
 package journeymap.client.forge.event;
 
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
+import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.ChatLog;
+import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.Tile;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -53,7 +53,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             catch (Throwable t)
             {
-                JourneymapClient.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
+                Journeymap.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
             }
         }
 
@@ -67,7 +67,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    JourneymapClient.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+                    Journeymap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
                 }
             }
             catch (Throwable t)

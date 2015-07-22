@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.waypoint;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;

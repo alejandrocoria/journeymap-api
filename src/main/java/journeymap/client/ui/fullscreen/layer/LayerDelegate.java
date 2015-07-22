@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.render.draw.DrawStep;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class LayerDelegate
             }
             catch (Exception e)
             {
-                JourneymapClient.getLogger().error(LogFormatter.toString(e));
+                Journeymap.getLogger().error(LogFormatter.toString(e));
             }
         }
     }
@@ -59,7 +59,7 @@ public class LayerDelegate
             }
             catch (Exception e)
             {
-                JourneymapClient.getLogger().error(LogFormatter.toString(e));
+                Journeymap.getLogger().error(LogFormatter.toString(e));
             }
         }
     }

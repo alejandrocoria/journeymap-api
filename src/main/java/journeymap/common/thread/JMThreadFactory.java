@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.thread;
+package journeymap.common.thread;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JMThreadFactory implements ThreadFactory
 {
-
     final static AtomicInteger threadNumber = new AtomicInteger(1);
     final static String namePrefix = "JM-"; //$NON-NLS-1$
     final ThreadGroup group;

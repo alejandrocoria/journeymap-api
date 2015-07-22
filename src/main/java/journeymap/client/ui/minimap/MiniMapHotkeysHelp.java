@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;

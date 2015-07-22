@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.ui.option.KeyedEnum;
 
 /**

@@ -6,15 +6,13 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client;
+package journeymap.common.version;
 
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
-import journeymap.client.thread.JMThreadFactory;
 import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import net.minecraftforge.fml.common.Loader;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -31,7 +29,7 @@ import java.util.concurrent.Executors;
 public class VersionCheck
 {
     private static volatile ExecutorService executorService;
-    private static volatile Boolean updateCheckEnabled = JourneymapClient.getCoreProperties().checkUpdates.get();
+    private static volatile Boolean updateCheckEnabled = Journeymap.proxy.isUpdateCheckEnabled();
     private static volatile Boolean versionIsCurrent = true;
     private static volatile Boolean versionIsChecked;
     private static volatile String versionAvailable;
@@ -87,7 +85,7 @@ public class VersionCheck
 
         if (!updateCheckEnabled)
         {
-            JourneymapClient.getLogger().info("Update check disabled in properties file."); //$NON-NLS-1$
+            Journeymap.getLogger().info("Update check disabled in properties file."); //$NON-NLS-1$
         }
         else
         {
@@ -97,7 +95,7 @@ public class VersionCheck
                 @Override
                 public void run()
                 {
-                    JourneymapClient.getLogger().info("Checking for updated version: " + Journeymap.VERSION_URL); //$NON-NLS-1$
+                    Journeymap.getLogger().info("Checking for updated version: " + Journeymap.VERSION_URL); //$NON-NLS-1$
                     InputStreamReader in = null;
                     HttpsURLConnection connection = null;
                     String rawResponse = null;
@@ -130,14 +128,14 @@ public class VersionCheck
                         }
                         else
                         {
-                            JourneymapClient.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
+                            Journeymap.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
                         }
 
-                        JourneymapClient.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, Journeymap.DOWNLOAD_URL));
+                        Journeymap.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, Journeymap.DOWNLOAD_URL));
                     }
                     catch (Throwable e)
                     {
-                        JourneymapClient.getLogger().error("Could not check version URL", e); //$NON-NLS-1$
+                        Journeymap.getLogger().error("Could not check version URL", e); //$NON-NLS-1$
                         updateCheckEnabled = false;
                     }
                     finally
@@ -218,11 +216,7 @@ public class VersionCheck
                 arch = "WOW64";
             }
 
-            String lang = String.format("%s_%s", System.getProperty("user.language"), System.getProperty("user.country"));
-            if (lang.contains("null"))
-            {
-                lang = ForgeHelper.INSTANCE.getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
-            }
+            String lang = String.format("%s_%s", System.getProperty("user.language", "en"), System.getProperty("user.country", "US"));
 
             // Build user agent string
             if (os.startsWith("Mac")) // Mac OS X, x86_64, ?
@@ -249,22 +243,6 @@ public class VersionCheck
         }
 
         return agent;
-    }
-
-    /**
-     * Launch the JourneyMap website in the native OS.
-     */
-    public static void launchWebsite()
-    {
-        String url = Journeymap.DOWNLOAD_URL;
-        try
-        {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
-        }
-        catch (Throwable e)
-        {
-            JourneymapClient.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
-        }
     }
 
     /**

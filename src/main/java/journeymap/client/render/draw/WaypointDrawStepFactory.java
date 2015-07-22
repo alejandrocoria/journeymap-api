@@ -11,9 +11,10 @@ package journeymap.client.render.draw;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
@@ -68,7 +69,7 @@ public class WaypointDrawStepFactory
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

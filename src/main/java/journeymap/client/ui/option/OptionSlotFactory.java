@@ -11,11 +11,12 @@ package journeymap.client.ui.option;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.*;
+import journeymap.common.Journeymap;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -195,7 +196,7 @@ public class OptionSlotFactory
                 }
                 else
                 {
-                    JourneymapClient.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), config));
+                    Journeymap.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), config));
                 }
             }
         }
@@ -384,7 +385,7 @@ public class OptionSlotFactory
             }
             catch (Exception e)
             {
-                JourneymapClient.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
+                Journeymap.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
             }
             String defaultTip = Constants.getString("jm.config.default", defaultEnumValue);
             boolean advanced = annotation.category() == Config.Category.Advanced;

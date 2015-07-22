@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.option;
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
+import journeymap.client.Constants;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.component.ListPropertyButton;
+import journeymap.common.Journeymap;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class LocationFormat
         LocationFormatKeys locationLocationFormatKeys = idToFormat.get(id);
         if (locationLocationFormatKeys == null)
         {
-            JourneymapClient.getLogger().warn("Invalid location format id: " + id);
+            Journeymap.getLogger().warn("Invalid location format id: " + id);
             locationLocationFormatKeys = idToFormat.get(locationFormatIds[0]);
         }
 

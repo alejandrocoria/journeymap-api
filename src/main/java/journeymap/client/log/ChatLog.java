@@ -6,12 +6,13 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.common.log;
+package journeymap.client.log;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.VersionCheck;
 import journeymap.client.service.WebServer;
+import journeymap.common.Journeymap;
+import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -78,7 +79,7 @@ public class ChatLog
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
+            Journeymap.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
         }
         queueAnnouncement(chat);
     }
@@ -138,12 +139,12 @@ public class ChatLog
                 }
                 catch (Exception e)
                 {
-                    JourneymapClient.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
+                    Journeymap.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
                 }
                 finally
                 {
                     Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.ERROR : Level.INFO;
-                    JourneymapClient.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
+                    Journeymap.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
                 }
             }
         }
@@ -166,7 +167,7 @@ public class ChatLog
                 }
                 catch (Throwable t)
                 {
-                    JourneymapClient.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
+                    Journeymap.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
                 }
             }
             else

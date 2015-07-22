@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.model.MapType;
@@ -23,6 +23,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.*;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeToggle;
+import journeymap.common.Journeymap;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL12;
@@ -134,7 +135,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
             UIManager.getInstance().closeAll();
         }
     }

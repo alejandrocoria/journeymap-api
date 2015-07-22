@@ -9,14 +9,14 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
+import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +33,7 @@ public class TileDrawStep
 {
     private static final Color bgColor = new Color(0x22, 0x22, 0x22);
 
-    private static final Logger logger = JourneymapClient.getLogger();
+    private static final Logger logger = Journeymap.getLogger();
     private final boolean debug = logger.isDebugEnabled();
     private final RegionCoord regionCoord;
     private final MapType mapType;
@@ -187,7 +187,7 @@ public class TileDrawStep
         int glErr = GL11.glGetError();
         if (glErr != GL11.GL_NO_ERROR)
         {
-            JourneymapClient.getLogger().warn("GL Error in TileDrawStep: " + glErr);
+            Journeymap.getLogger().warn("GL Error in TileDrawStep: " + glErr);
             clearTexture();
         }
 

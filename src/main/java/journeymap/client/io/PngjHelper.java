@@ -89,7 +89,7 @@ public class PngjHelper
                     }
                     catch (ArrayIndexOutOfBoundsException e)
                     {
-                        JourneymapClient.getLogger().error("Bad image data. Src len=" + src.length + ", dest len=" + dest.length + ", destPos=" + destPos);
+                        Journeymap.getLogger().error("Bad image data. Src len=" + src.length + ", dest len=" + dest.length + ", destPos=" + destPos);
                         break rowcopy;
                     }
                 }

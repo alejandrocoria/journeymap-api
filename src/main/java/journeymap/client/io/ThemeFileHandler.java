@@ -11,15 +11,16 @@ package journeymap.client.io;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.option.StringListProvider;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -42,7 +43,7 @@ public class ThemeFileHandler
 
     public static void initialize()
     {
-        JourneymapClient.getLogger().trace("Initializing themes ...");
+        Journeymap.getLogger().trace("Initializing themes ...");
 
         // Theme dirs
         Set<String> themeDirNames = new HashSet<String>();
@@ -101,7 +102,7 @@ public class ThemeFileHandler
             themeDirs = getThemeDirectories();
             if (themeDirs == null || themeDirs.length == 0)
             {
-                JourneymapClient.getLogger().error("Couldn't find theme directories.");
+                Journeymap.getLogger().error("Couldn't find theme directories.");
                 return Collections.emptyList();
             }
         }
@@ -176,7 +177,7 @@ public class ThemeFileHandler
                 return theme;
             }
         }
-        JourneymapClient.getLogger().warn(String.format("Theme '%s' not found, reverting to default", themeName));
+        Journeymap.getLogger().warn(String.format("Theme '%s' not found, reverting to default", themeName));
         return ThemePresets.THEME_VICTORIAN;
     }
 
@@ -192,7 +193,7 @@ public class ThemeFileHandler
             }
             else if (createIfMissing)
             {
-                JourneymapClient.getLogger().info("Generating Theme json file: " + themeFile);
+                Journeymap.getLogger().info("Generating Theme json file: " + themeFile);
                 Theme theme = new Theme();
                 theme.name = themeFile.getName();
                 save(theme);
@@ -201,7 +202,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Could not load Theme json file: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not load Theme json file: " + LogFormatter.toString(t));
         }
         return null;
     }
@@ -224,7 +225,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Could not save Theme json file: " + t);
+            Journeymap.getLogger().error("Could not save Theme json file: " + t);
         }
     }
 
@@ -244,7 +245,7 @@ public class ThemeFileHandler
             }
             catch (Throwable t)
             {
-                JourneymapClient.getLogger().error("Could not save DefaultTheme json file: " + t);
+                Journeymap.getLogger().error("Could not save DefaultTheme json file: " + t);
             }
         }
     }
@@ -305,7 +306,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Could not load Theme.DefaultTheme json file: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not load Theme.DefaultTheme json file: " + LogFormatter.toString(t));
         }
         return null;
     }

@@ -8,11 +8,11 @@
 
 package journeymap.client.io;
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
+import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.ui.option.StringListProvider;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class IconSetFileHandler
 
     public static void initialize()
     {
-        JourneymapClient.getLogger().info("Initializing icon sets...");
+        Journeymap.getLogger().info("Initializing icon sets...");
 
         // Mob icons
         for (String setName : MOB_ICON_SETS)
@@ -73,7 +73,7 @@ public class IconSetFileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Could not prepare iconset directories for " + parentDir + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not prepare iconset directories for " + parentDir + ": " + LogFormatter.toString(t));
         }
 
         // Create list of icon set names

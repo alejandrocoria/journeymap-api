@@ -9,10 +9,10 @@
 package journeymap.client.model.mod;
 
 import com.google.common.base.Joiner;
-import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
@@ -36,7 +36,16 @@ public class ModBlockDelegate
 
     private static final HashMap<GameRegistry.UniqueIdentifier, AtomicInteger> Errors = new HashMap<GameRegistry.UniqueIdentifier, AtomicInteger>();
     private static final int ERROR_LIMIT = 25;
-    private static Logger logger = JourneymapClient.getLogger();
+    private static Logger logger = Journeymap.getLogger();
+
+    /**
+     * Register special block handlers when this class is first loaded.
+     */
+    static
+    {
+        // register(new OpenBlocks.GraveHandler());
+        register(new CarpentersBlocks.CommonHandler());
+    }
 
     /**
      * Register a special block handler.
@@ -105,6 +114,37 @@ public class ModBlockDelegate
         return Blocks.containsKey(blockMD.uid);
     }
 
+//    /**
+//     * Provide special handling of getting a block icon.  Return nulls if not necessary,
+//     *
+//     * @param blockMD
+//     * @return
+//     */
+//    public IIcon getIcon(BlockMD blockMD)
+//    {
+//        try
+//        {
+//            IModBlockHandler handler = Blocks.get(blockMD.uid);
+//            if (handler != null)
+//            {
+//                return handler.getIcon(blockMD);
+//            }
+//        }
+//        catch (Throwable t)
+//        {
+//            int count = Errors.get(blockMD.uid).incrementAndGet();
+//            String message = String.format("Error (%s) from getIcon() on block '%s': %s", count, blockMD.uid, LogFormatter.toString(t));
+//            logger.error(message);
+//            if (count >= ERROR_LIMIT)
+//            {
+//                logger.warn(String.format("Deregistering problematic IModBlockHandler for '%s'.", blockMD.uid));
+//                Blocks.remove(blockMD.uid);
+//            }
+//        }
+//
+//        return null;
+//    }
+
     /**
      * Provide special handling of a block in-situ when encountered during a mapping task.
      * The block returned will be used to color that spot on the map.
@@ -145,37 +185,6 @@ public class ModBlockDelegate
         return delegatedBlockMD;
     }
 
-//    /**
-//     * Provide special handling of getting a block icon.  Return nulls if not necessary,
-//     *
-//     * @param blockMD
-//     * @return
-//     */
-//    public IIcon getIcon(BlockMD blockMD)
-//    {
-//        try
-//        {
-//            IModBlockHandler handler = Blocks.get(blockMD.uid);
-//            if (handler != null)
-//            {
-//                return handler.getIcon(blockMD);
-//            }
-//        }
-//        catch (Throwable t)
-//        {
-//            int count = Errors.get(blockMD.uid).incrementAndGet();
-//            String message = String.format("Error (%s) from getIcon() on block '%s': %s", count, blockMD.uid, LogFormatter.toString(t));
-//            logger.error(message);
-//            if (count >= ERROR_LIMIT)
-//            {
-//                logger.warn(String.format("Deregistering problematic IModBlockHandler for '%s'.", blockMD.uid));
-//                Blocks.remove(blockMD.uid);
-//            }
-//        }
-//
-//        return null;
-//    }
-
     public static interface IModBlockHandler
     {
         /**
@@ -205,14 +214,5 @@ public class ModBlockDelegate
          * @return
          */
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ);
-    }
-
-    /**
-     * Register special block handlers when this class is first loaded.
-     */
-    static
-    {
-        // register(new OpenBlocks.GraveHandler());
-        register(new CarpentersBlocks.CommonHandler());
     }
 }

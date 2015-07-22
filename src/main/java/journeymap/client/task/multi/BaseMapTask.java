@@ -12,12 +12,13 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.ChunkCoord;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -30,7 +31,7 @@ import java.util.Iterator;
 
 public abstract class BaseMapTask implements ITask
 {
-    static final Logger logger = JourneymapClient.getLogger();
+    static final Logger logger = Journeymap.getLogger();
     protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
     private static BufferedImage blankChunkImage = null;
     private static BufferedImage blankChunkImageUnderground = null;
@@ -152,14 +153,14 @@ public abstract class BaseMapTask implements ITask
         }
         catch (InterruptedException t)
         {
-            JourneymapClient.getLogger().warn("Task thread interrupted: " + this);
+            Journeymap.getLogger().warn("Task thread interrupted: " + this);
             timer.cancel();
             throw t;
         }
         catch (Throwable t)
         {
             String error = "Unexpected error in BaseMapTask: " + (LogFormatter.toString(t));
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             this.complete(false, true);
             timer.cancel();
         }

@@ -12,9 +12,10 @@ import com.google.common.collect.ImmutableSortedMap;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
@@ -83,7 +84,7 @@ public class EntityHelper
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().warn("Failed to " + timerName + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().warn("Failed to " + timerName + ": " + LogFormatter.toString(t));
         }
 
         timer.stop();

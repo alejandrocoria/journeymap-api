@@ -8,17 +8,17 @@
 
 package journeymap.client.cartography;
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
+import journeymap.client.Constants;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.task.multi.MapPlayerTask;
+import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -76,13 +76,13 @@ public class ColorCache
 
             if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
             {
-                JourneymapClient.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
+                Journeymap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
                 resourcePackSame = true;
             }
 
             if (currentModNames.equals(lastModNames))
             {
-                JourneymapClient.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
+                Journeymap.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
                 modPackSame = true;
             }
 
@@ -97,7 +97,7 @@ public class ColorCache
                 DataCache.instance().resetBlockMetadata();
 
                 // Load the cache from a color palette
-                JourneymapClient.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentResourcePackNames));
+                Journeymap.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentResourcePackNames));
                 loadColorPalette();
 
                 // Remap around player
@@ -121,12 +121,12 @@ public class ColorCache
                 this.baseColors.putAll(colorPalette.getBasicColorMap());
                 this.biomeColors.putAll(colorPalette.getBiomeColorMap());
                 long elapsed = System.currentTimeMillis() - start;
-                JourneymapClient.getLogger().info(String.format("Existing color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
+                Journeymap.getLogger().info(String.format("Existing color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
             }
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Could not load color palette: " + e);
+            Journeymap.getLogger().warn("Could not load color palette: " + e);
         }
     }
 
@@ -158,12 +158,12 @@ public class ColorCache
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
-            JourneymapClient.getLogger().info(String.format("New color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            Journeymap.getLogger().info(String.format("New color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
             return palette;
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
         }
         return null;
     }
@@ -202,7 +202,7 @@ public class ColorCache
             }
             catch (Exception e)
             {
-                JourneymapClient.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
+                Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
                 count += prefetchColors(DataCache.instance().getBlockMD(block, 0));
             }
         }
@@ -293,11 +293,11 @@ public class ColorCache
             if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF))
             { // white without alpha, white with alpha
                 color = colorMultiplier(color, tint);
-                JourneymapClient.getLogger().debug("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
+                Journeymap.getLogger().debug("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
             }
             else
             {
-                JourneymapClient.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
+                Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
             }
             putBiomeColor(blockMD, biome, color);
         }
@@ -318,7 +318,7 @@ public class ColorCache
             catch (Throwable t)
             {
                 blockMD.addFlags(BlockMD.Flag.Error);
-                JourneymapClient.getLogger().error("Couldn't get biome foliage color: " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("Couldn't get biome foliage color: " + LogFormatter.toString(t));
             }
             int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
             int darker = colorMultiplier(leafTimesBiome, 0xFFAAAAAA); // I added this, I'm sure it'll break with some custom leaf mod somewhere.
@@ -342,7 +342,7 @@ public class ColorCache
             catch (Throwable t)
             {
                 blockMD.addFlags(BlockMD.Flag.Error);
-                JourneymapClient.getLogger().error("Couldn't get biome grass color: " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("Couldn't get biome grass color: " + LogFormatter.toString(t));
             }
             color = colorMultiplier(baseColor, biomeColor);
             putBiomeColor(blockMD, biome, color);
@@ -374,7 +374,7 @@ public class ColorCache
         catch (NullPointerException e)
         {
             // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
-            JourneymapClient.getLogger().warn("Block throws NullPointerException when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName());
+            Journeymap.getLogger().warn("Block throws NullPointerException when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName());
             return 16777215;
         }
     }
@@ -456,7 +456,7 @@ public class ColorCache
                 { // white without alpha, white with alpha
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
                     DataCache.instance().getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.BiomeColor);
-                    JourneymapClient.getLogger().debug("Custom biome tint discovered for " + blockMD);
+                    Journeymap.getLogger().debug("Custom biome tint discovered for " + blockMD);
                 }
                 else
                 {
@@ -465,7 +465,7 @@ public class ColorCache
                     if (renderColor != 0xffffff && renderColor != 0xffffffff)
                     { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
-                        JourneymapClient.getLogger().debug("Applied render color for " + blockMD);
+                        Journeymap.getLogger().debug("Applied render color for " + blockMD);
                     }
                 }
             }
@@ -480,11 +480,11 @@ public class ColorCache
             }
             else if (colorHelper.failedFor(blockMD))
             {
-                JourneymapClient.getLogger().warn("Iconloader failed to get base color for " + blockMD);
+                Journeymap.getLogger().warn("Iconloader failed to get base color for " + blockMD);
             }
             else
             {
-                JourneymapClient.getLogger().warn("Unknown failure, could not get base color for " + blockMD);
+                Journeymap.getLogger().warn("Unknown failure, could not get base color for " + blockMD);
             }
         }
         return baseColor;

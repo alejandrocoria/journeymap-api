@@ -6,9 +6,9 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.common.log;
+package journeymap.client.log;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;
@@ -214,10 +214,10 @@ public class JMLogger
         if (!singletonErrors.contains(text.hashCode()))
         {
             singletonErrors.add(text.hashCode());
-            JourneymapClient.getLogger().error(text + " (SUPPRESSED)");
+            Journeymap.getLogger().error(text + " (SUPPRESSED)");
             if (throwable != null)
             {
-                JourneymapClient.getLogger().error(LogFormatter.toString(throwable));
+                Journeymap.getLogger().error(LogFormatter.toString(throwable));
             }
         }
         else

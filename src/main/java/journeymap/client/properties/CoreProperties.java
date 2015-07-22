@@ -11,7 +11,7 @@ package journeymap.client.properties;
 import com.google.common.base.Objects;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.common.log.JMLogger;
+import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.properties.config.Config;
 import journeymap.client.task.multi.RenderSpec;
@@ -259,7 +259,7 @@ public class CoreProperties extends PropertiesBase implements Comparable<CorePro
                 .add("cachePlayersData", cachePlayersData)
                 .add("cacheVillagersData", cacheVillagersData)
                 .add("caveIgnoreGlass", caveIgnoreGlass)
-                .add("checkUpdates", checkUpdates)
+                .add("isUpdateCheckEnabled", checkUpdates)
                 .add("renderDelay", renderDelay)
                 .add("hideSneakingEntities", hideSneakingEntities)
                 .add("logLevel", logLevel)

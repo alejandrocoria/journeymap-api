@@ -11,8 +11,9 @@ package journeymap.client.thread;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.task.multi.ITask;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 public class RunnableTask implements Runnable
 {
     static final JourneymapClient jm = JourneymapClient.getInstance();
-    static final Logger logger = JourneymapClient.getLogger();
+    static final Logger logger = Journeymap.getLogger();
     static final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     static final boolean threadLogging = jm.isThreadLogging();
 
@@ -50,7 +51,7 @@ public class RunnableTask implements Runnable
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().warn("Interrupted task that ran too long:" + task);
+            Journeymap.getLogger().warn("Interrupted task that ran too long:" + task);
         }
     }
 

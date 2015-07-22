@@ -10,6 +10,9 @@ package journeymap.common;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.Map;
 
 /**
  * Proxy to provide a common interface for initializing client-side or server-side.
@@ -29,5 +32,18 @@ public interface CommonProxy
      * @throws Throwable
      */
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable;
+
+    /**
+     * Whether this side will accept being connected to the other side.
+     * Since we don't care if the other side has JourneyMap or some other mod, always return true.
+     */
+    public boolean checkModLists(Map<String, String> modList, Side side);
+
+    /**
+     * Whether the update check is enabled.
+     *
+     * @return
+     */
+    public boolean isUpdateCheckEnabled();
 
 }

@@ -8,13 +8,12 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.VersionCheck;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.MapSaver;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
@@ -28,6 +27,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.common.Journeymap;
 import net.minecraft.client.gui.GuiButton;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
@@ -62,7 +62,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneymapClient.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            Journeymap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
         }
     }
 
@@ -75,7 +75,23 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            JourneymapClient.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            Journeymap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+        }
+    }
+
+    /**
+     * Launch the JourneyMap website in the native OS.
+     */
+    public static void launchWebsite()
+    {
+        String url = Journeymap.DOWNLOAD_URL;
+        try
+        {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        }
+        catch (Throwable e)
+        {
+            Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 
@@ -205,7 +221,7 @@ public class FullscreenActions extends JmUI
         }
         if (guibutton == buttonCheck)
         {
-            VersionCheck.launchWebsite();
+            launchWebsite();
             UIManager.getInstance().openFullscreenMap();
             return;
         }

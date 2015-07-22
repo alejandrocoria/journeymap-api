@@ -8,12 +8,12 @@
 
 package journeymap.client.model;
 
-import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.dialog.OptionsManager;
+import journeymap.common.Journeymap;
 
 import java.util.ArrayList;
 
@@ -68,7 +68,7 @@ public class SplashInfo
             }
             catch (Throwable t)
             {
-                JourneymapClient.getLogger().error("Couldn't invoke action: " + action + ": " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("Couldn't invoke action: " + action + ": " + LogFormatter.toString(t));
             }
         }
     }

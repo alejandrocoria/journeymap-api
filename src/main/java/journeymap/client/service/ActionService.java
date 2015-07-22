@@ -12,10 +12,11 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.MapSaver;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapType;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.task.multi.SaveMapTask;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import se.rupy.http.Event;
@@ -166,7 +167,7 @@ public class ActionService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Unexpected error handling path: " + (path), event, true);
         }
     }

@@ -9,8 +9,8 @@
 package journeymap.client.waypoint;
 
 import com.google.common.io.Files;
-import journeymap.client.JourneymapClient;
 import journeymap.client.model.Waypoint;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -74,7 +74,7 @@ public class JmReader
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
+            Journeymap.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
             waypointFile.deleteOnExit();
         }
     }
@@ -91,7 +91,7 @@ public class JmReader
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error(String.format("Can't load waypoint file %s with contents: %s because %s", waypointFile, waypointString, e.getMessage()));
+            Journeymap.getLogger().error(String.format("Can't load waypoint file %s with contents: %s because %s", waypointFile, waypointString, e.getMessage()));
         }
         return waypoint;
     }

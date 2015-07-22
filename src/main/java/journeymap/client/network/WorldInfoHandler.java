@@ -6,16 +6,16 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.common.network;
+package journeymap.client.network;
 
-import io.netty.buffer.ByteBuf;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.common.Journeymap;
+import journeymap.common.network.WorldIDPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -32,9 +32,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class WorldInfoHandler
 {
-    // Channel name
-    public static final String CHANNEL_NAME = "world_info";
-
     // Packet discriminator for World ID message
     public static final int PACKET_WORLDID = 0;
 
@@ -58,17 +55,17 @@ public class WorldInfoHandler
     {
         try
         {
-            channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL_NAME);
+            channel = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
             if (channel != null)
             {
-                channel.registerMessage(WorldIdListener.class, WorldIdMessage.class, PACKET_WORLDID, Side.CLIENT);
-                JourneymapClient.getLogger().info(String.format("Registered channel: %s", CHANNEL_NAME));
+                channel.registerMessage(WorldIdListener.class, WorldIDPacket.class, PACKET_WORLDID, Side.CLIENT);
+                Journeymap.getLogger().info(String.format("Registered channel: %s", WorldIDPacket.CHANNEL_NAME));
                 MinecraftForge.EVENT_BUS.register(this);
             }
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(String.format("Failed to register channel %s: %s", CHANNEL_NAME, t));
+            Journeymap.getLogger().error(String.format("Failed to register channel %s: %s", WorldIDPacket.CHANNEL_NAME, t));
         }
     }
 
@@ -82,8 +79,8 @@ public class WorldInfoHandler
             long now = System.currentTimeMillis();
             if (lastRequest + MIN_DELAY_MS < now && lastResponse + MIN_DELAY_MS < now)
             {
-                JourneymapClient.getLogger().info("Requesting World ID");
-                channel.sendToServer(new WorldIdMessage());
+                Journeymap.getLogger().info("Requesting World ID");
+                channel.sendToServer(new WorldIDPacket());
                 lastRequest = System.currentTimeMillis();
             }
         }
@@ -116,63 +113,17 @@ public class WorldInfoHandler
     /**
      * Simple message listener for WorldUidMesssages received from the server.
      */
-    public static class WorldIdListener implements IMessageHandler<WorldIdMessage, IMessage>
+    public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage>
     {
         @SideOnly(Side.CLIENT)
         @Override
-        public IMessage onMessage(WorldIdMessage message, MessageContext ctx)
+        public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
             lastResponse = System.currentTimeMillis();
-            JourneymapClient.getLogger().info(String.format("Got the World ID from server: %s", message.worldUid));
-            JourneymapClient.getInstance().setCurrentWorldId(message.worldUid);
+            Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
+            JourneymapClient.getInstance().setCurrentWorldId(message.getWorldID());
             return null;
         }
     }
 
-    /**
-     * Simple message to get a World ID from the server.
-     * Send a blank one from the client as a request.
-     */
-    public static class WorldIdMessage implements IMessage
-    {
-        private String worldUid;
-
-        public WorldIdMessage()
-        {
-        }
-
-        public String getWorldUid()
-        {
-            return worldUid;
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-            try
-            {
-                worldUid = ByteBufUtils.readUTF8String(buf);
-            }
-            catch (Throwable t)
-            {
-                JourneymapClient.getLogger().error(String.format("Failed to read message: %s", t));
-            }
-        }
-
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-            try
-            {
-                if (worldUid != null)
-                {
-                    ByteBufUtils.writeUTF8String(buf, worldUid);
-                }
-            }
-            catch (Throwable t)
-            {
-                JourneymapClient.getLogger().error(String.format("Failed to read message: %s", t));
-            }
-        }
-    }
 }

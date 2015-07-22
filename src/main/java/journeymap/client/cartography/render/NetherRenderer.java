@@ -9,12 +9,12 @@
 package journeymap.client.cartography.render;
 
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 
 /**
  * Render a chunk in the Nether.
@@ -93,7 +93,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
 

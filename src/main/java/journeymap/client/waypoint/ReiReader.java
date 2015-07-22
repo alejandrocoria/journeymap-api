@@ -8,11 +8,11 @@
 
 package journeymap.client.waypoint;
 
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.Constants;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import journeymap.common.Journeymap;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -114,7 +114,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Could not derive Rei filename: " + e.getMessage());
+            Journeymap.getLogger().warn("Could not derive Rei filename: " + e.getMessage());
         }
 
         if (worldName == null)
@@ -173,7 +173,7 @@ public class ReiReader
             catch (Exception e)
             {
                 ChatLog.announceError(Constants.getString("jm.waypoint.import_rei_file_error", pointsFile.getName()));
-                JourneymapClient.getLogger().error(LogFormatter.toString(e));
+                Journeymap.getLogger().error(LogFormatter.toString(e));
                 fileErrors++;
             }
         }
@@ -247,7 +247,7 @@ public class ReiReader
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
+            Journeymap.getLogger().warn("Couldn't parse " + v[i] + " as " + parts[i] + " in \"" + line + "\" because: " + e.getMessage());
             pointErrors++;
             return null;
         }

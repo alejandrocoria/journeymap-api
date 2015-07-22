@@ -8,7 +8,7 @@
 
 package journeymap.client.service;
 
-import journeymap.common.log.JMLogger;
+import journeymap.client.log.JMLogger;
 import se.rupy.http.Event;
 
 import java.io.File;

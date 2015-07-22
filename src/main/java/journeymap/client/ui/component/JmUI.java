@@ -10,7 +10,7 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -38,7 +38,7 @@ public abstract class JmUI extends GuiScreen
 
     protected final String title;
     protected final int headerHeight = 35;
-    protected final Logger logger = JourneymapClient.getLogger();
+    protected final Logger logger = Journeymap.getLogger();
     protected JmUI returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
@@ -214,7 +214,7 @@ public abstract class JmUI extends GuiScreen
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Error in UI: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error in UI: " + LogFormatter.toString(t));
             closeAndReturn();
         }
     }

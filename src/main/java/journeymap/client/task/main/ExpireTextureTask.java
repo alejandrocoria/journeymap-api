@@ -10,6 +10,7 @@ package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
@@ -28,7 +29,7 @@ public class ExpireTextureTask implements IMainThreadTask
 {
     private static final int MAX_FAILS = 5;
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
-    private static Logger LOGGER = JourneymapClient.getLogger();
+    private static Logger LOGGER = Journeymap.getLogger();
     private final List<TextureImpl> textures;
     private final int textureId;
     private volatile int fails;

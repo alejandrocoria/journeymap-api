@@ -11,9 +11,10 @@ package journeymap.client.model;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.mod.ModBlockDelegate;
+import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -256,7 +257,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, x, y, z, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -306,7 +307,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -327,7 +328,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         EnumSet<BlockMD.Flag> eset = getFlags(block);
         eset.addAll(flags);
         blockFlags.put(block, eset);
-        JourneymapClient.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
+        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
     }
 
     public boolean hasFlag(Block block, BlockMD.Flag flag)

@@ -9,15 +9,15 @@
 package journeymap.client.render.draw;
 
 import com.google.common.base.Strings;
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.properties.InGameMapProperties;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.common.Journeymap;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -117,13 +117,13 @@ public class RadarDrawStepFactory
                 }
                 catch (Exception e)
                 {
-                    JourneymapClient.getLogger().error("Exception during prepareSteps: " + LogFormatter.toString(e));
+                    Journeymap.getLogger().error("Exception during prepareSteps: " + LogFormatter.toString(e));
                 }
             }
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Throwable during prepareSteps: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Throwable during prepareSteps: " + LogFormatter.toString(t));
         }
 
         return drawStepList;

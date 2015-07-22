@@ -9,10 +9,11 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.WebMapProperties;
-import journeymap.client.thread.JMThreadFactory;
+import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import se.rupy.http.Daemon;
@@ -36,7 +37,7 @@ public class WebServer
     private final static int MAXFAILS = 5;
     private static volatile WebServer instance;
 
-    private final Logger logger = JourneymapClient.getLogger();
+    private final Logger logger = Journeymap.getLogger();
 
     private Daemon rupy;
     private int port;
@@ -62,7 +63,7 @@ public class WebServer
             }
             catch (Throwable e)
             {
-                JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
             }
         }
 
@@ -82,12 +83,12 @@ public class WebServer
             }
             catch (Throwable e)
             {
-                JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
                 enable = false;
             }
             if (!enable)
             {
-                JourneymapClient.getLogger().error("Unexpected error, JMServer couldn't be started.");
+                Journeymap.getLogger().error("Unexpected error, JMServer couldn't be started.");
             }
         }
 

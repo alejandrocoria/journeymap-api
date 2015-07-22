@@ -10,10 +10,10 @@ package journeymap.client.model;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
+import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
@@ -144,7 +144,7 @@ public class ChunkMD
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(e + " at " + x + "," + y + "," + z);
+            Journeymap.getLogger().warn(e + " at " + x + "," + y + "," + z);
         }
 
         return Math.max(0, y);

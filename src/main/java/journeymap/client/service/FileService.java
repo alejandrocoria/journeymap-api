@@ -14,11 +14,12 @@ import journeymap.client.cartography.ColorPalette;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.theme.ThemePresets;
+import journeymap.common.Journeymap;
 import se.rupy.http.Event;
 
 import java.awt.image.BufferedImage;
@@ -68,7 +69,7 @@ public class FileService extends BaseService
 
         if (resourceDir == null)
         {
-            JourneymapClient.getLogger().error("Can't determine path to webroot!");
+            Journeymap.getLogger().error("Can't determine path to webroot!");
         }
         else
         {
@@ -186,7 +187,7 @@ public class FileService extends BaseService
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
                     fileStream = FileHandler.getIconStream(ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
-                    JourneymapClient.getLogger().warn("Couldn't get theme file for " + path);
+                    Journeymap.getLogger().warn("Couldn't get theme file for " + path);
                 }
                 else
                 {
@@ -221,7 +222,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error: " + path, event, true);
         }
     }
@@ -309,7 +310,7 @@ public class FileService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
         }
 
         return in;
@@ -392,7 +393,7 @@ public class FileService extends BaseService
         }
         catch (IOException e)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(e));
+            Journeymap.getLogger().error(LogFormatter.toString(e));
             throw event;
         }
         finally
@@ -427,7 +428,7 @@ public class FileService extends BaseService
         }
         catch (Exception ex)
         {
-            JourneymapClient.getLogger().warn("Failed to gzip encode: " + data);
+            Journeymap.getLogger().warn("Failed to gzip encode: " + data);
             return null;
         }
     }

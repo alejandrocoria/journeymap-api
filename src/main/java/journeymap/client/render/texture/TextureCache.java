@@ -8,15 +8,15 @@
 
 package journeymap.client.render.texture;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.task.main.ExpireTextureTask;
-import journeymap.client.thread.JMThreadFactory;
 import journeymap.client.ui.theme.Theme;
+import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.StringUtils;
 
@@ -346,7 +346,7 @@ public class TextureCache
                 }
                 else
                 {
-                    JourneymapClient.getLogger().error("Unknown theme image: " + texName);
+                    Journeymap.getLogger().error("Unknown theme image: " + texName);
                     return getUnknownEntity();
                 }
             }
@@ -386,7 +386,7 @@ public class TextureCache
                 }
                 else
                 {
-                    JourneymapClient.getLogger().error("Unable to get scaled image: " + texName);
+                    Journeymap.getLogger().error("Unable to get scaled image: " + texName);
                     return getUnknownEntity();
                 }
             }
@@ -435,7 +435,7 @@ public class TextureCache
                 }
                 else
                 {
-                    JourneymapClient.getLogger().warn("Couldn't get a skin at all for " + username);
+                    Journeymap.getLogger().warn("Couldn't get a skin at all for " + username);
                 }
                 return null;
             }
@@ -462,7 +462,7 @@ public class TextureCache
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
+            Journeymap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
         }
         return img;
     }
@@ -485,12 +485,12 @@ public class TextureCache
             }
             else
             {
-                JourneymapClient.getLogger().warn("Bad Response getting image: " + imageURL + " : " + conn.getResponseCode());
+                Journeymap.getLogger().warn("Bad Response getting image: " + imageURL + " : " + conn.getResponseCode());
             }
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().warn("Error getting skin image: " + imageURL + " : " + e.getMessage());
+            Journeymap.getLogger().warn("Error getting skin image: " + imageURL + " : " + e.getMessage());
         }
         finally
         {

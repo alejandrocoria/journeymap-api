@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;

@@ -21,6 +21,7 @@ import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
+import journeymap.common.Journeymap;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -187,7 +188,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         long count = badBlockCount.incrementAndGet();
         if (count == 1 || count % 10240 == 0)
         {
-            JourneymapClient.getLogger().warn(
+            Journeymap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             + ". Total bad blocks: " + count
             ); //$NON-NLS-1$
@@ -422,7 +423,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if (slope == null || slope.isNaN())
         {
-            JourneymapClient.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+            Journeymap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
             slope = 1f;
         }
         return slope;
@@ -522,7 +523,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
         //why is height 4 set on a chunk to the left?
@@ -623,7 +624,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(e.getMessage());
+            Journeymap.getLogger().warn(e.getMessage());
             return null;
         }
     }

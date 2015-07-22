@@ -9,11 +9,11 @@
 package journeymap.client.cartography;
 
 import com.google.common.base.Objects;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.*;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
+import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Level;
 
 import java.awt.*;
@@ -52,7 +52,7 @@ public class ChunkRenderController
 
         if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getDimension() != mapType.dimension)
         {
-            JourneymapClient.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
+            Journeymap.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
             return false;
         }
 
@@ -122,12 +122,12 @@ public class ChunkRenderController
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
-            JourneymapClient.getLogger().log(Level.WARN, LogFormatter.toString(e));
+            Journeymap.getLogger().log(Level.WARN, LogFormatter.toString(e));
             return false; // Can happen when server isn't connected, just wait for next tick
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
+            Journeymap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
         }
         finally
         {
@@ -147,9 +147,9 @@ public class ChunkRenderController
 
         if (!renderOkay)
         {
-            if (JourneymapClient.getLogger().isDebugEnabled())
+            if (Journeymap.getLogger().isDebugEnabled())
             {
-                JourneymapClient.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
+                Journeymap.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
             }
         }
 

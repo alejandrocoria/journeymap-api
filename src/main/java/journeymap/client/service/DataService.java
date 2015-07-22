@@ -11,8 +11,9 @@ package journeymap.client.service;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.*;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -33,6 +34,7 @@ public class DataService extends BaseService
 
     public static final String combinedPath;
     public static final HashMap<String, Class> providerMap;
+    private static final long serialVersionUID = 4412225358529161454L;
 
     static
     {
@@ -57,8 +59,6 @@ public class DataService extends BaseService
         }
         combinedPath = sb.toString();
     }
-
-    private static final long serialVersionUID = 4412225358529161454L;
 
 
     /**
@@ -114,7 +114,7 @@ public class DataService extends BaseService
                 }
                 catch (Exception e)
                 {
-                    JourneymapClient.getLogger().warn("Bad value for images.since: " + sinceVal);
+                    Journeymap.getLogger().warn("Bad value for images.since: " + sinceVal);
                     since = new Date().getTime();
                 }
             }
@@ -210,7 +210,7 @@ public class DataService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(String.format("Unexpected error in data service: %s", LogFormatter.toString(t)));
+            Journeymap.getLogger().error(String.format("Unexpected error in data service: %s", LogFormatter.toString(t)));
             throwEventException(500, "Error retrieving " + path, event, true);
         }
     }

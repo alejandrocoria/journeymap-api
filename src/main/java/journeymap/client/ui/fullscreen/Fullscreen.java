@@ -9,16 +9,15 @@
 package journeymap.client.ui.fullscreen;
 
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.VersionCheck;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
@@ -36,6 +35,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
+import journeymap.client.ui.dialog.FullscreenActions;
 import journeymap.client.ui.fullscreen.layer.LayerDelegate;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.client.ui.theme.Theme;
@@ -43,6 +43,7 @@ import journeymap.client.ui.theme.ThemeButton;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.client.ui.theme.ThemeToolbar;
 import journeymap.common.Journeymap;
+import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
@@ -78,7 +79,7 @@ public class Fullscreen extends JmUI
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
     int msx, msy, mx, my;
-    Logger logger = JourneymapClient.getLogger();
+    Logger logger = Journeymap.getLogger();
     MapChat chat;
     ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
     ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
@@ -448,7 +449,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    VersionCheck.launchWebsite();
+                    FullscreenActions.launchWebsite();
                     buttonAlert.setDrawButton(false);
                     return true;
                 }

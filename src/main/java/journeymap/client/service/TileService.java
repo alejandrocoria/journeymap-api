@@ -15,6 +15,7 @@ import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.render.map.Tile;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -139,9 +140,9 @@ public class TileService extends FileService
             }
 
             final long stop = System.currentTimeMillis();
-            if (JourneymapClient.getLogger().isEnabled(Level.DEBUG))
+            if (Journeymap.getLogger().isEnabled(Level.DEBUG))
             {
-                JourneymapClient.getLogger().debug((stop - start) + "ms to serve tile");
+                Journeymap.getLogger().debug((stop - start) + "ms to serve tile");
             }
 
         }

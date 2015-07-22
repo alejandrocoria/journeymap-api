@@ -9,12 +9,12 @@
 package journeymap.client.model;
 
 import com.google.common.cache.*;
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.thread.JMThreadFactory;
+import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +32,7 @@ public class RegionImageCache
 {
     public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
     public static final long regionCacheAge = flushInterval / 2;
-    static final Logger logger = JourneymapClient.getLogger();
+    static final Logger logger = Journeymap.getLogger();
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
     private Minecraft minecraft = ForgeHelper.INSTANCE.getClient();

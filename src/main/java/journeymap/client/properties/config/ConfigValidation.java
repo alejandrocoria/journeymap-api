@@ -9,11 +9,11 @@
 package journeymap.client.properties.config;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.common.Constants;
-import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.Constants;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.option.StringListProvider;
+import journeymap.common.Journeymap;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -41,13 +41,13 @@ public class ConfigValidation
             boolean saveNeeded = validateConfigs(instance.getClass(), instance);
             if (saveNeeded)
             {
-                JourneymapClient.getLogger().warn(instance.getClass().getSimpleName() + " failed validation and has been corrected.");
+                Journeymap.getLogger().warn(instance.getClass().getSimpleName() + " failed validation and has been corrected.");
             }
             return saveNeeded;
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Unexpected error in ConfigValidation: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Unexpected error in ConfigValidation: " + LogFormatter.toString(t));
             return false;
         }
     }
@@ -84,7 +84,7 @@ public class ConfigValidation
                 }
                 else if (fieldType.equals(AtomicDouble.class))
                 {
-                    JourneymapClient.getLogger().error("Validation for AtomicDouble not implemented.");
+                    Journeymap.getLogger().error("Validation for AtomicDouble not implemented.");
                 }
                 else if (fieldType.equals(AtomicReference.class))
                 {
@@ -122,7 +122,7 @@ public class ConfigValidation
 
         if (config.minValue() == config.maxValue())
         {
-            JourneymapClient.getLogger().warn(String.format("@Config on %s.%s has no range", instance.getClass().getSimpleName(), field.getName()));
+            Journeymap.getLogger().warn(String.format("@Config on %s.%s has no range", instance.getClass().getSimpleName(), field.getName()));
         }
         else
         {
@@ -131,7 +131,7 @@ public class ConfigValidation
             if (defaultValue < config.minValue() || defaultValue > config.maxValue())
             {
                 defaultValueUsable = false;
-                JourneymapClient.getLogger().warn(String.format("@Config on %s.%s defaultValue is out of range", instance.getClass().getSimpleName(), field.getName()));
+                Journeymap.getLogger().warn(String.format("@Config on %s.%s defaultValue is out of range", instance.getClass().getSimpleName(), field.getName()));
             }
 
             AtomicInteger property = (AtomicInteger) field.get(instance);
@@ -167,7 +167,7 @@ public class ConfigValidation
 
         if (!slp.getStrings().contains(slp.getDefaultString()))
         {
-            JourneymapClient.getLogger().warn(String.format("@Config on %s.%s has an invalid default String: %s",
+            Journeymap.getLogger().warn(String.format("@Config on %s.%s has an invalid default String: %s",
                     instance.getClass().getSimpleName(), field.getName(), slp.getDefaultString()));
         }
 
@@ -208,7 +208,7 @@ public class ConfigValidation
         catch (Exception e)
         {
             defaultValue = enumSet.iterator().next();
-            JourneymapClient.getLogger().warn(String.format("@Config on %s.%s has an invalid default Enum: %s",
+            Journeymap.getLogger().warn(String.format("@Config on %s.%s has an invalid default Enum: %s",
                     instance.getClass().getSimpleName(), field.getName(), config.defaultEnum()));
         }
 
@@ -230,7 +230,7 @@ public class ConfigValidation
      */
     private static void warnPropertyValue(Config config, Field field, Object oldValue, Object newValue)
     {
-        JourneymapClient.getLogger().warn(String.format("Property %s.%s invalid: %s . Changing to: %s", field.getDeclaringClass().getSimpleName(), field.getName(), oldValue, newValue));
+        Journeymap.getLogger().warn(String.format("Property %s.%s invalid: %s . Changing to: %s", field.getDeclaringClass().getSimpleName(), field.getName(), oldValue, newValue));
     }
 
     /**

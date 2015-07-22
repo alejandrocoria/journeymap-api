@@ -8,13 +8,13 @@
 
 package journeymap.client.forge.helper.impl;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
+import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
@@ -35,7 +35,7 @@ import java.util.HashSet;
 public class ColorHelper_1_8 implements IColorHelper
 {
     final BufferedImage blocksTexture;
-    Logger logger = JourneymapClient.getLogger();
+    Logger logger = Journeymap.getLogger();
     DataCache dataCache = DataCache.instance();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 

@@ -6,14 +6,14 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.common;
+package journeymap.client;
 
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
@@ -60,13 +60,6 @@ public class Constants
 
     // Network Channel IDs
 
-    public static final String WORLD_ID_CHANNEL= "world_info";
-
-    public enum WorldType
-    {
-        mp, sp
-    }
-
     /**
      * Initialize the keybindings, return them as a list.
      * @return
@@ -99,7 +92,7 @@ public class Constants
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
+            Journeymap.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
         }
         return locale;
     }
@@ -114,7 +107,7 @@ public class Constants
         String result = I18n.format(key);
         if (result.equals(key))
         {
-            JourneymapClient.getLogger().warn("Message key not found: " + key);
+            Journeymap.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
@@ -130,7 +123,7 @@ public class Constants
         String result = I18n.format(key, params);
         if (result.equals(key))
         {
-            JourneymapClient.getLogger().warn("Message key not found: " + key);
+            Journeymap.getLogger().warn("Message key not found: " + key);
         }
         return result;
     }
@@ -168,7 +161,7 @@ public class Constants
         }
         catch(Throwable t)
         {
-            JourneymapClient.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
+            Journeymap.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
             return false;
         }
     }
@@ -205,7 +198,7 @@ public class Constants
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
+            Journeymap.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
         }
 
         String packs;
@@ -243,6 +236,11 @@ public class Constants
         }
         Collections.sort(list);
         return Joiner.on(", ").join(list);
+    }
+
+    public enum WorldType
+    {
+        mp, sp
     }
 
 

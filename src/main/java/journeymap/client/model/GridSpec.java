@@ -8,7 +8,7 @@
 
 package journeymap.client.model;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;

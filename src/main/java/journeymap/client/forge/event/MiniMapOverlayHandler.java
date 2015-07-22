@@ -8,11 +8,11 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.StatTimer;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;

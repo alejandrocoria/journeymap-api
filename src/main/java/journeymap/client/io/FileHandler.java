@@ -14,12 +14,13 @@ import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.JMLogger;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.JMLogger;
+import journeymap.client.log.LogFormatter;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
@@ -165,7 +166,7 @@ public class FileHandler
 
             if (worldId != null && defaultWorldDirectory.exists() && !worldDirectory.exists())
             {
-                JourneymapClient.getLogger().log(Level.INFO, "Moving default directory to " + worldDirectory);
+                Journeymap.getLogger().log(Level.INFO, "Moving default directory to " + worldDirectory);
                 try
                 {
                     migrateLegacyFolderName(defaultWorldDirectory, worldDirectory);
@@ -173,7 +174,7 @@ public class FileHandler
                 }
                 catch (Exception e)
                 {
-                    JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+                    Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
                 }
             }
 
@@ -236,7 +237,7 @@ public class FileHandler
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+            Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
             throw new RuntimeException(e);
         }
 
@@ -265,7 +266,7 @@ public class FileHandler
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().log(Level.ERROR, LogFormatter.toString(e));
+            Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
         }
 
         return testWorldDirectory;
@@ -286,7 +287,7 @@ public class FileHandler
             {
                 throw new IllegalStateException("Need to rename legacy folder, but not able to");
             }
-            JourneymapClient.getLogger().info(String.format("Migrated legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
+            Journeymap.getLogger().info(String.format("Migrated legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
         }
         catch (Exception e)
         {
@@ -335,7 +336,7 @@ public class FileHandler
             InputStream is = JourneymapClient.class.getResourceAsStream(png);
             if (is == null)
             {
-                JourneymapClient.getLogger().warn("Image not found: " + png);
+                Journeymap.getLogger().warn("Image not found: " + png);
                 return null;
             }
             BufferedImage img = ImageIO.read(is);
@@ -345,7 +346,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = "Could not get web image " + fileName + ": " + e.getMessage();
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }
@@ -357,7 +358,7 @@ public class FileHandler
             InputStream is = JourneymapClient.class.getResourceAsStream("/assets/journeymap/lang/" + fileName);
             if (is == null)
             {
-                JourneymapClient.getLogger().warn("Language file not found: " + fileName);
+                Journeymap.getLogger().warn("Language file not found: " + fileName);
                 return null;
             }
             Properties properties = new Properties();
@@ -368,7 +369,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = "Could not get language file " + fileName + ": " + (e.getMessage());
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }
@@ -385,7 +386,7 @@ public class FileHandler
             }
             if (is == null)
             {
-                JourneymapClient.getLogger().warn("Message file not found: " + filePrefix);
+                Journeymap.getLogger().warn("Message file not found: " + filePrefix);
                 return null;
             }
             return new GsonBuilder().create().fromJson(new InputStreamReader(is), model);
@@ -393,7 +394,7 @@ public class FileHandler
         catch (Throwable e)
         {
             String error = "Could not get Message model " + filePrefix + ": " + (e.getMessage());
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }
@@ -432,7 +433,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = "Could not get imageFile " + imageFile + ": " + (e.getMessage());
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }
@@ -465,7 +466,7 @@ public class FileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().warn("Couldn't copy color palette html: " + t);
+            Journeymap.getLogger().warn("Couldn't copy color palette html: " + t);
             return null;
         }
     }
@@ -484,7 +485,7 @@ public class FileHandler
             }
             catch (IOException e)
             {
-                JourneymapClient.getLogger().error("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Could not open path with /usr/bin/open: " + path + " : " + LogFormatter.toString(e));
             }
         }
         else
@@ -501,7 +502,7 @@ public class FileHandler
                 }
                 catch (IOException e)
                 {
-                    JourneymapClient.getLogger().error("Could not open path with cmd.exe: " + path + " : " + LogFormatter.toString(e));
+                    Journeymap.getLogger().error("Could not open path with cmd.exe: " + path + " : " + LogFormatter.toString(e));
                 }
             }
         }
@@ -514,7 +515,7 @@ public class FileHandler
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Could not open path with Desktop: " + path + " : " + LogFormatter.toString(e));
             Sys.openURL("file://" + path);
         }
     }
@@ -543,7 +544,7 @@ public class FileHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
+            Journeymap.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
         }
     }
 
@@ -663,7 +664,7 @@ public class FileHandler
         }
         catch (Throwable e)
         {
-            JourneymapClient.getLogger().error(String.format("Could not delete using: %s : %s", Joiner.on(" ").join(cmd), LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Could not delete using: %s : %s", Joiner.on(" ").join(cmd), LogFormatter.toString(e)));
         }
         return file.exists();
     }
@@ -704,15 +705,15 @@ public class FileHandler
                     catch (Exception e)
                     {
                         String error = "FileHandler can't write image: " + iconFile + ": " + e;
-                        JourneymapClient.getLogger().error(error);
+                        Journeymap.getLogger().error(error);
                     }
 
-                    JourneymapClient.getLogger().debug("Created image: " + iconFile);
+                    Journeymap.getLogger().debug("Created image: " + iconFile);
                 }
                 else
                 {
                     String pngPath = Joiner.on('/').join(assetsPath, setName, iconPath);
-                    JourneymapClient.getLogger().error(String.format("Can't get image from file (%s) nor resource (%s) ", iconFile, pngPath));
+                    Journeymap.getLogger().error(String.format("Can't get image from file (%s) nor resource (%s) ", iconFile, pngPath));
                 }
             }
         }
@@ -740,7 +741,7 @@ public class FileHandler
         catch (IOException e)
         {
             String error = String.format("Could not get icon from resource: %s, %s, %s : %s", assetsPath, setName, iconPath, e.getMessage());
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }
@@ -753,7 +754,7 @@ public class FileHandler
             InputStream is = JourneymapClient.class.getResourceAsStream(pngPath);
             if (is == null)
             {
-                JourneymapClient.getLogger().warn(String.format("Icon Set asset not found: " + pngPath));
+                Journeymap.getLogger().warn(String.format("Icon Set asset not found: " + pngPath));
                 return null;
             }
             return is;
@@ -761,7 +762,7 @@ public class FileHandler
         catch (Throwable e)
         {
             String error = String.format("Could not get icon stream: %s, %s, %s : %s", assetsPath, setName, iconPath, e.getMessage());
-            JourneymapClient.getLogger().error(error);
+            Journeymap.getLogger().error(error);
             return null;
         }
     }

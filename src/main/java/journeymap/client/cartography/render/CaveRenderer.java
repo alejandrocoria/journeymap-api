@@ -15,11 +15,12 @@ import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
+import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.awt.*;
@@ -75,7 +76,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     {
         if (vSlice == null)
         {
-            JourneymapClient.getLogger().warn("ChunkOverworldCaveRenderer is for caves. vSlice can't be null");
+            Journeymap.getLogger().warn("ChunkOverworldCaveRenderer is for caves. vSlice can't be null");
             return false;
         }
 
@@ -90,7 +91,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 ok = surfaceRenderer.render(g2D, null, chunkMd, vSlice, true);
                 if (!ok)
                 {
-                    JourneymapClient.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
+                    Journeymap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
                 }
             }
         }
@@ -125,7 +126,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             if (!ok)
             {
-                JourneymapClient.getLogger().debug("The underground chunk didn't paint: " + chunkMd.toString());
+                Journeymap.getLogger().debug("The underground chunk didn't paint: " + chunkMd.toString());
             }
             return ok;
         }
@@ -244,7 +245,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     paintBadBlock(x, vSlice, z, g2D);
                     String error = "CaveRenderer error at x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
                             + vSlice + "," + z + " : " + LogFormatter.toString(t); //$NON-NLS-1$ //$NON-NLS-2$
-                    JourneymapClient.getLogger().error(error);
+                    Journeymap.getLogger().error(error);
                 }
             }
         }
@@ -446,7 +447,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
             y = sliceMaxY;
         }
 

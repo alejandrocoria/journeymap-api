@@ -9,7 +9,7 @@
 package journeymap.client.feature;
 
 import com.google.common.reflect.ClassPath;
-import journeymap.client.JourneymapClient;
+import journeymap.common.Journeymap;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -120,7 +120,7 @@ public class FeatureManager
             controlCodeAltered = true;
             for (Feature feature : disableControlCodes.get(controlCode))
             {
-                JourneymapClient.getLogger().info("Feature disabled in multiplayer via control code: " + feature);
+                Journeymap.getLogger().info("Feature disabled in multiplayer via control code: " + feature);
                 Holder.INSTANCE.policyMap.put(feature, new Policy(feature, true, false));
             }
 
@@ -142,7 +142,7 @@ public class FeatureManager
                 }
                 if (controlCodeAltered != null)
                 {
-                    JourneymapClient.getLogger().info("Returning to default " + getPolicyDetails());
+                    Journeymap.getLogger().info("Returning to default " + getPolicyDetails());
                 }
                 controlCodeAltered = false;
             }

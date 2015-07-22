@@ -10,17 +10,17 @@ package journeymap.client.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
@@ -219,7 +219,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().log(Level.WARN, LogFormatter.toString(t));
+            Journeymap.getLogger().log(Level.WARN, LogFormatter.toString(t));
         }
         finally
         {
@@ -279,7 +279,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
         }
 
         //why is height 4 set on a chunk to the left?
@@ -334,7 +334,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                 if (slope == null || slope.isNaN() || slope.isInfinite())
                 {
-                    JourneymapClient.getLogger().warn(String.format("Bad topo slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+                    Journeymap.getLogger().warn(String.format("Bad topo slope for %s at %s,%s: %s", chunkMd, x, z, slope));
                     slope = 1f;
                 }
 

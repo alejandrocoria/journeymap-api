@@ -9,16 +9,17 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.common.log.ChatLog;
+import journeymap.client.log.ChatLog;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -43,7 +44,7 @@ public class Tile
     final Point ulBlock;
     final Point lrBlock;
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
-    private final Logger logger = JourneymapClient.getLogger();
+    private final Logger logger = Journeymap.getLogger();
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;

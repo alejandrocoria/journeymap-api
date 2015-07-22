@@ -9,11 +9,11 @@
 package journeymap.client.model;
 
 import com.google.common.base.Strings;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
@@ -112,7 +112,7 @@ public class BlockMD
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().debug("Displayname not available for " + name);
+            Journeymap.getLogger().debug("Displayname not available for " + name);
         }
 
         if (Strings.isNullOrEmpty(name) || name.startsWith("tile"))
@@ -182,7 +182,7 @@ public class BlockMD
             if (color == null)
             {
                 this.color = color = Color.black.getRGB();
-                JourneymapClient.getLogger().warn("Could not get color for " + block);
+                Journeymap.getLogger().warn("Could not get color for " + block);
                 addFlags(Flag.Error);
             }
             else if (!isBiomeColored())

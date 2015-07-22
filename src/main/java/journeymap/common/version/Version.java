@@ -6,9 +6,10 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client;
+package journeymap.common.version;
 
 import com.google.common.base.Joiner;
+import journeymap.common.Journeymap;
 
 import java.util.Arrays;
 
@@ -66,7 +67,7 @@ public class Version implements Comparable<Version>
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
+            Journeymap.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
             if (defaultVersion == null)
             {
                 defaultVersion = new Version(0, 0, 0);
@@ -96,7 +97,7 @@ public class Version implements Comparable<Version>
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(String.format("Version had problems when parsed: %s", versionString));
+            Journeymap.getLogger().warn(String.format("Version had problems when parsed: %s", versionString));
             if (defaultVersion == null)
             {
                 defaultVersion = new Version(0, 0, 0);

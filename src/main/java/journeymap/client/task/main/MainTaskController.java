@@ -10,8 +10,9 @@ package journeymap.client.task.main;
 
 import com.google.common.collect.Queues;
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,7 @@ public class MainTaskController
     {
         this.minecraft = mc;
         this.journeyMap = jm;
-        this.logger = JourneymapClient.getLogger();
+        this.logger = Journeymap.getLogger();
     }
 
     public void addTask(IMainThreadTask task)

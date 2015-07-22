@@ -1,7 +1,16 @@
+/*
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ */
+
 package journeymap.common.network;
 
 
 import io.netty.buffer.ByteBuf;
+import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -10,13 +19,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by Mysticdrew on 10/8/2014.
  */
-public class WorldIDPacket implements IMessage {
+public class WorldIDPacket implements IMessage
+{
+    // Channel name
+    public static final String CHANNEL_NAME = "world_info";
 
     private String worldID;
 
-    public WorldIDPacket() {}
+    public WorldIDPacket()
+    {
+    }
 
-    public WorldIDPacket(String worldID) {
+    public WorldIDPacket(String worldID)
+    {
         this.worldID = worldID;
     }
 
@@ -26,24 +41,39 @@ public class WorldIDPacket implements IMessage {
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
+    public void fromBytes(ByteBuf buf)
+    {
+        try
+        {
+            worldID = ByteBufUtils.readUTF8String(buf);
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(String.format("Failed to read message: %s", t));
+        }
     }
 
     @Override
-    public void toBytes(ByteBuf buf) {
-        try {
-            if(worldID != null) {
+    public void toBytes(ByteBuf buf)
+    {
+        try
+        {
+            if (worldID != null)
+            {
                 ByteBufUtils.writeUTF8String(buf, worldID);
             }
         }
-        catch(Throwable t) {
-            // LogHelper.error("[toBytes]Failed to read message: " + t);
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("[toBytes]Failed to read message: " + t);
         }
     }
 
-    public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage> {
+    public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage>
+    {
         @Override
-        public IMessage onMessage(WorldIDPacket message, MessageContext ctx) {
+        public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
+        {
 //            LogHelper.info("On Request: Sending WorldID packet to: "
 //                    + ForgePlayerUtil.instance.getPlayerInfoById(
 //                    ctx.getServerHandler().playerEntity.getUniqueID()).getName()

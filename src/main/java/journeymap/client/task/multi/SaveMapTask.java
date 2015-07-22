@@ -10,6 +10,7 @@ package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.MapSaver;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +19,7 @@ import java.io.File;
 public class SaveMapTask implements ITask
 {
 
-    private static final Logger logger = JourneymapClient.getLogger();
+    private static final Logger logger = Journeymap.getLogger();
 
     MapSaver mapSaver;
 

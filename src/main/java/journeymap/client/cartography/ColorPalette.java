@@ -12,14 +12,15 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
-import journeymap.common.log.ChatLog;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.ChatLog;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
+import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Loader;
@@ -127,7 +128,7 @@ public class ColorPalette
             {
                 if (palette.isPermanent())
                 {
-                    JourneymapClient.getLogger().info("Existing color palette is set to be permanent.");
+                    Journeymap.getLogger().info("Existing color palette is set to be permanent.");
                     return palette;
                 }
 
@@ -135,19 +136,19 @@ public class ColorPalette
                 {
                     if (modNames.equals(palette.modNames))
                     {
-                        JourneymapClient.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
+                        Journeymap.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
                         return palette;
                     }
                     else
                     {
-                        JourneymapClient.getLogger().warn("Existing color palette's mods no longer match current loadout.");
-                        JourneymapClient.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
+                        Journeymap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
+                        Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
                     }
                 }
                 else
                 {
-                    JourneymapClient.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
-                    JourneymapClient.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
+                    Journeymap.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
+                    Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
                 }
             }
         }
@@ -188,7 +189,7 @@ public class ColorPalette
             }
             catch (Exception e2)
             {
-                JourneymapClient.getLogger().error("Couldn't rename bad palette file: " + e2);
+                Journeymap.getLogger().error("Couldn't rename bad palette file: " + e2);
             }
             return null;
         }
@@ -227,7 +228,7 @@ public class ColorPalette
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -242,7 +243,7 @@ public class ColorPalette
             Block block = GameRegistry.findBlock(uid.modId, uid.name);
             if (block == null)
             {
-                JourneymapClient.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
+                Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
                 continue;
             }
             BlockMD blockMD = DataCache.instance().getBlockMD(block, blockColor.meta);
@@ -307,7 +308,7 @@ public class ColorPalette
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Can't get colorpalette.html: " + t);
+            Journeymap.getLogger().error("Can't get colorpalette.html: " + t);
         }
         return null;
     }

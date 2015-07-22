@@ -8,10 +8,10 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.network.WorldInfoHandler;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.network.WorldInfoHandler;
+import journeymap.common.Journeymap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
@@ -61,7 +61,7 @@ public class EventHandlerManager
     {
         if (handlers.containsKey(handler.getClass()))
         {
-            JourneymapClient.getLogger().warn("Handler already registered: " + handler.getClass().getName());
+            Journeymap.getLogger().warn("Handler already registered: " + handler.getClass().getName());
             return;
         }
 
@@ -73,11 +73,11 @@ public class EventHandlerManager
             {
                 busType.eventBus.register(handler);
                 registered = true;
-                JourneymapClient.getLogger().debug(name + " registered in " + busType);
+                Journeymap.getLogger().debug(name + " registered in " + busType);
             }
             catch (Throwable t)
             {
-                JourneymapClient.getLogger().error(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
+                Journeymap.getLogger().error(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
             }
         }
 
@@ -87,7 +87,7 @@ public class EventHandlerManager
         }
         else
         {
-            JourneymapClient.getLogger().warn("Handler was not registered at all: " + handler.getClass().getName());
+            Journeymap.getLogger().warn("Handler was not registered at all: " + handler.getClass().getName());
         }
     }
 
@@ -112,12 +112,12 @@ public class EventHandlerManager
                     }
                     if (unregistered)
                     {
-                        JourneymapClient.getLogger().debug(name + " unregistered from " + busType);
+                        Journeymap.getLogger().debug(name + " unregistered from " + busType);
                     }
                 }
                 catch (Throwable t)
                 {
-                    JourneymapClient.getLogger().error(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
+                    Journeymap.getLogger().error(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
                 }
             }
         }

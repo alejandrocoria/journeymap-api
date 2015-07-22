@@ -9,19 +9,20 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.ChatLog;
+import journeymap.client.log.ChatLog;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
 public class DeleteMapTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
-    private static Logger LOGGER = JourneymapClient.getLogger();
+    private static Logger LOGGER = Journeymap.getLogger();
     boolean allDims;
 
     private DeleteMapTask(boolean allDims)

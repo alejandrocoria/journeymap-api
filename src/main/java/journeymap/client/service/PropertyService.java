@@ -9,9 +9,10 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
+import journeymap.common.Journeymap;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -122,7 +123,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error trying " + path, event, true);
         }
     }
@@ -157,7 +158,7 @@ public class PropertyService extends BaseService
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(LogFormatter.toString(t));
             throwEventException(500, "Error trying " + path, event, true);
         }
     }

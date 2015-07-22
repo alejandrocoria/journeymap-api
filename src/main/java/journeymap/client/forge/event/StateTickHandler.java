@@ -10,10 +10,11 @@ package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -100,7 +101,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn("Error during performMainThreadTasks: " + e);
+            Journeymap.getLogger().warn("Error during performMainThreadTasks: " + e);
         }
         finally
         {
@@ -115,7 +116,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             EntityPlayer player = mc.thePlayer;
             if (player == null)
             {
-                JourneymapClient.getLogger().error("Lost reference to player before Deathpoint could be created");
+                Journeymap.getLogger().error("Lost reference to player before Deathpoint could be created");
                 return;
             }
 
@@ -128,7 +129,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 WaypointStore.instance().save(deathpoint);
             }
 
-            JourneymapClient.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
+            Journeymap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
                     ForgeHelper.INSTANCE.getEntityName(player),
                     MathHelper.floor_double(player.posX),
                     MathHelper.floor_double(player.posY),
@@ -138,7 +139,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
         }
     }
 
@@ -156,7 +157,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 String error = I18n.format("jm.error.java6");
                 ForgeHelper.INSTANCE.getClient().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(error));
-                JourneymapClient.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
+                Journeymap.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
             }
             catch (Exception e2)
             {

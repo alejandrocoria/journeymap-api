@@ -10,16 +10,16 @@ package journeymap.client.cartography.render;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
 import journeymap.client.data.DataCache;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.log.StatTimer;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Level;
 
@@ -218,7 +218,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Throwable t)
         {
-            JourneymapClient.getLogger().log(Level.WARN, LogFormatter.toString(t));
+            Journeymap.getLogger().log(Level.WARN, LogFormatter.toString(t));
         }
         finally
         {

@@ -15,8 +15,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import journeymap.common.Journeymap;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -53,7 +54,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -112,7 +113,7 @@ public class WaypointStore
         }
         catch (Exception e)
         {
-            JourneymapClient.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
+            Journeymap.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
             waypointFile.deleteOnExit();
         }
     }
@@ -145,11 +146,11 @@ public class WaypointStore
 
                 load(waypoints, false);
 
-                JourneymapClient.getLogger().info(String.format("Loaded %s waypoints from %s", cache.size(), waypointDir));
+                Journeymap.getLogger().info(String.format("Loaded %s waypoints from %s", cache.size(), waypointDir));
             }
             catch (Exception e)
             {
-                JourneymapClient.getLogger().error(String.format("Error loading waypoints from %s: %s", waypointDir, LogFormatter.toString(e)));
+                Journeymap.getLogger().error(String.format("Error loading waypoints from %s: %s", waypointDir, LogFormatter.toString(e)));
             }
         }
     }

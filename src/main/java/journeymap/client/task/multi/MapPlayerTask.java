@@ -8,7 +8,7 @@
 
 package journeymap.client.task.multi;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
@@ -17,6 +17,7 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -306,7 +307,7 @@ public class MapPlayerTask extends BaseMapTask
                 }
                 else
                 {
-                    JourneymapClient.getLogger().warn("Unexpected task in batch: " + task);
+                    Journeymap.getLogger().warn("Unexpected task in batch: " + task);
                 }
             }
             lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;

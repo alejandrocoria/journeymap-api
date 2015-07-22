@@ -8,16 +8,17 @@
 
 package journeymap.client.render.ingame;
 
-import journeymap.common.Constants;
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
-import journeymap.common.log.LogFormatter;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -72,7 +73,7 @@ public class RenderWaypointBeacon
                     }
                     catch (Throwable t)
                     {
-                        JourneymapClient.getLogger().error("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
+                        Journeymap.getLogger().error("EntityWaypoint failed to render for " + wp + ": " + LogFormatter.toString(t));
                     }
                 }
             }
@@ -80,7 +81,7 @@ public class RenderWaypointBeacon
         catch (Throwable t)
         {
             //allTimer.cancel();
-            JourneymapClient.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error rendering waypoints: " + LogFormatter.toString(t));
         }
         finally
         {

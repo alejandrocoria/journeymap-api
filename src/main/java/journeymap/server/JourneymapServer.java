@@ -9,11 +9,12 @@
 package journeymap.server;
 
 import journeymap.common.CommonProxy;
-import journeymap.common.network.PacketHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Map;
 
 /**
  * Coming soon to a codebase near you.
@@ -48,5 +49,31 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void postInitialize(FMLPostInitializationEvent event)
     {
+    }
+
+    /**
+     * Accept any modlist on client
+     *
+     * @param modList
+     * @param side
+     * @return
+     */
+    @Override
+    public boolean checkModLists(Map<String, String> modList, Side side)
+    {
+        // TODO: Check for JM client and enable/disable worldid checking, etc.
+        return true;
+    }
+
+    /**
+     * Whether the update check is enabled.
+     *
+     * @return
+     */
+    @Override
+    public boolean isUpdateCheckEnabled()
+    {
+        // TODO: Make this configurable
+        return false;
     }
 }

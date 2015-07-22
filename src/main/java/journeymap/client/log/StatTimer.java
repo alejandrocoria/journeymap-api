@@ -6,10 +6,10 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.common.log;
+package journeymap.client.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.client.JourneymapClient;
+import journeymap.common.Journeymap;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +28,7 @@ public class StatTimer
     private static final int MAX_COUNT = 1000000;
     private static final int MAX_ELAPSED_LIMIT_WARNINGS = 25;
     private static final int ELAPSED_LIMIT_DEFAULT = 1000;
-    private static final Logger logger = JourneymapClient.getLogger();
+    private static final Logger logger = Journeymap.getLogger();
     private static Map<String, StatTimer> timers = Collections.synchronizedMap(new HashMap<String, StatTimer>());
     private final int warmupCount;
     private final int elapsedLimit;

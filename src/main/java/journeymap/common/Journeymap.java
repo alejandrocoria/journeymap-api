@@ -8,13 +8,15 @@
 
 package journeymap.common;
 
-import journeymap.client.Version;
+import journeymap.common.version.Version;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
@@ -39,14 +41,20 @@ public class Journeymap
     public static CommonProxy proxy;
 
     /**
+     * Get the common logger.
+     */
+    public static Logger getLogger()
+    {
+        return LogManager.getLogger(MOD_ID);
+    }
+
+    /**
      * Whether this side will accept being connected to the other side.
-     * Since we don't care if the other side has JourneyMap or some other mod, the answer is yes.
      */
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        // Don't require JourneyMap to be on either side
-        return true;
+        return proxy.checkModLists(modList, side);
     }
 
     /**
