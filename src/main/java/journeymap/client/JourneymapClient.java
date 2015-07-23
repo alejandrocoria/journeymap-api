@@ -586,7 +586,7 @@ public class JourneymapClient implements CommonProxy
     @Override
     public void handleWorldIdMessage(String worldId, EntityPlayerMP playerEntity)
     {
-        //setCurrentWorldId(worldId);
+        setCurrentWorldId(worldId);
     }
 
     /**

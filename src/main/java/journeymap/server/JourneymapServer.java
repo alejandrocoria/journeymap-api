@@ -9,6 +9,10 @@
 package journeymap.server;
 
 import journeymap.common.CommonProxy;
+import journeymap.common.network.PacketHandler;
+import journeymap.common.network.WorldIDPacket;
+import journeymap.server.nbt.WorldNbtIDSaveHandler;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,6 +26,7 @@ import java.util.Map;
 @SideOnly(Side.SERVER)
 public class JourneymapServer implements CommonProxy
 {
+
     /**
      * Constructor.
      */
@@ -37,8 +42,8 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event)
     {
-//        PacketHandler packetHandler = new PacketHandler();
-//        packetHandler.init(Side.SERVER);
+        PacketHandler packetHandler = new PacketHandler();
+        packetHandler.init(Side.SERVER);
     }
 
     /**
@@ -75,5 +80,11 @@ public class JourneymapServer implements CommonProxy
     {
         // TODO: Make this configurable
         return false;
+    }
+
+    @Override
+    public void handleWorldIdMessage(String message, EntityPlayerMP playerEntity) {
+        WorldNbtIDSaveHandler nbt = new WorldNbtIDSaveHandler();
+        PacketHandler.sendPlayerWorldID(nbt.getWorldID(), playerEntity);
     }
 }

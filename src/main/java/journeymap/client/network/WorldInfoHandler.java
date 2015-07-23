@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  * @author techbrew
  */
+@Deprecated
 public class WorldInfoHandler
 {
     // Packet discriminator for World ID message
@@ -121,7 +122,7 @@ public class WorldInfoHandler
         {
             lastResponse = System.currentTimeMillis();
             Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
-            JourneymapClient.getInstance().setCurrentWorldId(message.getWorldID());
+            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
             return null;
         }
     }

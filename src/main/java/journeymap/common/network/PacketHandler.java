@@ -12,6 +12,7 @@ package journeymap.common.network;
  * Created by Mysticdrew on 10/8/2014.
  */
 
+import journeymap.common.Journeymap;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -32,18 +33,13 @@ public class PacketHandler
     public static void sendPlayerWorldID(String worldID, EntityPlayerMP player) {
 
         if ((player instanceof EntityPlayerMP) && (player != null)) {
-           // LogHelper.info(player.getName() + " is an EntityPlayerMP attempting to send the worldId packet");
             try {
                 WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
             } catch (RuntimeException rte) {
-               // LogHelper.error(player.getName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
+                Journeymap.getLogger().error(player.getName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
             } catch (Exception e) {
-               // LogHelper.error("Unknown Exception - PlayerName:" + player.getName() + " WorldID:" + worldID +" Exception "+ e);
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getName() + " WorldID:" + worldID +" Exception "+ e);
             }
-        }
-        else
-        {
-            // LogHelper.info(player.getName() + " is not an EntityPlayerMP");
         }
 
 

@@ -11,10 +11,12 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Created by Mysticdrew on 10/8/2014.
@@ -74,14 +76,12 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
-//            LogHelper.info("On Request: Sending WorldID packet to: "
-//                    + ForgePlayerUtil.instance.getPlayerInfoById(
-//                    ctx.getServerHandler().playerEntity.getUniqueID()).getName()
-//            );
+            EntityPlayerMP player = null;
+            if (ctx.side == Side.SERVER) {
+               player =  ctx.getServerHandler().playerEntity;
+            }
 
-            String worldName = ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName();
-            String worldID = "worldID";// ConfigHandler.getConfigByWorldName(worldName).getWorldID();
-            PacketHandler.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity);
+            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
             return null;
         }
     }

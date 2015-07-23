@@ -8,6 +8,8 @@
 
 package journeymap.common;
 
+import journeymap.common.network.WorldIDPacket;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -46,4 +48,10 @@ public interface CommonProxy
      */
     public boolean isUpdateCheckEnabled();
 
+    /**
+     * Handles the response when a world ID packet is received.
+     * @param message
+     * @param playerEntity
+     */
+    public void handleWorldIdMessage(String message, EntityPlayerMP playerEntity);
 }
