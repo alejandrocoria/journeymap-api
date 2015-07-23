@@ -130,12 +130,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         else
         {
-            if (mc.theWorld == null)
+            worldName = mc.theWorld.getWorldInfo().getWorldName();
+            String serverName = getServerName();
+
+            if (serverName == null)
             {
                 return "offline";
             }
-            worldName = mc.theWorld.getWorldInfo().getWorldName();
-            String serverName = getServerName();
 
             if (!"MpServer".equals(worldName))
             {

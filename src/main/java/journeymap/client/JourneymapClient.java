@@ -37,8 +37,10 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
+import journeymap.common.network.WorldIDPacket;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -574,6 +576,17 @@ public class JourneymapClient implements CommonProxy
         miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties2.class);
         webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
         waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
+    }
+
+    /**
+     * Handling of the worldIdPacket message.
+     * @param worldId
+     * @param playerEntity
+     */
+    @Override
+    public void handleWorldIdMessage(String worldId, EntityPlayerMP playerEntity)
+    {
+        //setCurrentWorldId(worldId);
     }
 
     /**
