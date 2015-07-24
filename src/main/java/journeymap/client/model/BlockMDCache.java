@@ -135,6 +135,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
             modBlockUIDs.put(new GameRegistry.UniqueIdentifier(torch), EnumSet.of(HasAir, NoShadow));
         }
 
+        // TODO: Move into mod handler
         // More mod-specific overrides
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Mariculture:kelp"), EnumSet.of(Side2Texture, Plant));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:LooseRock"), EnumSet.of(HasAir, NoShadow));
@@ -163,6 +164,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                 continue;
             }
 
+            // TODO: Check if this will work in 1.7.10
+            // If not, then need to uncomment fence lines at the top of this method
             if (block instanceof BlockFence || block instanceof BlockFenceGate)
             {
                 setAlpha(block, .4F);
