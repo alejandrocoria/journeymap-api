@@ -18,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
@@ -244,7 +245,11 @@ public class BlockMD
     {
         if (block == null)
         {
-            block = GameRegistry.findBlock(uid.modId, uid.name);
+            // 1.7.10
+            // block = GameRegistry.findBlock(uid.modId, uid.name);
+
+            // 1.8 TODO: Should work in 1.7 too, verify
+            block = GameData.getBlockRegistry().getObject(uid.toString());
             if (block == null)
             {
                 block = Blocks.air;
