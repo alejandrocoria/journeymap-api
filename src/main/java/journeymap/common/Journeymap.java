@@ -54,7 +54,14 @@ public class Journeymap
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        return proxy.checkModLists(modList, side);
+        if(proxy==null)
+        {
+            return true;
+        }
+        else
+        {
+            return proxy.checkModLists(modList, side);
+        }
     }
 
     /**
