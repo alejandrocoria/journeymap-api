@@ -178,27 +178,35 @@ public class ColorHelper_1_8 implements IColorHelper
             int xStart, yStart, xStop, yStop;
             BufferedImage textureImg;
 
-            if (icon instanceof TextureAtlasSprite)
-            {
-                TextureAtlasSprite tas = (TextureAtlasSprite) icon;
-                textureImg = blocksTexture;
-                xStart = tas.getOriginX();
-                yStart = tas.getOriginY();
-                xStop = xStart + icon.getIconWidth();
-                yStop = yStart + icon.getIconHeight();
-            }
-            else
-            {
-                textureImg = blocksTexture;
+            // 1.7.10
+//            if (icon instanceof TextureAtlasSprite)
+//            {
+//                TextureAtlasSprite tas = (TextureAtlasSprite) icon;
+//                textureImg = blocksTexture;
+//                xStart = tas.getOriginX();
+//                yStart = tas.getOriginY();
+//                xStop = xStart + icon.getIconWidth();
+//                yStop = yStart + icon.getIconHeight();
+//            }
+//            else
+//            {
+//                textureImg = blocksTexture;
+//
+//                xStart = (int) Math.round(((float) textureImg.getWidth()) * Math.min(icon.getMinU(), icon.getMaxU()));
+//                yStart = (int) Math.round(((float) textureImg.getHeight()) * Math.min(icon.getMinV(), icon.getMaxV()));
+//                int iconWidth = (int) Math.round(((float) textureImg.getWidth()) * Math.abs(icon.getMaxU() - icon.getMinU()));
+//                int iconHeight = (int) Math.round(((float) textureImg.getHeight()) * Math.abs(icon.getMaxV() - icon.getMinV()));
+//
+//                xStop = xStart + iconWidth;
+//                yStop = yStart + iconHeight;
+//            }
 
-                xStart = (int) Math.round(((float) textureImg.getWidth()) * Math.min(icon.getMinU(), icon.getMaxU()));
-                yStart = (int) Math.round(((float) textureImg.getHeight()) * Math.min(icon.getMinV(), icon.getMaxV()));
-                int iconWidth = (int) Math.round(((float) textureImg.getWidth()) * Math.abs(icon.getMaxU() - icon.getMinU()));
-                int iconHeight = (int) Math.round(((float) textureImg.getHeight()) * Math.abs(icon.getMaxV() - icon.getMinV()));
-
-                xStop = xStart + iconWidth;
-                yStop = yStart + iconHeight;
-            }
+            // 1.8
+            // 1.8
+            textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+            xStart = yStart = 0;
+            xStop = textureImg.getWidth();
+            yStop = textureImg.getHeight();
 
             boolean unusable = true;
             if (textureImg != null && textureImg.getWidth() > 0)

@@ -156,7 +156,9 @@ public class ColorCache
             String modPackNames = Constants.getModNames();
             palette = new ColorPalette(resourcePackNames, modPackNames, baseColors, biomeColors);
             palette.setPermanent(permanent);
-            palette.writeToFile(standard);
+            // TODO RENABLE WHEN COLORS FIXED
+            Journeymap.getLogger().warn("FILE NOT ACTUALLY SAVED");
+            // palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
             Journeymap.getLogger().info(String.format("New color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
             return palette;
@@ -196,7 +198,7 @@ public class ColorCache
                 block.getSubBlocks(item, null, subBlocks);
                 for (ItemStack subBlockStack : subBlocks)
                 {
-                    int meta = subBlockStack.getItemDamage();
+                    int meta = subBlockStack.getMetadata();
                     count += prefetchColors(DataCache.instance().getBlockMD(block, meta));
                 }
             }
@@ -461,7 +463,7 @@ public class ColorCache
                 else
                 {
                     // Check for render color
-                    int renderColor = forgeHelper.getRenderColor(blockMD) & 0xf;
+                    int renderColor = forgeHelper.getRenderColor(blockMD);
                     if (renderColor != 0xffffff && renderColor != 0xffffffff)
                     { // white without alpha or white with alpha
                         baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
