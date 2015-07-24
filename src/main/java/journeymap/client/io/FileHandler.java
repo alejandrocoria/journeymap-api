@@ -247,6 +247,11 @@ public class FileHandler
 
     public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
     {
+        if (minecraft.theWorld == null)
+        {
+            return null;
+        }
+
         File testWorldDirectory = null;
         try
         {
