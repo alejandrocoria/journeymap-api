@@ -156,9 +156,7 @@ public class ColorCache
             String modPackNames = Constants.getModNames();
             palette = new ColorPalette(resourcePackNames, modPackNames, baseColors, biomeColors);
             palette.setPermanent(permanent);
-            // TODO RENABLE WHEN COLORS FIXED
-            Journeymap.getLogger().warn("FILE NOT ACTUALLY SAVED");
-            // palette.writeToFile(standard);
+            palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
             Journeymap.getLogger().info(String.format("New color palette generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
             return palette;
@@ -236,6 +234,15 @@ public class ColorCache
         return count;
     }
 
+    /**
+     * Get the color of the block at the world coordinates.
+     * @param chunkMd
+     * @param blockMD
+     * @param x     world x (not blockX)
+     * @param y     y
+     * @param z     world z (not blockZ)
+     * @return
+     */
     public Integer getBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
         if (colorHelper == null)
@@ -256,12 +263,30 @@ public class ColorCache
         return color.getRGB();
     }
 
+    /**
+     * Get the biome-based block color at the world coordinates
+     * @param chunkMd
+     * @param blockMD
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
         BiomeGenBase biome = forgeHelper.getBiome(chunkMd.getWorld(), x, y, z);
         return getBiomeBlockColor(biome, blockMD, x, y, z);
     }
 
+    /**
+     * Get the biome-based block color at the world coordinates with the given biome.
+     * @param biome
+     * @param blockMD
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     public Color getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z)
     {
         Block block = blockMD.getBlock();
