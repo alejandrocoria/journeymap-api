@@ -117,13 +117,13 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public int getLightOpacity(World world, BlockMD blockMD, int blockX, int blockY, int blockZ)
+    public int getLightOpacity(World world, BlockMD blockMD, int x, int y, int z)
     {
         // 1.7
-        // return blockMD.getBlock().getLightOpacity(world, blockX, blockY, blockZ);
+        // return blockMD.getBlock().getLightOpacity(world, x & 15, y, z & 15);
 
         // 1.8
-        return blockMD.getBlock().getLightOpacity(world, new BlockPos(blockX, blockY, blockZ));
+        return blockMD.getBlock().getLightOpacity(world, new BlockPos(x, y, z));
     }
 
     @Override
@@ -146,13 +146,13 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public int getSavedLightValue(Chunk chunk, int x, int y, int z)
+    public int getSavedLightValue(Chunk chunk, int localX, int y, int localZ)
     {
         // 1.7
         // return chunk.getSavedLightValue(getSkyBlock(), x, y, z);
 
         // 1.8
-        return chunk.getLightFor(getSkyBlock(), new BlockPos(x, y, z));
+        return chunk.getLightFor(getSkyBlock(), pos(chunk, localX, y, localZ));
     }
 
     @Override
@@ -351,7 +351,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.getPrecipitationHeight(x, z);
 
         // 1.8
-        return chunk.getPrecipitationHeight(new BlockPos((chunk.xPosition << 4) + x, 0, (chunk.zPosition << 4) + z)).getY();
+        return chunk.getPrecipitationHeight(pos(chunk, x, 0, z)).getY();
     }
 
     @Override
@@ -361,7 +361,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.getPrecipitationHeight(x, z);
 
         // 1.8
-        return chunk.getPrecipitationHeight(new BlockPos((chunk.xPosition << 4) + x, 0, (chunk.zPosition << 4) + z)).getY();
+        return chunk.getPrecipitationHeight(pos(chunk, x, 0, z)).getY();
     }
 
     @Override
@@ -371,17 +371,17 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return block.getLightOpacity(chunk.getWorld(), (this.getCoord().chunkXPos << 4) + localX, y, (this.getCoord().chunkZPos << 4) + localZ);
 
         // 1.8
-        return block.getLightOpacity(chunk.getWorld(), new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ));
+        return block.getLightOpacity(chunk.getWorld(), pos(chunk, localX, 0, localZ));
     }
 
     @Override
-    public TileEntity getTileEntity(World world, int blockX, int y, int blockZ)
+    public TileEntity getTileEntity(World world, int localX, int y, int localZ)
     {
         // 1.7
-        // return world.getTileEntity(blockX, y, blockZ);
+        // return world.getTileEntity(localX, y, localZ);
 
         // 1.8
-        return world.getTileEntity(new BlockPos(blockX, y, blockZ));
+        return world.getTileEntity(new BlockPos(localX, y, localZ));
     }
 
     @Override
@@ -513,4 +513,16 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return netManager.getRemoteAddress();
     }
 
+    /**
+     * Create a world BlockPos from chunk-local coords
+     * @param chunk
+     * @param localX
+     * @param y
+     * @param localZ
+     * @return
+     */
+    private BlockPos pos(Chunk chunk, int localX, int y, int localZ)
+    {
+       return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
+    }
 }

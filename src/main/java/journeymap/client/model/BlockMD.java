@@ -166,12 +166,12 @@ public class BlockMD
      * Gets block color using chunk-local coords (x and z in {0-15} )
      *
      * @param chunkMd the chunk md
-     * @param x       the x
-     * @param y       the y
-     * @param z       the z
+     * @param blockX       the x offset in the chunk
+     * @param y            the y
+     * @param blockZ       the z offset in the chunk
      * @return the color
      */
-    public int getColor(ChunkMD chunkMd, int x, int y, int z)
+    public int getColor(ChunkMD chunkMd, int blockX, int y, int blockZ)
     {
         if (this.color != null)
         {
@@ -179,7 +179,7 @@ public class BlockMD
         }
         else
         {
-            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, x, y, z);
+            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, chunkMd.toBlockX(blockX), y, chunkMd.toBlockX(blockZ));
             if (color == null)
             {
                 this.color = color = Color.black.getRGB();
