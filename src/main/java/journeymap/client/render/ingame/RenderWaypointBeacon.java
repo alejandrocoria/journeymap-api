@@ -302,7 +302,6 @@ public class RenderWaypointBeacon
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
         GlStateManager.disableLighting();
-        GlStateManager.disableCull();
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
         GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0);
@@ -407,7 +406,6 @@ public class RenderWaypointBeacon
         renderHelper.glEnableTexture2D();
 
         renderHelper.glEnableLighting();
-        renderHelper.glEnableCull();
         renderHelper.glEnableDepth();
 
     }
