@@ -326,6 +326,7 @@ public class RenderWaypointBeacon
 
             // For 1.8
             renderHelper.glColor(color, 80);
+            renderHelper.glEnableBlend();
             // For 1.7.10
 //            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
