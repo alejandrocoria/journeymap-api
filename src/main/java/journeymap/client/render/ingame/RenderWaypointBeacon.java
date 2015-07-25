@@ -301,7 +301,7 @@ public class RenderWaypointBeacon
         mc.renderEngine.bindTexture(beam);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);;
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.disableBlend();
@@ -324,7 +324,11 @@ public class RenderWaypointBeacon
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             //double d3 = (double) time * 0.025D * -1.5D;
             renderHelper.startDrawingQuads();
-            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
+
+            // For 1.8
+            renderHelper.glColor(color, 80);
+            // For 1.7.10
+//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
             double d4 = (double) b0 * 0.2D;
             double d5 = Math.cos(d3 + 2.356194490192345D) * d4;
             double d6 = Math.sin(d3 + 2.356194490192345D) * d4;
@@ -358,37 +362,46 @@ public class RenderWaypointBeacon
             renderHelper.draw();
         }
 
-//        if (staticBeam)
-//        {
-//            renderHelper.glDisableCull();
-//
-//            double d26 = (double) (256.0F * f1);
-//            double d29 = (double) (-1.0F + texOffset);
-//            double d30 = (double) (256.0F * f1) + d29;
-//
-//            x -= .5;
-//            z -= .5;
-//
-//            renderHelper.startDrawingQuads();
+        if (staticBeam)
+        {
+            renderHelper.glDisableCull();
+
+            double d26 = (double) (256.0F * f1);
+            double d29 = (double) (-1.0F + texOffset);
+            double d30 = (double) (256.0F * f1) + d29;
+            renderHelper.glColor(color, 80);
+            x -= .5;
+            z -= .5;
+
+            // Next 3 lines are for 1.8
+            renderHelper.glEnableBlend();
+            renderHelper.glBlendFunc(770, 771, 1, 0);
+            renderHelper.glDepthMask(false);
+
+            renderHelper.startDrawingQuads();
+
+            // For 1.8
+            renderHelper.glColor(color, 40);
+            // For 1.7.10
 //            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
-//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
-//            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
-//            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
-//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
-//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
-//            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
-//            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
-//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
-//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
-//            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
-//            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
-//            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
-//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
-//            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
-//            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
-//            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
-//            renderHelper.draw();
-//        }
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
+            renderHelper.draw();
+        }
 
         renderHelper.glEnableLighting();
         renderHelper.glEnableTexture2D();
@@ -396,6 +409,8 @@ public class RenderWaypointBeacon
         renderHelper.glEnableLighting();
         renderHelper.glEnableCull();
         renderHelper.glEnableDepth();
+
+        renderHelper.glDisableBlend();
     }
 
 }
