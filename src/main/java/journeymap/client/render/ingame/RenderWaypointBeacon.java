@@ -301,7 +301,6 @@ public class RenderWaypointBeacon
         mc.renderEngine.bindTexture(beam);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);;
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.disableBlend();
@@ -369,7 +368,6 @@ public class RenderWaypointBeacon
             double d26 = (double) (256.0F * f1);
             double d29 = (double) (-1.0F + texOffset);
             double d30 = (double) (256.0F * f1) + d29;
-            renderHelper.glColor(color, 80);
             x -= .5;
             z -= .5;
 
@@ -401,6 +399,7 @@ public class RenderWaypointBeacon
             renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
             renderHelper.draw();
+            renderHelper.glDisableBlend();
         }
 
         renderHelper.glEnableLighting();
@@ -410,7 +409,6 @@ public class RenderWaypointBeacon
         renderHelper.glEnableCull();
         renderHelper.glEnableDepth();
 
-        renderHelper.glDisableBlend();
     }
 
 }
