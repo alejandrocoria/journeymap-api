@@ -10,6 +10,8 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;
@@ -33,6 +35,8 @@ import java.util.List;
 public class Splash extends JmUI
 {
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
+
+    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
     Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
@@ -183,8 +187,8 @@ public class Splash extends JmUI
             DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, Color.lightGray, 200, Color.lightGray, 200);
 
             brickTex.bindTexture();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, brickTex.getGlTextureId());
-            GL11.glColor4f(1, 1, 1, 1);
+            renderHelper.glBindTexture(brickTex.getGlTextureId());
+            renderHelper.glColor4f(1, 1, 1, 1);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
 
