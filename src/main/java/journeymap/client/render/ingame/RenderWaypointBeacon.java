@@ -122,7 +122,7 @@ public class RenderWaypointBeacon
             if (viewDistance > maxRenderDistance)
             {
                 Vec3 delta = waypointVec.subtract(playerVec).normalize();
-                waypointVec = playerVec.addVector(-delta.xCoord * maxRenderDistance, -delta.yCoord * maxRenderDistance, -delta.zCoord * maxRenderDistance);
+                waypointVec = playerVec.addVector(delta.xCoord * maxRenderDistance, delta.yCoord * maxRenderDistance, delta.zCoord * maxRenderDistance);
                 viewDistance = maxRenderDistance;
             }
 
@@ -324,10 +324,10 @@ public class RenderWaypointBeacon
             renderHelper.startDrawingQuads();
 
             // For 1.8
-            renderHelper.glColor(color, 80);
+            renderHelper.glColor(color, 120);
             renderHelper.glEnableBlend();
             // For 1.7.10
-//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 80);
+//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 120);
             double d4 = (double) b0 * 0.2D;
             double d5 = Math.cos(d3 + 2.356194490192345D) * d4;
             double d6 = Math.sin(d3 + 2.356194490192345D) * d4;
