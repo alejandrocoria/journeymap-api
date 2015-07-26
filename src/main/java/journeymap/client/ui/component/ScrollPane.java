@@ -142,7 +142,7 @@ public class ScrollPane extends GuiSlot
     }
 
     @Override
-    public void drawScreen(int mX, int mY, float f)
+    public void drawScreen(int mX, int mY, float f) // func_148128_a
     {
         GL11.glPushMatrix();
         GL11.glTranslated(getX(), getY(), 0);
@@ -191,7 +191,7 @@ public class ScrollPane extends GuiSlot
 
         Scrollable item = items.get(index);
         item.setPosition(itemX, itemY);
-        item.setWidth(this.paneWidth - margin);
+        item.setScrollableWidth(this.paneWidth - margin); // func_180791_a
 
         //System.out.println(String.format("Item %s = %s", index, itemY));
 
@@ -300,7 +300,7 @@ public class ScrollPane extends GuiSlot
 
         public int getWidth();
 
-        public void setWidth(int width);
+        public void setScrollableWidth(int width);
 
         public int getFitWidth(FontRenderer fr);
 
