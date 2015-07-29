@@ -9,15 +9,20 @@
 package journeymap.common;
 
 import journeymap.common.version.Version;
+import journeymap.server.JourneymapServer;
+import journeymap.server.oldservercode.command.CommandJMServerForge;
+import journeymap.server.oldservercode.config.ConfigHandler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -84,5 +89,28 @@ public class Journeymap
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
     {
         proxy.postInitialize(event);
+    }
+
+    @SideOnly(Side.SERVER)
+    @Mod.EventHandler
+    public void preInitEvent(FMLPreInitializationEvent event)
+    {
+        ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
+    }
+
+    @SideOnly(Side.SERVER)
+    @Mod.EventHandler
+    public void serverStartingEvent(FMLServerStartingEvent event)
+    {
+        event.registerServerCommand(new CommandJMServerForge());
+    }
+
+    @SideOnly(Side.SERVER)
+    @Mod.EventHandler
+    public void serverStartedEvent(FMLServerStartedEvent event)
+    {
+        MinecraftServer server = MinecraftServer.getServer();
+        JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
+        getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
     }
 }
