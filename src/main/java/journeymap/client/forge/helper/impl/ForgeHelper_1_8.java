@@ -9,14 +9,23 @@
 package journeymap.client.forge.helper.impl;
 
 import com.google.common.base.Strings;
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.dto.RealmsServer;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
+import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
+import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiScreenRealmsProxy;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -25,6 +34,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.realms.RealmsScreen;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -36,9 +46,11 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.net.SocketAddress;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -235,7 +247,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     /**
-     * TODO
+     * Gets the server name.
      */
     @Override
     public String getRealmsServerName()
@@ -300,7 +312,64 @@ public class ForgeHelper_1_8 implements IForgeHelper
 //            }
 //        }
 
-        // 1.8 TODO
+        // 1.8
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        if(!mc.isSingleplayer())
+        {
+            try
+            {
+                NetHandlerPlayClient netHandler = mc.getNetHandler();
+                GuiScreen netHandlerGui = ReflectionHelper.getPrivateValue(NetHandlerPlayClient.class, netHandler, "field_147307_j", "guiScreenServer");
+
+                if (netHandlerGui instanceof GuiScreenRealmsProxy)
+                {
+                    RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).func_154321_a();
+                    if (realmsScreen instanceof RealmsMainScreen)
+                    {
+                        RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
+                        long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
+                        List<RealmsServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
+                        for (RealmsServer mcoServer : mcoServers)
+                        {
+                            if (mcoServer.id == selectedServerId)
+                            {
+                                serverName = mcoServer.name;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
+            }
+        }
+
+        if (serverName != null)
+        {
+            return serverName;
+        }
+        else
+        {
+            mc = ForgeHelper.INSTANCE.getClient();
+            ServerData serverData = mc.getCurrentServerData(); // 1.8 getServerData()
+
+            if (serverData != null)
+            {
+                serverName = serverData.serverName;
+                if (serverName != null)
+                {
+                    serverName = serverName.replaceAll("\\W+", "~").trim();
+
+                    if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
+                    {
+                        serverName = serverData.serverIP;
+                    }
+                    return serverName;
+                }
+            }
+        }
         return null;
     }
 
