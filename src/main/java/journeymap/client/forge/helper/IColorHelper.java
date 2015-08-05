@@ -19,5 +19,5 @@ public interface IColorHelper
 {
     boolean failedFor(BlockMD blockMD);
 
-    Color loadBlockColor(BlockMD blockMD);
+    Integer loadBlockColor(BlockMD blockMD);
 }

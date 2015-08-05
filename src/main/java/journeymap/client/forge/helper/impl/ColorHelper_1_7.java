@@ -25,7 +25,7 @@ public class ColorHelper_1_7 implements IColorHelper
     }
 
     @Override
-    public Color loadBlockColor(BlockMD blockMD)
+    public Integer loadBlockColor(BlockMD blockMD)
     {
         return null;
     }

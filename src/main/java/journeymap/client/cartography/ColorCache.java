@@ -38,8 +38,7 @@ import java.util.List;
  */
 public class ColorCache
 {
-    private final HashMap<BlockMD, Color> baseColors = new HashMap<BlockMD, Color>(256);
-    private final HashMap<String, HashMap<BlockMD, Color>> biomeColors = new HashMap<String, HashMap<BlockMD, Color>>(32);
+    private final HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>(256);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private volatile IColorHelper colorHelper;
     private volatile ColorPalette currentPalette;
@@ -119,7 +118,6 @@ public class ColorCache
             if (colorPalette != null)
             {
                 this.baseColors.putAll(colorPalette.getBasicColorMap());
-                this.biomeColors.putAll(colorPalette.getBiomeColorMap());
                 long elapsed = System.currentTimeMillis() - start;
                 Journeymap.getLogger().info(String.format("Existing color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
             }
@@ -154,7 +152,7 @@ public class ColorCache
         {
             String resourcePackNames = Constants.getResourcePackNames();
             String modPackNames = Constants.getModNames();
-            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors, biomeColors);
+            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
@@ -249,7 +247,7 @@ public class ColorCache
         {
             return null;
         }
-        Color color = null;
+        Integer color = null;
         if (!blockMD.isBiomeColored())
         {
             // This may load a custom biome color and update
@@ -260,7 +258,7 @@ public class ColorCache
         {
             color = getBiomeBlockColor(chunkMd, blockMD, x, y, z);
         }
-        return color.getRGB();
+        return color;
     }
 
     /**
@@ -272,7 +270,7 @@ public class ColorCache
      * @param z
      * @return
      */
-    private Color getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
+    private Integer getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
         BiomeGenBase biome = forgeHelper.getBiome(chunkMd.getWorld(), x, y, z);
         return getBiomeBlockColor(biome, blockMD, x, y, z);
@@ -287,7 +285,7 @@ public class ColorCache
      * @param z
      * @return
      */
-    public Color getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z)
+    public Integer getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z)
     {
         Block block = blockMD.getBlock();
 
@@ -310,82 +308,37 @@ public class ColorCache
         return getCustomBiomeColor(blockMD, biome, x, y, z);
     }
 
-    private Color getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+    private Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
     {
-        Color color = getBiomeColor(blockMD, biome);
-        if (color == null)
+        Integer color = getBaseColor(blockMD, x, y, z);
+        int tint = getBiomeColorMultiplier(blockMD, x, y, z);
+        if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF))
+        { // white without alpha, white with alpha
+            color = RGB.multiply(color, tint);
+            Journeymap.getLogger().debug("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
+        }
+        else
         {
-            color = getBaseColor(blockMD, x, y, z);
-            int tint = getBiomeColorMultiplier(blockMD, x, y, z);
-            if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF))
-            { // white without alpha, white with alpha
-                color = colorMultiplier(color, tint);
-                Journeymap.getLogger().debug("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
-            }
-            else
-            {
-                Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
-            }
-            putBiomeColor(blockMD, biome, color);
+            Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
         }
         return color;
     }
 
-    private Color getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+    private Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
     {
-        Color color = getBiomeColor(blockMD, biome);
-        if (color == null)
-        {
-            int leafColor = forgeHelper.getRenderColor(blockMD);
-            int biomeColor = forgeHelper.getFoliageColor(BiomeGenBase.plains, x, y, z); // TODO: also use modded foliage color?
-            try
-            {
-                biomeColor = forgeHelper.getFoliageColor(biome, x, y, z);
-            }
-            catch (Throwable t)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-                Journeymap.getLogger().error("Couldn't get biome foliage color: " + LogFormatter.toString(t));
-            }
-            int leafTimesBiome = colorMultiplier(biomeColor, leafColor);
-            int darker = colorMultiplier(leafTimesBiome, 0xFFAAAAAA); // I added this, I'm sure it'll break with some custom leaf mod somewhere.
-            color = new Color(darker);
-            putBiomeColor(blockMD, biome, color);
-        }
-        return color;
+        int leafColor = forgeHelper.getRenderColor(blockMD);
+        int biomeColor = forgeHelper.getFoliageColor(biome, x, y, z);
+        return RGB.multiply(RGB.multiply(0x999999,leafColor), biomeColor);
     }
 
-    private Color getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+    private Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
     {
-        Color color = getBiomeColor(blockMD, biome);
-        if (color == null)
-        {
-            Color baseColor = getBaseColor(blockMD, x, y, z);
-            int biomeColor = forgeHelper.getGrassColor(BiomeGenBase.plains, x, y, z); // Default
-            try
-            {
-                biomeColor = forgeHelper.getGrassColor(biome, x, y, z);
-            }
-            catch (Throwable t)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-                Journeymap.getLogger().error("Couldn't get biome grass color: " + LogFormatter.toString(t));
-            }
-            color = colorMultiplier(baseColor, biomeColor);
-            putBiomeColor(blockMD, biome, color);
-        }
-        return color;
+        return RGB.multiply(0x999999, forgeHelper.getGrassColor(biome, x, y, z));
     }
 
-    private Color getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+    private Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
     {
-        Color color = getBiomeColor(blockMD, biome);
-        if (color == null)
-        {
-            color = colorMultiplier(getBaseColor(blockMD, x, y, z), biome.waterColorMultiplier);
-            putBiomeColor(blockMD, biome, color);
-        }
-        return color;
+        return RGB.multiply(getBaseColor(blockMD, x, y, z), forgeHelper.getWaterColor(biome, x, y, z));
     }
 
     private int getBiomeColorMultiplier(BlockMD blockMD, int x, int y, int z)
@@ -406,29 +359,6 @@ public class ColorCache
         }
     }
 
-    private HashMap<BlockMD, Color> getBiomeColorMap(BiomeGenBase biome)
-    {
-        synchronized (biomeColors)
-        {
-            HashMap<BlockMD, Color> biomeColorMap = biomeColors.get(biome.biomeName);
-            if (biomeColorMap == null)
-            {
-                biomeColorMap = new HashMap<BlockMD, Color>(16);
-                biomeColors.put(biome.biomeName, biomeColorMap);
-            }
-            return biomeColorMap;
-        }
-    }
-
-    private Color getBiomeColor(BlockMD blockMD, BiomeGenBase biome)
-    {
-        return getBiomeColorMap(biome).get(blockMD);
-    }
-
-    private void putBiomeColor(BlockMD blockMD, BiomeGenBase biome, Color color)
-    {
-        getBiomeColorMap(biome).put(blockMD, color);
-    }
 
     /**
      * Gets the color for the block from the cache, or
@@ -437,14 +367,14 @@ public class ColorCache
      * @param blockMD
      * @return
      */
-    private Color getBaseColor(BlockMD blockMD, int x, int y, int z)
+    private int getBaseColor(BlockMD blockMD, int x, int y, int z)
     {
-        Color color = baseColors.get(blockMD);
+        Integer color = baseColors.get(blockMD);
         if (color == null)
         {
             if (blockMD.isAir())
             {
-                color = Color.white;
+                color = 0xFFFFFF;
                 blockMD.setAlpha(0f);
                 blockMD.addFlags(BlockMD.Flag.HasAir, BlockMD.Flag.OpenToSky, BlockMD.Flag.NoShadow);
             }
@@ -463,10 +393,10 @@ public class ColorCache
      *
      * @return
      */
-    private Color loadBaseColor(BlockMD blockMD, int x, int y, int z)
+    private Integer loadBaseColor(BlockMD blockMD, int x, int y, int z)
     {
 
-        Color baseColor = null;
+        Integer baseColor = null;
 
         // Get the color from the texture
         baseColor = colorHelper.loadBlockColor(blockMD);
@@ -491,7 +421,7 @@ public class ColorCache
                     int renderColor = forgeHelper.getRenderColor(blockMD);
                     if (renderColor != 0xffffff && renderColor != 0xffffffff)
                     { // white without alpha or white with alpha
-                        baseColor = colorMultiplier(baseColor, 0xff000000 | renderColor); // Force opaque render color
+                        baseColor = RGB.multiply(baseColor, 0xff000000 | renderColor); // Force opaque render color
                         Journeymap.getLogger().debug("Applied render color for " + blockMD);
                     }
                 }
@@ -500,7 +430,7 @@ public class ColorCache
 
         if (baseColor == null)
         {
-            baseColor = Color.BLACK;
+            baseColor = 0x000000;
             if (blockMD.hasFlag(BlockMD.Flag.TileEntity))
             {
 
@@ -520,7 +450,6 @@ public class ColorCache
     public void reset()
     {
         colorHelper = ForgeHelper.INSTANCE.getColorHelper();
-        biomeColors.clear();
         baseColors.clear();
     }
 
@@ -582,10 +511,10 @@ public class ColorCache
                 }
             }
 
-            if (value instanceof Color)
+            if (value instanceof Integer)
             {
-                Color color = (Color) value;
-                String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+                Integer color = (Integer) value;
+                String hex = RGB.toHexString(color);
                 sb.append(LogFormatter.LINEBREAK).append("<span class='entry' title='").append(hex).append("'>");
                 sb.append("<span class='rgb' style='background-color:").append(hex).append("'></span>");
                 sb.append(info).append("</span>");
@@ -607,34 +536,6 @@ public class ColorCache
         }
         sb.append(LogFormatter.LINEBREAK).append("</div><!-- /").append(name).append(" -->");
         return sb.toString();
-    }
-
-    Color colorMultiplier(Color color, int mult)
-    {
-        return new Color(colorMultiplier(color.getRGB(), mult));
-    }
-
-    int colorMultiplier(int rgb, int mult)
-    {
-
-        int alpha1 = rgb >> 24 & 0xFF;
-        int red1 = rgb >> 16 & 0xFF;
-        int green1 = rgb >> 8 & 0xFF;
-        int blue1 = rgb & 0xFF;
-
-        int alpha2 = mult >> 24 & 0xFF;
-        int red2 = mult >> 16 & 0xFF;
-        int green2 = mult >> 8 & 0xFF;
-        int blue2 = mult & 0xFF;
-
-        int alpha = alpha1 * alpha2 / 255;
-        int red = red1 * red2 / 255;
-        int green = green1 * green2 / 255;
-        int blue = blue1 * blue2 / 255;
-
-        int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
-
-        return result | -16777216;
     }
 
     private static class Holder

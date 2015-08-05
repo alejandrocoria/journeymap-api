@@ -70,16 +70,13 @@ public class ColorPalette
     @Since(1)
     ArrayList<BlockColor> basicColors = new ArrayList<BlockColor>(0);
 
-    @Since(1)
-    LinkedHashMap<String, ArrayList<BlockColor>> biomeColors = new LinkedHashMap<String, ArrayList<BlockColor>>(60);
-
     private transient File origin;
 
     ColorPalette()
     {
     }
 
-    ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Color> basicColorMap, HashMap<String, HashMap<BlockMD, Color>> biomeColorMap)
+    ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Integer> basicColorMap)
     {
         this.name = Constants.getString("jm.colorpalette.file_title");
         this.generated = String.format("Generated using %s for %s on %s", JourneymapClient.MOD_NAME, Loader.MC_VERSION, new Date());
@@ -95,14 +92,6 @@ public class ColorPalette
         this.description = lines.toArray(new String[4]);
 
         this.basicColors = toList(basicColorMap);
-        ArrayList<String> biomeNames = new ArrayList<String>(biomeColorMap.keySet());
-        Collections.sort(biomeNames);
-
-        for (String biomeName : biomeNames)
-        {
-            ArrayList<BlockColor> list = toList(biomeColorMap.get(biomeName));
-            this.biomeColors.put(biomeName, list);
-        }
     }
 
     public static ColorPalette getActiveColorPalette()
@@ -201,10 +190,10 @@ public class ColorPalette
         return contents.replaceAll(token, Matcher.quoteReplacement(Constants.getString(key, params)));
     }
 
-    private ArrayList<BlockColor> toList(HashMap<BlockMD, Color> map)
+    private ArrayList<BlockColor> toList(HashMap<BlockMD, Integer> map)
     {
         ArrayList<BlockColor> list = new ArrayList<BlockColor>(map.size());
-        for (Map.Entry<BlockMD, Color> entry : map.entrySet())
+        for (Map.Entry<BlockMD, Integer> entry : map.entrySet())
         {
             list.add(new BlockColor(entry.getKey(), entry.getValue()));
         }
@@ -234,9 +223,9 @@ public class ColorPalette
     }
 
 
-    private HashMap<BlockMD, Color> listToMap(ArrayList<BlockColor> list)
+    private HashMap<BlockMD, Integer> listToMap(ArrayList<BlockColor> list)
     {
-        HashMap<BlockMD, Color> map = new HashMap<BlockMD, Color>(list.size());
+        HashMap<BlockMD, Integer> map = new HashMap<BlockMD, Integer>(list.size());
         for (BlockColor blockColor : list)
         {
             GameRegistry.UniqueIdentifier uid = new GameRegistry.UniqueIdentifier(blockColor.uid);
@@ -258,24 +247,14 @@ public class ColorPalette
                 blockMD.setAlpha((alpha != null) ? alpha : 1f);
             }
             int color = Integer.parseInt(blockColor.color.replaceFirst("#", ""), 16);
-            map.put(blockMD, new Color(color));
+            map.put(blockMD, color);
         }
         return map;
     }
 
-    public HashMap<BlockMD, Color> getBasicColorMap()
+    public HashMap<BlockMD, Integer> getBasicColorMap()
     {
         return listToMap(this.basicColors);
-    }
-
-    public HashMap<String, HashMap<BlockMD, Color>> getBiomeColorMap()
-    {
-        HashMap<String, HashMap<BlockMD, Color>> map = new HashMap<String, HashMap<BlockMD, Color>>();
-        for (String biome : biomeColors.keySet())
-        {
-            map.put(biome, listToMap(biomeColors.get(biome)));
-        }
-        return map;
     }
 
     public File getOrigin()
@@ -335,12 +314,7 @@ public class ColorPalette
 
     public int size()
     {
-        int count = basicColors.size();
-        if (biomeColors.size() > 0)
-        {
-            count += ((biomeColors.size() * biomeColors.entrySet().iterator().next().getValue().size()));
-        }
-        return count;
+        return basicColors.size();
     }
 
     @Override
@@ -367,12 +341,14 @@ public class ColorPalette
         @Since(1)
         Float alpha;
 
-        BlockColor(BlockMD blockMD, Color awtColor)
+        BlockColor(BlockMD blockMD, Integer intColor)
         {
             this.name = blockMD.getName();
             // 1.8 needs the cast
             this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
             this.meta = blockMD.meta;
+
+            Color awtColor = new Color(intColor);
             this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());
             if (blockMD.getAlpha() < 1f)
             {

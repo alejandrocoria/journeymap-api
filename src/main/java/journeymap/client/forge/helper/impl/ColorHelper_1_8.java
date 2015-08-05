@@ -8,6 +8,7 @@
 
 package journeymap.client.forge.helper.impl;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
@@ -60,10 +61,10 @@ public class ColorHelper_1_8 implements IColorHelper
      * @return
      */
     @Override
-    public Color loadBlockColor(BlockMD blockMD)
+    public Integer loadBlockColor(BlockMD blockMD)
     {
 
-        Color color = null;
+        Integer color = null;
 
         if (blocksTexture == null)
         {
@@ -164,9 +165,9 @@ public class ColorHelper_1_8 implements IColorHelper
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
 
-    Color getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
-        Color color = null;
+        Integer color = null;
 
         try
         {
@@ -280,7 +281,7 @@ public class ColorHelper_1_8 implements IColorHelper
 
 
             // Set color
-            color = new Color(r, g, b);
+            color = RGB.toInteger(r, g, b);
 
             // Determine alpha
             Block block = blockMD.getBlock();
@@ -317,7 +318,7 @@ public class ColorHelper_1_8 implements IColorHelper
         {
             if (logger.isTraceEnabled())
             {
-                logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color.getRGB()));
+                logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color));
             }
         }
 

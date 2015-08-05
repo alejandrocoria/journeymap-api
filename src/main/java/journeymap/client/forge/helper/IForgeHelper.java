@@ -104,6 +104,8 @@ public interface IForgeHelper
 
     public int getGrassColor(BiomeGenBase biome, int x, int y, int z);
 
+    public int getWaterColor(BiomeGenBase biome, int x, int y, int z);
+
     public int getColorMultiplier(World world, Block block, int x, int y, int z);
 
     public int getRenderColor(BlockMD blockMD);

@@ -44,6 +44,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -489,8 +490,13 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // 1.7
         // return world.getBiomeGenForCoords(x, y, z);
 
-        // 1.7
-        return world.getBiomeGenForCoords(new BlockPos(x, y, z));
+        // 1.8
+        BlockPos pos = new BlockPos(x, y, z);
+        Chunk chunk = world.getChunkFromBlockCoords(pos);
+        if(chunk instanceof EmptyChunk) {
+            return null;
+        }
+        return world.getBiomeGenForCoords(pos);
     }
 
     @Override
@@ -531,6 +537,16 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return biome.getGrassColorAtPos(new BlockPos(x, y, z));
+    }
+
+    @Override
+    public int getWaterColor(BiomeGenBase biome, int x, int y, int z)
+    {
+        // 1.7
+        //return biome.waterColorMultiplier;
+
+        // 1.8
+        return biome.getWaterColorMultiplier();
     }
 
     @Override
