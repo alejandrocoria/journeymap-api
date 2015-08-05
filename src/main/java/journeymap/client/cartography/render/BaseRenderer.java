@@ -154,22 +154,22 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
         if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
         {
-            basicColor = RGB.darken(basicColor, tweakBrightenLightsourceBlock); // magic #
+            basicColor = RGB.adjustBrightness(basicColor, tweakBrightenLightsourceBlock); // magic #
         }
 
         if ((waterAbove) && waterColor != null)
         {
-            // Blend day color with watercolor above, darken for daylight filtered down
-            stratum.setDayColor(RGB.blendWith(waterColor, RGB.darken(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff)));
+            // Blend day color with watercolor above, adjustBrightness for daylight filtered down
+            stratum.setDayColor(RGB.blendWith(waterColor, RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff)));
             stratum.setDayColor(RGB.blendWith(stratum.getDayColor(), waterColor, tweakBlendShallowWater)); // magic #
 
             // Darken for night light and blend with watercolor above
-            stratum.setNightColor(RGB.darken(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
+            stratum.setNightColor(RGB.adjustBrightness(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
         }
         else
         {
-            // Just darken based on light levels
-            stratum.setDayColor(RGB.darken(basicColor, daylightDiff));
+            // Just adjustBrightness based on light levels
+            stratum.setDayColor(RGB.adjustBrightness(basicColor, daylightDiff));
 
             stratum.setNightColor(RGB.darkenAmbient(basicColor, nightLightDiff, getAmbientColor()));
         }

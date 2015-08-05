@@ -183,10 +183,16 @@ public final class RGB
         return String.format("r=%s,g=%s,b=%s", ints[0], ints[1], ints[2]);
     }
 
+    public static String toHexString(Integer rgb)
+    {
+        int[] ints = ints(rgb);
+        return String.format("#%02x%02x%02x", ints[0], ints[1], ints[2]);
+    }
+
     /**
-     * Darken a color by a factor.
+     * Darken/Lighten a color by a factor.
      */
-    public static int darken(int rgb, float factor)
+    public static int adjustBrightness(int rgb, float factor)
     {
         if (factor == 1F)
         {
@@ -197,7 +203,7 @@ public final class RGB
 
     /**
      * Darken or lighten a color by a factor.
-     * If darken, add a blue tint to simulate shadow.
+     * If adjustBrightness, add a blue tint to simulate shadow.
      */
     public static int bevelSlope(int rgb, float factor)
     {
@@ -253,6 +259,35 @@ public final class RGB
         floats[2] = otherFloats[2] * otherAlpha / 1f + floats[2] * (1 - otherAlpha);
 
         return toInteger(floats);
+    }
+
+    /**
+     * Adjust color rgb using a multiplier
+     * @param rgb
+     * @param multiplier
+     * @return
+     */
+    public static int multiply(int rgb, int multiplier)
+    {
+
+        int alpha1 = rgb >> 24 & 0xFF;
+        int red1 = rgb >> 16 & 0xFF;
+        int green1 = rgb >> 8 & 0xFF;
+        int blue1 = rgb & 0xFF;
+
+        int alpha2 = multiplier >> 24 & 0xFF;
+        int red2 = multiplier >> 16 & 0xFF;
+        int green2 = multiplier >> 8 & 0xFF;
+        int blue2 = multiplier & 0xFF;
+
+        int alpha = alpha1 * alpha2 / 255;
+        int red = red1 * red2 / 255;
+        int green = green1 * green2 / 255;
+        int blue = blue1 * blue2 / 255;
+
+        int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
+
+        return result | -16777216;
     }
 
     /**

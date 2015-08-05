@@ -339,7 +339,7 @@ public class Strata
             setWaterColor(0x2525CD);
         }
 
-        setWaterColor(RGB.darken(getWaterColor(), .85f)); // magic # to match how it looks in game
+        setWaterColor(RGB.adjustBrightness(getWaterColor(), .85f)); // magic # to match how it looks in game
     }
 
     public Integer getRenderDayColor()

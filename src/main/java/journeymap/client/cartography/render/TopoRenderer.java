@@ -353,7 +353,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         if (slope < 1)
         {
             color = getBaseBlockColor(topBlockMd, x, y, z);
-            color = RGB.darken(color, slope);
+            color = RGB.adjustBrightness(color, slope);
         }
         else if (slope > 1)
         {
