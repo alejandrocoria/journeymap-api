@@ -167,7 +167,7 @@ public class ChunkMD
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getLightOpacity(getWorld(), blockMD, toBlockX(localX), y, toBlockZ(localZ));
+        return ForgeHelper.INSTANCE.getLightOpacity(getWorld(), blockMD, toWorldX(localX), y, toWorldZ(localZ));
     }
 
     public Serializable getProperty(String name)
@@ -273,12 +273,12 @@ public class ChunkMD
         return now;
     }
 
-    public int toBlockX(int localX)
+    public int toWorldX(int localX)
     {
         return (coord.chunkXPos << 4) + localX;
     }
 
-    public int toBlockZ(int localZ)
+    public int toWorldZ(int localZ)
     {
         return (coord.chunkZPos << 4) + localZ;
     }

@@ -47,8 +47,8 @@ public class OpenBlocks
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            int blockX = chunkMD.toBlockX(localX);
-            int blockZ = chunkMD.toBlockZ(localZ);
+            int blockX = chunkMD.toWorldX(localX);
+            int blockZ = chunkMD.toWorldZ(localZ);
             //String name = I18n.format("tile.openblocks.grave.name");
             TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(chunkMD.getWorld(), blockX, y, blockZ);
 

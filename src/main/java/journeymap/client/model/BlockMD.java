@@ -16,7 +16,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -179,7 +179,7 @@ public class BlockMD
         }
         else
         {
-            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, chunkMd.toBlockX(blockX), y, chunkMd.toBlockX(blockZ));
+            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
             if (color == null)
             {
                 this.color = color = Color.black.getRGB();
@@ -338,7 +338,7 @@ public class BlockMD
      */
     public boolean isFoliage()
     {
-        return getBlock() instanceof BlockLeaves;
+        return getBlock() instanceof BlockLeavesBase;
     }
 
     /**

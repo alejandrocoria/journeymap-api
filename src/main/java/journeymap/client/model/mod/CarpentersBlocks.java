@@ -63,8 +63,8 @@ public class CarpentersBlocks
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            final int blockX = chunkMD.toBlockX(localX);
-            final int blockZ = chunkMD.toBlockZ(localZ);
+            final int blockX = chunkMD.toWorldX(localX);
+            final int blockZ = chunkMD.toWorldZ(localZ);
             final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(chunkMD.getWorld(), blockX, y, blockZ);
             if (tileEntity != null)
             {
