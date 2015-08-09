@@ -637,7 +637,10 @@ public class MiniMap
         if (dv.showFps)
         {
             String fps = mc.debug;
-            final int idx = fps != null ? fps.indexOf(',') : -1;
+            // 1.7
+            // final int idx = fps != null ? fps.indexOf(',') : -1;
+            // 1.8
+            final int idx = fps != null ? fps.indexOf('(')-1 : -1;
             if (idx > 0)
             {
                 fpsLabelText = fps.substring(0, idx);
