@@ -9,6 +9,8 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
@@ -17,7 +19,6 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
-import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -27,13 +28,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
- *
+ * Draw a map tile via the grid renderer.
  */
 public class TileDrawStep
 {
     private static final Color bgColor = new Color(0x22, 0x22, 0x22);
-
     private static final Logger logger = Journeymap.getLogger();
+    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+
     private final boolean debug = logger.isDebugEnabled();
     private final RegionCoord regionCoord;
     private final MapType mapType;
@@ -138,28 +140,21 @@ public class TileDrawStep
 
         // Background
         DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
-
-        GL11.glEnable(GL11.GL_BLEND);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        renderHelper.glEnableBlend();
+        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        renderHelper.glEnableTexture2D();
 
         // Tile
         if (textureId != -1)
         {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
-            GL11.glColor4f(1, 1, 1, alpha);
+            renderHelper.glBindTexture(textureId);
+            renderHelper.glColor4f(1, 1, 1, alpha);
 
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
-            if (!useScaled)
-            {
-                // TODO: Does this help?
-                //textureFilter = GL11.GL_NEAREST;
-            }
-
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
@@ -184,8 +179,8 @@ public class TileDrawStep
             DrawUtil.drawLabel(mapType + " tile age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
         }
 
-        GL11.glColor4f(1, 1, 1, 1);
-        GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
+        renderHelper.glColor4f(1, 1, 1, 1);
+        renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
 
         drawTimer.stop();
 
@@ -378,19 +373,5 @@ public class TileDrawStep
             logger.error(e);
             return null;
         }
-
-
-        /**
-         BufferedImage image = new BufferedImage(regionImage.getWidth(), regionImage.getHeight(), regionImage.getType());
-         final Graphics2D g2D = initRenderingHints(image.createGraphics());
-
-
-         g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-         //g2D.drawImage(regionImage, 0, 0, 512, 512, sx1, sy1, sx2, sy2, Color.yellow, null);
-         g2D.drawImage(regionImage, sx1, sy1, sx2-sx1, sy2-sy1,null);
-         g2D.dispose();
-
-         return image;
-         */
     }
 }

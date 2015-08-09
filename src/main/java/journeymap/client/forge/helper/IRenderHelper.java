@@ -33,6 +33,11 @@ public interface IRenderHelper
     public void glBlendFunc(int sfactorRGB, int dfactorRGB);
     public void glColor(Color color, int alpha);
     public void glColor4f(float r, float g, float b, float a);
+    public void glClearColor(float r, float g, float b, float a);
+    public void glColorMask(boolean r, boolean g, boolean b, boolean a);
+    public void glTexParameteri(int target, int pname, int param);
+    public void glScaled(double x, double y, double z);
+    public void glDepthFunc(int func);
     public void glShadeModel(int model);
     public void glBindTexture(int glid);
     public void glDisableDepth();
@@ -44,4 +49,5 @@ public interface IRenderHelper
     public void glDisableFog();
     public void glEnableCull();
     public void glDisableCull();
+    public void glDeleteTextures(int textureId);
 }

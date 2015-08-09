@@ -21,7 +21,6 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.EnumChatFormatting;
@@ -225,7 +224,7 @@ public class RenderWaypointBeacon
                     GL11.glTranslated(shiftX, shiftY, shiftZ);
                     GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
                     GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-                    GL11.glScaled(-scale, -scale, scale);
+                    renderHelper.glScaled(-scale, -scale, scale);
 
                     renderHelper.glDepthMask(true);
                     renderHelper.glEnableDepth();
@@ -266,7 +265,7 @@ public class RenderWaypointBeacon
                 GL11.glTranslated(shiftX, shiftY, shiftZ);
                 GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
                 GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-                GL11.glScaled(-scale, -scale, scale);
+                renderHelper.glScaled(-scale, -scale, scale);
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
@@ -297,14 +296,13 @@ public class RenderWaypointBeacon
     {
         float f1 = 1f;
 
-        IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
         mc.renderEngine.bindTexture(beam);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0);
+        renderHelper.glDisableLighting();
+        renderHelper.glDisableBlend();
+        renderHelper.glEnableDepth();
+        renderHelper.glBlendFunc(770, 1, 1, 0);
         //renderHelper.glDepthMask(false);
 
         float time = (float) mc.theWorld.getTotalWorldTime();

@@ -9,13 +9,13 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,7 +129,7 @@ public class ExpireTextureTask implements IMainThreadTask
             {
                 if (Display.isCurrent())
                 {
-                    GL11.glDeleteTextures(texture.getGlTextureId());
+                    ForgeHelper.INSTANCE.getRenderHelper().glDeleteTextures(texture.getGlTextureId());
                     //LOGGER.info("Successfully deleted " + texture);
                     texture.clear();
                     success = true;
@@ -156,7 +156,7 @@ public class ExpireTextureTask implements IMainThreadTask
         {
             if (Display.isCurrent())
             {
-                GL11.glDeleteTextures(textureId);
+                ForgeHelper.INSTANCE.getRenderHelper().glDeleteTextures(textureId);
                 return true;
             }
         }

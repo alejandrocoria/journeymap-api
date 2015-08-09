@@ -13,6 +13,7 @@ import journeymap.client.forge.helper.IRenderHelper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -42,7 +43,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // tessellator.addVertex(x,y,z);
 
         // 1.8
-        worldrenderer.addVertex(x,y,z);
+        worldrenderer.addVertex(x, y, z);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // tessellator.addVertexWithUV(x,y,z,u,v);
 
         // 1.8
-        worldrenderer.addVertexWithUV(x,y,z,u,v);
+        worldrenderer.addVertexWithUV(x, y, z, u, v);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // tessellator.setColorRGBA_F(x,y,z);
 
         // 1.8
-        worldrenderer.setColorRGBA_F(r,g,b,a);
+        worldrenderer.setColorRGBA_F(r, g, b, a);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha/255f);
 
         // 1.8
-        GlStateManager.color(rgb[0], rgb[1], rgb[2], alpha/255f);
+        GlStateManager.color(rgb[0], rgb[1], rgb[2], alpha / 255f);
     }
 
     @Override
@@ -191,6 +192,52 @@ public class RenderHelper_1_8 implements IRenderHelper
 
         // 1.8
         GlStateManager.color(r,g,b,a);
+    }
+
+    @Override
+    public void glClearColor(float r, float g, float b, float a)
+    {
+        // 1.7
+        // GL11.glClearColor(r,g,b,a);
+
+        // 1.8
+        GlStateManager.clearColor(r, g, b, a);
+    }
+
+    @Override
+    public void glColorMask(boolean r, boolean g, boolean b, boolean a)
+    {
+        // 1.7
+        // GL11.glColorMask(r,g,b,a);
+
+        // 1.8
+        GlStateManager.colorMask(r, g, b, a);
+    }
+
+    @Override
+    public void glTexParameteri(int target, int pname, int param)
+    {
+        GL11.glTexParameteri(target, pname, param);
+    }
+
+    @Override
+    public void glScaled(double x, double y, double z)
+    {
+        // 1.7
+        // GL11.glScaled(x,y,z);
+
+        // 1.8
+        GlStateManager.scale(x, y, z);
+    }
+
+    @Override
+    public void glDepthFunc(int func)
+    {
+        // 1.7
+        // GL11.glDepthFunc(func);
+
+        // 1.8
+        GlStateManager.depthFunc(func);
     }
 
     @Override
@@ -301,5 +348,15 @@ public class RenderHelper_1_8 implements IRenderHelper
 
         // 1.8
         GlStateManager.disableCull();
+    }
+
+    @Override
+    public void glDeleteTextures(int textureId)
+    {
+        // 1.7
+        // GL11.glDeleteTextures(textureId);
+
+        // 1.8
+        GlStateManager.deleteTexture(textureId);
     }
 }

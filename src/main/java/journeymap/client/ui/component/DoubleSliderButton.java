@@ -13,7 +13,6 @@ import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 /**
  * Created by Mark on 9/29/2014.
@@ -77,7 +76,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
             if (this.isMouseOver() || this.dragging)
             {
 
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
                 double sliderValue = getSliderValue();
                 GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);

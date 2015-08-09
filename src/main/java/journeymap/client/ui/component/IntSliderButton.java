@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -81,7 +80,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
             if (this.isEnabled() || this.dragging)
             {
 
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
                 double sliderValue = getSliderValue();
                 GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);

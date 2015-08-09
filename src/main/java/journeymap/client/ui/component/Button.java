@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
@@ -26,6 +27,8 @@ import java.util.List;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
+    protected static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+
     protected Color smallFrameColorLight = new Color(160, 160, 160);
     protected Color smallFrameColorDark = new Color(120, 120, 120);
     protected Color smallBgColor = new Color(100, 100, 100);

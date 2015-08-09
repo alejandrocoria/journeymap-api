@@ -10,6 +10,8 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
@@ -35,7 +37,7 @@ import java.util.List;
 
 public abstract class JmUI extends GuiScreen
 {
-
+    protected static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     protected final String title;
     protected final int headerHeight = 35;
     protected final Logger logger = Journeymap.getLogger();
@@ -274,8 +276,8 @@ public abstract class JmUI extends GuiScreen
         {
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
             RenderHelper.disableStandardItemLighting();
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            renderHelper.glDisableLighting();
+            renderHelper.glDisableDepth();
             int maxLineWidth = 0;
             Iterator iterator = tooltip.iterator();
 
@@ -351,8 +353,8 @@ public abstract class JmUI extends GuiScreen
 
             this.zLevel = 0.0F;
             itemRender.zLevel = 0.0F;
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            renderHelper.glEnableLighting();
+            renderHelper.glEnableDepth();
             RenderHelper.enableStandardItemLighting();
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         }

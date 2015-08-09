@@ -26,7 +26,7 @@ public class DrawUtil
 {
     public static double zLevel = 0;
 
-    public static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
@@ -133,7 +133,7 @@ public class DrawUtil
             {
                 x = x / fontScale;
                 y = y / fontScale;
-                GL11.glScaled(fontScale, fontScale, 0);
+                renderHelper.glScaled(fontScale, fontScale, 0);
             }
 
             double textX = x;
@@ -289,12 +289,12 @@ public class DrawUtil
             }
         }
 
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
+        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
+        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
 
         if (rotation != 0)
         {

@@ -9,6 +9,8 @@
 package journeymap.client.render.texture;
 
 import com.google.common.base.Objects;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -21,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
 {
+    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private final ReentrantLock bufferLock = new ReentrantLock();
     protected BufferedImage image;
     protected boolean retainImage;
@@ -151,17 +154,17 @@ public class TextureImpl extends AbstractTexture
         {
             try
             {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, super.getGlTextureId());
+                renderHelper.glBindTexture(super.getGlTextureId());
 
                 //Send texel data to OpenGL
 
                 // Setup wrap mode
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 
                 //Setup texture scaling filtering
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 

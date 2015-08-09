@@ -14,6 +14,7 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -44,6 +45,7 @@ import java.awt.geom.Rectangle2D;
  */
 public class MiniMap
 {
+    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private static final MapState state = new MapState();
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
@@ -204,10 +206,10 @@ public class MiniMap
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
 
             // Ensure colors and alpha reset
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
-            GL11.glColor4f(1, 1, 1, 1);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            renderHelper.glEnableBlend();
+            renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
+            renderHelper.glColor4f(1, 1, 1, 1);
+            renderHelper.glEnableDepth();
 
             // Mask the stencil
             beginStencil();
@@ -435,7 +437,6 @@ public class MiniMap
             double height = dv.displayHeight / 2 + (dv.translateY);
 
             GL11.glTranslated(width, height, 0);
-
             GL11.glRotated(rotation, 0, 0, 1.0f);
             GL11.glTranslated(-width, -height, 0);
         }
@@ -513,13 +514,13 @@ public class MiniMap
 
             DrawUtil.zLevel = 1000;
 
-            GL11.glColorMask(false, false, false, false); // allows map tiles to be partially opaque
+            renderHelper.glColorMask(false, false, false, false); // allows map tiles to be partially opaque
             dv.minimapFrame.drawMask();
-            GL11.glColorMask(true, true, true, true);
+            renderHelper.glColorMask(true, true, true, true);
 
             DrawUtil.zLevel = 0;
-            GL11.glDepthMask(false); // otherwise entities and reticle not shown
-            GL11.glDepthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
+            renderHelper.glDepthMask(false); // otherwise entities and reticle not shown
+            renderHelper.glDepthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
         }
         catch (Throwable t)
         {
@@ -532,10 +533,10 @@ public class MiniMap
     {
         try
         {
-            //GL11.glDepthMask(false); // doesn't seem to matter
-            GL11.glDisable(GL11.GL_DEPTH_TEST); // otherwise minimap frame not shown
-            //GL11.glDepthFunc(GL11.GL_LEQUAL);
-            //GL11.glColor4f(1, 1, 1, 1);
+            //renderHelper.glDepthMask(false); // doesn't seem to matter
+            renderHelper.glDisableDepth(); // otherwise minimap frame not shown
+            //renderHelper.glDepthFunc(renderHelper.GL_LEQUAL);
+            //renderHelper.glColor4f(1, 1, 1, 1);
         }
         catch (Throwable t)
         {
@@ -549,13 +550,13 @@ public class MiniMap
         {
             DrawUtil.zLevel = 0; // default
 
-            GL11.glDepthMask(true); // default
+            renderHelper.glDepthMask(true); // default
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT); // defensive
-            GL11.glEnable(GL11.GL_DEPTH_TEST); // default
-            GL11.glDepthFunc(GL11.GL_LEQUAL); // not default, but required by toolbar
-            GL11.glEnable(GL11.GL_ALPHA_TEST); // default
-            GL11.glColor4f(1, 1, 1, 1); // default
-            GL11.glClearColor(1, 1, 1, 1f); // defensive against shaders
+            renderHelper.glEnableDepth(); // default
+            renderHelper.glDepthFunc(GL11.GL_LEQUAL); // not default, but required by toolbar
+            renderHelper.glEnableAlpha(); // default
+            renderHelper.glColor4f(1, 1, 1, 1); // default
+            renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
 
         }
         catch (Throwable t)

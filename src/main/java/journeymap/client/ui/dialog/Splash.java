@@ -189,8 +189,8 @@ public class Splash extends JmUI
             brickTex.bindTexture();
             renderHelper.glBindTexture(brickTex.getGlTextureId());
             renderHelper.glColor4f(1, 1, 1, 1);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
 
             DrawUtil.drawBoundTexture(0, 0, listX, listY, 0, 8, 2, listX + listWidth, listY + listHeight);
 
