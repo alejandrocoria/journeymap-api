@@ -19,9 +19,10 @@ public class MapType
 {
     private static HashMap<Integer, MapType> cache = new HashMap<Integer, MapType>(256); // Max 4 names * 8 slices * 8 dimensions
     public final Integer vSlice;
-    ;
     public final Name name;
     public final int dimension;
+    private final int theHashCode;
+    private final String theCacheKey;
 
     public MapType(Name name, Integer vSlice, int dimension)
     {
@@ -30,6 +31,8 @@ public class MapType
         this.name = name;
         this.vSlice = vSlice;
         this.dimension = dimension;
+        this.theCacheKey = toCacheKey(name, vSlice, dimension);
+        this.theHashCode = theCacheKey.hashCode();
     }
 
     public static MapType from(Name name, Integer vSlice, int dimension)
@@ -77,13 +80,14 @@ public class MapType
         return from(Name.underground, vSlice, dimension);
     }
 
-    public static int toHash(Name name, Integer vSlice, int dimension)
+    public static String toCacheKey(Name name, Integer vSlice, int dimension)
     {
-        int result = 31;
-        result = 31 * result + (vSlice != null ? vSlice.hashCode() : -16);
-        result = 31 * result + name.hashCode();
-        result = 31 * result + (dimension + 4096);
-        return result;
+        return "" + dimension + name + vSlice;
+    }
+
+    public String toCacheKey()
+    {
+        return theCacheKey;
     }
 
     public String toString()
@@ -119,7 +123,7 @@ public class MapType
     @Override
     public int hashCode()
     {
-        return toHash(name, vSlice, dimension);
+        return theHashCode;
     }
 
     @Override

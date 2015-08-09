@@ -8,7 +8,6 @@
 
 package journeymap.client.render.map;
 
-import com.google.common.base.Objects;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
@@ -48,12 +47,16 @@ public class Tile
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
+    private final int theHashCode;
+    private final String theCacheKey;
 
     private Tile(final int tileX, final int tileZ, final int zoom)
     {
         this.tileX = tileX;
         this.tileZ = tileZ;
         this.zoom = zoom;
+        this.theCacheKey = toCacheKey(tileX, tileZ, zoom);
+        this.theHashCode = theCacheKey.hashCode();
         final int distance = 32 / (int) Math.pow(2, zoom);
         ulChunk = new ChunkCoordIntPair(tileX * distance, tileZ * distance);
         lrChunk = new ChunkCoordIntPair(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
@@ -80,9 +83,9 @@ public class Tile
         return t << (9 - zoom);
     }
 
-    public static int toHashCode(final int tileX, final int tileZ, final int zoom)
+    public static String toCacheKey(final int tileX, final int tileZ, final int zoom)
     {
-        return Objects.hashCode(tileX, tileZ, zoom);
+        return "" + tileX + "," + tileZ + "@" + zoom;
     }
 
     public static void switchTileRenderType()
@@ -190,10 +193,15 @@ public class Tile
         return "Tile [ r" + tileX + ", r" + tileZ + " (zoom " + zoom + ") ]";
     }
 
+    public String cacheKey()
+    {
+        return theCacheKey;
+    }
+
     @Override
     public int hashCode()
     {
-        return toHashCode(tileX, tileZ, zoom);
+        return theHashCode;
     }
 
     public Point2D blockPixelOffsetInTile(double x, double z)

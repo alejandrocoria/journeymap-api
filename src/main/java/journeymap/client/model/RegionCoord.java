@@ -21,13 +21,14 @@ public class RegionCoord implements Comparable<RegionCoord>
 {
     public transient static final int SIZE = 5;
     private transient static final int chunkSqRt = (int) Math.pow(2, SIZE);
-    private static final Cache<Integer, RegionCoord> cache = DataCache.instance().getRegionCoords();
     // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
     public final Path dimDir;
     public final int regionX;
     public final int regionZ;
     public final int dimension;
+    private final int theHashCode;
+    private final String theCacheKey;
 
     public RegionCoord(File worldDir, int regionX, int regionZ, int dimension)
     {
@@ -36,6 +37,8 @@ public class RegionCoord implements Comparable<RegionCoord>
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.dimension = dimension;
+        this.theCacheKey = toCacheKey(dimDir, regionX, regionZ);
+        this.theHashCode = theCacheKey.hashCode();
     }
 
     public static RegionCoord fromChunkPos(File worldDir, MapType mapType, int chunkX, int chunkZ)
@@ -50,11 +53,12 @@ public class RegionCoord implements Comparable<RegionCoord>
     {
         // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
         // unfortunately, so there's no reliable key.  If there's a collision, we put in a new one.
-        RegionCoord regionCoord = cache.getIfPresent(toHash(getDimPath(worldDir, dimension), regionX, regionZ));
+        Cache<String, RegionCoord> cache = DataCache.instance().getRegionCoords();
+        RegionCoord regionCoord = cache.getIfPresent(toCacheKey(getDimPath(worldDir, dimension), regionX, regionZ));
         if (regionCoord == null || regionX != regionCoord.regionX || regionZ != regionCoord.regionZ || dimension != regionCoord.dimension)
         {
             regionCoord = new RegionCoord(worldDir, regionX, regionZ, dimension);
-            cache.put(regionCoord.hashCode(), regionCoord);
+            cache.put(regionCoord.theCacheKey, regionCoord);
         }
         return regionCoord;
     }
@@ -89,15 +93,10 @@ public class RegionCoord implements Comparable<RegionCoord>
         return chunkPos >> SIZE;
     }
 
-    /**
-     * This has a high collision rate thanks to negative coordinates.
-     */
-    public static int toHash(Path dimDir, int regionX, int regionZ)
+
+    public static String toCacheKey(Path dimDir, int regionX, int regionZ)
     {
-        int result = dimDir.hashCode();
-        result = 31 * result + regionX;
-        result = 31 * result + regionZ;
-        return result;
+        return regionX + dimDir.toString() + regionZ;
     }
 
     public int getXOffset(int chunkX)
@@ -225,10 +224,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         return true;
     }
 
+    public String cacheKey()
+    {
+        return theCacheKey;
+    }
+
     @Override
     public int hashCode()
     {
-        return toHash(dimDir, regionX, regionZ);
+        return theHashCode;
     }
 
     @Override

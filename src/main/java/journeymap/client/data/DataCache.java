@@ -47,9 +47,9 @@ public class DataCache
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
-    final Cache<Integer, ChunkCoord> chunkCoords;
-    final Cache<Integer, RegionCoord> regionCoords;
-    final Cache<Integer, MapType> mapTypes;
+    final Cache<String, ChunkCoord> chunkCoords;
+    final Cache<String, RegionCoord> regionCoords;
+    final Cache<String, MapType> mapTypes;
     final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
     final BlockMDCache blockMetadataLoader;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
@@ -297,11 +297,11 @@ public class DataCache
         // Guarantee surface types don't use a slice
         vSlice = (name != MapType.Name.underground) ? null : vSlice;
 
-        MapType mapType = mapTypes.getIfPresent(MapType.toHash(name, vSlice, dimension));
+        MapType mapType = mapTypes.getIfPresent(MapType.toCacheKey(name, vSlice, dimension));
         if (mapType == null)
         {
             mapType = new MapType(name, vSlice, dimension);
-            mapTypes.put(mapType.hashCode(), mapType);
+            mapTypes.put(mapType.toCacheKey(), mapType);
         }
         return mapType;
     }
@@ -536,12 +536,12 @@ public class DataCache
         return regionImageSets;
     }
 
-    public Cache<Integer, ChunkCoord> getChunkCoords()
+    public Cache<String, ChunkCoord> getChunkCoords()
     {
         return chunkCoords;
     }
 
-    public Cache<Integer, RegionCoord> getRegionCoords()
+    public Cache<String, RegionCoord> getRegionCoords()
     {
         return regionCoords;
     }

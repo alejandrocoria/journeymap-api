@@ -43,6 +43,8 @@ public class TileDrawStep
     private final RegionImageSet regionImageSet;
     private final StatTimer updateRegionTimer = StatTimer.get("TileDrawStep.updateRegionTexture", 5, 50);
     private final StatTimer updateScaledTimer = StatTimer.get("TileDrawStep.updateScaledTexture", 5, 50);
+    private final int theHashCode;
+    private final String theCacheKey;
     private int sx1, sy1, sx2, sy2;
     private volatile TextureImpl scaledTexture;
     private volatile Future<TextureImpl> regionFuture;
@@ -64,6 +66,9 @@ public class TileDrawStep
         this.highQuality = highQuality && zoom != 0; // todo change when zoom can be < zero or 0 no longer 1:1
         this.drawTimer = (this.highQuality) ? StatTimer.get("TileDrawStep.draw(high)") : StatTimer.get("TileDrawStep.draw(low)");
 
+        theCacheKey = toCacheKey(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
+        theHashCode = theCacheKey.hashCode();
+
         this.regionImageSet = RegionImageCache.instance().getRegionImageSet(regionCoord);
         this.regionTextureHolder = regionImageSet.getHolder(mapType);
 
@@ -74,9 +79,9 @@ public class TileDrawStep
         }
     }
 
-    public static int toHashCode(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
+    public static String toCacheKey(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
-        return Objects.hashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
+        return regionCoord.cacheKey() + mapType.toCacheKey() + zoom + highQuality + sx1 + "," + sy1 + "," + sx2 + "," + sy2;
     }
 
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
@@ -221,9 +226,15 @@ public class TileDrawStep
         return zoom;
     }
 
+    public String cacheKey()
+    {
+        return theCacheKey;
+    }
+
+    @Override
     public int hashCode()
     {
-        return toHashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
+        return theHashCode;
     }
 
     @Override

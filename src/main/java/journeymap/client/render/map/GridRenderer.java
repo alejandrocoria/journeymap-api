@@ -62,7 +62,7 @@ public class GridRenderer
     private int lastHeight = -1;
     private int lastWidth = -1;
     private MapType mapType;
-    private int centerTileHash = Integer.MIN_VALUE;
+    private String centerTileKey = "";
     private int zoom;
     private double centerBlockX;
     private double centerBlockZ;
@@ -201,10 +201,10 @@ public class GridRenderer
         final int tileX = Tile.blockPosToTile((int) Math.floor(centerBlockX), this.zoom);
         final int tileZ = Tile.blockPosToTile((int) Math.floor(centerBlockZ), this.zoom);
 
-        // Chech hash of tile coords
-        final int newCenterHash = Tile.toHashCode(tileX, tileZ, zoom);
-        final boolean centerTileChanged = newCenterHash != centerTileHash;
-        centerTileHash = newCenterHash;
+        // Check key of center tile
+        final String newCenterKey = Tile.toCacheKey(tileX, tileZ, zoom);
+        final boolean centerTileChanged = !newCenterKey.equals(centerTileKey);
+        centerTileKey = newCenterKey;
 
         if (mapTypeChanged || centerTileChanged || grid.isEmpty())
         {

@@ -26,17 +26,17 @@ import java.util.concurrent.TimeUnit;
 public class TileDrawStepCache
 {
     private final Logger logger = Journeymap.getLogger();
-    private final Cache<Integer, TileDrawStep> drawStepCache;
+    private final Cache<String, TileDrawStep> drawStepCache;
     private Path lastDimDir;
 
     private TileDrawStepCache()
     {
         this.drawStepCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(30, TimeUnit.SECONDS)
-                .removalListener(new RemovalListener<Integer, TileDrawStep>()
+                .removalListener(new RemovalListener<String, TileDrawStep>()
                 {
                     @Override
-                    public void onRemoval(RemovalNotification<Integer, TileDrawStep> notification)
+                    public void onRemoval(RemovalNotification<String, TileDrawStep> notification)
                     {
                         TileDrawStep oldDrawStep = notification.getValue();
                         if (oldDrawStep != null)
@@ -48,7 +48,7 @@ public class TileDrawStepCache
                 .build();
     }
 
-    public static Cache<Integer, TileDrawStep> instance()
+    public static Cache<String, TileDrawStep> instance()
     {
         return Holder.INSTANCE.drawStepCache;
     }
@@ -67,12 +67,12 @@ public class TileDrawStepCache
     {
         checkWorldChange(regionCoord);
 
-        final int hash = TileDrawStep.toHashCode(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
-        TileDrawStep tileDrawStep = drawStepCache.getIfPresent(hash);
+        final String key = TileDrawStep.toCacheKey(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
+        TileDrawStep tileDrawStep = drawStepCache.getIfPresent(key);
         if (tileDrawStep == null)
         {
             tileDrawStep = new TileDrawStep(regionCoord, mapType, zoom, highQuality, sx1, sy1, sx2, sy2);
-            drawStepCache.put(hash, tileDrawStep);
+            drawStepCache.put(key, tileDrawStep);
         }
         return tileDrawStep;
     }

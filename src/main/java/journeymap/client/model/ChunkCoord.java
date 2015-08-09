@@ -17,13 +17,14 @@ import java.util.Objects;
 public class ChunkCoord
 {
 
-    private static final Cache<Integer, ChunkCoord> cache = DataCache.instance().getChunkCoords();
+    private static final Cache<String, ChunkCoord> cache = DataCache.instance().getChunkCoords();
     // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
     public final int chunkX;
     public final int chunkZ;
     public final MapType mapType;
-    //private RegionCoord rCoord = null;
+    private final int theHashCode;
+    private final String theCacheKey;
 
     private ChunkCoord(File worldDir, final MapType mapType, int chunkX, int chunkZ)
     {
@@ -31,6 +32,8 @@ public class ChunkCoord
         this.mapType = mapType;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        this.theCacheKey = toCacheKey(worldDir, mapType, chunkX, chunkZ);
+        this.theHashCode = theCacheKey.hashCode();
     }
 
     public static ChunkCoord fromChunkMD(File worldDir, MapType mapType, ChunkMD chunkMd)
@@ -40,27 +43,22 @@ public class ChunkCoord
 
     public static ChunkCoord fromChunkPos(final File worldDir, final MapType mapType, final int chunkX, final int chunkZ)
     {
-        // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
-        // unfortunately, so there's no reliable key.  If there's a collision, we put in a new one.
-        int hash = toHash(worldDir, mapType, chunkX, chunkZ);
-        ChunkCoord chunkCoord = cache.getIfPresent(hash);
+        String key = toCacheKey(worldDir, mapType, chunkX, chunkZ);
+        ChunkCoord chunkCoord = cache.getIfPresent(key);
         if (chunkCoord == null || chunkCoord.chunkX != chunkX || chunkCoord.chunkZ != chunkZ || !Objects.equals(chunkCoord.mapType, mapType))
         {
             //JourneyMap.getLogger().info("ChunkCoord from cache had hash collision: " + chunkCoord + " vs " + mapType + ", chunkX:" + chunkX + ", chunkZ:" + chunkZ);
             chunkCoord = new ChunkCoord(worldDir, mapType, chunkX, chunkZ);
-            cache.put(hash, chunkCoord);
+            cache.put(key, chunkCoord);
         }
         return chunkCoord;
     }
 
-    public static int toHash(File worldDir, final MapType mapType, int chunkX, int chunkZ)
+    public static String toCacheKey(File worldDir, final MapType mapType, int chunkX, int chunkZ)
     {
-        int result = worldDir.hashCode();
-        result = 31 * result + mapType.hashCode();
-        result = 31 * result + chunkX;
-        result = 31 * result + chunkZ;
-        return result;
+        return "" + chunkX + "," + chunkZ + mapType.toCacheKey() + worldDir.getName();
     }
+
 
     public RegionCoord getRegionCoord()
     {
@@ -111,10 +109,15 @@ public class ChunkCoord
         return true;
     }
 
+    public String cacheKey()
+    {
+        return theCacheKey;
+    }
+
     @Override
     public int hashCode()
     {
-        return toHash(worldDir, mapType, chunkX, chunkZ);
+        return theHashCode;
     }
 
     @Override
