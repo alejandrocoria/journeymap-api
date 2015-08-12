@@ -9,6 +9,7 @@
 package journeymap.client.model;
 
 import com.google.common.base.Objects;
+import journeymap.common.Journeymap;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -47,13 +48,22 @@ public abstract class ImageSet
     public boolean writeToDisk(boolean force)
     {
         boolean updated = false;
-        for (ImageHolder imageHolder : imageHolders.values())
+        try
         {
-            if (force || imageHolder.isDirty())
+            synchronized (imageHolders)
             {
-                imageHolder.writeToDisk();
-                updated = true;
+                for (ImageHolder imageHolder : imageHolders.values())
+                {
+                    if (force || imageHolder.isDirty())
+                    {
+                        imageHolder.writeToDisk();
+                        updated = true;
+                    }
+                }
             }
+
+        } catch (Throwable t) {
+            Journeymap.getLogger().error("Error writing ImageSet to disk: " + t);
         }
         return updated;
     }
@@ -79,11 +89,14 @@ public abstract class ImageSet
 
     public void clear()
     {
-        for (ImageHolder imageHolder : imageHolders.values())
+        synchronized (imageHolders)
         {
-            imageHolder.clear();
+            for (ImageHolder imageHolder : imageHolders.values())
+            {
+                imageHolder.clear();
+            }
+            imageHolders.clear();
         }
-        imageHolders.clear();
     }
 
     @Override
