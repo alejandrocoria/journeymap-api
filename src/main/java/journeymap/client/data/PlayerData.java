@@ -12,12 +12,14 @@ package journeymap.client.data;
 import com.google.common.cache.CacheLoader;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.JMLogger;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.biome.BiomeGenBase;
 
 /**
  * Provides game-related properties in a Map.
@@ -98,13 +100,16 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
         if (playerChunk != null)
         {
-            return ForgeHelper.INSTANCE.getBiome(playerChunk.getWorld(), MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
-            //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
+            try
+            {
+                BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(playerChunk.getWorld(), MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                return biome.biomeName;
+                //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
+            } catch (Exception e) {
+                JMLogger.logOnce("Couldn't get player biome: " + e.getMessage(), e);
+            }
         }
-        else
-        {
-            return "?"; //$NON-NLS-1$
-        }
+        return "?";
     }
 
     public long getTTL()

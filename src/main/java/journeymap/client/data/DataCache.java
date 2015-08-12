@@ -264,7 +264,7 @@ public class DataCache
                 }
                 return player.get(PlayerData.class);
             }
-            catch (ExecutionException e)
+            catch (Exception e)
             {
                 Journeymap.getLogger().error("ExecutionException in getPlayer: " + LogFormatter.toString(e));
                 return null;
