@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Forge Mod entry point
  */
-@Mod(modid = Journeymap.MOD_ID, name = Journeymap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true)
+@Mod(modid = Journeymap.MOD_ID, name = Journeymap.SHORT_MOD_NAME, version = "@JMVERSION@", canBeDeactivated = true, dependencies = "Forge@[${@FORGEVERSION@},)")
 public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
