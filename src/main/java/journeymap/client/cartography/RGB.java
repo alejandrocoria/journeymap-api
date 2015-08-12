@@ -17,6 +17,7 @@ import java.util.Collection;
 public final class RGB
 {
     transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
+    public static final int ALPHA_OPAQUE = 0xff000000;
 
     /**
      * Don't instantiate.
@@ -30,7 +31,7 @@ public final class RGB
      */
     public static Paint paintOf(int rgb)
     {
-        return PIXEL_PAINT.setColor(rgb);
+        return PIXEL_PAINT.setColor(ALPHA_OPAQUE | rgb);
     }
 
     /**
@@ -138,7 +139,7 @@ public final class RGB
 
     public static int toInteger(float r, float g, float b)
     {
-        return ((255 & 0xFF) << 24) |
+        return ((0xFF) << 24) |
                 (((int) (r * 255 + 0.5) & 0xFF) << 16) |
                 (((int) (g * 255 + 0.5) & 0xFF) << 8) |
                 (((int) (b * 255 + 0.5) & 0xFF));
@@ -146,7 +147,7 @@ public final class RGB
 
     public static int toInteger(float[] rgb)
     {
-        return ((255 & 0xFF) << 24) |
+        return ((0xFF) << 24) |
                 (((int) (rgb[0] * 255 + 0.5) & 0xFF) << 16) |
                 (((int) (rgb[1] * 255 + 0.5) & 0xFF) << 8) |
                 (((int) (rgb[2] * 255 + 0.5) & 0xFF));
@@ -154,7 +155,7 @@ public final class RGB
 
     public static int toInteger(int r, int g, int b)
     {
-        return ((255 & 0xFF) << 24) |
+        return ((0xFF) << 24) |
                 ((r & 0xFF) << 16) |
                 ((g & 0xFF) << 8) |
                 ((b & 0xFF));
@@ -162,7 +163,7 @@ public final class RGB
 
     public static int toInteger(int[] rgb)
     {
-        return ((255 & 0xFF) << 24) |
+        return  ((0xFF) << 24) |
                 ((rgb[0] & 0xFF) << 16) |
                 ((rgb[1] & 0xFF) << 8) |
                 ((rgb[2] & 0xFF));
@@ -326,6 +327,5 @@ public final class RGB
     {
         return value < 0 ? 0 : (value > 255 ? 255 : value);
     }
-
 
 }

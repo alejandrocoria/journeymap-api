@@ -246,7 +246,7 @@ public class ColorPalette
                 Float alpha = blockColor.alpha;
                 blockMD.setAlpha((alpha != null) ? alpha : 1f);
             }
-            int color = Integer.parseInt(blockColor.color.replaceFirst("#", ""), 16);
+            int color = RGB.ALPHA_OPAQUE | Integer.parseInt(blockColor.color.replaceFirst("#", ""), 16);
             map.put(blockMD, color);
         }
         return map;
