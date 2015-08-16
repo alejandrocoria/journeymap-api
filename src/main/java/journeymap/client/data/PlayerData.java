@@ -103,7 +103,11 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
             try
             {
                 BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(playerChunk.getWorld(), MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
-                return biome.biomeName;
+                // Can be null right after spawn/teleport before chunks loaded
+                if(biome!=null)
+                {
+                    return biome.biomeName;
+                }
                 //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
             } catch (Exception e) {
                 JMLogger.logOnce("Couldn't get player biome: " + e.getMessage(), e);
