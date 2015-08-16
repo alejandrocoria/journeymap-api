@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -154,40 +153,33 @@ public class RegionImageCache
         lastFlush = System.currentTimeMillis();
     }
 
+    public long getLastFlush()
+    {
+        return lastFlush;
+    }
+
     /**
-     * Get a list of regions in the cache that are dirty.
+     * Get a list of region images in the cache updated since the time specified.
      * This won't include regions which changed but have already been removed from the cache.
      *
      * @param time
      * @return
      */
-    public List<RegionCoord> getDirtySince(final MapType mapType, long time)
+    public List<RegionCoord> getChangedSince(final MapType mapType, long time)
     {
-        if (time <= lastFlush)
+        ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
+        for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            if (logger.isEnabled(Level.DEBUG))
+            if(regionImageSet.updatedSince(mapType, time))
             {
-                logger.debug("Nothing dirty, last flush was " + (time - lastFlush) + "ms before " + time);
+                list.add(regionImageSet.getRegionCoord());
             }
-            return Collections.EMPTY_LIST;
         }
-        else
+        if (logger.isEnabled(Level.DEBUG))
         {
-            ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
-            for (RegionImageSet regionImageSet : getRegionImageSets())
-            {
-                ImageHolder imageHolder = regionImageSet.imageHolders.get(mapType);
-                if (imageHolder != null && imageHolder.getImageTimestamp() > time)
-                {
-                    list.add(regionImageSet.getRegionCoord());
-                }
-            }
-            if (logger.isEnabled(Level.DEBUG))
-            {
-                logger.debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
-            }
-            return list;
+            logger.debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
         }
+        return list;
     }
 
     /**

@@ -70,18 +70,25 @@ public abstract class ImageSet
 
     public boolean updatedSince(MapType mapType, long time)
     {
-        for (ImageHolder imageHolder : imageHolders.values())
+        synchronized (imageHolders)
         {
-            if (mapType != null)
+            if (mapType == null)
             {
-                if (imageHolder.getMapType() == mapType && imageHolder.getImageTimestamp() > time)
+                for(ImageHolder holder : imageHolders.values())
+                {
+                    if(holder!=null && holder.getImageTimestamp() >= time)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                ImageHolder imageHolder = imageHolders.get(mapType);
+                if (imageHolder != null && imageHolder.getImageTimestamp() >= time)
                 {
                     return true;
                 }
-            }
-            else if (imageHolder.getImageTimestamp() > time)
-            {
-                return true;
             }
         }
         return false;

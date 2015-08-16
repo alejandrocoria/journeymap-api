@@ -26,8 +26,13 @@ public class ImagesData
 {
     public static final String PARAM_SINCE = "images.since";
 
+    // last query time
     final long since;
+
+    // list of region coords changed {[x][z]}
     final List<Object[]> regions;
+
+    // Last time this was queried
     final long queryTime;
 
     /**
@@ -36,19 +41,18 @@ public class ImagesData
     public ImagesData(Long since)
     {
         final long now = new Date().getTime();
-        this.since = (since == null) ? now : since;
         this.queryTime = now;
+        this.since = (since == null) ? now : since;
 
-        List<Object[]> coords = null;
-        List<RegionCoord> regions = RegionImageCache.instance().getDirtySince(null, this.since);
-        if (regions.isEmpty())
+        List<RegionCoord> dirtyRegions = RegionImageCache.instance().getChangedSince(null, this.since);
+        if (dirtyRegions.isEmpty())
         {
             this.regions = Collections.EMPTY_LIST;
         }
         else
         {
-            this.regions = new ArrayList<Object[]>(regions.size());
-            for (RegionCoord rc : regions)
+            this.regions = new ArrayList<Object[]>(dirtyRegions.size());
+            for (RegionCoord rc : dirtyRegions)
             {
                 this.regions.add(new Integer[]{rc.regionX, rc.regionZ});
             }
