@@ -9,6 +9,7 @@
 package journeymap.client.model.mod;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
@@ -29,6 +30,8 @@ public class Vanilla
 {
     public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
     {
+        private static final int giantMushroomBlockMeta = BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata();
+
         @Override
         public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache blockMDCache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
         {
@@ -60,7 +63,9 @@ public class Vanilla
             blockMDCache.setFlags(Blocks.air, HasAir, OpenToSky, NoShadow, OpenToSky);
             // 1.7 only
             // blockMDCache.setFlags(Blocks.fence, TransparentRoof);
-            blockMDCache.setFlags(Blocks.fire, NoShadow, Side2Texture);
+            blockMDCache.setFlags(Blocks.fire, NoShadow);
+            blockMDCache.setTextureSide(Blocks.fire, 2);
+
             blockMDCache.setFlags(Blocks.flowing_water, Water);
             blockMDCache.setFlags(Blocks.flowing_lava, NoShadow);
             blockMDCache.setFlags(Blocks.glass, TransparentRoof);
@@ -77,7 +82,8 @@ public class Vanilla
             blockMDCache.setFlags(Blocks.tripwire_hook, NoShadow);
             blockMDCache.setFlags(Blocks.unlit_redstone_torch, HasAir, NoShadow);
             blockMDCache.setFlags(Blocks.water, NoShadow, Water);
-            blockMDCache.setFlags(Blocks.web, OpenToSky, Side2Texture);
+            blockMDCache.setFlags(Blocks.web, OpenToSky);
+            blockMDCache.setTextureSide(Blocks.web, 2);
 
             // Set flags based on inheritance
             for (Block block : GameData.getBlockRegistry().typeSafeIterable())
@@ -125,7 +131,8 @@ public class Vanilla
 
                 if (block instanceof BlockCrops)
                 {
-                    blockMDCache.setFlags(block, Side2Texture, Crop, NoTopo);
+                    blockMDCache.setFlags(block, Crop, NoTopo);
+                    blockMDCache.setTextureSide(block, 2);
                     if (!JourneymapClient.getCoreProperties().mapPlantShadows.get())
                     {
                         blockMDCache.setFlags(block, NoShadow);
@@ -133,7 +140,8 @@ public class Vanilla
                 }
                 else if (block instanceof BlockBush || block instanceof BlockCactus || block instanceof BlockDeadBush)
                 {
-                    blockMDCache.setFlags(block, Side2Texture, Plant, NoTopo);
+                    blockMDCache.setFlags(block, Plant, NoTopo);
+                    blockMDCache.setTextureSide(block, 2);
                     if (!JourneymapClient.getCoreProperties().mapPlantShadows.get())
                     {
                         blockMDCache.setFlags(block, NoShadow);
@@ -145,14 +153,28 @@ public class Vanilla
                 }
             }
 
+            // Giant mushrooms get special handling
+            //TODO: Verify in 1.7, then remove this todo if it works.
+            blockMDCache.setTextureSide(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
+            blockMDCache.setTextureSide(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
+
+//            blockMDCache.setFlags(Blocks.brown_mushroom_block, SpecialHandling);
+//            blockMDCache.setFlags(Blocks.red_mushroom_block, SpecialHandling);
+//            return Arrays.asList(
+//                    blockMDCache.findUniqueIdentifierFor(Blocks.brown_mushroom_block),
+//                    blockMDCache.findUniqueIdentifierFor(Blocks.red_mushroom_block)
+//            );
             return null;
         }
 
+        /**
+         * Giant mushrooms get special handling.
+         * TODO: Verify in 1.7, then remove this todo if it works.
+         */
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            // No blocks need special handling
-            return blockMD;
+            return DataCache.instance().getBlockMD(blockMD.getBlock(), giantMushroomBlockMeta);
         }
     }
 }
