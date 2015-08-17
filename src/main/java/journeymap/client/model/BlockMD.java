@@ -16,7 +16,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -44,7 +43,7 @@ public class BlockMD
      */
     public final String name;
     private final EnumSet<Flag> flags;
-    private transient Block block;
+    private final Block block;
     private Integer color;
     private float alpha;
     private String iconName;
@@ -90,7 +89,6 @@ public class BlockMD
     {
         this.uid = uid;
         this.meta = meta;
-        this.block = block;
         this.name = (displayName == null) ? this.uid.name : displayName;
         if(flags==null) flags = EnumSet.noneOf(BlockMD.Flag.class);
         this.flags = flags;
@@ -102,7 +100,18 @@ public class BlockMD
             {
                 color = RGB.toInteger(17, 12, 25);
             }
+
+            // 1.7.10
+            // block = GameRegistry.findBlock(uid.modId, uid.name);
+
+            // 1.8 TODO: Should work in 1.7 too, verify
+            block = GameData.getBlockRegistry().getObject(uid.toString());
+            if (block == null)
+            {
+                block = Blocks.air;
+            }
         }
+        this.block = block;
     }
 
     public static String getBlockName(Block block, int meta)
@@ -248,18 +257,6 @@ public class BlockMD
      */
     public Block getBlock()
     {
-        if (block == null)
-        {
-            // 1.7.10
-            // block = GameRegistry.findBlock(uid.modId, uid.name);
-
-            // 1.8 TODO: Should work in 1.7 too, verify
-            block = GameData.getBlockRegistry().getObject(uid.toString());
-            if (block == null)
-            {
-                block = Blocks.air;
-            }
-        }
         return block;
     }
 
@@ -280,7 +277,7 @@ public class BlockMD
      */
     public boolean isAir()
     {
-        return getBlock() instanceof BlockAir || hasFlag(Flag.HasAir);
+        return block instanceof BlockAir || hasFlag(Flag.HasAir);
     }
 
     /**
@@ -300,7 +297,6 @@ public class BlockMD
      */
     public boolean isTorch()
     {
-        getBlock();
         return block == Blocks.torch || block == Blocks.redstone_torch || block == Blocks.unlit_redstone_torch;
     }
 
@@ -311,8 +307,7 @@ public class BlockMD
      */
     public boolean isWater()
     {
-        getBlock();
-        return block == Blocks.water || block == Blocks.flowing_water;
+        return hasFlag(Flag.Water);
     }
 
     /**
@@ -332,7 +327,6 @@ public class BlockMD
      */
     public boolean isLava()
     {
-        getBlock();
         return block == Blocks.lava || block == Blocks.flowing_lava;
     }
 
@@ -343,7 +337,17 @@ public class BlockMD
      */
     public boolean isFoliage()
     {
-        return getBlock() instanceof BlockLeavesBase;
+        return hasFlag(Flag.Foliage);
+    }
+
+    /**
+     * Is grass.
+     *
+     * @return the boolean
+     */
+    public boolean isGrass()
+    {
+        return hasFlag(Flag.Grass);
     }
 
     /**
@@ -435,6 +439,21 @@ public class BlockMD
          * Block color is custom + determined by biome.
          */
         CustomBiomeColor,
+
+        /**
+         * Block color is determined by biome foliage multiplier
+        */
+        Foliage,
+
+        /**
+         * Block color is determined by biome grass multiplier
+         */
+        Grass,
+
+        /**
+         * Block color is determined by biome water multiplier
+         */
+        Water,
 
         /**
          * Block doesn't count as overhead cover.

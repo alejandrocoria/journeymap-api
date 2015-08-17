@@ -11,6 +11,7 @@ package journeymap.client.model.mod;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,46 +21,63 @@ import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
+import static journeymap.client.model.BlockMD.Flag.*;
+
 /**
- * Delegate getting the block used to texture a CarpentersBlock
+ * Special handling for CarpentersBlocks to get the proper color of the wrapped block, etc.
  */
 public class CarpentersBlocks
 {
     public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
     {
-        private static final String MODPREFIX = "CarpentersBlocks:";
-
-        private static final List<String> BLOCKNAMES = Arrays.asList(
-                "blockCarpentersBlock", "blockCarpentersBarrier",
-                "blockCarpentersBed", "blockCarpentersCollapsibleBlock", "blockCarpentersDaylightSensor", "blockCarpentersDoor",
-                "blockCarpentersFlowerPot", "blockCarpentersGarageDoor", "blockCarpentersGate", "blockCarpentersHatch",
-                "blockCarpentersPressurePlate", "blockCarpentersSafe", "blockCarpentersSlope", "blockCarpentersStairs");
-
-        private static final Collection<GameRegistry.UniqueIdentifier> UIDS = initUIDs();
+        private static final String MODID = "CarpentersBlocks";
         private static final String TAG_ATTR_LIST = "cbAttrList";
         private static final String TAG_ID = "id";
         private static final String TAG_DAMAGE = "Damage";
 
-        private static Collection<GameRegistry.UniqueIdentifier> initUIDs()
-        {
-            List<GameRegistry.UniqueIdentifier> list = new ArrayList<GameRegistry.UniqueIdentifier>(BLOCKNAMES.size());
-            for (String name : BLOCKNAMES)
-            {
-                list.add(new GameRegistry.UniqueIdentifier(MODPREFIX + name));
-            }
-            return list;
-        }
-
+        /**
+         * Sets special handling for all CarpentersBlocks except torches, which are
+         * treated like vanilla torches and not mapped.
+         */
         @Override
-        public Collection<GameRegistry.UniqueIdentifier> getBlockUids()
+        public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
         {
-            return UIDS;
+            List<GameRegistry.UniqueIdentifier> specialHandlingUids = new ArrayList<GameRegistry.UniqueIdentifier>(16);
+            for (GameRegistry.UniqueIdentifier uid : registeredBlockIds)
+            {
+                if(uid.modId.equals(MODID))
+                {
+                    if(uid.name.equals("blockCarpentersTorch"))
+                    {
+                        cache.setFlags(uid, HasAir, NoShadow);
+                    }
+                    else if(uid.name.equals("blockCarpentersLadder"))
+                    {
+                        cache.setFlags(uid, SpecialHandling, OpenToSky);
+                        specialHandlingUids.add(uid);
+                    }
+                    else
+                    {
+                        cache.setFlags(uid, SpecialHandling);
+                        specialHandlingUids.add(uid);
+                    }
+                }
+            }
+            return specialHandlingUids;
         }
 
+        /**
+         * Get the block flagged with used to color the carpenter's block.
+         *
+         * @param chunkMD   Containing chunk
+         * @param blockMD   CarpentersBlock flagged with SpecialHandling
+         * @param localX    x local to chunk
+         * @param y         y
+         * @param localZ    z local to chunk
+         * @return          block used to provide color
+         */
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
@@ -93,12 +111,5 @@ public class CarpentersBlocks
             }
             return blockMD;
         }
-
-//        @Override
-//        public IIcon getIcon(BlockMD blockMD)
-//        {
-//            // com.carpentersblocks.util.BlockProperties.MASK_DEFAULT_ICON = 16;
-//            return blockMD.getBlock().getIcon(1, 16);
-//        }
     }
 }
