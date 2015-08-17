@@ -83,7 +83,8 @@ public class ColorCache
                 modPackSame = true;
             }
 
-            if (!resourcePackSame || !modPackSame)
+            // TODO: Don't check in
+            //if (!resourcePackSame || !modPackSame)
             {
                 reset();
 

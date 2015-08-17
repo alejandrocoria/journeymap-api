@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
+import static journeymap.client.model.BlockMD.Flag.OverrideMeta;
 import static journeymap.client.model.BlockMD.Flag.SpecialHandling;
 
 /**
@@ -33,6 +34,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
+    private final HashMap<Block, Integer> blockOverrideMetas;
     private ModBlockDelegate modBlockDelegate;
 
     public BlockMDCache()
@@ -44,7 +46,8 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         VOIDBLOCK = new BlockMD("Void", voidUid, null, 0, 1f, null);
 
         blockFlags = new HashMap<Block, EnumSet<BlockMD.Flag>>(64);
-        blockAlphas = new HashMap<Block, Float>(8);
+        blockAlphas = new HashMap<Block, Float>(16);
+        blockOverrideMetas = new HashMap<Block, Integer>(16);
     }
 
     /**
@@ -257,6 +260,30 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         // safety check on value
         alpha = Math.min(Math.max(0f, alpha), 1f);
         blockAlphas.put(block, alpha);
+    }
+
+    public void setTextureSide(GameRegistry.UniqueIdentifier blockid, int side)
+    {
+        Block block = GameData.getBlockRegistry().getObject(blockid);
+        if(block!=null)
+        {
+            setTextureSide(block, side);
+        }
+        else
+        {
+            Journeymap.getLogger().error(String.format("Can't find block with id %s; unable to set texture side", blockid));
+        }
+    }
+
+    public void setTextureSide(Block block, int side)
+    {
+        setFlags(block, OverrideMeta);
+        blockOverrideMetas.put(block, side);
+    }
+
+    public Integer getOverrideMeta(Block block)
+    {
+        return blockOverrideMetas.get(block);
     }
 
     public void setAlpha(GameRegistry.UniqueIdentifier blockid, Float alpha)

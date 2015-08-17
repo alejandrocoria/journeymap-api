@@ -131,7 +131,7 @@ public class ColorHelper_1_8 implements IColorHelper
 //            catch (Throwable t)
 //            {
 //                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
-//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
 //                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
 //            }
 //
@@ -150,7 +150,7 @@ public class ColorHelper_1_8 implements IColorHelper
 //
 //            if (blockIcon == null)
 //            {
-//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
 //                while (blockIcon == null && side >= 0)
 //                {
 //                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
@@ -159,7 +159,15 @@ public class ColorHelper_1_8 implements IColorHelper
 //            }
 //        }
 
-        IBlockState state = blockMD.getBlock().getStateFromMeta(blockMD.meta);
+        // TODO: Make this work with 1.7
+        Integer overrideMeta = null;
+        if(blockMD.hasOverrideMeta())
+        {
+            overrideMeta = blockMD.getOverrideMeta();
+        }
+        int meta = overrideMeta!=null ? overrideMeta : blockMD.meta;
+
+        IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
         return ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }

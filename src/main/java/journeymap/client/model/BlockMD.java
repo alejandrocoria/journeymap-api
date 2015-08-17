@@ -351,6 +351,15 @@ public class BlockMD
     }
 
     /**
+     * Has an override meta to use
+     * @return
+     */
+    public boolean hasOverrideMeta()
+    {
+        return hasFlag(Flag.OverrideMeta);
+    }
+
+    /**
      * Is biome colored.
      *
      * @return the boolean
@@ -358,6 +367,15 @@ public class BlockMD
     public boolean isBiomeColored()
     {
         return hasAnyFlag(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
+    }
+
+    /**
+     * Returns the override meta to use when deriving color, or null if no override specified.
+     * @return
+     */
+    public Integer getOverrideMeta()
+    {
+        return DataCache.instance().getBlockMetadata().getOverrideMeta(block);
     }
 
     @Override
@@ -461,9 +479,9 @@ public class BlockMD
         NoShadow,
 
         /**
-         * Block's color should come from the side 2 texture.
+         * Block's color should come from the override meta
          */
-        Side2Texture,
+        OverrideMeta,
 
         /**
          * Block isn't opaque.

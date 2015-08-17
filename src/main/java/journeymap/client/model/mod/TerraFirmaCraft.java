@@ -41,7 +41,8 @@ public class TerraFirmaCraft
                     }
                     else if(name.contains("seagrass"))
                     {
-                        cache.setFlags(uid, Side2Texture, Plant);
+                        cache.setFlags(uid, Plant);
+                        cache.setTextureSide(uid, 2);
                     }
                     else if(name.contains("grass") || name.contains("dirt"))
                     {

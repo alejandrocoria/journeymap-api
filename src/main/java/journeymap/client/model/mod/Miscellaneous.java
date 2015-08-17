@@ -57,7 +57,8 @@ public class Miscellaneous
             GameRegistry.UniqueIdentifier maricultureKelpId = new GameRegistry.UniqueIdentifier("Mariculture:kelp");
             if(registeredBlockIds.contains(maricultureKelpId))
             {
-                cache.setFlags(maricultureKelpId, Side2Texture, Plant);
+                cache.setFlags(maricultureKelpId, Plant);
+                cache.setTextureSide(maricultureKelpId, 2);
             }
 
             // Thaumcraft leaves (greatwood, silverwood)

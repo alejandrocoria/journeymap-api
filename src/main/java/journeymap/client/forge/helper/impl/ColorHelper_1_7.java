@@ -11,8 +11,6 @@ package journeymap.client.forge.helper.impl;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.model.BlockMD;
 
-import java.awt.*;
-
 /**
  * IColorHelper implementation for 1.7.   Formerly IconLoader.
  */
@@ -126,7 +124,7 @@ public class ColorHelper_1_7 implements IColorHelper
 //            catch (Throwable t)
 //            {
 //                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
-//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
 //                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
 //            }
 //
@@ -145,7 +143,7 @@ public class ColorHelper_1_7 implements IColorHelper
 //
 //            if (blockIcon == null)
 //            {
-//                int side = blockMD.hasFlag(BlockMD.Flag.Side2Texture) ? 2 : 1;
+//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
 //                while (blockIcon == null && side >= 0)
 //                {
 //                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
