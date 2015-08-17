@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -298,10 +297,15 @@ public class ColorHelper_1_8 implements IColorHelper
                 }
                 else if (block.getRenderType() > 0)
                 {
-                    blockAlpha = a * 1.0f / 255; // try to use texture alpha
-                    if (blockAlpha == 1f)
+                    // 1.8 check translucent because lava's opacity = 0;
+                    if (block.isTranslucent())
                     { // try to use light opacity
                         blockAlpha = block.getLightOpacity() / 255f;
+                    }
+
+                    // try to use texture alpha
+                    if(blockAlpha==0 || blockAlpha==1) {
+                        blockAlpha = a * 1.0f / 255;
                     }
                 }
             }
