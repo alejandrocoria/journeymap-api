@@ -278,6 +278,10 @@ public class MapPlayerTask extends BaseMapTask
         @Override
         public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
         {
+            if(mc.thePlayer==null) {
+                return;
+            }
+
             startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
             DataCache.instance().invalidateChunkMDCache();
