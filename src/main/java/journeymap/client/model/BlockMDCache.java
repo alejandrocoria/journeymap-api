@@ -26,7 +26,7 @@ import java.util.*;
 import static journeymap.client.model.BlockMD.Flag.*;
 
 /**
- * Created by Mark on 7/14/2014.
+ * Block MetaData Cache
  */
 public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 {
@@ -34,7 +34,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public final BlockMD VOIDBLOCK;
     private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
     private final HashMap<Block, Float> blockAlphas;
-    //private final Multimap<String, Block> blocksForIconName = MultimapBuilder.ListMultimapBuilder.hashKeys().arrayListValues().build();
     private final ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
 
     public BlockMDCache()
@@ -90,6 +89,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 //        setFlags(Blocks.fence, TransparentRoof);
         setFlags(Blocks.fire, NoShadow, Side2Texture);
         setFlags(Blocks.flowing_water, BiomeColor);
+        setFlags(Blocks.flowing_lava, NoShadow);
         setFlags(Blocks.glass, TransparentRoof);
         setFlags(Blocks.glass_pane, TransparentRoof);
         setFlags(Blocks.grass, BiomeColor);
@@ -136,21 +136,20 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
 
         // TODO: Move into mod handler
+        // TerraFirmaCraft blocks
+        List<String> tfcBlocks = Arrays.asList("LooseRock", "Grass", "Grass2", "ClayGrass", "ClayGrass2", "DryGrass", "DryGrass2", "FreshWater",
+                "FreshWaterStationary", "PeatGrass", "TallGrass", "SaltWater", "SaltWaterStationary", "SeaGrassStill");
+        for(String tfcBlock : tfcBlocks)
+        {
+            modBlockUIDs.put(new GameRegistry.UniqueIdentifier("tfc2:" + tfcBlock), EnumSet.of(BiomeColor));
+            modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:" + tfcBlock), EnumSet.of(BiomeColor));
+        }
+
         // More mod-specific overrides
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Mariculture:kelp"), EnumSet.of(Side2Texture, Plant));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("tfc2:LooseRock"), EnumSet.of(HasAir, NoShadow));
+        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("tfc2:SeaGrassStill"), EnumSet.of(Side2Texture));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:LooseRock"), EnumSet.of(HasAir, NoShadow));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:Grass"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:Grass2"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:ClayGrass"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:ClayGrass2"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:DryGrass2"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:FreshWater"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:FreshWaterStationary"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:PeatGrass"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:TallGrass"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SaltWater"), EnumSet.of(BiomeColor));
-        modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SaltWaterStationary"), EnumSet.of(BiomeColor));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("terrafirmacraft:SeaGrassStill"), EnumSet.of(Side2Texture));
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves"), EnumSet.of(BiomeColor)); // Thaumcraft:blockMagicalLeaves Greatwood Leaves #2C6F0E
         modBlockUIDs.put(new GameRegistry.UniqueIdentifier("CarpentersBlocks:blockCarpentersLadder"), EnumSet.of(OpenToSky));
