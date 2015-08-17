@@ -357,7 +357,7 @@ public class BlockMD
      */
     public boolean isBiomeColored()
     {
-        return flags.contains(Flag.BiomeColor) || flags.contains(Flag.CustomBiomeColor);
+        return hasAnyFlag(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     }
 
     @Override
@@ -429,11 +429,6 @@ public class BlockMD
          * Block should be treated like air.
          */
         HasAir,
-
-        /**
-         * Block color is determined by biome.
-         */
-        BiomeColor,
 
         /**
          * Block color is custom + determined by biome.

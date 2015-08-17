@@ -19,7 +19,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.item.Item;
@@ -27,9 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.common.registry.GameData;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * Cache of block baseColors derived from the current texture pack.
@@ -287,9 +285,7 @@ public class ColorCache
      */
     public Integer getBiomeBlockColor(BiomeGenBase biome, BlockMD blockMD, int x, int y, int z)
     {
-        Block block = blockMD.getBlock();
-
-        if (block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant)
+        if (blockMD.isGrass())
         {
             return getGrassColor(blockMD, biome, x, y, z);
         }
@@ -299,7 +295,7 @@ public class ColorCache
             return getWaterColor(blockMD, biome, x, y, z);
         }
 
-        if (blockMD.isFoliage() || block instanceof BlockVine)
+        if (blockMD.isFoliage())
         {
             return getFoliageColor(blockMD, biome, x, y, z);
         }
@@ -412,8 +408,8 @@ public class ColorCache
                 if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF))
                 { // white without alpha, white with alpha
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                    DataCache.instance().getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.BiomeColor);
-                    Journeymap.getLogger().debug("Custom biome tint discovered for " + blockMD);
+                    DataCache.instance().getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.CustomBiomeColor);
+                    Journeymap.getLogger().info("Custom biome tint discovered for " + blockMD);
                 }
                 else
                 {

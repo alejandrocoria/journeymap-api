@@ -45,7 +45,6 @@ public class Vanilla
             blockMDCache.setAlpha(Blocks.stained_glass, .5F);
             blockMDCache.setAlpha(Blocks.stained_glass_pane, .5F);
             blockMDCache.setAlpha(Blocks.torch, .5F);
-            blockMDCache.setAlpha(Blocks.vine, .2F);
             blockMDCache.setAlpha(Blocks.water, .3F);
 
             // Set optional flags
@@ -59,32 +58,25 @@ public class Vanilla
 
             // Set manual flags
             blockMDCache.setFlags(Blocks.air, HasAir, OpenToSky, NoShadow, OpenToSky);
-            blockMDCache.setFlags(Blocks.double_plant, BiomeColor);
-//        blockMDCache.setFlags(Blocks.fence, TransparentRoof);
+            // 1.7 only
+            // blockMDCache.setFlags(Blocks.fence, TransparentRoof);
             blockMDCache.setFlags(Blocks.fire, NoShadow, Side2Texture);
-            blockMDCache.setFlags(Blocks.flowing_water, BiomeColor);
+            blockMDCache.setFlags(Blocks.flowing_water, Water);
             blockMDCache.setFlags(Blocks.flowing_lava, NoShadow);
             blockMDCache.setFlags(Blocks.glass, TransparentRoof);
             blockMDCache.setFlags(Blocks.glass_pane, TransparentRoof);
-            blockMDCache.setFlags(Blocks.grass, BiomeColor);
             blockMDCache.setFlags(Blocks.iron_bars, TransparentRoof);
             blockMDCache.setFlags(Blocks.ladder, OpenToSky);
             blockMDCache.setFlags(Blocks.lava, NoShadow);
-            blockMDCache.setFlags(Blocks.leaves, OpenToSky, BiomeColor, NoTopo);
-            blockMDCache.setFlags(Blocks.leaves2, OpenToSky, BiomeColor, NoTopo);
-            blockMDCache.setFlags(Blocks.log, OpenToSky, BiomeColor, NoTopo);
-            blockMDCache.setFlags(Blocks.log2, OpenToSky, BiomeColor, NoTopo);
-            blockMDCache.setFlags(Blocks.redstone_torch, HasAir);
+            blockMDCache.setFlags(Blocks.redstone_torch, HasAir, NoShadow, NoTopo);
             blockMDCache.setFlags(Blocks.snow_layer, NoTopo);
             blockMDCache.setFlags(Blocks.stained_glass, TransparentRoof, Transparency);
             blockMDCache.setFlags(Blocks.stained_glass_pane, TransparentRoof, Transparency);
-            blockMDCache.setFlags(Blocks.tallgrass, BiomeColor);
-            blockMDCache.setFlags(Blocks.torch, HasAir, NoShadow);
+            blockMDCache.setFlags(Blocks.torch, HasAir, NoShadow, NoTopo);
             blockMDCache.setFlags(Blocks.tripwire, NoShadow);
             blockMDCache.setFlags(Blocks.tripwire_hook, NoShadow);
             blockMDCache.setFlags(Blocks.unlit_redstone_torch, HasAir, NoShadow);
-            blockMDCache.setFlags(Blocks.vine, OpenToSky, NoShadow, BiomeColor);
-            blockMDCache.setFlags(Blocks.water, NoShadow, BiomeColor);
+            blockMDCache.setFlags(Blocks.water, NoShadow, Water);
             blockMDCache.setFlags(Blocks.web, OpenToSky, Side2Texture);
 
             // Set flags based on inheritance
@@ -96,6 +88,11 @@ public class Vanilla
                     continue;
                 }
 
+                if(block instanceof BlockLog)
+                {
+                    blockMDCache.setFlags(block, OpenToSky, CustomBiomeColor, NoTopo);
+                }
+
                 // TODO: Check if this will work in 1.7.10
                 // If not, then need to uncomment fence lines at the top of this method
                 if (block instanceof BlockFence || block instanceof BlockFenceGate)
@@ -104,20 +101,26 @@ public class Vanilla
                     blockMDCache.setFlags(block, TransparentRoof);
                 }
 
-                if (block instanceof BlockGrass)
+                if (block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant)
                 {
                     blockMDCache.setFlags(block, Grass);
                 }
 
                 if (block instanceof BlockLeavesBase)
                 {
-                    blockMDCache.setFlags(block, Foliage, NoTopo);
+                    blockMDCache.setFlags(block, OpenToSky, Foliage, NoTopo);
+                }
+
+                if (block instanceof BlockVine)
+                {
+                    blockMDCache.setAlpha(block, .2F);
+                    blockMDCache.setFlags(block, OpenToSky, Foliage, NoTopo, NoShadow);
                 }
 
                 // TODO: use foliage?
-                if (block instanceof BlockVine || block instanceof BlockLilyPad)
+                if (block instanceof BlockLilyPad)
                 {
-                    blockMDCache.setFlags(block, BiomeColor, NoTopo);
+                    blockMDCache.setFlags(block, CustomBiomeColor, NoTopo);
                 }
 
                 if (block instanceof BlockCrops)
