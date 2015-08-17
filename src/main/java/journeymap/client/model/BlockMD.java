@@ -92,8 +92,9 @@ public class BlockMD
         this.meta = meta;
         this.block = block;
         this.name = (displayName == null) ? this.uid.name : displayName;
+        if(flags==null) flags = EnumSet.noneOf(BlockMD.Flag.class);
         this.flags = flags;
-        this.alpha = alpha;
+        setAlpha(alpha);
         if (block == null)
         {
             // TODO: Get this out of here.
@@ -106,17 +107,21 @@ public class BlockMD
 
     public static String getBlockName(Block block, int meta)
     {
-        String name = block.getUnlocalizedName();
+        String name = null;
         try
         {
             name = ForgeHelper.INSTANCE.getBlockName(block, meta);
+            if(name==null)
+            {
+                name = block.getUnlocalizedName().replaceAll("tile.","").replaceAll("Block", "");
+            }
         }
         catch (Throwable t)
         {
             Journeymap.getLogger().debug("Displayname not available for " + name);
         }
 
-        if (Strings.isNullOrEmpty(name) || name.startsWith("tile"))
+        if (Strings.isNullOrEmpty(name))
         {
             name = block.getClass().getSimpleName().replaceAll("Block", "");
         }
