@@ -50,7 +50,7 @@ minecraft {
     replace "@MINOR@", config.jm_minor
     replace "@MICRO@", config.jm_micro
     replace "@PATCH@", config.jm_patch
-    mappings = "snapshot_20141130"
+    mappings = "snapshot_${config.snapshot}"
 }
 
 dependencies {
