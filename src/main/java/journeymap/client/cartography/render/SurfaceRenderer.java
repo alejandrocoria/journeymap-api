@@ -198,14 +198,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         continue blockLoop;
                     }
 
-                    // Check a block up
+                    // Plants/crops/double-tall need to check one or two blocks up
                     if (mapPlants || mapCrops)
                     {
                         BlockMD temp = chunkMd.getTopBlockMD(x, standardY + 1, z);
-                        if ((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) ||
-                                (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
+                        if ((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) || (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
                         {
-                            standardY++;
+                            standardY+=1;
                         }
                     }
 

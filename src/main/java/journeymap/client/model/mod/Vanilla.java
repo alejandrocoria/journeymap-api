@@ -9,7 +9,6 @@
 package journeymap.client.model.mod;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
@@ -93,43 +92,50 @@ public class Vanilla
                     blockMDCache.setFlags(block, HasAir, OpenToSky, NoShadow);
                     continue;
                 }
-
-                if(block instanceof BlockLog)
+                else if(block instanceof BlockLog)
                 {
                     blockMDCache.setFlags(block, OpenToSky, CustomBiomeColor, NoTopo);
                 }
-
                 // TODO: Check if this will work in 1.7.10
                 // If not, then need to uncomment fence lines at the top of this method
-                if (block instanceof BlockFence || block instanceof BlockFenceGate)
+                else if (block instanceof BlockFence || block instanceof BlockFenceGate)
                 {
                     blockMDCache.setAlpha(block, .4F);
                     blockMDCache.setFlags(block, TransparentRoof);
                 }
-
-                if (block instanceof BlockGrass || block instanceof BlockTallGrass || block instanceof BlockDoublePlant)
+                else if (block instanceof BlockGrass)
                 {
                     blockMDCache.setFlags(block, Grass);
                 }
-
-                if (block instanceof BlockLeavesBase)
+                else if (block instanceof BlockTallGrass)
+                {
+                    blockMDCache.setFlags(block, Plant);
+                    blockMDCache.setTextureSide(block, 2);
+                    String name = blockMDCache.findUniqueIdentifierFor(block).name;
+                    if(name.contains("fern") || name.contains("grass"))
+                    {
+                        blockMDCache.setFlags(block, Grass);
+                    }
+                }
+                else if(block instanceof BlockDoublePlant)
+                {
+                    blockMDCache.setFlags(block, Plant);
+                }
+                else if (block instanceof BlockLeavesBase)
                 {
                     blockMDCache.setFlags(block, OpenToSky, Foliage, NoTopo);
                 }
-
-                if (block instanceof BlockVine)
+                else if (block instanceof BlockVine)
                 {
                     blockMDCache.setAlpha(block, .2F);
                     blockMDCache.setFlags(block, OpenToSky, Foliage, NoTopo, NoShadow);
                 }
-
                 // TODO: use foliage?
-                if (block instanceof BlockLilyPad)
+                else if (block instanceof BlockLilyPad)
                 {
                     blockMDCache.setFlags(block, CustomBiomeColor, NoTopo);
                 }
-
-                if (block instanceof BlockCrops)
+                else if (block instanceof BlockCrops)
                 {
                     blockMDCache.setFlags(block, Crop, NoTopo);
                     blockMDCache.setTextureSide(block, 2);
@@ -174,7 +180,8 @@ public class Vanilla
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            return DataCache.instance().getBlockMD(blockMD.getBlock(), giantMushroomBlockMeta);
+            //return DataCache.instance().getBlockMD(blockMD.getBlock(), giantMushroomBlockMeta);
+            return blockMD;
         }
     }
 }

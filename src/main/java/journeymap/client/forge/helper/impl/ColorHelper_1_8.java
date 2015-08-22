@@ -17,6 +17,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -160,6 +161,7 @@ public class ColorHelper_1_8 implements IColorHelper
 //        }
 
         // TODO: Make this work with 1.7
+        Block block = blockMD.getBlock();
         Integer overrideMeta = null;
         if(blockMD.hasOverrideMeta())
         {
@@ -168,6 +170,17 @@ public class ColorHelper_1_8 implements IColorHelper
         int meta = overrideMeta!=null ? overrideMeta : blockMD.meta;
 
         IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
+
+        // Always get the upper portion of a double plant for rendering
+        if(block instanceof BlockDoublePlant)
+        {
+            if(state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
+            {
+                // cycle to upper
+                state = state.cycleProperty(BlockDoublePlant.HALF);
+            }
+        }
+
         return ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }

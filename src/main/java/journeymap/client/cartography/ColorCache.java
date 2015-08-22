@@ -145,7 +145,7 @@ public class ColorCache
     private ColorPalette generateColorPalette(boolean standard, boolean permanent)
     {
         long start = System.currentTimeMillis();
-        prefetchResourcePackColors();
+        //prefetchResourcePackColors();
         ColorPalette palette = null;
         try
         {
@@ -291,14 +291,14 @@ public class ColorCache
             return getGrassColor(blockMD, biome, x, y, z);
         }
 
-        if (blockMD.isWater())
-        {
-            return getWaterColor(blockMD, biome, x, y, z);
-        }
-
         if (blockMD.isFoliage())
         {
             return getFoliageColor(blockMD, biome, x, y, z);
+        }
+
+        if (blockMD.isWater())
+        {
+            return getWaterColor(blockMD, biome, x, y, z);
         }
 
         // Anything else, including those with CustomBiomeColor
@@ -309,7 +309,7 @@ public class ColorCache
     {
         Integer color = getBaseColor(blockMD, x, y, z);
         int tint = getBiomeColorMultiplier(blockMD, x, y, z);
-        if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF))
+        if ((tint != 0xFFFFFF) && (tint != 0xFFFFFFFF) && tint!=0)
         { // white without alpha, white with alpha
             color = RGB.multiply(color, tint);
             Journeymap.getLogger().debug("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
@@ -346,13 +346,13 @@ public class ColorCache
             // TODO: Defer calls to colorMultiplier to main thread only,
             // since some mods like Forestry mess up TileEntities when this is called
             // from a worker thread
-            return forgeHelper.getColorMultiplier(world, blockMD.getBlock(), x, 78, z) | 0xFF000000;
+            return forgeHelper.getColorMultiplier(world, blockMD.getBlock(), x, y, z);
         }
-        catch (NullPointerException e)
+        catch (Exception e)
         {
             // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
             Journeymap.getLogger().warn("Block throws NullPointerException when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName());
-            return 16777215;
+            return 0xffffff;
         }
     }
 
@@ -430,7 +430,8 @@ public class ColorCache
             baseColor = 0x000000;
             if (blockMD.hasFlag(BlockMD.Flag.TileEntity))
             {
-
+                // TODO: What to do about this?
+                Journeymap.getLogger().info("Iconloader ignoring tile entity: " + blockMD);
             }
             else if (colorHelper.failedFor(blockMD))
             {
