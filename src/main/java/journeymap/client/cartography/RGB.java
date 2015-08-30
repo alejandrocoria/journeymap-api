@@ -9,6 +9,7 @@
 package journeymap.client.cartography;
 
 import java.awt.*;
+import java.nio.ByteOrder;
 import java.util.Collection;
 
 /**
@@ -18,6 +19,7 @@ public final class RGB
 {
     transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
     public static final int ALPHA_OPAQUE = 0xff000000;
+    public static final int BLACK = -16777216;
 
     /**
      * Don't instantiate.
@@ -203,6 +205,19 @@ public final class RGB
     }
 
     /**
+     * Magic number adjustments.  Do not examine too closely.
+     */
+    public static int biomeDarken(int rgb)
+    {
+        float[] floats = floats(rgb);
+        float r,g,b;
+        r = floats[0]*floats[0]*.236f;
+        g = floats[1]*floats[1]*.601f;
+        b = floats[2]*floats[2]*.163f;
+        return toInteger(r,g,b);
+    }
+
+    /**
      * Darken or lighten a color by a factor.
      * If adjustBrightness, add a blue tint to simulate shadow.
      */
@@ -270,21 +285,70 @@ public final class RGB
      */
     public static int multiply(int rgb, int multiplier)
     {
+        float[] rgbFloats = floats(rgb);
+        float[] multFloats = floats(multiplier);
 
+        rgbFloats[0] = rgbFloats[0]*multFloats[0];
+        rgbFloats[1] = rgbFloats[1]*multFloats[1];
+        rgbFloats[2] = rgbFloats[2]*multFloats[2];
+
+        return toInteger(rgbFloats);
+    }
+
+    public static int multiply2(int rgb, int multiplier)
+    {
+        float[] multFloats = floats(multiplier);
+        float rMult = multFloats[0];
+        float gMult = multFloats[1];
+        float bMult = multFloats[2];
+
+        int rgb2 = rgb;
+        int r;
+        int g;
+        int b;
+
+        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)
+        {
+            r = (int)((float)(rgb2 & 255) * rMult);
+            g = (int)((float)(rgb2 >> 8 & 255) * gMult);
+            b = (int)((float)(rgb2 >> 16 & 255) * bMult);
+            rgb2 &= -16777216;
+            rgb2 |= b << 16 | g << 8 | r;
+        }
+        else
+        {
+            r = (int)((float)(rgb2 >> 24 & 255) * rMult);
+            g = (int)((float)(rgb2 >> 16 & 255) * gMult);
+            b = (int)((float)(rgb2 >> 8 & 255) * bMult);
+            rgb2 &= 255;
+            rgb2 |= r << 24 | g << 16 | b << 8;
+        }
+
+        return rgb2;
+    }
+
+    /**
+     * Adjust color rgb using a diff
+     * @param rgb
+     * @param diff
+     * @return
+     */
+    public static int subtract(int rgb, int diff)
+    {
         int alpha1 = rgb >> 24 & 0xFF;
         int red1 = rgb >> 16 & 0xFF;
         int green1 = rgb >> 8 & 0xFF;
         int blue1 = rgb & 0xFF;
 
-        int alpha2 = multiplier >> 24 & 0xFF;
-        int red2 = multiplier >> 16 & 0xFF;
-        int green2 = multiplier >> 8 & 0xFF;
-        int blue2 = multiplier & 0xFF;
+        int alpha2 = diff >> 24 & 0xFF;
+        int red2 = diff >> 16 & 0xFF;
+        int green2 = diff >> 8 & 0xFF;
+        int blue2 = diff & 0xFF;
 
-        int alpha = alpha1 * alpha2 / 255;
-        int red = red1 * red2 / 255;
-        int green = green1 * green2 / 255;
-        int blue = blue1 * blue2 / 255;
+        int alpha = clampInt(alpha1 - alpha2);
+        int red = clampInt(red1 - red2);
+        int green = clampInt(green1 - green2);
+        int blue = clampInt(blue1 - blue2);
 
         int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
 
