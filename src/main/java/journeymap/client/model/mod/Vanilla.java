@@ -109,12 +109,15 @@ public class Vanilla
                 }
                 else if (block instanceof BlockTallGrass)
                 {
-                    blockMDCache.setFlags(block, Plant);
-                    blockMDCache.setTextureSide(block, 2);
                     String name = blockMDCache.findUniqueIdentifierFor(block).name;
-                    if(name.contains("fern") || name.contains("grass"))
+                    if(name.contains("fern"))
                     {
-                        blockMDCache.setFlags(block, Grass);
+                        blockMDCache.setFlags(block, Plant, CustomBiomeColor);
+                        blockMDCache.setTextureSide(block, 2);
+                    }
+                    else
+                    {
+                        blockMDCache.setFlags(block, HasAir, NoTopo);
                     }
                 }
                 else if(block instanceof BlockDoublePlant)
