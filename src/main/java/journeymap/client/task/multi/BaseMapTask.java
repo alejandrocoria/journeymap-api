@@ -22,6 +22,8 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
@@ -118,8 +120,13 @@ public abstract class BaseMapTask implements ITask
                     try
                     {
                         ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, mapType, chunkMd);
-                        renderController.renderChunk(cCoord, chunkMd, mapType);
-                        count++;
+                        // TODO: Confirm this works as expected
+                        // Don't render the chunk if it's empty
+                        Chunk chunk = world.getChunkFromChunkCoords(cCoord.chunkX, cCoord.chunkZ);
+                        if(!(chunk instanceof EmptyChunk)) {
+                            renderController.renderChunk(cCoord, chunkMd, mapType);
+                            count++;
+                        }
                     }
                     catch (ChunkMD.ChunkMissingException e)
                     {

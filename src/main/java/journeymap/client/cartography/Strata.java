@@ -10,10 +10,12 @@ package journeymap.client.cartography;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
+import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.chunk.EmptyChunk;
 
 import java.util.Stack;
 
@@ -153,7 +155,7 @@ public class Strata
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Couldn't push Stratum into stack: " + t);
+            JMLogger.logOnce("Couldn't push Stratum into stack: " + t.getMessage(), t);
             return null;
         }
     }
@@ -226,13 +228,13 @@ public class Strata
      */
     Integer getWaterColor(int blockX, int blockY, int blockZ)
     {
-        ChunkMD chunk = dataCache.getChunkMD(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
-        if (chunk != null)
+        ChunkMD chunkMD = dataCache.getChunkMD(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
+        if (chunkMD != null && !(chunkMD.getChunk() instanceof EmptyChunk))
         {
-            BlockMD block = dataCache.getBlockMD(chunk, blockX & 15, blockY, blockZ & 15);
+            BlockMD block = dataCache.getBlockMD(chunkMD, blockX & 15, blockY, blockZ & 15);
             if (block != null && block.isWater())
             {
-                return block.getColor(chunk, blockX & 15, blockY, blockZ & 15);
+                return block.getColor(chunkMD, blockX & 15, blockY, blockZ & 15);
             }
         }
         return null;
