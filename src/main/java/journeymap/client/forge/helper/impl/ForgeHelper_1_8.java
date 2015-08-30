@@ -19,7 +19,6 @@ import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
@@ -517,58 +516,6 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return hasNoSky(entity.getEntityWorld());
-    }
-
-    @Override
-    public int getFoliageColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.getBiomeFoliageColor(x, y, z);
-
-        // 1.8
-        return biome.getFoliageColorAtPos(new BlockPos(x, y, z));
-    }
-
-    @Override
-    public int getGrassColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.getBiomeGrassColor(x, y, z);
-
-        // 1.8
-        return biome.getGrassColorAtPos(new BlockPos(x, y, z));
-    }
-
-    @Override
-    public int getWaterColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.waterColorMultiplier;
-
-        // 1.8
-        return biome.getWaterColorMultiplier();
-    }
-
-    @Override
-    public int getColorMultiplier(World world, Block block, int x, int y, int z)
-    {
-        // 1.7
-        // return block.colorMultiplier(world, x, 78, z)
-
-        // 1.8
-        return block.colorMultiplier(world, new BlockPos(x, y, z));
-    }
-
-    @Override
-    public int getRenderColor(BlockMD blockMD)
-    {
-        // 1.7
-        // return blockMD.getBlock().getRenderColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.meta);
-        return block.getRenderColor(blockState);
     }
 
     @Override

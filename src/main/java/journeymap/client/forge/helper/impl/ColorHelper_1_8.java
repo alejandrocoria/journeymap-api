@@ -22,6 +22,9 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -52,6 +55,58 @@ public class ColorHelper_1_8 implements IColorHelper
     public boolean failedFor(BlockMD blockMD)
     {
         return failed.contains(blockMD);
+    }
+
+    @Override
+    public int getFoliageColor(BiomeGenBase biome, int x, int y, int z)
+    {
+        // 1.7
+        //return biome.getBiomeFoliageColor(x, y, z);
+
+        // 1.8
+        return biome.getFoliageColorAtPos(new BlockPos(x, y, z));
+    }
+
+    @Override
+    public int getGrassColor(BiomeGenBase biome, int x, int y, int z)
+    {
+        // 1.7
+        //return biome.getBiomeGrassColor(x, y, z);
+
+        // 1.8
+        return biome.getGrassColorAtPos(new BlockPos(x, y, z));
+    }
+
+    @Override
+    public int getWaterColor(BiomeGenBase biome, int x, int y, int z)
+    {
+        // 1.7
+        //return biome.waterColorMultiplier;
+
+        // 1.8
+        return biome.getWaterColorMultiplier();
+    }
+
+    @Override
+    public int getColorMultiplier(World world, Block block, int x, int y, int z)
+    {
+        // 1.7
+        // return block.colorMultiplier(world, x, 78, z)
+
+        // 1.8
+        return block.colorMultiplier(world, new BlockPos(x, y, z));
+    }
+
+    @Override
+    public int getRenderColor(BlockMD blockMD)
+    {
+        // 1.7
+        // return blockMD.getBlock().getRenderColor(blockMD.meta);
+
+        // 1.8
+        Block block = blockMD.getBlock();
+        IBlockState blockState = block.getStateFromMeta(blockMD.meta);
+        return block.getRenderColor(blockState);
     }
 
     /**
@@ -163,18 +218,18 @@ public class ColorHelper_1_8 implements IColorHelper
         // TODO: Make this work with 1.7
         Block block = blockMD.getBlock();
         Integer overrideMeta = null;
-        if(blockMD.hasOverrideMeta())
+        if (blockMD.hasOverrideMeta())
         {
             overrideMeta = blockMD.getOverrideMeta();
         }
-        int meta = overrideMeta!=null ? overrideMeta : blockMD.meta;
+        int meta = overrideMeta != null ? overrideMeta : blockMD.meta;
 
         IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
 
         // Always get the upper portion of a double plant for rendering
-        if(block instanceof BlockDoublePlant)
+        if (block instanceof BlockDoublePlant)
         {
-            if(state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
+            if (state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
             {
                 // cycle to upper
                 state = state.cycleProperty(BlockDoublePlant.HALF);
@@ -325,7 +380,8 @@ public class ColorHelper_1_8 implements IColorHelper
                     }
 
                     // try to use texture alpha
-                    if(blockAlpha==0 || blockAlpha==1) {
+                    if (blockAlpha == 0 || blockAlpha == 1)
+                    {
                         blockAlpha = a * 1.0f / 255;
                     }
                 }
