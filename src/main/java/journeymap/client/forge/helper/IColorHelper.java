@@ -30,5 +30,6 @@ public interface IColorHelper
 
     public int getColorMultiplier(World world, Block block, int x, int y, int z);
 
+    @Deprecated
     public int getRenderColor(BlockMD blockMD);
 }

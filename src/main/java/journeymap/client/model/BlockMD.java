@@ -20,7 +20,6 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -196,9 +195,8 @@ public class BlockMD
             Integer color = ColorCache.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
             if (color == null)
             {
-                this.color = color = Color.black.getRGB();
-                Journeymap.getLogger().warn("Could not get color for " + block);
-                addFlags(Flag.Error);
+                // Can't render this time
+                return RGB.BLACK_ARGB;
             }
             else if (!isBiomeColored())
             {

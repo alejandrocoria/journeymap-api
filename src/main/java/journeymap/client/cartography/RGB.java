@@ -19,13 +19,32 @@ public final class RGB
 {
     transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
     public static final int ALPHA_OPAQUE = 0xff000000;
-    public static final int BLACK = -16777216;
+    public static final int BLACK_ARGB = 0xFF000000; // -16777216
+    public static final int BLACK_RGB = 0x000000; // 0
+    public static final int WHITE_ARGB = 0xFFFFFFFF; // 4294967295
+    public static final int WHITE_RGB = 0xFFFFFF; // 16777215
 
     /**
      * Don't instantiate.
      */
     private RGB()
     {
+    }
+
+    /**
+     * Whether a color is black, with our without the alpha channel.
+     */
+    public static boolean isBlack(int rgb)
+    {
+        return rgb==BLACK_ARGB || rgb==BLACK_RGB;
+    }
+
+    /**
+     * Whether a color is white, with our without the alpha channel.
+     */
+    public static boolean isWhite(int rgb)
+    {
+        return rgb==WHITE_ARGB || rgb==WHITE_RGB;
     }
 
     /**

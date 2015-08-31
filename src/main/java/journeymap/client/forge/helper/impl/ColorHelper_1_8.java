@@ -97,6 +97,10 @@ public class ColorHelper_1_8 implements IColorHelper
         return block.colorMultiplier(world, new BlockPos(x, y, z));
     }
 
+    /**
+     * @deprecated use getColorMultiplier() instead
+     */
+    @Deprecated
     @Override
     public int getRenderColor(BlockMD blockMD)
     {

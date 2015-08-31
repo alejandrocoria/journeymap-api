@@ -50,6 +50,8 @@ public interface IForgeHelper
 
     public boolean hasNoSky(World world);
 
+    public World getWorld();
+
     public World getWorld(Chunk chunk);
 
     public RenderManager getRenderManager();

@@ -119,6 +119,16 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
+    public World getWorld()
+    {
+        // 1.7
+        // ??
+
+        // 1.8
+        return getClient().theWorld;
+    }
+
+    @Override
     public World getWorld(Chunk chunk)
     {
         // 1.7
