@@ -214,13 +214,14 @@ public class Strata
      */
     Integer getAverageWaterColor(int blockX, int blockY, int blockZ)
     {
-        return RGB.average(
-                getWaterColor(blockX, blockY, blockZ),
-                getWaterColor(blockX - 1, blockY, blockZ),
-                getWaterColor(blockX + 1, blockY, blockZ),
-                getWaterColor(blockX, blockY - 1, blockZ),
-                getWaterColor(blockX, blockY + 1, blockZ)
-        );
+        return getWaterColor(blockX, blockY, blockZ);
+//        return RGB.average(
+//                getWaterColor(blockX, blockY, blockZ),
+//                getWaterColor(blockX - 1, blockY, blockZ),
+//                getWaterColor(blockX + 1, blockY, blockZ),
+//                getWaterColor(blockX, blockY - 1, blockZ),
+//                getWaterColor(blockX, blockY + 1, blockZ)
+//        );
     }
 
     /**
