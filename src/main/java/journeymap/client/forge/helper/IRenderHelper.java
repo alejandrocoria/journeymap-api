@@ -11,7 +11,8 @@ package journeymap.client.forge.helper;
 import java.awt.*;
 
 /**
- * Encapsulates setting up vertices for a Tesselator.
+ * Interface used to encapsulate compile-time differences between Minecraft/Forge versions
+ * with respect to OpenGL operations.
  */
 public interface IRenderHelper
 {

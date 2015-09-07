@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -58,36 +57,6 @@ public class ColorHelper_1_8 implements IColorHelper
     }
 
     @Override
-    public int getFoliageColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.getBiomeFoliageColor(x, y, z);
-
-        // 1.8
-        return biome.getFoliageColorAtPos(new BlockPos(x, y, z));
-    }
-
-    @Override
-    public int getGrassColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.getBiomeGrassColor(x, y, z);
-
-        // 1.8
-        return biome.getGrassColorAtPos(new BlockPos(x, y, z));
-    }
-
-    @Override
-    public int getWaterColor(BiomeGenBase biome, int x, int y, int z)
-    {
-        // 1.7
-        //return biome.waterColorMultiplier;
-
-        // 1.8
-        return biome.getWaterColorMultiplier();
-    }
-
-    @Override
     public int getColorMultiplier(World world, Block block, int x, int y, int z)
     {
         // 1.7
@@ -111,6 +80,18 @@ public class ColorHelper_1_8 implements IColorHelper
         Block block = blockMD.getBlock();
         IBlockState blockState = block.getStateFromMeta(blockMD.meta);
         return block.getRenderColor(blockState);
+    }
+
+    @Override
+    public int getMapColor(BlockMD blockMD)
+    {
+        // 1.7
+        // return blockMD.getBlock().getMapColor(blockMD.meta);
+
+        // 1.8
+        Block block = blockMD.getBlock();
+        IBlockState blockState = block.getStateFromMeta(blockMD.meta);
+        return block.getMapColor(blockState).colorValue;
     }
 
     /**

@@ -9,12 +9,20 @@
 package journeymap.client.model.mod;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.RGB;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.forge.helper.IColorHelper;
+import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
+import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -27,10 +35,82 @@ import static journeymap.client.model.BlockMD.Flag.*;
  */
 public class Vanilla
 {
-    public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
+    public static class CommonColorHandler implements ModBlockDelegate.IModBlockColorHandler
     {
-        private static final int giantMushroomBlockMeta = BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata();
+        public static final CommonColorHandler INSTANCE = new CommonColorHandler();
 
+        private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
+        private final IColorHelper colorHelper = forgeHelper.getColorHelper();
+
+        /**
+         * Get the block's tint based on the biome position it's in.
+         */
+        public Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        {
+            Integer color = ColorCache.instance().getBaseColor(blockMD, x, y, z);
+            int tint = getTint(blockMD, x, y, z);
+
+            if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
+            {
+                color = RGB.multiply(color, tint);
+                if (!blockMD.hasFlag(BlockMD.Flag.CustomBiomeColor))
+                {
+                    blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
+                    Journeymap.getLogger().info("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
+                }
+            }
+            else
+            {
+                Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
+            }
+            return color;
+        }
+
+        /**
+         * Get the foliage color for the block.
+         */
+        public Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        {
+            return RGB.adjustBrightness(RGB.multiply(ColorCache.instance().getBaseColor(blockMD, x, y, z), getTint(blockMD, x, y, z)), .8f);
+        }
+
+        /**
+         * Get the grass color for the block.
+         */
+        public Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        {
+            // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
+            return RGB.multiply(0x929292, getTint(blockMD, x, y, z));
+        }
+
+        /**
+         * Get the water color for the block.
+         */
+        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        {
+            return RGB.multiply(ColorCache.instance().getBaseColor(blockMD, x, y, z), getTint(blockMD, x, y, z));
+        }
+
+        /**
+         * Get the tint (color multiplier) for the block.
+         */
+        public Integer getTint(BlockMD blockMD, int x, int y, int z)
+        {
+            try
+            {
+                return colorHelper.getColorMultiplier(forgeHelper.getWorld(), blockMD.getBlock(), x, y, z);
+            }
+            catch (Exception e)
+            {
+                // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
+                JMLogger.logOnce("Block throws exception when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName(), e);
+                return RGB.WHITE_ARGB;
+            }
+        }
+    }
+
+    public final static class CommonBlockHandler implements ModBlockDelegate.IModBlockHandler
+    {
         @Override
         public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache blockMDCache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
         {
@@ -84,9 +164,13 @@ public class Vanilla
             blockMDCache.setFlags(Blocks.web, OpenToSky);
             blockMDCache.setTextureSide(Blocks.web, 2);
 
+            blockMDCache.VOIDBLOCK.setBaseColor(0x110C19);
+
             // Set flags based on inheritance
             for (Block block : GameData.getBlockRegistry().typeSafeIterable())
             {
+                String name = blockMDCache.findUniqueIdentifierFor(block).name;
+
                 if (block.getMaterial() == Material.air)
                 {
                     blockMDCache.setFlags(block, HasAir, OpenToSky, NoShadow);
@@ -109,7 +193,7 @@ public class Vanilla
                 }
                 else if (block instanceof BlockTallGrass)
                 {
-                    String name = blockMDCache.findUniqueIdentifierFor(block).name;
+
                     if(name.contains("fern"))
                     {
                         blockMDCache.setFlags(block, Plant, CustomBiomeColor);
@@ -163,27 +247,16 @@ public class Vanilla
             }
 
             // Giant mushrooms get special handling
-            //TODO: Verify in 1.7, then remove this todo if it works.
+            // 1.7 ??
+            // 1.8
             blockMDCache.setTextureSide(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
             blockMDCache.setTextureSide(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
-
-//            blockMDCache.setFlags(Blocks.brown_mushroom_block, SpecialHandling);
-//            blockMDCache.setFlags(Blocks.red_mushroom_block, SpecialHandling);
-//            return Arrays.asList(
-//                    blockMDCache.findUniqueIdentifierFor(Blocks.brown_mushroom_block),
-//                    blockMDCache.findUniqueIdentifierFor(Blocks.red_mushroom_block)
-//            );
             return null;
         }
 
-        /**
-         * Giant mushrooms get special handling.
-         * TODO: Verify in 1.7, then remove this todo if it works.
-         */
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            //return DataCache.instance().getBlockMD(blockMD.getBlock(), giantMushroomBlockMeta);
             return blockMD;
         }
     }

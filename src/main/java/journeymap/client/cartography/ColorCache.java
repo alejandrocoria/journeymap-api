@@ -13,7 +13,6 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
@@ -226,6 +225,7 @@ public class ColorCache
 
     /**
      * Prefetch colors for each block.
+     * TODO:  Determine whether the fake coords are going to be a problem
      */
     private int prefetchColors(BlockMD blockMD)
     {
@@ -254,6 +254,12 @@ public class ColorCache
         if (blockMD.isBiomeColored())
         {
             color = getBiomeBlockColor(chunkMd, blockMD, x, y, z);
+        }
+
+        // Last resort
+        if (color == null)
+        {
+            color = colorHelper.getMapColor(blockMD);
         }
         return color;
     }
@@ -287,87 +293,29 @@ public class ColorCache
     {
         if (blockMD.isGrass())
         {
-            return getGrassColor(blockMD, biome, x, y, z);
+            return blockMD.getBlockColorHandler().getGrassColor(blockMD, biome, x, y, z);
         }
 
         if (blockMD.isFoliage())
         {
-            return getFoliageColor(blockMD, biome, x, y, z);
+            return blockMD.getBlockColorHandler().getFoliageColor(blockMD, biome, x, y, z);
         }
 
         if (blockMD.isWater())
         {
-            return getWaterColor(blockMD, biome, x, y, z);
+            return blockMD.getBlockColorHandler().getWaterColor(blockMD, biome, x, y, z);
         }
 
         // Anything else, including those with CustomBiomeColor
-        return getCustomBiomeColor(blockMD, biome, x, y, z);
+        return blockMD.getBlockColorHandler().getCustomBiomeColor(blockMD, biome, x, y, z);
     }
 
     /**
-     * Get the block's tint based on the biome position it's in.
+     * Gets the cached base color, if any.
      */
-    private Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+    public Integer getBaseColor(BlockMD blockMD)
     {
-        Integer color = getBaseColor(blockMD, x, y, z);
-        int tint = getTint(blockMD, x, y, z);
-
-        if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
-        {
-            color = RGB.multiply(color, tint);
-            if(!blockMD.hasFlag(BlockMD.Flag.CustomBiomeColor))
-            {
-                blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                Journeymap.getLogger().info("Custom biome tint set for " + blockMD + " in " + biome.biomeName);
-            }
-        }
-        else
-        {
-            Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD + " in " + biome.biomeName);
-        }
-        return color;
-    }
-
-    /**
-     * Get the foliage color for the block.
-     */
-    private Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
-    {
-        return RGB.multiply(getBaseColor(blockMD, x, y, z), getTint(blockMD, x, y, z));
-    }
-
-    /**
-     * Get the grass color for the block.
-     */
-    private Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
-    {
-        // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
-        return RGB.multiply(0x929292, getTint(blockMD, x, y, z));
-    }
-
-    /**
-     * Get the water color for the block.
-     */
-    private Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
-    {
-        return RGB.multiply(getBaseColor(blockMD, x, y, z), getTint(blockMD, x, y, z));
-    }
-
-    /**
-     * Get the tint (color multiplier) for the block.
-     */
-    private int getTint(BlockMD blockMD, int x, int y, int z)
-    {
-        try
-        {
-            return colorHelper.getColorMultiplier(forgeHelper.getWorld(), blockMD.getBlock(), x, y, z);
-        }
-        catch (Exception e)
-        {
-            // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
-            JMLogger.logOnce("Block throws exception when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName(), e);
-            return RGB.WHITE_ARGB;
-        }
+        return baseColors.get(blockMD);
     }
 
     /**
@@ -377,9 +325,9 @@ public class ColorCache
      * @param blockMD
      * @return
      */
-    private int getBaseColor(BlockMD blockMD, int x, int y, int z)
+    public int getBaseColor(BlockMD blockMD, int x, int y, int z)
     {
-        Integer color = baseColors.get(blockMD);
+        Integer color = getBaseColor(blockMD);
         if (color == null)
         {
             if (blockMD.isAir())
@@ -392,9 +340,17 @@ public class ColorCache
             {
                 color = loadBaseColor(blockMD, x, y, z);
             }
-            baseColors.put(blockMD, color);
+            setBaseColor(blockMD, color);
         }
         return color;
+    }
+
+    /**
+     * Set the base color for a BlockMD.
+     */
+    public void setBaseColor(BlockMD blockMD, Integer color)
+    {
+        baseColors.put(blockMD, color);
     }
 
     /**
@@ -417,7 +373,7 @@ public class ColorCache
             if (!blockMD.isBiomeColored())
             {
                 // Check for custom biome-based color multiplier
-                int tint = getTint(blockMD, x, y, z);
+                int tint = blockMD.getBlockColorHandler().getTint(blockMD, x, y, z);
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);

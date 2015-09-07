@@ -8,21 +8,24 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.mod.ModBlockDelegate;
+import journeymap.client.model.mod.Vanilla;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
+import java.util.*;
 
 /**
  * Block Metadata
@@ -46,6 +49,7 @@ public class BlockMD
     private Integer color;
     private float alpha;
     private String iconName;
+    private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
 
     /**
      * Instantiates a new BlockMD.
@@ -94,12 +98,6 @@ public class BlockMD
         setAlpha(alpha);
         if (block == null)
         {
-            // TODO: Get this out of here.
-            if ("Void".equals(name))
-            {
-                color = RGB.toInteger(17, 12, 25);
-            }
-
             // 1.7.10
             // block = GameRegistry.findBlock(uid.modId, uid.name);
 
@@ -111,6 +109,7 @@ public class BlockMD
             }
         }
         this.block = block;
+        this.blockColorHandler = Vanilla.CommonColorHandler.INSTANCE;
     }
 
     public static String getBlockName(Block block, int meta)
@@ -134,6 +133,36 @@ public class BlockMD
             name = block.getClass().getSimpleName().replaceAll("Block", "");
         }
         return name;
+    }
+
+    /**
+     * Gets the meta variants possible for a given Block.
+     */
+    public static Collection<Integer> getMetaValuesForBlock(Block block)
+    {
+        ArrayList<Integer> metas = new ArrayList<Integer>();
+        ArrayList<ItemStack> subBlocks = new ArrayList<ItemStack>();
+        try
+        {
+            Item item = Item.getItemFromBlock(block);
+            if (item == null)
+            {
+                metas.add(0);
+            }
+            else
+            {
+                block.getSubBlocks(item, null, subBlocks);
+                for (ItemStack subBlockStack : subBlocks)
+                {
+                    metas.add(subBlockStack.getMetadata());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
+        }
+        return metas;
     }
 
     /**
@@ -173,6 +202,7 @@ public class BlockMD
     public void addFlags(Flag... addFlags)
     {
         Collections.addAll(this.flags, addFlags);
+        DataCache.instance().getBlockMetadata().setFlags(getBlock(), this.flags);
     }
 
     /**
@@ -205,6 +235,26 @@ public class BlockMD
 
             return color;
         }
+    }
+
+    public ModBlockDelegate.IModBlockColorHandler getBlockColorHandler()
+    {
+        return blockColorHandler;
+    }
+
+    public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
+    {
+        this.blockColorHandler = blockColorHandler;
+    }
+
+    public Integer getBaseColor()
+    {
+        return ColorCache.instance().getBaseColor(this);
+    }
+
+    public void setBaseColor(Integer baseColor)
+    {
+        ColorCache.instance().setBaseColor(this, baseColor);
     }
 
     public String getIconName()
@@ -423,7 +473,7 @@ public class BlockMD
     @Override
     public String toString()
     {
-        return String.format("BlockMD [%s]", toCacheKeyString(uid, meta));
+        return String.format("BlockMD [%s] (%s)", toCacheKeyString(uid, meta), Joiner.on(",").join(flags));
     }
 
     /**

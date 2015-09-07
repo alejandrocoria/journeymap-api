@@ -8,9 +8,13 @@
 
 package journeymap.client.model.mod;
 
+import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.block.Block;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.List;
@@ -25,41 +29,53 @@ public class TerraFirmaCraft
     private static final String MODID = "terrafirmacraft";
     private static final String MODID2 = "tfc2";
 
-    public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
+    public static class TfcBlockHandler implements ModBlockDelegate.IModBlockHandler
     {
+        private final TfcWaterColorHandler waterColorHandler = new TfcWaterColorHandler();
+
         @Override
         public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
         {
+            BlockMDCache blockMdCache = DataCache.instance().getBlockMetadata();
             for (GameRegistry.UniqueIdentifier uid : registeredBlockIds)
             {
                 if(uid.modId.equals(MODID) || uid.modId.equals(MODID2))
                 {
                     String name = uid.name.toLowerCase();
-                    if(name.equals("looserock") || name.equals("loose_rock"))
+                    Block block = GameData.getBlockRegistry().getObject(uid.toString());
+                    if (name.equals("looserock") || name.equals("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
                     {
-                        cache.setFlags(uid, HasAir, NoShadow, NoTopo);
+                        blockMdCache.preloadBlock(block, HasAir, NoShadow, NoTopo);
                     }
                     else if(name.contains("seagrass"))
                     {
-                        cache.setFlags(uid, Plant);
                         cache.setTextureSide(uid, 2);
+                        blockMdCache.preloadBlock(block, Plant);
                     }
-                    else if(name.contains("grass") || name.contains("dirt"))
+                    else if (name.contains("grass"))
                     {
-                        cache.setFlags(uid, Grass);
+                        blockMdCache.preloadBlock(block, null, 1f, Grass);
+                    }
+                    else if (name.contains("dirt"))
+                    {
+                        blockMdCache.preloadBlock(block);
                     }
                     else if(name.contains("water"))
                     {
-                        cache.setFlags(uid, Water);
-                        cache.setAlpha(uid, .3f);
+                        blockMdCache.preloadBlock(block, null, .3f, Water, NoShadow);
+                        for (int meta : BlockMD.getMetaValuesForBlock(block))
+                        {
+                            BlockMD blockMD = DataCache.instance().getBlockMD(block, meta);
+                            if (blockMD.getBaseColor() == null)
+                            {
+                                blockMD.setBaseColor(0x0b1940);
+                            }
+                            blockMD.setBlockColorHandler(waterColorHandler);
+                        }
                     }
                     else if(name.contains("leaves"))
                     {
-                        cache.setFlags(uid, NoTopo, Foliage);
-                    }
-                    else if(name.contains("rubble"))
-                    {
-                        cache.setAlpha(uid, 1f);
+                        blockMdCache.preloadBlock(block, NoTopo, Foliage);
                     }
                 }
             }
@@ -70,8 +86,16 @@ public class TerraFirmaCraft
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
-            // Should never be called
             return blockMD;
+        }
+
+    }
+
+    public static class TfcWaterColorHandler extends Vanilla.CommonColorHandler
+    {
+        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        {
+            return blockMD.getBaseColor();
         }
     }
 }

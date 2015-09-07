@@ -10,6 +10,9 @@ package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import journeymap.client.cartography.RGB;
+import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.mod.ModBlockDelegate;
@@ -312,6 +315,39 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public ModBlockDelegate getModBlockDelegate()
     {
         return modBlockDelegate;
+    }
+
+    public void preloadBlock(Block block, BlockMD.Flag... flags)
+    {
+        preloadBlock(block, null, null, flags);
+    }
+
+    public void preloadBlock(Block block, Integer color, Float alpha, BlockMD.Flag... flags)
+    {
+        for (int meta : BlockMD.getMetaValuesForBlock(block))
+        {
+            BlockMD blockMD = DataCache.instance().getBlockMD(block, meta);
+            if (flags.length > 0)
+            {
+                blockMD.addFlags(flags);
+            }
+            if (alpha != null)
+            {
+                blockMD.setAlpha(alpha);
+            }
+            if (color == null)
+            {
+                color = ForgeHelper.INSTANCE.getColorHelper().loadBlockColor(blockMD);
+            }
+            if (color != null)
+            {
+                Journeymap.getLogger().info("Preloaded " + blockMD + " color: " + RGB.toString(color));
+            }
+            else
+            {
+                Journeymap.getLogger().info("Couldn't preload " + blockMD + " color.");
+            }
+        }
     }
 
 }

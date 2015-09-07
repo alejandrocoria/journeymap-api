@@ -14,6 +14,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
@@ -29,12 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ModBlockDelegate
 {
+    private static final int ERROR_LIMIT = 25;
+    private static Logger logger = Journeymap.getLogger();
     private final HashMap<GameRegistry.UniqueIdentifier, IModBlockHandler> Blocks = new HashMap<GameRegistry.UniqueIdentifier, IModBlockHandler>();
     private final HashMap<GameRegistry.UniqueIdentifier, AtomicInteger> Errors = new HashMap<GameRegistry.UniqueIdentifier, AtomicInteger>();
     private final List<IModBlockHandler> handlers;
-
-    private static final int ERROR_LIMIT = 25;
-    private static Logger logger = Journeymap.getLogger();
 
     /**
      * Register special block handlers when this class is initialized.
@@ -42,9 +42,9 @@ public class ModBlockDelegate
     public ModBlockDelegate()
     {
         handlers = Arrays.asList(
-                new Vanilla.CommonHandler(),
+                new Vanilla.CommonBlockHandler(),
                 new CarpentersBlocks.CommonHandler(),
-                new TerraFirmaCraft.CommonHandler(),
+                new TerraFirmaCraft.TfcBlockHandler(),
                 new Miscellaneous.CommonHandler());
     }
 
@@ -187,5 +187,21 @@ public class ModBlockDelegate
          * The block returned will be used to color that spot on the map.
          */
         BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ);
+    }
+
+    /**
+     * Interface for a class that determines how block colors are derived during mapping.
+     */
+    public interface IModBlockColorHandler
+    {
+        public Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+
+        public Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+
+        public Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+
+        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+
+        public Integer getTint(BlockMD blockMD, int x, int y, int z);
     }
 }

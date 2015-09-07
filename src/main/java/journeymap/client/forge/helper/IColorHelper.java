@@ -11,10 +11,10 @@ package journeymap.client.forge.helper;
 import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 
 /**
- * Created by Mark on 7/12/2015.
+ * Interface used to encapsulate compile-time differences between Minecraft/Forge versions
+ * with respect to deriving block colors.
  */
 public interface IColorHelper
 {
@@ -22,14 +22,10 @@ public interface IColorHelper
 
     Integer loadBlockColor(BlockMD blockMD);
 
-    public int getFoliageColor(BiomeGenBase biome, int x, int y, int z);
-
-    public int getGrassColor(BiomeGenBase biome, int x, int y, int z);
-
-    public int getWaterColor(BiomeGenBase biome, int x, int y, int z);
-
-    public int getColorMultiplier(World world, Block block, int x, int y, int z);
+    int getColorMultiplier(World world, Block block, int x, int y, int z);
 
     @Deprecated
     public int getRenderColor(BlockMD blockMD);
+
+    public int getMapColor(BlockMD blockMD);
 }
