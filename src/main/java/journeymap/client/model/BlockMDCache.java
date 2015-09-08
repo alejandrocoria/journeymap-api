@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -20,8 +22,9 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+// 1.8
+//import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
@@ -191,7 +194,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
      */
     public void setFlags(GameRegistry.UniqueIdentifier blockid, BlockMD.Flag... flags)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
             setFlags(block, Arrays.asList(flags));
@@ -267,7 +270,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setTextureSide(GameRegistry.UniqueIdentifier blockid, int side)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
             setTextureSide(block, side);
@@ -291,7 +294,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setAlpha(GameRegistry.UniqueIdentifier blockid, Float alpha)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
             setAlpha(block, alpha);

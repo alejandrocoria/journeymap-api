@@ -8,6 +8,10 @@
 
 package journeymap.server;
 
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
@@ -24,11 +28,12 @@ import journeymap.server.oldservercode.util.ForgePlayerUtil;
 import journeymap.server.oldservercode.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+// 1.8
+//import net.minecraftforge.fml.common.FMLCommonHandler;
+//import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+//import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;

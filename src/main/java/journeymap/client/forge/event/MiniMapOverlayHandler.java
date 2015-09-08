@@ -8,6 +8,11 @@
 
 package journeymap.client.forge.event;
 
+// 1.7.10
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -18,10 +23,11 @@ import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+// 1.8
+//import net.minecraftforge.fml.common.eventhandler.EventPriority;
+//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
 import java.util.EnumSet;

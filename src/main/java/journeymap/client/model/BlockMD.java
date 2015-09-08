@@ -10,6 +10,9 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+// 1.7.10
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
@@ -22,8 +25,9 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+// 1.8
+//import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 

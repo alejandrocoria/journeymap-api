@@ -8,7 +8,10 @@
 
 package journeymap.client.forge.event;
 
-
+// 1.7.10
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
@@ -20,16 +23,17 @@ import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
+// 1.8
+//import net.minecraftforge.fml.client.registry.ClientRegistry;
+//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+//import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
 import java.util.HashSet;
 
 /**
- * Created by mwoodman on 1/29/14.
+ * Handles keyboard events in-game.  (Not in UIs).
  */
 public class KeyEventHandler implements EventHandlerManager.EventHandler
 {

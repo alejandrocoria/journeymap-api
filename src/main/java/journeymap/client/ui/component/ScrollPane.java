@@ -166,14 +166,13 @@ public class ScrollPane extends GuiSlot
     }
 
     // 1.7
-    // @Override
+    @Override
     protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
     {
         drawSlot(index, xPosition, yPosition, l, null, var6, var7);
     }
 
     // 1.8
-    @Override
     protected void drawSlot(int index, int xPosition, int yPosition, int l, int var6, int var7)
     {
         if (firstVisibleIndex == -1)

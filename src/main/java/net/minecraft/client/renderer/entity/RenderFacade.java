@@ -21,7 +21,7 @@ public class RenderFacade extends Render
     // 1.8
     public RenderFacade(RenderManager unused)
     {
-        super(unused);
+        super();
     }
 
     /**

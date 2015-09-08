@@ -1,13 +1,18 @@
 package journeymap.server.oldservercode.network;
 
-
+// 1.7.10
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
 import journeymap.server.oldservercode.config.ConfigHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+// 1.8
+//import net.minecraftforge.fml.common.network.ByteBufUtils;
+//import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+//import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+//import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Created by Mysticdrew on 10/8/2014.
@@ -57,7 +62,10 @@ public class WorldIDPacket implements IMessage
         {
             String worldName = ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName();
             String worldID = ConfigHandler.getConfigByWorldName(worldName).getWorldID();
-            PacketManager.instance.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity.getName());
+            // 1.7.10
+            PacketManager.instance.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity.getCommandSenderName());
+            // 1.8
+            //PacketManager.instance.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity.getName());
             return null;
         }
     }

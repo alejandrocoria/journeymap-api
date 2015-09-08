@@ -318,10 +318,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         setWidth(width);
     }
 
-    @Override
     public void setWidth(int width)
     {
-        super.setWidth(width);
+        this.width = width;
     }
 
     public int getHeight()

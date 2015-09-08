@@ -4,13 +4,17 @@ package journeymap.server.oldservercode.network;
  * Created by Mysticdrew on 10/8/2014.
  */
 
+// 1.7.10
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
 import journeymap.common.Journeymap;
-import journeymap.common.network.PacketHandler;
 import journeymap.server.oldservercode.util.ForgePlayerUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+// 1.8
+//import net.minecraftforge.fml.common.network.NetworkRegistry;
+//import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+//import net.minecraftforge.fml.relauncher.Side;
 
 public class ForgePacketHandler implements IPacketHandler
 {

@@ -12,11 +12,15 @@ package journeymap.common.network;
  * Created by Mysticdrew on 10/8/2014.
  */
 
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
 import journeymap.common.Journeymap;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+// 1.8
+//import net.minecraftforge.fml.common.network.NetworkRegistry;
+//import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+//import net.minecraftforge.fml.relauncher.Side;
 
 
 public class PacketHandler
@@ -36,9 +40,9 @@ public class PacketHandler
             try {
                 WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
             } catch (RuntimeException rte) {
-                Journeymap.getLogger().error(player.getName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
+                Journeymap.getLogger().error(player.getDisplayName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
             } catch (Exception e) {
-                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getName() + " WorldID:" + worldID +" Exception "+ e);
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getDisplayName() + " WorldID:" + worldID +" Exception "+ e);
             }
         }
 

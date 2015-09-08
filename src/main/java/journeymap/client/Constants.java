@@ -11,14 +11,17 @@ package journeymap.client;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
+// 1.8
+//import net.minecraftforge.fml.common.Loader;
+//import net.minecraftforge.fml.common.ModContainer;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;

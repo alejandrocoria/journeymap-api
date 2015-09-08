@@ -10,6 +10,7 @@ package journeymap.client.data;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.*;
+import cpw.mods.fml.common.registry.GameData;
 import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
@@ -21,7 +22,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;

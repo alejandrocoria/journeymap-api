@@ -9,13 +9,16 @@
 package journeymap.client.model.mod;
 
 import com.google.common.base.Joiner;
+// 1.7.10
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+// 1.8
+// import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;

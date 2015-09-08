@@ -8,6 +8,7 @@
 
 package journeymap.client.cartography;
 
+import cpw.mods.fml.common.registry.GameData;
 import journeymap.client.Constants;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -24,7 +25,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
 

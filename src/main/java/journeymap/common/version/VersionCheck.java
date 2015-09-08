@@ -11,9 +11,11 @@ package journeymap.common.version;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import cpw.mods.fml.common.Loader;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
-import net.minecraftforge.fml.common.Loader;
+// 1.8
+//import net.minecraftforge.fml.common.Loader;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;

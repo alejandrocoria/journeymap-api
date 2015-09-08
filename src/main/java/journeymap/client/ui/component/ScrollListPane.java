@@ -112,7 +112,8 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
      */
     public void handleMouseInput()
     {
-        super.handleMouseInput();
+        // TODO ?
+        // super.handleMouseInput();
     }
 
     /**
@@ -134,8 +135,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
 
     }
 
-    // 1.7 protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
-    protected void drawSlot(int slotIndex, int x, int y, int slotHeight, int mouseX, int mouseY)
+    protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
     {
         // 1.7
         //boolean selected = this.func_148124_c(mouseX, mouseY) == slotIndex;

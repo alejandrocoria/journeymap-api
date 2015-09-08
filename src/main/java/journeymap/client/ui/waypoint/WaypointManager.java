@@ -302,7 +302,7 @@ public class WaypointManager extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
         boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
@@ -335,7 +335,7 @@ public class WaypointManager extends JmUI
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
+    public void handleMouseInput()
     {
         super.handleMouseInput();
         int i = Mouse.getEventDWheel();

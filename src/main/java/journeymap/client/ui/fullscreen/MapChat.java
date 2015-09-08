@@ -56,7 +56,7 @@ public class MapChat extends GuiChat
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-    public void keyTyped(char par1, int par2) throws IOException
+    public void keyTyped(char par1, int par2)
     {
         if (hidden)
         {
@@ -69,7 +69,7 @@ public class MapChat extends GuiChat
      * Handles mouse input.
      */
     @Override
-    public void handleMouseInput() throws IOException
+    public void handleMouseInput()
     {
         if (hidden)
         {
@@ -82,7 +82,7 @@ public class MapChat extends GuiChat
      * Called when the mouse is clicked.
      */
     //@Override
-    public void mouseClicked(int par1, int par2, int par3) throws IOException
+    public void mouseClicked(int par1, int par2, int par3)
     {
         if (hidden)
         {

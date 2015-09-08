@@ -8,6 +8,7 @@
 
 package modinfo;
 
+import cpw.mods.fml.common.Loader;
 import modinfo.mp.v1.Client;
 import modinfo.mp.v1.Message;
 import modinfo.mp.v1.Payload;
@@ -15,7 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.Language;
 import net.minecraft.client.resources.Locale;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraftforge.fml.common.Loader;
+//import net.minecraftforge.fml.common.Loader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

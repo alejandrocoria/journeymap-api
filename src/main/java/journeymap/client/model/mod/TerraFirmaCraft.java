@@ -8,14 +8,17 @@
 
 package journeymap.client.model.mod;
 
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+// 1.8
+//import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.List;
 

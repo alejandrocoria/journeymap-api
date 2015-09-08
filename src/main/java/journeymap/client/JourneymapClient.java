@@ -8,6 +8,11 @@
 
 package journeymap.client;
 
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.data.DataCache;
@@ -37,15 +42,15 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.network.WorldIDPacket;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+// 1.8
+//import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+//import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+//import net.minecraftforge.fml.common.registry.EntityRegistry;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

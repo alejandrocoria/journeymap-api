@@ -8,17 +8,24 @@
 
 package journeymap.common;
 
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.network.NetworkCheckHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
 import journeymap.server.oldservercode.command.CommandJMServerForge;
 import journeymap.server.oldservercode.config.ConfigHandler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.network.NetworkCheckHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+// 1.8
+//import net.minecraftforge.fml.common.Mod;
+//import net.minecraftforge.fml.common.SidedProxy;
+//import net.minecraftforge.fml.common.event.*;
+//import net.minecraftforge.fml.common.network.NetworkCheckHandler;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

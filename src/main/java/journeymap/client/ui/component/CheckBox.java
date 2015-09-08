@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.component;
 
+import cpw.mods.fml.client.config.GuiUtils;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;

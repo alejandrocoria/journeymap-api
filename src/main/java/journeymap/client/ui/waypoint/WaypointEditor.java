@@ -436,7 +436,7 @@ public class WaypointEditor extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         for (GuiTextField field : fieldList)

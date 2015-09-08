@@ -8,6 +8,8 @@
 
 package journeymap.client.model.mod;
 
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
@@ -23,8 +25,9 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+// 1.8
+//import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.List;
 
@@ -116,8 +119,6 @@ public class Vanilla
         {
             // Set alphas
             blockMDCache.setAlpha(Blocks.air, 0F);
-//        blockMDCache.setAlpha(Blocks.fence, .4F);
-//        blockMDCache.setAlpha(Blocks.fence_gate, .4F);
             blockMDCache.setAlpha(Blocks.flowing_water, .3F);
             blockMDCache.setAlpha(Blocks.glass, .3F);
             blockMDCache.setAlpha(Blocks.glass_pane, .3F);
@@ -140,8 +141,6 @@ public class Vanilla
 
             // Set manual flags
             blockMDCache.setFlags(Blocks.air, HasAir, OpenToSky, NoShadow, OpenToSky);
-            // 1.7 only
-            // blockMDCache.setFlags(Blocks.fence, TransparentRoof);
             blockMDCache.setFlags(Blocks.fire, NoShadow);
             blockMDCache.setTextureSide(Blocks.fire, 2);
 
@@ -180,8 +179,6 @@ public class Vanilla
                 {
                     blockMDCache.setFlags(block, OpenToSky, CustomBiomeColor, NoTopo);
                 }
-                // TODO: Check if this will work in 1.7.10
-                // If not, then need to uncomment fence lines at the top of this method
                 else if (block instanceof BlockFence || block instanceof BlockFenceGate)
                 {
                     blockMDCache.setAlpha(block, .4F);
@@ -247,10 +244,10 @@ public class Vanilla
             }
 
             // Giant mushrooms get special handling
-            // 1.7 ??
-            // 1.8
-            blockMDCache.setTextureSide(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
-            blockMDCache.setTextureSide(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
+            // 1.7
+            // TODO see which side is needed to show outside colors
+            blockMDCache.setTextureSide(Blocks.brown_mushroom_block, 2);
+            blockMDCache.setTextureSide(Blocks.red_mushroom_block, 2);
             return null;
         }
 

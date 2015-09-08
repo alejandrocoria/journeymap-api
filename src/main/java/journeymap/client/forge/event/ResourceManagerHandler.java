@@ -8,6 +8,9 @@
 
 package journeymap.client.forge.event;
 
+// 1.7.10
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
@@ -15,8 +18,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+// 1.8
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Handle reloads/changes to resource packs.
