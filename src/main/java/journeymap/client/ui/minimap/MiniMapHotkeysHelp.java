@@ -119,7 +119,7 @@ public class MiniMapHotkeysHelp extends JmUI
     }
 
     @Override
-    protected void keyTyped(char c, int i) throws IOException
+    protected void keyTyped(char c, int i)
     {
         super.keyTyped(c, i);
         KeyEventHandler.onKeypress(true);

@@ -19,7 +19,7 @@ public class CommandJMServerForge extends CommandBase {
     }
 
     @Override
-    public String getName() {
+    public String getCommandName() {
         return "jmserver";
     }
 
@@ -31,9 +31,9 @@ public class CommandJMServerForge extends CommandBase {
     }
 
     @Override
-    public boolean canCommandSenderUse(ICommandSender sender)
+    public boolean canCommandSenderUseCommand(ICommandSender sender)
     {
-        return super.canCommandSenderUse(sender);
+        return super.canCommandSenderUseCommand(sender);
     }
 
     @Override
@@ -43,15 +43,15 @@ public class CommandJMServerForge extends CommandBase {
     }
 
     @Override
-    public void execute(ICommandSender sender, String[] args) throws WrongUsageException
+    public void processCommand(ICommandSender sender, String[] args) throws WrongUsageException
     {
         if (args.length > 0) {
             jmserver.processCommand(
-                    sender.getCommandSenderEntity().getName(),
+                    sender.getCommandSenderName(),
                     sender.getEntityWorld().getWorldInfo().getWorldName(),
                     args);
         } else {
-            throw  new WrongUsageException(getCommandUsage(sender));
+            throw new WrongUsageException(getCommandUsage(sender));
         }
     }
 
