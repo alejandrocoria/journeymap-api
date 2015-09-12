@@ -15,7 +15,8 @@ import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by mwoodman on 7/3/2014.
+ * A single-block layer local to a chunk with color and transparency info assigned
+ * so that the colors can be composited together in Strata.
  */
 public class Stratum
 {

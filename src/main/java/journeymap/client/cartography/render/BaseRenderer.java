@@ -72,9 +72,12 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected float shadingSecondaryUpslopeMultiplier; // Range: 1-?
 
     protected float tweakMoonlightLevel; // Range: 0 - 15
+    protected float tweakBrightenDaylightDiff; // Range: 0-1
     protected float tweakBrightenLightsourceBlock; // Range: 0 - 1.5
     protected float tweakBlendShallowWater; // Range: 0 - 1
     protected float tweakMinimumDarkenNightWater; // Range: 0 - 1
+    protected float tweakWaterColorBlend; // Range 0-1
+    protected int tweakDarkenWaterColorMultiplier; // Range: int rg
     protected int tweakSurfaceAmbientColor; // Range: int rgb
     protected int tweakCaveAmbientColor; // Range: int rgb
     protected int tweakNetherAmbientColor; // Range: int rgb
@@ -93,9 +96,12 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         this.shadingSecondaryUpslopeMultiplier = 1.05f;
 
         this.tweakMoonlightLevel = 3.5f;
+        this.tweakBrightenDaylightDiff = 0.06f;
         this.tweakBrightenLightsourceBlock = 1.2f;
         this.tweakBlendShallowWater = .15f;
         this.tweakMinimumDarkenNightWater = .25f;
+        this.tweakWaterColorBlend = .66f;
+        this.tweakDarkenWaterColorMultiplier = 0x7A90BF;
         this.tweakSurfaceAmbientColor = 0x00001A;
         this.tweakCaveAmbientColor = 0x000000;
         this.tweakNetherAmbientColor = 0x330808;
@@ -145,10 +151,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             throw new IllegalStateException("Stratum wasn't initialized for setStratumColors");
         }
 
-        // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherant light level
+        // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherent light level
         float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
+        daylightDiff+=tweakBrightenDaylightDiff;
 
-        // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherant light level
+        // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherent light level
         float nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
 
         int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
@@ -160,8 +167,9 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         if ((waterAbove) && waterColor != null)
         {
             // Blend day color with watercolor above, adjustBrightness for daylight filtered down
-            stratum.setDayColor(RGB.blendWith(waterColor, RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff)), Math.max(daylightDiff, nightLightDiff)));
-            stratum.setDayColor(RGB.blendWith(stratum.getDayColor(), waterColor, tweakBlendShallowWater)); // magic #
+            int adjustedWaterColor = RGB.multiply(waterColor,tweakDarkenWaterColorMultiplier);
+            int adjustedBasicColor = RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff));
+            stratum.setDayColor(RGB.blendWith(adjustedBasicColor, adjustedWaterColor, tweakWaterColorBlend));
 
             // Darken for night light and blend with watercolor above
             stratum.setNightColor(RGB.adjustBrightness(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
@@ -189,9 +197,9 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         if (count == 1 || count % 10240 == 0)
         {
             Journeymap.getLogger().warn(
-                    "Bad block at " + x + "," + y + "," + z //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    "Bad block at " + x + "," + y + "," + z   
                             + ". Total bad blocks: " + count
-            ); //$NON-NLS-1$
+            ); 
         }
     }
 
