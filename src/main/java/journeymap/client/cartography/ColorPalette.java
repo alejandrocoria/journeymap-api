@@ -51,8 +51,11 @@ public class ColorPalette
     public static final String VARIABLE = "var colorpalette=";
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
+
+    @Since(3)
+    int version;
 
     @Since(1)
     String name;
@@ -83,6 +86,7 @@ public class ColorPalette
 
     ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Integer> basicColorMap)
     {
+        this.version = VERSION;
         this.name = Constants.getString("jm.colorpalette.file_title");
         this.generated = String.format("Generated using %s for %s on %s", JourneymapClient.MOD_NAME, Loader.MC_VERSION, new Date());
         this.resourcePacks = resourcePacks;
@@ -110,7 +114,14 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(worldPaletteFile);
             if (palette != null)
             {
-                return palette;
+                if(palette.version<VERSION)
+                {
+                    Journeymap.getLogger().warn(String.format("Existing world color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
+                }
+                else
+                {
+                    return palette;
+                }
             }
         }
 
@@ -118,6 +129,12 @@ public class ColorPalette
         if (standardPaletteFile.canRead())
         {
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
+            if (palette != null && palette.version<VERSION)
+            {
+                Journeymap.getLogger().warn(String.format("Existing color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
+                palette = null;
+            }
+
             if (palette != null)
             {
                 if (palette.isPermanent())
