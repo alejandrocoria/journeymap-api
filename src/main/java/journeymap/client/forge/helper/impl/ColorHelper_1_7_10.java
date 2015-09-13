@@ -19,11 +19,8 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -158,14 +155,17 @@ public class ColorHelper_1_7_10 implements IColorHelper
         // Always get the upper portion of a double plant for rendering
         if (block instanceof BlockDoublePlant)
         {
-            return (TextureAtlasSprite) ((BlockDoublePlant) block).func_149888_a(true, meta);
+            try
+            {
+                return (TextureAtlasSprite) ((BlockDoublePlant) block).func_149888_a(true, meta);
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error("Error getting texture from " + blockMD + ": " + e);
+            }
         }
-        else
-        {
-            // TODO: This probably doesn't work.
-            int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? blockMD.getOverrideMeta() : 0;
-            return (TextureAtlasSprite) block.getIcon(side, meta);
-        }
+
+        return (TextureAtlasSprite) block.getIcon(blockMD.getTextureSide(), meta);
     }
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
@@ -295,9 +295,9 @@ public class ColorHelper_1_7_10 implements IColorHelper
             }
             else
             {
-                if (dataCache.getBlockMetadata().hasAlpha(block))
+                if (blockMD.hasFlag(BlockMD.Flag.Transparency))
                 {
-                    blockAlpha = dataCache.getBlockMetadata().getAlpha(block);
+                    blockAlpha = blockMD.getAlpha();
                 }
                 else if (block.getRenderType() > 0)
                 {
@@ -314,7 +314,6 @@ public class ColorHelper_1_7_10 implements IColorHelper
                     }
                 }
             }
-            dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
         }

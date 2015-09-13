@@ -425,11 +425,6 @@ public class ColorCache
         sb.append(LogFormatter.LINEBREAK).append("<!-- color cache --><div>");
         sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePackNames);
 
-        sb.append(LogFormatter.LINEBREAK).append("<table><tr valign='top'><td width='50%'>");
-        sb.append(debugCache(DataCache.instance().getBlockMetadata().getAlphaMap(), "Block Transparency"));
-        sb.append(LogFormatter.LINEBREAK).append("</td><td>");
-        sb.append(LogFormatter.LINEBREAK).append(debugCache(DataCache.instance().getBlockMetadata().getFlagsMap(), "Block Flags"));
-        sb.append(LogFormatter.LINEBREAK).append("</td></tr></table>");
         sb.append(LogFormatter.LINEBREAK).append("</div><!-- /color cache -->");
 
         return sb.toString();

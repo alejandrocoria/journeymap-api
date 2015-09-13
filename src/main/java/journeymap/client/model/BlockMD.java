@@ -10,9 +10,9 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-// 1.7.10
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
@@ -25,31 +25,26 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import java.util.*;
+
+// 1.7.10
 // 1.8
 //import net.minecraftforge.fml.common.registry.GameData;
 //import net.minecraftforge.fml.common.registry.GameRegistry;
-
-import java.util.*;
 
 /**
  * Block Metadata
  */
 public class BlockMD
 {
-    /**
-     * The Uid.
-     */
     public final GameRegistry.UniqueIdentifier uid;
-    /**
-     * The Meta.
-     */
     public final int meta;
-    /**
-     * The Name.
-     */
     public final String name;
     private final EnumSet<Flag> flags;
     private final Block block;
+    private int textureSide = 1;
+    private Integer overrideMeta;
     private Integer color;
     private float alpha;
     private String iconName;
@@ -169,6 +164,17 @@ public class BlockMD
         return metas;
     }
 
+    public static Collection<BlockMD> getAllBlockMDs(Block block)
+    {
+        Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
+        List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
+        for (int meta : metas)
+        {
+            list.add(DataCache.instance().getBlockMD(block, meta));
+        }
+        return list;
+    }
+
     /**
      * Whether BlockMD has the flag.
      *
@@ -206,7 +212,6 @@ public class BlockMD
     public void addFlags(Flag... addFlags)
     {
         Collections.addAll(this.flags, addFlags);
-        DataCache.instance().getBlockMetadata().setFlags(getBlock(), this.flags);
     }
 
     /**
@@ -279,6 +284,16 @@ public class BlockMD
     public float getAlpha()
     {
         return alpha;
+    }
+
+    /**
+     * Whether it should be used for beveled slope coloration.
+     *
+     * @return
+     */
+    public boolean hasNoShadow()
+    {
+        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
     }
 
     /**
@@ -408,7 +423,7 @@ public class BlockMD
      */
     public boolean hasOverrideMeta()
     {
-        return hasFlag(Flag.OverrideMeta);
+        return overrideMeta!=null;
     }
 
     /**
@@ -421,13 +436,29 @@ public class BlockMD
         return hasAnyFlag(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     }
 
+    public int getTextureSide()
+    {
+        return textureSide;
+    }
+
+    public void setTextureSide(int textureSide)
+    {
+        this.textureSide = textureSide;
+    }
+
     /**
      * Returns the override meta to use when deriving color, or null if no override specified.
+     *
      * @return
      */
     public Integer getOverrideMeta()
     {
-        return DataCache.instance().getBlockMetadata().getOverrideMeta(block);
+        return overrideMeta;
+    }
+
+    public void setOverrideMeta(Integer overrideMeta)
+    {
+        this.overrideMeta = overrideMeta;
     }
 
     @Override
@@ -529,11 +560,6 @@ public class BlockMD
          * Block shouldn't cast a shadow.
          */
         NoShadow,
-
-        /**
-         * Block's color should come from the override meta
-         */
-        OverrideMeta,
 
         /**
          * Block isn't opaque.

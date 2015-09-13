@@ -15,7 +15,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -60,6 +59,11 @@ public class ChunkMD
     public Block getBlock(int x, int y, int z)
     {
         return getChunk().getBlock(x, y, z);
+    }
+
+    public BlockMD getBlockMD(int x, int y, int z)
+    {
+        return DataCache.instance().getBlockMD(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
     }
 
     /**
@@ -119,20 +123,17 @@ public class ChunkMD
 
         try
         {
-            Block block;
+            Chunk chunk = getChunk();
+            BlockMD blockMD;
             while (y >= 0)
             {
-                block = getBlock(x, y, z);
+                blockMD = getBlockMD(x, y, z);
 
-                if (block instanceof BlockAir)
+                if (blockMD.isAir() || blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                 {
                     y--;
                 }
-                else if (blockMDCache.hasFlag(block, BlockMD.Flag.HasAir) || blockMDCache.hasFlag(block, BlockMD.Flag.OpenToSky))
-                {
-                    y--;
-                }
-                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), x, y, z))
+                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(chunk, x, y, z))
                 {
                     y--;
                 }
@@ -144,7 +145,7 @@ public class ChunkMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(e + " at " + x + "," + y + "," + z);
+            Journeymap.getLogger().warn(e + " at " + toWorldX(x) + "," + y + "," + toWorldX(x));
         }
 
         return Math.max(0, y);
