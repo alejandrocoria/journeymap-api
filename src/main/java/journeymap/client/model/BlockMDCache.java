@@ -23,9 +23,11 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
 
-import static journeymap.client.model.BlockMD.Flag.OverrideMeta;
 import static journeymap.client.model.BlockMD.Flag.SpecialHandling;
 
 /**
@@ -35,9 +37,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 {
     public final BlockMD AIRBLOCK;
     public final BlockMD VOIDBLOCK;
-    private final HashMap<Block, EnumSet<BlockMD.Flag>> blockFlags;
-    private final HashMap<Block, Float> blockAlphas;
-    private final HashMap<Block, Integer> blockOverrideMetas;
     private ModBlockDelegate modBlockDelegate;
 
     public BlockMDCache()
@@ -47,10 +46,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
         GameRegistry.UniqueIdentifier voidUid = new GameRegistry.UniqueIdentifier("journeymap:void");
         VOIDBLOCK = new BlockMD("Void", voidUid, null, 0, 1f, null);
-
-        blockFlags = new HashMap<Block, EnumSet<BlockMD.Flag>>(64);
-        blockAlphas = new HashMap<Block, Float>(16);
-        blockOverrideMetas = new HashMap<Block, Integer>(16);
     }
 
     /**
@@ -59,9 +54,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
     public void initialize()
     {
         StatTimer timer = StatTimer.get("BlockMDCache.initialize", 0, 2000).start();
-
-        blockAlphas.clear();
-        blockFlags.clear();
         modBlockDelegate = new ModBlockDelegate();
 
         // Get list of all registered block ids
@@ -163,7 +155,7 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
                     if (blockMD == null)
                     {
                         String displayName = BlockMD.getBlockName(block, meta);
-                        blockMD = new BlockMD(displayName, block, meta, getAlpha(block), getFlags(block));
+                        blockMD = new BlockMD(displayName, block, meta, 1f);
                         map.put(meta, blockMD);
                     }
                 }
@@ -178,12 +170,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         }
     }
 
-    public EnumSet<BlockMD.Flag> getFlags(Block block)
-    {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(block);
-        return flags == null ? EnumSet.noneOf(BlockMD.Flag.class) : flags;
-    }
-
     /**
      * Set flags by block UID.
      * @param blockid
@@ -191,10 +177,10 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
      */
     public void setFlags(GameRegistry.UniqueIdentifier blockid, BlockMD.Flag... flags)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
-            setFlags(block, Arrays.asList(flags));
+            setFlags(block, flags);
         }
         else
         {
@@ -204,70 +190,25 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setFlags(Block block, BlockMD.Flag... flags)
     {
-        setFlags(block, Arrays.asList(flags));
-    }
-
-    public void setFlags(Block block, Collection<BlockMD.Flag> flags)
-    {
-        EnumSet<BlockMD.Flag> eset = getFlags(block);
-        eset.addAll(flags);
-        blockFlags.put(block, eset);
-        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + eset);
-    }
-
-    public boolean hasFlag(Block block, BlockMD.Flag flag)
-    {
-        EnumSet<BlockMD.Flag> flags = blockFlags.get(block);
-        return flags != null && flags.contains(flag);
-    }
-
-    public boolean hasAnyFlags(Block block, BlockMD.Flag... flags)
-    {
-        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(block);
-        if (flagSet == null)
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
         {
-            return false;
+            blockMD.addFlags(flags);
         }
-        for (BlockMD.Flag flag : flags)
-        {
-            if (flagSet.contains(flag))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void removeFlag(Block block, BlockMD.Flag flag)
-    {
-        EnumSet<BlockMD.Flag> flagSet = blockFlags.get(block);
-        if (flagSet != null)
-        {
-            flagSet.remove(flag);
-        }
-    }
-
-    public boolean hasAlpha(Block block)
-    {
-        return blockAlphas.containsKey(block);
-    }
-
-    public float getAlpha(Block block)
-    {
-        Float alpha = blockAlphas.get(block);
-        return alpha == null ? 1F : alpha;
+        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + flags);
     }
 
     public void setAlpha(Block block, Float alpha)
     {
-        // safety check on value
-        alpha = Math.min(Math.max(0f, alpha), 1f);
-        blockAlphas.put(block, alpha);
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.setAlpha(alpha);
+        }
+        Journeymap.getLogger().debug(block.getUnlocalizedName() + " alpha set: " + alpha);
     }
 
     public void setTextureSide(GameRegistry.UniqueIdentifier blockid, int side)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
             setTextureSide(block, side);
@@ -280,18 +221,24 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
 
     public void setTextureSide(Block block, int side)
     {
-        setFlags(block, OverrideMeta);
-        blockOverrideMetas.put(block, side);
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.setTextureSide(side);
+        }
     }
 
-    public Integer getOverrideMeta(Block block)
+    public void setOverrideMeta(Block block, int overrideMeta)
     {
-        return blockOverrideMetas.get(block);
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.setOverrideMeta(overrideMeta);
+        }
     }
+
 
     public void setAlpha(GameRegistry.UniqueIdentifier blockid, Float alpha)
     {
-        Block block = GameData.getBlockRegistry().getObject(blockid);
+        Block block = (Block) GameData.getBlockRegistry().getObject(blockid);
         if(block!=null)
         {
             setAlpha(block, alpha);
@@ -300,16 +247,6 @@ public class BlockMDCache extends CacheLoader<Block, HashMap<Integer, BlockMD>>
         {
             Journeymap.getLogger().error(String.format("Can't find block with id %s; unable to set alpha", blockid));
         }
-    }
-
-    public HashMap getFlagsMap()
-    {
-        return blockFlags;
-    }
-
-    public HashMap getAlphaMap()
-    {
-        return blockAlphas;
     }
 
     public ModBlockDelegate getModBlockDelegate()

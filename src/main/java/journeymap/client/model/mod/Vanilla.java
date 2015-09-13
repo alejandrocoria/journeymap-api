@@ -8,9 +8,11 @@
 
 package journeymap.client.model.mod;
 
+
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorCache;
 import journeymap.client.cartography.RGB;
+import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
@@ -116,8 +118,6 @@ public class Vanilla
         {
             // Set alphas
             blockMDCache.setAlpha(Blocks.air, 0F);
-//        blockMDCache.setAlpha(Blocks.fence, .4F);
-//        blockMDCache.setAlpha(Blocks.fence_gate, .4F);
             blockMDCache.setAlpha(Blocks.flowing_water, .3F);
             blockMDCache.setAlpha(Blocks.glass, .3F);
             blockMDCache.setAlpha(Blocks.glass_pane, .3F);
@@ -140,8 +140,6 @@ public class Vanilla
 
             // Set manual flags
             blockMDCache.setFlags(Blocks.air, HasAir, OpenToSky, NoShadow, OpenToSky);
-            // 1.7 only
-            // blockMDCache.setFlags(Blocks.fence, TransparentRoof);
             blockMDCache.setFlags(Blocks.fire, NoShadow);
             blockMDCache.setTextureSide(Blocks.fire, 2);
 
@@ -180,8 +178,6 @@ public class Vanilla
                 {
                     blockMDCache.setFlags(block, OpenToSky, CustomBiomeColor, NoTopo);
                 }
-                // TODO: Check if this will work in 1.7.10
-                // If not, then need to uncomment fence lines at the top of this method
                 else if (block instanceof BlockFence || block instanceof BlockFenceGate)
                 {
                     blockMDCache.setAlpha(block, .4F);
@@ -193,20 +189,12 @@ public class Vanilla
                 }
                 else if (block instanceof BlockTallGrass)
                 {
-
-                    if(name.contains("fern"))
-                    {
-                        blockMDCache.setFlags(block, Plant, CustomBiomeColor);
-                        blockMDCache.setTextureSide(block, 2);
-                    }
-                    else
-                    {
-                        blockMDCache.setFlags(block, HasAir, NoTopo);
-                    }
+                    blockMDCache.setFlags(block, HasAir, NoTopo);
                 }
                 else if(block instanceof BlockDoublePlant)
                 {
-                    blockMDCache.setFlags(block, Plant);
+                    blockMDCache.setFlags(block, Plant, NoTopo);
+                    blockMDCache.setTextureSide(block, 2);
                 }
                 else if (block instanceof BlockLeavesBase)
                 {
@@ -217,7 +205,6 @@ public class Vanilla
                     blockMDCache.setAlpha(block, .2F);
                     blockMDCache.setFlags(block, OpenToSky, Foliage, NoTopo, NoShadow);
                 }
-                // TODO: use foliage?
                 else if (block instanceof BlockLilyPad)
                 {
                     blockMDCache.setFlags(block, CustomBiomeColor, NoTopo);
@@ -231,7 +218,18 @@ public class Vanilla
                         blockMDCache.setFlags(block, NoShadow);
                     }
                 }
-                else if (block instanceof BlockBush || block instanceof BlockCactus || block instanceof BlockDeadBush)
+                else if (block instanceof BlockFlower)
+                {
+                    blockMDCache.setFlags(block, Plant, NoTopo);
+                }
+                else if (block instanceof BlockHugeMushroom)
+                {
+                    // 1.8 : 14 gets "all_outside" texture
+
+                    int overrideMeta = block.getMetaFromState(block.getDefaultState());
+                    blockMDCache.setOverrideMeta(block, overrideMeta);
+                }
+                else if (block instanceof BlockBush || block instanceof BlockCactus)
                 {
                     blockMDCache.setFlags(block, Plant, NoTopo);
                     blockMDCache.setTextureSide(block, 2);
@@ -246,11 +244,26 @@ public class Vanilla
                 }
             }
 
-            // Giant mushrooms get special handling
-            // 1.7 ??
-            // 1.8
-            blockMDCache.setTextureSide(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
-            blockMDCache.setTextureSide(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_OUTSIDE.getMetadata());
+            // Flower colors look bad because the stem color is averaged in, overriding them is easier.
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta()).setBaseColor(0x980406);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setBaseColor(0x1E7EB6);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setBaseColor(0x8549B6);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setBaseColor(0x9DA1A7);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setBaseColor(0x980406);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setBaseColor(0xA3581A);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setBaseColor(0xB0B0B0);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setBaseColor(0xB09AB0);
+            DataCache.instance().getBlockMD(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setBaseColor(0xB3B3B3);
+            DataCache.instance().getBlockMD(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setBaseColor(0xAFB401);
+
+            // Double-tall grass should be treated like BlockTallGrass:  ignored
+            DataCache.instance().getBlockMD(Blocks.double_plant, 2).addFlags(HasAir, NoTopo);
+
+            // Ferns unlike other BlockTallGrass will be treated like plants
+            DataCache.instance().getBlockMD(Blocks.tallgrass, 2).addFlags(Plant, CustomBiomeColor);
+
+
+
             return null;
         }
 

@@ -160,47 +160,6 @@ public class ColorHelper_1_8 implements IColorHelper
     {
         TextureAtlasSprite blockIcon = null;
 
-//        if (blockMD.getBlock() instanceof BlockDoublePlant)
-//        {
-//            BlockDoublePlant blockDoublePlant = ((BlockDoublePlant) blockMD.getBlock());
-//
-//            // Get the top icon
-//            try
-//            {
-//                blockIcon = blockDoublePlant.func_149888_a(true, blockMD.meta & BlockDoublePlant.field_149892_a.length);
-//            }
-//            catch (Throwable t)
-//            {
-//                logger.warn(blockMD + " trying BlockDoublePlant.func_149888_a(true, " + (blockMD.meta & BlockDoublePlant.field_149892_a.length) + " throws exception: " + t);
-//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
-//                blockIcon = blockDoublePlant.getIcon(side, blockMD.meta);
-//            }
-//
-//            if (blockIcon.getIconName().contains("sunflower"))
-//            {
-//                // Sunflower front
-//                blockIcon = blockDoublePlant.sunflowerIcons[0];
-//            }
-//        }
-//        else
-//        {
-//            if (blockMD.hasFlag(BlockMD.Flag.SpecialHandling))
-//            {
-//                blockIcon = DataCache.instance().getModBlockDelegate().getIcon(blockMD);
-//            }
-//
-//            if (blockIcon == null)
-//            {
-//                int side = blockMD.hasFlag(BlockMD.Flag.OverrideMeta) ? 2 : 1;
-//                while (blockIcon == null && side >= 0)
-//                {
-//                    blockIcon = blockMD.getBlock().getIcon(side, blockMD.meta);
-//                    side--;
-//                }
-//            }
-//        }
-
-        // TODO: Make this work with 1.7
         Block block = blockMD.getBlock();
         Integer overrideMeta = null;
         if (blockMD.hasOverrideMeta())
@@ -221,7 +180,8 @@ public class ColorHelper_1_8 implements IColorHelper
             }
         }
 
-        return ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        TextureAtlasSprite icon = ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        return icon;
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
 
@@ -237,34 +197,7 @@ public class ColorHelper_1_8 implements IColorHelper
             int x = 0, y = 0;
 
             int xStart, yStart, xStop, yStop;
-            BufferedImage textureImg;
-
-            // 1.7.10
-//            if (icon instanceof TextureAtlasSprite)
-//            {
-//                TextureAtlasSprite tas = (TextureAtlasSprite) icon;
-//                textureImg = blocksTexture;
-//                xStart = tas.getOriginX();
-//                yStart = tas.getOriginY();
-//                xStop = xStart + icon.getIconWidth();
-//                yStop = yStart + icon.getIconHeight();
-//            }
-//            else
-//            {
-//                textureImg = blocksTexture;
-//
-//                xStart = (int) Math.round(((float) textureImg.getWidth()) * Math.min(icon.getMinU(), icon.getMaxU()));
-//                yStart = (int) Math.round(((float) textureImg.getHeight()) * Math.min(icon.getMinV(), icon.getMaxV()));
-//                int iconWidth = (int) Math.round(((float) textureImg.getWidth()) * Math.abs(icon.getMaxU() - icon.getMinU()));
-//                int iconHeight = (int) Math.round(((float) textureImg.getHeight()) * Math.abs(icon.getMaxV() - icon.getMinV()));
-//
-//                xStop = xStart + iconWidth;
-//                yStop = yStart + iconHeight;
-//            }
-
-            // 1.8
-            // 1.8
-            textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+            BufferedImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
             xStart = yStart = 0;
             xStop = textureImg.getWidth();
             yStop = textureImg.getHeight();
@@ -352,9 +285,9 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                if (dataCache.getBlockMetadata().hasAlpha(block))
+                if (blockMD.hasFlag(BlockMD.Flag.Transparency))
                 {
-                    blockAlpha = dataCache.getBlockMetadata().getAlpha(block);
+                    blockAlpha = blockMD.getAlpha();
                 }
                 else if (block.getRenderType() > 0)
                 {
@@ -371,7 +304,7 @@ public class ColorHelper_1_8 implements IColorHelper
                     }
                 }
             }
-            dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
+            //dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
         }

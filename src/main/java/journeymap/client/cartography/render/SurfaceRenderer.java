@@ -332,7 +332,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Now add bevel for slope
-            if ((topBlockMd.isWater() && mapBathymetry) || !topBlockMd.hasFlag(BlockMD.Flag.NoShadow))
+            if ((topBlockMd.isWater() && mapBathymetry) || !topBlockMd.hasNoShadow())
             {
                 float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
                 if (slope != 1f)

@@ -364,7 +364,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Now add bevel for slope
-            if (!(blockMD.hasFlag(BlockMD.Flag.NoShadow)))
+            if (!(blockMD.hasNoShadow()))
             {
                 float slope = getSlope(chunkMd, blockMD, x, vSlice, z, chunkHeights, chunkSlopes);
                 if (slope != 1f)

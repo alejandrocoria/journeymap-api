@@ -519,7 +519,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                             y--;
                         }
                     }
-                    else if (!blockMD.isLava() && blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    else if (!blockMD.isLava() && blockMD.hasNoShadow())
                     {
                         y--;
                     }
