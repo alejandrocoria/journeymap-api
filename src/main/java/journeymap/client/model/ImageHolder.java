@@ -231,6 +231,10 @@ public class ImageHolder
 
     public long getImageTimestamp()
     {
-        return texture.getLastImageUpdate();
+        if (texture != null)
+        {
+            return texture.getLastImageUpdate();
+        }
+        return 0;
     }
 }
