@@ -103,15 +103,14 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        logger.info(String.format("Chunks found in %s: %s/%s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
-
-        if (chunkCoords.size() - missing >= 16)
+        if (chunkCoords.size() - missing > 0)
         {
+            logger.info(String.format("Mapping chunks found in %s: %s/%s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
             super.performTask(mc, jm, jmWorldDir, threadLogging);
         }
         else
         {
-            logger.info("Skipping underpopulated region: " + rCoord);
+            logger.info(String.format("Skipping empty region: %s", rCoord));
         }
     }
 
@@ -119,15 +118,12 @@ public class MapRegionTask extends BaseMapTask
     protected void complete(boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
-        if (!cancelled)
-        {
-            RegionImageCache.instance().flushToDisk();
-        }
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {
             logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
         }
+        RegionImageCache.instance().getRegionImageSet(rCoord);
     }
 
     @Override

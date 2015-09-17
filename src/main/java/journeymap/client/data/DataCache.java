@@ -13,15 +13,12 @@ import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
-import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
-import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -50,8 +47,6 @@ public class DataCache
     final Cache<String, ChunkCoord> chunkCoords;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
-    final LoadingCache<Block, HashMap<Integer, BlockMD>> blockMetadata;
-    final BlockMDCache blockMetadataLoader;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
@@ -113,10 +108,6 @@ public class DataCache
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
-
-        blockMetadataLoader = new BlockMDCache();
-        blockMetadata = getCacheBuilder().initialCapacity(GameData.getBlockRegistry().getKeys().size()).build(blockMetadataLoader);
-        managedCaches.put(blockMetadata, "BlockMD");
 
         chunkCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
         managedCaches.put(chunkCoords, "ChunkCoord");
@@ -496,40 +487,10 @@ public class DataCache
         }
     }
 
-    public void resetBlockMetadata()
-    {
-        blockMetadata.invalidateAll();
-        blockMetadataLoader.initialize();
-    }
-
-    public BlockMDCache getBlockMetadata()
-    {
-        return blockMetadataLoader;
-    }
-
-    /**
-     * Produces a BlockMD instance from chunk-local coords.
-     */
-    public BlockMD getBlockMD(ChunkMD chunkMd, int x, int y, int z)
-    {
-        return blockMetadataLoader.getBlockMD(blockMetadata, chunkMd, x, y, z);
-    }
-
-    /**
-     * Produces a BlockMD instance from chunk-local coords.
-     */
-    public BlockMD getBlockMD(Block block, int meta)
-    {
-        return blockMetadataLoader.getBlockMD(blockMetadata, block, meta);
-    }
-
-    /**
-     * Produces a BlockMD instance from chunk-local coords.
-     */
-    public ModBlockDelegate getModBlockDelegate()
-    {
-        return blockMetadataLoader.getModBlockDelegate();
-    }
+//    public void resetBlockMetadata()
+//    {
+//        BlockMD.reset();
+//    }
 
     public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
     {

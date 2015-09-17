@@ -8,7 +8,6 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.cartography.ColorCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
@@ -43,15 +42,13 @@ public class ResourceManagerHandler implements IResourceManagerReloadListener
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager)
     {
-        if (mc.theWorld == null)
-        {
-            // Can happen when resource packs are changed after quitting out of world.
-            // This ensures the palette is rechecked when mapping starts
-            ColorCache.instance().reset();
-        }
-        else
-        {
-            ColorCache.instance().ensureCurrent();
-        }
+//        try
+//        {
+//            ColorManager.instance().ensureCurrent();
+//        }
+//        catch (Exception e)
+//        {
+//            Journeymap.getLogger().warn("Error calling ColorManager.ensureCurrent(): " + LogFormatter.toString(e));
+//        }
     }
 }

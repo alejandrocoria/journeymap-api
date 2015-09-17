@@ -454,6 +454,11 @@ public class StatTimer
         }
     }
 
+    public String getLogReportString()
+    {
+        return EnumChatFormatting.getTextWithoutFormattingCodes(getSimpleReportString());
+    }
+
     /**
      * Gets a simplified report of the timer stats with color formatting for Shift-F3 display.
      *

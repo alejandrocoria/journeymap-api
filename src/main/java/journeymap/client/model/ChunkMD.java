@@ -63,7 +63,7 @@ public class ChunkMD
 
     public BlockMD getBlockMD(int x, int y, int z)
     {
-        return DataCache.instance().getBlockMD(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
+        return BlockMD.get(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
     }
 
     /**
@@ -83,7 +83,7 @@ public class ChunkMD
 
         do
         {
-            topBlockMd = dataCache.getBlockMD(this, x, y, z);
+            topBlockMd = BlockMD.getBlockMD(this, x, y, z);
 
             // Null check
             if (topBlockMd == null)
@@ -117,7 +117,6 @@ public class ChunkMD
      */
     public int ceiling(final int x, final int z)
     {
-        BlockMDCache blockMDCache = dataCache.getBlockMetadata();
         final int chunkHeight = getHeightValue(x, z);
         int y = chunkHeight;
 

@@ -18,6 +18,8 @@ import net.minecraft.world.World;
  */
 public interface IColorHelper
 {
+    boolean initBlocksTexture();
+
     boolean failedFor(BlockMD blockMD);
 
     Integer loadBlockColor(BlockMD blockMD);

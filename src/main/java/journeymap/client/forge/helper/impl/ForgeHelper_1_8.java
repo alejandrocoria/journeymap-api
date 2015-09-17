@@ -262,67 +262,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     @Override
     public String getRealmsServerName()
     {
-        // 1.7
         String serverName = null;
-//        Minecraft mc = ForgeHelper.INSTANCE.getClient();
-//        if(!mc.isSingleplayer())
-//        {
-//            try
-//            {
-//                NetHandlerPlayClient netHandler = mc.getNetHandler();
-//                GuiScreen netHandlerGui = ReflectionHelper.getPrivateValue(NetHandlerPlayClient.class, netHandler, "field_147307_j", "guiScreenServer");
-//
-//                if (netHandlerGui instanceof GuiScreenRealmsProxy)
-//                {
-//                    RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).func_154321_a();
-//                    if (realmsScreen instanceof RealmsMainScreen)
-//                    {
-//                        RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
-//                        long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
-//                        List<McoServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
-//                        for (McoServer mcoServer : mcoServers)
-//                        {
-//                            if (mcoServer.id == selectedServerId)
-//                            {
-//                                serverName = mcoServer.name;
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            catch (Throwable t)
-//            {
-//                JourneyMap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
-//            }
-//        }
-//
-//        if (serverName != null)
-//        {
-//            return serverName;
-//        }
-//        else
-//        {
-//            Minecraft mc = ForgeHelper.INSTANCE.getClient();
-//            ServerData serverData = mc.func_147104_D(); // 1.8 getServerData()
-//
-//            if (serverData != null)
-//            {
-//                serverName = serverData.serverName;
-//                if (serverName != null)
-//                {
-//                    serverName = serverName.replaceAll("\\W+", "~").trim();
-//
-//                    if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
-//                    {
-//                        serverName = serverData.serverIP;
-//                    }
-//                    return serverName;
-//                }
-//            }
-//        }
-
-        // 1.8
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
         if(!mc.isSingleplayer())
         {

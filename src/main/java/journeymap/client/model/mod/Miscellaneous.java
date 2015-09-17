@@ -10,7 +10,6 @@ package journeymap.client.model.mod;
 
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
-import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.WaypointStore;
@@ -20,7 +19,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static journeymap.client.model.BlockMD.Flag.*;
@@ -32,11 +30,16 @@ public class Miscellaneous
 {
     public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
     {
-        @Override
-        public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
+        // Mariculture Kelp
+        GameRegistry.UniqueIdentifier maricultureKelpId = new GameRegistry.UniqueIdentifier("Mariculture:kelp");
+
+        // Thaumcraft leaves (greatwood, silverwood)
+        GameRegistry.UniqueIdentifier thaumcraftLeavesId = new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves");
+
+        List<GameRegistry.UniqueIdentifier> torches = new ArrayList<GameRegistry.UniqueIdentifier>();
+
+        public CommonHandler()
         {
-            // Torches from mods shouldn't cast block-sized shadows
-            List<GameRegistry.UniqueIdentifier> torches = new ArrayList<GameRegistry.UniqueIdentifier>();
             torches.add(new GameRegistry.UniqueIdentifier("TConstruct:decoration.stonetorch"));
             torches.add(new GameRegistry.UniqueIdentifier("ExtraUtilities:magnumTorch"));
             torches.add(new GameRegistry.UniqueIdentifier("appliedenergistics2:tile.BlockQuartzTorch"));
@@ -44,31 +47,26 @@ public class Miscellaneous
             {
                 torches.add(new GameRegistry.UniqueIdentifier("chisel:torch" + i));
             }
+        }
 
-            // Hide torches
-            for(GameRegistry.UniqueIdentifier registeredBlockId : registeredBlockIds)
+        @Override
+        public boolean initialize(BlockMD blockMD)
+        {
+            GameRegistry.UniqueIdentifier uid = blockMD.getUid();
+            if (torches.contains(uid))
             {
-                if(torches.contains(registeredBlockId)) {
-                    cache.setFlags(registeredBlockId, HasAir, NoShadow);
-                }
+                blockMD.addFlags(HasAir, NoShadow);
             }
-
-            // Mariculture Kelp
-            GameRegistry.UniqueIdentifier maricultureKelpId = new GameRegistry.UniqueIdentifier("Mariculture:kelp");
-            if(registeredBlockIds.contains(maricultureKelpId))
+            else if (uid.equals(maricultureKelpId))
             {
-                cache.setFlags(maricultureKelpId, Plant);
-                cache.setTextureSide(maricultureKelpId, 2);
+                blockMD.addFlags(Plant);
+                blockMD.setTextureSide(2);
             }
-
-            // Thaumcraft leaves (greatwood, silverwood)
-            GameRegistry.UniqueIdentifier thaumcraftLeavesId = new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves");
-            if(registeredBlockIds.contains(thaumcraftLeavesId))
+            else if (uid.equals(thaumcraftLeavesId))
             {
-                cache.setFlags(thaumcraftLeavesId, NoTopo, Foliage);
+                blockMD.addFlags(NoTopo, Foliage);
             }
-
-            return null;
+            return false;
         }
 
         @Override
@@ -90,14 +88,15 @@ public class Miscellaneous
         private static final String TAG_PLAYERUUID = "PlayerUUID";
 
         @Override
-        public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
+        public boolean initialize(BlockMD blockMD)
         {
-            if(registeredBlockIds.contains(UID))
+            if (blockMD.getUid().equals(UID))
             {
-                cache.setFlags(UID, BlockMD.Flag.SpecialHandling);
-                return Arrays.asList(UID);
+                blockMD.setModBlockHandler(this);
+                return true;
             }
-            return null;
+
+            return false;
         }
 
         @Override

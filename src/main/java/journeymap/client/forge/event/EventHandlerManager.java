@@ -8,7 +8,7 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.common.Journeymap;
@@ -36,9 +36,10 @@ public class EventHandlerManager
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
+        register(new TextureAtlasHandler());
         worldInfoHandler = new WorldInfoHandler();
         resourceManagerHandler = new ResourceManagerHandler();
-        ColorCache.instance();
+        ColorManager.instance();
     }
 
     public static void registerGuiHandlers()

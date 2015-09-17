@@ -486,7 +486,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         try
         {
-            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             boolean propUnsetWaterHeight = true;
 
             while (y > 0)
@@ -526,7 +526,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     break;
                 }
                 y--;
-                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             }
         }
         catch (Exception e)

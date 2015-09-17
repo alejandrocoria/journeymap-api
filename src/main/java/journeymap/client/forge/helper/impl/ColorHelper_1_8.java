@@ -9,7 +9,6 @@
 package journeymap.client.forge.helper.impl;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.LogFormatter;
@@ -25,11 +24,13 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.HashSet;
 
 /**
@@ -37,9 +38,8 @@ import java.util.HashSet;
  */
 public class ColorHelper_1_8 implements IColorHelper
 {
-    final BufferedImage blocksTexture;
+    BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
-    DataCache dataCache = DataCache.instance();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 
     /**
@@ -47,7 +47,7 @@ public class ColorHelper_1_8 implements IColorHelper
      */
     public ColorHelper_1_8()
     {
-        blocksTexture = initBlocksTexture();
+
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ColorHelper_1_8 implements IColorHelper
 
         // 1.8
         Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.meta);
+        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
         return block.getRenderColor(blockState);
     }
 
@@ -90,7 +90,7 @@ public class ColorHelper_1_8 implements IColorHelper
 
         // 1.8
         Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.meta);
+        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
         return block.getMapColor(blockState).colorValue;
     }
 
@@ -106,7 +106,8 @@ public class ColorHelper_1_8 implements IColorHelper
 
         Integer color = null;
 
-        if (blocksTexture == null)
+        boolean ok = blocksTexture != null || initBlocksTexture();
+        if (!ok)
         {
             logger.warn("BlocksTexture not yet loaded");
             return null;
@@ -158,6 +159,11 @@ public class ColorHelper_1_8 implements IColorHelper
 
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
+        if (blocksTexture == null)
+        {
+            initBlocksTexture();
+        }
+
         TextureAtlasSprite blockIcon = null;
 
         Block block = blockMD.getBlock();
@@ -166,7 +172,7 @@ public class ColorHelper_1_8 implements IColorHelper
         {
             overrideMeta = blockMD.getOverrideMeta();
         }
-        int meta = overrideMeta != null ? overrideMeta : blockMD.meta;
+        int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
 
         IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
 
@@ -187,6 +193,16 @@ public class ColorHelper_1_8 implements IColorHelper
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
+        if (blocksTexture == null)
+        {
+            initBlocksTexture();
+        }
+
+        if (blocksTexture == null)
+        {
+            return null;
+        }
+
         Integer color = null;
 
         try
@@ -266,7 +282,6 @@ public class ColorHelper_1_8 implements IColorHelper
             if (unusable)
             {
                 blockMD.addFlags(BlockMD.Flag.Error);
-                dataCache.getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.Error);
                 String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
                 logger.debug(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
                 r = g = b = 0;
@@ -304,7 +319,7 @@ public class ColorHelper_1_8 implements IColorHelper
                     }
                 }
             }
-            //dataCache.getBlockMetadata().setAlpha(block, blockAlpha);
+            //dataCache.getBlockMetadata().setAllAlpha(block, blockAlpha);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
         }
@@ -324,52 +339,47 @@ public class ColorHelper_1_8 implements IColorHelper
         return color;
     }
 
-    private BufferedImage initBlocksTexture()
+    @Override
+    public boolean initBlocksTexture()
     {
-
         StatTimer timer = StatTimer.get("IconLoader.initBlocksTexture", 0);
-        timer.start();
-
-        BufferedImage image = null;
 
         try
         {
-            int glid = ForgeHelper.INSTANCE.getClient().getTextureManager().getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
-            GL11.glBindTexture(3553, glid);
-            int width = GL11.glGetTexLevelParameteri(3553, 0, 4096);
-            int height = GL11.glGetTexLevelParameteri(3553, 0, 4097);
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
-
-            GL11.glGetTexImage(3553, 0, 6408, 5121, byteBuffer);
-            image = new BufferedImage(width, height, 6);
-            byteBuffer.position(0);
-            byte[] var4 = new byte[byteBuffer.remaining()];
-            byteBuffer.get(var4);
-
-            for (int var5 = 0; var5 < width; var5++)
+            if (!Display.isCurrent())
             {
-                for (int var6 = 0; var6 < height; var6++)
-                {
-                    int var7 = var6 * width * 4 + var5 * 4;
-                    byte var8 = 0;
-                    int var10 = var8 | (var4[(var7 + 2)] & 0xFF);
-                    var10 |= (var4[(var7 + 1)] & 0xFF) << 8;
-                    var10 |= (var4[(var7 + 0)] & 0xFF) << 16;
-                    var10 |= (var4[(var7 + 3)] & 0xFF) << 24;
-                    image.setRGB(var5, var6, var10);
-                }
+                return false;
             }
 
+            timer.start();
+
+            ForgeHelper.INSTANCE.getClient().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+            GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+
+            int miplevel = 0;
+            int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
+            int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
+            IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
+            int[] aint = new int[width * height];
+            GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
+            intbuffer.get(aint);
+            BufferedImage bufferedimage = new BufferedImage(width, height, 2);
+            bufferedimage.setRGB(0, 0, width, height, aint, 0, width);
+
             timer.stop();
+            Journeymap.getLogger().info(timer.getLogReportString());
+
+            blocksTexture = bufferedimage;
+            return true;
 
         }
         catch (Throwable t)
         {
             logger.error("Could not load blocksTexture :" + t);
             timer.cancel();
+            return false;
         }
-
-        return image;
     }
 
 }

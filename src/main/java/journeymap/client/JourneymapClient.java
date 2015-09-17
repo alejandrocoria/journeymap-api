@@ -9,7 +9,7 @@
 package journeymap.client;
 
 import journeymap.client.cartography.ChunkRenderController;
-import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.FeatureManager;
@@ -37,7 +37,6 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.network.WorldIDPacket;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -447,7 +446,7 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.reset();
-            ColorCache.instance().ensureCurrent();
+            ColorManager.instance().ensureCurrent();
 
             multithreadTaskController = new TaskController();
             multithreadTaskController.enableTasks();

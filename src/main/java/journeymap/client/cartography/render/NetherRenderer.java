@@ -62,8 +62,8 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
         {
             y = sliceMaxY;
 
-            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-            BlockMD blockMDAbove = dataCache.getBlockMD(chunkMd, x, Math.min(y + 1, sliceMaxY), z);
+            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+            BlockMD blockMDAbove = BlockMD.getBlockMD(chunkMd, x, Math.min(y + 1, sliceMaxY), z);
 
             while (y > 0)
             {
@@ -87,8 +87,8 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 
                 y--;
 
-                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-                blockMDAbove = dataCache.getBlockMD(chunkMd, x, y + 1, z);
+                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                blockMDAbove = BlockMD.getBlockMD(chunkMd, x, y + 1, z);
             }
         }
         catch (Exception e)

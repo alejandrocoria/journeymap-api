@@ -8,10 +8,8 @@
 
 package journeymap.client.model.mod;
 
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
-import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,9 +17,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -42,30 +37,30 @@ public class CarpentersBlocks
          * treated like vanilla torches and not mapped.
          */
         @Override
-        public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
+        public boolean initialize(BlockMD blockMD)
         {
-            List<GameRegistry.UniqueIdentifier> specialHandlingUids = new ArrayList<GameRegistry.UniqueIdentifier>(16);
-            for (GameRegistry.UniqueIdentifier uid : registeredBlockIds)
-            {
+
+            GameRegistry.UniqueIdentifier uid = blockMD.getUid();
                 if(uid.modId.equals(MODID))
                 {
                     if(uid.name.equals("blockCarpentersTorch"))
                     {
-                        cache.setFlags(uid, HasAir, NoShadow);
+                        blockMD.addFlags(HasAir, NoShadow);
                     }
                     else if(uid.name.equals("blockCarpentersLadder"))
                     {
-                        cache.setFlags(uid, SpecialHandling, OpenToSky);
-                        specialHandlingUids.add(uid);
+                        blockMD.addFlags(OpenToSky);
+                        blockMD.setModBlockHandler(this);
+                        return true;
                     }
                     else
                     {
-                        cache.setFlags(uid, SpecialHandling);
-                        specialHandlingUids.add(uid);
+                        blockMD.setModBlockHandler(this);
+                        return true;
                     }
                 }
-            }
-            return specialHandlingUids;
+
+            return false;
         }
 
         /**
@@ -105,7 +100,7 @@ public class CarpentersBlocks
                             meta = Integer.parseInt(idMeta.substring(0, idMeta.length() - 1));
                         }
                         Block block = GameData.getBlockRegistry().getObjectById(id);
-                        blockMD = DataCache.instance().getBlockMD(block, meta);
+                        blockMD = BlockMD.get(block, meta);
                     }
                 }
             }
