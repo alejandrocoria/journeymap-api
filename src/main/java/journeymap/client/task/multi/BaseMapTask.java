@@ -128,11 +128,7 @@ public abstract class BaseMapTask implements ITask
                             renderController.renderChunk(cCoord, chunkMd, mapType);
                             count++;
                         }
-                        else
-                        {
-                            // TODO REMOVE
-                            logger.info("Can't map empty chunk: " + cCoord);
-                        }
+
                     }
                     catch (ChunkMD.ChunkMissingException e)
                     {

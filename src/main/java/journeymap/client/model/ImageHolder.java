@@ -38,6 +38,7 @@ public class ImageHolder
     final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
     final int imageSize;
+    boolean blank = true;
     boolean dirty = true;
     boolean partialUpdate;
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
@@ -93,6 +94,7 @@ public class ImageHolder
                 g2D.drawImage(imagePart, x, y, null);
                 g2D.dispose();
                 partialUpdate = true;
+                blank = false;
             }
             else
             {
@@ -138,6 +140,12 @@ public class ImageHolder
             if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)
             {
                 image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+                blank = true;
+                dirty = false;
+            }
+            else
+            {
+                blank = false;
             }
             this.texture = new TextureImpl(null, image, true, false);
             texture.setDescription(imagePath.toString());
@@ -157,6 +165,11 @@ public class ImageHolder
 
     protected void writeToDisk()
     {
+        if (blank)
+        {
+            return;
+        }
+
         writeToDiskTimer.start();
         if (writeLock.tryLock())
         {
