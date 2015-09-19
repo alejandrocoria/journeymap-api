@@ -126,7 +126,6 @@ public class MapRegionTask extends BaseMapTask
         {
             logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
         }
-        RegionImageCache.instance().getRegionImageSet(rCoord);
     }
 
     @Override

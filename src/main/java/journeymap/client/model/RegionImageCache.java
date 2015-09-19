@@ -100,6 +100,11 @@ public class RegionImageCache
         return regionImageSetsCache.getUnchecked(RegionImageSet.Key.from(rCoord));
     }
 
+    public RegionImageSet getRegionImageSet(RegionImageSet.Key rCoordKey)
+    {
+        return regionImageSetsCache.getUnchecked(rCoordKey);
+    }
+
     // Doesn't trigger access on cache
     private Collection<RegionImageSet> getRegionImageSets()
     {
