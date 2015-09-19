@@ -203,6 +203,11 @@ public class RegionImageCache
 
     public void clear()
     {
+        for (RegionImageSet regionImageSet : getRegionImageSets())
+        {
+            // Ensures textures are properly disposed of
+            regionImageSet.clear();
+        }
         regionImageSetsCache.invalidateAll();
         regionImageSetsCache.cleanUp();
     }
