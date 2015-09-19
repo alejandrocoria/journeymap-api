@@ -123,9 +123,15 @@ public abstract class BaseMapTask implements ITask
                         // TODO: Confirm this works as expected
                         // Don't render the chunk if it's empty
                         Chunk chunk = world.getChunkFromChunkCoords(cCoord.chunkX, cCoord.chunkZ);
-                        if(!(chunk instanceof EmptyChunk)) {
+                        if (chunk != null && !(chunk instanceof EmptyChunk))
+                        {
                             renderController.renderChunk(cCoord, chunkMd, mapType);
                             count++;
+                        }
+                        else
+                        {
+                            // TODO REMOVE
+                            logger.info("Can't map empty chunk: " + cCoord);
                         }
                     }
                     catch (ChunkMD.ChunkMissingException e)

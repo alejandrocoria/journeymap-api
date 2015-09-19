@@ -61,13 +61,19 @@ public class ChunkLoader
         ChunkMD chunkMD = null;
         try
         {
-            Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
-            if (chunk != null)
+            // Check for the region file on disk first so the loader doesn't create empty region files
+            File regionDir = new File(loader.chunkSaveLocation, "region");
+            File regionFile = new File(regionDir, "r." + (coord.chunkXPos >> 5) + "." + (coord.chunkZPos >> 5) + ".mca");
+            if (regionFile.exists())
             {
-                // 1.8 TODO:  Can this be safely left commented out?
-                // chunk.generateHeightMap();
-                chunk.generateSkylightMap();
-                chunkMD = new ChunkMD(chunk);
+                Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+                if (chunk != null)
+                {
+                    // 1.8 TODO:  Can this be safely left commented out?
+                    // chunk.generateHeightMap();
+                    chunk.generateSkylightMap();
+                    chunkMD = new ChunkMD(chunk);
+                }
             }
         }
         catch (IOException e)
