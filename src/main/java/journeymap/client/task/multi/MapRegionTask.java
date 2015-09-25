@@ -86,7 +86,7 @@ public class MapRegionTask extends BaseMapTask
         int missing = 0;
         for (ChunkCoordIntPair coord : retainedCoords)
         {
-            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord);
+            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null)
             {
                 DataCache.instance().addChunkMD(chunkMD);
@@ -95,7 +95,7 @@ public class MapRegionTask extends BaseMapTask
 
         for (ChunkCoordIntPair coord : chunkCoords)
         {
-            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord);
+            ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null)
             {
                 DataCache.instance().addChunkMD(chunkMD);
@@ -118,13 +118,18 @@ public class MapRegionTask extends BaseMapTask
     }
 
     @Override
-    protected void complete(boolean cancelled, boolean hadError)
+    protected void complete(int mappedChunks, boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
+        RegionImageCache.instance().flushToDisk();
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {
             logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
+        }
+        else
+        {
+            logger.info(String.format("Mapped chunks found in %s: %s ", rCoord, mappedChunks));
         }
     }
 

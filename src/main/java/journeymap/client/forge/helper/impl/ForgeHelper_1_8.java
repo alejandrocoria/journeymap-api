@@ -475,7 +475,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return (chunk.isChunkLoaded && !chunk.isEmpty());
 
         // 1.8
-        return (chunk.isLoaded() && !chunk.isEmpty());
+        return (chunk!=null && chunk.isLoaded() && !(chunk instanceof EmptyChunk));
     }
 
     @Override
