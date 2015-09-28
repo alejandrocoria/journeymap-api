@@ -12,7 +12,6 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
-// 1.7.10
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -26,16 +25,18 @@ import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-// 1.8
-//import net.minecraftforge.fml.common.Loader;
-//import net.minecraftforge.fml.common.registry.GameData;
-//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
+
+// 1.7.10
+// 1.8
+//import net.minecraftforge.fml.common.Loader;
+//import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * Provides serialization of cache colors to/from file.

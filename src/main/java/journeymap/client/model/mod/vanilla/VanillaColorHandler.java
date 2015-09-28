@@ -9,7 +9,6 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
-import net.minecraft.block.BlockFlower;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -97,16 +96,18 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
         BlockMD.VOIDBLOCK.setBaseColor(0x110C19);
 
         // Flower colors look bad because the stem color is averaged in, overriding them is easier.
-        // 1.8
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta()).setBaseColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setBaseColor(0x1E7EB6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setBaseColor(0x8549B6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setBaseColor(0x9DA1A7);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setBaseColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setBaseColor(0xA3581A);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setBaseColor(0xB0B0B0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setBaseColor(0xB09AB0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setBaseColor(0xB3B3B3);
-        BlockMD.get(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setBaseColor(0xAFB401);
+        // 1.7.10
+        // public static final String[] field_149859_a = new String[] {"poppy", "blueOrchid", "allium", "houstonia", "tulipRed", "tulipOrange", "tulipWhite", "tulipPink", "oxeyeDaisy"};
+        // public static final String[] field_149858_b = new String[] {"dandelion"};
+        BlockMD.get(Blocks.red_flower, 0).setBaseColor(0x980406);
+        BlockMD.get(Blocks.red_flower, 1).setBaseColor(0x1E7EB6);
+        BlockMD.get(Blocks.red_flower, 2).setBaseColor(0x8549B6);
+        BlockMD.get(Blocks.red_flower, 3).setBaseColor(0x9DA1A7);
+        BlockMD.get(Blocks.red_flower, 4).setBaseColor(0x980406);
+        BlockMD.get(Blocks.red_flower, 5).setBaseColor(0xA3581A);
+        BlockMD.get(Blocks.red_flower, 6).setBaseColor(0xB0B0B0);
+        BlockMD.get(Blocks.red_flower, 7).setBaseColor(0xB09AB0);
+        BlockMD.get(Blocks.red_flower, 8).setBaseColor(0xB3B3B3);
+        BlockMD.get(Blocks.yellow_flower, 0).setBaseColor(0xAFB401);
     }
 }

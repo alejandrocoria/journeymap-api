@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.cartography.RGB;
@@ -24,8 +26,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
@@ -35,11 +35,10 @@ import java.util.*;
  */
 public class BlockMD
 {
+    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
-
-    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     private final Block block;
     private final int meta;
     private final GameRegistry.UniqueIdentifier uid;
@@ -53,6 +52,33 @@ public class BlockMD
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
 
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
+
+    /**
+     * Private constructor.
+     */
+    private BlockMD(Block block, int meta)
+    {
+        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+    }
+
+    /**
+     * Private constructor
+     */
+    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    {
+        this.block = block;
+        this.meta = meta;
+        this.uid = uid;
+        this.name = name;
+        this.alpha = alpha;
+        this.textureSide = textureSide;
+        this.flags = flags;
+        this.blockColorHandler = VanillaColorHandler.INSTANCE;
+        if (block != null)
+        {
+            modBlockDelegate.initialize(this);
+        }
+    }
 
     /**
      * Preloads the cache with all registered blocks and their subblocks.
@@ -82,6 +108,7 @@ public class BlockMD
 
     /**
      * Get all BlockMDs.
+     *
      * @return
      */
     public static Collection<BlockMD> getAll()
@@ -194,33 +221,6 @@ public class BlockMD
         for (BlockMD blockMD : getAll())
         {
             Journeymap.getLogger().info(blockMD);
-        }
-    }
-
-    /**
-     * Private constructor.
-     */
-    private BlockMD(Block block, int meta)
-    {
-        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
-    }
-
-    /**
-     * Private constructor
-     */
-    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
-    {
-        this.block = block;
-        this.meta = meta;
-        this.uid = uid;
-        this.name = name;
-        this.alpha = alpha;
-        this.textureSide = textureSide;
-        this.flags = flags;
-        this.blockColorHandler = VanillaColorHandler.INSTANCE;
-        if (block != null)
-        {
-            modBlockDelegate.initialize(this);
         }
     }
 
@@ -457,16 +457,6 @@ public class BlockMD
     }
 
     /**
-     * Whether it should be used for beveled slope coloration.
-     *
-     * @return
-     */
-    public boolean hasNoShadow()
-    {
-        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
-    }
-
-    /**
      * Sets alpha.
      *
      * @param alpha the alpha
@@ -485,6 +475,16 @@ public class BlockMD
                 this.flags.remove(Flag.Transparency);
             }
         }
+    }
+
+    /**
+     * Whether it should be used for beveled slope coloration.
+     *
+     * @return
+     */
+    public boolean hasNoShadow()
+    {
+        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
     }
 
     /**

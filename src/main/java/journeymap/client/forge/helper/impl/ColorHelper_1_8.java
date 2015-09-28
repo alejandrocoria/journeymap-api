@@ -8,30 +8,6 @@
 
 package journeymap.client.forge.helper.impl;
 
-import journeymap.client.cartography.RGB;
-import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IColorHelper;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.log.StatTimer;
-import journeymap.client.model.BlockMD;
-import journeymap.common.Journeymap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
-
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.HashSet;
-
 /**
  * IColorHelper implementation for 1.8.   Formerly IconLoader.
  */

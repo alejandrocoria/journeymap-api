@@ -14,6 +14,7 @@ package journeymap.client.forge.helper.impl;
 public class ForgeHelper_1_8 // implements IForgeHelper
 {
 //    private IRenderHelper renderHelper = new RenderHelper_1_8();
+//    private IBlockAccess blockAccess = new JmBlockAccess();
 //
 //    @Override
 //    public IRenderHelper getRenderHelper()
@@ -25,6 +26,12 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //    public IColorHelper getColorHelper()
 //    {
 //        return new ColorHelper_1_8();
+//    }
+//
+//    @Override
+//    public IBlockAccess isAirBlock()
+//    {
+//        return blockAccess;
 //    }
 //
 //    @Override
@@ -94,13 +101,13 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //    }
 //
 //    @Override
-//    public int getLightOpacity(World world, BlockMD blockMD, int x, int y, int z)
+//    public int getLightOpacity(BlockMD blockMD, int x, int y, int z)
 //    {
 //        // 1.7
 //        // return blockMD.getBlock().getLightOpacity(world, x & 15, y, z & 15);
 //
 //        // 1.8
-//        return blockMD.getBlock().getLightOpacity(world, new BlockPos(x, y, z));
+//        return blockMD.getBlock().getLightOpacity(blockAccess, new BlockPos(x, y, z));
 //    }
 //
 //    @Override
@@ -217,67 +224,7 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //    @Override
 //    public String getRealmsServerName()
 //    {
-//        // 1.7
 //        String serverName = null;
-////        Minecraft mc = ForgeHelper.INSTANCE.getClient();
-////        if(!mc.isSingleplayer())
-////        {
-////            try
-////            {
-////                NetHandlerPlayClient netHandler = mc.getNetHandler();
-////                GuiScreen netHandlerGui = ReflectionHelper.getPrivateValue(NetHandlerPlayClient.class, netHandler, "field_147307_j", "guiScreenServer");
-////
-////                if (netHandlerGui instanceof GuiScreenRealmsProxy)
-////                {
-////                    RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).func_154321_a();
-////                    if (realmsScreen instanceof RealmsMainScreen)
-////                    {
-////                        RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
-////                        long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
-////                        List<McoServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
-////                        for (McoServer mcoServer : mcoServers)
-////                        {
-////                            if (mcoServer.id == selectedServerId)
-////                            {
-////                                serverName = mcoServer.name;
-////                                break;
-////                            }
-////                        }
-////                    }
-////                }
-////            }
-////            catch (Throwable t)
-////            {
-////                JourneyMap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
-////            }
-////        }
-////
-////        if (serverName != null)
-////        {
-////            return serverName;
-////        }
-////        else
-////        {
-////            Minecraft mc = ForgeHelper.INSTANCE.getClient();
-////            ServerData serverData = mc.func_147104_D(); // 1.8 getServerData()
-////
-////            if (serverData != null)
-////            {
-////                serverName = serverData.serverName;
-////                if (serverName != null)
-////                {
-////                    serverName = serverName.replaceAll("\\W+", "~").trim();
-////
-////                    if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
-////                    {
-////                        serverName = serverData.serverIP;
-////                    }
-////                    return serverName;
-////                }
-////            }
-////        }
-//
-//        // 1.8
 //        Minecraft mc = ForgeHelper.INSTANCE.getClient();
 //        if(!mc.isSingleplayer())
 //        {
@@ -409,13 +356,13 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //    }
 //
 //    @Override
-//    public TileEntity getTileEntity(World world, int localX, int y, int localZ)
+//    public TileEntity getTileEntity(int localX, int y, int localZ)
 //    {
 //        // 1.7
 //        // return world.getTileEntity(localX, y, localZ);
 //
 //        // 1.8
-//        return world.getTileEntity(new BlockPos(localX, y, localZ));
+//        return blockAccess.getTileEntity(new BlockPos(localX, y, localZ));
 //    }
 //
 //    @Override
@@ -449,18 +396,13 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //    }
 //
 //    @Override
-//    public BiomeGenBase getBiome(World world, int x, int y, int z)
+//    public BiomeGenBase getBiome(int x, int y, int z)
 //    {
 //        // 1.7
 //        // return world.getBiomeGenForCoords(x, y, z);
 //
 //        // 1.8
-//        BlockPos pos = new BlockPos(x, y, z);
-//        Chunk chunk = world.getChunkFromBlockCoords(pos);
-//        if(chunk instanceof EmptyChunk) {
-//            return null;
-//        }
-//        return world.getBiomeGenForCoords(pos);
+//        return blockAccess.getBiomeGenForCoords(new BlockPos(x, y, z));
 //    }
 //
 //    @Override
@@ -490,7 +432,7 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //        // return (chunk.isChunkLoaded && !chunk.isEmpty());
 //
 //        // 1.8
-//        return (chunk.isLoaded() && !chunk.isEmpty());
+//        return (chunk!=null && chunk.isLoaded() && !(chunk instanceof EmptyChunk));
 //    }
 //
 //    @Override
@@ -520,6 +462,110 @@ public class ForgeHelper_1_8 // implements IForgeHelper
 //     */
 //    private BlockPos pos(Chunk chunk, int localX, int y, int localZ)
 //    {
-//       return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
+//        return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
+//    }
+//
+//    class JmBlockAccess implements IBlockAccess
+//    {
+//
+//        @Override
+//        public TileEntity getTileEntity(BlockPos pos)
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().getTileEntity(pos);
+//        }
+//
+//        @Override
+//        public int getCombinedLight(BlockPos pos, int min)
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().getCombinedLight(pos, min);
+//        }
+//
+//        @Override
+//        public IBlockState getBlockState(BlockPos pos)
+//        {
+//            if (!this.isValid(pos))
+//            {
+//                return Blocks.air.getDefaultState();
+//            }
+//            else
+//            {
+//                ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
+//                if (chunkMD.hasChunk())
+//                {
+//                    return chunkMD.getChunk().getBlockState(pos);
+//                }
+//                return Blocks.air.getDefaultState();
+//            }
+//        }
+//
+//        @Override
+//        public boolean isAirBlock(BlockPos pos)
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().isAirBlock(pos);
+//        }
+//
+//        @Override
+//        public BiomeGenBase getBiomeGenForCoords(BlockPos pos)
+//        {
+//            ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
+//            if (chunkMD!=null && chunkMD.hasChunk())
+//            {
+//                try
+//                {
+//                    Chunk chunk = chunkMD.getChunk();
+//                    BiomeGenBase biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
+//                    if(biome==null) {
+//                        return null;
+//                    }
+//                    return biome;
+//                }
+//                catch (Throwable throwable)
+//                {
+//                    Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
+//                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
+//                }
+//            }
+//            else
+//            {
+//                return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+//            }
+//        }
+//
+//        @Override
+//        public boolean extendedLevelsInChunkCache()
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+//        }
+//
+//        @Override
+//        public int getStrongPower(BlockPos pos, EnumFacing direction)
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().getStrongPower(pos, direction);
+//        }
+//
+//        @Override
+//        public WorldType getWorldType()
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().getWorldType();
+//        }
+//
+//        @Override
+//        public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default)
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().isSideSolid(pos, side, _default);
+//        }
+//
+//        /**
+//         * Check if the given BlockPos has valid coordinates
+//         */
+//        private boolean isValid(BlockPos pos)
+//        {
+//            return pos.getX() >= -30000000 && pos.getZ() >= -30000000 && pos.getX() < 30000000 && pos.getZ() < 30000000 && pos.getY() >= 0 && pos.getY() < 256;
+//        }
+//
+//        private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
+//        {
+//            return DataCache.instance().getChunkMD(new ChunkCoordIntPair(pos.getX() >> 4, pos.getZ() >> 4));
+//        }
 //    }
 }

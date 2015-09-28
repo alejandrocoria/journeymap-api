@@ -41,6 +41,37 @@ public class ModBlockDelegate
     }
 
     /**
+     * Provide special handling of a block in-situ when encountered during a mapping task.
+     * The block returned will be used to color that spot on the map.
+     */
+    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
+    {
+        BlockMD delegatedBlockMD = null;
+        try
+        {
+            IModBlockHandler handler = blockMD.getModBlockHandler();
+            if (handler != null)
+            {
+                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, localX, y, localZ);
+            }
+            else
+            {
+                blockMD.setModBlockHandler(null);
+            }
+        }
+        catch (Throwable t)
+        {
+            String message = String.format("Error handling block '%s': %s", blockMD, LogFormatter.toString(t));
+            logger.error(message);
+        }
+        if (delegatedBlockMD == null)
+        {
+            delegatedBlockMD = blockMD;
+        }
+        return delegatedBlockMD;
+    }
+
+    /**
      * Call handlers to initialize their blocks' flags with the cache.
      */
     public void initialize(BlockMD blockMD)
@@ -76,37 +107,6 @@ public class ModBlockDelegate
         }
 
 
-    }
-
-    /**
-     * Provide special handling of a block in-situ when encountered during a mapping task.
-     * The block returned will be used to color that spot on the map.
-     */
-    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
-    {
-        BlockMD delegatedBlockMD = null;
-        try
-        {
-            IModBlockHandler handler = blockMD.getModBlockHandler();
-            if (handler != null)
-            {
-                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, localX, y, localZ);
-            }
-            else
-            {
-                blockMD.setModBlockHandler(null);
-            }
-        }
-        catch (Throwable t)
-        {
-            String message = String.format("Error handling block '%s': %s", blockMD, LogFormatter.toString(t));
-            logger.error(message);
-        }
-        if (delegatedBlockMD == null)
-        {
-            delegatedBlockMD = blockMD;
-        }
-        return delegatedBlockMD;
     }
 
     /**

@@ -1,5 +1,8 @@
 package journeymap.client.forge.event;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -8,9 +11,6 @@ import journeymap.client.task.main.IMainThreadTask;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.EnumSet;
 
