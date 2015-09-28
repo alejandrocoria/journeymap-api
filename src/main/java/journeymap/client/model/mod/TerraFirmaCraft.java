@@ -8,19 +8,10 @@
 
 package journeymap.client.model.mod;
 
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
-import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
-import journeymap.client.model.BlockMDCache;
 import journeymap.client.model.ChunkMD;
-import net.minecraft.block.Block;
+import journeymap.client.model.mod.vanilla.VanillaColorHandler;
 import net.minecraft.world.biome.BiomeGenBase;
-// 1.8
-//import net.minecraftforge.fml.common.registry.GameData;
-//import net.minecraftforge.fml.common.registry.GameRegistry;
-
-import java.util.List;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -37,53 +28,47 @@ public class TerraFirmaCraft
         private final TfcWaterColorHandler waterColorHandler = new TfcWaterColorHandler();
 
         @Override
-        public List<GameRegistry.UniqueIdentifier> initialize(BlockMDCache cache, List<GameRegistry.UniqueIdentifier> registeredBlockIds)
+        public boolean initialize(BlockMD blockMD)
         {
-            BlockMDCache blockMdCache = DataCache.instance().getBlockMetadata();
-            for (GameRegistry.UniqueIdentifier uid : registeredBlockIds)
+            if (blockMD.getUid().modId.equals(MODID) || blockMD.getUid().modId.equals(MODID2))
             {
-                if(uid.modId.equals(MODID) || uid.modId.equals(MODID2))
+                String name = blockMD.getUid().name.toLowerCase();
+                if (name.equals("looserock") || name.equals("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
                 {
-                    String name = uid.name.toLowerCase();
-                    Block block = GameData.getBlockRegistry().getObject(uid.toString());
-                    if (name.equals("looserock") || name.equals("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
+                    blockMD.addFlags(HasAir, NoShadow, NoTopo);
+                }
+                else if (name.contains("seagrass"))
+                {
+                    blockMD.setTextureSide(2);
+                    blockMD.addFlags(Plant);
+                    //preloadColor(blockMD);
+                }
+                else if (name.contains("grass"))
+                {
+                    blockMD.addFlags(Grass);
+                    //preloadColor(blockMD);
+                }
+                else if (name.contains("dirt"))
+                {
+                    //preloadColor(blockMD);
+                }
+                else if (name.contains("water"))
+                {
+                    blockMD.setAlpha(.3f);
+                    blockMD.addFlags(Water, NoShadow);
+                    if (blockMD.getBaseColor() == null)
                     {
-                        blockMdCache.preloadBlock(block, HasAir, NoShadow, NoTopo);
+                        blockMD.setBaseColor(0x0b1940);
                     }
-                    else if(name.contains("seagrass"))
-                    {
-                        cache.setTextureSide(uid, 2);
-                        blockMdCache.preloadBlock(block, Plant);
-                    }
-                    else if (name.contains("grass"))
-                    {
-                        blockMdCache.preloadBlock(block, null, 1f, Grass);
-                    }
-                    else if (name.contains("dirt"))
-                    {
-                        blockMdCache.preloadBlock(block);
-                    }
-                    else if(name.contains("water"))
-                    {
-                        blockMdCache.preloadBlock(block, null, .3f, Water, NoShadow);
-                        for (int meta : BlockMD.getMetaValuesForBlock(block))
-                        {
-                            BlockMD blockMD = DataCache.instance().getBlockMD(block, meta);
-                            if (blockMD.getBaseColor() == null)
-                            {
-                                blockMD.setBaseColor(0x0b1940);
-                            }
-                            blockMD.setBlockColorHandler(waterColorHandler);
-                        }
-                    }
-                    else if(name.contains("leaves"))
-                    {
-                        blockMdCache.preloadBlock(block, NoTopo, Foliage);
-                    }
+                    blockMD.setBlockColorHandler(waterColorHandler);
+                }
+                else if (name.contains("leaves"))
+                {
+                    blockMD.addFlags(NoTopo, Foliage);
                 }
             }
 
-            return null;
+            return false;
         }
 
         @Override
@@ -94,7 +79,7 @@ public class TerraFirmaCraft
 
     }
 
-    public static class TfcWaterColorHandler extends Vanilla.CommonColorHandler
+    public static class TfcWaterColorHandler extends VanillaColorHandler
     {
         public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
         {

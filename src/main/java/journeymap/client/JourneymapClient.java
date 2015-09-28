@@ -14,7 +14,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.cartography.ChunkRenderController;
-import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.FeatureManager;
@@ -452,7 +452,7 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.reset();
-            ColorCache.instance().ensureCurrent();
+            ColorManager.instance().ensureCurrent();
 
             multithreadTaskController = new TaskController();
             multithreadTaskController.enableTasks();

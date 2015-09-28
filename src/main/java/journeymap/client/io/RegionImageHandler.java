@@ -24,7 +24,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,10 +92,8 @@ public class RegionImageHandler
 
     public static BufferedImage readRegionImage(File regionFile, boolean returnNull)
     {
-        FileInputStream fis = null;
         BufferedImage image = null;
-
-        if (regionFile.exists() && regionFile.canRead())
+        if (regionFile.canRead())
         {
             try
             {
@@ -109,13 +106,6 @@ public class RegionImageHandler
             }
         }
 
-        if (image == null)
-        {
-            if (!returnNull)
-            {
-                image = createBlankImage(512, 512);
-            }
-        }
         return image;
     }
 

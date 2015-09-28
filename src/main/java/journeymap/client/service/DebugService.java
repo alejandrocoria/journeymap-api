@@ -10,7 +10,7 @@ package journeymap.client.service;
 
 import com.google.common.io.CharStreams;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
@@ -67,7 +67,7 @@ public class DebugService extends FileService
         if (JourneymapClient.getInstance().isMapping())
         {
             sb.append(LogFormatter.LINEBREAK).append("<h1>Block Data</h1><div>");
-            sb.append(LogFormatter.LINEBREAK).append(ColorCache.instance().getCacheDebugHtml());
+            sb.append(LogFormatter.LINEBREAK).append(ColorManager.instance().getCacheDebugHtml());
             sb.append(LogFormatter.LINEBREAK).append("</div><!-- / Block Data -->");
         }
 

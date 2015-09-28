@@ -9,13 +9,10 @@
 package journeymap.client.cartography;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.chunk.EmptyChunk;
 
 import java.util.Stack;
 
@@ -136,7 +133,7 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(ColorCache.instance().getBlockColor(chunkMd, blockMD, x, y, z));
+                    setWaterColor(ColorManager.instance().getBlockColor(chunkMd, blockMD, x, y, z));
                 }
             }
 

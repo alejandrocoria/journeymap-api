@@ -18,7 +18,6 @@ import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.ChatLog;
@@ -217,7 +216,20 @@ public class ColorPalette
         ArrayList<BlockColor> list = new ArrayList<BlockColor>(map.size());
         for (Map.Entry<BlockMD, Integer> entry : map.entrySet())
         {
-            list.add(new BlockColor(entry.getKey(), entry.getValue()));
+            BlockMD blockMD = entry.getKey();
+            Integer color = entry.getValue();
+            if (blockMD == null || color == null)
+            {
+                continue;
+            }
+            if (blockMD.hasFlag(BlockMD.Flag.Error))
+            {
+                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + entry.getKey());
+            }
+            else
+            {
+                list.add(new BlockColor(blockMD, color));
+            }
         }
         Collections.sort(list);
         return list;
@@ -251,18 +263,13 @@ public class ColorPalette
         for (BlockColor blockColor : list)
         {
             GameRegistry.UniqueIdentifier uid = new GameRegistry.UniqueIdentifier(blockColor.uid);
-
-            // 1.7.10
-            // Block block = GameRegistry.findBlock(uid.modId, uid.name);
-
-            // 1.8 TODO: Should work in 1.7 too, verify
             Block block = GameData.getBlockRegistry().getObject(uid.toString());
             if (block == null)
             {
                 Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
                 continue;
             }
-            BlockMD blockMD = DataCache.instance().getBlockMD(block, blockColor.meta);
+            BlockMD blockMD = BlockMD.get(block, blockColor.meta);
             if (blockMD.hasFlag(BlockMD.Flag.Transparency))
             {
                 Float alpha = blockColor.alpha;
@@ -368,7 +375,7 @@ public class ColorPalette
             this.name = blockMD.getName();
             // 1.8 needs the cast
             this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
-            this.meta = blockMD.meta;
+            this.meta = blockMD.getMeta();
 
             Color awtColor = new Color(intColor);
             this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());

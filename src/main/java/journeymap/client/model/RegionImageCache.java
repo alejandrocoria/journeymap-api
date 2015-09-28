@@ -100,6 +100,11 @@ public class RegionImageCache
         return regionImageSetsCache.getUnchecked(RegionImageSet.Key.from(rCoord));
     }
 
+    public RegionImageSet getRegionImageSet(RegionImageSet.Key rCoordKey)
+    {
+        return regionImageSetsCache.getUnchecked(rCoordKey);
+    }
+
     // Doesn't trigger access on cache
     private Collection<RegionImageSet> getRegionImageSets()
     {
@@ -203,6 +208,11 @@ public class RegionImageCache
 
     public void clear()
     {
+        for (RegionImageSet regionImageSet : getRegionImageSets())
+        {
+            // Ensures textures are properly disposed of
+            regionImageSet.clear();
+        }
         regionImageSetsCache.invalidateAll();
         regionImageSetsCache.cleanUp();
     }

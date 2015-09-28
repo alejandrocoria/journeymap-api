@@ -10,108 +10,224 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorCache;
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.cartography.RGB;
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.log.LogFormatter;
+import journeymap.client.log.StatTimer;
 import journeymap.client.model.mod.ModBlockDelegate;
-import journeymap.client.model.mod.Vanilla;
+import journeymap.client.model.mod.vanilla.VanillaColorHandler;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
-// 1.7.10
-// 1.8
-//import net.minecraftforge.fml.common.registry.GameData;
-//import net.minecraftforge.fml.common.registry.GameRegistry;
-
 /**
- * Block Metadata
+ * Block + meta = BlockMetaData.  Carries color, flags, and other
+ * data points specific to a Block+meta combination.
  */
 public class BlockMD
 {
-    public final GameRegistry.UniqueIdentifier uid;
-    public final int meta;
-    public final String name;
-    private final EnumSet<Flag> flags;
+    public static BlockMD AIRBLOCK;
+    public static BlockMD VOIDBLOCK;
+    private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
+
+    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     private final Block block;
-    private int textureSide = 1;
+    private final int meta;
+    private final GameRegistry.UniqueIdentifier uid;
+    private final String name;
+    private EnumSet<Flag> flags;
+    private int textureSide;
     private Integer overrideMeta;
     private Integer color;
     private float alpha;
     private String iconName;
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
 
+    private ModBlockDelegate.IModBlockHandler modBlockHandler;
+
     /**
-     * Instantiates a new BlockMD.
-     *
-     * @param displayName the display name
-     * @param block       the block
-     * @param meta        the meta
-     * @param alpha       the alpha
-     * @param flags       the flags
+     * Preloads the cache with all registered blocks and their subblocks.
      */
-    BlockMD(String displayName, Block block, int meta, float alpha, BlockMD.Flag... flags)
+    public static void reset()
     {
-        this(displayName, block, meta, alpha, flags.length == 0 ? EnumSet.noneOf(BlockMD.Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
+        StatTimer timer = StatTimer.get("BlockMD.reset", 0, 2000);
+        timer.start();
+        cache.clear();
+
+        // Create new delegate
+        modBlockDelegate = new ModBlockDelegate();
+
+        // Dummy blocks
+        AIRBLOCK = new BlockMD(Blocks.air, 0, new GameRegistry.UniqueIdentifier("minecraft:air"), "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
+        VOIDBLOCK = new BlockMD(null, 0, new GameRegistry.UniqueIdentifier("journeymap:void"), "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
+
+        // Load all registered block+metas
+        Collection<BlockMD> all = getAll();
+
+        // Final color updates
+        VanillaColorHandler.INSTANCE.setExplicitColors();
+
+        timer.stop();
+        Journeymap.getLogger().info(String.format("Built BlockMD cache (%s) : %s", all.size(), timer.getLogReportString()));
     }
 
     /**
-     * Instantiates a new BlockMD.
-     *
-     * @param displayName the display name
-     * @param block       the block
-     * @param meta        the meta
-     * @param alpha       the alpha
-     * @param flags       the flags
+     * Get all BlockMDs.
+     * @return
      */
-    BlockMD(String displayName, Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
+    public static Collection<BlockMD> getAll()
     {
-        this(displayName, DataCache.instance().getBlockMetadata().findUniqueIdentifierFor(block), block, meta, alpha, flags);
-    }
-
-    /**
-     * Instantiates a new BlockMD.
-     *
-     * @param displayName the display name
-     * @param block       the block
-     * @param meta        the meta
-     * @param alpha       the alpha
-     * @param flags       the flags
-     */
-    BlockMD(String displayName, GameRegistry.UniqueIdentifier uid, Block block, int meta, float alpha, EnumSet<BlockMD.Flag> flags)
-    {
-        this.uid = uid;
-        this.meta = meta;
-        this.name = (displayName == null) ? this.uid.name : displayName;
-        if(flags==null) flags = EnumSet.noneOf(BlockMD.Flag.class);
-        this.flags = flags;
-        setAlpha(alpha);
-        if (block == null)
+        List<BlockMD> allBlockMDs = new ArrayList<BlockMD>(512);
+        for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            // 1.7.10
-            // block = GameRegistry.findBlock(uid.modId, uid.name);
-
-            // 1.8 TODO: Should work in 1.7 too, verify
-            block = GameData.getBlockRegistry().getObject(uid.toString());
-            if (block == null)
+            Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
+            for (int meta : metas)
             {
-                block = Blocks.air;
+                allBlockMDs.add(get(block, meta, metas.size()));
             }
         }
-        this.block = block;
-        this.blockColorHandler = Vanilla.CommonColorHandler.INSTANCE;
+        return allBlockMDs;
     }
 
-    public static String getBlockName(Block block, int meta)
+    /**
+     * Retrieves a BlockMD instance corresponding to chunk-local coords.
+     */
+    public static BlockMD getBlockMD(ChunkMD chunkMd, int localX, int y, int localZ)
+    {
+        try
+        {
+            if (y >= 0)
+            {
+                Block block = chunkMd.getBlock(localX, y, localZ);
+
+                if (block instanceof BlockAir)
+                {
+                    return AIRBLOCK;
+                }
+                else
+                {
+                    int meta = chunkMd.getBlockMeta(localX, y, localZ);
+                    BlockMD blockMD = get(block, meta);
+                    if (blockMD.hasFlag(Flag.SpecialHandling))
+                    {
+                        BlockMD delegated = ModBlockDelegate.handleBlock(chunkMd, blockMD, localX, y, localZ);
+                        if (delegated != null)
+                        {
+                            blockMD = delegated;
+                        }
+                    }
+                    return blockMD;
+                }
+            }
+            else
+            {
+                return VOIDBLOCK;
+            }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, localX, y, localZ, LogFormatter.toString(e)));
+            return AIRBLOCK;
+        }
+    }
+
+    /**
+     * Retrieves/lazy-creates the corresponding BlockMD instance.
+     */
+    public static BlockMD get(Block block, int meta)
+    {
+        return get(block, meta, null);
+    }
+
+    /**
+     * Retrieves/lazy-creates the corresponding BlockMD instance,
+     * preinitializing the inner map to subBlocks size if needed.
+     */
+    private static BlockMD get(Block block, int meta, Integer subBlocks)
+    {
+        try
+        {
+            if (block == null)
+            {
+                return AIRBLOCK;
+            }
+
+            Map<Integer, BlockMD> map = cache.get(block);
+            if (map == null)
+            {
+                if (subBlocks == null)
+                {
+                    subBlocks = BlockMD.getMetaValuesForBlock(block).size();
+                }
+                int size = (int) Math.ceil(Math.max(1, subBlocks) * 1.25);
+                map = new HashMap<Integer, BlockMD>(size + (size / 2));
+                cache.put(block, map);
+            }
+
+            BlockMD blockMD = map.get(meta);
+            if (blockMD == null)
+            {
+                blockMD = new BlockMD(block, meta);
+                map.put(meta, blockMD);
+            }
+
+            return blockMD;
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            return AIRBLOCK;
+        }
+    }
+
+    public static void debug()
+    {
+        for (BlockMD blockMD : getAll())
+        {
+            Journeymap.getLogger().info(blockMD);
+        }
+    }
+
+    /**
+     * Private constructor.
+     */
+    private BlockMD(Block block, int meta)
+    {
+        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+    }
+
+    /**
+     * Private constructor
+     */
+    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    {
+        this.block = block;
+        this.meta = meta;
+        this.uid = uid;
+        this.name = name;
+        this.alpha = alpha;
+        this.textureSide = textureSide;
+        this.flags = flags;
+        this.blockColorHandler = VanillaColorHandler.INSTANCE;
+        if (block != null)
+        {
+            modBlockDelegate.initialize(this);
+        }
+    }
+
+    /**
+     * Get a displayname for the block.
+     */
+    private static String getBlockName(Block block, int meta)
     {
         String name = null;
         try
@@ -164,15 +280,58 @@ public class BlockMD
         return metas;
     }
 
+    /**
+     * Get all BlockMD variations for a given block.
+     */
     public static Collection<BlockMD> getAllBlockMDs(Block block)
     {
+        if (cache.isEmpty())
+        {
+            reset();
+        }
+
         Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
         List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
         for (int meta : metas)
         {
-            list.add(DataCache.instance().getBlockMD(block, meta));
+            list.add(BlockMD.get(block, meta));
         }
         return list;
+    }
+
+    /**
+     * Set flags on all BlockMD variations of Block.
+     */
+    public static void setAllFlags(Block block, BlockMD.Flag... flags)
+    {
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.addFlags(flags);
+        }
+        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + flags);
+    }
+
+    /**
+     * Set alpha on all BlockMD variations of Block.
+     */
+    public static void setAllAlpha(Block block, Float alpha)
+    {
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.setAlpha(alpha);
+        }
+        Journeymap.getLogger().debug(block.getUnlocalizedName() + " alpha set: " + alpha);
+    }
+
+    /**
+     * Set texture side on all BlockMD variations of Block.
+     */
+    public static void setTextureSide(Block block, int side)
+    {
+        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        {
+            blockMD.setTextureSide(side);
+        }
     }
 
     /**
@@ -206,13 +365,28 @@ public class BlockMD
 
     /**
      * Add flags.
-     *
-     * @param addFlags the add flags
      */
     public void addFlags(Flag... addFlags)
     {
         Collections.addAll(this.flags, addFlags);
     }
+
+    /**
+     * Add flags.
+     */
+    public void addFlags(Collection<Flag> addFlags)
+    {
+        this.flags.addAll(addFlags);
+    }
+
+    /**
+     * Clear flags
+     */
+    public void clearFlags()
+    {
+        this.flags.clear();
+    }
+
 
     /**
      * Gets block color using chunk-local coords (x and z in {0-15} )
@@ -225,21 +399,17 @@ public class BlockMD
      */
     public int getColor(ChunkMD chunkMd, int blockX, int y, int blockZ)
     {
-        if (this.color != null)
+        if (!isBiomeColored() && this.color != null)
         {
             return this.color;
         }
         else
         {
-            Integer color = ColorCache.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
+            Integer color = ColorManager.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
             if (color == null)
             {
                 // Can't render this time
                 return RGB.BLACK_ARGB;
-            }
-            else if (!isBiomeColored())
-            {
-                this.color = color; // save
             }
 
             return color;
@@ -258,12 +428,12 @@ public class BlockMD
 
     public Integer getBaseColor()
     {
-        return ColorCache.instance().getBaseColor(this);
+        return this.color;
     }
 
     public void setBaseColor(Integer baseColor)
     {
-        ColorCache.instance().setBaseColor(this, baseColor);
+        this.color = baseColor;
     }
 
     public String getIconName()
@@ -418,6 +588,46 @@ public class BlockMD
     }
 
     /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Gets UID
+     *
+     * @return
+     */
+    public GameRegistry.UniqueIdentifier getUid()
+    {
+        return uid;
+    }
+
+    /**
+     * Gets meta
+     *
+     * @return
+     */
+    public int getMeta()
+    {
+        return meta;
+    }
+
+    /**
+     * Gets flags
+     *
+     * @return
+     */
+    public EnumSet<Flag> getFlags()
+    {
+        return flags;
+    }
+
+    /**
      * Has an override meta to use
      * @return
      */
@@ -436,11 +646,19 @@ public class BlockMD
         return hasAnyFlag(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     }
 
+    /**
+     * Gets texture side
+     * @return
+     */
     public int getTextureSide()
     {
         return textureSide;
     }
 
+    /**
+     * Sets texture side
+     * @param textureSide
+     */
     public void setTextureSide(int textureSide)
     {
         this.textureSide = textureSide;
@@ -456,9 +674,39 @@ public class BlockMD
         return overrideMeta;
     }
 
+    /**
+     * Sets override meta.
+     * @param overrideMeta
+     */
     public void setOverrideMeta(Integer overrideMeta)
     {
         this.overrideMeta = overrideMeta;
+    }
+
+    /**
+     * Gets handler for special mod blocks.
+     */
+    public ModBlockDelegate.IModBlockHandler getModBlockHandler()
+    {
+        return modBlockHandler;
+    }
+
+    /**
+     * Sets handler for special mod blocks.
+     *
+     * @param modBlockHandler
+     */
+    public void setModBlockHandler(ModBlockDelegate.IModBlockHandler modBlockHandler)
+    {
+        this.modBlockHandler = modBlockHandler;
+        if (modBlockHandler == null)
+        {
+            flags.remove(Flag.SpecialHandling);
+        }
+        else
+        {
+            flags.add(Flag.SpecialHandling);
+        }
     }
 
     @Override
@@ -495,30 +743,10 @@ public class BlockMD
         return result;
     }
 
-    /**
-     * To cache key string.
-     *
-     * @return the string
-     */
-    public String toCacheKeyString(GameRegistry.UniqueIdentifier uid, int meta)
-    {
-        return String.format("%s:%s:%s", uid.modId, uid.name, meta);
-    }
-
     @Override
     public String toString()
     {
-        return String.format("BlockMD [%s] (%s)", toCacheKeyString(uid, meta), Joiner.on(",").join(flags));
-    }
-
-    /**
-     * Gets name.
-     *
-     * @return the name
-     */
-    public String getName()
-    {
-        return name;
+        return String.format("BlockMD [%s:%s:%s] (%s)", uid.modId, uid.name, meta, Joiner.on(",").join(flags));
     }
 
     /**
@@ -601,6 +829,4 @@ public class BlockMD
          */
         NoTopo
     }
-
-
 }

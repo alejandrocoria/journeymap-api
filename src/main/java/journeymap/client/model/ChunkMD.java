@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
@@ -36,17 +37,22 @@ public class ChunkMD
     public static final String PROP_LOADED = "loaded";
     public static final String PROP_LAST_RENDERED = "lastRendered";
     final static DataCache dataCache = DataCache.instance();
-    private final SoftReference<Chunk> chunkReference;
+    private final SoftReference<Chunk> chunkSoftReference;
     private final ChunkCoordIntPair coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
+    private Chunk retainedChunk;
 
     public ChunkMD(Chunk chunk)
+    {
+        this(chunk, false);
+    }
+
+    public ChunkMD(Chunk chunk, boolean forceRetain)
     {
         if (chunk == null)
         {
             throw new IllegalArgumentException("Chunk can't be null");
         }
-        this.chunkReference = new SoftReference<Chunk>(chunk);
         this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition); // avoid GC issue holding onto chunk's coord ref
 
         // Set load time
@@ -54,6 +60,12 @@ public class ChunkMD
 
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
         properties.put(PROP_IS_SLIME_CHUNK, chunk.getRandomWithSeed(987234911L).nextInt(10) == 0);
+
+        this.chunkSoftReference = new SoftReference<Chunk>(chunk);
+        if (forceRetain)
+        {
+            retainedChunk = chunk;
+        }
     }
 
     public Block getBlock(int x, int y, int z)
@@ -63,7 +75,7 @@ public class ChunkMD
 
     public BlockMD getBlockMD(int x, int y, int z)
     {
-        return DataCache.instance().getBlockMD(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
+        return BlockMD.get(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
     }
 
     /**
@@ -83,7 +95,7 @@ public class ChunkMD
 
         do
         {
-            topBlockMd = dataCache.getBlockMD(this, x, y, z);
+            topBlockMd = BlockMD.getBlockMD(this, x, y, z);
 
             // Null check
             if (topBlockMd == null)
@@ -117,7 +129,6 @@ public class ChunkMD
      */
     public int ceiling(final int x, final int z)
     {
-        BlockMDCache blockMDCache = dataCache.getBlockMetadata();
         final int chunkHeight = getHeightValue(x, z);
         int y = chunkHeight;
 
@@ -153,7 +164,7 @@ public class ChunkMD
 
     public boolean hasChunk()
     {
-        return chunkReference.get() != null;
+        return chunkSoftReference.get() != null && !(chunkSoftReference.get() instanceof EmptyChunk);
     }
 
     public int getHeightValue(int x, int z)
@@ -168,7 +179,7 @@ public class ChunkMD
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getLightOpacity(getWorld(), blockMD, toWorldX(localX), y, toWorldZ(localZ));
+        return ForgeHelper.INSTANCE.getLightOpacity(blockMD, toWorldX(localX), y, toWorldZ(localZ));
     }
 
     public Serializable getProperty(String name)
@@ -219,7 +230,7 @@ public class ChunkMD
 
     public Chunk getChunk()
     {
-        Chunk chunk = chunkReference.get();
+        Chunk chunk = chunkSoftReference.get();
         if (chunk == null)
         {
             throw new ChunkMissingException(getCoord());
@@ -306,6 +317,20 @@ public class ChunkMD
         return ForgeHelper.INSTANCE.getDimension(getWorld());
     }
 
+    public void stopChunkRetention()
+    {
+        this.retainedChunk = null;
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        if (retainedChunk != null)
+        {
+            super.finalize();
+        }
+    }
+
     public static class ChunkMissingException extends RuntimeException
     {
         ChunkMissingException(ChunkCoordIntPair coord)
@@ -325,6 +350,4 @@ public class ChunkMD
             return Optional.fromNullable(chunkMD);
         }
     }
-
-
 }

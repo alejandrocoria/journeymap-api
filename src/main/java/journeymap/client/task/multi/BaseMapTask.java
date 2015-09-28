@@ -22,8 +22,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
@@ -73,7 +71,7 @@ public abstract class BaseMapTask implements ITask
         {
             if (mc.theWorld == null)
             {
-                this.complete(true, false);
+                this.complete(count, true, false);
                 return;
             }
 
@@ -90,7 +88,7 @@ public abstract class BaseMapTask implements ITask
                     logger.debug("Dimension changed, map task obsolete."); //$NON-NLS-1$
                 }
                 timer.cancel();
-                this.complete(true, false);
+                this.complete(count, true, false);
                 return;
             }
 
@@ -104,7 +102,7 @@ public abstract class BaseMapTask implements ITask
                         logger.debug("JM isn't mapping, aborting"); //$NON-NLS-1$
                     }
                     timer.cancel();
-                    this.complete(true, false);
+                    this.complete(count, true, false);
                     return;
                 }
 
@@ -120,17 +118,12 @@ public abstract class BaseMapTask implements ITask
                     try
                     {
                         ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, mapType, chunkMd);
-                        // TODO: Confirm this works as expected
-                        // Don't render the chunk if it's empty
-                        Chunk chunk = world.getChunkFromChunkCoords(cCoord.chunkX, cCoord.chunkZ);
-                        if(!(chunk instanceof EmptyChunk)) {
-                            renderController.renderChunk(cCoord, chunkMd, mapType);
-                            count++;
-                        }
+                        renderController.renderChunk(cCoord, chunkMd, mapType);
+                        count++;
                     }
-                    catch (ChunkMD.ChunkMissingException e)
+                    catch (Throwable t)
                     {
-                        logger.info(e.getMessage());
+                        logger.warn("Error rendering chunk " + chunkMd + ": " + t.getMessage());
                     }
                 }
             }
@@ -142,7 +135,7 @@ public abstract class BaseMapTask implements ITask
                     logger.debug("JM isn't mapping, aborting.");  //$NON-NLS-1$
                 }
                 timer.cancel();
-                this.complete(true, false);
+                this.complete(count, true, false);
                 return;
             }
 
@@ -155,7 +148,7 @@ public abstract class BaseMapTask implements ITask
             // Push chunk cache to region cache
             RegionImageCache.instance().updateTextures(flushCacheWhenDone);
             chunkCoords.clear();
-            this.complete(false, false);
+            this.complete(count, false, false);
             timer.stop();
         }
         catch (InterruptedException t)
@@ -168,7 +161,7 @@ public abstract class BaseMapTask implements ITask
         {
             String error = "Unexpected error in BaseMapTask: " + (LogFormatter.toString(t));
             Journeymap.getLogger().error(error);
-            this.complete(false, true);
+            this.complete(count, false, true);
             timer.cancel();
         }
         finally
@@ -180,7 +173,7 @@ public abstract class BaseMapTask implements ITask
         }
     }
 
-    protected abstract void complete(boolean cancelled, boolean hadError);
+    protected abstract void complete(int mappedChunks, boolean cancelled, boolean hadError);
 
     @Override
     public String toString()

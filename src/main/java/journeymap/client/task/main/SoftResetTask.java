@@ -45,7 +45,6 @@ public class SoftResetTask implements IMainThreadTask
         jm.loadConfigProperties();
         JMLogger.setLevelFromProperties();
         DataCache.instance().purge();
-        DataCache.instance().resetBlockMetadata();
         TileDrawStepCache.instance().invalidateAll();
         UIManager.getInstance().reset();
         WaypointStore.instance().reset();

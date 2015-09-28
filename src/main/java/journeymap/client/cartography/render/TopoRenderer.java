@@ -179,7 +179,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                         int checkY = roofY;
                         while (checkY > standardY)
                         {
-                            topBlockMd = dataCache.getBlockMD(chunkMd, x, checkY, z);
+                            topBlockMd = BlockMD.getBlockMD(chunkMd, x, checkY, z);
                             if (topBlockMd.isTransparentRoof())
                             {
                                 y = Math.max(standardY, checkY);
@@ -252,7 +252,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         try
         {
-            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             boolean propUnsetWaterHeight = true;
 
             while (y > 0)
@@ -274,7 +274,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     break;
                 }
                 y--;
-                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             }
         }
         catch (Exception e)

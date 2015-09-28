@@ -44,6 +44,20 @@ public class RegionLoader
         this.regionsFound = regions.size();
     }
 
+    public static File getRegionFile(Minecraft minecraft, int dimension, int chunkX, int chunkZ)
+    {
+        File regionDir = new File(FileHandler.getWorldSaveDir(minecraft), "region");
+        File regionFile = new File(regionDir, String.format("r.%s.%s.mca", (chunkX >> 5), (chunkZ >> 5)));
+        return regionFile;
+    }
+
+    public static File getRegionFile(Minecraft minecraft, int chunkX, int chunkZ)
+    {
+        File regionDir = new File(FileHandler.getWorldSaveDir(minecraft), "region");
+        File regionFile = new File(regionDir, String.format("r.%s.%s.mca", (chunkX >> 5), (chunkZ >> 5)));
+        return regionFile;
+    }
+
     public Iterator<RegionCoord> regionIterator()
     {
         return regions.iterator();
@@ -80,13 +94,13 @@ public class RegionLoader
             return null;
         }
 
-        final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
-        final RegionImageHandler rfh = RegionImageHandler.getInstance();
-        final Stack<RegionCoord> stack = new Stack<RegionCoord>();
-
+        RegionImageCache.instance().flushToDisk();
         RegionImageCache.instance().clear();
 
-        AnvilChunkLoader anvilChunkLoader = ChunkLoader.getAnvilChunkLoader(mc);
+        final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
+        final Stack<RegionCoord> stack = new Stack<RegionCoord>();
+
+        AnvilChunkLoader anvilChunkLoader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc));
 
         int validFileCount = 0;
         int existingImageCount = 0;

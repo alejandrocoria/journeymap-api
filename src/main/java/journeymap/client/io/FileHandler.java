@@ -60,6 +60,33 @@ public class FileHandler
         return null;
     }
 
+    public static File getWorldSaveDir(Minecraft minecraft)
+    {
+        if (minecraft.isSingleplayer())
+        {
+            try
+            {
+                File savesDir = new File(minecraft.mcDataDir, "saves");
+                File worldSaveDir = new File(savesDir, minecraft.getIntegratedServer().getFolderName());
+                if (minecraft.theWorld.provider.getSaveFolder() != null)
+                {
+                    File dir = new File(worldSaveDir, minecraft.theWorld.provider.getSaveFolder());
+                    dir.mkdirs();
+                    return dir;
+                }
+                else
+                {
+                    return worldSaveDir;
+                }
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error("Error getting world save dir: %s", t);
+            }
+        }
+        return null;
+    }
+
     public static File getMCWorldDir(Minecraft minecraft, final int dimension)
     {
         File worldDir = getMCWorldDir(minecraft);

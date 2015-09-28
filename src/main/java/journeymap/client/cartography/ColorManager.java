@@ -8,9 +8,7 @@
 
 package journeymap.client.cartography;
 
-import cpw.mods.fml.common.registry.GameData;
 import journeymap.client.Constants;
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
@@ -20,33 +18,24 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.*;
 
 /**
- * Cache of block baseColors derived from the current texture pack.
+ * Manages of block colors derived from the current texture pack.
  *
  * @author mwoodman
  */
-public class ColorCache
+public class ColorManager
 {
-    private final HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>(256);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private volatile IColorHelper colorHelper;
+    private volatile IColorHelper colorHelper = forgeHelper.getColorHelper();
     private volatile ColorPalette currentPalette;
     private String lastResourcePackNames;
     private String lastModNames;
 
-    private ColorCache()
-    {
-    }
-
-    public static ColorCache instance()
+    public static ColorManager instance()
     {
         return Holder.INSTANCE;
     }
@@ -56,49 +45,41 @@ public class ColorCache
      */
     public void ensureCurrent()
     {
-        if (forgeHelper.getClient().theWorld == null)
+        String currentResourcePackNames = Constants.getResourcePackNames();
+        String currentModNames = Constants.getModNames();
+
+        boolean resourcePackSame = false;
+        boolean modPackSame = false;
+
+        if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
         {
-            // Can happen when resource packs are changed after quitting out of world.
-            // This ensures on next world load
-            reset();
+            Journeymap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
+            resourcePackSame = true;
         }
-        else
+
+        if (currentModNames.equals(lastModNames))
         {
-            String currentResourcePackNames = Constants.getResourcePackNames();
-            String currentModNames = Constants.getModNames();
+            Journeymap.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
+            modPackSame = true;
+        }
 
-            boolean resourcePackSame = false;
-            boolean modPackSame = false;
+        if (!resourcePackSame || !modPackSame)
+        {
+            lastResourcePackNames = currentResourcePackNames;
+            lastModNames = currentModNames;
 
-            if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
-            {
-                Journeymap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
-                resourcePackSame = true;
-            }
+            // Reload all BlockMDs
+            BlockMD.reset();
+        }
 
-            if (currentModNames.equals(lastModNames))
-            {
-                Journeymap.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
-                modPackSame = true;
-            }
+        // Load the color palette
+        if (forgeHelper.getClient().theWorld != null)
+        {
+            Journeymap.getLogger().info("Loading color palette...");
+            loadColorPalette();
 
-            if (!resourcePackSame || !modPackSame)
-            {
-                reset();
-
-                lastResourcePackNames = currentResourcePackNames;
-                lastModNames = currentModNames;
-
-                // Make sure block metadata is reset
-                DataCache.instance().resetBlockMetadata();
-
-                // Load the cache from a color palette
-                Journeymap.getLogger().info(String.format("Getting color palette for Resource Pack(s): %s", currentResourcePackNames));
-                loadColorPalette();
-
-                // Remap around player
-                MapPlayerTask.forceNearbyRemap();
-            }
+            // Remap around player
+            MapPlayerTask.forceNearbyRemap();
         }
     }
 
@@ -122,7 +103,10 @@ public class ColorCache
             long start = System.currentTimeMillis();
             if (colorPalette != null)
             {
-                this.baseColors.putAll(colorPalette.getBasicColorMap());
+                for (Map.Entry<BlockMD, Integer> entry : colorPalette.getBasicColorMap().entrySet())
+                {
+                    entry.getKey().setBaseColor(entry.getValue());
+                }
                 long elapsed = System.currentTimeMillis() - start;
                 Journeymap.getLogger().info(String.format("Existing color palette loaded %d colors in %dms from file: %s", colorPalette.size(), elapsed, colorPalette.getOrigin()));
             }
@@ -165,6 +149,13 @@ public class ColorCache
         {
             String resourcePackNames = Constants.getResourcePackNames();
             String modPackNames = Constants.getModNames();
+
+            HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>();
+            for (BlockMD blockMD : BlockMD.getAll())
+            {
+                baseColors.put(blockMD, blockMD.getBaseColor());
+            }
+
             palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
@@ -187,53 +178,24 @@ public class ColorCache
         StatTimer timer = StatTimer.get("prefetchResourcePackColors", -1).start();
 
         int count = 0;
-        Iterator<Block> fmlBlockIter = GameData.getBlockRegistry().iterator();
-        while (fmlBlockIter.hasNext())
+        for (BlockMD blockMD : BlockMD.getAll())
         {
-            Block block = fmlBlockIter.next();
-            if (block.getMaterial().equals(Material.air))
+            if (!blockMD.isAir())
             {
-                continue;
-            }
-
-            ArrayList<ItemStack> subBlocks = new ArrayList<ItemStack>();
-            try
-            {
-                Item item = Item.getItemFromBlock(block);
-                if (item == null)
+                Integer baseColor = colorHelper.loadBlockColor(blockMD);
+                if (baseColor != null)
                 {
-                    count += prefetchColors(DataCache.instance().getBlockMD(block, 0));
-                    continue;
+                    blockMD.setBaseColor(baseColor);
+                    count++;
                 }
-
-                block.getSubBlocks(item, null, subBlocks);
-                for (ItemStack subBlockStack : subBlocks)
-                {
-                    int meta = subBlockStack.getMetadata();
-                    count += prefetchColors(DataCache.instance().getBlockMD(block, meta));
-                }
-            }
-            catch (Exception e)
-            {
-                Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
-                count += prefetchColors(DataCache.instance().getBlockMD(block, 0));
             }
         }
 
         timer.stop();
+
+        Journeymap.getLogger().info("Prefetched " + count + " block colors from resource packs in " + timer.elapsed() + "ms");
     }
 
-    /**
-     * Prefetch colors for each block.
-     * TODO:  Determine whether the fake coords are going to be a problem
-     */
-    private int prefetchColors(BlockMD blockMD)
-    {
-        int count = 0;
-        getBaseColor(blockMD, 0, 78, 0);
-        count++;
-        return count;
-    }
 
     /**
      * Get the color of the block at the world coordinates.
@@ -269,7 +231,7 @@ public class ColorCache
      */
     private Integer getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        BiomeGenBase biome = forgeHelper.getBiome(chunkMd.getWorld(), x, y, z);
+        BiomeGenBase biome = forgeHelper.getBiome(x, y, z);
         if(biome!=null)
         {
             return getBiomeBlockColor(biome, blockMD, x, y, z);
@@ -310,13 +272,6 @@ public class ColorCache
         return blockMD.getBlockColorHandler().getCustomBiomeColor(blockMD, biome, x, y, z);
     }
 
-    /**
-     * Gets the cached base color, if any.
-     */
-    public Integer getBaseColor(BlockMD blockMD)
-    {
-        return baseColors.get(blockMD);
-    }
 
     /**
      * Gets the color for the block from the cache, or
@@ -327,7 +282,7 @@ public class ColorCache
      */
     public int getBaseColor(BlockMD blockMD, int x, int y, int z)
     {
-        Integer color = getBaseColor(blockMD);
+        Integer color = blockMD.getBaseColor();
         if (color == null)
         {
             if (blockMD.isAir())
@@ -340,18 +295,11 @@ public class ColorCache
             {
                 color = loadBaseColor(blockMD, x, y, z);
             }
-            setBaseColor(blockMD, color);
+            blockMD.setBaseColor(color);
         }
         return color;
     }
 
-    /**
-     * Set the base color for a BlockMD.
-     */
-    public void setBaseColor(BlockMD blockMD, Integer color)
-    {
-        baseColors.put(blockMD, color);
-    }
 
     /**
      * Provides a color using the icon loader.
@@ -377,7 +325,6 @@ public class ColorCache
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                    DataCache.instance().getBlockMetadata().setFlags(blockMD.getBlock(), BlockMD.Flag.CustomBiomeColor);
                     Journeymap.getLogger().info("Custom biome color will be used with " + blockMD);
                 }
                 else
@@ -413,18 +360,12 @@ public class ColorCache
         return baseColor;
     }
 
-    public void reset()
-    {
-        colorHelper = ForgeHelper.INSTANCE.getColorHelper();
-        baseColors.clear();
-    }
-
     public String getCacheDebugHtml()
     {
         StringBuilder sb = new StringBuilder();
         sb.append(LogFormatter.LINEBREAK).append("<!-- color cache --><div>");
         sb.append(LogFormatter.LINEBREAK).append("<b>Current Resource Packs: </b>").append(lastResourcePackNames);
-
+        sb.append(LogFormatter.LINEBREAK).append(debugCache(currentPalette.getBasicColorMap(), "Block Colors"));
         sb.append(LogFormatter.LINEBREAK).append("</div><!-- /color cache -->");
 
         return sb.toString();
@@ -501,7 +442,7 @@ public class ColorCache
 
     private static class Holder
     {
-        private static final ColorCache INSTANCE = new ColorCache();
+        private static final ColorManager INSTANCE = new ColorManager();
     }
 
 }

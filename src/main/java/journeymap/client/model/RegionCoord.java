@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import com.google.common.cache.Cache;
 import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.io.nbt.RegionLoader;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.io.File;
@@ -93,10 +95,14 @@ public class RegionCoord implements Comparable<RegionCoord>
         return chunkPos >> SIZE;
     }
 
-
     public static String toCacheKey(Path dimDir, int regionX, int regionZ)
     {
         return regionX + dimDir.toString() + regionZ;
+    }
+
+    public boolean exists()
+    {
+        return RegionLoader.getRegionFile(ForgeHelper.INSTANCE.getClient(), getMinChunkX(), getMinChunkZ()).exists();
     }
 
     public int getXOffset(int chunkX)

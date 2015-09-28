@@ -7,17 +7,14 @@
  */
 
 package journeymap.client.forge.event;
-// 1.7
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.EventBus;
-import journeymap.client.cartography.ColorCache;
+
+import journeymap.client.cartography.ColorManager;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.common.Journeymap;
 import net.minecraftforge.common.MinecraftForge;
-// 1.8
-//import net.minecraftforge.fml.common.FMLCommonHandler;
-//import net.minecraftforge.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -39,9 +36,10 @@ public class EventHandlerManager
         register(new WorldEventHandler());
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
+        register(new TextureAtlasHandler());
         worldInfoHandler = new WorldInfoHandler();
         resourceManagerHandler = new ResourceManagerHandler();
-        ColorCache.instance();
+        ColorManager.instance();
     }
 
     public static void registerGuiHandlers()

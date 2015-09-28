@@ -8,19 +8,14 @@
 
 package journeymap.client.forge.event;
 
-// 1.7.10
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import journeymap.client.cartography.ColorCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-// 1.8
-//import net.minecraftforge.fml.relauncher.Side;
-//import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Handle reloads/changes to resource packs.
@@ -47,15 +42,13 @@ public class ResourceManagerHandler implements IResourceManagerReloadListener
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager)
     {
-        if (mc.theWorld == null)
-        {
-            // Can happen when resource packs are changed after quitting out of world.
-            // This ensures the palette is rechecked when mapping starts
-            ColorCache.instance().reset();
-        }
-        else
-        {
-            ColorCache.instance().ensureCurrent();
-        }
+//        try
+//        {
+//            ColorManager.instance().ensureCurrent();
+//        }
+//        catch (Exception e)
+//        {
+//            Journeymap.getLogger().warn("Error calling ColorManager.ensureCurrent(): " + LogFormatter.toString(e));
+//        }
     }
 }

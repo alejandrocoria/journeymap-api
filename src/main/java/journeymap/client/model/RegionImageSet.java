@@ -96,6 +96,22 @@ public class RegionImageSet extends ImageSet
         return RegionCoord.fromRegionPos(key.worldDir, key.regionX, key.regionZ, key.dimension);
     }
 
+    public long getOldestTimestamp()
+    {
+        long time = System.currentTimeMillis();
+        synchronized (imageHolders)
+        {
+            for (ImageHolder holder : imageHolders.values())
+            {
+                if (holder != null)
+                {
+                    time = Math.min(time, holder.getImageTimestamp());
+                }
+            }
+        }
+        return time;
+    }
+
     @Override
     public int hashCode()
     {

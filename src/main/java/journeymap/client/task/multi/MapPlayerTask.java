@@ -197,7 +197,7 @@ public class MapPlayerTask extends BaseMapTask
     }
 
     @Override
-    protected void complete(boolean cancelled, boolean hadError)
+    protected void complete(int mappedChunks, boolean cancelled, boolean hadError)
     {
         elapsedNs = System.nanoTime() - startNs;
     }
