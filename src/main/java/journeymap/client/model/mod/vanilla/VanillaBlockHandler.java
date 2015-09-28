@@ -9,9 +9,9 @@ import journeymap.client.model.mod.ModBlockDelegate;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
-import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static journeymap.client.model.BlockMD.Flag.*;
