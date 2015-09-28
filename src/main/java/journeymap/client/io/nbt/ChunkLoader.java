@@ -19,64 +19,35 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 
 public class ChunkLoader
 {
-
     private static Logger logger = Journeymap.getLogger();
 
-    public static File getWorldSaveDir(Minecraft mc)
-    {
-        if (mc.isSingleplayer())
-        {
-            try
-            {
-                File savesDir = new File(mc.mcDataDir, "saves");
-                File worldSaveDir = new File(savesDir, mc.getIntegratedServer().getFolderName());
-                if (mc.theWorld.provider.getSaveFolder() != null)
-                {
-                    File dir = new File(worldSaveDir, mc.theWorld.provider.getSaveFolder());
-                    dir.mkdirs();
-                    return dir;
-                }
-                else
-                {
-                    return worldSaveDir;
-                }
-            }
-            catch (Throwable t)
-            {
-                logger.error("Error getting world save dir: %s", t);
-            }
-        }
-        return null;
-    }
-
-    public static File getRegionFile(Minecraft minecraft, int chunkX, int chunkZ)
-    {
-        File regionDir = new File(getWorldSaveDir(minecraft), "region");
-        File regionFile = new File(regionDir, String.format("r.%s.%s.mca", (chunkX >> 5), (chunkZ >> 5)));
-        return regionFile;
-    }
-
+    /**
+     * Gets the chunk from the region file on disk.  Only works in SinglePlayer, and assumes the current dimension
+     * is the intended dimension.
+     */
     public static ChunkMD getChunkMD(AnvilChunkLoader loader, Minecraft mc, ChunkCoordIntPair coord, boolean forceRetain)
     {
         try
         {
             // Check for the region file on disk first so the loader doesn't create empty region files
-            if (getRegionFile(mc, coord.chunkXPos, coord.chunkZPos).exists())
+            if (RegionLoader.getRegionFile(mc, coord.chunkXPos, coord.chunkZPos).exists())
             {
                 if (loader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
                 {
                     Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
-//                    if (chunk!=null && !(chunk instanceof EmptyChunk))
-
-                    // 1.8 TODO:  Can this be safely left commented out?
-                    //chunk.generateHeightMap();
-                    chunk.generateSkylightMap();
-                    return new ChunkMD(chunk, forceRetain);
+                    if (chunk != null)
+                    {
+                        chunk.generateSkylightMap();
+                        return new ChunkMD(chunk, forceRetain);
+                    }
+                    else
+                    {
+                        logger.warn("AnvilChunkLoader returned null for chunk: " + coord);
+                    }
                 }
             }
             else

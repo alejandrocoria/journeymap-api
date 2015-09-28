@@ -14,6 +14,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.io.FileHandler;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.io.nbt.RegionLoader;
 import journeymap.client.log.ChatLog;
@@ -90,7 +91,7 @@ public class MapRegionTask extends BaseMapTask
     @Override
     public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        AnvilChunkLoader loader = new AnvilChunkLoader(ChunkLoader.getWorldSaveDir(mc));
+        AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc));
 
         int missing = 0;
         for (ChunkCoordIntPair coord : retainedCoords)
@@ -117,7 +118,7 @@ public class MapRegionTask extends BaseMapTask
 
         if (chunkCoords.size() - missing > 0)
         {
-            logger.info(String.format("Mapping chunks found in %s: %s/%s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
+            logger.info(String.format("Potential chunks to map in %s: %s (out of %s)", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
             super.performTask(mc, jm, jmWorldDir, threadLogging);
         }
         else
@@ -138,7 +139,7 @@ public class MapRegionTask extends BaseMapTask
         }
         else
         {
-            logger.info(String.format("Mapped chunks found in %s: %s ", rCoord, mappedChunks));
+            logger.info(String.format("Actual chunks mapped in %s: %s ", rCoord, mappedChunks));
         }
     }
 
