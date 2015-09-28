@@ -179,7 +179,7 @@ public class ChunkMD
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getLightOpacity(getWorld(), blockMD, toWorldX(localX), y, toWorldZ(localZ));
+        return ForgeHelper.INSTANCE.getLightOpacity(blockMD, toWorldX(localX), y, toWorldZ(localZ));
     }
 
     public Serializable getProperty(String name)

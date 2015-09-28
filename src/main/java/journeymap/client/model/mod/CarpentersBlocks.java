@@ -78,7 +78,7 @@ public class CarpentersBlocks
         {
             final int blockX = chunkMD.toWorldX(localX);
             final int blockZ = chunkMD.toWorldZ(localZ);
-            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(chunkMD.getWorld(), blockX, y, blockZ);
+            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockX, y, blockZ);
             if (tileEntity != null)
             {
                 final NBTTagCompound tag = new NBTTagCompound();

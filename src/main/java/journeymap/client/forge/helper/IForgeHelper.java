@@ -22,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -37,6 +38,8 @@ public interface IForgeHelper
 {
 
     public IRenderHelper getRenderHelper();
+
+    public IBlockAccess getIBlockAccess();
 
     public IColorHelper getColorHelper();
 
@@ -60,7 +63,7 @@ public interface IForgeHelper
 
     public boolean hasCustomName(Entity entity);
 
-    public int getLightOpacity(World world, BlockMD blockMD, int blockX, int blockY, int blockZ);
+    public int getLightOpacity(BlockMD blockMD, int blockX, int blockY, int blockZ);
 
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance);
 
@@ -92,11 +95,11 @@ public interface IForgeHelper
 
     public int getPrecipitationHeight(Chunk chunk, int x, int z);
 
-    public TileEntity getTileEntity(World world, int blockX, int y, int blockZ);
+    public TileEntity getTileEntity(int blockX, int y, int blockZ);
 
     public String getBlockName(Block block, int meta);
 
-    public BiomeGenBase getBiome(World world, int x, int y, int z);
+    public BiomeGenBase getBiome(int x, int y, int z);
 
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z);
 

@@ -231,7 +231,7 @@ public class ColorManager
      */
     private Integer getBiomeBlockColor(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
     {
-        BiomeGenBase biome = forgeHelper.getBiome(chunkMd.getWorld(), x, y, z);
+        BiomeGenBase biome = forgeHelper.getBiome(x, y, z);
         if(biome!=null)
         {
             return getBiomeBlockColor(biome, blockMD, x, y, z);

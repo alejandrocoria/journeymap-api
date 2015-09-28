@@ -10,7 +10,6 @@ package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
 import net.minecraft.block.Block;
-import net.minecraft.world.World;
 
 /**
  * Interface used to encapsulate compile-time differences between Minecraft/Forge versions
@@ -24,7 +23,7 @@ public interface IColorHelper
 
     Integer loadBlockColor(BlockMD blockMD);
 
-    int getColorMultiplier(World world, Block block, int x, int y, int z);
+    int getColorMultiplier(Block block, int x, int y, int z);
 
     @Deprecated
     public int getRenderColor(BlockMD blockMD);

@@ -22,7 +22,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -41,6 +40,7 @@ public class ColorHelper_1_8 implements IColorHelper
     BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
+    //IBlockAccess jmBlockAccess = new JmBlockAccess();
 
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.
@@ -57,13 +57,13 @@ public class ColorHelper_1_8 implements IColorHelper
     }
 
     @Override
-    public int getColorMultiplier(World world, Block block, int x, int y, int z)
+    public int getColorMultiplier(Block block, int x, int y, int z)
     {
         // 1.7
         // return block.colorMultiplier(world, x, 78, z)
 
         // 1.8
-        return block.colorMultiplier(world, new BlockPos(x, y, z));
+        return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), new BlockPos(x, y, z));
     }
 
     /**
@@ -381,5 +381,4 @@ public class ColorHelper_1_8 implements IColorHelper
             return false;
         }
     }
-
 }

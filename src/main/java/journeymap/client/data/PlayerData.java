@@ -102,7 +102,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         {
             try
             {
-                BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(playerChunk.getWorld(), MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
                 // Can be null right after spawn/teleport before chunks loaded
                 if(biome!=null)
                 {

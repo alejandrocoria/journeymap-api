@@ -105,7 +105,7 @@ public class Miscellaneous
             int blockX = chunkMD.toWorldX(localX);
             int blockZ = chunkMD.toWorldZ(localZ);
             //String name = I18n.format("tile.openblocks.grave.name");
-            TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(chunkMD.getWorld(), blockX, y, blockZ);
+            TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockX, y, blockZ);
 
             if (tileEntity != null)
             {

@@ -79,7 +79,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     {
         try
         {
-            return colorHelper.getColorMultiplier(forgeHelper.getWorld(), blockMD.getBlock(), x, y, z);
+            return colorHelper.getColorMultiplier(blockMD.getBlock(), x, y, z);
         }
         catch (Exception e)
         {
