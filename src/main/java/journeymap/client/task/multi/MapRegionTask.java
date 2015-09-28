@@ -30,6 +30,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -61,13 +62,21 @@ public class MapRegionTask extends BaseMapTask
         final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion(mapType.vSlice);
         final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
-        // Ensure chunks north, west, nw are kept alive for slope calculations
+        HashMap<RegionCoord, Boolean> existingRegions = new HashMap<RegionCoord, Boolean>();
+
+        // Ensure chunks north, west, nw are loaded for slope calculations
         for (ChunkCoordIntPair coord : renderCoords)
         {
             for (ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
             {
                 ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
-                if (!renderCoords.contains(keepAliveCoord))
+                RegionCoord neighborRCoord = RegionCoord.fromChunkPos(rCoord.worldDir, mapType, keepAliveCoord.chunkXPos, keepAliveCoord.chunkZPos);
+                if (!existingRegions.containsKey(neighborRCoord))
+                {
+                    existingRegions.put(neighborRCoord, neighborRCoord.exists());
+                }
+
+                if (!renderCoords.contains(keepAliveCoord) && existingRegions.get(neighborRCoord))
                 {
                     retainedCoords.add(keepAliveCoord);
                 }
@@ -81,7 +90,7 @@ public class MapRegionTask extends BaseMapTask
     @Override
     public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        AnvilChunkLoader loader = ChunkLoader.getAnvilChunkLoader(mc);
+        AnvilChunkLoader loader = new AnvilChunkLoader(ChunkLoader.getWorldSaveDir(mc));
 
         int missing = 0;
         for (ChunkCoordIntPair coord : retainedCoords)

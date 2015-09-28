@@ -80,13 +80,13 @@ public class RegionLoader
             return null;
         }
 
-        final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
-        final RegionImageHandler rfh = RegionImageHandler.getInstance();
-        final Stack<RegionCoord> stack = new Stack<RegionCoord>();
-
+        RegionImageCache.instance().flushToDisk();
         RegionImageCache.instance().clear();
 
-        AnvilChunkLoader anvilChunkLoader = ChunkLoader.getAnvilChunkLoader(mc);
+        final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
+        final Stack<RegionCoord> stack = new Stack<RegionCoord>();
+
+        AnvilChunkLoader anvilChunkLoader = new AnvilChunkLoader(ChunkLoader.getWorldSaveDir(mc));
 
         int validFileCount = 0;
         int existingImageCount = 0;

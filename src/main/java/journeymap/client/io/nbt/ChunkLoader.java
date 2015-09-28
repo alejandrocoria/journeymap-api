@@ -17,8 +17,6 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.minecraft.world.chunk.storage.RegionFile;
-import net.minecraft.world.chunk.storage.RegionFileCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -29,7 +27,7 @@ public class ChunkLoader
 
     private static Logger logger = Journeymap.getLogger();
 
-    public static AnvilChunkLoader getAnvilChunkLoader(Minecraft mc)
+    public static File getWorldSaveDir(Minecraft mc)
     {
         if (mc.isSingleplayer())
         {
@@ -37,24 +35,30 @@ public class ChunkLoader
             {
                 File savesDir = new File(mc.mcDataDir, "saves");
                 File worldSaveDir = new File(savesDir, mc.getIntegratedServer().getFolderName());
-                File file2;
                 if (mc.theWorld.provider.getSaveFolder() != null)
                 {
-                    file2 = new File(worldSaveDir, mc.theWorld.provider.getSaveFolder());
-                    file2.mkdirs();
-                    return new AnvilChunkLoader(file2);
+                    File dir = new File(worldSaveDir, mc.theWorld.provider.getSaveFolder());
+                    dir.mkdirs();
+                    return dir;
                 }
                 else
                 {
-                    return new AnvilChunkLoader(worldSaveDir);
+                    return worldSaveDir;
                 }
             }
             catch (Throwable t)
             {
-                logger.error("Couldn't get chunk loader: %s", t);
+                logger.error("Error getting world save dir: %s", t);
             }
         }
         return null;
+    }
+
+    public static File getRegionFile(Minecraft minecraft, int chunkX, int chunkZ)
+    {
+        File regionDir = new File(getWorldSaveDir(minecraft), "region");
+        File regionFile = new File(regionDir, String.format("r.%s.%s.mca", (chunkX >> 5), (chunkZ >> 5)));
+        return regionFile;
     }
 
     public static ChunkMD getChunkMD(AnvilChunkLoader loader, Minecraft mc, ChunkCoordIntPair coord, boolean forceRetain)
@@ -62,12 +66,9 @@ public class ChunkLoader
         try
         {
             // Check for the region file on disk first so the loader doesn't create empty region files
-            File regionDir = new File(loader.chunkSaveLocation, "region");
-            File regionFile = new File(regionDir, "r." + (coord.chunkXPos >> 5) + "." + (coord.chunkZPos >> 5) + ".mca");
-            if (regionFile.exists())
+            if (getRegionFile(mc, coord.chunkXPos, coord.chunkZPos).exists())
             {
-                RegionFile rf = RegionFileCache.createOrLoadRegionFile(loader.chunkSaveLocation, (coord.chunkXPos >> 5), (coord.chunkZPos >> 5));
-                if (rf.chunkExists(coord.chunkXPos, coord.chunkZPos))
+                if (loader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
                 {
                     Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
 //                    if (chunk!=null && !(chunk instanceof EmptyChunk))
@@ -77,6 +78,10 @@ public class ChunkLoader
                     chunk.generateSkylightMap();
                     return new ChunkMD(chunk, forceRetain);
                 }
+            }
+            else
+            {
+                logger.warn("Region doesn't exist for chunk: " + coord);
             }
         }
         catch (IOException e)
