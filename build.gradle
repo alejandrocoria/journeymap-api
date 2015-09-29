@@ -43,7 +43,7 @@ minecraft {
     version = "${config.minecraft_version}-${config.forge_version}"
     runDir = "eclipse"
 
-    replace "@JMVERSION@", version
+    replace "@JMVERSION@", "${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}"
     replace "@MCVERSION@", config.minecraft_version
     replace "@FORGEVERSION@", config.forge_version
     replace "@MAJOR@", config.jm_major
