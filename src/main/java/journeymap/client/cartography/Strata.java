@@ -133,7 +133,7 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(ColorManager.instance().getBlockColor(chunkMd, blockMD, x, y, z));
+                    setWaterColor(blockMD.getColor(chunkMd.toWorldX(x), y, chunkMd.toWorldZ(z)));
                 }
             }
 

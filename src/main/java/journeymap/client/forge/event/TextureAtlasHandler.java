@@ -1,12 +1,10 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
+import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.common.Journeymap;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,7 +17,7 @@ import java.util.EnumSet;
  */
 public class TextureAtlasHandler implements EventHandlerManager.EventHandler
 {
-    IMainThreadTask task = new Task();
+    IMainThreadTask task = new EnsureCurrentColorsTask();
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
@@ -38,27 +36,6 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
         catch (Exception e)
         {
             Journeymap.getLogger().warn("Error queuing TextureAtlasHandlerTask: " + LogFormatter.toString(e));
-        }
-    }
-
-    /**
-     * Initialize the blocks texture image used for color derivation,
-     * ensure the color manager palette is current.
-     */
-    class Task implements IMainThreadTask
-    {
-        @Override
-        public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
-        {
-            ForgeHelper.INSTANCE.getColorHelper().initBlocksTexture();
-            ColorManager.instance().ensureCurrent();
-            return null;
-        }
-
-        @Override
-        public String getName()
-        {
-            return "TextureAtlasHandlerTask";
         }
     }
 }

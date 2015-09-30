@@ -63,6 +63,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
 {
     private IRenderHelper renderHelper = new RenderHelper_1_8();
     private IBlockAccess blockAccess = new JmBlockAccess();
+    private IColorHelper colorHelper = new ColorHelper_1_8();
 
     @Override
     public IRenderHelper getRenderHelper()
@@ -73,7 +74,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     @Override
     public IColorHelper getColorHelper()
     {
-        return new ColorHelper_1_8();
+        return colorHelper;
     }
 
     @Override
@@ -444,13 +445,42 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
+    public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z)
+    {
+        BlockPos pos = new BlockPos(x, y, z);
+        if (chunkMD != null && chunkMD.hasChunk())
+        {
+            try
+            {
+                Chunk chunk = chunkMD.getChunk();
+                BiomeGenBase biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
+                if (biome == null)
+                {
+                    return null;
+                }
+                return biome;
+            }
+            catch (Throwable throwable)
+            {
+                Journeymap.getLogger().error("Error in getBiome(): " + throwable);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
+            }
+        }
+        else
+        {
+            return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+        }
+    }
+
+    @Override
     public BiomeGenBase getBiome(int x, int y, int z)
     {
         // 1.7
         // return world.getBiomeGenForCoords(x, y, z);
 
         // 1.8
-        return blockAccess.getBiomeGenForCoords(new BlockPos(x, y, z));
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+        return getBiome(chunkMD, x, y, z);
     }
 
     @Override

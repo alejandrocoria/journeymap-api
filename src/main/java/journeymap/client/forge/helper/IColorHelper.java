@@ -17,16 +17,17 @@ import net.minecraft.block.Block;
  */
 public interface IColorHelper
 {
+    boolean hasBlocksTexture();
+
     boolean initBlocksTexture();
 
     boolean failedFor(BlockMD blockMD);
 
-    Integer loadBlockColor(BlockMD blockMD);
+    Integer getTextureColor(BlockMD blockMD);
 
     int getColorMultiplier(Block block, int x, int y, int z);
 
-    @Deprecated
-    public int getRenderColor(BlockMD blockMD);
+    int getRenderColor(BlockMD blockMD);
 
-    public int getMapColor(BlockMD blockMD);
+    int getMapColor(BlockMD blockMD);
 }

@@ -9,8 +9,6 @@
 package journeymap.client.service;
 
 import com.google.common.io.CharStreams;
-import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
@@ -63,13 +61,6 @@ public class DebugService extends FileService
 
         sb.append(LogFormatter.LINEBREAK).append("<h1>Properties</h1><div>");
         sb.append(LogFormatter.LINEBREAK).append(JMLogger.getPropertiesSummary().replaceAll(LogFormatter.LINEBREAK, "<p>")).append("</div>");
-
-        if (JourneymapClient.getInstance().isMapping())
-        {
-            sb.append(LogFormatter.LINEBREAK).append("<h1>Block Data</h1><div>");
-            sb.append(LogFormatter.LINEBREAK).append(ColorManager.instance().getCacheDebugHtml());
-            sb.append(LogFormatter.LINEBREAK).append("</div><!-- / Block Data -->");
-        }
 
         sb.append(LogFormatter.LINEBREAK).append("</div> <!-- /accordion -->");
 

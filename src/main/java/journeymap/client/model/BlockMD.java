@@ -11,8 +11,6 @@ package journeymap.client.model;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
-import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
@@ -35,11 +33,10 @@ import java.util.*;
  */
 public class BlockMD
 {
+    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
-
-    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     private final Block block;
     private final int meta;
     private final GameRegistry.UniqueIdentifier uid;
@@ -53,6 +50,33 @@ public class BlockMD
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
 
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
+
+    /**
+     * Private constructor.
+     */
+    private BlockMD(Block block, int meta)
+    {
+        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+    }
+
+    /**
+     * Private constructor
+     */
+    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    {
+        this.block = block;
+        this.meta = meta;
+        this.uid = uid;
+        this.name = name;
+        this.alpha = alpha;
+        this.textureSide = textureSide;
+        this.flags = flags;
+        this.blockColorHandler = VanillaColorHandler.INSTANCE;
+        if (block != null)
+        {
+            modBlockDelegate.initialize(this);
+        }
+    }
 
     /**
      * Preloads the cache with all registered blocks and their subblocks.
@@ -194,33 +218,6 @@ public class BlockMD
         for (BlockMD blockMD : getAll())
         {
             Journeymap.getLogger().info(blockMD);
-        }
-    }
-
-    /**
-     * Private constructor.
-     */
-    private BlockMD(Block block, int meta)
-    {
-        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
-    }
-
-    /**
-     * Private constructor
-     */
-    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
-    {
-        this.block = block;
-        this.meta = meta;
-        this.uid = uid;
-        this.name = name;
-        this.alpha = alpha;
-        this.textureSide = textureSide;
-        this.flags = flags;
-        this.blockColorHandler = VanillaColorHandler.INSTANCE;
-        if (block != null)
-        {
-            modBlockDelegate.initialize(this);
         }
     }
 
@@ -387,53 +384,37 @@ public class BlockMD
         this.flags.clear();
     }
 
-
     /**
-     * Gets block color using chunk-local coords (x and z in {0-15} )
-     *
-     * @param chunkMd the chunk md
-     * @param blockX       the x offset in the chunk
-     * @param y            the y
-     * @param blockZ       the z offset in the chunk
-     * @return the color
+     * Gets block color using world coordinates.
      */
-    public int getColor(ChunkMD chunkMd, int blockX, int y, int blockZ)
+    public int getColor(int globalX, int y, int globalZ)
     {
-        if (!isBiomeColored() && this.color != null)
-        {
-            return this.color;
-        }
-        else
-        {
-            Integer color = ColorManager.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
-            if (color == null)
-            {
-                // Can't render this time
-                return RGB.BLACK_ARGB;
-            }
-
-            return color;
-        }
+        return blockColorHandler.getBlockColor(this, globalX, y, globalZ);
     }
 
-    public ModBlockDelegate.IModBlockColorHandler getBlockColorHandler()
+    public Integer getColor()
     {
-        return blockColorHandler;
+        return this.color;
+    }
+
+    public void setColor(Integer baseColor)
+    {
+        this.color = baseColor;
+    }
+
+    public boolean ensureColor()
+    {
+        if (this.color == null)
+        {
+            this.color = this.blockColorHandler.getTextureColor(this);
+            return true;
+        }
+        return false;
     }
 
     public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
     {
         this.blockColorHandler = blockColorHandler;
-    }
-
-    public Integer getBaseColor()
-    {
-        return this.color;
-    }
-
-    public void setBaseColor(Integer baseColor)
-    {
-        this.color = baseColor;
     }
 
     public String getIconName()
@@ -457,16 +438,6 @@ public class BlockMD
     }
 
     /**
-     * Whether it should be used for beveled slope coloration.
-     *
-     * @return
-     */
-    public boolean hasNoShadow()
-    {
-        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
-    }
-
-    /**
      * Sets alpha.
      *
      * @param alpha the alpha
@@ -485,6 +456,16 @@ public class BlockMD
                 this.flags.remove(Flag.Transparency);
             }
         }
+    }
+
+    /**
+     * Whether it should be used for beveled slope coloration.
+     *
+     * @return
+     */
+    public boolean hasNoShadow()
+    {
+        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
     }
 
     /**

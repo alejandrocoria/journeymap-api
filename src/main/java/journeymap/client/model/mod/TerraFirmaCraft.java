@@ -11,7 +11,6 @@ package journeymap.client.model.mod;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaColorHandler;
-import net.minecraft.world.biome.BiomeGenBase;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -22,6 +21,7 @@ public class TerraFirmaCraft
 {
     private static final String MODID = "terrafirmacraft";
     private static final String MODID2 = "tfc2";
+    private static final int WATER_COLOR = 0x0b1940;
 
     public static class TfcBlockHandler implements ModBlockDelegate.IModBlockHandler
     {
@@ -56,10 +56,6 @@ public class TerraFirmaCraft
                 {
                     blockMD.setAlpha(.3f);
                     blockMD.addFlags(Water, NoShadow);
-                    if (blockMD.getBaseColor() == null)
-                    {
-                        blockMD.setBaseColor(0x0b1940);
-                    }
                     blockMD.setBlockColorHandler(waterColorHandler);
                 }
                 else if (name.contains("leaves"))
@@ -81,9 +77,10 @@ public class TerraFirmaCraft
 
     public static class TfcWaterColorHandler extends VanillaColorHandler
     {
-        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z)
+        @Override
+        protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
         {
-            return blockMD.getBaseColor();
+            return WATER_COLOR;
         }
     }
 }

@@ -18,6 +18,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -40,7 +41,6 @@ public class ColorHelper_1_8 implements IColorHelper
     BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
-    //IBlockAccess jmBlockAccess = new JmBlockAccess();
 
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.
@@ -48,6 +48,11 @@ public class ColorHelper_1_8 implements IColorHelper
     public ColorHelper_1_8()
     {
 
+    }
+
+    public boolean hasBlocksTexture()
+    {
+        return blocksTexture != null;
     }
 
     @Override
@@ -91,7 +96,15 @@ public class ColorHelper_1_8 implements IColorHelper
         // 1.8
         Block block = blockMD.getBlock();
         IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        return block.getMapColor(blockState).colorValue;
+        MapColor mapColor = block.getMapColor(blockState);
+        if (mapColor != null)
+        {
+            return mapColor.colorValue;
+        }
+        else
+        {
+            return RGB.BLACK_RGB;
+        }
     }
 
     /**
@@ -101,7 +114,7 @@ public class ColorHelper_1_8 implements IColorHelper
      * @return
      */
     @Override
-    public Integer loadBlockColor(BlockMD blockMD)
+    public Integer getTextureColor(BlockMD blockMD)
     {
 
         Integer color = null;
@@ -159,12 +172,12 @@ public class ColorHelper_1_8 implements IColorHelper
 
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-        if (blocksTexture == null)
+        boolean ok = blocksTexture != null || initBlocksTexture();
+        if (!ok)
         {
-            initBlocksTexture();
+            logger.warn("BlocksTexture not yet loaded");
+            return null;
         }
-
-        TextureAtlasSprite blockIcon = null;
 
         Block block = blockMD.getBlock();
         Integer overrideMeta = null;
@@ -193,13 +206,10 @@ public class ColorHelper_1_8 implements IColorHelper
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
-        if (blocksTexture == null)
+        boolean ok = blocksTexture != null || initBlocksTexture();
+        if (!ok)
         {
-            initBlocksTexture();
-        }
-
-        if (blocksTexture == null)
-        {
+            logger.warn("BlocksTexture not yet loaded");
             return null;
         }
 
@@ -342,7 +352,7 @@ public class ColorHelper_1_8 implements IColorHelper
     @Override
     public boolean initBlocksTexture()
     {
-        StatTimer timer = StatTimer.get("IconLoader.initBlocksTexture", 0);
+        StatTimer timer = StatTimer.get("ColorHelper.initBlocksTexture", 0);
 
         try
         {
@@ -367,8 +377,8 @@ public class ColorHelper_1_8 implements IColorHelper
             BufferedImage bufferedimage = new BufferedImage(width, height, 2);
             bufferedimage.setRGB(0, 0, width, height, aint, 0, width);
 
+            Journeymap.getLogger().info("initBlocksTexture: " + timer.elapsed() + "ms");
             timer.stop();
-            Journeymap.getLogger().info(timer.getLogReportString());
 
             blocksTexture = bufferedimage;
             return true;

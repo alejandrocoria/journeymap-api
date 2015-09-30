@@ -13,7 +13,6 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
-import net.minecraft.world.biome.BiomeGenBase;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
@@ -38,6 +37,37 @@ public class ModBlockDelegate
                 new CarpentersBlocks.CommonHandler(),
                 new TerraFirmaCraft.TfcBlockHandler(),
                 new Miscellaneous.CommonHandler());
+    }
+
+    /**
+     * Provide special handling of a block in-situ when encountered during a mapping task.
+     * The block returned will be used to color that spot on the map.
+     */
+    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
+    {
+        BlockMD delegatedBlockMD = null;
+        try
+        {
+            IModBlockHandler handler = blockMD.getModBlockHandler();
+            if (handler != null)
+            {
+                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, localX, y, localZ);
+            }
+            else
+            {
+                blockMD.setModBlockHandler(null);
+            }
+        }
+        catch (Throwable t)
+        {
+            String message = String.format("Error handling block '%s': %s", blockMD, LogFormatter.toString(t));
+            logger.error(message);
+        }
+        if (delegatedBlockMD == null)
+        {
+            delegatedBlockMD = blockMD;
+        }
+        return delegatedBlockMD;
     }
 
     /**
@@ -79,37 +109,6 @@ public class ModBlockDelegate
     }
 
     /**
-     * Provide special handling of a block in-situ when encountered during a mapping task.
-     * The block returned will be used to color that spot on the map.
-     */
-    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
-    {
-        BlockMD delegatedBlockMD = null;
-        try
-        {
-            IModBlockHandler handler = blockMD.getModBlockHandler();
-            if (handler != null)
-            {
-                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, localX, y, localZ);
-            }
-            else
-            {
-                blockMD.setModBlockHandler(null);
-            }
-        }
-        catch (Throwable t)
-        {
-            String message = String.format("Error handling block '%s': %s", blockMD, LogFormatter.toString(t));
-            logger.error(message);
-        }
-        if (delegatedBlockMD == null)
-        {
-            delegatedBlockMD = blockMD;
-        }
-        return delegatedBlockMD;
-    }
-
-    /**
      * Interface for a class that initializes block flags for a specific mod, and/or
      * does special block handling during mapping.
      */
@@ -133,14 +132,8 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
-        public Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+        public Integer getBlockColor(BlockMD blockMD, int globalX, int y, int globalZ);
 
-        public Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getTint(BlockMD blockMD, int x, int y, int z);
+        public Integer getTextureColor(BlockMD blockMD);
     }
 }
