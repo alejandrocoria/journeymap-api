@@ -34,10 +34,8 @@ import java.util.List;
 
 public class Splash extends JmUI
 {
-    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
-
     private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
-
+    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
     Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
     ButtonList bottomButtons;
@@ -45,7 +43,7 @@ public class Splash extends JmUI
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("excavator5", "Sullivan", "jm.common.splash_patreon"),
+            new SplashPerson("bmangt2", "Opzon", "jm.common.splash_patreon"),
             new SplashPerson("mysticdrew", "mysticdrew", "jm.common.splash_developer"),
             new SplashPerson("techbrew", "techbrew", "jm.common.splash_developer")
     );

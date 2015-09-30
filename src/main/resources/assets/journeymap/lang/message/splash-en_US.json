@@ -3,27 +3,19 @@
 {
   "lines": [
     {
-      "label": "Many performance improvements",
+      "label": "More accurate biome colors!",
       "action": ""
     },
     {
-      "label": "New Feature: Grid Editor customizes the chunk grid",
-      "action": "GridEditor"
+      "label": "JourneyMapServer now included in the same jar!",
+      "action": ""
     },
     {
-      "label": "New Feature: Action > Delete Map",
-      "action": "FullscreenActions"
+      "label": "Bugfixes and more bugfixes!",
+      "action": ""
     },
     {
-      "label": "New Feature: Action > Disable Mapping",
-      "action": "FullscreenActions"
-    },
-    {
-      "label": "New settings in Options > Cartography",
-      "action": "OptionsManager#Cartography"
-    },
-    {
-      "label": "F3 and Shift-F3 show JourneyMap performance data",
+      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8!",
       "action": ""
     }
   ]

@@ -2,27 +2,19 @@
 {
   "lines": [
     {
-      "label": "Useita suorituskyvyn parannuksia",
+      "label": "More accurate biome colors!",
       "action": ""
     },
     {
-      "label": "Uusi ominaisuus: Ruudukko editori muokkaa chunk-ruudukkoa",
-      "action": "GridEditor"
+      "label": "JourneyMapServer now included in the same jar!",
+      "action": ""
     },
     {
-      "label": "Uusi ominaisuus: Toiminto > Poista kartta",
-      "action": "FullscreenActions"
+      "label": "Bugfixes and more bugfixes!",
+      "action": ""
     },
     {
-      "label": "Uusi ominaisuus: Toiminto > Poista kartoitus käytöstä",
-      "action": "FullscreenActions"
-    },
-    {
-      "label": "Uusia omnaisuuksia Asetukset > Kartografia",
-      "action": "OptionsManager#Cartography"
-    },
-    {
-      "label": "F3 ja Shift-F3 näyttääksesi JourneyMap suorituskykydatan",
+      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8!",
       "action": ""
     }
   ]
