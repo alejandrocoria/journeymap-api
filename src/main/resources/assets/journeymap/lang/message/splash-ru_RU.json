@@ -3,27 +3,19 @@
 {
   "lines": [
     {
-      "label": "Много улучшений производительности",
+      "label": "More accurate biome colors!",
       "action": ""
     },
     {
-      "label": "Новая функция: Редактор Сетки: настраивает чанк-сетку",
-      "action": "GridEditor"
+      "label": "JourneyMapServer now included in the same jar!",
+      "action": ""
     },
     {
-      "label": "Новая функция: Действия > Удалить карту",
-      "action": "FullscreenActions"
+      "label": "Bugfixes and more bugfixes!",
+      "action": ""
     },
     {
-      "label": "Новая функция: Действия > Отключение зарисовки карты",
-      "action": "FullscreenActions"
-    },
-    {
-      "label": "Новые настройки в опциях > Картография",
-      "action": "OptionsManager#Cartography"
-    },
-    {
-      "label": "F3 и Shift-F3 покажут данные о производительности JourneyMap в отладочной информации",
+      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8!",
       "action": ""
     }
   ]

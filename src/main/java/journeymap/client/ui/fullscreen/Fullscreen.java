@@ -23,7 +23,6 @@ import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
-import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
@@ -140,12 +139,6 @@ public class Fullscreen extends JmUI
         if (!JourneymapClient.getCoreProperties().splashViewed.get().equals(Journeymap.JM_VERSION.toString()))
         {
             UIManager.getInstance().openSplash(this);
-        }
-
-        // Check for first-time use
-        if (!JourneymapClient.getCoreProperties().optionsManagerViewed.get().equals(Journeymap.JM_VERSION.toString()))
-        {
-            UIManager.getInstance().openOptionsManager(this, Config.Category.Cartography);
         }
     }
 

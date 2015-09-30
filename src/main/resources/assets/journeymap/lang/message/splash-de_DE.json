@@ -2,27 +2,19 @@
 {
   "lines": [
     {
-      "label": "Viele Leistungsverbesserungen",
+      "label": "More accurate biome colors!",
       "action": ""
     },
     {
-      "label": "Neue Funktion: Gitter-Editor verändert das Chunk-Gitter",
-      "action": "GridEditor"
+      "label": "JourneyMapServer now included in the same jar!",
+      "action": ""
     },
     {
-      "label": "New Feature: Aktionen > Karte löschen",
-      "action": "FullscreenActions"
+      "label": "Bugfixes and more bugfixes!",
+      "action": ""
     },
     {
-      "label": "Neue Funktion: Aktionen > Mapping deaktivieren",
-      "action": "FullscreenActions"
-    },
-    {
-      "label": "Neue Einstellungen in Optionen > Kartographie",
-      "action": "OptionsManager#Cartography"
-    },
-    {
-      "label": "F3 und Shift-F3 zeigt auch die Leistung der MiniMap",
+      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8!",
       "action": ""
     }
   ]
