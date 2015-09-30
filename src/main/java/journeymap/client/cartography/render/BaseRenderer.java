@@ -158,7 +158,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherent light level
         float nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
 
-        int basicColor = stratum.isWater() ? waterColor : stratum.getBlockMD().getColor(stratum.getChunkMd(), stratum.getX(), stratum.getY(), stratum.getZ());
+        int basicColor;
+        if (stratum.isWater())
+        {
+            basicColor = waterColor;
+        }
+        else
+        {
+            basicColor = stratum.getBlockMD().getColor(stratum.getChunkMd().toWorldX(stratum.getX()), stratum.getY(), stratum.getChunkMd().toWorldZ(stratum.getZ()));
+        }
+
         if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
         {
             basicColor = RGB.adjustBrightness(basicColor, tweakBrightenLightsourceBlock); // magic #
@@ -178,7 +187,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             // Just adjustBrightness based on light levels
             stratum.setDayColor(RGB.adjustBrightness(basicColor, daylightDiff));
-
             stratum.setNightColor(RGB.darkenAmbient(basicColor, nightLightDiff, getAmbientColor()));
         }
 

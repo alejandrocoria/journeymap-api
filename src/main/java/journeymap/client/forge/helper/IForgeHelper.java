@@ -9,6 +9,7 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -98,6 +99,8 @@ public interface IForgeHelper
     public TileEntity getTileEntity(int blockX, int y, int blockZ);
 
     public String getBlockName(Block block, int meta);
+
+    public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z);
 
     public BiomeGenBase getBiome(int x, int y, int z);
 

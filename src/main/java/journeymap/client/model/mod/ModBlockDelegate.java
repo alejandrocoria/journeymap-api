@@ -13,7 +13,6 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
-import net.minecraft.world.biome.BiomeGenBase;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
@@ -133,14 +132,8 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
-        public Integer getCustomBiomeColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
+        public Integer getBlockColor(BlockMD blockMD, int globalX, int y, int globalZ);
 
-        public Integer getFoliageColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getGrassColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getWaterColor(BlockMD blockMD, BiomeGenBase biome, int x, int y, int z);
-
-        public Integer getTint(BlockMD blockMD, int x, int y, int z);
+        public Integer getTextureColor(BlockMD blockMD);
     }
 }

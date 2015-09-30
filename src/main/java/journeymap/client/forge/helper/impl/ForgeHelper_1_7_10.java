@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation to encapsulate uses of methods/fields that have changed in 1.8
+ * Implementation to encapsulate uses of methods/fields that differ from 1.8
  */
 public class ForgeHelper_1_7_10 implements IForgeHelper
 {
@@ -282,7 +282,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         else
         {
             mc = ForgeHelper.INSTANCE.getClient();
-            ServerData serverData = mc.getCurrentServerData(); // 1.8 getServerData()
+            ServerData serverData = mc.getCurrentServerData();
 
             if (serverData != null)
             {
@@ -305,56 +305,48 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public Vec3 getEntityPositionVector(Entity entity)
     {
-        // 1.7
         return ((EntityLiving)entity).getPosition(1);
     }
 
     @Override
     public Tessellator getTessellator()
     {
-        // 1.7
         return Tessellator.instance;
     }
 
     @Override
     public boolean canBlockSeeTheSky(Chunk chunk, int x, int y, int z)
     {
-        // 1.7
         return chunk.canBlockSeeTheSky(x, y, z);
     }
 
     @Override
     public int getHeightValue(Chunk chunk, int x, int z)
     {
-        // 1.7
         return chunk.getHeightValue(x, z);
     }
 
     @Override
     public int getAbsoluteHeightValue(Chunk chunk, int x, int z)
     {
-        // 1.7
         return chunk.getPrecipitationHeight(x, z);
     }
 
     @Override
     public int getPrecipitationHeight(Chunk chunk, int x, int z)
     {
-        // 1.7
         return chunk.getPrecipitationHeight(x, z);
     }
 
     @Override
     public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ)
     {
-        // 1.7
         return block.getLightOpacity(chunk.worldObj, (chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
     }
 
     @Override
     public TileEntity getTileEntity(int localX, int y, int localZ)
     {
-        // 1.7
         return blockAccess.getTileEntity(localX, y, localZ);
     }
 
@@ -365,12 +357,10 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         Item item = Item.getItemFromBlock(block);
         if (item == null)
         {
-            // 1.7
             item = block.getItemDropped(0, new Random(), 0);
         }
         if (item != null)
         {
-            // 1.7
             ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
 
             String displayName = stack.getDisplayName();
@@ -383,44 +373,61 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     }
 
     @Override
+    public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z)
+    {
+        if (chunkMD != null && chunkMD.hasChunk())
+        {
+            try
+            {
+                Chunk chunk = chunkMD.getChunk();
+                BiomeGenBase biome = chunk.getBiomeGenForWorldCoords(x & 15, z & 15, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
+                if (biome != null)
+                {
+                    return biome;
+                }
+            }
+            catch (Throwable throwable)
+            {
+                Journeymap.getLogger().error("Error in getBiome(): " + throwable);
+            }
+        }
+        return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
+    }
+
+    @Override
     public BiomeGenBase getBiome(int x, int y, int z)
     {
-        // 1.7
-        return blockAccess.getBiomeGenForCoords(x, z);
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+        return getBiome(chunkMD, x, y, z);
     }
 
     @Override
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z)
     {
-        // 1.7
         return chunk.getBlockMetadata(x,y,z);
     }
 
     @Override
     public boolean hasNoSky(Entity entity)
     {
-        // 1.7
         return hasNoSky(entity.worldObj);
     }
 
     @Override
     public boolean hasChunkData(Chunk chunk)
     {
-        // 1.7
         return (chunk.isChunkLoaded && !chunk.isEmpty());
     }
 
     @Override
     public Iterator<Block> getRegisteredBlocks()
     {
-        // package change
         return GameData.getBlockRegistry().iterator();
     }
 
     @Override
     public SocketAddress getSocketAddress(NetworkManager netManager)
     {
-        // 1.7
         return netManager.getRemoteAddress();
     }
 

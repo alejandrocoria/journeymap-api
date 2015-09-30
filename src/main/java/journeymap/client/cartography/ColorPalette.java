@@ -167,6 +167,43 @@ public class ColorPalette
         return null;
     }
 
+    /**
+     * Create a color palette based on current block colors and write it to file.
+     */
+    public static ColorPalette create(boolean standard, boolean permanent)
+    {
+        long start = System.currentTimeMillis();
+
+        ColorPalette palette = null;
+        try
+        {
+            String resourcePackNames = Constants.getResourcePackNames();
+            String modPackNames = Constants.getModNames();
+
+            HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>();
+            for (BlockMD blockMD : BlockMD.getAll())
+            {
+                Integer baseColor = blockMD.getColor();
+                if (baseColor != null)
+                {
+                    baseColors.put(blockMD, baseColor);
+                }
+            }
+
+            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
+            palette.setPermanent(permanent);
+            palette.writeToFile(standard);
+            long elapsed = System.currentTimeMillis() - start;
+            Journeymap.getLogger().info(String.format("Color palette file generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            return palette;
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
+        }
+        return null;
+    }
+
     static File getWorldPaletteFile()
     {
         Minecraft mc = ForgeHelper.INSTANCE.getClient();

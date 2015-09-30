@@ -13,8 +13,6 @@ import com.google.common.base.Strings;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
-import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
@@ -387,53 +385,37 @@ public class BlockMD
         this.flags.clear();
     }
 
-
     /**
-     * Gets block color using chunk-local coords (x and z in {0-15} )
-     *
-     * @param chunkMd the chunk md
-     * @param blockX       the x offset in the chunk
-     * @param y            the y
-     * @param blockZ       the z offset in the chunk
-     * @return the color
+     * Gets block color using world coordinates.
      */
-    public int getColor(ChunkMD chunkMd, int blockX, int y, int blockZ)
+    public int getColor(int globalX, int y, int globalZ)
     {
-        if (!isBiomeColored() && this.color != null)
-        {
-            return this.color;
-        }
-        else
-        {
-            Integer color = ColorManager.instance().getBlockColor(chunkMd, this, chunkMd.toWorldX(blockX), y, chunkMd.toWorldZ(blockZ));
-            if (color == null)
-            {
-                // Can't render this time
-                return RGB.BLACK_ARGB;
-            }
-
-            return color;
-        }
+        return blockColorHandler.getBlockColor(this, globalX, y, globalZ);
     }
 
-    public ModBlockDelegate.IModBlockColorHandler getBlockColorHandler()
+    public Integer getColor()
     {
-        return blockColorHandler;
+        return this.color;
+    }
+
+    public void setColor(Integer baseColor)
+    {
+        this.color = baseColor;
+    }
+
+    public boolean ensureColor()
+    {
+        if (this.color == null)
+        {
+            this.color = this.blockColorHandler.getTextureColor(this);
+            return true;
+        }
+        return false;
     }
 
     public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
     {
         this.blockColorHandler = blockColorHandler;
-    }
-
-    public Integer getBaseColor()
-    {
-        return this.color;
-    }
-
-    public void setBaseColor(Integer baseColor)
-    {
-        this.color = baseColor;
     }
 
     public String getIconName()
