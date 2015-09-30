@@ -40,7 +40,7 @@ group = "${config.group_id}"
 archivesBaseName = "${config.mod_id}".toLowerCase()
 
 minecraft {
-    version = "${config.minecraft_version}-${config.forge_version}"
+    version = "${config.forge_version}-${config.minecraft_version}"
     runDir = "eclipse"
 
     replace "@JMVERSION@", "${config.jm_major}.${config.jm_minor}.${config.jm_micro}${config.jm_patch}"
