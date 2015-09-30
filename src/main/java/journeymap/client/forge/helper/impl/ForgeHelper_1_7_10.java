@@ -305,7 +305,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public Vec3 getEntityPositionVector(Entity entity)
     {
-        return ((EntityLiving)entity).getPosition(1);
+        return Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ);
     }
 
     @Override
