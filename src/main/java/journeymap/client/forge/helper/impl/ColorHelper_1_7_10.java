@@ -21,6 +21,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.IIcon;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -157,21 +158,39 @@ public class ColorHelper_1_7_10 implements IColorHelper
         }
         int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
 
+        IIcon icon = null;
+
         // TODO: Verify this works after pulling in 1.8 refactoring
         // Always get the upper portion of a double plant for rendering
         if (block instanceof BlockDoublePlant)
         {
             try
             {
-                return (TextureAtlasSprite) ((BlockDoublePlant) block).func_149888_a(true, meta);
+                icon = ((BlockDoublePlant) block).func_149888_a(true, meta);
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error("Error getting texture from " + blockMD + ": " + e);
+                Journeymap.getLogger().error(blockMD + " threw an error calling func_149888_a: " + e + ": " + e.getStackTrace()[0]);
             }
         }
+        else
+        {
+            icon = block.getIcon(blockMD.getTextureSide(), meta);
+        }
 
-        return (TextureAtlasSprite) block.getIcon(blockMD.getTextureSide(), meta);
+        if (icon != null)
+        {
+            if (icon instanceof TextureAtlasSprite)
+            {
+                return (TextureAtlasSprite) icon;
+            }
+            else
+            {
+                return new TempTextureAtlasSprite(icon);
+            }
+        }
+        return null;
+
     }
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
@@ -359,6 +378,44 @@ public class ColorHelper_1_7_10 implements IColorHelper
             logger.error("Could not load blocksTexture :" + t);
             timer.cancel();
             return false;
+        }
+    }
+
+    /**
+     * Facade to expose IIcon as a TextureAtlasSprite.
+     */
+    class TempTextureAtlasSprite extends TextureAtlasSprite
+    {
+        IIcon wrapped;
+
+        protected TempTextureAtlasSprite(IIcon icon)
+        {
+            super(icon.getIconName());
+            this.wrapped = icon;
+        }
+
+        @Override
+        public int getOriginX()
+        {
+            return Math.round(((float) wrapped.getIconWidth()) * Math.min(wrapped.getMinU(), wrapped.getMaxU()));
+        }
+
+        @Override
+        public int getOriginY()
+        {
+            return Math.round(((float) wrapped.getIconHeight()) * Math.min(wrapped.getMinV(), wrapped.getMaxV()));
+        }
+
+        @Override
+        public int getIconWidth()
+        {
+            return wrapped.getIconWidth();
+        }
+
+        @Override
+        public int getIconHeight()
+        {
+            return wrapped.getIconHeight();
         }
     }
 }
