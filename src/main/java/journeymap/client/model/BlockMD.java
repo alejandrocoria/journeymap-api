@@ -200,6 +200,12 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
+                GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+                if (uid == null)
+                {
+                    Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
+                    return AIRBLOCK;
+                }
                 blockMD = new BlockMD(block, meta);
                 map.put(meta, blockMD);
             }
