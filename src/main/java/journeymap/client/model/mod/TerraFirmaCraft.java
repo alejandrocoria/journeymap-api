@@ -57,6 +57,10 @@ public class TerraFirmaCraft
                     blockMD.setAlpha(.3f);
                     blockMD.addFlags(Water, NoShadow);
                     blockMD.setBlockColorHandler(waterColorHandler);
+                    if (blockMD.getColor() == null)
+                    {
+                        blockMD.setColor(WATER_COLOR);
+                    }
                 }
                 else if (name.contains("leaves"))
                 {
