@@ -9,9 +9,9 @@
 package journeymap.client.ui.component;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import cpw.mods.fml.client.config.GuiUtils;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
 /**

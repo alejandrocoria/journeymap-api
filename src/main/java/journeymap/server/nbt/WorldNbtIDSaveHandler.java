@@ -22,7 +22,7 @@ public class WorldNbtIDSaveHandler {
 
     public WorldNbtIDSaveHandler() {
         world = MinecraftServer.getServer().getEntityWorld();
-        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, "JourneyMapWorldID");
+        data = (NBTWorldSaveDataHandler) world.perWorldStorage.loadData(NBTWorldSaveDataHandler.class, "JourneyMapWorldID");
     }
 
 
@@ -48,7 +48,7 @@ public class WorldNbtIDSaveHandler {
     private String createNewWorldID() {
         String worldID = UUID.randomUUID().toString();
         data = new NBTWorldSaveDataHandler("JourneyMapWorldID");
-        world.getPerWorldStorage().setData("JourneyMapWorldID", data);
+        world.perWorldStorage.setData("JourneyMapWorldID", data);
         saveWorldID(worldID);
         //LogHelper.info("Created New World ID: " + worldID);
         return worldID;

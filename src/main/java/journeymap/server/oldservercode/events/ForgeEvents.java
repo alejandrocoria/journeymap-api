@@ -1,5 +1,8 @@
 package journeymap.server.oldservercode.events;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.common.Journeymap;
 import journeymap.server.oldservercode.config.ConfigHandler;
 import journeymap.server.oldservercode.mapcontrol.MappingOptionsHandler;
@@ -8,9 +11,9 @@ import journeymap.server.oldservercode.reference.Codes;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 /**
@@ -51,19 +54,19 @@ public class ForgeEvents {
                 e.printStackTrace();
             }
 
-            if (options.disableRadar(player.getName())) {
-                Journeymap.getLogger().info("Disabling Radar for player: " + player.getName());
+            if (options.disableRadar(player.getCommandSenderName())) {
+                Journeymap.getLogger().info("Disabling Radar for player: " + player.getCommandSenderName());
                 player.addChatMessage(new ChatComponentTranslation(Codes.RADAR_CODE));
             }
 
-            if (options.disableCaveMapping(player.getName())) {
-                Journeymap.getLogger().info("Disabling CaveMapping for player: " + player.getName());
+            if (options.disableCaveMapping(player.getCommandSenderName())) {
+                Journeymap.getLogger().info("Disabling CaveMapping for player: " + player.getCommandSenderName());
                 player.addChatMessage(new ChatComponentTranslation(Codes.CAVE_MAPPING_CODE));
             }
 
             if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID()) {
-                Journeymap.getLogger().info(String.format("Login: Sending WorldID Packet to %s", player.getName()));
-                PacketManager.instance.sendPlayerWorldID(worldID, player.getName());
+                Journeymap.getLogger().info(String.format("Login: Sending WorldID Packet to %s", player.getCommandSenderName()));
+                PacketManager.instance.sendPlayerWorldID(worldID, player.getCommandSenderName());
             }
         }
     }

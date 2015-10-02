@@ -8,7 +8,6 @@
 
 package journeymap.client.forge.helper.impl;
 
-/*
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
@@ -20,10 +19,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -33,19 +30,17 @@ import org.lwjgl.opengl.GL12;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
 import java.util.HashSet;
-*/
 
 /**
- * IColorHelper implementation for 1.8.   Formerly IconLoader.
+ * IColorHelper implementation for 1.7.10.   Formerly IconLoader.
  */
-public class ColorHelper_1_8 // implements IColorHelper
+public class ColorHelper_1_7_10 implements IColorHelper
 {
-    /**
     BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 
-    public ColorHelper_1_8()
+    public ColorHelper_1_7_10()
     {
 
     }
@@ -64,36 +59,20 @@ public class ColorHelper_1_8 // implements IColorHelper
     @Override
     public int getColorMultiplier(Block block, int x, int y, int z)
     {
-        // 1.7
-        // return block.colorMultiplier(world, x, 78, z)
-
-        // 1.8
-        return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), new BlockPos(x, y, z));
+        return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), x, y, z);
     }
 
     @Deprecated
     @Override
     public int getRenderColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getRenderColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        return block.getRenderColor(blockState);
+        return blockMD.getBlock().getRenderColor(blockMD.getMeta());
     }
 
     @Override
     public int getMapColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getMapColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        MapColor mapColor = block.getMapColor(blockState);
+        MapColor mapColor = blockMD.getBlock().getMapColor(blockMD.getMeta());
         if (mapColor != null)
         {
             return mapColor.colorValue;
@@ -178,21 +157,21 @@ public class ColorHelper_1_8 // implements IColorHelper
         }
         int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
 
-        IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
-
+        // TODO: Verify this works after pulling in 1.8 refactoring
         // Always get the upper portion of a double plant for rendering
         if (block instanceof BlockDoublePlant)
         {
-            if (state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
+            try
             {
-                // cycle to upper
-                state = state.cycleProperty(BlockDoublePlant.HALF);
+                return (TextureAtlasSprite) ((BlockDoublePlant) block).func_149888_a(true, meta);
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error("Error getting texture from " + blockMD + ": " + e);
             }
         }
 
-        TextureAtlasSprite icon = ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
-        return icon;
-        //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
+        return (TextureAtlasSprite) block.getIcon(blockMD.getTextureSide(), meta);
     }
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
@@ -382,5 +361,4 @@ public class ColorHelper_1_8 // implements IColorHelper
             return false;
         }
     }
-    */
 }

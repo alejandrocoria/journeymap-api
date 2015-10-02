@@ -8,6 +8,7 @@
 
 package journeymap.client.model.mod;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -15,13 +16,14 @@ import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static journeymap.client.model.BlockMD.Flag.*;
+
+//import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * Special handlers for miscellaneous mods that don't really need their own impl.

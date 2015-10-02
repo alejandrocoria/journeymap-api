@@ -10,7 +10,10 @@ package journeymap.client.ui.theme;
 
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
-import net.minecraftforge.fml.common.FMLLog;
+// 1.7.10
+import cpw.mods.fml.common.FMLLog;
+// 1.8
+//import net.minecraftforge.fml.common.FMLLog;
 
 import java.awt.*;
 

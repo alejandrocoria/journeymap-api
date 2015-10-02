@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
@@ -22,8 +24,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
@@ -106,6 +106,7 @@ public class BlockMD
 
     /**
      * Get all BlockMDs.
+     *
      * @return
      */
     public static Collection<BlockMD> getAll()
@@ -200,6 +201,12 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
+                GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+                if (uid == null)
+                {
+                    Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
+                    return AIRBLOCK;
+                }
                 blockMD = new BlockMD(block, meta);
                 map.put(meta, blockMD);
             }

@@ -14,7 +14,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
-import net.minecraftforge.fml.common.registry.GameData;
+//import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -42,7 +42,7 @@ public class DataService extends BaseService
         providerMap.put("/data/all", AllData.class);  //$NON-NLS-1$
         providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
         providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
-        providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$
+        //providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$
         providerMap.put("/data/image", ImagesData.class);  //$NON-NLS-1$
         providerMap.put("/data/messages", MessagesData.class);  //$NON-NLS-1$
         providerMap.put("/data/player", PlayerData.class);  //$NON-NLS-1$

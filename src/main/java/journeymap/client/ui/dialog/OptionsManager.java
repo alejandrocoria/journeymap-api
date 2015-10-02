@@ -337,7 +337,7 @@ public class OptionsManager extends JmUI
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
+    public void handleMouseInput()
     {
         super.handleMouseInput();
         optionsListPane.handleMouseInput();
@@ -428,7 +428,7 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
         boolean pressed = optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);

@@ -8,11 +8,15 @@
 
 package journeymap.common;
 
-import journeymap.common.network.WorldIDPacket;
+// 1.7
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
+// 1.8
+//import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+//import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+//import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Map;
 

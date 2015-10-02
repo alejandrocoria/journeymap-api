@@ -8,12 +8,12 @@
 
 package journeymap.client.forge.helper;
 
-import journeymap.client.forge.helper.impl.ForgeHelper_1_8;
+import journeymap.client.forge.helper.impl.ForgeHelper_1_7_10;
 
 /**
  * Delegates to a version-specific implementation of IForgeHelper.INSTANCE.
  */
 public class ForgeHelper
 {
-    public static final IForgeHelper INSTANCE = new ForgeHelper_1_8();
+    public static final IForgeHelper INSTANCE = new ForgeHelper_1_7_10();
 }

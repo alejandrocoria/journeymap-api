@@ -8,6 +8,8 @@
 
 package journeymap.client.model.mod;
 
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -15,8 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 

@@ -590,7 +590,7 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    public void handleMouseInput() throws IOException
+    public void handleMouseInput()
     { // handleMouseInput
 
         if (chat != null && !chat.isHidden())
@@ -629,7 +629,7 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
     {
         if (chat != null && !chat.isHidden())
         {
@@ -742,7 +742,7 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    public void keyTyped(char c, int i) throws IOException
+    public void keyTyped(char c, int i)
     {
         if (chat != null && !chat.isHidden())
         {

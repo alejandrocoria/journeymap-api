@@ -229,16 +229,18 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
         BlockMD.VOIDBLOCK.setColor(0x110C19);
 
         // Flower colors look bad because the stem color is averaged in, overriding them is easier.
-        // 1.8
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setColor(0x1E7EB6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setColor(0x8549B6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setColor(0x9DA1A7);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setColor(0xA3581A);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setColor(0xB0B0B0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setColor(0xB09AB0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setColor(0xB3B3B3);
-        BlockMD.get(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setColor(0xAFB401);
+        // 1.7.10
+        // public static final String[] field_149859_a = new String[] {"poppy", "blueOrchid", "allium", "houstonia", "tulipRed", "tulipOrange", "tulipWhite", "tulipPink", "oxeyeDaisy"};
+        // public static final String[] field_149858_b = new String[] {"dandelion"};
+        BlockMD.get(Blocks.red_flower, 0).setColor(0x980406);
+        BlockMD.get(Blocks.red_flower, 1).setColor(0x1E7EB6);
+        BlockMD.get(Blocks.red_flower, 2).setColor(0x8549B6);
+        BlockMD.get(Blocks.red_flower, 3).setColor(0x9DA1A7);
+        BlockMD.get(Blocks.red_flower, 4).setColor(0x980406);
+        BlockMD.get(Blocks.red_flower, 5).setColor(0xA3581A);
+        BlockMD.get(Blocks.red_flower, 6).setColor(0xB0B0B0);
+        BlockMD.get(Blocks.red_flower, 7).setColor(0xB09AB0);
+        BlockMD.get(Blocks.red_flower, 8).setColor(0xB3B3B3);
+        BlockMD.get(Blocks.yellow_flower, 0).setColor(0xAFB401);
     }
 }

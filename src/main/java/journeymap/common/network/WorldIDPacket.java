@@ -9,14 +9,20 @@
 package journeymap.common.network;
 
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
+// 1.8
+//import net.minecraftforge.fml.common.network.ByteBufUtils;
+//import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+//import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+//import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+//import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Created by Mysticdrew on 10/8/2014.

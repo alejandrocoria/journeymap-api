@@ -8,13 +8,13 @@
 
 package journeymap.client.forge.event;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventBus;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.common.Journeymap;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

@@ -10,6 +10,7 @@ package journeymap.client.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
+import cpw.mods.fml.client.FMLClientHandler;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -26,7 +27,8 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.client.FMLClientHandler;
+// 1.8
+//import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 

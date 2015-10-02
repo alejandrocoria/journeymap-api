@@ -38,7 +38,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     private void preInitialize()
     {
         // Init flags and alphas to be set according to a Block's material.
-        setFlags(Material.barrier, HasAir, OpenToSky, NoShadow);
+        // setFlags(Material.barrier, HasAir, OpenToSky, NoShadow); // 1.8
         setFlags(Material.air, HasAir, OpenToSky, NoShadow);
         setFlags(Material.glass, .4F, TransparentRoof);
         if (JourneymapClient.getCoreProperties().caveIgnoreGlass.get())
@@ -145,14 +145,11 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
         // Below are the oddball blocks that need extra help
 
-        // 1.7.10
-        // TODO BlockHugeMushroom
 
-        // 1.8
         if (block instanceof BlockHugeMushroom)
         {
-            // 1.8 : 14 gets "all_outside" texture
-            int overrideMeta = block.getMetaFromState(block.getDefaultState());
+            // 1.7.10
+            int overrideMeta = 14;
             if (blockMD.getMeta() != overrideMeta)
             {
                 blockMD.setOverrideMeta(overrideMeta);
