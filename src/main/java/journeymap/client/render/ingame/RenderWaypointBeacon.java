@@ -20,7 +20,6 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.EnumChatFormatting;
@@ -121,7 +120,10 @@ public class RenderWaypointBeacon
             if (viewDistance > maxRenderDistance)
             {
                 Vec3 delta = waypointVec.subtract(playerVec).normalize();
-                waypointVec = playerVec.addVector(delta.xCoord * maxRenderDistance, delta.yCoord * maxRenderDistance, delta.zCoord * maxRenderDistance);
+                // 1.8
+                // waypointVec = playerVec.addVector(delta.xCoord * maxRenderDistance, delta.yCoord * maxRenderDistance, delta.zCoord * maxRenderDistance);
+                // 1.7.10
+                waypointVec = playerVec.addVector(-delta.xCoord * maxRenderDistance, -delta.yCoord * maxRenderDistance, -delta.zCoord * maxRenderDistance);
                 viewDistance = maxRenderDistance;
             }
 
@@ -179,7 +181,6 @@ public class RenderWaypointBeacon
 
             // Set render scale (1/64)
             double scale = 0.00390625 * ((viewDistance + 4) / 3);
-            FontRenderer fr = renderManager.getFontRenderer();
 
             final TextureImpl texture = waypoint.getTexture();
             double halfTexHeight = texture.getHeight() / 2;
