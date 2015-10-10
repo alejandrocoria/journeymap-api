@@ -9,6 +9,7 @@ eclipse/.metadata
 eclipse/Minecraft/.idea/workspace.xml
 jars/
 logs/
+run/
 runtime/
 *~
 src/minecraft/*.*
