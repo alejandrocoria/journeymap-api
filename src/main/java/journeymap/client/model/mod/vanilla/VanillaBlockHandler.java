@@ -169,7 +169,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Toggle plant shadows
-        if (blockMD.hasAnyFlag(Plant, Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get())
+        if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get())
         {
             blockMD.addFlags(NoShadow);
         }

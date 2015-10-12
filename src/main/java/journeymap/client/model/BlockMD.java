@@ -33,6 +33,8 @@ import java.util.*;
  */
 public class BlockMD
 {
+    public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
+    public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
@@ -355,7 +357,7 @@ public class BlockMD
      * @param checkFlags the flags to check for
      * @return true if found
      */
-    public boolean hasAnyFlag(Flag... checkFlags)
+    public boolean hasAnyFlag(EnumSet<Flag> checkFlags)
     {
         for (Flag flag : checkFlags)
         {
@@ -472,7 +474,12 @@ public class BlockMD
      */
     public boolean hasNoShadow()
     {
-        return hasFlag(Flag.NoShadow) || (hasAnyFlag(Flag.Plant, Flag.Crop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
+        if (hasFlag(Flag.NoShadow))
+        {
+            return true;
+        }
+
+        return (hasAnyFlag(FlagsPlantAndCrop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
     }
 
     /**
@@ -631,7 +638,7 @@ public class BlockMD
      */
     public boolean isBiomeColored()
     {
-        return hasAnyFlag(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
+        return hasAnyFlag(FlagsBiomeColored);
     }
 
     /**
