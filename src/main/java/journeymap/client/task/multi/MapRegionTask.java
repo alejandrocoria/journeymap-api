@@ -60,7 +60,7 @@ public class MapRegionTask extends BaseMapTask
 
         final World world = minecraft.theWorld;
 
-        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion(mapType.vSlice);
+        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion();
         final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
 
         HashMap<RegionCoord, Boolean> existingRegions = new HashMap<RegionCoord, Boolean>();

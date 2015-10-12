@@ -26,8 +26,7 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 
 /**
- * ChunkMD is a MetaData wrapper for a chunk and the various bits
- * of metadata that need to accompany a ChunkStub.
+ * ChunkMD is a MetaData wrapper for a Chunk.
  *
  * @author mwoodman
  */

@@ -10,7 +10,6 @@ package journeymap.client.io.nbt;
 
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.model.ChunkCoord;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
@@ -124,7 +123,7 @@ public class RegionLoader
                     {
                         if (!RegionImageHandler.getRegionImageFile(rc, mapType, false).exists())
                         {
-                            List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion(mapType.vSlice);
+                            List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
                             for (ChunkCoordIntPair coord : chunkCoords)
                             {
                                 if (anvilChunkLoader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
@@ -148,8 +147,7 @@ public class RegionLoader
         }
 
         // Add player's current region
-        ChunkCoord cc = ChunkCoord.fromChunkPos(jmImageWorldDir, mapType, mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
-        final RegionCoord playerRc = cc.getRegionCoord();
+        final RegionCoord playerRc = RegionCoord.fromChunkPos(jmImageWorldDir, mapType, mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
         if (stack.contains(playerRc))
         {
             stack.remove(playerRc);
