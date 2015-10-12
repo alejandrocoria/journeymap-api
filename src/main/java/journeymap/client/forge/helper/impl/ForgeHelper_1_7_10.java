@@ -89,28 +89,24 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public EnumSkyBlock getSkyBlock()
     {
-        // 1.7
         return EnumSkyBlock.Block;
     }
 
     @Override
     public FontRenderer getFontRenderer()
     {
-        // 1.7
         return getClient().fontRendererObj;
     }
 
     @Override
     public int getPlayerDimension()
     {
-        // 1.7
         return getClient().thePlayer.worldObj.provider.dimensionId;
     }
 
     @Override
     public boolean hasNoSky(World world)
     {
-        // 1.7
         return world.provider.hasNoSky;
     }
 
@@ -123,42 +119,45 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public World getWorld(Chunk chunk)
     {
-        // 1.7
         return chunk.worldObj;
     }
 
     @Override
     public int getLightOpacity(BlockMD blockMD, int x, int y, int z)
     {
-        // 1.7
+
         return blockMD.getBlock().getLightOpacity(blockAccess, x & 15, y, z & 15);
     }
 
     @Override
     public int getDimension(World world)
     {
-        // 1.7
         return world.provider.dimensionId;
     }
 
     @Override
     public int getDimension(WorldProvider worldProvider)
     {
-        // 1.7
         return worldProvider.dimensionId;
     }
 
     @Override
     public int getSavedLightValue(Chunk chunk, int localX, int y, int localZ)
     {
-        // 1.7
-        return chunk.getSavedLightValue(getSkyBlock(), localX & 15, y, localZ & 15);
+        try
+        {
+            return chunk.getSavedLightValue(getSkyBlock(), localX & 15, y, localZ & 15);
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        {
+            // Encountered on a 1.8 custom-gen world where the value was 16
+            return 1; // At least let it show up
+        }
     }
 
     @Override
     public RenderManager getRenderManager()
     {
-        // 1.7
         return RenderManager.instance;
     }
 
@@ -168,35 +167,33 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public String getEntityName(Entity entity)
     {
-        // 1.7
         return entity.getCommandSenderName();
     }
 
     @Override
     public boolean hasCustomName(Entity entity)
     {
-        // 1.7
         return ((EntityLiving) entity).hasCustomNameTag();
     }
 
     @Override
     public AxisAlignedBB getBoundingBox(int x1, int y1, int z1, int x2, int y2, int z2)
     {
-        // 1.7
+
         return AxisAlignedBB.getBoundingBox(x1, y1, z1, x2, y2, z2);
     }
 
     @Override
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance)
     {
-        // 1.7
+
         return AxisAlignedBB.getBoundingBox(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
     }
 
     @Override
     public Vec3 newVec3(double x, double y, double z)
     {
-        // 1.7
+
         return Vec3.createVectorHelper(x, y, z);
     }
 
@@ -206,7 +203,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public AxisAlignedBB getEntityBoundingBox(EntityLivingBase entity)
     {
-        // 1.7
+
         return entity.boundingBox;
     }
 
@@ -216,10 +213,9 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public String getRealmsServerName()
     {
-        // 1.7
         String serverName = null;
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
-        if(!mc.isSingleplayer())
+        if (!mc.isSingleplayer())
         {
             try
             {
@@ -404,7 +400,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z)
     {
-        return chunk.getBlockMetadata(x,y,z);
+        return chunk.getBlockMetadata(x, y, z);
     }
 
     @Override
