@@ -44,7 +44,6 @@ public class DataCache
     final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
-    final Cache<String, ChunkCoord> chunkCoords;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
     final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
@@ -108,9 +107,6 @@ public class DataCache
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
-
-        chunkCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
-        managedCaches.put(chunkCoords, "ChunkCoord");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
         managedCaches.put(regionCoords, "RegionCoord");
@@ -495,11 +491,6 @@ public class DataCache
     public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
     {
         return regionImageSets;
-    }
-
-    public Cache<String, ChunkCoord> getChunkCoords()
-    {
-        return chunkCoords;
     }
 
     public Cache<String, RegionCoord> getRegionCoords()

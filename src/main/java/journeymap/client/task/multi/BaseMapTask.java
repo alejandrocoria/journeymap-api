@@ -14,10 +14,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.ChunkCoord;
-import journeymap.client.model.ChunkMD;
-import journeymap.client.model.MapType;
-import journeymap.client.model.RegionImageCache;
+import journeymap.client.model.*;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -117,8 +114,8 @@ public abstract class BaseMapTask implements ITask
                 {
                     try
                     {
-                        ChunkCoord cCoord = ChunkCoord.fromChunkMD(jmWorldDir, mapType, chunkMd);
-                        renderController.renderChunk(cCoord, chunkMd, mapType);
+                        RegionCoord rCoord = RegionCoord.fromChunkPos(jmWorldDir, mapType, chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos);
+                        renderController.renderChunk(rCoord, mapType, chunkMd);
                         count++;
                     }
                     catch (Throwable t)

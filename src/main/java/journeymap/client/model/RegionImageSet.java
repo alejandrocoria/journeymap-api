@@ -47,13 +47,13 @@ public class RegionImageSet extends ImageSet
         }
     }
 
-    public BufferedImage getChunkImage(ChunkCoord cCoord, MapType mapType)
+    public BufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
     {
         BufferedImage regionImage = getHolder(mapType).getImage();
         RegionCoord regionCoord = getRegionCoord();
         BufferedImage current = regionImage.getSubimage(
-                regionCoord.getXOffset(cCoord.chunkX),
-                regionCoord.getZOffset(cCoord.chunkZ),
+                regionCoord.getXOffset(chunkMd.getCoord().chunkXPos),
+                regionCoord.getZOffset(chunkMd.getCoord().chunkZPos),
                 16, 16);
 
 //        BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -64,11 +64,11 @@ public class RegionImageSet extends ImageSet
         return current;
     }
 
-    public void setChunkImage(ChunkCoord cCoord, MapType mapType, BufferedImage chunkImage)
+    public void setChunkImage(ChunkMD chunkMd, MapType mapType, BufferedImage chunkImage)
     {
         ImageHolder holder = getHolder(mapType);
         RegionCoord regionCoord = getRegionCoord();
-        holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(cCoord.chunkX), regionCoord.getZOffset(cCoord.chunkZ));
+        holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().chunkXPos), regionCoord.getZOffset(chunkMd.getCoord().chunkZPos));
     }
 
     public boolean hasChunkUpdates()

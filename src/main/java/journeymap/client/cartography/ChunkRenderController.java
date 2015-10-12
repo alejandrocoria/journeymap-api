@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage;
 /**
  * Delegates rendering job to one or more renderer.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class ChunkRenderController
 {
@@ -41,27 +41,19 @@ public class ChunkRenderController
         //standardRenderer = new ChunkTopoRenderer();
     }
 
-    public boolean renderChunk(ChunkCoord cCoord, ChunkMD chunkMd, MapType mapType)
+    public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
-        long start = System.nanoTime();
         Graphics2D undergroundG2D = null;
         Graphics2D dayG2D = null;
         Graphics2D nightG2D = null;
         boolean renderOkay = false;
-        final RegionCoord rCoord = cCoord.getRegionCoord();
-
-        if (cCoord.isUnderground() != mapType.isUnderground() || !Objects.equal(cCoord.getVerticalSlice(), mapType.vSlice) || chunkMd.getDimension() != mapType.dimension)
-        {
-            Journeymap.getLogger().error(String.format("Bad data; Coordinates not compatible with MapType: %s, %s, %s ", cCoord, chunkMd, mapType));
-            return false;
-        }
 
         try
         {
             RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
             if (mapType.isUnderground())
             {
-                BufferedImage image = regionImageSet.getChunkImage(cCoord, mapType);
+                BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
                     undergroundG2D = RegionImageHandler.initRenderingHints(image.createGraphics());
@@ -85,14 +77,14 @@ public class ChunkRenderController
 
                     if (renderOkay)
                     {
-                        regionImageSet.setChunkImage(cCoord, mapType, image);
+                        regionImageSet.setChunkImage(chunkMd, mapType, image);
                     }
                 }
             }
             else
             {
-                BufferedImage imageDay = regionImageSet.getChunkImage(cCoord, MapType.day(rCoord.dimension));
-                BufferedImage imageNight = regionImageSet.getChunkImage(cCoord, MapType.night(rCoord.dimension));
+                BufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
+                BufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
 
                 if (imageDay != null)
                 {
@@ -110,8 +102,8 @@ public class ChunkRenderController
 
                 if (renderOkay)
                 {
-                    regionImageSet.setChunkImage(cCoord, MapType.day(rCoord.dimension), imageDay);
-                    regionImageSet.setChunkImage(cCoord, MapType.night(rCoord.dimension), imageNight);
+                    regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
+                    regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
                 }
             }
 
@@ -149,7 +141,7 @@ public class ChunkRenderController
         {
             if (Journeymap.getLogger().isDebugEnabled())
             {
-                Journeymap.getLogger().debug("Chunk render failed: %s %s %s", rCoord, cCoord, mapType);
+                Journeymap.getLogger().debug("Chunk render failed: %s / %s / %s", rCoord, chunkMd, mapType);
             }
         }
 

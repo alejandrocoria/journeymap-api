@@ -153,25 +153,25 @@ public class RegionCoord implements Comparable<RegionCoord>
         return getMaxChunkZ(regionZ);
     }
 
-    public ChunkCoord getMinChunkCoord(Integer vSlice)
+    public ChunkCoordIntPair getMinChunkCoord()
     {
-        return ChunkCoord.fromChunkPos(worldDir, MapType.from(vSlice, dimension), getMinChunkX(), getMinChunkZ());
+        return new ChunkCoordIntPair(getMinChunkX(), getMinChunkZ());
     }
 
-    public ChunkCoord getMaxChunkCoord(Integer vSlice)
+    public ChunkCoordIntPair getMaxChunkCoord()
     {
-        return ChunkCoord.fromChunkPos(worldDir, MapType.from(vSlice, dimension), getMaxChunkX(), getMaxChunkZ());
+        return new ChunkCoordIntPair(getMaxChunkX(), getMaxChunkZ());
     }
 
-    public List<ChunkCoordIntPair> getChunkCoordsInRegion(Integer vSlice)
+    public List<ChunkCoordIntPair> getChunkCoordsInRegion()
     {
         final List<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1024);
-        final ChunkCoord min = getMinChunkCoord(vSlice);
-        final ChunkCoord max = getMaxChunkCoord(vSlice);
+        final ChunkCoordIntPair min = getMinChunkCoord();
+        final ChunkCoordIntPair max = getMaxChunkCoord();
 
-        for (int x = min.chunkX; x <= max.chunkX; x++)
+        for (int x = min.chunkXPos; x <= max.chunkXPos; x++)
         {
-            for (int z = min.chunkZ; z <= max.chunkZ; z++)
+            for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
             {
                 list.add(new ChunkCoordIntPair(x, z));
             }
