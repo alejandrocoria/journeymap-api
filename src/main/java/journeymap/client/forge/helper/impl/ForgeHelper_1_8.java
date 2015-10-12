@@ -185,7 +185,15 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.getSavedLightValue(getSkyBlock(), x, y, z);
 
         // 1.8
-        return chunk.getLightFor(getSkyBlock(), pos(chunk, localX, y, localZ));
+        try
+        {
+            return chunk.getLightFor(getSkyBlock(), pos(chunk, localX, y, localZ));
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        {
+            // Encountered on a custom-gen world where the value was 16
+            return 1; // At least let it show up
+        }
     }
 
     @Override
