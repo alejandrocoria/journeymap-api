@@ -8,7 +8,6 @@
 
 package journeymap.client.data;
 
-import com.google.common.base.Optional;
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
@@ -41,17 +40,18 @@ public class DataCache
     final LoadingCache<Class, WorldData> world;
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSets;
     final LoadingCache<Class, Map<String, Object>> messages;
-    final LoadingCache<EntityDTO, DrawEntityStep> entityDrawSteps;
+    final LoadingCache<EntityLivingBase, DrawEntityStep> entityDrawSteps;
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
-    final ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadataRemovalListener;
+    final LoadingCache<ChunkCoordIntPair, ChunkMD> chunkMetadata;
+    final ProxyRemovalListener<ChunkCoordIntPair, ChunkMD> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
     private final int defaultConcurrencyLevel = 1;
-    LoadingCache<ChunkCoordIntPair, Optional<ChunkMD>> chunkMetadata;
+
 
     // Private constructor
     private DataCache()
@@ -104,7 +104,7 @@ public class DataCache
         regionImageSets = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>();
+        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, ChunkMD>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
@@ -380,11 +380,11 @@ public class DataCache
         entityDTOs.invalidateAll();
     }
 
-    public DrawEntityStep getDrawEntityStep(EntityDTO entityDTO)
+    public DrawEntityStep getDrawEntityStep(EntityLivingBase entity)
     {
         synchronized (entityDrawSteps)
         {
-            return entityDrawSteps.getUnchecked(entityDTO);
+            return entityDrawSteps.getUnchecked(entity);
         }
     }
 
@@ -424,15 +424,16 @@ public class DataCache
 
             try
             {
-                Optional<ChunkMD> optional = chunkMetadata.get(coord);
-                if (optional.isPresent())
+                chunkMD = chunkMetadata.getUnchecked(coord);
+                if (chunkMD != null && !chunkMD.hasChunk())
                 {
-                    chunkMD = optional.get();
+                    chunkMetadata.invalidate(coord);
+                    chunkMD = null;
                 }
-                else
-                {
-                    chunkMetadata.invalidate(coord); // removes empty Optional
-                }
+            }
+            catch (CacheLoader.InvalidCacheLoadException e)
+            {
+                return null;
             }
             catch (Throwable e)
             {
@@ -447,7 +448,7 @@ public class DataCache
     {
         synchronized (chunkMetadata)
         {
-            chunkMetadata.put(chunkMD.getCoord(), Optional.of(chunkMD));
+            chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
     }
 
@@ -475,7 +476,7 @@ public class DataCache
         }
     }
 
-    public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>> listener)
+    public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, ChunkMD> listener)
     {
         synchronized (chunkMetadataRemovalListener)
         {

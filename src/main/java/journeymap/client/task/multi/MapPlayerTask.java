@@ -19,6 +19,7 @@ import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
@@ -56,8 +57,13 @@ public class MapPlayerTask extends BaseMapTask
     public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityDTO player)
     {
         final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-        final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(player.entityLiving);
-        boolean underground = ForgeHelper.INSTANCE.hasNoSky(player.entityLiving) || player.underground;
+        final EntityLivingBase playerEntity = player.entityLivingRef.get();
+        if (playerEntity == null)
+        {
+            return null;
+        }
+        final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(playerEntity);
+        boolean underground = ForgeHelper.INSTANCE.hasNoSky(playerEntity) || player.underground;
 
         if (underground && !cavesAllowed)
         {
@@ -78,25 +84,25 @@ public class MapPlayerTask extends BaseMapTask
         }
         else
         {
-            final long time = player.entityLiving.worldObj.getWorldInfo().getWorldTime() % 24000L;
+            final long time = playerEntity.worldObj.getWorldInfo().getWorldTime() % 24000L;
             mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
         }
 
         List<ITask> tasks = new ArrayList<ITask>(2);
-        tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
+        tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
 
         if (underground)
         {
             if (worldHasSky && JourneymapClient.getCoreProperties().alwaysMapSurface.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.day(player), new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkCoordIntPair>()));
             }
         }
         else
         {
             if (cavesAllowed && JourneymapClient.getCoreProperties().alwaysMapCaves.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, player.entityLiving.worldObj, MapType.underground(player), new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.underground(player), new ArrayList<ChunkCoordIntPair>()));
             }
         }
 

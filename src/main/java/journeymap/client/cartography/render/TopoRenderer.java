@@ -8,7 +8,6 @@
 
 package journeymap.client.cartography.render;
 
-import com.google.common.base.Optional;
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
@@ -390,7 +389,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<ChunkCoordIntPair, Optional<ChunkMD>> notification)
+    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {

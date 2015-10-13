@@ -8,7 +8,6 @@
 
 package journeymap.client.model;
 
-import com.google.common.base.Optional;
 import com.google.common.cache.CacheLoader;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -22,7 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 
 import java.io.Serializable;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
@@ -36,7 +35,7 @@ public class ChunkMD
     public static final String PROP_LOADED = "loaded";
     public static final String PROP_LAST_RENDERED = "lastRendered";
     final static DataCache dataCache = DataCache.instance();
-    private final SoftReference<Chunk> chunkSoftReference;
+    private final WeakReference<Chunk> chunkReference;
     private final ChunkCoordIntPair coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
     private Chunk retainedChunk;
@@ -60,7 +59,7 @@ public class ChunkMD
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
         properties.put(PROP_IS_SLIME_CHUNK, chunk.getRandomWithSeed(987234911L).nextInt(10) == 0);
 
-        this.chunkSoftReference = new SoftReference<Chunk>(chunk);
+        this.chunkReference = new WeakReference<Chunk>(chunk);
         if (forceRetain)
         {
             retainedChunk = chunk;
@@ -163,7 +162,7 @@ public class ChunkMD
 
     public boolean hasChunk()
     {
-        return chunkSoftReference.get() != null && !(chunkSoftReference.get() instanceof EmptyChunk);
+        return chunkReference.get() != null && !(chunkReference.get() instanceof EmptyChunk);
     }
 
     public int getHeightValue(int x, int z)
@@ -229,7 +228,7 @@ public class ChunkMD
 
     public Chunk getChunk()
     {
-        Chunk chunk = chunkSoftReference.get();
+        Chunk chunk = chunkReference.get();
         if (chunk == null)
         {
             throw new ChunkMissingException(getCoord());
@@ -338,15 +337,14 @@ public class ChunkMD
         }
     }
 
-    public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, Optional<ChunkMD>>
+    public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, ChunkMD>
     {
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
         @Override
-        public Optional<ChunkMD> load(ChunkCoordIntPair coord) throws Exception
+        public ChunkMD load(ChunkCoordIntPair coord) throws Exception
         {
-            ChunkMD chunkMD = ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
-            return Optional.fromNullable(chunkMD);
+            return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
         }
     }
 }

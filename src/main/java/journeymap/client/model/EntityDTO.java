@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StringUtils;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.UUID;
 
 /**
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class EntityDTO implements Serializable
 {
     public final String entityId;
-    public transient EntityLivingBase entityLiving;
+    public transient WeakReference<EntityLivingBase> entityLivingRef;
     public String filename;
     public Boolean hostile;
     public double posX;
@@ -53,7 +54,7 @@ public class EntityDTO implements Serializable
 
     private EntityDTO(EntityLivingBase entity)
     {
-        this.entityLiving = entity;
+        this.entityLivingRef = new WeakReference<EntityLivingBase>(entity);
         this.entityId = entity.getUniqueID().toString();
     }
 
@@ -67,7 +68,7 @@ public class EntityDTO implements Serializable
         this.chunkCoordX = entity.chunkCoordX;
         this.chunkCoordY = entity.chunkCoordY;
         this.chunkCoordZ = entity.chunkCoordZ;
-        this.heading = Math.round(entityLiving.rotationYawHead % 360);
+        this.heading = Math.round(entity.rotationYawHead % 360);
         if (currentPlayer != null)
         {
             this.invisible = entity.isInvisibleToPlayer(currentPlayer);

@@ -14,6 +14,7 @@ import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.EntityHelper;
+import net.minecraft.entity.EntityLivingBase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,12 +38,19 @@ public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
 
         List<EntityDTO> list = EntityHelper.getAnimalsNearby();
         List<EntityDTO> finalList = new ArrayList<EntityDTO>(list);
-        for (EntityDTO entity : list)
+        for (EntityDTO entityDTO : list)
         {
-            // Exclude animals being ridden, since their positions lag behind the players on the map
-            if (entity.entityLiving.riddenByEntity != null)
+            EntityLivingBase entityLiving = entityDTO.entityLivingRef.get();
+            if (entityLiving == null)
             {
-                finalList.remove(entity);
+                finalList.remove(entityDTO);
+                continue;
+            }
+
+            // Exclude animals being ridden, since their positions lag behind the players on the map
+            if (entityLiving.riddenByEntity != null)
+            {
+                finalList.remove(entityDTO);
             }
         }
 

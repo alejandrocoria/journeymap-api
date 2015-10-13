@@ -10,8 +10,8 @@ package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
 import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.EntityDTO;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
@@ -22,9 +22,10 @@ import net.minecraft.scoreboard.Team;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.lang.ref.WeakReference;
 
 /**
- * Created by mwoodman on 12/26/13.
+ * Draws an entity.
  */
 public class DrawEntityStep implements DrawStep
 {
@@ -35,17 +36,16 @@ public class DrawEntityStep implements DrawStep
     boolean hideSneaks = JourneymapClient.getCoreProperties().hideSneakingEntities.get();
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
-    EntityDTO entityDTO;
     TextureImpl texture;
     TextureImpl locatorTexture;
-    EntityLivingBase entityLiving;
+    WeakReference<EntityLivingBase> entityLivingRef;
+    String customName;
     boolean flip;
 
-    private DrawEntityStep(EntityDTO entityDTO)
+    private DrawEntityStep(EntityLivingBase entityLiving)
     {
         super();
-        this.entityDTO = entityDTO;
-        this.entityLiving = entityDTO.entityLiving;
+        this.entityLivingRef = new WeakReference<EntityLivingBase>(entityLiving);
     }
 
     public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading)
@@ -54,22 +54,27 @@ public class DrawEntityStep implements DrawStep
         this.texture = texture;
         this.flip = flip;
         this.showHeading = showHeading;
+        EntityLivingBase entityLiving = entityLivingRef.get();
+        if (entityLiving != null)
+        {
+            customName = DataCache.instance().getEntityDTO(entityLiving).customName;
+        }
     }
 
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-
+        EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
                 || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
         {
             return;
         }
 
-        Point2D pixel = gridRenderer.getPixel(entityDTO.entityLiving.posX, entityDTO.entityLiving.posZ);
+        Point2D pixel = gridRenderer.getPixel(entityLiving.posX, entityLiving.posZ);
         if (pixel != null)
         {
-            double heading = entityDTO.entityLiving.rotationYawHead;
+            double heading = entityLiving.rotationYawHead;
             double drawX = pixel.getX() + xOffset;
             double drawY = pixel.getY() + yOffset;
 
@@ -79,7 +84,7 @@ public class DrawEntityStep implements DrawStep
                 alpha = 1f - Math.max(.1f, (float) ((entityLiving.posY - minecraft.thePlayer.posY) / 32f));
             }
 
-            if (entityDTO.entityLiving instanceof EntityPlayer)
+            if (entityLiving instanceof EntityPlayer)
             {
                 int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
                 float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
@@ -95,6 +100,12 @@ public class DrawEntityStep implements DrawStep
 
     private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
+        EntityLivingBase entityLiving = entityLivingRef.get();
+        if (entityLiving == null)
+        {
+            return;
+        }
+
         if (locatorTexture != null && showHeading)
         {
             DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
@@ -121,6 +132,12 @@ public class DrawEntityStep implements DrawStep
 
     private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
+        EntityLivingBase entityLiving = entityLivingRef.get();
+        if (entityLiving == null)
+        {
+            return;
+        }
+
         Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
 
         if (locatorTexture != null && showHeading)
@@ -130,10 +147,10 @@ public class DrawEntityStep implements DrawStep
 
         int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
         //entityDTO.customName = EnumChatFormatting.LIGHT_PURPLE  + entityDTO.entityLiving.getCommandSenderName(); // TODO REMOVE
-        if (entityDTO.customName != null)
+        if (customName != null)
         {
             Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
-            DrawUtil.drawCenteredLabel(entityDTO.customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, Color.white, labelFgAlpha, fontScale, rotation);
+            DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, Color.white, labelFgAlpha, fontScale, rotation);
         }
 
         if (texture != null)
@@ -142,12 +159,12 @@ public class DrawEntityStep implements DrawStep
         }
     }
 
-    public static class SimpleCacheLoader extends CacheLoader<EntityDTO, DrawEntityStep>
+    public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep>
     {
         @Override
-        public DrawEntityStep load(EntityDTO entityDTO) throws Exception
+        public DrawEntityStep load(EntityLivingBase entityLiving) throws Exception
         {
-            return new DrawEntityStep(entityDTO);
+            return new DrawEntityStep(entityLiving);
         }
     }
 }
