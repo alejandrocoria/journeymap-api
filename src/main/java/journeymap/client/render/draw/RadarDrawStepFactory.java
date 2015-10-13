@@ -18,6 +18,7 @@ import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -50,6 +51,12 @@ public class RadarDrawStepFactory
 
             for (EntityDTO dto : entityDTOs)
             {
+                EntityLivingBase entityLiving = dto.entityLivingRef.get();
+                if (entityLiving == null)
+                {
+                    continue;
+                }
+
                 try
                 {
                     isPet = !Strings.isNullOrEmpty(dto.owner);
@@ -69,7 +76,7 @@ public class RadarDrawStepFactory
 
                     if (grid.getPixel(dto.posX, dto.posZ) != null)
                     {
-                        isPlayer = dto.entityLiving instanceof EntityPlayer;
+                        isPlayer = entityLiving instanceof EntityPlayer;
 
                         // Determine and draw locator
                         if (dto.hostile)
@@ -98,8 +105,8 @@ public class RadarDrawStepFactory
                         // Draw entity icon and label
                         if (isPlayer)
                         {
-                            entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(dto.entityLiving));
-                            DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
+                            entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(entityLiving));
+                            DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);
                         }
@@ -108,7 +115,7 @@ public class RadarDrawStepFactory
                             entityIcon = tc.getEntityIconTexture(iconSetName, dto.filename);
                             if (entityIcon != null)
                             {
-                                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(dto);
+                                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
                                 drawStep.update(false, locatorImg, entityIcon, showMobHeading);
                                 drawStepList.add(drawStep);
                             }

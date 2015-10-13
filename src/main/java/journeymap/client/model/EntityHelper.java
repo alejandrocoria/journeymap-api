@@ -325,7 +325,13 @@ public class EntityHelper
         @Override
         public int compare(EntityDTO o1, EntityDTO o2)
         {
-            return Double.compare(o1.entityLiving.getDistanceSqToEntity(player), o2.entityLiving.getDistanceSqToEntity(player));
+            EntityLivingBase e1 = o1.entityLivingRef.get();
+            EntityLivingBase e2 = o2.entityLivingRef.get();
+            if (e1 == null || e2 == null)
+            {
+                return 0;
+            }
+            return Double.compare(e1.getDistanceSqToEntity(player), e2.getDistanceSqToEntity(player));
         }
     }
 

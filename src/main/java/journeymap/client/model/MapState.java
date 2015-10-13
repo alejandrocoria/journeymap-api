@@ -26,6 +26,7 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.task.multi.MapPlayerTask;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
@@ -127,9 +128,14 @@ public class MapState
     {
         EntityDTO player = DataCache.getPlayer();
         MapType currentMapType = getCurrentMapType();
+        final EntityLivingBase playerEntity = player.entityLivingRef.get();
+        if (playerEntity == null)
+        {
+            return;
+        }
         if (currentMapType.isUnderground())
         {
-            if (!ForgeHelper.INSTANCE.hasNoSky(player.entityLiving))
+            if (!ForgeHelper.INSTANCE.hasNoSky(playerEntity))
             {
                 lastMapProperties.showCaves.set(false);
                 setMapType(MapType.day(player));
@@ -183,7 +189,7 @@ public class MapState
         MapType mapType = null;
 
         EntityDTO player = DataCache.getPlayer();
-        if (ForgeHelper.INSTANCE.hasNoSky(player.entityLiving))
+        if (ForgeHelper.INSTANCE.hasNoSky(player.entityLivingRef.get()))
         {
             mapType = MapType.underground(player);
         }

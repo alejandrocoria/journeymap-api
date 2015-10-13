@@ -9,7 +9,6 @@
 package journeymap.client.cartography.render;
 
 
-import com.google.common.base.Optional;
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author mwoodman
  */
-public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, Optional<ChunkMD>>
+public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
     public static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
