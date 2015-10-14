@@ -374,8 +374,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             ChunkCoordIntPair coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
-
-            //JourneyMap.getLogger().info("Invalidated data related to chunk " + coord);
+            columnPropertiesCache.invalidate(coord);
         }
     }
 }

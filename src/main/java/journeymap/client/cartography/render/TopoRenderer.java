@@ -396,6 +396,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             ChunkCoordIntPair coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
+            columnPropertiesCache.invalidate(coord);
         }
     }
 }

@@ -486,6 +486,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 }
             }
 
+            columnPropertiesCache.invalidate(coord);
+
             //JourneyMap.getLogger().info("Invalidated data related to chunk " + coord);
         }
     }
