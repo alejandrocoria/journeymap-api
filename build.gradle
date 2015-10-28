@@ -1,5 +1,5 @@
 plugins {
-    id "net.minecraftforge.gradle.forge" version "2.0.1"
+    id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 
 //apply plugin: 'forge'
@@ -124,14 +124,19 @@ task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlim
         exclude("journeymap/client/feature/impl/Unlimited.class")
         exclude("journeymap/client/feature/impl/NoRadar.class")
     }
-    /*
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.fairPlay
     }
-    */
 }
 
+artifacts.archives unlimitedJar, fairPlayJar
+
+reobf {
+    unlimitedJar {}
+    fairPlayJar {}
+}
 /*
 def reobf { 
     reobf (unlimitedJar) { spec ->
