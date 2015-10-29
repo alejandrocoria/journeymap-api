@@ -2,6 +2,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 
+
 //apply plugin: 'forge'
 //apply plugin: 'java'
 
@@ -45,25 +46,25 @@ dependencies {
 }
 
 processResources {
-        // this will ensure that this task is redone when the versions change.
-        inputs.property "version", project.version
-        inputs.property "mcversion", project.minecraft.version
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-        from(sourceSets.main.resources.srcDirs) {
-            include 'license.txt'
-            expand 'version': project.version, 'mcversion': project.minecraft.version, 'date' : getDate()
-        }
-        // copy everything else, thats not the mcmod.info
-        from(sourceSets.main.resources.srcDirs) {
-            exclude 'mcmod.info'
-            exclude 'license.txt'
-        }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'license.txt'
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'date' : getDate()
+    }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+        exclude 'license.txt'
+    }
 }
 
 task copyJs(type: Copy) {
     from 'tmp'
     into 'build/resources/main/assets/journeymap/web/css'
-    include 'journeymap.css' 
+    include 'journeymap.css'
 }
 
 task copyCss(type: Copy, dependsOn: copyJs) {
@@ -80,8 +81,8 @@ task filter() {
     }
 }
 
-task minifyJs(type: JavaExec, dependsOn: filter) { 
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true) 
+task minifyJs(type: JavaExec, dependsOn: filter) {
+    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true)
     {
         arg(value: "${srcWebDir}js/journeymap.js")
         arg(value: "-o")
@@ -90,7 +91,7 @@ task minifyJs(type: JavaExec, dependsOn: filter) {
 }
 
 task minifyCss(type: JavaExec, dependsOn: filter) {
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true) 
+    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true)
     {
         arg(value: "${srcWebDir}css/journeymap.css")
         arg(value: "-o")
@@ -106,10 +107,11 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
+task aUnlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
     version = "${version}-${config.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
+        duplicatesStrategy = 'exclude'
         exclude("journeymap/client/feature/impl/NoRadar.class")
     }
     from(sourceSets.main.resources.srcDirs) {
@@ -120,33 +122,23 @@ task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
 
 task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
     version = "${version}-${config.fairPlay}".toLowerCase()
+
     from(sourceSets.main.output) {
         exclude("journeymap/client/feature/impl/Unlimited.class")
         exclude("journeymap/client/feature/impl/NoRadar.class")
     }
-
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.fairPlay
     }
 }
 
-artifacts.archives unlimitedJar, fairPlayJar
+artifacts.archives aUnlimitedJar, fairPlayJar
 
 reobf {
-    unlimitedJar {}
+    aUnlimitedJar {}
     fairPlayJar {}
 }
-/*
-def reobf { 
-    reobf (unlimitedJar) { spec ->
-        spec.classpath = sourceSets.main.compileClasspath;
-    }
-    reobf (fairPlayJar) { spec ->
-        spec.classpath = sourceSets.main.compileClasspath;
-    }
-}
-*/
 
 task makePretty(type: Delete) {
     delete "build/libs/${archivesBaseName}-${version}.jar"
