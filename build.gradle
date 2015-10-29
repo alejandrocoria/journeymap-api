@@ -2,15 +2,6 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 
-
-//apply plugin: 'forge'
-//apply plugin: 'java'
-
-// Fixes bug in IDEA 14 that wasn't putting resources into build/classes
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
-}
-
 ext {
     configFile = file "project.properties"
     srcWebDir = "src/main/resources/assets/journeymap/web/"
@@ -39,6 +30,8 @@ minecraft {
     replace "@MICRO@", config.jm_micro
     replace "@PATCH@", config.jm_patch
     mappings = "${config.snapshot}"
+
+    makeObfSourceJar = false
 }
 
 dependencies {
