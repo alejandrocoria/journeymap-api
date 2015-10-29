@@ -100,7 +100,7 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task aUnlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
+task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
     version = "${version}-${config.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
@@ -126,10 +126,10 @@ task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlim
     }
 }
 
-artifacts.archives aUnlimitedJar, fairPlayJar
+artifacts.archives unlimitedJar, fairPlayJar
 
 reobf {
-    aUnlimitedJar {}
+    unlimitedJar {}
     fairPlayJar {}
 }
 
