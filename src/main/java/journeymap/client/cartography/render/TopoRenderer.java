@@ -9,6 +9,7 @@
 package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
+import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
@@ -116,7 +117,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
 
@@ -133,7 +134,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render the chunk image
-            return renderSurface(g2D, chunkMd, vSlice, false);
+            return renderSurface(painter, chunkMd, vSlice, false);
         }
         catch (Throwable e)
         {
@@ -150,13 +151,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the surface.
      */
-    protected boolean renderSurface(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    protected boolean renderSurface(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         boolean chunkOk = false;
 
         try
         {
-            g2D.setComposite(ALPHA_OPAQUE);
             int sliceMaxY = 0;
 
             for (int x = 0; x < 16; x++)
@@ -193,7 +193,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (roofY == 0 || standardY == 0)
                     {
-                        paintVoidBlock(x, z, g2D);
+                        painter.paintVoidBlock(x, z);
                         chunkOk = true;
                         continue blockLoop;
                     }
@@ -208,11 +208,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (topBlockMd == null)
                     {
-                        paintBadBlock(x, standardY, z, g2D);
+                        painter.paintBadBlock(x, standardY, z);
                         continue blockLoop;
                     }
 
-                    chunkOk = paintStrata(null, g2D, chunkMd, topBlockMd, vSlice, x, standardY, z, cavePrePass) || chunkOk;
+                    chunkOk = paintStrata(null, painter, chunkMd, topBlockMd, vSlice, x, standardY, z, cavePrePass) || chunkOk;
                 }
             }
         }
@@ -342,7 +342,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return slopes;
     }
 
-    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
+    protected boolean paintStrata(final Strata strata, final ChunkPainter painter, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
     {
 
         int color = 0;
@@ -362,7 +362,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             color = getBaseBlockColor(topBlockMd, x, y, z);
         }
 
-        paintBlock(x, z, color, g2D);
+        painter.paintBlock(x, z, color);
 
         return true;
     }

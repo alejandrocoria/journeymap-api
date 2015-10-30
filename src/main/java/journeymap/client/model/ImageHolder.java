@@ -9,7 +9,7 @@
 package journeymap.client.model;
 
 import com.google.common.base.Objects;
-import journeymap.client.cartography.render.BaseRenderer;
+import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
@@ -90,7 +90,7 @@ public class ImageHolder
             {
                 BufferedImage textureImage = texture.getImage();
                 Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
-                g2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                g2D.setComposite(ChunkPainter.ALPHA_OPAQUE);
                 g2D.drawImage(imagePart, x, y, null);
                 g2D.dispose();
                 partialUpdate = true;

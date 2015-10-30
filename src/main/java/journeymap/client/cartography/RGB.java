@@ -9,20 +9,18 @@
 package journeymap.client.cartography;
 
 import java.awt.*;
-import java.nio.ByteOrder;
-import java.util.Collection;
 
 /**
  * Color operations utility class.
  */
 public final class RGB
 {
-    transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
     public static final int ALPHA_OPAQUE = 0xff000000;
     public static final int BLACK_ARGB = 0xFF000000; // -16777216
     public static final int BLACK_RGB = 0x000000; // 0
     public static final int WHITE_ARGB = 0xFFFFFFFF; // 4294967295
     public static final int WHITE_RGB = 0xFFFFFF; // 16777215
+    transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
 
     /**
      * Don't instantiate.
@@ -55,81 +53,6 @@ public final class RGB
         return PIXEL_PAINT.setColor(ALPHA_OPAQUE | rgb);
     }
 
-    /**
-     * Returns an average color from a collection.
-     *
-     * @param colors
-     * @return
-     */
-    public static Integer average(Collection<Integer> colors)
-    {
-        int[] out = {0, 0, 0};
-
-        int used = 0;
-        for (Integer color : colors)
-        {
-            if (color == null)
-            {
-                continue;
-            }
-            int[] cInts = ints(color);
-            out[0] += cInts[0];
-            out[1] += cInts[1];
-            out[2] += cInts[2];
-
-            used++;
-        }
-
-        if (used == 0)
-        {
-            return null;
-        }
-
-        out[0] /= used;
-        out[1] /= used;
-        out[2] /= used;
-
-        return toInteger(out);
-    }
-
-    /**
-     * Returns an average color from an array.
-     * Nulls allowed but ignored.
-     *
-     * @param colors
-     * @return
-     */
-    public static Integer average(Integer... colors)
-    {
-        int[] out = {0, 0, 0};
-
-        int used = 0;
-        for (Integer color : colors)
-        {
-            if (color == null)
-            {
-                continue;
-            }
-            int[] cInts = ints(color);
-            out[0] += cInts[0];
-            out[1] += cInts[1];
-            out[2] += cInts[2];
-
-            used++;
-        }
-
-        if (used == 0)
-        {
-            return null;
-        }
-
-        out[0] /= used;
-        out[1] /= used;
-        out[2] /= used;
-
-        return toInteger(out);
-    }
-
     public static Integer max(Integer... colors)
     {
         int[] out = {0, 0, 0};
@@ -156,7 +79,6 @@ public final class RGB
 
         return toInteger(out);
     }
-
 
     public static int toInteger(float r, float g, float b)
     {
@@ -224,16 +146,13 @@ public final class RGB
     }
 
     /**
-     * Magic number adjustments.  Do not examine too closely.
+     * Desaturate a color.  Not perfect, it'll do.
      */
-    public static int biomeDarken(int rgb)
+    public static int greyScale(int rgb)
     {
-        float[] floats = floats(rgb);
-        float r,g,b;
-        r = floats[0]*floats[0]*.236f;
-        g = floats[1]*floats[1]*.601f;
-        b = floats[2]*floats[2]*.163f;
-        return toInteger(r,g,b);
+        int[] ints = ints(rgb);
+        int avg = clampInt((ints[0] + ints[1] + ints[2]) / 3);
+        return toInteger(avg, avg, avg);
     }
 
     /**
@@ -312,66 +231,6 @@ public final class RGB
         rgbFloats[2] = rgbFloats[2]*multFloats[2];
 
         return toInteger(rgbFloats);
-    }
-
-    public static int multiply2(int rgb, int multiplier)
-    {
-        float[] multFloats = floats(multiplier);
-        float rMult = multFloats[0];
-        float gMult = multFloats[1];
-        float bMult = multFloats[2];
-
-        int rgb2 = rgb;
-        int r;
-        int g;
-        int b;
-
-        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)
-        {
-            r = (int)((float)(rgb2 & 255) * rMult);
-            g = (int)((float)(rgb2 >> 8 & 255) * gMult);
-            b = (int)((float)(rgb2 >> 16 & 255) * bMult);
-            rgb2 &= -16777216;
-            rgb2 |= b << 16 | g << 8 | r;
-        }
-        else
-        {
-            r = (int)((float)(rgb2 >> 24 & 255) * rMult);
-            g = (int)((float)(rgb2 >> 16 & 255) * gMult);
-            b = (int)((float)(rgb2 >> 8 & 255) * bMult);
-            rgb2 &= 255;
-            rgb2 |= r << 24 | g << 16 | b << 8;
-        }
-
-        return rgb2;
-    }
-
-    /**
-     * Adjust color rgb using a diff
-     * @param rgb
-     * @param diff
-     * @return
-     */
-    public static int subtract(int rgb, int diff)
-    {
-        int alpha1 = rgb >> 24 & 0xFF;
-        int red1 = rgb >> 16 & 0xFF;
-        int green1 = rgb >> 8 & 0xFF;
-        int blue1 = rgb & 0xFF;
-
-        int alpha2 = diff >> 24 & 0xFF;
-        int red2 = diff >> 16 & 0xFF;
-        int green2 = diff >> 8 & 0xFF;
-        int blue2 = diff & 0xFF;
-
-        int alpha = clampInt(alpha1 - alpha2);
-        int red = clampInt(red1 - red2);
-        int green = clampInt(green1 - green2);
-        int blue = clampInt(blue1 - blue2);
-
-        int result = (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
-
-        return result | -16777216;
     }
 
     /**
