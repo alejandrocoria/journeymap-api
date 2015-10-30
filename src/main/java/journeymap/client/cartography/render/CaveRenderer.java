@@ -10,10 +10,7 @@ package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
-import journeymap.client.cartography.Strata;
-import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.*;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
@@ -21,8 +18,6 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import net.minecraft.world.ChunkCoordIntPair;
-
-import java.awt.*;
 
 /**
  * Renders chunk image for caves in the overworld.
@@ -36,7 +31,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected SurfaceRenderer surfaceRenderer;
     protected StatTimer renderCaveTimer = StatTimer.get("CaveRenderer.render");
     protected Strata strata = new Strata("Cave", 40, 8, true);
-    protected float defaultDim = .8f;
+    protected float defaultDim = .2f;
     protected boolean mapSurfaceAboveCaves;
 
     /**
@@ -71,7 +66,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      * Render chunk image for caves in the overworld.
      */
     @Override
-    public synchronized boolean render(final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice)
+    public synchronized boolean render(final ChunkPainter g2D, final ChunkMD chunkMd, final Integer vSlice)
     {
         if (vSlice == null)
         {
@@ -138,7 +133,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for underground.
      */
-    protected boolean renderUnderground(final Graphics2D g2D, final ChunkMD chunkMd, final int vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected boolean renderUnderground(final ChunkPainter painter, final ChunkMD chunkMd, final int vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
         final int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
         final int sliceMinY = sliceBounds[0];
@@ -164,21 +159,21 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     if (ceiling < 0)
                     {
                         chunkOk = true;
-                        paintVoidBlock(x, z, g2D);
+                        painter.paintVoidBlock(x, z);
                         continue;
                     }
 
                     // Nothing even in this slice.
                     if (ceiling < sliceMinY)
                     {
-                        if (surfaceRenderer != null)
+                        if (surfaceRenderer != null && mapSurfaceAboveCaves)
                         {
                             // Should be painted by surface renderer already.
-                            paintDimOverlay(x, z, defaultDim, g2D);
+                            painter.paintDimOverlay(x, z, defaultDim);
                         }
                         else
                         {
-                            paintBlackBlock(x, z, g2D);
+                            painter.paintBlackBlock(x, z);
                         }
                         chunkOk = true;
                         continue;
@@ -204,30 +199,30 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                         {
                             if (strata.isBlocksFound())
                             {
-                                paintBlackBlock(x, z, g2D);
+                                painter.paintBlackBlock(x, z);
                             }
                             else
                             {
-                                paintVoidBlock(x, z, g2D);
+                                painter.paintVoidBlock(x, z);
                             }
                         }
                         else if (ceiling > sliceMaxY)
                         {
                             int distance = ceiling - y;
-                            if (distance < 16)
+                            if (distance < 16 && mapSurfaceAboveCaves)
                             {
                                 // Show dimmed surface above
-                                paintDimOverlay(x, z, Math.max(defaultDim, distance / 16), g2D);
+                                painter.paintDimOverlay(x, z, Math.max(defaultDim, distance / 16));
                             }
                             else
                             {
                                 // Or not.
-                                paintBlackBlock(x, z, g2D);
+                                painter.paintBlackBlock(x, z);
                             }
                         }
-                        else
+                        else if (mapSurfaceAboveCaves)
                         {
-                            paintDimOverlay(x, z, defaultDim, g2D);
+                            painter.paintDimOverlay(x, z, defaultDim);
                         }
 
                         chunkOk = true;
@@ -235,13 +230,13 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     else
                     {
                         // Paint that action
-                        chunkOk = paintStrata(strata, g2D, chunkMd, vSlice, x, ceiling, z, chunkHeights, chunkSlopes) || chunkOk;
+                        chunkOk = paintStrata(strata, painter, chunkMd, vSlice, x, ceiling, z, chunkHeights, chunkSlopes) || chunkOk;
                     }
 
                 }
                 catch (Throwable t)
                 {
-                    paintBadBlock(x, vSlice, z, g2D);
+                    painter.paintBadBlock(x, vSlice, z);
                     String error = "CaveRenderer error at x,vSlice,z = " + x + "," //$NON-NLS-1$ //$NON-NLS-2$
                             + vSlice + "," + z + " : " + LogFormatter.toString(t); //$NON-NLS-1$ //$NON-NLS-2$
                     Journeymap.getLogger().error(error);
@@ -323,11 +318,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Paint the image with the color derived from a BlockStack
      */
-    protected boolean paintStrata(final Strata strata, final Graphics2D g2D, final ChunkMD chunkMd, final Integer vSlice, final int x, final int y, final int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected boolean paintStrata(final Strata strata, final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice, final int x, final int y, final int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
         if (strata.isEmpty())
         {
-            paintBadBlock(x, y, z, g2D);
+            painter.paintBadBlock(x, y, z);
             return false;
         }
 
@@ -358,7 +353,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             // Shouldn't happen
             if (strata.getRenderCaveColor() == null)
             {
-                paintBadBlock(x, y, z, g2D);
+                painter.paintBadBlock(x, y, z);
                 return false;
             }
 
@@ -373,13 +368,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // And draw to the actual chunkimage
-            g2D.setComposite(ALPHA_OPAQUE);
-            g2D.setPaint(RGB.paintOf(strata.getRenderCaveColor()));
-            g2D.fillRect(x, z, 1, 1);
+            painter.paintBlock(x, z, strata.getRenderCaveColor());
         }
         catch (RuntimeException e)
         {
-            paintBadBlock(x, y, z, g2D);
+            painter.paintBadBlock(x, y, z);
             throw e;
         }
 

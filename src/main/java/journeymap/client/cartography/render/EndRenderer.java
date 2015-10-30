@@ -9,13 +9,12 @@
 package journeymap.client.cartography.render;
 
 
+import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
-
-import java.awt.*;
 
 /**
  * Render a chunk in the End.
@@ -52,7 +51,7 @@ public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
     /**
      * Paint the image with the color derived from a BlockStack
      */
-    protected boolean paintStrata(final Strata strata, final Graphics2D dayG2d, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
+    protected boolean paintStrata(final Strata strata, final ChunkPainter dayG2d, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
     {
         return super.paintStrata(strata, dayG2d, null, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass);
     }

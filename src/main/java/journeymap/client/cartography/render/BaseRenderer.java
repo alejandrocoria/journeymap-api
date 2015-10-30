@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base class for methods reusable across renderers.
@@ -39,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
-    public static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
+    protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
@@ -56,7 +55,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapPlantShadows;
     protected float[] ambientColor;
 
-    protected volatile AtomicLong badBlockCount = new AtomicLong(0);
+
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
     protected String cachePrefix = "";
@@ -194,59 +193,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
     }
 
-    /**
-     * It's a problem
-     */
-    public void paintBadBlock(final int x, final int y, final int z, final Graphics2D g2D)
-    {
-        long count = badBlockCount.incrementAndGet();
-        if (count == 1 || count % 10240 == 0)
-        {
-            Journeymap.getLogger().warn(
-                    "Bad block at " + x + "," + y + "," + z   
-                            + ". Total bad blocks: " + count
-            ); 
-        }
-    }
-
-    /**
-     * Darken the existing color.
-     */
-    protected void paintDimOverlay(int x, int z, float alpha, final Graphics2D g2D)
-    {
-        if (g2D != null)
-        {
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-            paintBlock(x, z, COLOR_BLACK, g2D);
-            g2D.setComposite(ALPHA_OPAQUE);
-        }
-    }
-
-    /**
-     * Paint the block.
-     */
-    public void paintBlock(final int x, final int z, final int color,
-                           final Graphics2D g2D)
-    {
-        g2D.setPaint(RGB.paintOf(color));
-        g2D.fillRect(x, z, 1, 1);
-    }
-
-    /**
-     * Paint the void.
-     */
-    public void paintVoidBlock(final int x, final int z, final Graphics2D g2D)
-    {
-        paintBlock(x, z, COLOR_VOID, g2D);
-    }
-
-    /**
-     * Paint the void.
-     */
-    public void paintBlackBlock(final int x, final int z, final Graphics2D g2D)
-    {
-        paintBlock(x, z, COLOR_BLACK, g2D);
-    }
 
 
     /**
@@ -724,4 +670,5 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             return internal;
         }
     }
+
 }

@@ -8,15 +8,16 @@
 
 package journeymap.client.cartography;
 
-import com.google.common.base.Objects;
-import journeymap.client.cartography.render.*;
+import journeymap.client.cartography.render.CaveRenderer;
+import journeymap.client.cartography.render.EndRenderer;
+import journeymap.client.cartography.render.NetherRenderer;
+import journeymap.client.cartography.render.SurfaceRenderer;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
 import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Level;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -43,9 +44,9 @@ public class ChunkRenderController
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
-        Graphics2D undergroundG2D = null;
-        Graphics2D dayG2D = null;
-        Graphics2D nightG2D = null;
+        ChunkPainter undergroundG2D = null;
+        ChunkPainter dayG2D = null;
+        ChunkPainter nightG2D = null;
         boolean renderOkay = false;
 
         try
@@ -56,7 +57,7 @@ public class ChunkRenderController
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
-                    undergroundG2D = RegionImageHandler.initRenderingHints(image.createGraphics());
+                    undergroundG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(image.createGraphics()));
                     switch (rCoord.dimension)
                     {
                         case -1:
@@ -88,14 +89,12 @@ public class ChunkRenderController
 
                 if (imageDay != null)
                 {
-                    dayG2D = RegionImageHandler.initRenderingHints(imageDay.createGraphics());
-                    dayG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                    dayG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
                 }
 
                 if (imageNight != null)
                 {
-                    nightG2D = RegionImageHandler.initRenderingHints(imageNight.createGraphics());
-                    nightG2D.setComposite(BaseRenderer.ALPHA_OPAQUE);
+                    nightG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
                 }
 
                 renderOkay = dayG2D != null && overWorldSurfaceRenderer.render(dayG2D, nightG2D, chunkMd);
@@ -125,15 +124,15 @@ public class ChunkRenderController
         {
             if (dayG2D != null)
             {
-                dayG2D.dispose();
+                dayG2D.finishPainting();
             }
             if (nightG2D != null)
             {
-                nightG2D.dispose();
+                nightG2D.finishPainting();
             }
             if (undergroundG2D != null)
             {
-                undergroundG2D.dispose();
+                undergroundG2D.finishPainting();
             }
         }
 
