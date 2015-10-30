@@ -151,7 +151,9 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     int roofY = 0;
                     int y = standardY;
 
-                    roofY = Math.max(0, chunkMd.getAbsoluteHeightValue(x, z));
+                    // TODO: Re-evaluate whether this section is necessary now that
+                    // precipHeight is always used
+                    roofY = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
                     if (standardY < roofY)
                     {
                         // Is transparent roof above standard height?

@@ -15,7 +15,6 @@ import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -487,9 +486,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         // Find the height.
-        // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
-
-        y = Math.max(0, ForgeHelper.INSTANCE.getHeightValue(chunkMd.getChunk(), x, z));
+        y = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
 
         try
         {

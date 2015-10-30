@@ -170,7 +170,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         int y = -1;
         if (!chunk.isEmpty())
         {
-            y = Math.max(1, ForgeHelper.INSTANCE.getPrecipitationHeight(chunk, blockCoord.x & 15, blockCoord.z & 15));
+            y = Math.max(1, chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
         }
 
         // Create waypoint

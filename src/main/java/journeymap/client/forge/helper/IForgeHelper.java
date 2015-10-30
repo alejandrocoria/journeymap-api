@@ -37,7 +37,6 @@ import java.util.Iterator;
  */
 public interface IForgeHelper
 {
-
     public IRenderHelper getRenderHelper();
 
     public IBlockAccess getIBlockAccess();
@@ -88,13 +87,11 @@ public interface IForgeHelper
 
     public boolean canBlockSeeTheSky(Chunk chunk, int x, int y, int z);
 
-    public int getHeightValue(Chunk chunk, int x, int z);
-
-    public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
-
-    public int getAbsoluteHeightValue(Chunk chunk, int x, int z);
+    public int getHeight(Chunk chunk, int x, int z);
 
     public int getPrecipitationHeight(Chunk chunk, int x, int z);
+
+    public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
 
     public TileEntity getTileEntity(int blockX, int y, int blockZ);
 

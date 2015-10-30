@@ -171,7 +171,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     int roofY = 0;
                     int y = standardY;
 
-                    roofY = Math.max(0, chunkMd.getAbsoluteHeightValue(x, z));
+                    roofY = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
                     if (standardY < roofY)
                     {
                         // Is transparent roof above standard height?
@@ -246,8 +246,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
 
         // Find the height.
-        // TODO: This doesn't catch glass or all that anymore, does it?  Use precip height?
-        y = Math.max(0, chunkMd.getHeightValue(x, z));
+        y = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
 
         try
         {
