@@ -127,7 +127,7 @@ public class ChunkMD
      */
     public int ceiling(final int x, final int z)
     {
-        final int chunkHeight = getHeightValue(x, z);
+        final int chunkHeight = getPrecipitationHeight(x, z);
         int y = chunkHeight;
 
         try
@@ -165,14 +165,14 @@ public class ChunkMD
         return chunkReference.get() != null && !(chunkReference.get() instanceof EmptyChunk);
     }
 
-    public int getHeightValue(int x, int z)
+    public int getHeight(int x, int z)
     {
-        return ForgeHelper.INSTANCE.getHeightValue(getChunk(), x, z);
+        return ForgeHelper.INSTANCE.getHeight(getChunk(), x, z);
     }
 
-    public int getAbsoluteHeightValue(int x, int z)
+    public int getPrecipitationHeight(int x, int z)
     {
-        return ForgeHelper.INSTANCE.getAbsoluteHeightValue(getChunk(), x, z);
+        return ForgeHelper.INSTANCE.getPrecipitationHeight(getChunk(), x, z);
     }
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)

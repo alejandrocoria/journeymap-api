@@ -63,11 +63,10 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             // Get block under mouse
             Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
             String info;
-            Integer blockY = null;
             if (!chunk.isEmpty())
             {
                 ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
-                blockY = Math.max(chunkMD.getHeightValue(blockCoord.x & 15, blockCoord.z & 15), chunkMD.getAbsoluteHeightValue(blockCoord.x & 15, blockCoord.z & 15));
+                int blockY = chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.x, blockY, blockCoord.z).biomeName;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),

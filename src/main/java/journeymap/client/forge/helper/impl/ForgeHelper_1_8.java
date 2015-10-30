@@ -373,23 +373,13 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public int getHeightValue(Chunk chunk, int x, int z)
+    public int getHeight(Chunk chunk, int x, int z)
     {
         // 1.7
         // return chunk.getHeightValue(x, z);
 
         // 1.8
         return chunk.getHeight(x, z);
-    }
-
-    @Override
-    public int getAbsoluteHeightValue(Chunk chunk, int x, int z)
-    {
-        // 1.7
-        // return chunk.getPrecipitationHeight(x, z);
-
-        // 1.8
-        return chunk.getPrecipitationHeight(pos(chunk, x, 0, z)).getY();
     }
 
     @Override

@@ -13,6 +13,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockCoordIntPair;
+import journeymap.client.model.ChunkMD;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
@@ -23,6 +24,8 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.input.Mouse;
 
@@ -166,11 +169,11 @@ public class WaypointLayer implements LayerDelegate.Layer
         }
 
         // Check chunk
-        Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.x >> 4, blockCoord.z >> 4));
         int y = -1;
-        if (!chunk.isEmpty())
+        if (chunkMD!=null && !chunkMD.getChunk().isEmpty())
         {
-            y = Math.max(1, ForgeHelper.INSTANCE.getPrecipitationHeight(chunk, blockCoord.x & 15, blockCoord.z & 15));
+            y = Math.max(1, chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
         }
 
         // Create waypoint
