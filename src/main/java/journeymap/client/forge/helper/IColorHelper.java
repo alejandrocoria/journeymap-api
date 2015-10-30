@@ -9,6 +9,7 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 
 /**
@@ -25,7 +26,7 @@ public interface IColorHelper
 
     Integer getTextureColor(BlockMD blockMD);
 
-    int getColorMultiplier(Block block, int x, int y, int z);
+    int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z);
 
     int getRenderColor(BlockMD blockMD);
 

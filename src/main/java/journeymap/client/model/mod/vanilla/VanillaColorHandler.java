@@ -6,6 +6,7 @@ import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
 import net.minecraft.block.BlockFlower;
@@ -31,12 +32,12 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      * Get the color of the block at global coordinates
      */
     @Override
-    public Integer getBlockColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = getBaseColor(blockMD, globalX, y, globalZ);
+        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
         if (blockMD.isBiomeColored())
         {
-            color = getBiomeColor(blockMD, globalX, y, globalZ);
+            color = getBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         // Fallback to Minecraft's own map color
@@ -51,31 +52,31 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the biome-based block color at the world coordinates
      */
-    protected Integer getBiomeColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getBiomeColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
         if (blockMD.isGrass())
         {
-            return getGrassColor(blockMD, globalX, y, globalZ);
+            return getGrassColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         if (blockMD.isFoliage())
         {
-            return getFoliageColor(blockMD, globalX, y, globalZ);
+            return getFoliageColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         if (blockMD.isWater())
         {
-            return getWaterColor(blockMD, globalX, y, globalZ);
+            return getWaterColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         // Anything else, including those with CustomBiomeColor
-        return getCustomBiomeColor(blockMD, globalX, y, globalZ);
+        return getCustomBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
     }
 
     /**
      * Gets the color for the block.  If one isn't set yet, it is loaded from the block texture.
      */
-    protected int getBaseColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected int getBaseColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
         Integer color = blockMD.getColor();
         if (color == null)
@@ -99,10 +100,10 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the block's tint based on the biome position it's in.
      */
-    protected Integer getCustomBiomeColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getCustomBiomeColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = getBaseColor(blockMD, globalX, y, globalZ);
-        int tint = getTint(blockMD, globalX, y, globalZ);
+        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
+        int tint = getTint(chunkMD, blockMD, globalX, y, globalZ);
 
         if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
         {
@@ -123,36 +124,37 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the foliage color for the block.
      */
-    protected Integer getFoliageColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getFoliageColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        return RGB.adjustBrightness(RGB.multiply(getBaseColor(blockMD, globalX, y, globalZ), getTint(blockMD, globalX, y, globalZ)), .8f);
+        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, globalX, y, globalZ),
+                getTint(chunkMD, blockMD, globalX, y, globalZ)), .8f);
     }
 
     /**
      * Get the grass color for the block.
      */
-    protected Integer getGrassColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
         // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
-        return RGB.multiply(0x929292, getTint(blockMD, globalX, y, globalZ));
+        return RGB.multiply(0x929292, getTint(chunkMD, blockMD, globalX, y, globalZ));
     }
 
     /**
      * Get the water color for the block.
      */
-    protected Integer getWaterColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getWaterColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        return RGB.multiply(getBaseColor(blockMD, globalX, y, globalZ), getTint(blockMD, globalX, y, globalZ));
+        return RGB.multiply(getBaseColor(chunkMD, blockMD, globalX, y, globalZ), getTint(chunkMD, blockMD, globalX, y, globalZ));
     }
 
     /**
      * Get the tint (color multiplier) for the block.
      */
-    protected Integer getTint(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getTint(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
         try
         {
-            return colorHelper.getColorMultiplier(blockMD.getBlock(), globalX, y, globalZ);
+            return colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
         }
         catch (Exception e)
         {
@@ -182,7 +184,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             if (!blockMD.isBiomeColored())
             {
                 // Check for custom biome-based color multiplier
-                int tint = getTint(blockMD, globalX, y, globalZ);
+                int tint = getTint(null, blockMD, globalX, y, globalZ);
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);

@@ -132,7 +132,7 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
-        public Integer getBlockColor(BlockMD blockMD, int globalX, int y, int globalZ);
+        public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ);
 
         public Integer getTextureColor(BlockMD blockMD);
     }
