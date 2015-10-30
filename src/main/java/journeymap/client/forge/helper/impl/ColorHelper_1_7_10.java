@@ -14,6 +14,7 @@ import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
@@ -58,9 +59,16 @@ public class ColorHelper_1_7_10 implements IColorHelper
     }
 
     @Override
-    public int getColorMultiplier(Block block, int x, int y, int z)
+    public int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z)
     {
-        return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), x, y, z);
+        if(chunkMD==null)
+        {
+            return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), x, y, z);
+        }
+        else
+        {
+            return block.colorMultiplier(chunkMD.getWorld(), x, y, z);
+        }
     }
 
     @Deprecated

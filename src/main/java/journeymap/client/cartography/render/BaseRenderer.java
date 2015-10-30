@@ -162,7 +162,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         else
         {
-            basicColor = stratum.getBlockMD().getColor(stratum.getChunkMd().toWorldX(stratum.getX()), stratum.getY(), stratum.getChunkMd().toWorldZ(stratum.getZ()));
+            ChunkMD chunkMD = stratum.getChunkMd();
+            basicColor = stratum.getBlockMD().getColor(chunkMD, chunkMD.toWorldX(stratum.getX()), stratum.getY(), chunkMD.toWorldZ(stratum.getZ()));
         }
 
         if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)

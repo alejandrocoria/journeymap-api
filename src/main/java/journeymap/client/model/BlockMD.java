@@ -396,9 +396,9 @@ public class BlockMD
     /**
      * Gets block color using world coordinates.
      */
-    public int getColor(int globalX, int y, int globalZ)
+    public int getColor(ChunkMD chunkMD, int globalX, int y, int globalZ)
     {
-        return blockColorHandler.getBlockColor(this, globalX, y, globalZ);
+        return blockColorHandler.getBlockColor(chunkMD, this, globalX, y, globalZ);
     }
 
     public Integer getColor()
