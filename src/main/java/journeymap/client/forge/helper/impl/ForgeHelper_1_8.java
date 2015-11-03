@@ -528,6 +528,21 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return netManager.getRemoteAddress();
     }
 
+    @Override
+    public String getFPS()
+    {
+        String fps = Minecraft.getMinecraft().debug;
+        final int idx = fps != null ? fps.indexOf('(')-1 : -1;
+        if (idx > 0)
+        {
+            return fps.substring(0, idx);
+        }
+        else
+        {
+           return "";
+        }
+    }
+
     /**
      * Create a world BlockPos from chunk-local coords
      * @param chunk
