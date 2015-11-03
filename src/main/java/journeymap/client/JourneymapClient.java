@@ -80,7 +80,6 @@ public class JourneymapClient implements CommonProxy
     private volatile Minecraft mc;
     private Logger logger;
     private boolean threadLogging = false;
-    private ModInfo modInfo;
 
     // Task controller for issuing tasks in executor
     private TaskController multithreadTaskController;
@@ -254,7 +253,8 @@ public class JourneymapClient implements CommonProxy
             }
 
             // Init ModInfo
-            modInfo = new ModInfo("UA-28839029-4", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition());
+            ModInfo modInfo = new ModInfo("UA-28839029-4", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition());
+            modInfo.reportAppView();
 
             // Trigger statics on EntityList (may not be needed anymore?)
             EntityRegistry.instance();
@@ -433,12 +433,6 @@ public class JourneymapClient implements CommonProxy
             if (mc == null || mc.theWorld == null || !initialized || !coreProperties.mappingEnabled.get())
             {
                 return;
-            }
-
-            if (modInfo != null)
-            {
-                modInfo.reportAppView();
-                //lastModInfoKeepAlive = System.currentTimeMillis();
             }
 
             File worldDir = FileHandler.getJMWorldDir(mc, currentWorldId);
