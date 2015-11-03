@@ -83,7 +83,6 @@ public class ChunkPainter
     {
         Integer color;
         int lastColor = -1;
-        Paint paint;
 
         try
         {
@@ -100,8 +99,8 @@ public class ChunkPainter
                     // Update color
                     if (color != lastColor)
                     {
-                        paint = RGB.paintOf(color);
-                        g2D.setPaint(paint);
+                        lastColor = color;
+                        g2D.setPaint(RGB.paintOf(color));
                     }
 
                     g2D.fillRect(x, z, 1, 1);
