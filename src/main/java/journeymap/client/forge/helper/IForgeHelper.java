@@ -110,4 +110,6 @@ public interface IForgeHelper
     public Iterator<Block> getRegisteredBlocks();
 
     public SocketAddress getSocketAddress(NetworkManager netManager);
+
+    public String getFPS();
 }
