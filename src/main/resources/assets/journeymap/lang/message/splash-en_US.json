@@ -3,19 +3,19 @@
 {
   "lines": [
     {
-      "label": "More accurate biome colors!",
+      "label": "Improved memory and CPU usage",
       "action": ""
     },
     {
-      "label": "JourneyMapServer now included in the same jar!",
+      "label": "More accurate biome colors",
       "action": ""
     },
     {
-      "label": "Bugfixes and more bugfixes!",
+      "label": "JourneyMapServer now included in the same jar",
       "action": ""
     },
     {
-      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8!",
+      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8",
       "action": ""
     }
   ]
