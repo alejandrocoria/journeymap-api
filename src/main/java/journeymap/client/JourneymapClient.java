@@ -42,6 +42,7 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
+import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -318,6 +319,9 @@ public class JourneymapClient implements CommonProxy
             // Webserver
             WebServer.setEnabled(webMapProperties.enabled.get(), false);
             initialized = true;
+
+
+            VersionCheck.getVersionAvailable();
 
             // threadLogging = getLogger().isTraceEnabled();
         }

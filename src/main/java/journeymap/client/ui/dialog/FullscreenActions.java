@@ -28,6 +28,7 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
+import journeymap.common.version.VersionCheck;
 import net.minecraft.client.gui.GuiButton;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
@@ -85,6 +86,22 @@ public class FullscreenActions extends JmUI
     public static void launchWebsite()
     {
         String url = Journeymap.DOWNLOAD_URL;
+        try
+        {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        }
+        catch (Throwable e)
+        {
+            Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+        }
+    }
+
+    /**
+     * Launch the download website in the native OS.
+     */
+    public static void launchDownloadWebsite()
+    {
+        String url = VersionCheck.getDownloadUrl();
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
