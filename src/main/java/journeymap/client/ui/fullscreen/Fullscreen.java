@@ -442,7 +442,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    FullscreenActions.launchWebsite();
+                    FullscreenActions.launchDownloadWebsite();
                     buttonAlert.setDrawButton(false);
                     return true;
                 }

@@ -9,19 +9,23 @@
 package journeymap.common.version;
 
 import com.google.common.io.CharStreams;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import cpw.mods.fml.common.Loader;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
-import net.minecraftforge.fml.common.Loader;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+// 1.8
+//import net.minecraftforge.fml.common.Loader;
 
 /**
  * Checks to see if a newer released version of JourneyMap is available.
@@ -33,6 +37,7 @@ public class VersionCheck
     private static volatile Boolean versionIsCurrent = true;
     private static volatile Boolean versionIsChecked;
     private static volatile String versionAvailable;
+    private static volatile String downloadUrl;
 
     /**
      * Whether this build is the current version available.
@@ -74,6 +79,19 @@ public class VersionCheck
     }
 
     /**
+     * Gets the current version available.
+     * @return
+     */
+    public static String getDownloadUrl()
+    {
+        if (versionIsChecked == null)
+        {
+            checkVersion();
+        }
+        return downloadUrl;
+    }
+
+    /**
      * Check for the current version by querying a JSON file that is
      * manually updated when a new version is released.
      */
@@ -95,43 +113,65 @@ public class VersionCheck
                 @Override
                 public void run()
                 {
-                    Journeymap.getLogger().info("Checking for updated version: " + Journeymap.VERSION_URL); //$NON-NLS-1$
                     InputStreamReader in = null;
-                    HttpsURLConnection connection = null;
+                    HttpURLConnection connection = null;
                     String rawResponse = null;
                     try
                     {
                         URL uri = URI.create(Journeymap.VERSION_URL).toURL();
-                        connection = (HttpsURLConnection) uri.openConnection();
+                        connection = (HttpURLConnection) uri.openConnection();
                         connection.setConnectTimeout(6000);
                         connection.setReadTimeout(6000);
                         connection.setRequestMethod("GET");
-                        connection.setRequestProperty("User-Agent", createUserAgent());
                         in = new InputStreamReader(uri.openStream());
                         rawResponse = CharStreams.toString(in);
 
-                        Gson gson = new GsonBuilder().create();
-                        VersionData versionData = gson.fromJson(rawResponse, VersionData.class);
+                        JsonObject project = new JsonParser().parse(rawResponse).getAsJsonObject();
+                        JsonObject versions = project.get("versions").getAsJsonObject();
+                        Iterator<JsonElement> files = versions.get(Loader.MC_VERSION).getAsJsonArray().iterator();
 
-                        if (versionData.versions != null)
+                        String currentVersion = Journeymap.JM_VERSION.toString();
+                        boolean currentIsRelease = Journeymap.JM_VERSION.isRelease();
+                        while(files.hasNext())
                         {
-                            for (VersionLine versionLine : versionData.versions)
+                            JsonObject file = files.next().getAsJsonObject();
+                            try
                             {
-                                if (Loader.MC_VERSION.equals(versionLine.minecraft))
+                                // {"id":2264681,"url":"http:\/\/curse.com\/mc-mods\/minecraft\/journeymap-32274\/2264681","name":"journeymap-1.7.10-5.1.1b9-unlimited.jar","type":"beta","version":"1.7.10","downloads":1435,"created_at":"2015-10-31T02:50:09+0000"}
+                                JsonElement type = file.get("type");
+                                if (currentIsRelease && !("release".equals(type.getAsString())))
                                 {
-                                    versionAvailable = versionLine.journeymap;
-                                    versionIsCurrent = isCurrent(Journeymap.JM_VERSION.toString(), versionAvailable);
+                                    continue;
+                                }
+
+                                String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
+                                if(!name.contains("-"))
+                                {
+                                    continue;
+                                }
+                                String fileVersion = name.split("-")[1];
+                                String url = file.get("url").getAsString();
+                                if (!isCurrent(currentVersion, fileVersion))
+                                {
+                                    downloadUrl = url;
+                                    versionAvailable = fileVersion;
+                                    versionIsCurrent = false;
                                     versionIsChecked = true;
+                                    Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
                                     break;
                                 }
+                            } catch (Exception e) {
+                                Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
                             }
                         }
-                        else
-                        {
-                            Journeymap.getLogger().warn("Version URL had no data!"); //$NON-NLS-1$
-                        }
 
-                        Journeymap.getLogger().info(String.format("Current version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, Journeymap.DOWNLOAD_URL));
+                        if(!versionIsChecked)
+                        {
+                            versionAvailable = currentVersion;
+                            versionIsCurrent = true;
+                            versionIsChecked = true;
+                            downloadUrl = Journeymap.DOWNLOAD_URL;
+                        }
                     }
                     catch (Throwable e)
                     {
@@ -165,7 +205,7 @@ public class VersionCheck
     }
 
     /**
-     * Whether this instance's version is current (equal or newer) to one avaialable.
+     * Whether this instance's version is current (equal or newer) to one available.
      * @param thisVersionStr
      * @param availableVersionStr
      * @return
@@ -181,84 +221,5 @@ public class VersionCheck
         Version availableVersion = Version.from(availableVersionStr, null);
 
         return !availableVersion.isNewerThan(thisVersion);
-    }
-
-    /**
-     * Create the user agent string used by the HTTP connection.
-     * @return
-     */
-    private static String createUserAgent()
-    {
-        String agent = null;
-
-        try
-        {
-            // Get system properties
-            String os = System.getProperty("os.name");
-            if (os == null)
-            {
-                os = "";
-            }
-
-            String version = System.getProperty("os.version");
-            if (version == null)
-            {
-                version = "";
-            }
-
-            String arch = System.getProperty("os.arch");
-            if (arch == null)
-            {
-                arch = "";
-            }
-            if (arch.equals("amd64"))
-            {
-                arch = "WOW64";
-            }
-
-            String lang = String.format("%s_%s", System.getProperty("user.language", "en"), System.getProperty("user.country", "US"));
-
-            // Build user agent string
-            if (os.startsWith("Mac")) // Mac OS X, x86_64, ?
-            {
-                version = version.replace(".", "_");
-                agent = String.format("Mozilla/5.0 (Macintosh; U; Intel Mac OS X %s; %s)", version, lang);
-            }
-            else if (os.startsWith("Win")) // Windows 7, amd64, 6.1
-            {
-                agent = String.format("Mozilla/5.0 (Windows; U; Windows NT %s; %s; %s)", version, arch, lang);
-            }
-            else if (os.startsWith("Linux")) // Linux, os.version = kernel version, os.arch = amd64
-            {
-                agent = String.format("Mozilla/5.0 (Linux; U; Linux %s; %s; %s)", version, arch, lang);
-            }
-            else
-            {
-                agent = String.format("Mozilla/5.0 (%s; U; %s %s; %s, %s)", os, os, version, arch, lang);
-            }
-        }
-        catch (Throwable t)
-        {
-            agent = "Mozilla/5.0 (Unknown)";
-        }
-
-        return agent;
-    }
-
-    /**
-     * Object model representing the JSON document.
-     */
-    class VersionData
-    {
-        VersionLine[] versions;
-    }
-
-    /**
-     * Object model representing a version line in the JSON document.
-     */
-    class VersionLine
-    {
-        String minecraft;
-        String journeymap;
     }
 }

@@ -10,6 +10,7 @@ package journeymap.common.version;
 
 import com.google.common.base.Joiner;
 import journeymap.common.Journeymap;
+import org.apache.logging.log4j.core.helpers.Strings;
 
 import java.util.Arrays;
 
@@ -137,6 +138,15 @@ public class Version implements Comparable<Version>
     public boolean isNewerThan(Version other)
     {
         return compareTo(other) > 0;
+    }
+
+    /**
+     * Whether this version is a release (no patch).
+     * @return
+     */
+    public boolean isRelease()
+    {
+        return Strings.isEmpty(patch);
     }
 
 

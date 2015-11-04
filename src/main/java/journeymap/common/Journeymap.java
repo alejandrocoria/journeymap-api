@@ -37,7 +37,7 @@ public class Journeymap
     public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
-    public static final String VERSION_URL = "https://dl.dropboxusercontent.com/u/38077766/JourneyMap/journeymap-versions.json";
+    public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap-32274.json";
 
     @Mod.Instance(Journeymap.MOD_ID)
     public static Journeymap instance;
