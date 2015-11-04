@@ -142,6 +142,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Whether this version is a release (no patch).
+     *
      * @return
      */
     public boolean isRelease()

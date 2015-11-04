@@ -9,12 +9,13 @@
 package journeymap.common.version;
 
 import com.google.common.io.CharStreams;
-import com.google.gson.*;
-import cpw.mods.fml.common.Loader;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
+import net.minecraftforge.fml.common.Loader;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -23,9 +24,6 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-// 1.8
-//import net.minecraftforge.fml.common.Loader;
 
 /**
  * Checks to see if a newer released version of JourneyMap is available.
@@ -132,7 +130,7 @@ public class VersionCheck
 
                         String currentVersion = Journeymap.JM_VERSION.toString();
                         boolean currentIsRelease = Journeymap.JM_VERSION.isRelease();
-                        while(files.hasNext())
+                        while (files.hasNext())
                         {
                             JsonObject file = files.next().getAsJsonObject();
                             try
@@ -145,7 +143,7 @@ public class VersionCheck
                                 }
 
                                 String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
-                                if(!name.contains("-"))
+                                if (!name.contains("-"))
                                 {
                                     continue;
                                 }
@@ -160,12 +158,14 @@ public class VersionCheck
                                     Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
                                     break;
                                 }
-                            } catch (Exception e) {
+                            }
+                            catch (Exception e)
+                            {
                                 Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
                             }
                         }
 
-                        if(!versionIsChecked)
+                        if (!versionIsChecked)
                         {
                             versionAvailable = currentVersion;
                             versionIsCurrent = true;
