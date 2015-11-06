@@ -21,10 +21,16 @@ public class ThemePresets
 {
     public static final Theme THEME_VICTORIAN = createVictorian();
     public static final Theme THEME_PURIST = createPurist();
+    public static final String DIR_VAULT = "Vault";
 
     public static List<Theme> getPresets()
     {
         return Arrays.asList(THEME_PURIST, THEME_VICTORIAN);
+    }
+
+    public static List<String> getPresetDirs()
+    {
+        return Arrays.asList(THEME_PURIST.directory, THEME_VICTORIAN.directory, DIR_VAULT);
     }
 
     private static Theme createVictorian()
