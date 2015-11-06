@@ -223,7 +223,7 @@ public class ThemeMinimapFrame
 
     private TextureImpl getTexture(String suffix, Theme.ImageSpec imageSpec)
     {
-        return getTexture(suffix, imageSpec.width, imageSpec.height, false, false);
+        return getTexture(suffix, imageSpec.width, imageSpec.height, true, false);
     }
 
     private TextureImpl getTexture(String suffix, int width, int height, boolean resize, boolean retain)

@@ -392,13 +392,13 @@ public class Theme implements Comparable<Theme>
          * Circular minimap specifications, corresponds to /minimap/circle
          */
         @Since(1)
-        public MinimapCircle circle = new MinimapCircle();
+        public MinimapCircle circle;// = new MinimapCircle();
 
         /**
          * Square minimap specifications, corresponds to /minimap/square
          */
         @Since(1)
-        public MinimapSquare square = new MinimapSquare();
+        public MinimapSquare square;// = new MinimapSquare();
 
         /**
          * Shared minimap spec
