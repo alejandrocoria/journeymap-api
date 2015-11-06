@@ -47,9 +47,9 @@ public class ThemeFileHandler
 
         // Theme dirs
         Set<String> themeDirNames = new HashSet<String>();
-        for (Theme theme : ThemePresets.getPresets())
+        for (String dir : ThemePresets.getPresetDirs())
         {
-            themeDirNames.add(theme.directory);
+            themeDirNames.add(dir);
         }
 
         // Copy theme dirs from assets
