@@ -84,7 +84,6 @@ public class DisplayVars
         this.showLocation = miniMapProperties.showLocation.get();
         this.showCompass = miniMapProperties.showCompass.get();
         this.showReticle = miniMapProperties.showReticle.get();
-        this.shape = miniMapProperties.shape.get();
         this.position = miniMapProperties.position.get();
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
@@ -95,28 +94,37 @@ public class DisplayVars
         this.theme = ThemeFileHandler.getCurrentTheme();
 
         // Assign shape
-        switch (shape)
+        switch (miniMapProperties.shape.get())
         {
-            case Circle:
-            {
-                minimapSpec = theme.minimap.circle;
-                minimapWidth = miniMapProperties.getSize();
-                minimapHeight = miniMapProperties.getSize();
-                reticleSegmentLength = minimapHeight / 2;
-                break;
-            }
             case Rectangle:
             {
-                minimapSpec = theme.minimap.square;
-                double ratio = mc.displayWidth * 1D / mc.displayHeight;
-                minimapHeight = miniMapProperties.getSize();
-                minimapWidth = (int) (minimapHeight * ratio);
-                reticleSegmentLength = minimapWidth / 1.5;
-                break;
+                if (theme.minimap.square != null)
+                {
+                    this.shape = Shape.Rectangle;
+                    minimapSpec = theme.minimap.square;
+                    double ratio = mc.displayWidth * 1D / mc.displayHeight;
+                    minimapHeight = miniMapProperties.getSize();
+                    minimapWidth = (int) (minimapHeight * ratio);
+                    reticleSegmentLength = minimapWidth / 1.5;
+                    break;
+                }
+            }
+            case Circle:
+            {
+                if (theme.minimap.circle != null)
+                {
+                    this.shape = Shape.Circle;
+                    minimapSpec = theme.minimap.circle;
+                    minimapWidth = miniMapProperties.getSize();
+                    minimapHeight = miniMapProperties.getSize();
+                    reticleSegmentLength = minimapHeight / 2;
+                    break;
+                }
             }
             case Square:
             default:
             {
+                this.shape = Shape.Square;
                 minimapSpec = theme.minimap.square;
                 minimapWidth = miniMapProperties.getSize();
                 minimapHeight = miniMapProperties.getSize();
@@ -289,7 +297,7 @@ public class DisplayVars
             labelFps = null;
         }
 
-        int labelMargin = Math.max(compassLabelHeight / 2, minimapSpec.labelBottomMargin);
+        int labelMargin = minimapSpec.labelBottomMargin;
         int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
 
         if (showLocation)
