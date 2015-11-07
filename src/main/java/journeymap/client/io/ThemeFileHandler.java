@@ -153,6 +153,16 @@ public class ThemeFileHandler
         return getCurrentTheme(false);
     }
 
+    /**
+     * Set the current theme.
+     * @param theme
+     */
+    public synchronized static void setCurrentTheme(Theme theme)
+    {
+        JourneymapClient.getCoreProperties().themeName.set(theme.name);
+        getCurrentTheme(true);
+    }
+
     public synchronized static Theme getCurrentTheme(boolean forceReload)
     {
         if (forceReload)
@@ -278,10 +288,7 @@ public class ThemeFileHandler
             index++;
         }
 
-        TextureCache.instance().purgeThemeImages();
-        currentTheme = getThemes().get(index);
-        JourneymapClient.getCoreProperties().themeName.set(currentTheme.name);
-        getCurrentTheme(true);
+        setCurrentTheme(getThemes().get(index));
     }
 
     /**

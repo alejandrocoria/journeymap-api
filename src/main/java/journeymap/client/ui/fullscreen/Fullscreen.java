@@ -16,6 +16,7 @@ import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
@@ -36,6 +37,7 @@ import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.dialog.FullscreenActions;
 import journeymap.client.ui.fullscreen.layer.LayerDelegate;
+import journeymap.client.ui.minimap.Shape;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeButton;
@@ -57,7 +59,6 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -1090,6 +1091,24 @@ public class Fullscreen extends JmUI
     public final boolean doesGuiPauseGame()
     {
         return false;
+    }
+
+    /**
+     * Set theme by name
+     */
+    public void setTheme(String name)
+    {
+        try
+        {
+            Theme theme = ThemeFileHandler.getThemeByName(name);
+            ThemeFileHandler.setCurrentTheme(theme);
+            JourneymapClient.getMiniMapProperties(JourneymapClient.getActiveMinimapId()).shape.set(Shape.Rectangle);
+            ChatLog.announceI18N("jm.common.ui_theme_applied");
+        }
+        catch(Exception e)
+        {
+            Journeymap.getLogger().error("Could not load Theme: " + LogFormatter.toString(e));
+        }
     }
 }
 

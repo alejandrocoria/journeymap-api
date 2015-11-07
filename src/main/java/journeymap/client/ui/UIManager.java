@@ -76,14 +76,23 @@ public class UIManager
     {
         try
         {
-            T ui = uiClass.getConstructor(JmUI.class).newInstance(returnDisplay);
-            return open(ui);
+            // Try constructor with return display
+            return open(uiClass.getConstructor(JmUI.class).newInstance(returnDisplay));
         }
         catch (Throwable e)
         {
-            logger.log(Level.ERROR, "Unexpected exception creating UI with return class: " + LogFormatter.toString(e)); //$NON-NLS-1$
-            closeCurrent();
-            return null;
+            try
+            {
+                // Try constructor without return display
+                return open(uiClass.getConstructor().newInstance());
+            }
+            catch (Throwable e2)
+            {
+                logger.log(Level.ERROR, "1st unexpected exception creating UI: " + LogFormatter.toString(e));
+                logger.log(Level.ERROR, "2nd unexpected exception creating UI: " + LogFormatter.toString(e2));
+                closeCurrent();
+                return null;
+            }
         }
     }
 
