@@ -14,6 +14,8 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.Button;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.util.Random;
+
 /**
  * Created by Mark on 5/8/2015.
  */
@@ -24,6 +26,9 @@ public class SplashPerson
     public final String title;
     public Button button;
     public int width;
+    public int moveX;
+    public int moveY;
+    private int moveDistance = 1;
 
     public SplashPerson(String ign, String name, String titleKey)
     {
@@ -40,6 +45,7 @@ public class SplashPerson
     public void setButton(Button button)
     {
         this.button = button;
+        randomizeVector();
     }
 
     public TextureImpl getSkin()
@@ -61,5 +67,39 @@ public class SplashPerson
     public void setWidth(int minWidth)
     {
         this.width = minWidth;
+    }
+
+    public void randomizeVector()
+    {
+        this.moveDistance = new Random().nextInt(2) + 1;
+        this.moveX = new Random().nextBoolean() ? moveDistance : -moveDistance;
+        this.moveY = new Random().nextBoolean() ? moveDistance : -moveDistance;
+    }
+
+    private void reverseX()
+    {
+        this.moveDistance = new Random().nextInt(2) + 1;
+        this.moveX = (moveX < 0) ? moveDistance : -moveDistance;
+    }
+
+    private void reverseY()
+    {
+        this.moveDistance = new Random().nextInt(2) + 1;
+        this.moveY = (moveY < 0) ? moveDistance : -moveDistance;
+    }
+
+    public void adjustVector(int screenWidth, int screenHeight)
+    {
+        if (button.xPosition <= moveDistance || button.xPosition + button.getWidth() >= screenWidth - moveDistance)
+        {
+            reverseX();
+        }
+
+        if (button.yPosition <= moveDistance || button.yPosition + button.getHeight() >= screenHeight - moveDistance)
+        {
+            reverseY();
+        }
+        button.xPosition += moveX;
+        button.yPosition += moveY;
     }
 }
