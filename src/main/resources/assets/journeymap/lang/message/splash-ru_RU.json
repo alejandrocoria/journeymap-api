@@ -3,11 +3,15 @@
 {
   "lines": [
     {
+      "label": "New 'Vault' theme. Click here to try it!",
+      "action": "fullscreen.Fullscreen#setTheme#Vault"
+    },
+    {
       "label": "Improved memory and CPU usage",
       "action": ""
     },
     {
-      "label": "More accurate biome colors",
+      "label": "More accurate biome and water colors",
       "action": ""
     },
     {

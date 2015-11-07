@@ -156,6 +156,7 @@ jm.common.ui_theme=Tema för utseende
 jm.common.ui_theme.tooltip=Temat som används för att styra utseendet på kontroller i fullskärmskarta och minikartan.
 jm.common.ui_theme_author=Författare: §b %1$s§f
 jm.common.ui_theme_name=Namn: §b %1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Uppdatering tillgänglig!
 jm.common.update_check=Leta efter uppdatering
 jm.common.use_browser=Använd webbläsare
