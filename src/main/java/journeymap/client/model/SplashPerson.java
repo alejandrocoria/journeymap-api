@@ -14,6 +14,8 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.Button;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -101,5 +103,32 @@ public class SplashPerson
         }
         button.xPosition += moveX;
         button.yPosition += moveY;
+    }
+
+    public void avoid(List<SplashPerson> devs)
+    {
+        for (SplashPerson dev : devs)
+        {
+            if (this == dev)
+            {
+                continue;
+            }
+
+            Rectangle2D thisBounds = new Rectangle2D.Double(button.getX(), button.getY(), button.width, button.height);
+            Rectangle2D thatBounds = new Rectangle2D.Double(dev.button.getX(), dev.button.getY(), dev.button.width, dev.button.height);
+            if (thisBounds.intersects(thatBounds))
+            {
+                this.moveDistance *= 2;
+                if (new Random().nextBoolean())
+                {
+                    reverseX();
+                }
+                else
+                {
+                    reverseY();
+                }
+                break;
+            }
+        }
     }
 }

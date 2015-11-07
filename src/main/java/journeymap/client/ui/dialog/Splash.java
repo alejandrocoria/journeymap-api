@@ -162,6 +162,7 @@ public class Splash extends JmUI
             for (SplashPerson dev : devs)
             {
                 temp = drawPerson(temp, lineHeight, dev);
+                dev.avoid(devs);
                 dev.adjustVector(this.width, this.height);
             }
         }
