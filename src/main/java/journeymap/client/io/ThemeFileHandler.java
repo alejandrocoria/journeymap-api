@@ -17,6 +17,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.render.texture.TextureCache;
+import journeymap.client.ui.UIManager;
 import journeymap.client.ui.option.StringListProvider;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
@@ -159,8 +160,13 @@ public class ThemeFileHandler
      */
     public synchronized static void setCurrentTheme(Theme theme)
     {
+        if (currentTheme == theme)
+        {
+            return;
+        }
         JourneymapClient.getCoreProperties().themeName.set(theme.name);
         getCurrentTheme(true);
+        UIManager.getInstance().getMiniMap().reset();
     }
 
     public synchronized static Theme getCurrentTheme(boolean forceReload)
