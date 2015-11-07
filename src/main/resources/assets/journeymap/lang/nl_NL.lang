@@ -156,6 +156,7 @@ jm.common.ui_theme=UI Thema
 jm.common.ui_theme.tooltip=Het Thema gebruikt voor de minimap en voor UI besturing in de fullscreen kaart
 jm.common.ui_theme_author=Auteur: §b%1$s§f
 jm.common.ui_theme_name=Naam: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Update Beschikbaar!
 jm.common.update_check=Controleer Voor Update
 jm.common.use_browser=Gebruik Browser

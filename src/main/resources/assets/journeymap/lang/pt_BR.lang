@@ -209,6 +209,7 @@ jm.common.tile_display_quality=Qualidade Alta de Exibição
 jm.common.ui_theme.tooltip=O tema usado para mostrar os controles da interface no mapa de tela cheia e o estilo de minimapa
 jm.common.ui_theme_author=Autor: §b%1$s§f
 jm.common.ui_theme_name=Nome: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.ui_theme=Desenho da interface
 jm.common.update_available=Atualização disponível!
 jm.common.update_check=Procurar atualização

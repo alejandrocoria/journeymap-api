@@ -156,6 +156,7 @@ jm.common.ui_theme=Diseño de la Interfaz
 jm.common.ui_theme.tooltip=El Diseño a utilizar para mostrar el control de la Interfaz en el mapa de pantalla completa y el estilo del Mini Mapa
 jm.common.ui_theme_author=Autor: §b%1$s§f
 jm.common.ui_theme_name=Nombre: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Actualizacion Disponible!
 jm.common.update_check=Buscar Actualizaciones
 jm.common.use_browser=Usar Navegador

@@ -156,6 +156,7 @@ jm.common.ui_theme=UI主题风格
 jm.common.ui_theme.tooltip=主题风格在 呈现全屏地图中的UI控制栏 以及 改变小地图样式 时被使用
 jm.common.ui_theme_author=作者: §b%1$s§f
 jm.common.ui_theme_name=名称: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=更新可用!
 jm.common.update_check=检查更新
 jm.common.use_browser=使用浏览器
