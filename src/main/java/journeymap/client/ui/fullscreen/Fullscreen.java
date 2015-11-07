@@ -24,6 +24,7 @@ import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
+import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
@@ -59,6 +60,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -1100,10 +1102,16 @@ public class Fullscreen extends JmUI
     {
         try
         {
+            MiniMapProperties mmp = JourneymapClient.getMiniMapProperties(JourneymapClient.getActiveMinimapId());
+            mmp.shape.set(Shape.Rectangle);
+            mmp.showBiome.set(false);
+            mmp.sizePercent.set(20);
+            mmp.save();
             Theme theme = ThemeFileHandler.getThemeByName(name);
             ThemeFileHandler.setCurrentTheme(theme);
-            JourneymapClient.getMiniMapProperties(JourneymapClient.getActiveMinimapId()).shape.set(Shape.Rectangle);
+            UIManager.getInstance().getMiniMap().reset();
             ChatLog.announceI18N("jm.common.ui_theme_applied");
+            UIManager.getInstance().closeAll();
         }
         catch(Exception e)
         {

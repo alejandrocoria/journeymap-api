@@ -55,7 +55,7 @@ public class MiniMapProperties extends InGameMapProperties
     public final AtomicInteger terrainAlpha = new AtomicInteger(100);
 
     @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "PlayerHeading")
-    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.PlayerHeading);
+    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
     @Config(category = Inherit, key = "jm.minimap.compass_font_scale", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger compassFontScale = new AtomicInteger(1);
