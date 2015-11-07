@@ -156,6 +156,7 @@ jm.common.ui_theme=UI 테마
 jm.common.ui_theme.tooltip=전체화면 맵의 UI 컨트롤과 미니맵 스타일에 사용되는 테마
 jm.common.ui_theme_author=제작자: §b%1$s§f
 jm.common.ui_theme_name=이름: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=새로운 업데이트가 있습니다!
 jm.common.update_check=업데이트 확인
 jm.common.use_browser=브라우저 사용

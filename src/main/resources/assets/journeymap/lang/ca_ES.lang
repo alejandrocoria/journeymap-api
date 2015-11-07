@@ -154,6 +154,7 @@ jm.common.show_waypoints=Mostrar Waypoints
 jm.common.show_waypoints.tooltip=Els Waypoints son mostrat al mapa
 jm.common.ui_theme=Diseny de la Interfície
 jm.common.ui_theme.tooltip=El Diseny a utilitzar per mostrar el control de la Interfície al mapa de pantalla completa i l'estil del Mini Mapa
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.ui_theme_author=Autor: §b%1$s§f
 jm.common.ui_theme_name=Nom: §b%1$s§f
 jm.common.update_available=Actualizació Disponible!

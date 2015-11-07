@@ -209,6 +209,7 @@ jm.common.ui_theme=Thème de l'interface
 jm.common.ui_theme.tooltip=Le Thème utilisé pour afficher l'interface de la carte plein-écran et pour styliser la Mini-Carte
 jm.common.ui_theme_author=Auteur: §b%1$s§f
 jm.common.ui_theme_name=Nom: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Mise-à-Jour Disponible!
 jm.common.update_check=Vérifier les Mise-à-Jour
 jm.common.use_browser=Utiliser l'Explorateur

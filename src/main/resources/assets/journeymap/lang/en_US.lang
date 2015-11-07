@@ -212,11 +212,11 @@ jm.common.splash_friend=Friend
 jm.common.splash_walloffame=Wall of Fame
 jm.common.splash_title=About JourneyMap %1$s
 jm.common.splash_whatisnew=What's New?
-
 jm.common.ui_theme=UI Theme
 jm.common.ui_theme.tooltip=The Theme used to display UI controls in the Fullscreen Map and to style the MiniMap
 jm.common.ui_theme_author=Author: §b%1$s§f
 jm.common.ui_theme_name=Name: §b%1$s§f
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Update Available!
 jm.common.update_check=Check for Update
 jm.common.use_browser=Use Browser
