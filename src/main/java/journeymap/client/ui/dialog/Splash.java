@@ -38,12 +38,17 @@ public class Splash extends JmUI
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
     Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
+    ButtonList devButtons;
     ButtonList bottomButtons;
     ButtonList infoButtons;
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("bmangt2", "Opzon", "jm.common.splash_patreon"),
+            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
+    );
+
+    private List<SplashPerson> devs = Arrays.asList(
             new SplashPerson("mysticdrew", "mysticdrew", "jm.common.splash_developer"),
             new SplashPerson("techbrew", "techbrew", "jm.common.splash_developer")
     );
@@ -71,7 +76,9 @@ public class Splash extends JmUI
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();
         int minWidth = 0;
+
         peopleButtons = new ButtonList();
+        devButtons = new ButtonList();
 
         for (SplashPerson person : people)
         {
@@ -148,6 +155,17 @@ public class Splash extends JmUI
             gap = by / 4;
         }
 
+        // Wandering devs
+        if (!devButtons.isEmpty())
+        {
+            int temp = by;
+            for (SplashPerson dev : devs)
+            {
+                temp = drawPerson(temp, lineHeight, dev);
+                dev.adjustVector(this.width, this.height);
+            }
+        }
+
         // Begin What's New
         if (!infoButtons.isEmpty())
         {
@@ -196,51 +214,28 @@ public class Splash extends JmUI
                     DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1f, true);
 
             peopleButtons.layoutCenteredHorizontal(bx, by, true, 10);
-            int rowWidth = peopleButtons.getWidth(hgap);
 
-            Button topLeft = people.get(0).getButton();
-            Button bottomRight = people.get(people.size() - 1).getButton();
+            if (devButtons.isEmpty())
+            {
+                for (SplashPerson dev : devs)
+                {
+                    Button button = new Button(dev.name);// Just used for layout, not display
+                    devButtons.add(button);
+                    dev.setButton(button);
+                }
+                devButtons.equalizeWidths(fr);
+                devButtons.layoutCenteredHorizontal(bx, by, true, 10);
+            }
+//            int rowWidth = peopleButtons.getWidth(hgap);
+//
+//            Button topLeft = people.get(0).getButton();
+//            Button bottomRight = people.get(people.size() - 1).getButton();
 
             for (SplashPerson person : people)
             {
-                float scale = 1;
-                Button button = person.getButton();
-                int imgSize = (int) (person.getSkin().getWidth() * scale);
-                int imgY = button.getY() - 2;
-                int imgX = button.getCenterX() - (imgSize / 2);
-
-                DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, Color.black, 100, Color.black, 200);
-                DrawUtil.drawImage(person.getSkin(), imgX, imgY, false, scale, 0);
-                by = imgY + imgSize + 4;
-
-                String name = person.name.trim();
-                String name2 = null;
-                boolean twoLineName = name.contains(" ");
-                if (twoLineName)
-                {
-                    String[] parts = person.name.split(" ");
-                    name = parts[0];
-                    name2 = parts[1];
-                }
-
-                DrawUtil.drawLabel(name, button.getCenterX(), by,
-                        DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
-
-                by += lineHeight;
-
-                if (name2 != null)
-                {
-                    DrawUtil.drawLabel(name2, button.getCenterX(), by,
-                            DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
-                    by += lineHeight;
-                }
-
-                DrawUtil.drawLabel(person.title, button.getCenterX(), by,
-                        DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.green, 255, scale, true);
-
-                by += lineHeight;
-
+                by = drawPerson(by, lineHeight, person);
             }
+
         }
 
         bx = (this.width) / 2;
@@ -248,6 +243,48 @@ public class Splash extends JmUI
 
         bottomButtons.layoutCenteredHorizontal(bx, by, true, hgap);
         DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
+    }
+
+    protected int drawPerson(int by, int lineHeight, SplashPerson person)
+    {
+        float scale = 1;
+        Button button = person.getButton();
+        int imgSize = (int) (person.getSkin().getWidth() * scale);
+        int imgY = button.getY() - 2;
+        int imgX = button.getCenterX() - (imgSize / 2);
+
+        DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, Color.black, 100, Color.black, 200);
+        DrawUtil.drawImage(person.getSkin(), imgX, imgY, false, scale, 0);
+        by = imgY + imgSize + 4;
+
+        String name = person.name.trim();
+        String name2 = null;
+        boolean twoLineName = name.contains(" ");
+        if (twoLineName)
+        {
+            String[] parts = person.name.split(" ");
+            name = parts[0];
+            name2 = parts[1];
+        }
+
+        DrawUtil.drawLabel(name, button.getCenterX(), by,
+                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
+
+        by += lineHeight;
+
+        if (name2 != null)
+        {
+            DrawUtil.drawLabel(name2, button.getCenterX(), by,
+                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
+            by += lineHeight;
+        }
+
+        DrawUtil.drawLabel(person.title, button.getCenterX(), by,
+                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.green, 255, scale, true);
+
+        by += lineHeight;
+
+        return by;
     }
 
     @Override
