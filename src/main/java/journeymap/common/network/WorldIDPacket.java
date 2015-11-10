@@ -11,6 +11,7 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
+import journeymap.server.oldservercode.config.ConfigHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -76,12 +77,14 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
+
             EntityPlayerMP player = null;
             if (ctx.side == Side.SERVER) {
-               player =  ctx.getServerHandler().playerEntity;
+                player =  ctx.getServerHandler().playerEntity;
+                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID()) {
+                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
+                }
             }
-
-            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
             return null;
         }
     }
