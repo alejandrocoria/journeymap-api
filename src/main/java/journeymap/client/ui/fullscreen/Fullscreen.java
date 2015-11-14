@@ -60,7 +60,6 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -882,70 +881,81 @@ public class Fullscreen extends JmUI
 
     void drawMap()
     {
-
         final boolean refreshReady = isRefreshReady();
         final StatTimer timer = refreshReady ? drawMapTimerWithRefresh : drawMapTimer;
         timer.start();
 
-        sizeDisplay(false);
-
-        int xOffset = 0;
-        int yOffset = 0;
-
-        if (isScrolling)
+        try
         {
-            int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
+            sizeDisplay(false);
 
-            int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
-            int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
+            int xOffset = 0;
+            int yOffset = 0;
 
-            xOffset = (mouseDragX * blockSize);
-            yOffset = (mouseDragY * blockSize);
-
-        }
-        else
-        {
-            if (refreshReady)
+            if (isScrolling)
             {
-                refreshState();
+                int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
+
+                int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+                int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
+
+                xOffset = (mouseDragX * blockSize);
+                yOffset = (mouseDragY * blockSize);
+
             }
             else
             {
-                gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
+                if (refreshReady)
+                {
+                    refreshState();
+                }
+                else
+                {
+                    gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
+                }
             }
-        }
 
-        gridRenderer.updateGL(0);
-        float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
+            // Clear GL error queue of anything that happened before JM starts drawing, don't report them
+            gridRenderer.clearGlErrors(false);
 
-        if (state.follow.get())
-        {
-            gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
-        }
-        gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-        gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
-        gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-        gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.updateRotation(0);
+            float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 
-        if (fullMapProperties.showSelf.get())
-        {
-            Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-            if (playerPixel != null)
+            if (state.follow.get())
             {
-                DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, TextureCache.instance().getPlayerLocatorSmall(), drawScale, 0);
+                gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
             }
+            gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+            gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
+            gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+
+            if (fullMapProperties.showSelf.get())
+            {
+                Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                if (playerPixel != null)
+                {
+                    DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, TextureCache.instance().getPlayerLocatorSmall(), drawScale, 0);
+                }
+            }
+
+            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+
+            DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
+                    statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
+
+            drawLogo();
+
+            sizeDisplay(true);
+        }
+        finally
+        {
+            timer.stop();
+
+            // Clear GL error queue of anything that happened during JM drawing and report them
+            gridRenderer.clearGlErrors(true);
         }
 
-        gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-
-        DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
-                statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
-
-        drawLogo();
-
-        sizeDisplay(true);
-
-        timer.stop();
 
         //GridRenderer.addDebugMessage(timer.getName(), timer.getSimpleReportString());
         //GridRenderer.addDebugMessage(StatTimer.get("GridRenderer.center").getName(), StatTimer.get("GridRenderer.center").getSimpleReportString());

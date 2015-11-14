@@ -156,6 +156,9 @@ public class MiniMap
                 return;
             }
 
+            // Clear GL error queue of anything that happened before JM starts drawing; don't log them
+            gridRenderer.clearGlErrors(false);
+
             // Check state
             final boolean doStateRefresh = gridRenderer.hasUnloadedTile() || state.shouldRefresh(mc, miniMapProperties);
 
@@ -182,6 +185,7 @@ public class MiniMap
                 gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
+            // Refresh state
             if (doStateRefresh)
             {
                 boolean checkWaypointDistance = JourneymapClient.getWaypointProperties().maxDistance.get() > 0;
@@ -392,6 +396,9 @@ public class MiniMap
         {
             cleanup();
             timer.stop();
+
+            // Clear GL error queue of anything that happened during drawing, and log them
+            gridRenderer.clearGlErrors(true);
         }
     }
 
@@ -441,13 +448,13 @@ public class MiniMap
             GL11.glTranslated(-width, -height, 0);
         }
 
-        gridRenderer.updateGL(rotation);
+        gridRenderer.updateRotation(rotation);
     }
 
     private void stopMapRotation(double rotation)
     {
         GL11.glPopMatrix();
-        gridRenderer.updateGL(rotation);
+        gridRenderer.updateRotation(rotation);
     }
 
     private boolean isOnScreen(Point2D.Double objectPixel, Point2D centerPixel, Rectangle2D.Double centerRect)

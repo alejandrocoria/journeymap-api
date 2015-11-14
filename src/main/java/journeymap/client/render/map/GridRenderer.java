@@ -45,15 +45,17 @@ public class GridRenderer
 {
     private static boolean enabled = true;
     private static HashMap<String, String> messages = new HashMap<String, String>();
+
     // Update pixel offsets for center
     private final TilePos centerPos = new TilePos(0, 0);
     private final Logger logger = Journeymap.getLogger();
     private final boolean debug = logger.isDebugEnabled();
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
-
+    private final int maxGlErrors = 20;
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
+    private int glErrors = 0;
 
     private int gridSize; // 5 = 2560px.
     private double srcSize;
@@ -422,6 +424,29 @@ public class GridRenderer
     }
 
     /**
+     * Clear GL error queue, optionally log them
+     */
+    public void clearGlErrors(boolean report)
+    {
+        int err;
+        while ((err = GL11.glGetError()) != GL11.GL_NO_ERROR)
+        {
+            if (report && glErrors <= maxGlErrors)
+            {
+                glErrors++;
+                if (glErrors < maxGlErrors)
+                {
+                    logger.warn("GL Error occurred during JourneyMap draw: " + err);
+                }
+                else
+                {
+                    logger.warn("GL Error reporting during JourneyMap will be suppressed after max errors: " + maxGlErrors);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns a pixel Point2D.Double if on screen, null if not.
      *
      * @param blockX pos x
@@ -580,7 +605,7 @@ public class GridRenderer
         this.mapType = mapType;
     }
 
-    public void updateGL(double rotation)
+    public void updateRotation(double rotation)
     {
         currentRotation = rotation;
         GL11.glGetInteger(GL11.GL_VIEWPORT, viewportBuf);
