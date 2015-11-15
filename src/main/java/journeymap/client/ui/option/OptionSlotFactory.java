@@ -13,19 +13,18 @@ import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.*;
 import journeymap.common.Journeymap;
 
-import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -250,7 +249,7 @@ public class OptionSlotFactory
             slotMetadata.setMasterPropertyForCategory(annotation.master());
             if (annotation.master())
             {
-                button.setLabelColors(Color.cyan, null, null);
+                button.setLabelColors(RGB.CYAN_RGB, null, null);
             }
             return slotMetadata;
         }

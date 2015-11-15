@@ -10,6 +10,7 @@ package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
@@ -38,7 +39,6 @@ import org.lwjgl.input.Keyboard;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -78,7 +78,7 @@ public class WaypointEditor extends JmUI
     private ArrayList<TextField> fieldList = new ArrayList<TextField>();
     private ArrayList<DimensionButton> dimButtonList = new ArrayList<DimensionButton>();
     private ScrollPane dimScrollPane;
-    private Color currentColor;
+    private Integer currentColor;
     private Rectangle2D.Double colorPickRect;
     private BufferedImage colorPickImg;
     private Waypoint editedWaypoint;
@@ -342,8 +342,7 @@ public class WaypointEditor extends JmUI
 
         dimScrollPane.drawScreen(x, y, par3);
 
-
-        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.BLACK, 255, Color.lightGray, 255, 1, true);
+        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 255, RGB.LIGHT_GRAY_RGB, 255, 1, true);
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
@@ -459,18 +458,19 @@ public class WaypointEditor extends JmUI
         {
             int x = mouseX - (int) colorPickRect.x;
             int y = mouseY - (int) colorPickRect.y;
-            setFormColor(new Color(colorPickImg.getRGB(x, y)));
+            setFormColor(colorPickImg.getRGB(x, y));
         }
     }
 
-    protected void setFormColor(Color color)
+    protected void setFormColor(Integer color)
     {
         //if(color!=null && color.equals(currentColor)) return;
 
         currentColor = color;
-        fieldR.setText(Integer.toString(color.getRed()));
-        fieldG.setText(Integer.toString(color.getGreen()));
-        fieldB.setText(Integer.toString(color.getBlue()));
+        int[] c = RGB.ints(color);
+        fieldR.setText(Integer.toString(c[0]));
+        fieldG.setText(Integer.toString(c[1]));
+        fieldB.setText(Integer.toString(c[2]));
         updateWaypointFromForm();
     }
 
@@ -601,9 +601,9 @@ public class WaypointEditor extends JmUI
 
     protected void updateWaypointFromForm()
     {
-        currentColor = new Color(getSafeColorInt(fieldR), getSafeColorInt(fieldG), getSafeColorInt(fieldB));
+        currentColor = RGB.toInteger(getSafeColorInt(fieldR), getSafeColorInt(fieldG), getSafeColorInt(fieldB));
         editedWaypoint.setColor(currentColor);
-        fieldName.setTextColor(editedWaypoint.getSafeColor().getRGB());
+        fieldName.setTextColor(editedWaypoint.getSafeColor());
 
         ArrayList<Integer> dims = new ArrayList<Integer>();
         for (DimensionButton db : dimButtonList)

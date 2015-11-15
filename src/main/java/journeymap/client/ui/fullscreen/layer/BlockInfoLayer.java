@@ -10,6 +10,7 @@ package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockCoordIntPair;
@@ -23,7 +24,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.world.chunk.Chunk;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -105,8 +105,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     class BlockInfoStep implements DrawStep
     {
 
-        Color bgColor = Color.darkGray;
-        Color fgColor = Color.white;
+        Integer bgColor = RGB.DARK_GRAY_RGB;
+        Integer fgColor = RGB.WHITE_RGB;
         double fontScale = 1;
         boolean fontShadow = false;
         int alpha = 255;

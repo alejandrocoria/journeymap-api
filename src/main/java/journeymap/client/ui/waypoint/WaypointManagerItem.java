@@ -9,6 +9,7 @@
 package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
+import journeymap.client.cartography.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
@@ -39,8 +40,8 @@ import java.util.List;
 public class WaypointManagerItem implements ScrollListPane.ISlot
 {
 
-    static Color background = new Color(20, 20, 20);
-    static Color backgroundHover = new Color(40, 40, 40);
+    static Integer background = new Color(20, 20, 20).getRGB();
+    static Integer backgroundHover = new Color(40, 40, 40).getRGB();
     final FontRenderer fontRenderer;
     final WaypointManager manager;
     int x;
@@ -158,7 +159,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, background, 100);
     }
 
-    protected void drawLabels(Minecraft mc, int x, int y, Color color)
+    protected void drawLabels(Minecraft mc, int x, int y, Integer color)
     {
         if (this.waypoint == null)
         {
@@ -169,16 +170,16 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
         if (color == null)
         {
-            color = waypointValid ? waypoint.getSafeColor() : Color.GRAY;
+            color = waypointValid ? waypoint.getSafeColor() : RGB.GRAY_RGB;
         }
 
         FontRenderer fr = ForgeHelper.INSTANCE.getFontRenderer();
 
         int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
-        fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color.getRGB());
+        fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color);
 
         String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
-        fr.drawStringWithShadow(name, manager.colName, y + yOffset, color.getRGB());
+        fr.drawStringWithShadow(name, manager.colName, y + yOffset, color);
     }
 
     protected void drawWaypoint(int x, int y)
@@ -313,7 +314,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonListLeft.setOptions(true, hover, true);
         buttonListRight.setOptions(true, hover, true);
 
-        Color color = hover ? backgroundHover : background;
+        Integer color = hover ? backgroundHover : background;
         int alpha = hover ? 255 : 100;
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, color, alpha);
 

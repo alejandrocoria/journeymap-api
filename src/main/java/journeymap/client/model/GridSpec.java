@@ -102,9 +102,9 @@ public class GridSpec
         renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
-    public Color getColor()
+    public Integer getColor()
     {
-        return new Color(red, green, blue);
+        return RGB.toInteger(red, green, blue);
     }
 
     public int getColorX()

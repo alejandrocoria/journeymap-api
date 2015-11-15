@@ -10,12 +10,14 @@ package journeymap.client.ui.theme;
 
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
-// 1.7.10
 import cpw.mods.fml.common.FMLLog;
-// 1.8
-//import net.minecraftforge.fml.common.FMLLog;
+import journeymap.client.cartography.RGB;
 
 import java.awt.*;
+
+// 1.7.10
+// 1.8
+//import net.minecraftforge.fml.common.FMLLog;
 
 /**
  * Theme specification for JourneyMap 5.0
@@ -86,16 +88,16 @@ public class Theme implements Comparable<Theme>
     }
 
     /**
-     * Hex string to Color.
+     * Hex string to Color int.
      */
-    public static Color getColor(String hexColor)
+    public static Integer getColor(String hexColor)
     {
         if (!Strings.isNullOrEmpty(hexColor))
         {
             try
             {
                 int color = Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
-                return new Color(color);
+                return color;
             }
             catch (Exception e)
             {
@@ -103,7 +105,7 @@ public class Theme implements Comparable<Theme>
 
             }
         }
-        return Color.white;
+        return RGB.WHITE_RGB;
     }
 
     @Override

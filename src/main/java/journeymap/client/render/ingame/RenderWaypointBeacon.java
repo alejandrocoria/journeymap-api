@@ -10,6 +10,7 @@ package journeymap.client.render.ingame;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.LogFormatter;
@@ -28,7 +29,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.util.Collection;
 
 /**
@@ -236,13 +236,13 @@ public class RenderWaypointBeacon
                     double labelY = (0 - halfTexHeight) - 8;
 
                     // Depth label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 150, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 150, waypoint.getSafeColor(), 255, fontScale, false);
 
                     renderHelper.glDisableDepth();
                     renderHelper.glDepthMask(false);
 
                     // Front label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, Color.black, 100, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 100, waypoint.getSafeColor(), 255, fontScale, false);
 
                     GL11.glPopMatrix();
                 }
@@ -293,7 +293,7 @@ public class RenderWaypointBeacon
     /**
      * Render beam
      */
-    static void renderBeam(double x, double y, double z, Color color, boolean staticBeam, boolean rotatingBeam)
+    static void renderBeam(double x, double y, double z, Integer color, boolean staticBeam, boolean rotatingBeam)
     {
         float f1 = 1f;
 
@@ -323,7 +323,8 @@ public class RenderWaypointBeacon
             renderHelper.startDrawingQuads();
 
             // For 1.8
-            renderHelper.glColor(color, 120);
+            float[] c = RGB.floats(color);
+            renderHelper.glColor4f(c[0], c[1], c[2], .45f);
             renderHelper.glEnableBlend();
             // For 1.7.10
 //            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 120);
@@ -378,7 +379,8 @@ public class RenderWaypointBeacon
             renderHelper.startDrawingQuads();
 
             // For 1.8
-            renderHelper.glColor(color, 40);
+            float[] c = RGB.floats(color);
+            renderHelper.glColor4f(c[0], c[1], c[2], .15f);
             // For 1.7.10
 //            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);

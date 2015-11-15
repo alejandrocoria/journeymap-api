@@ -9,6 +9,7 @@
 package journeymap.client.render.map;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
@@ -417,7 +418,7 @@ public class GridRenderer
 
             for (String message : messages.values())
             {
-                DrawUtil.drawLabel(message, centerX, centerZ += 20, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 255, Color.white, 255, 1, true);
+                DrawUtil.drawLabel(message, centerX, centerZ += 20, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 255, RGB.WHITE_RGB, 255, 1, true);
             }
         }
 

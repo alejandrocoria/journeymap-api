@@ -20,6 +20,14 @@ public final class RGB
     public static final int BLACK_RGB = 0x000000; // 0
     public static final int WHITE_ARGB = 0xFFFFFFFF; // 4294967295
     public static final int WHITE_RGB = 0xFFFFFF; // 16777215
+    public static final int GREEN_RGB = 0x00FF00;
+    public static final int RED_RGB = 0xFF0000;
+    public static final int BLUE_RGB = 0x0000FF;
+    public static final int CYAN_RGB = 0x00FFFF;
+    public static final int GRAY_RGB = 0x808080;
+    public static final int DARK_GRAY_RGB = 0x404040;
+    public static final int LIGHT_GRAY_RGB = 0xC0C0C0;
+
     transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
 
     /**

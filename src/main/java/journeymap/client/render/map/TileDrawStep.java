@@ -9,6 +9,7 @@
 package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.io.RegionImageHandler;
@@ -32,7 +33,7 @@ import java.util.concurrent.Future;
  */
 public class TileDrawStep
 {
-    private static final Color bgColor = new Color(0x22, 0x22, 0x22);
+    private static final Integer bgColor = 0x222222;
     private static final Logger logger = Journeymap.getLogger();
     private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private static final RegionImageCache regionImageCache = RegionImageCache.instance();
@@ -172,13 +173,13 @@ public class TileDrawStep
         {
             int debugX = (int) startX;
             int debugY = (int) startY;
-            DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, Color.green, 200);
-            DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, Color.red, 200);
-            DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
-            DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, RGB.GREEN_RGB, 200);
+            DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, RGB.RED_RGB, 200);
+            DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
+            DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : getRegionTextureHolder().getImageTimestamp();
             long age = (System.currentTimeMillis() - imageTimestamp) / 1000;
-            DrawUtil.drawLabel(mapType + " tile age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, Color.WHITE, 255, Color.BLUE, 255, 1.0, false);
+            DrawUtil.drawLabel(mapType + " tile age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
         }
 
         renderHelper.glColor4f(1, 1, 1, 1);

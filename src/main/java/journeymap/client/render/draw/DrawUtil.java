@@ -17,8 +17,6 @@ import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import java.awt.*;
-
 /**
  * Useful drawing routines that utilize the Minecraft Tessellator.
  */
@@ -39,7 +37,7 @@ public class DrawUtil
      * @param color
      * @param bgAlpha
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, 0);
     }
@@ -48,7 +46,7 @@ public class DrawUtil
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
@@ -65,7 +63,7 @@ public class DrawUtil
      * @param bgAlpha
      * @param rotation
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, double rotation)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, double rotation)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, rotation);
     }
@@ -86,7 +84,7 @@ public class DrawUtil
      * @param fontScale
      * @param fontShadow
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow)
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow)
     {
         drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
@@ -108,7 +106,7 @@ public class DrawUtil
      * @param fontShadow
      * @param rotation
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Color bgColor, int bgAlpha, Color color, int alpha, double fontScale, boolean fontShadow, double rotation)
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow, double rotation)
     {
         if (text == null || text.length() == 0)
         {
@@ -213,19 +211,13 @@ public class DrawUtil
             // Use translation for the double precision
             GL11.glTranslated(dTextX, dTextY, 0);
 
-            // Draw the string
-            if (color.getTransparency() != alpha)
-            {
-                color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-            }
-
             if (fontShadow)
             {
-                fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color.getRGB());
+                fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color);
             }
             else
             {
-                fontRenderer.drawString(text, intTextX, intTextY, color.getRGB());
+                fontRenderer.drawString(text, intTextX, intTextY, color);
             }
 
         }
@@ -263,7 +255,7 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Color color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
         GL11.glPushMatrix();
 
@@ -280,7 +272,7 @@ public class DrawUtil
 
             if (blend && color != null)
             {
-                float[] c = color.getColorComponents(null);
+                float[] c = RGB.floats(color);
                 renderHelper.glColor4f(c[0], c[1], c[2], alpha);
             }
             else
@@ -336,16 +328,16 @@ public class DrawUtil
         }
     }
 
-    public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
+    public static void drawRectangle(double x, double y, double width, double height, Integer color, int alpha)
     {
-        float[] rgb = RGB.floats(color.getRGB());
+        float[] c = RGB.floats(color);
 
         // Prep
         renderHelper.glEnableBlend();
         renderHelper.glDisableTexture2D();
         renderHelper.glDisableAlpha();
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glColor(color, alpha);
+        renderHelper.glColor4f(c[0], c[1], c[2], alpha);
 
         // Draw
         renderHelper.startDrawingQuads();
@@ -368,7 +360,7 @@ public class DrawUtil
      * Draws a rectangle with a vertical gradient between the specified colors.
      * 0, top, this.width, this.height - top, -1072689136, -804253680
      */
-    public static void drawGradientRect(double x, double y, double width, double height, Color startColor, int startAlpha, Color endColor, int endAlpha)
+    public static void drawGradientRect(double x, double y, double width, double height, Integer startColor, int startAlpha, Integer endColor, int endAlpha)
     {
         renderHelper.glDisableTexture2D();
         renderHelper.glEnableBlend();
@@ -377,12 +369,11 @@ public class DrawUtil
 
         renderHelper.glShadeModel(GL11.GL_SMOOTH);
 
-
         renderHelper.startDrawingQuads();
-        renderHelper.setColorRGBA_I(endColor.getRGB(), endAlpha);
+        renderHelper.setColorRGBA_I(endColor, endAlpha);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
         renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
-        renderHelper.setColorRGBA_I(startColor.getRGB(), startAlpha);
+        renderHelper.setColorRGBA_I(startColor, startAlpha);
         renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
         renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
         renderHelper.draw();
@@ -419,17 +410,17 @@ public class DrawUtil
         drawClampedImage(texture, null, x, y, scale, 1f, rotation);
     }
 
-    public static void drawClampedImage(TextureImpl texture, Color color, double x, double y, float scale, float alpha, double rotation)
+    public static void drawClampedImage(TextureImpl texture, Integer color, double x, double y, float scale, float alpha, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
     }
 
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, float scale, double rotation)
+    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, float scale, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
-    public static void drawColoredImage(TextureImpl texture, int alpha, Color color, double x, double y, double rotation)
+    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)
     {
         drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }

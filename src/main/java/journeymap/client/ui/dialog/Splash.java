@@ -10,6 +10,7 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.io.FileHandler;
@@ -179,10 +180,10 @@ public class Splash extends JmUI
             int listY = topY - 5;
             int listWidth = infoButtons.getRightX() + 10 - listX;
             int listHeight = infoButtons.getBottomY() + 5 - listY;
-            DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, Color.lightGray, 200, Color.lightGray, 200);
-            DrawUtil.drawGradientRect(listX, listY, listWidth, listHeight, Color.darkGray, 255, Color.black, 255);
+            DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, RGB.LIGHT_GRAY_RGB, 200, RGB.LIGHT_GRAY_RGB, 200);
+            DrawUtil.drawGradientRect(listX, listY, listWidth, listHeight, RGB.DARK_GRAY_RGB, 255, RGB.BLACK_RGB, 255);
             DrawUtil.drawLabel(Constants.getString("jm.common.splash_whatisnew"), bx, topY,
-                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1f, true);
+                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, RGB.CYAN_RGB, 255, 1f, true);
 
             by = listY + listHeight + 10;
         }
@@ -201,7 +202,7 @@ public class Splash extends JmUI
             int listWidth = infoButtons.getRightX() + 10 - listX;
             int listHeight = 100;
 
-            DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, Color.lightGray, 200, Color.lightGray, 200);
+            DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, RGB.LIGHT_GRAY_RGB, 200, RGB.LIGHT_GRAY_RGB, 200);
 
             brickTex.bindTexture();
             renderHelper.glBindTexture(brickTex.getGlTextureId());
@@ -212,7 +213,7 @@ public class Splash extends JmUI
             DrawUtil.drawBoundTexture(0, 0, listX, listY, 0, 8, 2, listX + listWidth, listY + listHeight);
 
             DrawUtil.drawLabel(Constants.getString("jm.common.splash_walloffame"), bx, titleY,
-                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.cyan, 255, 1f, true);
+                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, Color.cyan.getRGB(), 255, 1f, true);
 
             peopleButtons.layoutCenteredHorizontal(bx, by, true, 10);
 
@@ -254,7 +255,7 @@ public class Splash extends JmUI
         int imgY = button.getY() - 2;
         int imgX = button.getCenterX() - (imgSize / 2);
 
-        DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, Color.black, 100, Color.black, 200);
+        DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, RGB.BLACK_RGB, 100, RGB.BLACK_RGB, 200);
         DrawUtil.drawImage(person.getSkin(), imgX, imgY, false, scale, 0);
         by = imgY + imgSize + 4;
 
@@ -269,19 +270,19 @@ public class Splash extends JmUI
         }
 
         DrawUtil.drawLabel(name, button.getCenterX(), by,
-                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
+                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, RGB.WHITE_RGB, 255, scale, true);
 
         by += lineHeight;
 
         if (name2 != null)
         {
             DrawUtil.drawLabel(name2, button.getCenterX(), by,
-                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.white, 255, scale, true);
+                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, RGB.WHITE_RGB, 255, scale, true);
             by += lineHeight;
         }
 
         DrawUtil.drawLabel(person.title, button.getCenterX(), by,
-                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, Color.green, 255, scale, true);
+                DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, RGB.GREEN_RGB, 255, scale, true);
 
         by += lineHeight;
 

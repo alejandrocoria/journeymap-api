@@ -8,6 +8,7 @@
 
 package journeymap.client.ui.theme;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
@@ -45,7 +46,7 @@ public class ThemeMinimapFrame
     private double y;
     private int width;
     private int height;
-    private Color frameColor;
+    private Integer frameColor;
     private float frameAlpha;
     private boolean isSquare;
     private boolean showReticle;
@@ -55,7 +56,7 @@ public class ThemeMinimapFrame
     private double reticleHeadingThickness;
     private double reticleSegmentLength;
     private double reticleOffset;
-    private Color reticleColor;
+    private Integer reticleColor;
     private Rectangle.Double frameBounds;
 
     public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, int width, int height)
@@ -130,7 +131,7 @@ public class ThemeMinimapFrame
     {
         if (isSquare)
         {
-            DrawUtil.drawRectangle(x, y, this.width, this.height, Color.white, 255);
+            DrawUtil.drawRectangle(x, y, this.width, this.height, RGB.WHITE_RGB, 255);
         }
         else
         {

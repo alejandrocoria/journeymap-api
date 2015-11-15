@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.LogFormatter;
@@ -30,7 +31,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -152,9 +152,9 @@ public abstract class JmUI extends GuiScreen
 
     protected void drawTitle()
     {
-        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, Color.black, 100);
+        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, RGB.BLACK_RGB, 100);
         DrawUtil.drawLabel(this.title, this.width / 2, headerHeight / 2, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
-                Color.black, 0, Color.CYAN, 255, 1, true, 0);
+                RGB.BLACK_RGB, 0, Color.CYAN.getRGB(), 255, 1, true, 0);
     }
 
     @Override

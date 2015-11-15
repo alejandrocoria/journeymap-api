@@ -8,12 +8,12 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +39,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
         this.values = new ArrayList<T>(values);
         this.baseLabel = label;
         setValue(valueHolder.get());
-        disabledLabelColor = Color.darkGray;
+        disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
     public void setValue(T value)

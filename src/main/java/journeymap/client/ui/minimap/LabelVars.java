@@ -13,8 +13,6 @@ import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.theme.Theme;
 import net.minecraft.client.gui.FontRenderer;
 
-import java.awt.*;
-
 /**
  * Encapsulation of key attributes.
  */
@@ -26,9 +24,9 @@ class LabelVars
     final boolean fontShadow;
     DrawUtil.HAlign hAlign;
     DrawUtil.VAlign vAlign;
-    Color bgColor;
+    Integer bgColor;
     int bgAlpha;
-    Color fgColor;
+    Integer fgColor;
     private DisplayVars displayVars;
 
     LabelVars(DisplayVars displayVars, double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, Theme.LabelSpec labelSpec)

@@ -10,6 +10,7 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeFileHandler;
@@ -23,7 +24,6 @@ import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
 import journeymap.client.ui.UIManager;
-import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.*;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
@@ -38,14 +38,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
-import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 /**
  * Master options UI
- * // TODO: Black image for cave map
  */
 public class OptionsManager extends JmUI
 {
@@ -374,7 +370,7 @@ public class OptionsManager extends JmUI
                                 }
                                 else
                                 {
-                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
                                 }
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
@@ -387,7 +383,7 @@ public class OptionsManager extends JmUI
                                 }
                                 else
                                 {
-                                    slotMetadata.getButton().setLabelColors(Color.red, Color.red, null);
+                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
                                 }
                             }
                             else if (property == coreProperties.renderDistanceCaveMin)
@@ -771,7 +767,7 @@ public class OptionsManager extends JmUI
             this.category = category;
             setTooltip(Constants.getString("jm.config.reset.tooltip"));
             setDrawBackground(false);
-            setLabelColors(Color.red, Color.red, null);
+            setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
         }
     }
 
@@ -786,7 +782,7 @@ public class OptionsManager extends JmUI
             setDrawBackground(false);
             setDrawFrame(false);
             setEnabled(false);
-            setLabelColors(Color.lightGray, Color.lightGray, Color.lightGray);
+            setLabelColors(RGB.LIGHT_GRAY_RGB, RGB.LIGHT_GRAY_RGB, RGB.LIGHT_GRAY_RGB);
             this.width = width;
         }
 

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -234,28 +235,29 @@ public class Waypoint implements Serializable
             }
         }
 
-        setColor(new Color(r, g, b));
+        setColor(RGB.toInteger(r, g, b));
     }
 
-    public Color getColor()
+    public Integer getColor()
     {
-        return new Color(r, g, b);
+        return RGB.toInteger(r, g, b);
     }
 
-    public void setColor(Color color)
+    public void setColor(Integer color)
     {
-        this.r = color.getRed();
-        this.g = color.getGreen();
-        this.b = color.getBlue();
+        int c[] = RGB.ints(color);
+        this.r = c[0];
+        this.g = c[1];
+        this.b = c[2];
     }
 
-    public Color getSafeColor()
+    public Integer getSafeColor()
     {
         if (r + g + b >= 100)
         {
             return getColor();
         }
-        return Color.darkGray;
+        return RGB.DARK_GRAY_RGB;
     }
 
     public Collection<Integer> getDimensions()

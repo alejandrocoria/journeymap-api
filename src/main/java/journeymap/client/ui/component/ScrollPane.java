@@ -27,7 +27,7 @@ public class ScrollPane extends GuiSlot
     public int paneHeight = 0;
     public Point.Double origin = new Point2D.Double();
     protected Scrollable selected = null;
-    private Color frameColor = new Color(-6250336);
+    private Integer frameColor = new Color(-6250336).getRGB();
     private List<? extends Scrollable> items;
     private Minecraft mc;
     private int _mouseX;
@@ -264,8 +264,8 @@ public class ScrollPane extends GuiSlot
         int alpha = 100;
 
         // Tinted scrollbar area
-        DrawUtil.drawRectangle(0, top, width, paneHeight, Color.BLACK, alpha);
-        DrawUtil.drawRectangle(width - 6, top, 5, paneHeight, Color.BLACK, alpha);
+        DrawUtil.drawRectangle(0, top, width, paneHeight, Color.BLACK.getRGB(), alpha);
+        DrawUtil.drawRectangle(width - 6, top, 5, paneHeight, Color.BLACK.getRGB(), alpha);
 
         // Frame
         if (showFrame)

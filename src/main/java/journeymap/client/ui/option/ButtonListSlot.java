@@ -35,8 +35,8 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;
     SlotMetadata lastPressed = null;
-    Color colorToolbarBgStart = new Color(0, 0, 100);
-    Color colorToolbarBgEnd = new Color(0, 0, 100);
+    Integer colorToolbarBgStart = new Color(0, 0, 100).getRGB();
+    Integer colorToolbarBgEnd = new Color(0, 0, 100).getRGB();
 
     public ButtonListSlot(CategorySlot parent)
     {

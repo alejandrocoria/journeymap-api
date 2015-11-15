@@ -9,12 +9,12 @@
 package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
+import journeymap.client.cartography.RGB;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -22,10 +22,9 @@ import java.awt.geom.Point2D;
  */
 public class DrawWayPointStep implements DrawStep
 {
-
     public final Waypoint waypoint;
-    final Color color;
-    final Color fontColor;
+    final Integer color;
+    final Integer fontColor;
     final TextureImpl texture;
     final boolean isEdit;
     Point2D.Double lastPosition;
@@ -40,7 +39,7 @@ public class DrawWayPointStep implements DrawStep
      */
     public DrawWayPointStep(Waypoint waypoint)
     {
-        this(waypoint, waypoint.getColor(), waypoint.isDeathPoint() ? Color.red : waypoint.getSafeColor(), false);
+        this(waypoint, waypoint.getColor(), waypoint.isDeathPoint() ? RGB.RED_RGB : waypoint.getSafeColor(), false);
     }
 
     /**
@@ -50,7 +49,7 @@ public class DrawWayPointStep implements DrawStep
      * @param color
      * @param fontColor
      */
-    public DrawWayPointStep(Waypoint waypoint, Color color, Color fontColor, boolean isEdit)
+    public DrawWayPointStep(Waypoint waypoint, Integer color, Integer fontColor, boolean isEdit)
     {
         this.waypoint = waypoint;
         this.color = color;
@@ -78,7 +77,7 @@ public class DrawWayPointStep implements DrawStep
             if (showLabel)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.getHeight() : texture.getHeight());
-                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 180, fontColor, 255, fontScale, false, rotation);
+                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 180, fontColor, 255, fontScale, false, rotation);
             }
             if (isEdit)
             {

@@ -13,7 +13,6 @@ import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -34,12 +33,12 @@ public class ThemeCompassPoints
     final boolean showEast;
     final boolean showWest;
     final int bgAlpha;
-    final Color bgColor;
+    final Integer bgColor;
     final int fgAlpha;
-    final Color fgColor;
+    final Integer fgColor;
     final double fontScale;
     final int compassLabelHeight;
-    final Color compassPointColor;
+    final Integer compassPointColor;
     final TextureImpl compassPointTex;
     final float compassPointScale;
     final int xOffset;

@@ -47,7 +47,7 @@ public class GridEditor extends JmUI
     private IntSliderButton buttonOpacity;
     private CheckBox checkDay, checkNight, checkUnderground;
     private ThemeToggle buttonDay, buttonNight, buttonUnderground;
-    private Color activeColor;
+    private Integer activeColor;
     private MapType activeMapType;
 
     private Button buttonReset;
@@ -241,7 +241,7 @@ public class GridEditor extends JmUI
         {
             colorX += x;
             colorY += y;
-            DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.darkGray, 200);
+            DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.darkGray.getRGB(), 200);
             DrawUtil.drawRectangle(colorX - 1, colorY, 3, 1, activeColor, 255);
             DrawUtil.drawRectangle(colorX, colorY - 1, 1, 3, activeColor, 255);
         }
@@ -335,7 +335,7 @@ public class GridEditor extends JmUI
         {
             int x = mouseX - (int) colorPickRect.x;
             int y = mouseY - (int) colorPickRect.y;
-            activeColor = (new Color(colorPickImg.getRGB(x, y)));
+            activeColor = colorPickImg.getRGB(x, y);
             GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
             activeSpec.setColorCoords(x, y);
             updateGridSpecs();
@@ -407,7 +407,7 @@ public class GridEditor extends JmUI
         int colorX = activeSpec.getColorX();
         int colorY = activeSpec.getColorY();
 
-        GridSpec newSpec = new GridSpec(buttonStyle.getValueHolder().get(), activeColor, (float) buttonOpacity.getValue() / 100f).setColorCoords(colorX, colorY);
+        GridSpec newSpec = new GridSpec(buttonStyle.getValueHolder().get(), new Color(activeColor), (float) buttonOpacity.getValue() / 100f).setColorCoords(colorX, colorY);
 
         if (checkDay.getToggled())
         {
