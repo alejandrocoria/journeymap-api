@@ -169,7 +169,14 @@ public class ColorHelper_1_8 implements IColorHelper
         catch (Throwable t)
         {
             failed.add(blockMD);
-            logger.error("Error getting color: " + LogFormatter.toString(t));
+            if (blockMD.getUid().modId.equals("minecraft"))
+            {
+                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+            }
+            else
+            {
+                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+            }
             return null;
         }
     }
@@ -290,7 +297,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid " + blockMD.getUid());
             }
 
             if (unusable)
@@ -339,7 +346,16 @@ public class ColorHelper_1_8 implements IColorHelper
         }
         catch (Throwable e1)
         {
-            logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
+            if (blockMD.getUid().modId.equals("minecraft"))
+            {
+                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding "
+                        + blockMD.getUid() + ": " + LogFormatter.toPartialString(e1));
+            }
+            else
+            {
+                logger.warn("Error getting block color from a mod. Plese report this exception to the mod author of "
+                        + blockMD.getUid() + ": " + LogFormatter.toPartialString(e1));
+            }
         }
 
         if (color != null)
