@@ -41,7 +41,7 @@ public class InitBlockColorsTask implements ITask
         {
             if (!ForgeHelper.INSTANCE.getColorHelper().hasBlocksTexture())
             {
-                Journeymap.getLogger().error("Can't run InitBlockColorsTask before BlocksTexture initialized");
+                Journeymap.getLogger().debug("Can't run InitBlockColorsTask before BlocksTexture initialized");
                 return false;
             }
 
