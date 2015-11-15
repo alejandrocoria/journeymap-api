@@ -144,7 +144,15 @@ public class ColorHelper_1_7_10 implements IColorHelper
         catch (Throwable t)
         {
             failed.add(blockMD);
-            logger.error("Error getting color: " + LogFormatter.toString(t));
+            if (blockMD.getUid().modId.equals("minecraft"))
+            {
+                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+            }
+            else
+            {
+                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+            }
+
             return null;
         }
     }
@@ -178,7 +186,16 @@ public class ColorHelper_1_7_10 implements IColorHelper
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error(blockMD + " threw an error calling func_149888_a: " + e + ": " + e.getStackTrace()[0]);
+                if (blockMD.getUid().modId.equals("minecraft"))
+                {
+                    logger.warn("Error getting BlockDoublePlant icon. Plese report this exception to the JourneyMap mod author regarding "
+                            + blockMD.getUid() + ": " + LogFormatter.toPartialString(e));
+                }
+                else
+                {
+                    logger.warn("Error getting BlockDoublePlant icon from mod. Plese report this exception to the mod author of "
+                            + blockMD.getUid() + ": " + LogFormatter.toPartialString(e));
+                }
             }
         }
         else

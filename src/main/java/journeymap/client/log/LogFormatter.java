@@ -78,4 +78,25 @@ public class LogFormatter
             }
         }
     }
+
+    /**
+     * Creates a String of the stacktrace only up to the same method which calls this one.
+     *
+     * @param t
+     * @return
+     */
+    public static String toPartialString(Throwable t)
+    {
+        StringBuilder sb = new StringBuilder(t.toString());
+        StackTraceElement caller = Thread.currentThread().getStackTrace()[2];
+        for (StackTraceElement ste : t.getStackTrace())
+        {
+            sb.append("\n\tat " + ste);
+            if (ste.getClassName().equals(caller.getClassName()) && ste.getMethodName().equals(caller.getMethodName()))
+            {
+                break;
+            }
+        }
+        return sb.toString();
+    }
 }
