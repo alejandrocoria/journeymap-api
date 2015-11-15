@@ -11,8 +11,6 @@ package journeymap.client.ui.fullscreen;
 import net.minecraft.client.gui.GuiChat;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-
 
 public class MapChat extends GuiChat
 {

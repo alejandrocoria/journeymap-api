@@ -114,7 +114,7 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(worldPaletteFile);
             if (palette != null)
             {
-                if(palette.version<VERSION)
+                if (palette.version < VERSION)
                 {
                     Journeymap.getLogger().warn(String.format("Existing world color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
                 }
@@ -129,7 +129,7 @@ public class ColorPalette
         if (standardPaletteFile.canRead())
         {
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
-            if (palette != null && palette.version<VERSION)
+            if (palette != null && palette.version < VERSION)
             {
                 Journeymap.getLogger().warn(String.format("Existing color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
                 palette = null;

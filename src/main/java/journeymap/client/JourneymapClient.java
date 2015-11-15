@@ -103,6 +103,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the instance
+     *
      * @return
      */
     public static JourneymapClient getInstance()
@@ -228,6 +229,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Initialize the client.
+     *
      * @param event
      * @throws Throwable
      */
@@ -284,6 +286,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Post-initialize the client.
+     *
      * @param event
      */
     @SideOnly(Side.CLIENT)
@@ -343,6 +346,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Accept any modlist on server
+     *
      * @param modList
      * @param side
      * @return
@@ -362,6 +366,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Whether the instance is initialized.
+     *
      * @return
      */
     public Boolean isInitialized()
@@ -371,6 +376,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Whether the client is mapping.
+     *
      * @return
      */
     public Boolean isMapping()
@@ -380,6 +386,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Whether thread logging is enabled.
+     *
      * @return
      */
     public Boolean isThreadLogging()
@@ -389,6 +396,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Initialize the webserver
+     *
      * @return
      */
     public WebServer getJmServer()
@@ -516,6 +524,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Queue a task that has to be run on the main thread.
+     *
      * @param task
      */
     public void queueMainThreadTask(IMainThreadTask task)
@@ -562,6 +571,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the chunk render controller instance.  May be null.
+     *
      * @return
      */
     public ChunkRenderController getChunkRenderController()
@@ -584,6 +594,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Handling of the worldIdPacket message.
+     *
      * @param worldId
      * @param playerEntity
      */
@@ -595,6 +606,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the current world id.  May be null.
+     *
      * @return
      */
     public String getCurrentWorldId()
@@ -604,6 +616,7 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Set the current world id.
+     *
      * @param worldId
      */
     public void setCurrentWorldId(String worldId)

@@ -239,9 +239,9 @@ public class BlockMD
         try
         {
             name = ForgeHelper.INSTANCE.getBlockName(block, meta);
-            if(name==null)
+            if (name == null)
             {
-                name = block.getUnlocalizedName().replaceAll("tile.","").replaceAll("Block", "");
+                name = block.getUnlocalizedName().replaceAll("tile.", "").replaceAll("Block", "");
             }
         }
         catch (Throwable t)
@@ -624,11 +624,12 @@ public class BlockMD
 
     /**
      * Has an override meta to use
+     *
      * @return
      */
     public boolean hasOverrideMeta()
     {
-        return overrideMeta!=null;
+        return overrideMeta != null;
     }
 
     /**
@@ -643,6 +644,7 @@ public class BlockMD
 
     /**
      * Gets texture side
+     *
      * @return
      */
     public int getTextureSide()
@@ -652,6 +654,7 @@ public class BlockMD
 
     /**
      * Sets texture side
+     *
      * @param textureSide
      */
     public void setTextureSide(int textureSide)
@@ -671,6 +674,7 @@ public class BlockMD
 
     /**
      * Sets override meta.
+     *
      * @param overrideMeta
      */
     public void setOverrideMeta(Integer overrideMeta)
@@ -761,7 +765,7 @@ public class BlockMD
 
         /**
          * Block color is determined by biome foliage multiplier
-        */
+         */
         Foliage,
 
         /**

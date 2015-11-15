@@ -15,7 +15,6 @@ import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
-import java.io.IOException;
 
 public class MiniMapHotkeysHelp extends JmUI
 {

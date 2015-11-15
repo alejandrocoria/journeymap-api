@@ -9,6 +9,7 @@
 package journeymap.client.forge.event;
 
 // 1.7.10
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -25,13 +26,14 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
+
+import java.util.EnumSet;
+
 // 1.8
 //import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //import net.minecraftforge.fml.common.gameevent.TickEvent;
 //import net.minecraftforge.fml.relauncher.Side;
 //import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.EnumSet;
 
 /**
  * Tick handler for JourneyMap state

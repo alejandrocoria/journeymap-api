@@ -34,15 +34,22 @@ public class PacketHandler
         WORLD_INFO_CHANNEL.sendToAll(new WorldIDPacket(worldID));
     }
 
-    public static void sendPlayerWorldID(String worldID, EntityPlayerMP player) {
+    public static void sendPlayerWorldID(String worldID, EntityPlayerMP player)
+    {
 
-        if ((player instanceof EntityPlayerMP) && (player != null)) {
-            try {
+        if ((player instanceof EntityPlayerMP) && (player != null))
+        {
+            try
+            {
                 WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
-            } catch (RuntimeException rte) {
+            }
+            catch (RuntimeException rte)
+            {
                 Journeymap.getLogger().error(player.getDisplayName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
-            } catch (Exception e) {
-                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getDisplayName() + " WorldID:" + worldID +" Exception "+ e);
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getDisplayName() + " WorldID:" + worldID + " Exception " + e);
             }
         }
 
@@ -55,7 +62,9 @@ public class PacketHandler
         if (val)
         {
             intVal = 1;
-        } else {
+        }
+        else
+        {
             intVal = 0;
         }
         return intVal;

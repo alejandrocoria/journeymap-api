@@ -14,7 +14,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
-//import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -23,6 +22,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+//import net.minecraftforge.fml.common.registry.GameData;
 
 /**
  * Provide data for the Web UI

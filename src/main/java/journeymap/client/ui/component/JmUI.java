@@ -246,7 +246,7 @@ public abstract class JmUI extends GuiScreen
     }
 
     @Override
-    protected void keyTyped(char c, int i) 
+    protected void keyTyped(char c, int i)
     {
         switch (i)
         {

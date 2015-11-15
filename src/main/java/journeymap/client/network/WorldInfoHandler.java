@@ -17,7 +17,6 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.WorldIDPacket;

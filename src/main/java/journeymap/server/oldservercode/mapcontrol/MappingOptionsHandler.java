@@ -44,7 +44,7 @@ public class MappingOptionsHandler
         {
             return false;
         }
-        else  if (PlayerUtil.isOp(player) && config.getCaveMapping().isOpCaveMapping())
+        else if (PlayerUtil.isOp(player) && config.getCaveMapping().isOpCaveMapping())
         {
             return false;
         }
@@ -61,8 +61,8 @@ public class MappingOptionsHandler
     private boolean isUserInWhiteList(String userList, String player)
     {
         userList = userList.replace(" ", "");
-            if (userList.contains(","))
-            {
+        if (userList.contains(","))
+        {
             String[] whiteListedUsers = userList.split(",");
 
             for (int i = 0; i < whiteListedUsers.length; i++)
@@ -72,9 +72,9 @@ public class MappingOptionsHandler
                     return true;
                 }
             }
-            }
-            else if (userList.equalsIgnoreCase(player))
-            {
+        }
+        else if (userList.equalsIgnoreCase(player))
+        {
             return true;
         }
         return false;

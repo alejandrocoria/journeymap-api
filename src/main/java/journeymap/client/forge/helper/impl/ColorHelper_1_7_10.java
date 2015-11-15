@@ -61,7 +61,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
     @Override
     public int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z)
     {
-        if(chunkMD==null)
+        if (chunkMD == null)
         {
             return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), x, y, z);
         }

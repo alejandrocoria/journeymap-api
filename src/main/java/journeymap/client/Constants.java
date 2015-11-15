@@ -19,13 +19,14 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
-// 1.8
-//import net.minecraftforge.fml.common.Loader;
-//import net.minecraftforge.fml.common.ModContainer;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
 import java.util.*;
+
+// 1.8
+//import net.minecraftforge.fml.common.Loader;
+//import net.minecraftforge.fml.common.ModContainer;
 
 /**
  * Constants and Keybindings... and other stuff that are squatting here for some reason.
@@ -65,6 +66,7 @@ public class Constants
 
     /**
      * Initialize the keybindings, return them as a list.
+     *
      * @return
      */
     public static List<KeyBinding> initKeybindings()
@@ -83,6 +85,7 @@ public class Constants
 
     /**
      * Get the current locale
+     *
      * @return
      */
     public static Locale getLocale()
@@ -102,6 +105,7 @@ public class Constants
 
     /**
      * Get the localized string for a given key.
+     *
      * @param key
      * @return
      */
@@ -117,6 +121,7 @@ public class Constants
 
     /**
      * Get the localized string for a key and parameters.
+     *
      * @param key
      * @param params
      * @return
@@ -133,6 +138,7 @@ public class Constants
 
     /**
      * Get the key name for a binding.
+     *
      * @param keyBinding
      * @return
      */
@@ -143,6 +149,7 @@ public class Constants
 
     /**
      * Get the keycode for a binding.
+     *
      * @param keyBinding
      * @return
      */
@@ -153,6 +160,7 @@ public class Constants
 
     /**
      * Whether a keybinding is pressed.
+     *
      * @param keyBinding
      * @return
      */
@@ -162,7 +170,7 @@ public class Constants
         {
             return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             Journeymap.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
             return false;
@@ -171,6 +179,7 @@ public class Constants
 
     /**
      * Safely check two strings for case-insensitive equality.
+     *
      * @param first
      * @param second
      * @return
@@ -188,6 +197,7 @@ public class Constants
     /**
      * Get a list of all resource pack names.
      * TODO:  Why did this end up here?
+     *
      * @return
      */
     public static String getResourcePackNames()
@@ -225,6 +235,7 @@ public class Constants
     /**
      * Get a list of all loaded mod names.
      * TODO:  Why did this end up here?
+     *
      * @return
      */
     public static String getModNames()
@@ -245,7 +256,6 @@ public class Constants
     {
         mp, sp
     }
-
 
 
 }

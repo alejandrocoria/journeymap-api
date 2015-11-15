@@ -156,6 +156,7 @@ public class ThemeFileHandler
 
     /**
      * Set the current theme.
+     *
      * @param theme
      */
     public synchronized static void setCurrentTheme(Theme theme)

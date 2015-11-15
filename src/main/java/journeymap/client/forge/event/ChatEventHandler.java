@@ -9,7 +9,6 @@
 package journeymap.client.forge.event;
 
 import com.google.common.base.Strings;
-// 1.7.10
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,13 +19,15 @@ import journeymap.client.ui.UIManager;
 import journeymap.common.Journeymap;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+// 1.7.10
 // 1.8
 //import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //import net.minecraftforge.fml.relauncher.Side;
 //import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * Created by mwoodman on 1/29/14.

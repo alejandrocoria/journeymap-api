@@ -14,12 +14,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.data.DataCache;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraftforge.event.world.ChunkEvent;
+
+import java.util.EnumSet;
+
 // 1.8
 //import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //import net.minecraftforge.fml.relauncher.Side;
 //import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.EnumSet;
 
 /**
  * Listen for events which are likely to need the map to be updated.

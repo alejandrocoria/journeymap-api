@@ -9,12 +9,13 @@
 package journeymap.common.version;
 
 import com.google.common.io.CharStreams;
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import cpw.mods.fml.common.Loader;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -41,6 +42,7 @@ public class VersionCheck
 
     /**
      * Whether this build is the current version available.
+     *
      * @return
      */
     public static Boolean getVersionIsCurrent()
@@ -54,6 +56,7 @@ public class VersionCheck
 
     /**
      * Whether the current version available has been checked.
+     *
      * @return
      */
     public static Boolean getVersionIsChecked()
@@ -67,6 +70,7 @@ public class VersionCheck
 
     /**
      * Gets the current version available.
+     *
      * @return
      */
     public static String getVersionAvailable()
@@ -80,6 +84,7 @@ public class VersionCheck
 
     /**
      * Gets the current version available.
+     *
      * @return
      */
     public static String getDownloadUrl()
@@ -132,7 +137,7 @@ public class VersionCheck
 
                         String currentVersion = Journeymap.JM_VERSION.toString();
                         boolean currentIsRelease = Journeymap.JM_VERSION.isRelease();
-                        while(files.hasNext())
+                        while (files.hasNext())
                         {
                             JsonObject file = files.next().getAsJsonObject();
                             try
@@ -145,7 +150,7 @@ public class VersionCheck
                                 }
 
                                 String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
-                                if(!name.contains("-"))
+                                if (!name.contains("-"))
                                 {
                                     continue;
                                 }
@@ -160,12 +165,14 @@ public class VersionCheck
                                     Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
                                     break;
                                 }
-                            } catch (Exception e) {
+                            }
+                            catch (Exception e)
+                            {
                                 Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
                             }
                         }
 
-                        if(!versionIsChecked)
+                        if (!versionIsChecked)
                         {
                             versionAvailable = currentVersion;
                             versionIsCurrent = true;
@@ -206,6 +213,7 @@ public class VersionCheck
 
     /**
      * Whether this instance's version is current (equal or newer) to one available.
+     *
      * @param thisVersionStr
      * @param availableVersionStr
      * @return

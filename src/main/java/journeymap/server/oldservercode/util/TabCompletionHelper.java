@@ -7,9 +7,10 @@ import java.util.List;
 /**
  * Created by Mysticdrew on 11/20/2014.
  */
-public class TabCompletionHelper {
+public class TabCompletionHelper
+{
 
-    public static List<String> getListOfStringsMatchingLastWord(String[] args, String ... possibleCommands)
+    public static List<String> getListOfStringsMatchingLastWord(String[] args, String... possibleCommands)
     {
         String lastWord = args[args.length - 1];
 

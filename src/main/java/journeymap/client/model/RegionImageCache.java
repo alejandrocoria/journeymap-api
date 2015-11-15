@@ -175,7 +175,7 @@ public class RegionImageCache
         ArrayList<RegionCoord> list = new ArrayList<RegionCoord>();
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            if(regionImageSet.updatedSince(mapType, time))
+            if (regionImageSet.updatedSince(mapType, time))
             {
                 list.add(regionImageSet.getRegionCoord());
             }

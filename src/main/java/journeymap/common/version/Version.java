@@ -27,6 +27,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Constructor without a patch modifier.
+     *
      * @param major
      * @param minor
      * @param micro
@@ -38,6 +39,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Constructor with a patch modifier.
+     *
      * @param major
      * @param minor
      * @param micro
@@ -53,6 +55,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Creates a Version using parameters and a default Version if the parameters can't be parsed.
+     *
      * @param major
      * @param minor
      * @param micro
@@ -79,6 +82,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Converts a version string to a Version.
+     *
      * @param versionString
      * @param defaultVersion
      * @return
@@ -109,6 +113,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Converts a numeric string to an int.
+     *
      * @param number
      * @return
      */
@@ -123,6 +128,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Creates a MAJOR.MINOR string from this instance.
+     *
      * @return
      */
     public String toMajorMinorString()
@@ -132,6 +138,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Whether this is a newer version than the other.
+     *
      * @param other
      * @return
      */
@@ -142,6 +149,7 @@ public class Version implements Comparable<Version>
 
     /**
      * Whether this version is a release (no patch).
+     *
      * @return
      */
     public boolean isRelease()

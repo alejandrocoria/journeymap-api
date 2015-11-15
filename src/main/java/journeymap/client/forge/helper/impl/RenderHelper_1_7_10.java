@@ -12,7 +12,6 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.IRenderHelper;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -36,28 +35,28 @@ public class RenderHelper_1_7_10 implements IRenderHelper
     public void addVertex(double x, double y, double z)
     {
         // 1.7
-        tessellator.addVertex(x,y,z);
+        tessellator.addVertex(x, y, z);
     }
 
     @Override
     public void addVertexWithUV(double x, double y, double z, double u, double v)
     {
         // 1.7
-        tessellator.addVertexWithUV(x,y,z,u,v);
+        tessellator.addVertexWithUV(x, y, z, u, v);
     }
 
     @Override
     public void setColorRGBA_F(float r, float g, float b, float a)
     {
         // 1.7
-        tessellator.setColorRGBA_F(r,g,b,a);
+        tessellator.setColorRGBA_F(r, g, b, a);
     }
 
     @Override
     public void setColorRGBA(int r, int g, int b, int a)
     {
         // 1.7
-        tessellator.setColorRGBA_F(r,g,b,a);
+        tessellator.setColorRGBA_F(r, g, b, a);
     }
 
     @Override

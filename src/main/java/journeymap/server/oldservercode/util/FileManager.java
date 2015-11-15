@@ -59,7 +59,6 @@ public class FileManager
             }
 
 
-
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(text);

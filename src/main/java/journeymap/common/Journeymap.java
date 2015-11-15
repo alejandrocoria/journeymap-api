@@ -19,6 +19,12 @@ import journeymap.server.JourneymapServer;
 import journeymap.server.oldservercode.command.CommandJMServerForge;
 import journeymap.server.oldservercode.config.ConfigHandler;
 import net.minecraft.server.MinecraftServer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.util.Map;
+
 // 1.8
 //import net.minecraftforge.fml.common.Mod;
 //import net.minecraftforge.fml.common.SidedProxy;
@@ -26,11 +32,6 @@ import net.minecraft.server.MinecraftServer;
 //import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 //import net.minecraftforge.fml.relauncher.Side;
 //import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Forge Mod entry point
@@ -66,7 +67,7 @@ public class Journeymap
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        if(proxy==null)
+        if (proxy == null)
         {
             return true;
         }
@@ -78,6 +79,7 @@ public class Journeymap
 
     /**
      * Initialize the sided proxy.
+     *
      * @param event
      * @throws Throwable
      */
@@ -89,6 +91,7 @@ public class Journeymap
 
     /**
      * Post-initialize the sided proxy.
+     *
      * @param event
      * @throws Throwable
      */

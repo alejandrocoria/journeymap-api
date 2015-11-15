@@ -27,8 +27,6 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
-// 1.8
-//import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
@@ -37,6 +35,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.util.*;
+
+// 1.8
+//import net.minecraftforge.fml.client.FMLClientHandler;
 
 
 /**

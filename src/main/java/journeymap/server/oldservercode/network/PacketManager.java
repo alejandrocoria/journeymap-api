@@ -5,8 +5,8 @@ package journeymap.server.oldservercode.network;
  */
 public class PacketManager
 {
-    private IPacketHandler packetHandler;
     public static PacketManager instance;
+    private IPacketHandler packetHandler;
 
     public PacketManager(IPacketHandler packetHandler)
     {

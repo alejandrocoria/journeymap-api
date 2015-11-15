@@ -62,7 +62,9 @@ public abstract class ImageSet
                 }
             }
 
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             Journeymap.getLogger().error("Error writing ImageSet to disk: " + t);
         }
         return updated;
@@ -74,9 +76,9 @@ public abstract class ImageSet
         {
             if (mapType == null)
             {
-                for(ImageHolder holder : imageHolders.values())
+                for (ImageHolder holder : imageHolders.values())
                 {
-                    if(holder!=null && holder.getImageTimestamp() >= time)
+                    if (holder != null && holder.getImageTimestamp() >= time)
                     {
                         return true;
                     }

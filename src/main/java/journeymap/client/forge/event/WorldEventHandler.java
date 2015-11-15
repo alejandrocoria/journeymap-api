@@ -9,18 +9,20 @@
 package journeymap.client.forge.event;
 
 // 1.7.10
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
 import net.minecraftforge.event.world.WorldEvent;
+
+import java.util.EnumSet;
+
 // 1.8
 //import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //import net.minecraftforge.fml.relauncher.Side;
 //import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.EnumSet;
 
 /**
  * Created by mwoodman on 1/29/14.

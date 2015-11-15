@@ -1,0 +1,1318 @@
+Index: src/main/java/journeymap/server/util/arg/IntegerCommandArg.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/util/arg/IntegerCommandArg.java	(revision )
++++ src/main/java/journeymap/server/util/arg/IntegerCommandArg.java	(revision )
+@@ -0,0 +1,25 @@
++package journeymap.server.util.arg;
++
++/**
++ * Integer argument.
++ */
++public class IntegerCommandArg extends CommandArg<Integer>
++{
++    public IntegerCommandArg(String nameKey, String descriptionKey, boolean optional)
++    {
++        super(Integer.class, nameKey, descriptionKey, optional);
++    }
++
++    @Override
++    public Integer getValue(String stringValue) throws IllegalArgumentValueException
++    {
++        try
++        {
++            return Integer.parseInt(stringValue);
++        }
++        catch (NumberFormatException e)
++        {
++            throw new IllegalArgumentValueException(this, "jm.server.command.error.int_arg_expected");
++        }
++    }
++}
+Index: src/main/java/journeymap/server/command/GenChunksCommand.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/command/GenChunksCommand.java	(revision )
++++ src/main/java/journeymap/server/command/GenChunksCommand.java	(revision )
+@@ -0,0 +1,40 @@
++package journeymap.server.command;
++
++import journeymap.server.JourneymapServer;
++import journeymap.server.task.GenChunksTask;
++import journeymap.server.util.arg.CommandArgs;
++import net.minecraft.entity.player.EntityPlayerMP;
++
++/**
++ * Command to generate kick off a GenChunksTask.
++ */
++public class GenChunksCommand implements IServerCommand
++{
++    public static final CommandArgs signature = new CommandArgs.Builder(GenChunksCommand.class, "genchunks")
++            .integer("jm.server.command.genchunks.arg_dimension")
++            .integer("jm.server.command.genchunks.arg_minX")
++            .integer("jm.server.command.genchunks.arg_maxX")
++            .integer("jm.server.command.genchunks.arg_minX")
++            .integer("jm.server.command.genchunks.arg_maxZ")
++            .requireOp()
++            .build();
++
++    final int dimension, minX, minZ, maxX, maxZ;
++
++    public GenChunksCommand(Integer dimension, Integer minX, Integer minZ, Integer maxX, Integer maxZ)
++    {
++        this.dimension = dimension;
++        this.minX = minX >> 4;
++        this.maxX = maxX >> 4;
++        this.minZ = minZ >> 4;
++        this.maxZ = maxZ >> 4;
++    }
++
++    @Override
++    public boolean invoke(EntityPlayerMP player, String world)
++    {
++        JourneymapServer.ensureInitialized();
++        GenChunksTask.start(player.getCommandSenderName(), dimension, minX, minZ, maxX, maxZ);
++        return true;
++    }
++}
+Index: src/main/java/journeymap/client/task/main/DeleteMapTask.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/client/task/main/DeleteMapTask.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/client/task/main/DeleteMapTask.java	(revision )
+@@ -61,6 +61,7 @@
+             jm.toggleTask(MapPlayerTask.Manager.class, true, true);
+         }
+         return null;
++        //return new GenerateChunksTask(-32, -32, -16, -16);
+     }
+ 
+     @Override
+Index: src/main/java/journeymap/common/Journeymap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/common/Journeymap.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/common/Journeymap.java	(revision )
+@@ -13,12 +13,17 @@
+ import cpw.mods.fml.common.event.*;
+ import cpw.mods.fml.common.network.NetworkCheckHandler;
+ import cpw.mods.fml.relauncher.Side;
+-import cpw.mods.fml.relauncher.SideOnly;
+ import journeymap.common.version.Version;
+ import journeymap.server.JourneymapServer;
+ import journeymap.server.oldservercode.command.CommandJMServerForge;
+ import journeymap.server.oldservercode.config.ConfigHandler;
+ import net.minecraft.server.MinecraftServer;
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import java.io.File;
++import java.util.Map;
++
+ // 1.8
+ //import net.minecraftforge.fml.common.Mod;
+ //import net.minecraftforge.fml.common.SidedProxy;
+@@ -26,12 +31,7 @@
+ //import net.minecraftforge.fml.common.network.NetworkCheckHandler;
+ //import net.minecraftforge.fml.relauncher.Side;
+ //import net.minecraftforge.fml.relauncher.SideOnly;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
+ 
+-import java.io.File;
+-import java.util.Map;
+-
+ /**
+  * Forge Mod entry point
+  */
+@@ -98,21 +98,21 @@
+         proxy.postInitialize(event);
+     }
+ 
+-    @SideOnly(Side.SERVER)
++    //@SideOnly(Side.SERVER)
+     @Mod.EventHandler
+     public void preInitEvent(FMLPreInitializationEvent event)
+     {
+         ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
+     }
+ 
+-    @SideOnly(Side.SERVER)
++    //@SideOnly(Side.SERVER)
+     @Mod.EventHandler
+     public void serverStartingEvent(FMLServerStartingEvent event)
+     {
+         event.registerServerCommand(new CommandJMServerForge());
+     }
+ 
+-    @SideOnly(Side.SERVER)
++    //@SideOnly(Side.SERVER)
+     @Mod.EventHandler
+     public void serverStartedEvent(FMLServerStartedEvent event)
+     {
+\ No newline at end of file
+Index: src/main/java/journeymap/server/oldservercode/events/ForgeEvents.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/oldservercode/events/ForgeEvents.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/server/oldservercode/events/ForgeEvents.java	(revision )
+@@ -33,7 +33,6 @@
+         }
+     }
+ 
+-
+     private class UserJoinWorldThread extends Thread {
+         private String worldID;
+         private EntityPlayerMP player;
+Index: src/main/java/journeymap/server/task/GenChunksTask.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/task/GenChunksTask.java	(revision )
++++ src/main/java/journeymap/server/task/GenChunksTask.java	(revision )
+@@ -0,0 +1,165 @@
++package journeymap.server.task;
++
++import cpw.mods.fml.common.FMLCommonHandler;
++import cpw.mods.fml.common.eventhandler.SubscribeEvent;
++import cpw.mods.fml.common.gameevent.TickEvent;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.world.WorldServer;
++
++import java.text.DecimalFormat;
++import java.text.SimpleDateFormat;
++import java.util.Date;
++
++import static journeymap.server.oldservercode.chat.ChatHandler.sendMessage;
++
++/**
++ * Generates chunks defined by a bounding box of block coordinates.
++ * Generation is done in groups (batches) per server tick.
++ * Only one of these can be active at a time.
++ */
++public class GenChunksTask
++{
++    private static final int groupSize = 6;
++    public static volatile GenChunksTask runningTask;
++    // Derive chunk coords from block coord strings
++    final String sender;
++    final int dimension;
++    final int minX, minZ, maxX, maxZ;
++    final int totalChunks;
++    final int totalGroups;
++    long startTime;
++    long lastTickTime;
++    int currentX, currentZ, completedGroups;
++
++    private GenChunksTask(String sender, int dimension, int minX, int minZ, int maxX, int maxZ)
++    {
++        this.sender = sender;
++        this.dimension = dimension;
++        this.minX = minX;
++        this.maxX = maxX;
++        this.minZ = minZ;
++        this.maxZ = maxZ;
++        currentX = minX;
++        currentZ = minZ;
++        totalChunks = ((maxX - minX) * (maxZ - minZ));
++        totalGroups = totalChunks / ((groupSize - 2) * (groupSize - 2));
++        FMLCommonHandler.instance().bus().register(this);
++    }
++
++    public static void start(String sender, int dimension, int minX, int minZ, int maxX, int maxZ)
++    {
++        if (GenChunksTask.runningTask != null)
++        {
++            GenChunksTask.runningTask.stop();
++        }
++        GenChunksTask.runningTask = new GenChunksTask(sender, dimension, minX, minZ, maxX, maxZ);
++    }
++
++    @SubscribeEvent
++    public void on(TickEvent.ServerTickEvent event)
++    {
++        if (event.phase != TickEvent.Phase.END)
++        {
++            return;
++        }
++
++        if (System.currentTimeMillis() - lastTickTime < 1000)
++        {
++            return;
++        }
++
++        MinecraftServer server = MinecraftServer.getServer();
++        WorldServer worldServer = server.worldServerForDimension(dimension);
++
++        if (completedGroups == 0)
++        {
++            // TODO: Use message keys
++            String msg = String.format("Generating %s chunks for dimension %s", totalChunks, worldServer.getWorldInfo().getDimension());
++            sendMessage(sender, msg);
++            worldServer.theChunkProviderServer.saveChunks(true, null);
++            startTime = System.currentTimeMillis();
++        }
++
++        try
++        {
++            // Load groups of chunks in a 6x6 pattern, which ensures the inner 4x4 section of chunks can be completely
++            // decorated.  Each loop starts where the last left off, -1 on x and -1 on z, so that the perimeter of chunks
++            // is always loaded for the next group.
++            int groupX = Math.min(currentX + groupSize, maxX);
++            int groupZ = Math.min(currentZ + groupSize, maxZ);
++
++            for (int z = currentZ; z <= groupZ; z++)
++            {
++                for (int x = currentX; x <= groupX; x++)
++                {
++                    worldServer.theChunkProviderServer.loadChunk(x, z);
++                }
++            }
++
++            //worldServer.theChunkProviderServer.saveChunks(true, null);
++            worldServer.theChunkProviderServer.unloadAllChunks();
++            completedGroups++;
++
++            // Ensure there's a perimeter of loaded chunks for the next loop
++            if (groupX < maxX || groupZ < maxZ)
++            {
++                if (groupX >= maxX)
++                {
++                    currentX = minX;
++                    currentZ = groupZ - 1;
++                }
++                else
++                {
++                    currentX = groupX - 1;
++                }
++            }
++            else
++            {
++                currentX = maxX;
++                currentZ = maxZ;
++            }
++        }
++        catch (Throwable t)
++        {
++            t.printStackTrace();
++            // TODO: Use message keys
++            String msg = "Generating chunks stopped due to an error.  See the server log.";
++            sendMessage(sender, msg);
++            stop();
++            return;
++        }
++
++        // Report progress
++        long now = System.currentTimeMillis();
++        long millisPerGroup = (now - startTime) / completedGroups;
++        long remainingMillis = (totalGroups - completedGroups) * millisPerGroup;
++        Date estimatedCompleteDate = new Date(now + remainingMillis);
++        String estimatedDateStr = new SimpleDateFormat("d MMM yyyy HH:mm").format(estimatedCompleteDate);
++
++        int complete = completedGroups * ((groupSize - 2) * (groupSize - 2));
++        double percent = complete * 100.0 / totalChunks;
++        String percentStr = new DecimalFormat("##.#").format(percent) + "%";
++        // TODO: Use message keys
++        sendMessage(sender, String.format("Generating chunks: %s/%s (%s). Estimated completion: %s", complete, totalChunks, percentStr, estimatedDateStr));
++
++        if (completedGroups >= totalGroups)
++        {
++            stop();
++        }
++
++        // Prevent thrash
++        lastTickTime = System.currentTimeMillis();
++    }
++
++    public void stop()
++    {
++        FMLCommonHandler.instance().bus().unregister(this);
++        if (this == GenChunksTask.runningTask)
++        {
++            GenChunksTask.runningTask = null;
++        }
++        // TODO: Use message keys
++        String msg = "Generating chunks: Stopped.";
++        sendMessage(sender, msg);
++    }
++}
+Index: src/main/java/journeymap/server/util/arg/IllegalArgumentValueException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/util/arg/IllegalArgumentValueException.java	(revision )
++++ src/main/java/journeymap/server/util/arg/IllegalArgumentValueException.java	(revision )
+@@ -0,0 +1,26 @@
++package journeymap.server.util.arg;
++
++/**
++ * Thrown when a CommandArg value is incorrect.
++ */
++public class IllegalArgumentValueException extends IllegalArgumentException
++{
++    private CommandArg arg;
++    private String messageKey;
++
++    public IllegalArgumentValueException(CommandArg arg, String messageKey)
++    {
++        super(messageKey);
++        this.arg = arg;
++    }
++
++    public CommandArg getArg()
++    {
++        return arg;
++    }
++
++    public String getMessageKey()
++    {
++        return messageKey;
++    }
++}
+Index: src/main/java/journeymap/server/JourneymapServer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/JourneymapServer.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/server/JourneymapServer.java	(revision )
+@@ -8,17 +8,16 @@
+ 
+ package journeymap.server;
+ 
++import cpw.mods.fml.common.FMLCommonHandler;
+ import cpw.mods.fml.common.event.FMLInitializationEvent;
+ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+ import cpw.mods.fml.relauncher.Side;
+-import cpw.mods.fml.relauncher.SideOnly;
+ import journeymap.common.CommonProxy;
+ import journeymap.common.Journeymap;
+ import journeymap.common.network.PacketHandler;
+-import journeymap.common.network.WorldIDPacket;
+ import journeymap.server.nbt.WorldNbtIDSaveHandler;
+ import journeymap.server.oldservercode.chat.ChatHandler;
+-import journeymap.server.oldservercode.config.ConfigHandler;
++import journeymap.server.oldservercode.events.FMLEvents;
+ import journeymap.server.oldservercode.events.ForgeEvents;
+ import journeymap.server.oldservercode.network.ForgePacketHandler;
+ import journeymap.server.oldservercode.network.PacketManager;
+@@ -28,27 +27,28 @@
+ import journeymap.server.oldservercode.util.PlayerUtil;
+ import net.minecraft.entity.player.EntityPlayerMP;
+ import net.minecraftforge.common.MinecraftForge;
++import org.apache.logging.log4j.Logger;
++
++import java.util.Map;
++
+ // 1.8
+ //import net.minecraftforge.fml.common.FMLCommonHandler;
+ //import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+ //import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+ //import net.minecraftforge.fml.relauncher.Side;
+ //import net.minecraftforge.fml.relauncher.SideOnly;
+-import org.apache.logging.log4j.Logger;
+ 
+-import java.io.File;
+-import java.util.Map;
+ 
+-
+ /**
+  * Coming soon to a codebase near you.
+  */
+-@SideOnly(Side.SERVER)
++//@SideOnly(Side.SERVER)
+ public class JourneymapServer implements CommonProxy
+ {
+     public static String WORLD_NAME;
+-
++    private static boolean initialized = false;
+     private Logger logger;
++
+     /**
+      * Constructor.
+      */
+@@ -57,33 +57,52 @@
+         logger = Journeymap.getLogger();
+     }
+ 
+-    /**
+-     * Initialize the server.
+-     * @param event
+-     */
+-    @SideOnly(Side.SERVER)
+-    @Override
+-    public void initialize(FMLInitializationEvent event)
++    public static void ensureInitialized()
+     {
++        if (!initialized)
++        {
+-//        PacketHandler packetHandler = new PacketHandler();
+-//        packetHandler.init(Side.SERVER);
+-        Controller.setController(Controller.FORGE);
+-        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
++            //        PacketHandler packetHandler = new PacketHandler();
++            //        packetHandler.init(Side.SERVER);
++            Controller.setController(Controller.FORGE);
++            MinecraftForge.EVENT_BUS.register(new ForgeEvents());
+-        //FMLCommonHandler.instance().bus().register(new FMLEvents());
++            FMLCommonHandler.instance().bus().register(new FMLEvents());
+-        PacketManager.init(new ForgePacketHandler());
+-        PlayerUtil.init(new ForgePlayerUtil());
+-        ChatHandler.init(new ForgeChat());
++            PacketManager.init(new ForgePacketHandler());
++            PlayerUtil.init(new ForgePlayerUtil());
++            ChatHandler.init(new ForgeChat());
++            initialized = true;
+-    }
++        }
++    }
+ 
++    public static String getWorldName()
++    {
++        return WORLD_NAME;
++    }
++
++    public static void setWorldName(String worldName)
++    {
++        WORLD_NAME = worldName;
++    }
++
+     /**
++     * Initialize the server.
++     * @param event
++     */
++    //@SideOnly(Side.SERVER)
++    @Override
++    public void initialize(FMLInitializationEvent event)
++    {
++        ensureInitialized();
++    }
++
++    /**
+      * Post-initialize the server
+      * @param event
+      */
+-    @SideOnly(Side.SERVER)
++    //@SideOnly(Side.SERVER)
+     @Override
+     public void postInitialize(FMLPostInitializationEvent event)
+     {
+-
++        ensureInitialized();
+     }
+ 
+     /**
+@@ -96,7 +115,6 @@
+     @Override
+     public boolean checkModLists(Map<String, String> modList, Side side)
+     {
+-
+         logger.info(side.toString());
+ 
+         for (String s : modList.keySet()) {
+@@ -123,15 +141,5 @@
+     {
+         WorldNbtIDSaveHandler nbt = new WorldNbtIDSaveHandler();
+         PacketHandler.sendPlayerWorldID(nbt.getWorldID(), playerEntity);
+-    }
+-
+-    public static void setWorldName(String worldName)
+-    {
+-        WORLD_NAME = worldName;
+-    }
+-
+-    public static String getWorldName()
+-    {
+-        return WORLD_NAME;
+     }
+ }
+Index: src/main/java/journeymap/server/command/IServerCommand.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/command/IServerCommand.java	(revision )
++++ src/main/java/journeymap/server/command/IServerCommand.java	(revision )
+@@ -0,0 +1,11 @@
++package journeymap.server.command;
++
++import net.minecraft.entity.player.EntityPlayerMP;
++
++/**
++ * Created by Mark on 10/8/2015.
++ */
++public interface IServerCommand
++{
++    boolean invoke(EntityPlayerMP player, String world);
++}
+Index: src/main/java/journeymap/server/oldservercode/events/FMLEvents.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/oldservercode/events/FMLEvents.java	(revision )
++++ src/main/java/journeymap/server/oldservercode/events/FMLEvents.java	(revision )
+@@ -0,0 +1,10 @@
++package journeymap.server.oldservercode.events;
++
++/**
++ * Created by techbrew
++ */
++public class FMLEvents
++{
++
++
++}
+Index: src/main/java/journeymap/server/util/arg/CommandArg.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/util/arg/CommandArg.java	(revision )
++++ src/main/java/journeymap/server/util/arg/CommandArg.java	(revision )
+@@ -0,0 +1,105 @@
++package journeymap.server.util.arg;
++
++/**
++ * Provides structure for defining and handling command arguments in a consistent way.
++ */
++public abstract class CommandArg<T>
++{
++    final Class<T> argType;
++    final String nameKey;
++    final String descriptionKey;
++    final boolean optional;
++
++    /**
++     * Constructor.
++     *
++     * @param argType        The type of value expected
++     * @param nameKey        Key for argument name. Ex: jm.server.commandfoo.argname
++     * @param descriptionKey Description key for argument displayed in help text.  Ex: jm.server.commandfoo.argdesc
++     * @param optional       Whether a non-null value must be supplied.
++     */
++    protected CommandArg(Class<T> argType, String nameKey, String descriptionKey, boolean optional)
++    {
++        this.argType = argType;
++        this.nameKey = nameKey;
++        this.descriptionKey = descriptionKey;
++        this.optional = optional;
++    }
++
++    /**
++     * Create a named parameter for an integer value.
++     */
++    public static CommandArg<Integer> integer(String nameKey)
++    {
++        return integer(nameKey, null, false);
++    }
++
++    /**
++     * Create a named parameter for an integer value.
++     */
++    public static CommandArg<Integer> integer(String nameKey, String descriptionKey)
++    {
++        return integer(nameKey, null, false);
++    }
++
++    /**
++     * Create a named parameter for an integer value.
++     */
++    public static CommandArg<Integer> integer(String nameKey, String descriptionKey, boolean optional)
++    {
++        return new IntegerCommandArg(nameKey, descriptionKey, optional);
++    }
++
++    /**
++     * Create a named parameter for a String value.
++     */
++    public static CommandArg<String> string(String nameKey)
++    {
++        return string(nameKey, null, false);
++    }
++
++    /**
++     * Create a named parameter for a String value.
++     */
++    public static CommandArg<String> string(String nameKey, String descriptionKey)
++    {
++        return string(nameKey, null, false);
++    }
++
++    /**
++     * Create a named parameter for a String value.
++     */
++    public static CommandArg<String> string(String nameKey, String descriptionKey, boolean optional)
++    {
++        return new StringCommandArg(nameKey, descriptionKey, optional);
++    }
++
++    public Class<T> getArgType()
++    {
++        return this.argType;
++    }
++
++    public boolean isOptional()
++    {
++        return this.optional;
++    }
++
++    public String getDescriptionKey()
++    {
++        return descriptionKey;
++    }
++
++    public String getNameKey()
++    {
++        return nameKey;
++    }
++
++    /**
++     * Returns a T value parsed from the String value.
++     *
++     * @return
++     * @throws IllegalArgumentValueException
++     */
++    public abstract T getValue(String stringValue) throws IllegalArgumentValueException;
++
++}
+Index: src/main/java/journeymap/server/oldservercode/chat/ChatHandler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/oldservercode/chat/ChatHandler.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/server/oldservercode/chat/ChatHandler.java	(revision )
+@@ -12,6 +12,13 @@
+     }
+ 
+     public static void sendMessage(String player, String message) {
++        if (handler != null)
++        {
+-        handler.sendChatMessage(player, message);
++            handler.sendChatMessage(player, message);
++        }
++        else
++        {
++            System.out.println("No ChatHandler to send message to " + player + ": " + message);
++        }
+     }
+ }
+Index: src/main/java/journeymap/client/task/main/GenerateChunksTask.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/client/task/main/GenerateChunksTask.java	(revision )
++++ src/main/java/journeymap/client/task/main/GenerateChunksTask.java	(revision )
+@@ -0,0 +1,80 @@
++/*
++ * JourneyMap : A mod for Minecraft
++ *
++ * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
++ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
++ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
++ */
++
++package journeymap.client.task.main;
++
++import journeymap.client.JourneymapClient;
++import journeymap.client.log.LogFormatter;
++import journeymap.common.Journeymap;
++import net.minecraft.client.Minecraft;
++import net.minecraft.world.World;
++import net.minecraft.world.chunk.Chunk;
++import org.apache.logging.log4j.Logger;
++
++/**
++ * Checks state to start/stop mapping (code formerly in JourneyMap.java)
++ */
++public class GenerateChunksTask implements IMainThreadTask
++{
++    private static String NAME = "Tick." + GenerateChunksTask.class.getSimpleName();
++    private final int minX, minZ, maxX, maxZ;
++    Logger logger = Journeymap.getLogger();
++
++
++    public GenerateChunksTask(int minChunkX, int minChunkZ, int maxChunkX, int maxChunkZ)
++    {
++        minX = minChunkX;
++        minZ = minChunkZ;
++        maxX = maxChunkX;
++        maxZ = maxChunkZ;
++    }
++
++    @Override
++    public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
++    {
++        //long start = System.nanoTime();
++        try
++        {
++            if (!jm.isInitialized())
++            {
++                return this;
++            }
++
++            if (jm.isMapping())
++            {
++                Journeymap.getLogger().info("Starting!");
++                World world = mc.getIntegratedServer().getEntityWorld();
++                mc.getIntegratedServer().getEntityWorld().getChunkProvider().saveChunks(true, null);
++
++                for (int x = minX; x <= maxX; x++)
++                {
++                    for (int z = minZ; z <= maxZ; z++)
++                    {
++                        Journeymap.getLogger().info("Loading: " + x + "," + z);
++                        Chunk chunk = world.getChunkProvider().loadChunk(x, z);
++                    }
++                }
++
++                mc.getIntegratedServer().getEntityWorld().getChunkProvider().saveChunks(true, null);
++
++                Journeymap.getLogger().info("Done!");
++            }
++        }
++        catch (Throwable t)
++        {
++            logger.error("Error in JourneyMap.performMainThreadTasks(): " + LogFormatter.toString(t));
++        }
++        return this;
++    }
++
++    @Override
++    public String getName()
++    {
++        return NAME;
++    }
++}
+Index: src/main/java/journeymap/server/util/arg/CommandArgs.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/util/arg/CommandArgs.java	(revision )
++++ src/main/java/journeymap/server/util/arg/CommandArgs.java	(revision )
+@@ -0,0 +1,354 @@
++package journeymap.server.util.arg;
++
++import journeymap.common.Journeymap;
++import journeymap.server.command.IServerCommand;
++import journeymap.server.oldservercode.chat.ChatHandler;
++import net.minecraft.entity.player.EntityPlayerMP;
++import org.apache.logging.log4j.core.helpers.Strings;
++
++import java.lang.reflect.Constructor;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Iterator;
++import java.util.List;
++
++/**
++ * Convenience handler for a list of CommandArgs.
++ */
++public class CommandArgs
++{
++    private final Class<? extends IServerCommand> commandClass;
++    private final String commandName;
++    private Constructor<? extends IServerCommand> constructor;
++    private boolean requiresOp;
++    private List<CommandArg> argsList = new ArrayList<CommandArg>();
++
++    /**
++     * Constructor used by Builder.
++     */
++    private CommandArgs(Class<? extends IServerCommand> commandClass, String commandName)
++    {
++        this(commandClass, commandName, false, new CommandArg[0]);
++    }
++
++    /**
++     * Create a CommandArgs group.  Ensures optional args are ordered appropriately.
++     * As an alternative, use the Builder.
++     */
++    public CommandArgs(Class<? extends IServerCommand> commandClass, String commandName, boolean requiresOp, CommandArg... args)
++    {
++        this.commandClass = commandClass;
++        this.commandName = commandName;
++        this.requiresOp = requiresOp;
++        for (CommandArg arg : args)
++        {
++            addArg(arg);
++        }
++        if (!this.argsList.isEmpty())
++        {
++            initConstructor();
++        }
++    }
++
++    /**
++     * Whether or not Op priviledges are required.
++     *
++     * @return
++     */
++    public boolean requiresOp()
++    {
++        return this.requiresOp;
++    }
++
++    /**
++     * Checks whether the string values can be accepted, including optional ones.
++     * Assumes the first value is the command name.
++     * Does not guarantee they'll be parsed correctly.
++     */
++    public boolean accepts(EntityPlayerMP player, String[] stringValues)
++    {
++        if (constructor == null)
++        {
++            initConstructor();
++            // This reveals a coding error.
++            return false;
++        }
++
++        if (requiresOp())
++        {
++//            if(!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile()))
++//            {
++//                return false;
++//            }
++        }
++
++        if (stringValues.length - 1 > argsList.size())
++        {
++            return false;
++        }
++
++        Iterator<String> stringValuesIter = Arrays.asList(stringValues).iterator();
++
++        // Check for command name match
++        if (!stringValuesIter.next().equalsIgnoreCase(commandName))
++        {
++            return false;
++        }
++
++        // Check arguments
++        for (CommandArg arg : argsList)
++        {
++            if (!stringValuesIter.hasNext())
++            {
++                if (!arg.isOptional())
++                {
++                    return false;
++                }
++            }
++
++            String stringValue = stringValuesIter.next();
++            if (Strings.isEmpty(stringValue) && !arg.isOptional())
++            {
++                return false;
++            }
++        }
++
++        return true;
++    }
++
++    /**
++     * Parses string values and returns the parsed equivalent values.
++     * Assumes first value is the command name.
++     * Optional args without a string value will result in a null in the array.
++     *
++     * @throws IllegalArgumentValueException if a value can't be parsed.
++     */
++    protected Object[] parse(String[] stringValues) throws IllegalArgumentValueException
++    {
++        if (constructor == null)
++        {
++            // This reveals a coding error.  Should have called accept() first.
++            throw new IllegalArgumentException(commandClass + " can't be used because constructor wasn't found to match CommandArgs");
++        }
++
++        if (stringValues == null || stringValues.length == 0 || Strings.isEmpty(stringValues[0]))
++        {
++            // This reveals a coding error.  Should have called accept() first.
++            throw new IllegalArgumentException("First value can't be empty, and it should be command name");
++        }
++
++        List<Object> values = new ArrayList<Object>(stringValues.length);
++
++        Iterator<String> stringValuesIter = Arrays.asList(stringValues).iterator();
++
++        // Check for command name match
++        if (!stringValuesIter.next().equalsIgnoreCase(commandName))
++        {
++            // This reveals a coding error.  Should have called accept() first.
++            throw new IllegalArgumentException("Wrong command name");
++        }
++
++        for (CommandArg arg : argsList)
++        {
++            if (stringValuesIter.hasNext())
++            {
++                String stringValue = stringValuesIter.next();
++                if (Strings.isEmpty(stringValue))
++                {
++                    values.add(null);
++                }
++                else
++                {
++                    values.add(arg.getValue(stringValue));
++                }
++            }
++            else
++            {
++                values.add(null);
++            }
++        }
++
++        return values.toArray(new Object[values.size()]);
++    }
++
++    /**
++     * Parse the arguments and invoke the command.
++     *
++     * @return false if parsing failed, invocation failed, or command itself failed.
++     */
++    public boolean invoke(EntityPlayerMP player, String world, String[] args)
++    {
++        if (requiresOp())
++        {
++//            if(!ForgePlayerUtil.instance.isOp(player.getCommandSenderName()))
++//            {
++//                return false;
++//            }
++        }
++
++        Object[] values = null;
++        try
++        {
++            values = parse(args);
++        }
++        catch (IllegalArgumentValueException e)
++        {
++            // TODO: Use message keys
++            String errorMessage = String.format("Bad argument for %s: %s", e.getArg().getNameKey(), e.getMessageKey());
++            ChatHandler.sendMessage(player.getCommandSenderName(), errorMessage);
++            return false;
++        }
++
++        try
++        {
++            IServerCommand command = constructor.newInstance(values);
++            return command.invoke(player, world);
++        }
++        catch (ReflectiveOperationException e)
++        {
++            String consoleMessage = String.format("Couldn't instantiate %s to match arguments for %s. You may need an updated version of JourneyMap.", this.commandClass, this.commandName);
++            Journeymap.getLogger().error(consoleMessage);
++        }
++        catch (Throwable t)
++        {
++            String consoleMessage = String.format("An unexpected error occurred while invoking command '%s': %s", this.commandName, t.getMessage());
++            Journeymap.getLogger().error(consoleMessage, t);
++        }
++
++        // TODO: Use message keys
++        String errorMessage = String.format("An error occurred with command '%s'. The console log has more information.", this.commandName);
++        ChatHandler.sendMessage(player.getCommandSenderName(), errorMessage);
++        return false;
++    }
++
++    /**
++     * Add an arg and ensure optional arg ordering makes sense.
++     */
++    private CommandArgs addArg(CommandArg arg)
++    {
++        // Check validity of optional args
++        boolean lastArgOptional = false;
++        if (!argsList.isEmpty())
++        {
++            lastArgOptional = argsList.get(argsList.size() - 1).isOptional();
++            if (lastArgOptional && !arg.isOptional())
++            {
++                // This reveals a coding error.
++                throw new IllegalArgumentException("Non-optional CommandArg can't come after an optional one: " + arg.nameKey);
++            }
++        }
++        this.argsList.add(arg);
++        return this;
++    }
++
++    /**
++     * Return a usage statement.
++     */
++    public String getUsage()
++    {
++        // TODO: Use message keys
++        StringBuilder sb = new StringBuilder("Usage: ").append(commandName);
++        for (CommandArg arg : argsList)
++        {
++            boolean optional = arg.isOptional();
++            sb.append(optional ? " [" : " ");
++            sb.append(arg.getNameKey());
++            sb.append(optional ? "]" : "");
++        }
++
++        return sb.toString();
++    }
++
++    /**
++     * Return help for the command.
++     *
++     * @return
++     */
++    public String getHelp()
++    {
++        // TODO: Show param descriptions
++        return getUsage();
++    }
++
++    /**
++     * Find the constructor for the class which matches these arguments.
++     *
++     * @return null if no match found, which is a coding problem.
++     */
++    private void initConstructor()
++    {
++        try
++        {
++            List<Class> sigTypesList = new ArrayList<Class>();
++            for (CommandArg arg : argsList)
++            {
++                sigTypesList.add(arg.getArgType());
++            }
++
++            Class[] paramTypes = sigTypesList.toArray(new Class[sigTypesList.size()]);
++            Constructor<? extends IServerCommand> ctor = commandClass.getConstructor(paramTypes);
++            this.constructor = ctor;
++        }
++        catch (Exception e)
++        {
++            Journeymap.getLogger().error("Couldn't find constructor for " + commandClass + " to match arguments", e.getMessage());
++        }
++    }
++
++    /**
++     * Builder pattern for declaring CommandArgs.
++     */
++    public static class Builder
++    {
++        private final CommandArgs commandArgs;
++
++        public Builder(Class<? extends IServerCommand> commandClass, String commandName)
++        {
++            commandArgs = new CommandArgs(commandClass, commandName);
++        }
++
++        public CommandArgs build()
++        {
++            commandArgs.initConstructor();
++            return commandArgs;
++        }
++
++        public Builder requireOp()
++        {
++            commandArgs.requiresOp = true;
++            return this;
++        }
++
++        public Builder string(String nameKey)
++        {
++            return this.string(nameKey, null, false);
++        }
++
++        public Builder string(String nameKey, String descriptionKey)
++        {
++            return this.string(nameKey, descriptionKey, false);
++        }
++
++        public Builder string(String nameKey, String descriptionKey, boolean optional)
++        {
++            commandArgs.addArg(new StringCommandArg(nameKey, descriptionKey, optional));
++            return this;
++        }
++
++        public Builder integer(String nameKey)
++        {
++            return this.integer(nameKey, null, false);
++        }
++
++        public Builder integer(String nameKey, String descriptionKey)
++        {
++            return this.integer(nameKey, descriptionKey, false);
++        }
++
++        public Builder integer(String nameKey, String descriptionKey, boolean optional)
++        {
++            commandArgs.addArg(new IntegerCommandArg(nameKey, descriptionKey, optional));
++            return this;
++        }
++    }
++}
+Index: src/main/java/journeymap/server/oldservercode/command/CommandJourneyMapServer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/oldservercode/command/CommandJourneyMapServer.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/server/oldservercode/command/CommandJourneyMapServer.java	(revision )
+@@ -2,9 +2,14 @@
+ 
+ 
+ import journeymap.common.network.PacketHandler;
++import journeymap.server.command.GenChunksCommand;
+ import journeymap.server.oldservercode.config.ConfigHandler;
+ import journeymap.server.oldservercode.config.Configuration;
++import journeymap.server.oldservercode.util.ForgePlayerUtil;
+ import journeymap.server.oldservercode.util.TabCompletionHelper;
++import net.minecraft.entity.player.EntityPlayerMP;
++import net.minecraft.server.MinecraftServer;
++import net.minecraftforge.common.util.FakePlayer;
+ 
+ import java.util.List;
+ import java.util.UUID;
+@@ -16,12 +21,16 @@
+  */
+ public class CommandJourneyMapServer
+ {
+-
+-
+     public void processCommand(String sender, String world, String[] args)
+     {
+         String s = args[0].toLowerCase();
+-        if (s.equals("worldid")) {
++        EntityPlayerMP player = ForgePlayerUtil.instance.getPlayerEntityByName(sender);
++        if (player == null && sender.equals("Server"))
++        {
++            player = new FakePlayer(MinecraftServer.getServer().worldServerForDimension(0), ForgePlayerUtil.instance.getPlayerProfileByName(sender));
++        }
++        if (s.equals("worldid"))
++        {
+             if (ConfigHandler.getConfigByWorldName(world).isUsingWorldID())
+             {
+                 processWorldID(sender, world, args);
+@@ -35,9 +44,16 @@
+         else if (s.equals("help"))
+         {
+             processJMServerHelp(sender);
+-
+         }
++        else if (GenChunksCommand.signature.accepts(player, args))
++        {
++            GenChunksCommand.signature.invoke(player, world, args);
+-    }
++        }
++        else
++        {
++            processJMServerHelp(sender);
++        }
++    }
+ 
+     private void processJMServerHelp(String sender)
+     {
+@@ -55,23 +71,19 @@
+             if (s.equals("help"))
+             {
+                 processWorldIDHelp(sender);
+-
+             }
+             else if (s.equals("set"))
+             {
+                 processSetWorldID(sender, world, args[2]);
+-
+             }
+             else if (s.equals("setrandom"))
+             {
+                 processSetWorldID(sender, world, UUID.randomUUID().toString());
+-
+             }
+             else if (s.equals("resync"))
+             {
+                 sendMessage(sender, "Re-Syncing all clients!");
+                 PacketHandler.sendAllPlayersWorldID(world);
+-
+             }
+             else
+             {
+@@ -86,7 +98,7 @@
+ 
+     private void processSetWorldID(String sender, String world, String worldID)
+     {
+-        Configuration config  = ConfigHandler.getConfigByWorldName(world);
++        Configuration config = ConfigHandler.getConfigByWorldName(world);
+         config.setWorldID(worldID);
+         ConfigHandler.saveWorld(config, world);
+         PacketHandler.sendAllPlayersWorldID(worldID);
+@@ -104,16 +116,16 @@
+ 
+     public List<String> retrieveTabCompleteValues(String[] args)
+     {
+-
+-        if(args.length == 1)
++        if (args.length == 1)
+         {
+             return TabCompletionHelper.getListOfStringsMatchingLastWord(args, "help", "worldid");
+         }
+ 
+-        if(args.length == 2 && "worldid".equalsIgnoreCase(args[0]))
++        if (args.length == 2 && "worldid".equalsIgnoreCase(args[0]))
+         {
+             return TabCompletionHelper.getListOfStringsMatchingLastWord(args, "help", "set", "setrandom", "resync");
+         }
+         return null;
+     }
++
+ }
+Index: src/main/java/journeymap/client/task/multi/MapRegionTask.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/client/task/multi/MapRegionTask.java	(revision 9b1cb8a6fbada619939c556e0fed2d1ee2593cf3)
++++ src/main/java/journeymap/client/task/multi/MapRegionTask.java	(revision )
+@@ -35,7 +35,7 @@
+ import java.util.List;
+ 
+ /**
+- * TODO:  FIXME
++ * TODO: mem leak?
+  */
+ public class MapRegionTask extends BaseMapTask
+ {
+Index: src/main/java/journeymap/server/util/arg/StringCommandArg.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- src/main/java/journeymap/server/util/arg/StringCommandArg.java	(revision )
++++ src/main/java/journeymap/server/util/arg/StringCommandArg.java	(revision )
+@@ -0,0 +1,18 @@
++package journeymap.server.util.arg;
++
++/**
++ * String argument.
++ */
++public class StringCommandArg extends CommandArg<String>
++{
++    public StringCommandArg(String nameKey, String descriptionKey, boolean optional)
++    {
++        super(String.class, nameKey, descriptionKey, optional);
++    }
++
++    @Override
++    public String getValue(String stringValue)
++    {
++        return stringValue;
++    }
++}

@@ -9,7 +9,6 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
-import net.minecraft.block.BlockFlower;
 import net.minecraft.init.Blocks;
 
 /**
