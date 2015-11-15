@@ -25,9 +25,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
@@ -170,7 +168,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Check chunk
         ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.x >> 4, blockCoord.z >> 4));
         int y = -1;
-        if (chunkMD!=null && !chunkMD.getChunk().isEmpty())
+        if (chunkMD != null && !chunkMD.getChunk().isEmpty())
         {
             y = Math.max(1, chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
         }

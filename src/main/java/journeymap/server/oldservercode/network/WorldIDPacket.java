@@ -4,7 +4,6 @@ package journeymap.server.oldservercode.network;
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
 import journeymap.server.oldservercode.config.ConfigHandler;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -19,7 +18,9 @@ public class WorldIDPacket implements IMessage
 
     private String worldID;
 
-    public WorldIDPacket() {}
+    public WorldIDPacket()
+    {
+    }
 
     public WorldIDPacket(String worldID)
     {
@@ -41,12 +42,12 @@ public class WorldIDPacket implements IMessage
     {
         try
         {
-            if(worldID != null)
+            if (worldID != null)
             {
                 ByteBufUtils.writeUTF8String(buf, worldID);
             }
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             Journeymap.getLogger().error("[toBytes]Failed to read message: " + t);
         }
@@ -57,8 +58,10 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
-            if (ctx.side == Side.SERVER) {
-                if (ConfigHandler.getConfigByWorldName(ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID()) {
+            if (ctx.side == Side.SERVER)
+            {
+                if (ConfigHandler.getConfigByWorldName(ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
+                {
                     String worldName = ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName();
                     String worldID = ConfigHandler.getConfigByWorldName(worldName).getWorldID();
                     PacketManager.instance.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity.getName());

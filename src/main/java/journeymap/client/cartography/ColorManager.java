@@ -93,6 +93,7 @@ public class ColorManager
 
     /**
      * Get the current palette.
+     *
      * @return
      */
     public ColorPalette getCurrentPalette()

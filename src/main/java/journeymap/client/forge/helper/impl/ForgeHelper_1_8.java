@@ -283,7 +283,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     {
         String serverName = null;
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
-        if(!mc.isSingleplayer())
+        if (!mc.isSingleplayer())
         {
             try
             {
@@ -508,7 +508,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return (chunk.isChunkLoaded && !chunk.isEmpty());
 
         // 1.8
-        return (chunk!=null && chunk.isLoaded() && !(chunk instanceof EmptyChunk));
+        return (chunk != null && chunk.isLoaded() && !(chunk instanceof EmptyChunk));
     }
 
     @Override
@@ -532,19 +532,20 @@ public class ForgeHelper_1_8 implements IForgeHelper
     public String getFPS()
     {
         String fps = Minecraft.getMinecraft().debug;
-        final int idx = fps != null ? fps.indexOf('(')-1 : -1;
+        final int idx = fps != null ? fps.indexOf('(') - 1 : -1;
         if (idx > 0)
         {
             return fps.substring(0, idx);
         }
         else
         {
-           return "";
+            return "";
         }
     }
 
     /**
      * Create a world BlockPos from chunk-local coords
+     *
      * @param chunk
      * @param localX
      * @param y
@@ -553,7 +554,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
      */
     private BlockPos pos(Chunk chunk, int localX, int y, int localZ)
     {
-       return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
+        return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
     }
 
     class JmBlockAccess implements IBlockAccess
@@ -599,13 +600,14 @@ public class ForgeHelper_1_8 implements IForgeHelper
         public BiomeGenBase getBiomeGenForCoords(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
-            if (chunkMD!=null && chunkMD.hasChunk())
+            if (chunkMD != null && chunkMD.hasChunk())
             {
                 try
                 {
                     Chunk chunk = chunkMD.getChunk();
                     BiomeGenBase biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
-                    if(biome==null) {
+                    if (biome == null)
+                    {
                         return null;
                     }
                     return biome;

@@ -195,7 +195,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         BlockMD temp = chunkMd.getTopBlockMD(x, standardY + 1, z);
                         if ((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) || (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
                         {
-                            standardY+=1;
+                            standardY += 1;
                         }
                     }
 

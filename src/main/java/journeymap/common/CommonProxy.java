@@ -8,7 +8,6 @@
 
 package journeymap.common;
 
-import journeymap.common.network.WorldIDPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -23,6 +22,7 @@ public interface CommonProxy
 {
     /**
      * Initialize the side.
+     *
      * @param event
      * @throws Throwable
      */
@@ -30,6 +30,7 @@ public interface CommonProxy
 
     /**
      * Post-initialize the side.
+     *
      * @param event
      * @throws Throwable
      */
@@ -50,6 +51,7 @@ public interface CommonProxy
 
     /**
      * Handles the response when a world ID packet is received.
+     *
      * @param message
      * @param playerEntity
      */

@@ -59,7 +59,7 @@ public class Journeymap
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
     {
-        if(proxy==null)
+        if (proxy == null)
         {
             return true;
         }
@@ -71,6 +71,7 @@ public class Journeymap
 
     /**
      * Initialize the sided proxy.
+     *
      * @param event
      * @throws Throwable
      */
@@ -82,6 +83,7 @@ public class Journeymap
 
     /**
      * Post-initialize the sided proxy.
+     *
      * @param event
      * @throws Throwable
      */

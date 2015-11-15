@@ -284,7 +284,8 @@ public class MapPlayerTask extends BaseMapTask
         @Override
         public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
         {
-            if(mc.thePlayer==null) {
+            if (mc.thePlayer == null)
+            {
                 return;
             }
 

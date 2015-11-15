@@ -52,7 +52,7 @@ public class SplashInfo
             String[] parts = this.action.split("#");
             String className = parts[0];
             String action = null;
-            if(parts.length>0)
+            if (parts.length > 0)
             {
                 action = parts[1];
             }
@@ -61,21 +61,21 @@ public class SplashInfo
             {
                 Class<? extends JmUI> uiClass = (Class<? extends JmUI>) Class.forName("journeymap.client.ui." + className);
 
-                if (uiClass.equals(OptionsManager.class) && action!=null)
+                if (uiClass.equals(OptionsManager.class) && action != null)
                 {
                     Config.Category category = Config.Category.valueOf(action);
                     UIManager.getInstance().openOptionsManager(returnUi, category);
                     return;
                 }
-                else if(action!=null)
+                else if (action != null)
                 {
-                    String arg = parts.length==3 ? parts[2] : null;
+                    String arg = parts.length == 3 ? parts[2] : null;
                     Method actionMethod;
                     try
                     {
                         JmUI ui = UIManager.getInstance().open(uiClass, returnUi);
 
-                        if(arg==null)
+                        if (arg == null)
                         {
                             actionMethod = uiClass.getMethod(action);
                             actionMethod.invoke(ui);
@@ -87,7 +87,7 @@ public class SplashInfo
                         }
                         return;
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Journeymap.getLogger().warn("Couldn't perform action " + action + " on " + uiClass + ": " + e.getMessage());
                     }

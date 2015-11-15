@@ -150,7 +150,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherent light level
         float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
-        daylightDiff+=tweakBrightenDaylightDiff;
+        daylightDiff += tweakBrightenDaylightDiff;
 
         // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherent light level
         float nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
@@ -174,7 +174,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         if ((waterAbove) && waterColor != null)
         {
             // Blend day color with watercolor above, adjustBrightness for daylight filtered down
-            int adjustedWaterColor = RGB.multiply(waterColor,tweakDarkenWaterColorMultiplier);
+            int adjustedWaterColor = RGB.multiply(waterColor, tweakDarkenWaterColorMultiplier);
             int adjustedBasicColor = RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff));
             stratum.setDayColor(RGB.blendWith(adjustedBasicColor, adjustedWaterColor, tweakWaterColorBlend));
 
@@ -193,7 +193,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             stratum.setCaveColor(mapCaveLighting ? stratum.getNightColor() : stratum.getDayColor());
         }
     }
-
 
 
     /**

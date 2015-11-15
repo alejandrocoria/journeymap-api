@@ -1,7 +1,6 @@
 package journeymap.server.oldservercode.command;
 
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 
@@ -11,15 +10,18 @@ import java.util.List;
 /**
  * Created by Mysticdrew on 10/27/2014.
  */
-public class CommandJMServerForge extends CommandBase {
+public class CommandJMServerForge extends CommandBase
+{
     private CommandJourneyMapServer jmserver;
 
-    public CommandJMServerForge() {
+    public CommandJMServerForge()
+    {
         this.jmserver = new CommandJourneyMapServer();
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return "jmserver";
     }
 
@@ -45,13 +47,16 @@ public class CommandJMServerForge extends CommandBase {
     @Override
     public void execute(ICommandSender sender, String[] args) throws WrongUsageException
     {
-        if (args.length > 0) {
+        if (args.length > 0)
+        {
             jmserver.processCommand(
                     sender.getCommandSenderEntity().getName(),
                     sender.getEntityWorld().getWorldInfo().getWorldName(),
                     args);
-        } else {
-            throw  new WrongUsageException(getCommandUsage(sender));
+        }
+        else
+        {
+            throw new WrongUsageException(getCommandUsage(sender));
         }
     }
 

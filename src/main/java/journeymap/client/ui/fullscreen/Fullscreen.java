@@ -1123,7 +1123,7 @@ public class Fullscreen extends JmUI
             ChatLog.announceI18N("jm.common.ui_theme_applied");
             UIManager.getInstance().closeAll();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Journeymap.getLogger().error("Could not load Theme: " + LogFormatter.toString(e));
         }

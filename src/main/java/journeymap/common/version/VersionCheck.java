@@ -39,6 +39,7 @@ public class VersionCheck
 
     /**
      * Whether this build is the current version available.
+     *
      * @return
      */
     public static Boolean getVersionIsCurrent()
@@ -52,6 +53,7 @@ public class VersionCheck
 
     /**
      * Whether the current version available has been checked.
+     *
      * @return
      */
     public static Boolean getVersionIsChecked()
@@ -65,6 +67,7 @@ public class VersionCheck
 
     /**
      * Gets the current version available.
+     *
      * @return
      */
     public static String getVersionAvailable()
@@ -78,6 +81,7 @@ public class VersionCheck
 
     /**
      * Gets the current version available.
+     *
      * @return
      */
     public static String getDownloadUrl()
@@ -206,6 +210,7 @@ public class VersionCheck
 
     /**
      * Whether this instance's version is current (equal or newer) to one available.
+     *
      * @param thisVersionStr
      * @param availableVersionStr
      * @return

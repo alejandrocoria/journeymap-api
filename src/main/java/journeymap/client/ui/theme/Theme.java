@@ -11,10 +11,9 @@ package journeymap.client.ui.theme;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
 import journeymap.client.cartography.RGB;
+import net.minecraftforge.fml.common.FMLLog;
 
 import java.awt.*;
-
-import net.minecraftforge.fml.common.FMLLog;
 
 /**
  * Theme specification for JourneyMap 5.0

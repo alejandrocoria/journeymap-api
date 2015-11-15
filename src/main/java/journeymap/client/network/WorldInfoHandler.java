@@ -8,7 +8,6 @@
 
 package journeymap.client.network;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.WorldIDPacket;

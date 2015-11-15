@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 
 
-
 /**
  * Created by Mysticdrew on 11/19/2014.
  */

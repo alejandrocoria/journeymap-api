@@ -41,24 +41,24 @@ public class CarpentersBlocks
         {
 
             GameRegistry.UniqueIdentifier uid = blockMD.getUid();
-                if(uid.modId.equals(MODID))
+            if (uid.modId.equals(MODID))
+            {
+                if (uid.name.equals("blockCarpentersTorch"))
                 {
-                    if(uid.name.equals("blockCarpentersTorch"))
-                    {
-                        blockMD.addFlags(HasAir, NoShadow);
-                    }
-                    else if(uid.name.equals("blockCarpentersLadder"))
-                    {
-                        blockMD.addFlags(OpenToSky);
-                        blockMD.setModBlockHandler(this);
-                        return true;
-                    }
-                    else
-                    {
-                        blockMD.setModBlockHandler(this);
-                        return true;
-                    }
+                    blockMD.addFlags(HasAir, NoShadow);
                 }
+                else if (uid.name.equals("blockCarpentersLadder"))
+                {
+                    blockMD.addFlags(OpenToSky);
+                    blockMD.setModBlockHandler(this);
+                    return true;
+                }
+                else
+                {
+                    blockMD.setModBlockHandler(this);
+                    return true;
+                }
+            }
 
             return false;
         }
@@ -66,12 +66,12 @@ public class CarpentersBlocks
         /**
          * Get the block flagged with used to color the carpenter's block.
          *
-         * @param chunkMD   Containing chunk
-         * @param blockMD   CarpentersBlock flagged with SpecialHandling
-         * @param localX    x local to chunk
-         * @param y         y
-         * @param localZ    z local to chunk
-         * @return          block used to provide color
+         * @param chunkMD Containing chunk
+         * @param blockMD CarpentersBlock flagged with SpecialHandling
+         * @param localX  x local to chunk
+         * @param y       y
+         * @param localZ  z local to chunk
+         * @return block used to provide color
          */
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)

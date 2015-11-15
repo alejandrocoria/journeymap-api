@@ -5,7 +5,6 @@ package journeymap.server.oldservercode.network;
  */
 
 import journeymap.common.Journeymap;
-import journeymap.common.network.PacketHandler;
 import journeymap.server.oldservercode.util.ForgePlayerUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -33,14 +32,21 @@ public class ForgePacketHandler implements IPacketHandler
         if ((player instanceof EntityPlayerMP) && (player != null))
         {
             //Journeymap.getLogger().info(playerName + " is an EntityPlayerMP attempting to send the worldId packet");
-            try {
+            try
+            {
                 WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
-            } catch (RuntimeException rte) {
+            }
+            catch (RuntimeException rte)
+            {
                 Journeymap.getLogger().error(playerName + " is not a real player. WorldID:" + worldID + " Error: " + rte);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Journeymap.getLogger().error("Unknown Exception - PlayerName:" + playerName + " WorldID:" + worldID + " Exception " + e);
             }
-        } else {
+        }
+        else
+        {
             //Journeymap.getLogger().info(playerName + " is not an EntityPlayerMP");
         }
     }

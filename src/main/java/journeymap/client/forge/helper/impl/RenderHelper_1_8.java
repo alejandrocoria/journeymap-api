@@ -73,7 +73,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // tessellator.setColorRGBA_F(x,y,z);
 
         // 1.8
-        worldrenderer.setColorRGBA_F(r,g,b,a);
+        worldrenderer.setColorRGBA_F(r, g, b, a);
     }
 
     @Override
@@ -191,7 +191,7 @@ public class RenderHelper_1_8 implements IRenderHelper
         // GL11.glColor4f(r,g,b,a);
 
         // 1.8
-        GlStateManager.color(r,g,b,a);
+        GlStateManager.color(r, g, b, a);
     }
 
     @Override

@@ -3,7 +3,8 @@ package journeymap.server.oldservercode.network;
 /**
  * Created by Mysticdrew on 10/8/2014.
  */
-public class PermissionsPacket /*implements IMessage*/ {
+public class PermissionsPacket /*implements IMessage*/
+{
 
    /* private int radarAnimals;
     private int radarPlayers;

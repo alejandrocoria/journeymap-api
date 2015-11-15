@@ -44,11 +44,11 @@ public class Tile
     final Point lrBlock;
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
     private final Logger logger = Journeymap.getLogger();
+    private final int theHashCode;
+    private final String theCacheKey;
     int renderType = 0;
     int textureFilter = 0;
     int textureWrap = 0;
-    private final int theHashCode;
-    private final String theCacheKey;
 
     private Tile(final int tileX, final int tileZ, final int zoom)
     {

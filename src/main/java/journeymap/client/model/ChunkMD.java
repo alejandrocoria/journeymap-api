@@ -243,7 +243,7 @@ public class ChunkMD
 
     public int getWorldActualHeight()
     {
-        if(getHasNoSky())
+        if (getHasNoSky())
         {
             return getWorld().getActualHeight();
         }

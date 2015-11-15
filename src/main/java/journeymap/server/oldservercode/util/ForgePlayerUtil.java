@@ -17,6 +17,7 @@ public class ForgePlayerUtil implements IPlayerUtil
 
     /**
      * Gets the player's GameProfile by their UUID.
+     *
      * @param uuid {@Link UUID}
      * @return {@link com.mojang.authlib.GameProfile}
      */
@@ -29,6 +30,7 @@ public class ForgePlayerUtil implements IPlayerUtil
 
     /**
      * Gets the player's GameProfile by their UUID.
+     *
      * @param playerName
      * @return {@link com.mojang.authlib.GameProfile}
      */
@@ -41,13 +43,14 @@ public class ForgePlayerUtil implements IPlayerUtil
 
     /**
      * Checks the config manager to see if the user is an op or not.
+     *
      * @param playerName
      * @return boolean if the user is an op or not
      */
     public boolean isOp(String playerName)
     {
         EntityPlayerMP player = getPlayerEntityByName(playerName);
-        if (player instanceof  EntityPlayerMP)
+        if (player instanceof EntityPlayerMP)
         {
             UserListOps ops = MinecraftServer.getServer().getConfigurationManager().getOppedPlayers();
             for (String name : ops.getKeys())
@@ -63,6 +66,7 @@ public class ForgePlayerUtil implements IPlayerUtil
 
     /**
      * Gets the EntityPlayerMP by a the Player's Name.
+     *
      * @param name
      * @return {@link net.minecraft.entity.player.EntityPlayerMP}
      */
@@ -74,6 +78,7 @@ public class ForgePlayerUtil implements IPlayerUtil
 
     /**
      * Gets the EntityPlayerMP by a the Player's Name.
+     *
      * @param uuid
      * @return {@link net.minecraft.entity.player.EntityPlayerMP}
      */

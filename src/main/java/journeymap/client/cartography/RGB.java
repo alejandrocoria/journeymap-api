@@ -42,7 +42,7 @@ public final class RGB
      */
     public static boolean isBlack(int rgb)
     {
-        return rgb==BLACK_ARGB || rgb==BLACK_RGB;
+        return rgb == BLACK_ARGB || rgb == BLACK_RGB;
     }
 
     /**
@@ -50,7 +50,7 @@ public final class RGB
      */
     public static boolean isWhite(int rgb)
     {
-        return rgb==WHITE_ARGB || rgb==WHITE_RGB;
+        return rgb == WHITE_ARGB || rgb == WHITE_RGB;
     }
 
     /**
@@ -114,7 +114,7 @@ public final class RGB
 
     public static int toInteger(int[] rgb)
     {
-        return  ((0xFF) << 24) |
+        return ((0xFF) << 24) |
                 ((rgb[0] & 0xFF) << 16) |
                 ((rgb[1] & 0xFF) << 8) |
                 ((rgb[2] & 0xFF));
@@ -225,6 +225,7 @@ public final class RGB
 
     /**
      * Adjust color rgb using a multiplier
+     *
      * @param rgb
      * @param multiplier
      * @return
@@ -234,9 +235,9 @@ public final class RGB
         float[] rgbFloats = floats(rgb);
         float[] multFloats = floats(multiplier);
 
-        rgbFloats[0] = rgbFloats[0]*multFloats[0];
-        rgbFloats[1] = rgbFloats[1]*multFloats[1];
-        rgbFloats[2] = rgbFloats[2]*multFloats[2];
+        rgbFloats[0] = rgbFloats[0] * multFloats[0];
+        rgbFloats[1] = rgbFloats[1] * multFloats[1];
+        rgbFloats[2] = rgbFloats[2] * multFloats[2];
 
         return toInteger(rgbFloats);
     }

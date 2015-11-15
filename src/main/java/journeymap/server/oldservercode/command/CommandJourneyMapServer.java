@@ -21,7 +21,8 @@ public class CommandJourneyMapServer
     public void processCommand(String sender, String world, String[] args)
     {
         String s = args[0].toLowerCase();
-        if (s.equals("worldid")) {
+        if (s.equals("worldid"))
+        {
             if (ConfigHandler.getConfigByWorldName(world).isUsingWorldID())
             {
                 processWorldID(sender, world, args);
@@ -86,7 +87,7 @@ public class CommandJourneyMapServer
 
     private void processSetWorldID(String sender, String world, String worldID)
     {
-        Configuration config  = ConfigHandler.getConfigByWorldName(world);
+        Configuration config = ConfigHandler.getConfigByWorldName(world);
         config.setWorldID(worldID);
         ConfigHandler.saveWorld(config, world);
         PacketHandler.sendAllPlayersWorldID(worldID);
@@ -105,12 +106,12 @@ public class CommandJourneyMapServer
     public List<String> retrieveTabCompleteValues(String[] args)
     {
 
-        if(args.length == 1)
+        if (args.length == 1)
         {
             return TabCompletionHelper.getListOfStringsMatchingLastWord(args, "help", "worldid");
         }
 
-        if(args.length == 2 && "worldid".equalsIgnoreCase(args[0]))
+        if (args.length == 2 && "worldid".equalsIgnoreCase(args[0]))
         {
             return TabCompletionHelper.getListOfStringsMatchingLastWord(args, "help", "set", "setrandom", "resync");
         }
