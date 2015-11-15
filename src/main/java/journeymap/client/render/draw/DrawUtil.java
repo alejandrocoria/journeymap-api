@@ -267,18 +267,18 @@ public class DrawUtil
     {
         GL11.glPushMatrix();
 
-        if (blend)
+        try
         {
-            renderHelper.glEnableBlend();
-            renderHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
-        }
+            if (blend)
+            {
+                renderHelper.glEnableBlend();
+                renderHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
+            }
 
-        renderHelper.glEnableTexture2D();
-        renderHelper.glBindTexture(texture.getGlTextureId());
+            renderHelper.glEnableTexture2D();
+            renderHelper.glBindTexture(texture.getGlTextureId());
 
-        if (blend)
-        {
-            if (color != null)
+            if (blend && color != null)
             {
                 float[] c = color.getColorComponents(null);
                 renderHelper.glColor4f(c[0], c[1], c[2], alpha);
@@ -287,50 +287,53 @@ public class DrawUtil
             {
                 renderHelper.glColor4f(1, 1, 1, alpha);
             }
-        }
 
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
-        int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
+            int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
 
-        if (rotation != 0)
-        {
-            double transX = x + (width / 2);
-            double transY = y + (height / 2);
-
-            // Move origin to center of texture
-            GL11.glTranslated(transX, transY, 0);
-
-            // Rotatate around origin
-            GL11.glRotated(rotation, 0, 0, 1.0f);
-
-            // Return origin
-            GL11.glTranslated(-transX, -transY, 0);
-        }
-
-        final int direction = flip ? -1 : 1;
-
-        renderHelper.startDrawingQuads();
-        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
-        renderHelper.addVertexWithUV(x + width, y, zLevel, direction, 0);
-        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
-        renderHelper.draw();
-
-        // Ensure normal alpha blending afterward, just in case
-        if (blend)
-        {
-            if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
+            if (rotation != 0)
             {
-                renderHelper.glEnableBlend();
-                renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                double transX = x + (width / 2);
+                double transY = y + (height / 2);
+
+                // Move origin to center of texture
+                GL11.glTranslated(transX, transY, 0);
+
+                // Rotatate around origin
+                GL11.glRotated(rotation, 0, 0, 1.0f);
+
+                // Return origin
+                GL11.glTranslated(-transX, -transY, 0);
+            }
+
+            final int direction = flip ? -1 : 1;
+
+            renderHelper.startDrawingQuads();
+            renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
+            renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
+            renderHelper.addVertexWithUV(x + width, y, zLevel, direction, 0);
+            renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+            renderHelper.draw();
+
+            // Ensure normal alpha blending afterward, just in case
+            if (blend)
+            {
+                renderHelper.glColor4f(1, 1, 1, 1);
+                if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
+                {
+                    renderHelper.glEnableBlend();
+                    renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                }
             }
         }
-
-        GL11.glPopMatrix();
+        finally
+        {
+            GL11.glPopMatrix();
+        }
     }
 
     public static void drawRectangle(double x, double y, double width, double height, Color color, int alpha)
