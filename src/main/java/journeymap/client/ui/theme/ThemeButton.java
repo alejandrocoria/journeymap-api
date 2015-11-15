@@ -9,6 +9,7 @@
 package journeymap.client.ui.theme;
 
 import journeymap.client.Constants;
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
@@ -18,7 +19,6 @@ import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,10 +34,10 @@ public class ThemeButton extends BooleanPropertyButton
     protected TextureImpl textureOff;
     protected TextureImpl textureDisabled;
     protected TextureImpl textureIcon;
-    protected Color iconOnColor;
-    protected Color iconOffColor;
-    protected Color iconHoverColor;
-    protected Color iconDisabledColor;
+    protected Integer iconOnColor;
+    protected Integer iconOffColor;
+    protected Integer iconHoverColor;
+    protected Integer iconDisabledColor;
     protected String iconName;
     protected List<String> additionalTooltips;
 
@@ -132,7 +132,7 @@ public class ThemeButton extends BooleanPropertyButton
         }
     }
 
-    protected Color getIconColor(boolean isMouseOver)
+    protected Integer getIconColor(boolean isMouseOver)
     {
         if (!isEnabled())
         {
@@ -198,10 +198,10 @@ public class ThemeButton extends BooleanPropertyButton
 
         if (!buttonSpec.useThemeImages)
         {
-            DrawUtil.drawColoredImage(textureIcon, 255, Color.black, drawX + .5, drawY + .5, iconScale, 0);
+            DrawUtil.drawColoredImage(textureIcon, 255, RGB.BLACK_RGB, drawX + .5, drawY + .5, iconScale, 0);
         }
 
-        Color iconColor = getIconColor(isMouseOver);
+        Integer iconColor = getIconColor(isMouseOver);
         DrawUtil.drawColoredImage(textureIcon, 255, iconColor, drawX, drawY, iconScale, 0);
     }
 

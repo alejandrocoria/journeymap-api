@@ -58,8 +58,8 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,9 +87,9 @@ public class Fullscreen extends JmUI
     ThemeButton buttonTheme, buttonWaypointManager;
     ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
     ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
-    Color bgColor = new Color(0x22, 0x22, 0x22);
-    Color statusForegroundColor;
-    Color statusBackgroundColor;
+    Integer bgColor = 0x222222;
+    Integer statusForegroundColor;
+    Integer statusBackgroundColor;
     int statusForegroundAlpha;
     int statusBackgroundAlpha;
     StatTimer drawScreenTimer = StatTimer.get("Fullscreen.drawScreen");

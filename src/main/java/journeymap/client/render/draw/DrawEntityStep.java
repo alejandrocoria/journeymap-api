@@ -10,6 +10,7 @@ package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.map.GridRenderer;
@@ -20,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.lang.ref.WeakReference;
 
@@ -29,10 +29,11 @@ import java.lang.ref.WeakReference;
  */
 public class DrawEntityStep implements DrawStep
 {
-    static final Color labelBg = Color.black;
+    static final Integer labelBg = RGB.BLACK_RGB;
     static final int labelBgAlpha = 180;
-    static final Color labelFg = Color.white;
+    static final Integer labelFg = RGB.WHITE_RGB;
     static final int labelFgAlpha = 225;
+
     boolean hideSneaks = JourneymapClient.getCoreProperties().hideSneakingEntities.get();
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
@@ -121,12 +122,12 @@ public class DrawEntityStep implements DrawStep
         Team team = entityLiving.getTeam();
         if (team == null || !(entityLiving instanceof EntityPlayer))
         {
-            DrawUtil.drawLabel(ForgeHelper.INSTANCE.getEntityName(entityLiving), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.green, 255, fontScale, false, rotation);
+            DrawUtil.drawLabel(ForgeHelper.INSTANCE.getEntityName(entityLiving), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 205, RGB.GREEN_RGB, 255, fontScale, false, rotation);
         }
         else
         {
             String playerName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), ForgeHelper.INSTANCE.getEntityName(entityLiving));
-            DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, Color.black, 205, Color.white, 255, fontScale, false, rotation);
+            DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 205, RGB.WHITE_RGB, 255, fontScale, false, rotation);
         }
     }
 
@@ -150,7 +151,7 @@ public class DrawEntityStep implements DrawStep
         if (customName != null)
         {
             Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
-            DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, Color.white, labelFgAlpha, fontScale, rotation);
+            DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, RGB.WHITE_RGB, labelFgAlpha, fontScale, rotation);
         }
 
         if (texture != null)

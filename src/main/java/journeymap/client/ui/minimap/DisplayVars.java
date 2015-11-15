@@ -8,6 +8,7 @@
 
 package journeymap.client.ui.minimap;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
@@ -23,7 +24,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
@@ -365,19 +365,19 @@ public class DisplayVars
         private int scale = 4;
         private MapType mapType;
         private String name;
-        private Color color;
+        private Integer color;
 
         MapPresetStatus(MapType mapType, int miniMapId)
         {
             this.miniMapId = miniMapId;
             this.mapType = mapType;
-            this.color = Color.white;
+            this.color = RGB.WHITE_RGB;
             this.name = Integer.toString(miniMapId);
         }
 
         void draw(Point2D.Double mapCenter, int alpha, double rotation)
         {
-            DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, Color.black, 0, color, alpha, scale, true, rotation);
+            DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, color, alpha, scale, true, rotation);
         }
 
     }
@@ -390,8 +390,8 @@ public class DisplayVars
         private MapType mapType;
         private String name;
         private TextureImpl tex;
-        private Color color;
-        private Color opposite;
+        private Integer color;
+        private Integer opposite;
         private double x;
         private double y;
         private float bgScale;
@@ -402,8 +402,8 @@ public class DisplayVars
             this.mapType = mapType;
             name = mapType.isUnderground() ? "caves" : mapType.name();
             tex = TextureCache.instance().getThemeTexture(theme, String.format("icon/%s.png", name));
-            color = Color.white;
-            opposite = Color.darkGray;
+            color = RGB.WHITE_RGB;
+            opposite = RGB.DARK_GRAY_RGB;
             bgScale = 1.15f;
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }

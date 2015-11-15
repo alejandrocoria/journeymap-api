@@ -8,13 +8,13 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -44,7 +44,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
         this.property = property;
         this.properties = properties;
         setValue(property.get());
-        super.disabledLabelColor = Color.darkGray;
+        super.disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
     /**
@@ -79,7 +79,6 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
 
             if (this.isEnabled() || this.dragging)
             {
-
                 renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
                 double sliderValue = getSliderValue();

@@ -29,17 +29,17 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 {
     protected static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
-    protected Color smallFrameColorLight = new Color(160, 160, 160);
-    protected Color smallFrameColorDark = new Color(120, 120, 120);
-    protected Color smallBgColor = new Color(100, 100, 100);
-    protected Color smallBgHoverColor = new Color(125, 135, 190);
-    protected Color smallBgHoverColor2 = new Color(100, 100, 100);
+    protected Integer smallFrameColorLight = new Color(160, 160, 160).getRGB();
+    protected Integer smallFrameColorDark = new Color(120, 120, 120).getRGB();
+    protected Integer smallBgColor = new Color(100, 100, 100).getRGB();
+    protected Integer smallBgHoverColor = new Color(125, 135, 190).getRGB();
+    protected Integer smallBgHoverColor2 = new Color(100, 100, 100).getRGB();
 
-    protected Color labelColor;
-    protected Color hoverLabelColor;
-    protected Color disabledLabelColor;
+    protected Integer labelColor;
+    protected Integer hoverLabelColor;
+    protected Integer disabledLabelColor;
 
-    protected Color disabledBgColor = Color.darkGray;
+    protected Integer disabledBgColor = Color.darkGray.getRGB();
 
     //protected boolean enabled;
     protected boolean drawFrame;
@@ -66,9 +66,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void resetLabelColors()
     {
-        labelColor = new Color(14737632);
-        hoverLabelColor = new Color(16777120);
-        disabledLabelColor = Color.lightGray;
+        labelColor = new Color(14737632).getRGB();
+        hoverLabelColor = new Color(16777120).getRGB();
+        disabledLabelColor = Color.lightGray.getRGB();
     }
 
     protected void finishInit()
@@ -200,7 +200,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
-            Color varLabelColor = labelColor;
+            Integer varLabelColor = labelColor;
 
             if (!this.isEnabled())
             {
@@ -225,7 +225,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 }
                 else if (packedFGColour != 0)
                 {
-                    varLabelColor = new Color(packedFGColour);
+                    varLabelColor = packedFGColour;
                 }
             }
 
@@ -312,16 +312,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return width;
     }
 
+    public void setWidth(int width)
+    {
+        this.width = width;
+    }
+
     @Override
     public void setScrollableWidth(int width)
     {
         setWidth(width);
-    }
-
-    @Override
-    public void setWidth(int width)
-    {
-        super.setWidth(width);
     }
 
     public int getHeight()
@@ -573,7 +572,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return false;
     }
 
-    public void setBackgroundColors(Color smallBgColor, Color smallBgHoverColor, Color smallBgHoverColor2)
+    public void setBackgroundColors(Integer smallBgColor, Integer smallBgHoverColor, Integer smallBgHoverColor2)
     {
         this.smallBgColor = smallBgColor;
         this.smallBgHoverColor = smallBgHoverColor;
@@ -585,10 +584,10 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.drawLabelShadow = draw;
     }
 
-    public void setLabelColors(Color labelColor, Color hoverLabelColor, Color disabledLabelColor)
+    public void setLabelColors(Integer labelColor, Integer hoverLabelColor, Integer disabledLabelColor)
     {
         this.labelColor = labelColor;
-        packedFGColour = labelColor.getRGB();
+        packedFGColour = labelColor;
         if (hoverLabelColor != null)
         {
             this.hoverLabelColor = hoverLabelColor;
@@ -603,7 +602,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
     }
 
-    public Color getLabelColor()
+    public Integer getLabelColor()
     {
         return labelColor;
     }

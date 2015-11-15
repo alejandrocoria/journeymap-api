@@ -9,6 +9,7 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -29,10 +30,8 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
-import java.util.List;
 
 /**
  * Waypoint selection/creation.
@@ -205,7 +204,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     private void select(Waypoint waypoint)
     {
         selected = waypoint;
-        selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), Color.white, true);
+        selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), RGB.WHITE_RGB, true);
         drawStepList.add(selectedWaypointStep);
     }
 
@@ -255,17 +254,17 @@ public class WaypointLayer implements LayerDelegate.Layer
             pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
             if (gridRenderer.isOnScreen(pixel))
             {
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - (thick * thick), size + (thick * 4), thick, Color.black, 150);
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() - thick, size + (thick * thick), thick, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() - thick, size + (thick * thick), thick, RGB.WHITE_RGB, 255);
 
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - thick, thick, size + (thick * thick), Color.black, 150);
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY(), thick, size, Color.white, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY(), thick, size, RGB.WHITE_RGB, 255);
 
-                DrawUtil.drawRectangle(pixel.getX() + size, pixel.getY(), thick, size, Color.white, 255);
-                DrawUtil.drawRectangle(pixel.getX() + size + thick, pixel.getY() - thick, thick, size + (thick * thick), Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() + size, pixel.getY(), thick, size, RGB.WHITE_RGB, 255);
+                DrawUtil.drawRectangle(pixel.getX() + size + thick, pixel.getY() - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
 
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() + size, size + (thick * thick), thick, Color.white, 255);
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() + size + thick, size + (thick * 4), thick, Color.black, 150);
+                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() + size, size + (thick * thick), thick, RGB.WHITE_RGB, 255);
+                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, 150);
             }
         }
     }

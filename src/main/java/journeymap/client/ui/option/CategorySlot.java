@@ -9,6 +9,7 @@
 package journeymap.client.ui.option;
 
 import journeymap.client.Constants;
+import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
@@ -16,9 +17,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ScrollListPane;
 import net.minecraft.client.Minecraft;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  *
@@ -205,8 +204,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setHeight(slotHeight);
         button.drawButton(mc, mouseX, mouseY);
 
-        DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, Color.black, 50);
-        DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, Color.black, 0, button.getLabelColor(), 255, 1, true);
+        DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, RGB.BLACK_RGB, 50);
+        DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 0, button.getLabelColor(), 255, 1, true);
 
         if (masterSlot != null && selected)
         {

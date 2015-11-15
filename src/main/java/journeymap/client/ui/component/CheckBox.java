@@ -8,13 +8,13 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -71,11 +71,11 @@ public class CheckBox extends BooleanPropertyButton
             }
             else if (!isEnabled())
             {
-                color = Color.DARK_GRAY.getRGB();
+                color = RGB.DARK_GRAY_RGB;
             }
             else if (labelColor != null)
             {
-                color = labelColor.getRGB();
+                color = labelColor;
             }
             else if (packedFGColour != 0)
             {
