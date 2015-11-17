@@ -30,6 +30,7 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
@@ -145,7 +146,7 @@ public class MiniMap
     {
         StatTimer timer = drawTimer;
 
-        boolean unicodeForced = false;
+        RenderHelper.disableStandardItemLighting();
 
         try
         {
