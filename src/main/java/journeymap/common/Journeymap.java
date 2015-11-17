@@ -44,7 +44,7 @@ public class Journeymap
     public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 1, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String WEBSITE_URL = "http://journeymap.info/";
-    public static final String DOWNLOAD_URL = WEBSITE_URL + "download";
+    public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";
     public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap-32274.json";
 
     @Mod.Instance(Journeymap.MOD_ID)
