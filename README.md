@@ -14,7 +14,9 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
 ```
-    git fetch && git checkout 5.1.1_1.8 https://USERNAME@bitbucket.org/TeamJM/journeymap.git journeymap
+    git clone https://techbrew@bitbucket.org/TeamJM/journeymap.git
+    cd journeymap
+    git fetch && git checkout 5.1.1_1.8
 ```
 
 ### 2. Setup JourneyMap with Forge for IntelliJ IDEA
