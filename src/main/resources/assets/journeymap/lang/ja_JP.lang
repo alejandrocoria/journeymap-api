@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.1.1 Resource Bundle - ja_JP
+﻿﻿### JourneyMap 5.1.1 Resource Bundle - ja_JP
 ### Notes for translators:
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
@@ -20,31 +20,6 @@ jm.advanced.cache_villagers=村人をチェックする間隔
 jm.advanced.cache_villagers.tooltip=村人の場所をチェックする間隔をミリ秒で指定します。低い値を設定すると動作が重くなります。
 jm.advanced.checkupdates=JourneyMapの更新を確認する
 jm.advanced.checkupdates.tooltip=OFFにすると、新しいバージョンがリリースされても通知されなくなります。
-jm.common.alwaysmapcaves=常に洞窟用マップを表示
-jm.common.alwaysmapcaves.tooltip=地表にいる時でも洞窟用マップを表示します。チェックを外したほうが動作が軽くなります。
-jm.common.alwaysmapsurface=常に地表のマップを表示
-jm.common.alwaysmapsurface.tooltip=地下にいる時でも地表のマップを表示します。チェックを外したほうが動作が軽くなります。
-jm.common.renderstats=現在: %1$s (%2$s + %3$s) チャンクが%4$sミリ秒で更新中(平均 %5$s ミリ秒)
-jm.common.renderstats.title=描画についての最新の統計
-jm.common.renderstats.tooltip=全てのチャンク = (最小描画距離内の全チャンク + 最大描画距離内のいくつかのチャンク)です。あなたの周りの地形と、「地図内の表示の設定」によってこの値は著しく変化します。
-jm.common.renderstats_debug_cave=洞窟: %1$s (%2$s) + %3$s (%4$s) = %5$s チャンクが %6$s ミリ秒かけて更新されています (平均 %7$s ミリ秒)
-jm.common.renderstats_debug_cave_simple=洞窟: %1$s = %2$s チャンク が %3$s ミリ秒かけて更新されています(平均 %4$s ミリ秒)
-jm.common.renderstats_debug_surface=地表: %1$s (%2$s) + %3$s (%4$s) = %5$s チャンクが %6$s ミリ秒かけて更新されています (平均 %7$s ミリ秒)
-jm.common.renderstats_debug_surface_simple=地表: %1$s = %2$s チャンクが %3$s ミリ秒かけて更新されています (平均 %4$s ミリ秒)
-jm.common.renderdistance_cave_min=洞窟の最小描画距離
-jm.common.renderdistance_cave_min.tooltip=地下や空のないディメンションで、常にマップを更新し続ける半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
-jm.common.renderdistance_cave_max=洞窟の最大描画距離
-jm.common.renderdistance_cave_max.tooltip=地下や空のないディメンションで、マップを更新する最大の半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
-jm.common.renderdistance_surface_min=地表の最小描画距離
-jm.common.renderdistance_surface_min.tooltip=地上や空のあるディメンションで、常にマップを更新し続ける半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
-jm.common.renderdistance_surface_max=地表の最大描画距離
-jm.common.renderdistance_surface_max.tooltip=地上や空のあるディメンションで、マップを更新する最大の半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
-jm.common.renderdelay=描画の遅延
-jm.common.renderdelay.tooltip=指定した秒数、マップの描画が遅れます。長い秒数を指定すれば動作が軽くなりますが、マップが更新されにくくなります。
-jm.common.revealshape=マップを生成する範囲の形
-jm.common.revealshape.tooltip=プレイヤーの周囲の、マップを描画していく範囲の形です。円形のほうが動作が軽くなります。
-jm.common.tile_display_quality=細かい描画
-jm.common.tile_display_quality.tooltip=ミニマップの回転を「プレイヤーが向いている方向」にすることをおすすめします。チェックを外すとズームの速度やメモリの使用量が改善されます。 既にセーブされているマップに影響はありません。
 jm.advanced.loglevel=ログとして記録する情報
 jm.advanced.loglevel.tooltip=注意! ログの情報量を多くすればパフォーマンスに影響が出ます。 特に理由のない場合はデフォルトのままにしてください。
 jm.advanced.port=ウェブサーバーのポート
@@ -65,6 +40,10 @@ jm.colorpalette.file_title=JourneyMap カラーパレット
 jm.colorpalette.mods=MOD
 jm.colorpalette.resource_packs=リソースパック
 jm.common.actions=各種機能
+jm.common.alwaysmapcaves=常に洞窟用マップを表示
+jm.common.alwaysmapcaves.tooltip=地表にいる時でも洞窟用マップを表示します。チェックを外したほうが動作が軽くなります。
+jm.common.alwaysmapsurface=常に地表のマップを表示
+jm.common.alwaysmapsurface.tooltip=地下にいる時でも地表のマップを表示します。チェックを外したほうが動作が軽くなります。
 jm.common.automap_complete=地表のマップ自動生成が完了しました。
 jm.common.automap_complete_underground=%1$sの自動マップ生成が完了しました。
 jm.common.automap_dialog=自動マップ生成
@@ -81,19 +60,19 @@ jm.common.close=閉じる
 jm.common.day=昼
 jm.common.deletemap_dialog=マップを削除
 jm.common.deletemap_dialog_all=全てのディメンション
-jm.common.deletemap_dialog_this=このディメンション
 jm.common.deletemap_dialog_text=全てのディメンション、またはこのディメンションだけ削除しますか?
-jm.common.deletemap_text=1つ以上のディメンションのマップを削除します
+jm.common.deletemap_dialog_this=このディメンション
 jm.common.deletemap_status_done=マップが削除されました。
 jm.common.deletemap_status_error=マップを削除できませんでした。journeymap.logを開いて詳細をご確認下さい。
+jm.common.deletemap_text=1つ以上のディメンションのマップを削除します
 jm.common.deletemap_title=マップを削除
 jm.common.dimension=ディメンション %1$s
 jm.common.disabled_feature=機能が使えません
 jm.common.enable=有効
-jm.common.enable_mapping_true=マップ生成を有効化
 jm.common.enable_mapping_false=マップ生成を無効化
-jm.common.enable_mapping_true_text=マップの生成を有効にしました。.
 jm.common.enable_mapping_false_text=マップの生成を無効にしました。
+jm.common.enable_mapping_true=マップ生成を有効化
+jm.common.enable_mapping_true_text=マップの生成を有効にしました。.
 jm.common.file_updates=ファイルを更新しています。(%1$s) マップ生成を中断しました。
 jm.common.file_updates_complete=ファイルの更新が終わりました。マップ生成を再開しました。
 jm.common.font_scale=文字の大きさ
@@ -101,11 +80,11 @@ jm.common.font_scale.tooltip=ボタンとテキストの文字の大きさを設
 jm.common.grid_edit=グリッドを編集...
 jm.common.grid_edit.tooltip=全マップのグリッドの表示を設定します
 jm.common.grid_editor=グリッドエディター
+jm.common.grid_opacity=透明度
 jm.common.grid_style=スタイル
 jm.common.grid_style_checkers=チェック模様
 jm.common.grid_style_dots=ドット模様
 jm.common.grid_style_squares=四角
-jm.common.grid_opacity=透明度
 jm.common.help=ヘルプ...
 jm.common.hide_buttons=ボタンを非表示に
 jm.common.hotkeys=ショートカットキー...
@@ -177,6 +156,25 @@ jm.common.radar_max_villagers.tooltip=マップ上に表示する最大の村人
 jm.common.radar_vertical_distance=縦方向のレーダーの探知距離
 jm.common.radar_vertical_distance.tooltip=エンティティを探知する縦方向(上下)の範囲をブロック数で指定します。大きい値を指定すると大きなラグが発生します。
 jm.common.ready=§e%1$s が準備完了しました。
+jm.common.renderdelay=描画の遅延
+jm.common.renderdelay.tooltip=指定した秒数、マップの描画が遅れます。長い秒数を指定すれば動作が軽くなりますが、マップが更新されにくくなります。
+jm.common.renderdistance_cave_max=洞窟の最大描画距離
+jm.common.renderdistance_cave_max.tooltip=地下や空のないディメンションで、マップを更新する最大の半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
+jm.common.renderdistance_cave_min=洞窟の最小描画距離
+jm.common.renderdistance_cave_min.tooltip=地下や空のないディメンションで、常にマップを更新し続ける半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
+jm.common.renderdistance_surface_max=地表の最大描画距離
+jm.common.renderdistance_surface_max.tooltip=地上や空のあるディメンションで、マップを更新する最大の半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
+jm.common.renderdistance_surface_min=地表の最小描画距離
+jm.common.renderdistance_surface_min.tooltip=地上や空のあるディメンションで、常にマップを更新し続ける半径をチャンク数で指定します。低い値のほうが動作が軽くなります。マイクラ自体の描画距離より大きな値は効果がありません。
+jm.common.renderstats=現在: %1$s (%2$s + %3$s) チャンクが%4$sミリ秒で更新中(平均 %5$s ミリ秒)
+jm.common.renderstats.title=描画についての最新の統計
+jm.common.renderstats.tooltip=全てのチャンク = (最小描画距離内の全チャンク + 最大描画距離内のいくつかのチャンク)です。あなたの周りの地形と、「地図内の表示の設定」によってこの値は著しく変化します。
+jm.common.renderstats_debug_cave=洞窟: %1$s (%2$s) + %3$s (%4$s) = %5$s チャンクが %6$s ミリ秒かけて更新されています (平均 %7$s ミリ秒)
+jm.common.renderstats_debug_cave_simple=洞窟: %1$s = %2$s チャンク が %3$s ミリ秒かけて更新されています(平均 %4$s ミリ秒)
+jm.common.renderstats_debug_surface=地表: %1$s (%2$s) + %3$s (%4$s) = %5$s チャンクが %6$s ミリ秒かけて更新されています (平均 %7$s ミリ秒)
+jm.common.renderstats_debug_surface_simple=地表: %1$s = %2$s チャンクが %3$s ミリ秒かけて更新されています (平均 %4$s ミリ秒)
+jm.common.revealshape=マップを生成する範囲の形
+jm.common.revealshape.tooltip=プレイヤーの周囲の、マップを描画していく範囲の形です。円形のほうが動作が軽くなります。
 jm.common.save_filename=マップをスクリーンショットとして保存しました: %1$s
 jm.common.save_map=マップを画像化
 jm.common.saving_map_to_file=%1$s のマップをセーブしています...
@@ -203,17 +201,19 @@ jm.common.show_waypoints.tooltip=近くのウェイポイントをマップに�
 jm.common.splash_about=JourneyMapについて...
 jm.common.splash_action=クリックで開く
 jm.common.splash_developer=開発者
-jm.common.splash_tester=テスター
-jm.common.splash_patreon=Patreon
 jm.common.splash_friend=友人
-jm.common.splash_walloffame=Wall of Fame
+jm.common.splash_patreon=Patreon
+jm.common.splash_tester=テスター
 jm.common.splash_title=JourneyMap %1$s について
+jm.common.splash_walloffame=Wall of Fame
 jm.common.splash_whatisnew=新機能
+jm.common.tile_display_quality=細かい描画
+jm.common.tile_display_quality.tooltip=ミニマップの回転を「プレイヤーが向いている方向」にすることをおすすめします。チェックを外すとズームの速度やメモリの使用量が改善されます。 既にセーブされているマップに影響はありません。
 jm.common.ui_theme=UIのテーマ
-jm.common.ui_theme.tooltip=テーマでミニマップや全画面マップの見た目を変更できます
+jm.common.ui_theme.tooltip=テーマでミニマップや全画面マップの見た目を変更することができます
+jm.common.ui_theme_applied=UIテーマは当てはまりました。§bOptionsに行くMiniMap外観をカスタマイズするMiniMapがプリセットされました#§f。
 jm.common.ui_theme_author=作者: §b%1$s§f
 jm.common.ui_theme_name=テーマ名: §b%1$s§f
-jm.common.ui_theme_applied=UIテーマは当てはまりました。§bOptionsに行くMiniMap外観をカスタマイズするMiniMapがプリセットされました#§f。
 jm.common.update_available=新しいアップデートがあります!
 jm.common.update_check=アップデートを確認
 jm.common.use_browser=ブラウザでマップを表示
@@ -224,7 +224,7 @@ jm.config.category.advanced=高度な設定
 jm.config.category.advanced.tooltip=注意! これらの値を変更することで重大な問題が発生したりクラッシュしたりする可能性があります。
 jm.config.category.cartography=地図内の表示の設定
 jm.config.category.cartography.tooltip=生成されるマップの細かい表示についての設定です
-jm.config.category.fullmap=全画面マップ
+jm.config.category.fullmap=フルスクリーンマップ
 jm.config.category.fullmap.tooltip=全画面マップの見た目を設定します。
 jm.config.category.minimap=ミニマッププリセット 1
 jm.config.category.minimap.tooltip=ミニマッププリセット 1の見た目を設定します。 ('￥'キーでプリセットを切り替えられます)

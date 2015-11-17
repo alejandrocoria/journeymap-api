@@ -1,4 +1,4 @@
-### JourneyMap 5.1.0 Resource Bundle - fi_FI
+### JourneyMap 5.1.1 Resource Bundle - fi_FI
 ### JourneyMap Finnish translation version 1.1.1 (5.6.2015) by techbrew, 1.1.0 by Appelsiini1
 jm.advanced.announcemod=Ilmoita modi
 jm.advanced.announcemod.tooltip=Ilmoittaa keskusteluikkunassa, että JourneyMap on valmiina.
@@ -18,31 +18,6 @@ jm.advanced.cache_villagers=Kyläläisten välimuisti
 jm.advanced.cache_villagers.tooltip=Tutkadatan hankkimisen kesto (millisekunneissa) ennenkuin uusia kyläläisiä etsitään. Pienemmät arvot voivat vähentää suorituskykyä.
 jm.advanced.checkupdates=Hae päivityksiä modille
 jm.advanced.checkupdates.tooltip=Tämän ottaminen pois päältä tarkoittaa sitä, että et saa ilmoituksia, kun uusi versio JourneyMap:ista on saatavilla.
-jm.common.alwaysmapcaves=Aina kartoita luolat
-jm.common.alwaysmapcaves.tooltip=Aina kartoita luolat pystysuorassa chunkissasi (siivu), vaikka olisit Overworldin pinnalla. Ominaisuuden käytöstä poistaminen parantaa suorityskykyä.
-jm.common.alwaysmapsurface=Aina kartoita maanpinta
-jm.common.alwaysmapsurface.tooltip=Aina kartoita Overworldin pinta, vaikka olisit maan alla. Ominaisuuden käytöstä poistaminen parantaa suorityskykyä.
-jm.common.renderstats=Uusin: %1$s (%2$s + %3$s) chunks in %4$sms (avg %5$sms)
-jm.common.renderstats.title=Tilastot uusimmasta renderöinnistä.
-jm.common.renderstats.tooltip=Chunkit yhteensä = (Kaikki chunkit Min matkalla + Jotkin chunkit Max matkalla). Pinnanmuodot ympärilläsi ja kartografia-asetukset jotka valitset muuttavat merkittävästi näitä numeroita.
-jm.common.renderstats_debug_cave=Luolat: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
-jm.common.renderstats_debug_cave_simple=Luolat: %1$s = %2$s chunks in %3$sms (avg %4$sms)
-jm.common.renderstats_debug_surface=Pinta: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
-jm.common.renderstats_debug_surface_simple=Pinta: %1$s = %2$s chunks in %3$sms (avg %4$sms)
-jm.common.renderdistance_cave_min=Luolien Min matka
-jm.common.renderdistance_cave_min.tooltip=Ympärilläsi olevat palat, jotka kartoitetaan aina kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
-jm.common.renderdistance_cave_max=Luolien Max matka
-jm.common.renderdistance_cave_max.tooltip=Ympärilläsi olevat palat, jotka kartoitetaan aina kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
-jm.common.renderdistance_surface_min=Pinnan Min matka
-jm.common.renderdistance_surface_min.tooltip=Ympärilläsi olevat palat, jotka lopulta kartoitetaan kun olet maanpinnalla ulottuvuuksissa joissa on taivas. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
-jm.common.renderdistance_surface_max=Pinnan Max matka
-jm.common.renderdistance_surface_max.tooltip=Ympärilläsi olevat palat, jotka lopulta kartoitetaan kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
-jm.common.renderdelay=Piirtoviive
-jm.common.renderdelay.tooltip=Aika (sekunneisa) piirtokertojen välissä. Suuremmat arvot voivat parantaa suorityskykyä, mutta voi johtaa kadotettuihin paloihin matkustaessa.
-jm.common.revealshape=Paljastuksen muoto
-jm.common.revealshape.tooltip=Ympärilläsi olevan alueen kartan muoto. Ympyrä näyttää vähemmän paloja kuin kuutio ja voi parantaa suorityskykyä.
-jm.common.tile_display_quality=Suuri näyttölaatu
-jm.common.tile_display_quality.tooltip=Suositellaan käyttämään "Oma asetus" karttasuuntauksella. Poista valinta parantaaksesi suurennuksen suorityskykyä ja muistin käyttöä. Ei vaikuta kuvien laatuun.
 jm.advanced.loglevel=Lokiin kirjaamisen taso
 jm.advanced.loglevel.tooltip=Varoitus! Jotkin lokiin kirjaamisen tasot vähentävät suorituskykyä. Pidä oletuksena ellei toisin ohjeisteta.
 jm.advanced.port=Web Serverin portti
@@ -63,6 +38,10 @@ jm.colorpalette.file_title=JourneyMap väripaletti
 jm.colorpalette.mods=Modit
 jm.colorpalette.resource_packs=Resurssipaketit
 jm.common.actions=Toiminnot
+jm.common.alwaysmapcaves=Aina kartoita luolat
+jm.common.alwaysmapcaves.tooltip=Aina kartoita luolat pystysuorassa chunkissasi (siivu), vaikka olisit Overworldin pinnalla. Ominaisuuden käytöstä poistaminen parantaa suorityskykyä.
+jm.common.alwaysmapsurface=Aina kartoita maanpinta
+jm.common.alwaysmapsurface.tooltip=Aina kartoita Overworldin pinta, vaikka olisit maan alla. Ominaisuuden käytöstä poistaminen parantaa suorityskykyä.
 jm.common.automap_complete=Automaattinen pinnan kartoitus on pysähtynyt.
 jm.common.automap_complete_underground=Siivun automaattinen kartoitus %1$s on pysähtynyt.
 jm.common.automap_dialog=Kartoita automaattisesti
@@ -77,24 +56,21 @@ jm.common.automap_title=Automaattinen kartoitus...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Sulje
 jm.common.day=Päivä
-
 jm.common.deletemap_dialog=Poista kartta...
 jm.common.deletemap_dialog_all=Kaikki ulottuvuudet
-jm.common.deletemap_dialog_this=Tämä ulottuvuus
 jm.common.deletemap_dialog_text=Poista kartta kaikista ulottuvuuksista vai vain nykyisestä.
-jm.common.deletemap_text=Poista kartta yhdestä tai useammasta ulottuvuudesta
+jm.common.deletemap_dialog_this=Tämä ulottuvuus
 jm.common.deletemap_status_done=Kartta poistettu.
 jm.common.deletemap_status_error=Kartan poisto epäonnistui. Katso lisätietoja: journeymap.log.
+jm.common.deletemap_text=Poista kartta yhdestä tai useammasta ulottuvuudesta
 jm.common.deletemap_title=Poista kartta
-
-
 jm.common.dimension=Ulottuvuus %1$s
 jm.common.disabled_feature=Ominaisuus ei ole käytettävissä
 jm.common.enable=Käytössä
-jm.common.enable_mapping_true=Ota kartoitus käyttöön
 jm.common.enable_mapping_false=Poista kartoitus käytöstä
-jm.common.enable_mapping_true_text=Kartoitus käytössä
 jm.common.enable_mapping_false_text=Kartoitus poistettu käytöstä
+jm.common.enable_mapping_true=Ota kartoitus käyttöön
+jm.common.enable_mapping_true_text=Kartoitus käytössä
 jm.common.file_updates=Tiedostoja päivitetään (%1$s). Kartoitus keskeytetty.
 jm.common.file_updates_complete=Tiedostojen päivitys valmis. Kartoitus voi jatkua.
 jm.common.font_scale=Fonttien skaala
@@ -102,11 +78,11 @@ jm.common.font_scale.tooltip=Etikettien ja tekstien fonttien koko.
 jm.common.grid_edit=Muokkaa ruudukkoa
 jm.common.grid_edit.tooltip=Muuta palaruudukon ulkomuotoa kaikissa kartoissa
 jm.common.grid_editor=Ruudukon muokkaus
+jm.common.grid_opacity=Läpinäkyvyys
 jm.common.grid_style=Tyyli
 jm.common.grid_style_checkers=Ruutumalli
 jm.common.grid_style_dots=Pisteet
 jm.common.grid_style_squares=Kuutiot
-jm.common.grid_opacity=Läpinäkyvyys
 jm.common.help=Apua...
 jm.common.hide_buttons=Piilota napit
 jm.common.hotkeys=Hot Keys...
@@ -178,6 +154,25 @@ jm.common.radar_max_villagers.tooltip=Kyläläisten maksimimäärä tutkassa. Su
 jm.common.radar_vertical_distance=Pystysuora tutkan kantomatka
 jm.common.radar_vertical_distance.tooltip=Pystysuora matka (kuutioina) jolta haetaan ja näytetään yksiköitä tutkassa. Suuremmat arvot voivat aiheuttaa lagia.
 jm.common.ready=§e%1$s valmiina.
+jm.common.renderdelay=Piirtoviive
+jm.common.renderdelay.tooltip=Aika (sekunneisa) piirtokertojen välissä. Suuremmat arvot voivat parantaa suorityskykyä, mutta voi johtaa kadotettuihin paloihin matkustaessa.
+jm.common.renderdistance_cave_max=Luolien Max matka
+jm.common.renderdistance_cave_max.tooltip=Ympärilläsi olevat palat, jotka kartoitetaan aina kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
+jm.common.renderdistance_cave_min=Luolien Min matka
+jm.common.renderdistance_cave_min.tooltip=Ympärilläsi olevat palat, jotka kartoitetaan aina kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
+jm.common.renderdistance_surface_max=Pinnan Max matka
+jm.common.renderdistance_surface_max.tooltip=Ympärilläsi olevat palat, jotka lopulta kartoitetaan kun olet maanalla tai ulottuvuudessa jossa ei ole taivasta. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
+jm.common.renderdistance_surface_min=Pinnan Min matka
+jm.common.renderdistance_surface_min.tooltip=Ympärilläsi olevat palat, jotka lopulta kartoitetaan kun olet maanpinnalla ulottuvuuksissa joissa on taivas. Pienemmät arvot voivat parantaa suorityskykyä. Arvot, jotka ovat suuremmat kuin Minecraftin piirtomatka eivät vaikuta.
+jm.common.renderstats=Uusin: %1$s (%2$s + %3$s) chunks in %4$sms (avg %5$sms)
+jm.common.renderstats.title=Tilastot uusimmasta renderöinnistä.
+jm.common.renderstats.tooltip=Chunkit yhteensä = (Kaikki chunkit Min matkalla + Jotkin chunkit Max matkalla). Pinnanmuodot ympärilläsi ja kartografia-asetukset jotka valitset muuttavat merkittävästi näitä numeroita.
+jm.common.renderstats_debug_cave=Luolat: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
+jm.common.renderstats_debug_cave_simple=Luolat: %1$s = %2$s chunks in %3$sms (avg %4$sms)
+jm.common.renderstats_debug_surface=Pinta: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
+jm.common.renderstats_debug_surface_simple=Pinta: %1$s = %2$s chunks in %3$sms (avg %4$sms)
+jm.common.revealshape=Paljastuksen muoto
+jm.common.revealshape.tooltip=Ympärilläsi olevan alueen kartan muoto. Ympyrä näyttää vähemmän paloja kuin kuutio ja voi parantaa suorityskykyä.
 jm.common.save_filename=Tallenetaan karttaa näyttökuviin: %1$s
 jm.common.save_map=Tallenna kartta
 jm.common.saving_map_to_file=Tallennetaan %1$s -karttaa tiedostoon...
@@ -204,18 +199,19 @@ jm.common.show_waypoints.tooltip=Läheiset reittipisteet näytetään kartalla
 jm.common.splash_about=Tietoa...
 jm.common.splash_action=Paina näyttääksesi
 jm.common.splash_developer=Kehittäjä
-jm.common.splash_tester=Testaaja
-jm.common.splash_patreon=Patron
 jm.common.splash_friend=Ystävä
-jm.common.splash_walloffame=Wall of Fame
+jm.common.splash_patreon=Patron
+jm.common.splash_tester=Testaaja
 jm.common.splash_title=Tietoa JourneyMap %1$s
+jm.common.splash_walloffame=Wall of Fame
 jm.common.splash_whatisnew=Mitä uutta?
-
+jm.common.tile_display_quality=Suuri näyttölaatu
+jm.common.tile_display_quality.tooltip=Suositellaan käyttämään "Oma asetus" karttasuuntauksella. Poista valinta parantaaksesi suurennuksen suorityskykyä ja muistin käyttöä. Ei vaikuta kuvien laatuun.
 jm.common.ui_theme=UI teema
 jm.common.ui_theme.tooltip=Teemat joita käytetään kokonäytön kontrolleissa ja  minikartan tyylisxä
+jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.ui_theme_author=Tekijä: §b%1$s§f
 jm.common.ui_theme_name=Nimi: §b%1$s§f
-jm.common.ui_theme_applied=UI Theme applied. Go to §bOptions > MiniMap Preset #§f to customize the MiniMap appearance.
 jm.common.update_available=Päivitys saatavilla!
 jm.common.update_check=Tarkista päivitykset
 jm.common.use_browser=Käytä selainta
@@ -441,7 +437,7 @@ jm.webmap.follow_twitter_title=Seuraa JourneyMapMod Twitterissä
 jm.webmap.forum_link_text=minecraftforum.net
 jm.webmap.forum_link_title=JourneyMap foorumi minecraftforum.net
 jm.webmap.google_domain=Google Maps API Domain
-jm.webmap.google_domain_tooltip=Jos maasi estää pääsyn maps.google.com, valitse toinen domain Google Maps API:lle.
+# jm.webmap.google_domain.tooltip=If your country blocks maps.google.com, select a different domain for the Google Maps API.
 jm.webmap.grid_menu_item_text=Ruudukko
 jm.webmap.grid_menu_item_title=Näyttää chunk-ruudukon
 jm.webmap.location_text=Sijainti:
