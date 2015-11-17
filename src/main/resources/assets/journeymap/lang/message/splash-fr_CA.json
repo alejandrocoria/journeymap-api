@@ -1,24 +1,24 @@
-/* JourneyMap 5.1.0 Splash/About Dialog - fr_FR  et fr_CA */
+/* JourneyMap 5.1.1 Splash/About Dialog - fr_CA */
 {
   "lines": [
     {
-      "label": "New 'Vault' theme. Click here to try it!",
+      "label": "Nouveau thème 'Vault'. Cliquez ici pour l'essayer!",
       "action": "fullscreen.Fullscreen#setTheme#Vault"
     },
     {
-      "label": "Improved memory and CPU usage",
+      "label": "Amélioration de l'utilisation mémoire et CPU",
       "action": ""
     },
     {
-      "label": "More accurate biome and water colors",
+      "label": "Meilleure précision des couleurs de biome et d'eau",
       "action": ""
     },
     {
-      "label": "JourneyMapServer now included in the same jar",
+      "label": "JourneyMapServer est maintenant inclus dans la même jar",
       "action": ""
     },
     {
-      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8",
+      "label": "Version à la fois pour Minecraft 1.7.10 et 1.8",
       "action": ""
     }
   ]

@@ -1,25 +1,25 @@
-/* JourneyMap 5.1.0 Splash/About Dialog - ru_RU  */
+/* JourneyMap 5.1.1 Splash/About Dialog - ru_RU  */
 /* Only translate label values. Do not translate action values. */
 {
   "lines": [
     {
-      "label": "New 'Vault' theme. Click here to try it!",
+      "label": "Новая тема интерфейса 'Vault'. Нажмите здесь, чтобы попробовать!",
       "action": "fullscreen.Fullscreen#setTheme#Vault"
     },
     {
-      "label": "Improved memory and CPU usage",
+      "label": "Улучшенное использование процессора и оперативной памяти",
       "action": ""
     },
     {
-      "label": "More accurate biome and water colors",
+      "label": "Более точные цвета биомов и воды",
       "action": ""
     },
     {
-      "label": "JourneyMapServer now included in the same jar",
+      "label": "jar-файл JourneyMap теперь содержит и серверную часть",
       "action": ""
     },
     {
-      "label": "Simultaneous release for Minecraft 1.7.10 and 1.8",
+      "label": "Релиз для Minecraft 1.7.10 и 1.8",
       "action": ""
     }
   ]
