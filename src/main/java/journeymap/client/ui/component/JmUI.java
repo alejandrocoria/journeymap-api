@@ -61,6 +61,7 @@ public abstract class JmUI extends GuiScreen
             // Reallly should use a stack and prevent dups, but whatever.
             this.returnDisplay.returnDisplay = null;
         }
+        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
     }
 
 
@@ -233,8 +234,6 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
-
         if (returnDisplay == null)
         {
             UIManager.getInstance().openFullscreenMap();
