@@ -152,7 +152,7 @@ public class VersionCheck
                                     continue;
                                 }
                                 String fileVersion = name.split("-")[1];
-                                String url = file.get("url").getAsString();
+                                String url = Journeymap.DOWNLOAD_URL + file.get("id").getAsString();
                                 if (!isCurrent(currentVersion, fileVersion))
                                 {
                                     downloadUrl = url;
