@@ -16,6 +16,8 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
+import net.minecraft.world.storage.IThreadedFileIO;
+import net.minecraft.world.storage.ThreadedFileIOBase;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Formerly ImageSet.Wrapper
  */
-public class ImageHolder
+public class ImageHolder implements IThreadedFileIO
 {
     final static Logger logger = Journeymap.getLogger();
     final MapType mapType;
@@ -163,16 +165,32 @@ public class ImageHolder
         return dirty;
     }
 
-    protected void writeToDisk()
+    /**
+     * Experimental:  Use Minecraft's IO manager thread rather than do it in a JM thread.
+     * @return
+     */
+    protected boolean writeToDisk()
     {
         if (blank)
         {
-            return;
+            return false;
         }
+        else
+        {
+            ThreadedFileIOBase.threadedIOInstance.queueIO(this);
+            return true;
+        }
+    }
 
-        writeToDiskTimer.start();
+    /**
+     * Experimental:  Called by ThreadedFileIOBase.  Returns false if a repeat attempt isn't needed.
+     * @return
+     */
+    public boolean writeNextIO()
+    {
         if (writeLock.tryLock())
         {
+            writeToDiskTimer.start();
             try
             {
                 File imageFile = imagePath.toFile();
@@ -187,27 +205,31 @@ public class ImageHolder
 
                 if (logger.isEnabled(Level.DEBUG))
                 {
-                    logger.debug("Wrote to disk: " + imageFile); //$NON-NLS-1$
+                    logger.debug("Wrote to disk: " + imageFile); 
                 }
                 dirty = false;
+                return false; // don't retry
             }
             catch (Throwable e)
             {
-                String error = "Unexpected error writing to disk: " + this + ": " + LogFormatter.toString(e);
-                logger.error(error);
-                //throw new RuntimeException(e);
+                logger.error("Unexpected error writing to disk: " + this + ": " + e);
+                if (logger.isEnabled(Level.DEBUG))
+                {
+                    logger.debug(LogFormatter.toString(e)); 
+                }
+                return true; // do retry
             }
             finally
             {
                 writeLock.unlock();
+                writeToDiskTimer.stop();
             }
         }
         else
         {
-            logger.warn("Couldn't get write lock to write to disk: " + this);
+            logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
+            return true; // do retry
         }
-
-        writeToDiskTimer.stop();
 //        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
 //        {
 //            logger.warn("Image that took too long: " + this);

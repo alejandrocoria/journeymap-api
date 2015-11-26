@@ -45,9 +45,14 @@ public abstract class ImageSet
         return getHolder(mapType).getImage();
     }
 
-    public boolean writeToDisk(boolean force)
+    /**
+     * Returns the number of imageHolders actually written to disk.
+     * @param force
+     * @return
+     */
+    public int writeToDisk(boolean force)
     {
-        boolean updated = false;
+        int count = 0;
         try
         {
             synchronized (imageHolders)
@@ -57,7 +62,7 @@ public abstract class ImageSet
                     if (force || imageHolder.isDirty())
                     {
                         imageHolder.writeToDisk();
-                        updated = true;
+                        count++;
                     }
                 }
             }
@@ -67,7 +72,7 @@ public abstract class ImageSet
         {
             Journeymap.getLogger().error("Error writing ImageSet to disk: " + t);
         }
-        return updated;
+        return count;
     }
 
     public boolean updatedSince(MapType mapType, long time)

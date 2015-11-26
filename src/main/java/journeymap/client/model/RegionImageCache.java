@@ -80,7 +80,11 @@ public class RegionImageCache
                         RegionImageSet regionImageSet = notification.getValue();
                         if (regionImageSet != null)
                         {
-                            regionImageSet.writeToDisk(false);
+                            int count = regionImageSet.writeToDisk(false);
+                            if (count > 0)
+                            {
+                                Journeymap.getLogger().info("Wrote to disk before removal from cache: " + regionImageSet);
+                            }
                             regionImageSet.clear();
                         }
                     }
@@ -111,6 +115,10 @@ public class RegionImageCache
         return regionImageSetsCache.asMap().values();
     }
 
+    /**
+     * Finalize images before they can be bound as textures or written to disk
+     * @param forceFlush
+     */
     public void updateTextures(boolean forceFlush)
     {
         for (RegionImageSet regionImageSet : getRegionImageSets())
@@ -137,6 +145,9 @@ public class RegionImageCache
         }
     }
 
+    /**
+     * Write all dirty images to disk if flushInterval has passed
+     */
     private void autoFlush()
     {
         if (lastFlush + flushInterval < System.currentTimeMillis())
@@ -149,15 +160,22 @@ public class RegionImageCache
         }
     }
 
+    /**
+     * Write all dirty images to disk.
+     */
     public void flushToDisk()
     {
+        int count = 0;
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            regionImageSet.writeToDisk(false);
+           count+=regionImageSet.writeToDisk(false);
         }
         lastFlush = System.currentTimeMillis();
     }
 
+    /**
+     * lol
+     */
     public long getLastFlush()
     {
         return lastFlush;
