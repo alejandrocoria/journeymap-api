@@ -14,17 +14,22 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatAllowedCharacters;
 
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Read Rei's waypoint files and return a collection of the results.
@@ -89,30 +94,30 @@ public class ReiReader
         String worldName = null;
         try
         {
-//            NetHandlerPlayClient sendQueue = ForgeHelper.INSTANCE.getClient().getNetHandler();
-//            SocketAddress addr = sendQueue.getNetworkManager().getSocketAddress();
-//            String addrStr = addr.toString().replaceAll("[\r\n]", "");
-//            Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);
-//            if (matcher.matches())
-//            {
-//                worldName = matcher.group(1);
-//                if (worldName.isEmpty())
-//                {
-//                    worldName = matcher.group(2);
-//                }
-//                if (!matcher.group(3).equals("25565"))
-//                {
-//                    worldName = (new StringBuilder()).append(worldName).append("[").append(matcher.group(3)).append("]").toString();
-//                }
-//
-//                char arr$[] = ChatAllowedCharacters.allowedCharacters;
-//                int len$ = arr$.length;
-//                for (int i$ = 0; i$ < len$; i$++)
-//                {
-//                    char c = arr$[i$];
-//                    worldName = worldName.replace(c, '_');
-//                }
-//            }
+            NetHandlerPlayClient sendQueue = ForgeHelper.INSTANCE.getClient().getNetHandler();
+            SocketAddress addr = sendQueue.getNetworkManager().getRemoteAddress();
+            String addrStr = addr.toString().replaceAll("[\r\n]", "");
+            Matcher matcher = Pattern.compile("(.*)/(.*):([0-9]+)").matcher(addrStr);
+            if (matcher.matches())
+            {
+                worldName = matcher.group(1);
+                if (worldName.isEmpty())
+                {
+                    worldName = matcher.group(2);
+                }
+                if (!matcher.group(3).equals("25565"))
+                {
+                    worldName = (new StringBuilder()).append(worldName).append("[").append(matcher.group(3)).append("]").toString();
+                }
+
+                char arr$[] = ChatAllowedCharacters.allowedCharactersArray;
+                int len$ = arr$.length;
+                for (int i$ = 0; i$ < len$; i$++)
+                {
+                    char c = arr$[i$];
+                    worldName = worldName.replace(c, '_');
+                }
+            }
         }
         catch (Exception e)
         {

@@ -31,11 +31,11 @@ import java.util.HashMap;
  */
 public class VoxelReader
 {
-    // 1.7.2
-    public static final String VOXEL_JAR_NAME = "voxelmap-1.7.2-1.0 (June 9, 2014)";
-    public static final String VOXEL_JAR_URL = "http://www.mediafire.com/view/8tjjxvghv3jpv18/voxelmap-1.7.2-1.0";
+    // 1.7.10
+    public static final String VOXEL_JAR_NAME = "mod_voxelMap_1.5.18_for_1.7.10.jar (November 15, 2015)";
+    public static final String VOXEL_JAR_URL = "http://www.curse.com/mc-mods/minecraft/225179-voxelmap";
 
-    public static final String[] classNames = {"com.thevoxelbox.voxelmap.VoxelMap", "com.thevoxelbox.voxelmap.util.Waypoint"};
+    public static final String[] classNames = {"com.thevoxelbox.voxelmap.interfaces.AbstractVoxelMap", "com.thevoxelbox.voxelmap.util.Waypoint"};
     public static Boolean modLoaded;
 
     int pointErrors = 0;
@@ -52,7 +52,7 @@ public class VoxelReader
         ArrayList<Waypoint> converted = null;
         try
         {
-            voxelWaypoints.addAll(com.thevoxelbox.voxelmap.VoxelMap.getInstance().getWaypointManager().getWaypoints());
+            voxelWaypoints.addAll(com.thevoxelbox.voxelmap.interfaces.AbstractVoxelMap.getInstance().getWaypointManager().getWaypoints());
             modLoaded = true;
         }
         catch (Throwable e)
