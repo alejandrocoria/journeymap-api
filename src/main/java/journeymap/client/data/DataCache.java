@@ -504,7 +504,8 @@ public class DataCache
      */
     public void purge()
     {
-        RegionImageCache.instance().flushToDisk();
+        // Flush images, do syncronously to ensure it's done before cache invalidates
+        RegionImageCache.instance().flushToDisk(false);
 
         synchronized (managedCaches)
         {

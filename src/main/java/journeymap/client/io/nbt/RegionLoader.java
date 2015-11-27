@@ -93,7 +93,8 @@ public class RegionLoader
             return null;
         }
 
-        RegionImageCache.instance().flushToDisk();
+        // Flush synchronously so it's done before clearing
+        RegionImageCache.instance().flushToDisk(false);
         RegionImageCache.instance().clear();
 
         final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);

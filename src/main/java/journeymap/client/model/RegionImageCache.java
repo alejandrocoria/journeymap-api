@@ -50,7 +50,8 @@ public class RegionImageCache
             @Override
             public void run()
             {
-                flushToDisk();
+                // Don't flush asynchronously; do it in this thread
+                flushToDisk(false);
                 if (logger.isEnabled(Level.DEBUG))
                 {
                     logger.debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
@@ -80,10 +81,11 @@ public class RegionImageCache
                         RegionImageSet regionImageSet = notification.getValue();
                         if (regionImageSet != null)
                         {
-                            int count = regionImageSet.writeToDisk(false);
-                            if (count > 0)
+                            // Don't force it, but do it synchronously to ensure things aren't GCd before it's done.
+                            int count = regionImageSet.writeToDisk(false, false);
+                            if (count>0 && Journeymap.getLogger().isDebugEnabled())
                             {
-                                Journeymap.getLogger().info("Wrote to disk before removal from cache: " + regionImageSet);
+                                Journeymap.getLogger().debug("Wrote to disk before removal from cache: " + regionImageSet);
                             }
                             regionImageSet.clear();
                         }
@@ -117,9 +119,10 @@ public class RegionImageCache
 
     /**
      * Finalize images before they can be bound as textures or written to disk
-     * @param forceFlush
+     * @param forceFlush whether to force images to be written to disk
+     * @param async whether to do file writes on a different thread
      */
-    public void updateTextures(boolean forceFlush)
+    public void updateTextures(boolean forceFlush, boolean async)
     {
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
@@ -137,18 +140,19 @@ public class RegionImageCache
         // Write to disk if needed
         if (forceFlush)
         {
-            flushToDisk();
+            flushToDisk(async);
         }
         else
         {
-            autoFlush();
+            autoFlush(async);
         }
     }
 
     /**
      * Write all dirty images to disk if flushInterval has passed
+     * @param async whether to do file writes on a different thread
      */
-    private void autoFlush()
+    private void autoFlush(boolean async)
     {
         if (lastFlush + flushInterval < System.currentTimeMillis())
         {
@@ -156,19 +160,21 @@ public class RegionImageCache
             {
                 logger.debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
-            flushToDisk();
+            flushToDisk(async);
         }
     }
 
     /**
      * Write all dirty images to disk.
+     * @param async Whether to do file writes asynchronously
      */
-    public void flushToDisk()
+    public void flushToDisk(boolean async)
     {
         int count = 0;
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-           count+=regionImageSet.writeToDisk(false);
+            // Don't force writes that aren't necessary
+            count+=regionImageSet.writeToDisk(false, async);
         }
         lastFlush = System.currentTimeMillis();
     }
@@ -264,12 +270,6 @@ public class RegionImageCache
 
         if (dirs != null && dirs.length > 0)
         {
-            // Toss all images and textures without flushing to disk
-            for (RegionImageSet regionImageSet : getRegionImageSets())
-            {
-                regionImageSet.clear();
-            }
-
             // Clear cache
             this.clear();
 

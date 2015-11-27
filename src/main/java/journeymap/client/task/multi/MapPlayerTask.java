@@ -43,7 +43,7 @@ public class MapPlayerTask extends BaseMapTask
 
     private MapPlayerTask(ChunkRenderController chunkRenderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords)
     {
-        super(chunkRenderController, world, mapType, chunkCoords, false, 10000);
+        super(chunkRenderController, world, mapType, chunkCoords, false, true, 10000);
     }
 
     public static void forceNearbyRemap()

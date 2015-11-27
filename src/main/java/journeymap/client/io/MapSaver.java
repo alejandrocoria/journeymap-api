@@ -72,8 +72,8 @@ public class MapSaver
                 return null;
             }
 
-            // Ensure latest regions are flushed to disk
-            RegionImageCache.instance().flushToDisk();
+            // Ensure latest regions are flushed to disk synchronously before continuing
+            RegionImageCache.instance().flushToDisk(false);
 
             timer.start();
 
@@ -159,8 +159,8 @@ public class MapSaver
             // Create result file
             saveFile = new File(screenshotsDir, sb.toString());
 
-            // Ensure latest regions are flushed to disk
-            RegionImageCache.instance().flushToDisk();
+            // Ensure latest regions are flushed to disk synchronously before continuing
+            RegionImageCache.instance().flushToDisk(false);
 
             // Look for pngs
             File imageDir = getImageDir();

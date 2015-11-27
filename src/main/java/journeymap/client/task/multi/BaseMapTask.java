@@ -41,13 +41,15 @@ public abstract class BaseMapTask implements ITask
     final ChunkRenderController renderController;
     final int elapsedLimit;
     final MapType mapType;
+    final boolean asyncFileWrites;
 
-    public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, int elapsedLimit)
+    public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, boolean asyncFileWrites, int elapsedLimit)
     {
         this.renderController = renderController;
         this.world = world;
         this.mapType = mapType;
         this.chunkCoords = chunkCoords;
+        this.asyncFileWrites = asyncFileWrites;
         this.flushCacheWhenDone = flushCacheWhenDone;
         this.elapsedLimit = elapsedLimit;
     }
@@ -75,9 +77,7 @@ public abstract class BaseMapTask implements ITask
                 return;
             }
 
-            final long start = System.nanoTime();
             final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
-
 
             // Check the dimension
             int currentDimension = ForgeHelper.INSTANCE.getPlayerDimension();
@@ -146,7 +146,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            RegionImageCache.instance().updateTextures(flushCacheWhenDone);
+            RegionImageCache.instance().updateTextures(flushCacheWhenDone, asyncFileWrites);
             chunkCoords.clear();
             this.complete(count, false, false);
             timer.stop();

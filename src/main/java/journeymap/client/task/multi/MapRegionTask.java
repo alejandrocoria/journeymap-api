@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * TODO:  FIXME
+ * Maps an entire Minecraft region (512x512)
  */
 public class MapRegionTask extends BaseMapTask
 {
@@ -48,7 +48,7 @@ public class MapRegionTask extends BaseMapTask
 
     private MapRegionTask(ChunkRenderController renderController, World world, MapType mapType, RegionCoord rCoord, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
     {
-        super(renderController, world, mapType, chunkCoords, true, 5000);
+        super(renderController, world, mapType, chunkCoords, true, false, 5000);
         this.rCoord = rCoord;
         this.retainedCoords = retainCoords;
     }
@@ -131,7 +131,9 @@ public class MapRegionTask extends BaseMapTask
     protected void complete(int mappedChunks, boolean cancelled, boolean hadError)
     {
         lastTaskCompleted = System.currentTimeMillis();
-        RegionImageCache.instance().flushToDisk();
+
+        // Flush any images to disk, but do it synchronously on this thread.
+        RegionImageCache.instance().flushToDisk(false);
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {
@@ -261,7 +263,8 @@ public class MapRegionTask extends BaseMapTask
 
             if (regionLoader != null)
             {
-                RegionImageCache.instance().flushToDisk();
+                // Write files synchronously before clearing
+                RegionImageCache.instance().flushToDisk(false);
                 RegionImageCache.instance().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;

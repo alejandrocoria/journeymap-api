@@ -24,9 +24,7 @@ import org.apache.logging.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -45,12 +43,14 @@ public class ImageHolder implements IThreadedFileIO
     boolean partialUpdate;
     StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
     private volatile TextureImpl texture;
+    private boolean debug;
 
     ImageHolder(MapType mapType, File imageFile, int imageSize)
     {
         this.mapType = mapType;
         this.imagePath = imageFile.toPath();
         this.imageSize = imageSize;
+        this.debug = logger.isEnabled(Level.DEBUG);
         getTexture();
     }
 
@@ -166,74 +166,116 @@ public class ImageHolder implements IThreadedFileIO
     }
 
     /**
-     * Experimental:  Use Minecraft's IO manager thread rather than do it in a JM thread.
-     * @return
+     * Update the image file on disk.
+     *
+     * @param async Whether to queue the write with Minecraft's IO thread and immediately return
+     * @return true if the file was actually updated and async=false
      */
-    protected boolean writeToDisk()
+    protected boolean writeToDisk(boolean async)
     {
-        if (blank)
+        if (blank || texture==null || !texture.hasImage())
         {
             return false;
         }
         else
         {
-            ThreadedFileIOBase.threadedIOInstance.queueIO(this);
-            return true;
+            if(async)
+            {
+                // Experimental:  Use Minecraft's IO manager thread
+                ThreadedFileIOBase.threadedIOInstance.queueIO(this);
+                return true;
+            }
+            else
+            {
+                return !writeNextIO();
+            }
         }
     }
 
     /**
-     * Experimental:  Called by ThreadedFileIOBase.  Returns false if a repeat attempt isn't needed.
-     * @return
+     * Update the image file on disk.
+     *
+     * Implements IThreaedFileIO, to be called by ThreadedFileIOBase.
+     *
+     * @return true if a retry is needed
      */
     public boolean writeNextIO()
     {
+        if(texture==null || !texture.hasImage())
+        {
+            return false; // no retry
+        }
+
         if (writeLock.tryLock())
         {
             writeToDiskTimer.start();
+            File imageFile = imagePath.toFile();
             try
             {
-                File imageFile = imagePath.toFile();
-                if (!imageFile.exists())
+                writeImageToFile();
+            }
+            catch (IOException e)
+            {
+                if (imageFile.exists())
                 {
-                    imageFile.getParentFile().mkdirs();
+                    try
+                    {
+                        logger.error("IOException updating file, will delete and retry: " + this + ": " + LogFormatter.toPartialString(e));
+                        imageFile.delete();
+                        writeImageToFile();
+                    }
+                    catch (Throwable e2)
+                    {
+                        logger.error("Exception after delete/retry: " + this + ": " + LogFormatter.toPartialString(e));
+                    }
                 }
-
-                BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
-                ImageIO.write(texture.getImage(), "PNG", imageOutputStream);
-                imageOutputStream.close();
-
-                if (logger.isEnabled(Level.DEBUG))
+                else
                 {
-                    logger.debug("Wrote to disk: " + imageFile); 
+                    logger.error("IOException creating file: " + this + ": " + LogFormatter.toPartialString(e));
                 }
-                dirty = false;
-                return false; // don't retry
             }
             catch (Throwable e)
             {
-                logger.error("Unexpected error writing to disk: " + this + ": " + e);
-                if (logger.isEnabled(Level.DEBUG))
-                {
-                    logger.debug(LogFormatter.toString(e)); 
-                }
-                return true; // do retry
+                logger.error("Exception writing to disk: " + this + ": " + LogFormatter.toPartialString(e));
             }
             finally
             {
                 writeLock.unlock();
                 writeToDiskTimer.stop();
+                return false; // don't retry
             }
         }
         else
         {
-            logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
+            if (debug)
+            {
+                logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
+            }
             return true; // do retry
         }
-//        if (writeToDiskTimer.hasReachedElapsedLimit() && writeToDiskTimer.getElapsedLimitWarningsRemaining() > 0)
-//        {
-//            logger.warn("Image that took too long: " + this);
-//        }
+    }
+
+    private void writeImageToFile() throws IOException
+    {
+        BufferedImage image = texture.getImage();
+        if(image!=null)
+        {
+            File imageFile = imagePath.toFile();
+            if (!imageFile.exists())
+            {
+                imageFile.getParentFile().mkdirs();
+            }
+
+            BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
+            ImageIO.write(image, "PNG", imageOutputStream);
+            imageOutputStream.close();
+
+            if (debug)
+            {
+                logger.debug("Wrote to disk: " + imageFile);
+            }
+        }
+        dirty = false;
     }
 
     @Override
