@@ -6,6 +6,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
+import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -92,6 +93,11 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     {
         // Set vanilla color handler
         blockMD.setBlockColorHandler(VanillaColorHandler.INSTANCE);
+
+        if(blockMD.isWater())
+        {
+            Journeymap.getLogger().info("Water! " + blockMD);
+        }
 
         // Set flags based on material
         Material material = blockMD.getBlock().getMaterial();

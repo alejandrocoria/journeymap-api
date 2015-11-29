@@ -9,10 +9,9 @@ import net.minecraft.client.Minecraft;
 import java.io.File;
 
 /**
- * Initializes block colors on BlockMDs that don't have one
- * already set via ColorPalette.
+ * Initializes ColorManager
  */
-public class InitBlockColorsTask implements ITask
+public class InitColorManagerTask implements ITask
 {
     @Override
     public int getMaxRuntime()
@@ -23,7 +22,7 @@ public class InitBlockColorsTask implements ITask
     @Override
     public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        ColorManager.instance().initBlockColors();
+        ColorManager.instance().ensureCurrent();
     }
 
     public static class Manager implements ITaskManager
@@ -33,18 +32,12 @@ public class InitBlockColorsTask implements ITask
         @Override
         public Class<? extends ITask> getTaskClass()
         {
-            return InitBlockColorsTask.class;
+            return InitColorManagerTask.class;
         }
 
         @Override
         public boolean enableTask(Minecraft minecraft, Object params)
         {
-            if (!ForgeHelper.INSTANCE.getColorHelper().hasBlocksTexture())
-            {
-                Journeymap.getLogger().debug("Can't run InitBlockColorsTask before BlocksTexture initialized");
-                return false;
-            }
-
             enabled = true;
             return true;
         }
@@ -60,7 +53,7 @@ public class InitBlockColorsTask implements ITask
         {
             if (enabled)
             {
-                return new InitBlockColorsTask();
+                return new InitColorManagerTask();
             }
             else
             {

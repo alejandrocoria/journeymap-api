@@ -48,12 +48,23 @@ public class ColorHelper_1_8 implements IColorHelper
      */
     public ColorHelper_1_8()
     {
-
     }
 
+    @Override
     public boolean hasBlocksTexture()
     {
         return blocksTexture != null;
+    }
+
+    @Override
+    public boolean clearBlocksTexture()
+    {
+        if(blocksTexture==null)
+        {
+            return false;
+        }
+        blocksTexture = null;
+        return true;
     }
 
     @Override

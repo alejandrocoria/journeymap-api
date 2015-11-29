@@ -8,6 +8,7 @@
 
 package journeymap.client.cartography;
 
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.CaveRenderer;
 import journeymap.client.cartography.render.EndRenderer;
 import journeymap.client.cartography.render.NetherRenderer;
@@ -44,6 +45,11 @@ public class ChunkRenderController
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
+        if(!JourneymapClient.getInstance().isMapping())
+        {
+            return false;
+        }
+
         ChunkPainter undergroundG2D = null;
         ChunkPainter dayG2D = null;
         ChunkPainter nightG2D = null;

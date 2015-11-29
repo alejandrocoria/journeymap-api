@@ -18,6 +18,8 @@ import net.minecraft.block.Block;
  */
 public interface IColorHelper
 {
+    boolean clearBlocksTexture();
+
     boolean hasBlocksTexture();
 
     boolean initBlocksTexture();

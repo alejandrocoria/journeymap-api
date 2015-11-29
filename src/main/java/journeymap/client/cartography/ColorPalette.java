@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -74,11 +75,20 @@ public class ColorPalette
 
     private transient File origin;
 
+    /**
+     * Default constructor for GSON.
+     */
     ColorPalette()
     {
     }
 
-    ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Integer> basicColorMap)
+    /**
+     * Constructor invoked by static create() method/
+     * @param resourcePacks
+     * @param modNames
+     * @param basicColorMap
+     */
+    private ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Integer> basicColorMap)
     {
         this.version = VERSION;
         this.name = Constants.getString("jm.colorpalette.file_title");
@@ -97,6 +107,10 @@ public class ColorPalette
         this.basicColors = toList(basicColorMap);
     }
 
+    /**
+     * Returns the active pallete.
+     * @return
+     */
     public static ColorPalette getActiveColorPalette()
     {
         String resourcePacks = Constants.getResourcePackNames();
@@ -198,18 +212,18 @@ public class ColorPalette
         return null;
     }
 
-    static File getWorldPaletteFile()
+    private static File getWorldPaletteFile()
     {
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
         return new File(FileHandler.getJMWorldDir(mc), JSON_FILENAME);
     }
 
-    static File getStandardPaletteFile()
+    private static File getStandardPaletteFile()
     {
         return new File(FileHandler.getJourneyMapDir(), JSON_FILENAME);
     }
 
-    protected static ColorPalette loadFromFile(File file)
+    private static ColorPalette loadFromFile(File file)
     {
         String jsonString = null;
         try
@@ -267,7 +281,7 @@ public class ColorPalette
         return list;
     }
 
-    public boolean writeToFile(boolean standard)
+    private boolean writeToFile(boolean standard)
     {
         File palleteFile = null;
         try
@@ -318,9 +332,9 @@ public class ColorPalette
         return listToMap(this.basicColors);
     }
 
-    public File getOrigin()
+    public File getOrigin() throws IOException
     {
-        return origin;
+        return origin.getCanonicalFile();
     }
 
     public File getOriginHtml(boolean createIfMissing, boolean overwriteExisting)

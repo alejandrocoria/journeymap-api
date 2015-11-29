@@ -182,7 +182,7 @@ public class ImageHolder implements IThreadedFileIO
             if(async)
             {
                 // Experimental:  Use Minecraft's IO manager thread
-                ThreadedFileIOBase.threadedIOInstance.queueIO(this);
+                ThreadedFileIOBase.getThreadedIOInstance().queueIO(this);
                 return true;
             }
             else

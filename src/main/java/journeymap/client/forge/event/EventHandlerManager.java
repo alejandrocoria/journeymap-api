@@ -26,7 +26,6 @@ import java.util.HashMap;
 public class EventHandlerManager
 {
     static WorldInfoHandler worldInfoHandler;
-    static ResourceManagerHandler resourceManagerHandler;
     private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
 
     public static void registerGeneralHandlers()
@@ -38,7 +37,6 @@ public class EventHandlerManager
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
         worldInfoHandler = new WorldInfoHandler();
-        resourceManagerHandler = new ResourceManagerHandler();
         ColorManager.instance();
     }
 
