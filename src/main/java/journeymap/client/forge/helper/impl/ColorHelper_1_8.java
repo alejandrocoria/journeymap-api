@@ -39,7 +39,7 @@ import java.util.HashSet;
  */
 public class ColorHelper_1_8 implements IColorHelper
 {
-    BufferedImage blocksTexture;
+    private volatile BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 
@@ -234,6 +234,11 @@ public class ColorHelper_1_8 implements IColorHelper
             int x = 0, y = 0;
 
             int xStart, yStart, xStop, yStop;
+            if(icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
+            {
+                logger.warn("Couldn't get texture for " + icon.getIconName() + " because of an error matching it within the stitched blocks atlas.");
+                return null;
+            }
             BufferedImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
             xStart = yStart = 0;
             xStop = textureImg.getWidth();
@@ -297,7 +302,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid " + blockMD.getUid());
+                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid ");
             }
 
             if (unusable)
@@ -346,16 +351,7 @@ public class ColorHelper_1_8 implements IColorHelper
         }
         catch (Throwable e1)
         {
-            if (blockMD.getUid().modId.equals("minecraft"))
-            {
-                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding "
-                        + blockMD.getUid() + ": " + LogFormatter.toPartialString(e1));
-            }
-            else
-            {
-                logger.warn("Error getting block color from a mod. Plese report this exception to the mod author of "
-                        + blockMD.getUid() + ": " + LogFormatter.toPartialString(e1));
-            }
+            logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
         }
 
         if (color != null)
@@ -380,10 +376,11 @@ public class ColorHelper_1_8 implements IColorHelper
             {
                 return false;
             }
-
+            blocksTexture = null;
             timer.start();
 
-            ForgeHelper.INSTANCE.getClient().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+            int blocksTexId = ForgeHelper.INSTANCE.getClient().getTextureMapBlocks().getGlTextureId();
+            ForgeHelper.INSTANCE.getRenderHelper().glBindTexture(blocksTexId);
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
@@ -396,13 +393,12 @@ public class ColorHelper_1_8 implements IColorHelper
             intbuffer.get(aint);
             BufferedImage bufferedimage = new BufferedImage(width, height, 2);
             bufferedimage.setRGB(0, 0, width, height, aint, 0, width);
-
-            Journeymap.getLogger().info("initBlocksTexture: " + timer.elapsed() + "ms");
-            timer.stop();
-
             blocksTexture = bufferedimage;
-            return true;
 
+            double time = timer.stop();
+            Journeymap.getLogger().info(String.format("initBlocksTexture: %sx%s loaded in %sms", width, height, time));
+
+            return true;
         }
         catch (Throwable t)
         {
