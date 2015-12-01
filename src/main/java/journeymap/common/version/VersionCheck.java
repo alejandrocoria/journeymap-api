@@ -128,44 +128,51 @@ public class VersionCheck
                         in = new InputStreamReader(uri.openStream());
                         rawResponse = CharStreams.toString(in);
 
-                        JsonObject project = new JsonParser().parse(rawResponse).getAsJsonObject();
-                        JsonObject versions = project.get("versions").getAsJsonObject();
-                        Iterator<JsonElement> files = versions.get(Loader.MC_VERSION).getAsJsonArray().iterator();
-
                         String currentVersion = Journeymap.JM_VERSION.toString();
                         boolean currentIsRelease = Journeymap.JM_VERSION.isRelease();
-                        while (files.hasNext())
-                        {
-                            JsonObject file = files.next().getAsJsonObject();
-                            try
-                            {
-                                // {"id":2264681,"url":"http:\/\/curse.com\/mc-mods\/minecraft\/journeymap-32274\/2264681","name":"journeymap-1.7.10-5.1.1b9-unlimited.jar","type":"beta","version":"1.7.10","downloads":1435,"created_at":"2015-10-31T02:50:09+0000"}
-                                JsonElement type = file.get("type");
-                                if (currentIsRelease && !("release".equals(type.getAsString())))
-                                {
-                                    continue;
-                                }
 
-                                String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
-                                if (!name.contains("-"))
-                                {
-                                    continue;
-                                }
-                                String fileVersion = name.split("-")[1];
-                                String url = Journeymap.DOWNLOAD_URL + file.get("id").getAsString();
-                                if (!isCurrent(currentVersion, fileVersion))
-                                {
-                                    downloadUrl = url;
-                                    versionAvailable = fileVersion;
-                                    versionIsCurrent = false;
-                                    versionIsChecked = true;
-                                    Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
-                                    break;
-                                }
-                            }
-                            catch (Exception e)
+                        JsonObject project = new JsonParser().parse(rawResponse).getAsJsonObject();
+                        JsonElement version = project.get("versions").getAsJsonObject().get(Loader.MC_VERSION);
+                        if(version==null)
+                        {
+                            Journeymap.getLogger().warn("No versions found online for " + Loader.MC_VERSION);
+                        }
+                        else
+                        {
+                            Iterator<JsonElement> files = version.getAsJsonObject().get(Loader.MC_VERSION).getAsJsonArray().iterator();
+                            while (files.hasNext())
                             {
-                                Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
+                                JsonObject file = files.next().getAsJsonObject();
+                                try
+                                {
+                                    // {"id":2264681,"url":"http:\/\/curse.com\/mc-mods\/minecraft\/journeymap-32274\/2264681","name":"journeymap-1.7.10-5.1.1b9-unlimited.jar","type":"beta","version":"1.7.10","downloads":1435,"created_at":"2015-10-31T02:50:09+0000"}
+                                    JsonElement type = file.get("type");
+                                    if (currentIsRelease && !("release".equals(type.getAsString())))
+                                    {
+                                        continue;
+                                    }
+
+                                    String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
+                                    if (!name.contains("-"))
+                                    {
+                                        continue;
+                                    }
+                                    String fileVersion = name.split("-")[1];
+                                    String url = Journeymap.DOWNLOAD_URL + file.get("id").getAsString();
+                                    if (!isCurrent(currentVersion, fileVersion))
+                                    {
+                                        downloadUrl = url;
+                                        versionAvailable = fileVersion;
+                                        versionIsCurrent = false;
+                                        versionIsChecked = true;
+                                        Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
+                                        break;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
+                                }
                             }
                         }
 
