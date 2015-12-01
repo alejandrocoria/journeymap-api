@@ -22,6 +22,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -308,11 +309,14 @@ public class ColorPalette
         HashMap<BlockMD, Integer> map = new HashMap<BlockMD, Integer>(list.size());
         for (BlockColor blockColor : list)
         {
-            GameRegistry.UniqueIdentifier uid = new GameRegistry.UniqueIdentifier(blockColor.uid);
-            Block block = GameData.getBlockRegistry().getObject(uid.toString());
+            // 1.7.10 and 1.8
+            // Block block = GameData.getBlockRegistry().getObject(blockColor.uid);
+
+            // 1.8.8
+            Block block = GameData.getBlockRegistry().getObject(new ResourceLocation(blockColor.uid));
             if (block == null)
             {
-                Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + uid);
+                Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + blockColor.uid);
                 continue;
             }
             BlockMD blockMD = BlockMD.get(block, blockColor.meta);

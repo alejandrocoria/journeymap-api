@@ -16,17 +16,13 @@ import java.awt.*;
  */
 public interface IRenderHelper
 {
-    public void startDrawingQuads();
+    public void sizeDisplay(double width, double height);
 
-    public void addVertex(double x, double y, double z);
+    public void startDrawingQuads(boolean useColor);
 
     public void addVertexWithUV(double x, double y, double z, double u, double v);
 
-    public void setColorRGBA_F(float r, float g, float b, float a);
-
-    public void setColorRGBA(int r, int g, int b, int a);
-
-    public void setColorRGBA_I(int rgb, int a);
+    public void addVertexWithUV(double x, double y, double z, double u, double v, int[] rgba);
 
     public void draw();
 
@@ -45,8 +41,6 @@ public interface IRenderHelper
     public void glBlendFunc(int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
 
     public void glBlendFunc(int sfactorRGB, int dfactorRGB);
-
-    public void glColor(Color color, int alpha);
 
     public void glColor4f(float r, float g, float b, float a);
 

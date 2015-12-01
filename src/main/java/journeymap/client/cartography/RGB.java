@@ -189,9 +189,25 @@ public final class RGB
         return toInteger(clampFloats(floats, 1f));
     }
 
+    /**
+     * Creates an array with three elements [r,g,b]
+     * @param rgb color integer
+     * @return array
+     */
     public static int[] ints(int rgb)
     {
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF};
+    }
+
+    /**
+     * Creates an array with four elements [r,g,b,a]
+     * @param rgb color integer
+     * @param alpha alpha (0-255)
+     * @return array
+     */
+    public static int[] ints(int rgb, int alpha)
+    {
+        return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF, alpha & 0xFF};
     }
 
     public static float[] floats(int rgb)

@@ -24,7 +24,11 @@ public class ForgePlayerUtil implements IPlayerUtil
     public GameProfile getPlayerInfoById(UUID uuid)
     {
         MinecraftServer server = MinecraftServer.getServer();
-        GameProfile gameProfile = server.getPlayerProfileCache().func_152652_a(uuid);
+        // 1.8
+        // GameProfile gameProfile = server.getPlayerProfileCache().func_152652_a(uuid);
+
+        // 1.8.8
+        GameProfile gameProfile = server.getPlayerProfileCache().getProfileByUUID(uuid);
         return gameProfile;
     }
 

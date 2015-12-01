@@ -113,7 +113,10 @@ public class EntityDTO implements Serializable
         else if (entity instanceof EntityHorse)
         {
             // TODO: Test this with and without owners
-            String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
+            // 1.8
+            // String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
+            // 1.8.8
+            String ownerUuidString = ((EntityHorse) entity).getOwnerId();
             if (!Strings.isNullOrEmpty(ownerUuidString))
             {
                 try

@@ -13,77 +13,94 @@ import journeymap.client.forge.helper.IRenderHelper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 /**
  * Encapsulates setting up vertices for a Tesselator
  */
 public class RenderHelper_1_8 implements IRenderHelper
 {
-
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 
-    @Override
-    public void startDrawingQuads()
+    /**
+     * Default constructor.
+     */
+    RenderHelper_1_8()
     {
-        // 1.7
-        // tessellator.startDrawingQuads();
-
-        // 1.8
-        worldrenderer.startDrawingQuads();
     }
 
     @Override
-    public void addVertex(double x, double y, double z)
+    public void sizeDisplay(double width, double height)
     {
-        // 1.7
-        // tessellator.addVertex(x,y,z);
+        // 1.7.10 and 1.8
+        /*
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
+         */
+
+        // 1.8.8
+        GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.loadIdentity();
+        GlStateManager.ortho(0.0D, width, height, 0.0D, 100.0D, 3000.0D);
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.loadIdentity();
+        GlStateManager.translate(0.0F, 0.0F, -2000.0F);
+    }
+
+    @Override
+    public void startDrawingQuads(boolean useColor)
+    {
+        // 1.7.10
+        // tessellator.startDrawingQuads();
 
         // 1.8
-        worldrenderer.addVertex(x, y, z);
+        // worldrenderer.startDrawingQuads();
+
+        // 1.8.8
+        if(useColor)
+        {
+            // (floats) x,y,z + (floats) uv + (ints) r,g,b,a
+            worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        }
+        else
+        {
+            // (floats) x,y,z + (floats) u,v
+            worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        }
     }
 
     @Override
     public void addVertexWithUV(double x, double y, double z, double u, double v)
     {
-        // 1.7
+        // 1.7.10
         // tessellator.addVertexWithUV(x,y,z,u,v);
 
         // 1.8
-        worldrenderer.addVertexWithUV(x, y, z, u, v);
+        // worldrenderer.addVertexWithUV(x, y, z, u, v);
+
+        // 1.8.8
+        worldrenderer.pos(x, y, z).tex(u, v).endVertex();
     }
 
     @Override
-    public void setColorRGBA_F(float r, float g, float b, float a)
+    public void addVertexWithUV(double x, double y, double z, double u, double v, int[] rgba)
     {
-        // 1.7
-        // tessellator.setColorRGBA_F(x,y,z);
-
-        // 1.8
-        worldrenderer.setColorRGBA_F(r, g, b, a);
-    }
-
-    @Override
-    public void setColorRGBA(int r, int g, int b, int a)
-    {
-        // 1.7
-        // tessellator.setColorRGBA_F(x,y,z);
-
-        // 1.8
-        worldrenderer.setColorRGBA_F(r, g, b, a);
-    }
-
-    @Override
-    public void setColorRGBA_I(int rgb, int a)
-    {
-        // 1.7
+        // 1.7 and 1.8
         // tessellator.setColorRGBA_I(rgb, a);
+        // worldrenderer.addVertexWithUV(x, y, z, u, v);
 
-        // 1.8
-        worldrenderer.setColorRGBA_I(rgb, a);
+        // 1.8.8
+        worldrenderer.pos(x, y, z).tex(u, v).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
     }
 
     @Override
@@ -170,18 +187,6 @@ public class RenderHelper_1_8 implements IRenderHelper
 
         // 1.8
         GlStateManager.blendFunc(sfactorRGB, dfactorRGB);
-    }
-
-    @Override
-    public void glColor(Color color, int alpha)
-    {
-        float[] rgb = RGB.floats(color.getRGB());
-
-        // 1.7
-        // GL11.glColor4f(rgb[0], rgb[1], rgb[2], alpha/255f);
-
-        // 1.8
-        GlStateManager.color(rgb[0], rgb[1], rgb[2], alpha / 255f);
     }
 
     @Override

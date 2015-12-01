@@ -78,7 +78,7 @@ public class DisplayVars
     DisplayVars(Minecraft mc, final MiniMapProperties miniMapProperties)
     {
         // Immutable member and local vars
-        this.scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        this.scaledResolution = ForgeHelper.INSTANCE.getScaledResolution();
         this.showFps = miniMapProperties.showFps.get();
         this.showBiome = miniMapProperties.showBiome.get();
         this.showLocation = miniMapProperties.showLocation.get();

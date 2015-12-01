@@ -304,7 +304,7 @@ public class DrawUtil
 
             final int direction = flip ? -1 : 1;
 
-            renderHelper.startDrawingQuads();
+            renderHelper.startDrawingQuads(false);
             renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
             renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
             renderHelper.addVertexWithUV(x + width, y, zLevel, direction, 0);
@@ -328,29 +328,25 @@ public class DrawUtil
         }
     }
 
-    public static void drawRectangle(double x, double y, double width, double height, Integer color, int alpha)
+    public static void drawRectangle(double x, double y, double width, double height, int color, int alpha)
     {
-        float[] c = RGB.floats(color);
-
         // Prep
         renderHelper.glEnableBlend();
         renderHelper.glDisableTexture2D();
         renderHelper.glDisableAlpha();
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glColor4f(c[0], c[1], c[2], alpha);
 
         // Draw
-        renderHelper.startDrawingQuads();
-        // this was in 1.7, but perhaps the color assignment above will suffice?
-        //renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
-        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
-        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+        int[] rgba = RGB.ints(color, alpha);
+        renderHelper.startDrawingQuads(true);
+        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1, rgba);
+        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgba);
+        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0, rgba);
+        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0, rgba);
         renderHelper.draw();
 
         // Clean up
-        renderHelper.glColor4f(1, 1, 1, 1); // TODO: better to use resetColor() ?
+        renderHelper.glColor4f(1, 1, 1, 1);
         renderHelper.glEnableTexture2D();
         renderHelper.glEnableAlpha();
         renderHelper.glDisableBlend();
@@ -362,20 +358,20 @@ public class DrawUtil
      */
     public static void drawGradientRect(double x, double y, double width, double height, Integer startColor, int startAlpha, Integer endColor, int endAlpha)
     {
+        int[] rgbaStart = RGB.ints(startColor, startAlpha);
+        int[] rgbaEnd = RGB.ints(endColor, endAlpha);
+
         renderHelper.glDisableTexture2D();
         renderHelper.glEnableBlend();
         renderHelper.glDisableAlpha();
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-
         renderHelper.glShadeModel(GL11.GL_SMOOTH);
 
-        renderHelper.startDrawingQuads();
-        renderHelper.setColorRGBA_I(endColor, endAlpha);
-        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
-        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1);
-        renderHelper.setColorRGBA_I(startColor, startAlpha);
-        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0);
-        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+        renderHelper.startDrawingQuads(true);
+        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1, rgbaEnd);
+        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgbaEnd);
+        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0, rgbaStart);
+        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0, rgbaStart);
         renderHelper.draw();
 
         renderHelper.glShadeModel(GL11.GL_FLAT);
@@ -387,7 +383,7 @@ public class DrawUtil
 
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
-        renderHelper.startDrawingQuads();
+        renderHelper.startDrawingQuads(false);
         renderHelper.addVertexWithUV(startX, endY, z, startU, endV);
         renderHelper.addVertexWithUV(endX, endY, z, endU, endV);
         renderHelper.addVertexWithUV(endX, startY, z, endU, startV);
@@ -472,13 +468,7 @@ public class DrawUtil
 
     public static void sizeDisplay(double width, double height)
     {
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadIdentity();
-        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
+        renderHelper.sizeDisplay(width, height);
     }
 
     public enum HAlign

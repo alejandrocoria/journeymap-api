@@ -35,17 +35,19 @@ public class PacketHandler
 
         if ((player instanceof EntityPlayerMP) && (player != null))
         {
+            String playerName = player.getName();
+
             try
             {
                 WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
             }
             catch (RuntimeException rte)
             {
-                Journeymap.getLogger().error(player.getName() + " is not a real player. WorldID:" + worldID + " Error: " + rte);
+                Journeymap.getLogger().error(playerName + " is not a real player. WorldID:" + worldID + " Error: " + rte);
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + player.getName() + " WorldID:" + worldID + " Exception " + e);
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + playerName + " WorldID:" + worldID + " Exception " + e);
             }
         }
 

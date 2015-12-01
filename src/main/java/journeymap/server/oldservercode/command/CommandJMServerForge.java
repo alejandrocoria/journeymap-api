@@ -20,7 +20,10 @@ public class CommandJMServerForge extends CommandBase
     }
 
     @Override
-    public String getName()
+    // 1.7.10, 1.8
+    // public String getName()
+    // 1.8.8
+    public String getCommandName()
     {
         return "jmserver";
     }
@@ -33,9 +36,12 @@ public class CommandJMServerForge extends CommandBase
     }
 
     @Override
-    public boolean canCommandSenderUse(ICommandSender sender)
+    // 1.7.10, 1.8
+    // public String canCommandSenderUse()
+    // 1.8.8
+    public boolean canCommandSenderUseCommand(ICommandSender sender)
     {
-        return super.canCommandSenderUse(sender);
+        return super.canCommandSenderUseCommand(sender);
     }
 
     @Override
@@ -45,7 +51,10 @@ public class CommandJMServerForge extends CommandBase
     }
 
     @Override
-    public void execute(ICommandSender sender, String[] args) throws WrongUsageException
+    // 1.7.10, 1.8
+    // public String execute()
+    // 1.8.8
+    public void processCommand(ICommandSender sender, String[] args) throws WrongUsageException
     {
         if (args.length > 0)
         {

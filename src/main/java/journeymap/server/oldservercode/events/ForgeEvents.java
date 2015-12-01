@@ -60,22 +60,24 @@ public class ForgeEvents
                 e.printStackTrace();
             }
 
-            if (options.disableRadar(player.getName()))
+            String playerName = player.getName();
+
+            if (options.disableRadar(playerName))
             {
-                Journeymap.getLogger().info("Disabling Radar for player: " + player.getName());
+                Journeymap.getLogger().info("Disabling Radar for player: " + playerName);
                 player.addChatMessage(new ChatComponentTranslation(Codes.RADAR_CODE));
             }
 
-            if (options.disableCaveMapping(player.getName()))
+            if (options.disableCaveMapping(playerName))
             {
-                Journeymap.getLogger().info("Disabling CaveMapping for player: " + player.getName());
+                Journeymap.getLogger().info("Disabling CaveMapping for player: " + playerName);
                 player.addChatMessage(new ChatComponentTranslation(Codes.CAVE_MAPPING_CODE));
             }
 
             if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
             {
-                Journeymap.getLogger().info(String.format("Login: Sending WorldID Packet to %s", player.getName()));
-                PacketManager.instance.sendPlayerWorldID(worldID, player.getName());
+                Journeymap.getLogger().info(String.format("Login: Sending WorldID Packet to %s", playerName));
+                PacketManager.instance.sendPlayerWorldID(worldID, playerName);
             }
         }
     }

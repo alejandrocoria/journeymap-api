@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,9 +36,15 @@ public class ButtonList extends ArrayList<Button>
         this.label = label;
     }
 
-    public ButtonList(List<Button> buttons)
+    public ButtonList(List<GuiButton> buttons)
     {
-        super(buttons);
+        for(GuiButton button : buttons)
+        {
+            if(button instanceof Button)
+            {
+                add((Button) button);
+            }
+        }
     }
 
     public ButtonList(Button... buttons)

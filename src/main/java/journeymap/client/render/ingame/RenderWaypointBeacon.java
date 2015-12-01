@@ -319,14 +319,11 @@ public class RenderWaypointBeacon
             byte b0 = 1;
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             //double d3 = (double) time * 0.025D * -1.5D;
-            renderHelper.startDrawingQuads();
 
-            // For 1.8
-            float[] c = RGB.floats(color);
-            renderHelper.glColor4f(c[0], c[1], c[2], .45f);
+            int[] rgba = RGB.ints(color, 115);
+            renderHelper.startDrawingQuads(true);
             renderHelper.glEnableBlend();
-            // For 1.7.10
-//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 120);
+
             double d4 = (double) b0 * 0.2D;
             double d5 = Math.cos(d3 + 2.356194490192345D) * d4;
             double d6 = Math.sin(d3 + 2.356194490192345D) * d4;
@@ -341,22 +338,22 @@ public class RenderWaypointBeacon
             double d15 = 1.0D;
             double d16 = (double) (-1.0F + texOffset);
             double d17 = (double) (256.0F * f1) * (0.5D / d4) + d16;
-            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d15, d17);
-            renderHelper.addVertexWithUV(x + d5, y, z + d6, d15, d16);
-            renderHelper.addVertexWithUV(x + d7, y, z + d8, d14, d16);
-            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d14, d17);
-            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d15, d17);
-            renderHelper.addVertexWithUV(x + d11, y, z + d12, d15, d16);
-            renderHelper.addVertexWithUV(x + d9, y, z + d10, d14, d16);
-            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d14, d17);
-            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d15, d17);
-            renderHelper.addVertexWithUV(x + d7, y, z + d8, d15, d16);
-            renderHelper.addVertexWithUV(x + d11, y, z + d12, d14, d16);
-            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d14, d17);
-            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d15, d17);
-            renderHelper.addVertexWithUV(x + d9, y, z + d10, d15, d16);
-            renderHelper.addVertexWithUV(x + d5, y, z + d6, d14, d16);
-            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d14, d17);
+            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d15, d17, rgba);
+            renderHelper.addVertexWithUV(x + d5, y, z + d6, d15, d16, rgba);
+            renderHelper.addVertexWithUV(x + d7, y, z + d8, d14, d16, rgba);
+            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d14, d17, rgba);
+            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d15, d17, rgba);
+            renderHelper.addVertexWithUV(x + d11, y, z + d12, d15, d16, rgba);
+            renderHelper.addVertexWithUV(x + d9, y, z + d10, d14, d16, rgba);
+            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d14, d17, rgba);
+            renderHelper.addVertexWithUV(x + d7, y + d13, z + d8, d15, d17, rgba);
+            renderHelper.addVertexWithUV(x + d7, y, z + d8, d15, d16, rgba);
+            renderHelper.addVertexWithUV(x + d11, y, z + d12, d14, d16, rgba);
+            renderHelper.addVertexWithUV(x + d11, y + d13, z + d12, d14, d17, rgba);
+            renderHelper.addVertexWithUV(x + d9, y + d13, z + d10, d15, d17, rgba);
+            renderHelper.addVertexWithUV(x + d9, y, z + d10, d15, d16, rgba);
+            renderHelper.addVertexWithUV(x + d5, y, z + d6, d14, d16, rgba);
+            renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d14, d17, rgba);
             renderHelper.draw();
         }
 
@@ -375,29 +372,25 @@ public class RenderWaypointBeacon
             renderHelper.glBlendFunc(770, 771, 1, 0);
             renderHelper.glDepthMask(false);
 
-            renderHelper.startDrawingQuads();
-
-            // For 1.8
-            float[] c = RGB.floats(color);
-            renderHelper.glColor4f(c[0], c[1], c[2], .15f);
-            // For 1.7.10
-//            renderHelper.setColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), 40);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30);
-            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29);
-            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30);
-            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29);
-            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30);
-            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29);
-            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29);
-            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30);
-            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29);
-            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29);
-            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30);
+            int[] rgba = RGB.ints(color, 40);
+            renderHelper.startDrawingQuads(true);
+            
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29, rgba);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29, rgba);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 0, d30, rgba);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 1, d30, rgba);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 1, d29, rgba);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 0, d29, rgba);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 0, d30, rgba);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .2, 1, d30, rgba);
+            renderHelper.addVertexWithUV(x + .8, y, z + .2, 1, d29, rgba);
+            renderHelper.addVertexWithUV(x + .8, y, z + .8, 0, d29, rgba);
+            renderHelper.addVertexWithUV(x + .8, y + d26, z + .8, 0, d30, rgba);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .8, 1, d30, rgba);
+            renderHelper.addVertexWithUV(x + .2, y, z + .8, 1, d29, rgba);
+            renderHelper.addVertexWithUV(x + .2, y, z + .2, 0, d29, rgba);
+            renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 0, d30, rgba);
             renderHelper.draw();
             renderHelper.glDisableBlend();
         }

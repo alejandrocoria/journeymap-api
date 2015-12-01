@@ -13,6 +13,7 @@ import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -44,6 +45,8 @@ public interface IForgeHelper
     public IColorHelper getColorHelper();
 
     public Minecraft getClient();
+
+    public ScaledResolution getScaledResolution();
 
     public EnumSkyBlock getSkyBlock();
 

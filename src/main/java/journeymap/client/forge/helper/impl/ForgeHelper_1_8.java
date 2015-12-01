@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenRealmsProxy;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.Tessellator;
@@ -87,6 +88,18 @@ public class ForgeHelper_1_8 implements IForgeHelper
     public Minecraft getClient()
     {
         return FMLClientHandler.instance().getClient();
+    }
+
+    @Override
+    public ScaledResolution getScaledResolution()
+    {
+        Minecraft mc = getClient();
+
+        // 1.7.10, 1.8
+        // return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+
+        // 1.8.8
+        return new ScaledResolution(mc);
     }
 
     @Override
@@ -218,7 +231,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // 1.7
         // return entityLiving.getCommandSenderName();
 
-        // 1.8
+        // 1.8, 1.8.8
         return entity.getName();
     }
 
@@ -379,7 +392,11 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return chunk.getHeightValue(x, z);
 
         // 1.8
-        return chunk.getHeight(x, z);
+        // return chunk.getHeight(x, z);
+
+        // 1.8.8
+        return chunk.getHeightValue(x, z);
+
     }
 
     @Override
@@ -466,7 +483,11 @@ public class ForgeHelper_1_8 implements IForgeHelper
         }
         else
         {
-            return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+            // 1.8
+            // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+
+            // 1.8.8
+            return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().getBiomeGenerator(pos, BiomeGenBase.plains);
         }
     }
 
@@ -620,7 +641,11 @@ public class ForgeHelper_1_8 implements IForgeHelper
             }
             else
             {
-                return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+                // 1.8
+                // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+
+                // 1.8.8
+                return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().getBiomeGenerator(pos, BiomeGenBase.plains);
             }
         }
 

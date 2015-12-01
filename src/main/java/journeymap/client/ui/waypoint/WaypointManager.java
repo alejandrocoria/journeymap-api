@@ -518,7 +518,11 @@ public class WaypointManager extends JmUI
 
     protected void updateSort(SortButton sortButton)
     {
-        for (Button button : (List<Button>) buttonList)
+        // 1.8
+        // for (Button button : (List<Button>) buttonList)
+
+        // 1.8.8
+        for (GuiButton button : buttonList)
         {
             if (button instanceof SortButton)
             {
