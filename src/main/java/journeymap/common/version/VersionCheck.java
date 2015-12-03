@@ -139,7 +139,7 @@ public class VersionCheck
                         }
                         else
                         {
-                            Iterator<JsonElement> files = version.getAsJsonObject().get(Loader.MC_VERSION).getAsJsonArray().iterator();
+                            Iterator<JsonElement> files = version.getAsJsonArray().iterator();
                             while (files.hasNext())
                             {
                                 JsonObject file = files.next().getAsJsonObject();
