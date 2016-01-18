@@ -51,7 +51,7 @@ public class WaypointManager extends JmUI
     Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
-    private Button buttonClose, buttonAdd, buttonHelp, buttonOptions;
+    private Button buttonClose, buttonAdd, buttonOptions;
     private OnOffButton buttonToggleAll;
     private ButtonList bottomButtons;
     private Waypoint focusWaypoint;
@@ -130,14 +130,6 @@ public class WaypointManager extends JmUI
 //                buttonAdd.setTooltip(tooltip);
             }
 
-            if (buttonHelp == null)
-            {
-                buttonHelp = new Button(Constants.getString("jm.common.help"));
-                buttonHelp.fitWidth(getFontRenderer());
-//                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
-//                buttonHelp.setTooltip(tooltip);
-            }
-
             if (buttonOptions == null)
             {
                 buttonOptions = new Button(Constants.getString("jm.common.options_button"));
@@ -148,7 +140,7 @@ public class WaypointManager extends JmUI
 
             buttonClose = new Button(Constants.getString("jm.common.close"));
 
-            bottomButtons = new ButtonList(buttonOptions, buttonHelp, buttonAdd, buttonDimensions, buttonClose);
+            bottomButtons = new ButtonList(buttonOptions, buttonAdd, buttonDimensions, buttonClose);
             buttonList.addAll(bottomButtons);
 
 
@@ -404,11 +396,6 @@ public class WaypointManager extends JmUI
         {
             Waypoint waypoint = Waypoint.of(mc.thePlayer);
             UIManager.getInstance().openWaypointEditor(waypoint, true, this);
-            return;
-        }
-        if (guibutton == buttonHelp)
-        {
-            UIManager.getInstance().openWaypointHelp(this);
             return;
         }
         if (guibutton == buttonToggleAll)

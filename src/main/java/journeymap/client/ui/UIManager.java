@@ -20,7 +20,6 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.ui.minimap.MiniMapHotkeysHelp;
 import journeymap.client.ui.waypoint.WaypointEditor;
-import journeymap.client.ui.waypoint.WaypointHelp;
 import journeymap.client.ui.waypoint.WaypointManager;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
@@ -226,11 +225,6 @@ public class UIManager
     public void openSplash(JmUI returnDisplay)
     {
         open(Splash.class, returnDisplay);
-    }
-
-    public void openWaypointHelp(JmUI returnDisplay)
-    {
-        open(WaypointHelp.class, returnDisplay);
     }
 
     public void openWaypointManager(Waypoint waypoint, JmUI returnDisplay)

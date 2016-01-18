@@ -140,8 +140,6 @@ public class WaypointStore
                 cache.invalidateAll();
 
                 waypointDir = FileHandler.getWaypointDir();
-                waypoints.addAll(new ReiReader().loadWaypoints(waypointDir, true));
-                waypoints.addAll(new VoxelReader().loadWaypoints(waypointDir, true));
                 waypoints.addAll(new JmReader().loadWaypoints(waypointDir));
 
                 load(waypoints, false);

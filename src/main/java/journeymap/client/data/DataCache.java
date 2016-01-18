@@ -297,25 +297,7 @@ public class DataCache
     {
         synchronized (waypoints)
         {
-            if (WaypointsData.isReiMinimapEnabled() || WaypointsData.isVoxelMapEnabled())
-            {
-                // Caching needed
-                try
-                {
-                    if (forceRefresh)
-                    {
-                        waypoints.invalidateAll();
-                    }
-
-                    return waypoints.get(WaypointsData.class);
-                }
-                catch (ExecutionException e)
-                {
-                    Journeymap.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
-                    return Collections.EMPTY_LIST;
-                }
-            }
-            else if (WaypointsData.isManagerEnabled())
+            if (WaypointsData.isManagerEnabled())
             {
                 // The store is the cache
                 return WaypointStore.instance().getAll();
