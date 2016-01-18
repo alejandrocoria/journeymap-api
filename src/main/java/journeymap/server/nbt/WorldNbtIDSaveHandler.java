@@ -14,6 +14,8 @@ import net.minecraft.world.World;
 import java.util.UUID;
 
 /**
+ * TODO:  look for world_uuid first, then look for JourneyMapWorldID and migrate it to world_uuid if it exists, then create a new world_uuid if it doesn't exist
+ *
  * Created by Mysticdrew on 10/27/2014.
  */
 public class WorldNbtIDSaveHandler
@@ -26,7 +28,6 @@ public class WorldNbtIDSaveHandler
         world = MinecraftServer.getServer().getEntityWorld();
         data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, "JourneyMapWorldID");
     }
-
 
     public String getWorldID()
     {
