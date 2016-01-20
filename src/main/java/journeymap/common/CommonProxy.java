@@ -11,6 +11,7 @@ package journeymap.common;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Map;
@@ -20,6 +21,14 @@ import java.util.Map;
  */
 public interface CommonProxy
 {
+    /**
+     * Pre-initialize the side.
+     *
+     * @param event
+     * @throws Throwable
+     */
+    public void preInitialize(FMLPreInitializationEvent event) throws Throwable;
+
     /**
      * Initialize the side.
      *

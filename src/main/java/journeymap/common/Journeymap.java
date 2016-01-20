@@ -70,6 +70,18 @@ public class Journeymap
     }
 
     /**
+     * Pre-initialize the sided proxy.
+     *
+     * @param event
+     * @throws Throwable
+     */
+    @Mod.EventHandler
+    public void preInitialize(FMLPreInitializationEvent event) throws Throwable
+    {
+        proxy.preInitialize(event);
+    }
+
+    /**
      * Initialize the sided proxy.
      *
      * @param event
@@ -91,13 +103,6 @@ public class Journeymap
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
     {
         proxy.postInitialize(event);
-    }
-
-    @SideOnly(Side.SERVER)
-    @Mod.EventHandler
-    public void preInitEvent(FMLPreInitializationEvent event)
-    {
-        ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
     }
 
     @SideOnly(Side.SERVER)
