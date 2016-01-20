@@ -151,8 +151,13 @@ public class VersionCheck
                                     {
                                         continue;
                                     }
+                                    String name = file.get("name").getAsString();
+                                    if(!name.contains(Loader.MC_VERSION))
+                                    {
+                                        continue;
+                                    }
 
-                                    String name = file.get("name").getAsString().split(Loader.MC_VERSION)[1];
+                                    name = name.split(Loader.MC_VERSION)[1];
                                     if (!name.contains("-"))
                                     {
                                         continue;
