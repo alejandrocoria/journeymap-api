@@ -8,6 +8,8 @@
 
 package journeymap.client;
 
+import journeymap.client.api.impl.ClientAPI;
+import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
@@ -43,6 +45,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -221,6 +224,26 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
+     * Pre-initialize the side.
+     *
+     * @param event
+     * @throws Throwable
+     */
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void preInitialize(FMLPreInitializationEvent event) throws Throwable
+    {
+        try
+        {
+            PluginHelper.INSTANCE.preInitPlugins(event);
+        }
+        catch (Throwable t)
+        {
+            t.printStackTrace();
+        }
+    }
+
+    /**
      * Initialize the client.
      *
      * @param event
@@ -240,7 +263,7 @@ public class JourneymapClient implements CommonProxy
 
             // Ensure logger inits
             logger = JMLogger.init();
-            logger.info("ensureCurrent ENTER");
+            logger.info("initialize ENTER");
 
             if (initialized)
             {
@@ -264,7 +287,10 @@ public class JourneymapClient implements CommonProxy
             // Logging for thread debugging
             threadLogging = false;
 
-            logger.info("ensureCurrent EXIT, " + (timer == null ? "" : timer.stopAndReport()));
+            // Init Plugins
+            PluginHelper.INSTANCE.initPlugins(event, ClientAPI.INSTANCE);
+
+            logger.info("initialize EXIT, " + (timer == null ? "" : timer.getLogReportString()));
         }
         catch (Throwable t)
         {
