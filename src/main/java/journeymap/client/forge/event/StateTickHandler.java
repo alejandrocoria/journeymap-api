@@ -9,6 +9,7 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
@@ -18,6 +19,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -125,8 +127,13 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
             if (doCreate)
             {
-                Waypoint deathpoint = Waypoint.at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Waypoint.Type.Death, ForgeHelper.INSTANCE.getPlayerDimension());
-                WaypointStore.instance().save(deathpoint);
+                BlockPos pos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                int dim = ForgeHelper.INSTANCE.getPlayerDimension();
+                if (ClientAPI.INSTANCE.notifyDeathWaypoint(pos, dim))
+                {
+                    Waypoint deathpoint = Waypoint.at(pos, Waypoint.Type.Death, dim);
+                    WaypointStore.instance().save(deathpoint);
+                }
             }
 
             Journeymap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",

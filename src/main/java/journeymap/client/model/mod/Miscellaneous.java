@@ -8,16 +8,10 @@
 
 package journeymap.client.model.mod;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
-import journeymap.client.model.Waypoint;
-import journeymap.client.waypoint.WaypointStore;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,64 +67,6 @@ public class Miscellaneous
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
         {
             // Should never be called
-            return blockMD;
-        }
-    }
-
-    /**
-     * Create a waypoint for an OpenBlocks.
-     * TODO: Buggy, don't use until fixed
-     */
-    public static class OpenBlocksGraveHandler implements ModBlockDelegate.IModBlockHandler
-    {
-        public static final GameRegistry.UniqueIdentifier UID = new GameRegistry.UniqueIdentifier("OpenBlocks:grave");
-        private static final String TAG_PLAYERNAME = "PlayerName";
-        private static final String TAG_PLAYERUUID = "PlayerUUID";
-
-        @Override
-        public boolean initialize(BlockMD blockMD)
-        {
-            if (blockMD.getUid().equals(UID))
-            {
-                blockMD.setModBlockHandler(this);
-                return true;
-            }
-
-            return false;
-        }
-
-        @Override
-        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
-        {
-            int blockX = chunkMD.toWorldX(localX);
-            int blockZ = chunkMD.toWorldZ(localZ);
-            //String name = I18n.format("tile.openblocks.grave.name");
-            TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockX, y, blockZ);
-
-            if (tileEntity != null)
-            {
-                NBTTagCompound tag = new NBTTagCompound();
-                tileEntity.writeToNBT(tag);
-
-                String playerName = null;
-                if (tag.hasNoTags())
-                {
-                    playerName = "?";
-                }
-                else
-                {
-                    playerName = tag.getString(TAG_PLAYERNAME);
-                }
-
-                if (playerName == null)
-                {
-                    playerName = "";
-                }
-
-                Waypoint waypoint = new Waypoint(playerName + " " + blockMD.getName(), blockX, y, blockZ, Color.red, Waypoint.Type.Death, chunkMD.getDimension());
-                WaypointStore.instance().add(waypoint);
-            }
-
             return blockMD;
         }
     }

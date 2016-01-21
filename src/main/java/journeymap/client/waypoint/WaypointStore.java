@@ -44,17 +44,24 @@ public class WaypointStore
 
     private boolean writeToFile(Waypoint waypoint)
     {
-        File waypointFile = null;
-        try
+        if (waypoint.isPersistent())
         {
-            // Write to file
-            waypointFile = new File(FileHandler.getWaypointDir(), waypoint.getFileName());
-            Files.write(gson.toJson(waypoint), waypointFile, Charset.forName("UTF-8"));
-            return true;
+            File waypointFile = null;
+            try
+            {
+                // Write to file
+                waypointFile = new File(FileHandler.getWaypointDir(), waypoint.getFileName());
+                Files.write(gson.toJson(waypoint), waypointFile, Charset.forName("UTF-8"));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
+                return false;
+            }
         }
-        catch (Exception e)
+        else
         {
-            Journeymap.getLogger().error(String.format("Can't save waypoint file %s: %s", waypointFile, LogFormatter.toString(e)));
             return false;
         }
     }
@@ -157,7 +164,7 @@ public class WaypointStore
     {
         for (Waypoint waypoint : waypoints)
         {
-            if (forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
+            if (waypoint.isPersistent() && (forceSave || waypoint.isDirty()))
             {
                 save(waypoint);
             }

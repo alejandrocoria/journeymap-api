@@ -25,6 +25,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import org.lwjgl.input.Mouse;
 
@@ -113,7 +114,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
         for (Waypoint waypoint : waypoints)
         {
-            if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
+            if (waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
                 if (area.isVecInside(ForgeHelper.INSTANCE.newVec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
@@ -174,7 +175,8 @@ public class WaypointLayer implements LayerDelegate.Layer
         }
 
         // Create waypoint
-        Waypoint waypoint = Waypoint.at(blockCoord.x, y, blockCoord.z, Waypoint.Type.Normal, mc.thePlayer.dimension);
+        BlockPos blockPos = new BlockPos(blockCoord.x, 0, blockCoord.z);
+        Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, mc.thePlayer.dimension);
         UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;

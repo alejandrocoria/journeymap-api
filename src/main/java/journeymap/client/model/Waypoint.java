@@ -12,12 +12,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
+import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -32,20 +35,23 @@ import java.util.*;
  */
 public class Waypoint implements Serializable
 {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
 
     protected static final String ICON_NORMAL = "waypoint-normal.png";
     protected static final String ICON_DEATH = "waypoint-death.png";
-
-//    @Expose(serialize = false, deserialize = false)
-//    protected int version = 1;
 
     @Since(1)
     protected String id;
 
     @Since(1)
     protected String name;
+
+    @Since(2)
+    protected String waypointGroupName;
+
+    @Since(2)
+    protected String displayId;
 
     @Since(1)
     protected String icon;
@@ -75,12 +81,14 @@ public class Waypoint implements Serializable
     protected Type type;
 
     @Since(1)
-    protected Origin origin;
+    protected String origin;
 
     @Since(1)
     protected TreeSet<Integer> dimensions;
 
-    protected transient boolean readOnly;
+    @Since(2)
+    protected boolean persistent;
+
     protected transient boolean dirty;
     protected transient Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
@@ -99,15 +107,31 @@ public class Waypoint implements Serializable
         this.z = original.z;
     }
 
-    public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
+    public Waypoint(ModWaypoint modWaypoint)
     {
-        this(name, posX, posY, posZ, true, color.getRed(), color.getGreen(), color.getBlue(), type, Origin.JourneyMap, currentDimension, Arrays.asList(currentDimension));
+        this(modWaypoint.getWaypointName(), modWaypoint.getPoint(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimensions()[0]);
+
+        int[] prim = modWaypoint.getDimensions();
+        ArrayList<Integer> dims = new ArrayList<Integer>(prim.length);
+        for (int aPrim : prim)
+        {
+            dims.add(aPrim);
+        }
+        this.setDimensions(dims);
+        this.setOrigin(modWaypoint.getModId());
+        this.setPersistent(modWaypoint.isPersistent());
+        this.setWaypointGroupName(modWaypoint.getWaypointGroupName());
+    }
+
+    public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension)
+    {
+        this(name, pos.getX(), pos.getY(), pos.getZ(), true, color.getRed(), color.getGreen(), color.getBlue(), type, Journeymap.MOD_ID, currentDimension, Arrays.asList(currentDimension));
     }
 
     /**
      * Main constructor.
      */
-    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, Origin origin, Integer currentDimension, Collection<Integer> dimensions)
+    public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, String origin, Integer currentDimension, Collection<Integer> dimensions)
     {
         if (name == null)
         {
@@ -130,6 +154,7 @@ public class Waypoint implements Serializable
         this.enable = enable;
         this.type = type;
         this.origin = origin;
+        this.persistent = true;
 
         switch (type)
         {
@@ -148,10 +173,11 @@ public class Waypoint implements Serializable
 
     public static Waypoint of(EntityPlayer player)
     {
-        return at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Type.Normal, ForgeHelper.INSTANCE.getPlayerDimension());
+        BlockPos blockPos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+        return at(blockPos, Type.Normal, ForgeHelper.INSTANCE.getPlayerDimension());
     }
 
-    public static Waypoint at(int posX, int posY, int posZ, Type type, int dimension)
+    public static Waypoint at(BlockPos blockPos, Type type, int dimension)
     {
         String name;
         if (type == Type.Death)
@@ -163,9 +189,9 @@ public class Waypoint implements Serializable
         }
         else
         {
-            name = createName(posX, posZ);
+            name = createName(blockPos.getX(), blockPos.getZ());
         }
-        Waypoint waypoint = new Waypoint(name, posX, posY, posZ, Color.white, type, dimension);
+        Waypoint waypoint = new Waypoint(name, blockPos, Color.white, type, dimension);
         waypoint.setRandomColor();
         return waypoint;
     }
@@ -208,6 +234,17 @@ public class Waypoint implements Serializable
     public ChunkCoordIntPair getChunkCoordIntPair()
     {
         return new ChunkCoordIntPair(x >> 4, z >> 4);
+    }
+
+    public String getWaypointGroupName()
+    {
+        return waypointGroupName;
+    }
+
+    public Waypoint setWaypointGroupName(String waypointGroupName)
+    {
+        this.waypointGroupName = waypointGroupName;
+        return this;
     }
 
     public void setRandomColor()
@@ -394,12 +431,12 @@ public class Waypoint implements Serializable
         this.type = type;
     }
 
-    public Origin getOrigin()
+    public String getOrigin()
     {
         return origin;
     }
 
-    public void setOrigin(Origin origin)
+    public void setOrigin(String origin)
     {
         this.origin = origin;
     }
@@ -416,17 +453,22 @@ public class Waypoint implements Serializable
 
     public void setDirty(boolean dirty)
     {
-        this.dirty = dirty;
+        if (isPersistent())
+        {
+            this.dirty = dirty;
+        }
     }
 
-    public boolean isReadOnly()
+    public boolean isPersistent()
     {
-        return readOnly;
+        return persistent;
     }
 
-    public void setReadOnly(boolean readOnly)
+    public Waypoint setPersistent(boolean persistent)
     {
-        this.readOnly = readOnly;
+        this.persistent = persistent;
+        this.dirty = persistent;
+        return this;
     }
 
     @Override
@@ -509,13 +551,6 @@ public class Waypoint implements Serializable
     public int hashCode()
     {
         return id.hashCode();
-    }
-
-    public enum Origin
-    {
-        JourneyMap,
-        ReiMinimap,
-        VoxelMap
     }
 
     public enum Type

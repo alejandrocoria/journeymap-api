@@ -490,6 +490,9 @@ public class JourneymapClient implements CommonProxy
                     File.separator,
                     ForgeHelper.INSTANCE.getDimension(mc.theWorld),
                     memory));
+
+            // Notify plugins
+            ClientAPI.INSTANCE.notifyDisplayStarted(mc.theWorld.provider.getDimensionId());
         }
     }
 
