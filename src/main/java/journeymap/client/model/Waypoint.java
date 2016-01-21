@@ -119,6 +119,7 @@ public class Waypoint implements Serializable
         }
         this.setDimensions(dims);
         this.setOrigin(modWaypoint.getModId());
+        this.displayId = modWaypoint.getDisplayId();
         this.setPersistent(modWaypoint.isPersistent());
         this.setWaypointGroupName(modWaypoint.getWaypointGroupName());
     }
@@ -319,7 +320,12 @@ public class Waypoint implements Serializable
 
     public String getId()
     {
-        return id;
+        return (displayId != null) ? getGuid() : id;
+    }
+
+    public String getGuid()
+    {
+        return origin + ":" + displayId;
     }
 
     public String getName()
