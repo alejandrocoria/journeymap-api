@@ -62,7 +62,7 @@ public enum ClientAPI implements IClientAPI
                 DisplayablePair displayablePair = modObjects.add(displayable);
 
                 // Waypoints can be handled immediately
-                if (DisplayType.of(displayable.getClass()) == DisplayType.Waypoint)
+                if (displayable.getDisplayType() == DisplayType.Waypoint)
                 {
                     ModWaypoint modWaypoint = (ModWaypoint) displayable;
                     Waypoint waypoint = new Waypoint(modWaypoint);
@@ -80,7 +80,7 @@ public enum ClientAPI implements IClientAPI
     @Override
     public void remove(Displayable displayable)
     {
-        remove(displayable.getModId(), DisplayType.of(displayable.getClass()), displayable.getDisplayId());
+        remove(displayable.getModId(), displayable.getDisplayType(), displayable.getDisplayId());
     }
 
     @Override
@@ -122,18 +122,15 @@ public enum ClientAPI implements IClientAPI
     }
 
     @Override
-    public boolean exists(String modId, DisplayType displayType, String displayId)
+    public boolean exists(Displayable displayable)
     {
-        return modObjectsCache.getUnchecked(modId).exists(displayType, displayId);
+        return exists(displayable.getModId(), displayable.getDisplayType(), displayable.getDisplayId());
     }
 
     @Override
-    public boolean isVisible(String modId, DisplayType displayType, String displayId)
+    public boolean exists(String modId, DisplayType displayType, String displayId)
     {
-        DisplayablePair pair = modObjectsCache.getUnchecked(modId).get(displayType, displayId);
-
-        // TODO:  This only returns whether an internal object has been created, not whether it's actually visible
-        return pair != null && pair.getInternal() != null;
+        return modObjectsCache.getUnchecked(modId).exists(displayType, displayId);
     }
 
     @Override
@@ -165,7 +162,7 @@ public enum ClientAPI implements IClientAPI
 
     public boolean playerAccepts(Displayable displayable)
     {
-        return playerAccepts(displayable.getModId(), DisplayType.of(displayable.getClass()));
+        return playerAccepts(displayable.getModId(), displayable.getDisplayType());
     }
 
     /**
