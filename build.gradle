@@ -3,9 +3,6 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
-            url "https://oss.sonatype.org/content/groups/staging"
-        }
-        maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
@@ -33,6 +30,7 @@ archivesBaseName = "${project.mod_id}".toLowerCase()
 
 dependencies {
     compile 'info.journeymap:journeymap-api:1.8.9-1.0'
+    compile 'com.yahoo.platform.yui:yuicompressor:2.4.8'
 }
 
 minecraft {
