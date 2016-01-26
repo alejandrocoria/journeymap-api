@@ -15,11 +15,11 @@ import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import se.rupy.http.Event;
 
 import java.awt.image.BufferedImage;

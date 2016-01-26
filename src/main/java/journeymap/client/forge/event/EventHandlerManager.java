@@ -9,9 +9,9 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.cartography.ColorManager;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventBus;

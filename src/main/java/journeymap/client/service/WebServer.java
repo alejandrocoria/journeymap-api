@@ -10,9 +10,9 @@ package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.log.ChatLog;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.thread.JMThreadFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;

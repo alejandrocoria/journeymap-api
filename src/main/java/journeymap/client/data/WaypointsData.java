@@ -10,7 +10,6 @@ package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;

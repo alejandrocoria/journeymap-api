@@ -10,17 +10,17 @@ package journeymap.client.properties;
 
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.MapType;
-import journeymap.client.properties.config.Config;
 import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
+import journeymap.common.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.client.properties.config.Config.Category.Inherit;
+import static journeymap.common.properties.config.Config.Category.Inherit;
 
 /**
  * Properties for the minimap in-game.

@@ -1,10 +1,10 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;

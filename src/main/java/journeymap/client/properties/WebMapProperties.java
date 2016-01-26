@@ -9,14 +9,14 @@
 package journeymap.client.properties;
 
 import journeymap.client.model.MapType;
-import journeymap.client.properties.config.Config;
 import journeymap.client.service.MapApiService;
+import journeymap.common.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.client.properties.config.Config.Category.WebMap;
+import static journeymap.common.properties.config.Config.Category.WebMap;
 
 /**
  * Properties for the web map in browser.

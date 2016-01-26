@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -24,7 +24,7 @@ public class CheckBox extends BooleanPropertyButton
 {
     public int boxWidth = 11;
     AtomicBoolean property;
-    PropertiesBase properties;
+    CommonProperties properties;
     String glyph = "\u2714";
 
     public CheckBox(String displayString, boolean checked)
@@ -33,7 +33,7 @@ public class CheckBox extends BooleanPropertyButton
         this.toggled = checked;
     }
 
-    public CheckBox(String displayString, AtomicBoolean property, PropertiesBase properties)
+    public CheckBox(String displayString, AtomicBoolean property, CommonProperties properties)
     {
         super(displayString, displayString, properties, property);
         this.property = property;

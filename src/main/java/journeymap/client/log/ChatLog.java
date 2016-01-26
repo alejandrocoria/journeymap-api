@@ -12,6 +12,7 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.service.WebServer;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.event.ClickEvent;

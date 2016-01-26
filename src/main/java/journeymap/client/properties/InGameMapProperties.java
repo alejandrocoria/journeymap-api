@@ -9,14 +9,14 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
-import journeymap.client.properties.config.Config;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.common.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.client.properties.config.Config.Category.Inherit;
+import static journeymap.common.properties.config.Config.Category.Inherit;
 
 /**
  * Shared Properties for in-game map types.

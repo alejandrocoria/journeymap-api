@@ -8,11 +8,11 @@
 
 package journeymap.client.model.mod;
 
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;

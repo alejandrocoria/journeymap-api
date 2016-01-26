@@ -10,8 +10,8 @@ package journeymap.client.io.migrate;
 
 import journeymap.client.Constants;
 import journeymap.client.io.FileHandler;
-import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.version.Version;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

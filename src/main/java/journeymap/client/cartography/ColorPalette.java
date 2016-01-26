@@ -17,15 +17,14 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.ChatLog;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.awt.*;
 import java.io.File;

@@ -6,14 +6,12 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.properties.config;
+package journeymap.common.properties.config;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.client.Constants;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.properties.PropertiesBase;
-import journeymap.client.ui.option.StringListProvider;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.CommonProperties;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class ConfigValidation
      * @param instance instance to validate
      * @return true if save needed
      */
-    public static boolean validateConfigs(PropertiesBase instance)
+    public static boolean validateConfigs(CommonProperties instance)
     {
         try
         {
@@ -58,7 +56,7 @@ public class ConfigValidation
      * @param propertiesClass class with annotations
      * @return true if save needed
      */
-    private static boolean validateConfigs(Class<? extends PropertiesBase> propertiesClass, PropertiesBase instance) throws Exception
+    private static boolean validateConfigs(Class<? extends CommonProperties> propertiesClass, CommonProperties instance) throws Exception
     {
         boolean saveNeeded = false;
 
@@ -101,7 +99,7 @@ public class ConfigValidation
         }
 
         Class parentClass = propertiesClass.getSuperclass();
-        if (PropertiesBase.class.isAssignableFrom(parentClass))
+        if (CommonProperties.class.isAssignableFrom(parentClass))
         {
             saveNeeded = validateConfigs(parentClass, instance) || saveNeeded;
         }
@@ -116,7 +114,7 @@ public class ConfigValidation
      * @param field    the field
      * @param instance the owning instance
      */
-    private static boolean validateInteger(Config config, Field field, PropertiesBase instance) throws Exception
+    private static boolean validateInteger(Config config, Field field, CommonProperties instance) throws Exception
     {
         boolean saveNeeded = false;
 
@@ -158,7 +156,7 @@ public class ConfigValidation
      * @param field    the field
      * @param instance the owning instance
      */
-    private static boolean validateString(Config config, Field field, PropertiesBase instance) throws Exception
+    private static boolean validateString(Config config, Field field, CommonProperties instance) throws Exception
     {
         boolean saveNeeded = false;
 
@@ -190,7 +188,7 @@ public class ConfigValidation
      * @param field    the field
      * @param instance the owning instance
      */
-    private static boolean validateEnum(Config config, Field field, PropertiesBase instance) throws Exception
+    private static boolean validateEnum(Config config, Field field, CommonProperties instance) throws Exception
     {
         boolean saveNeeded = false;
 
@@ -232,27 +230,4 @@ public class ConfigValidation
     {
         Journeymap.getLogger().warn(String.format("Property %s.%s invalid: %s . Changing to: %s", field.getDeclaringClass().getSimpleName(), field.getName(), oldValue, newValue));
     }
-
-    /**
-     * Get the property displayname from the Config
-     */
-    public static String getName(Config annotation)
-    {
-        return Constants.getString(annotation.key());
-    }
-
-    /**
-     * Get the property tooltip from the Config
-     */
-    public static String getTooltip(Config annotation)
-    {
-        String tooltipKey = annotation.key() + ".tooltip";
-        String tooltip = Constants.getString(tooltipKey);
-        if (tooltipKey.equals(tooltip))
-        {
-            tooltip = null;
-        }
-        return tooltip;
-    }
-
 }

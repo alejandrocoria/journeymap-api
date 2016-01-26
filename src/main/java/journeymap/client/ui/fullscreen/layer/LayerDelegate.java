@@ -8,10 +8,10 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;

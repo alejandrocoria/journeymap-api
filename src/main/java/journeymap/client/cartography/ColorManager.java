@@ -13,10 +13,10 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 

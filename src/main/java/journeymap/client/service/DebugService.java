@@ -11,8 +11,8 @@ package journeymap.client.service;
 import com.google.common.io.CharStreams;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
+import journeymap.common.log.LogFormatter;
 import se.rupy.http.Event;
 
 import java.io.InputStream;

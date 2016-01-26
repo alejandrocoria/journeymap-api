@@ -10,12 +10,12 @@ package journeymap.client.data;
 
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
 

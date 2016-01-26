@@ -9,18 +9,18 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
-import journeymap.client.properties.config.Config;
+import journeymap.common.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static journeymap.client.properties.config.Config.Category.Waypoint;
-import static journeymap.client.properties.config.Config.Category.WaypointBeacon;
+import static journeymap.common.properties.config.Config.Category.Waypoint;
+import static journeymap.common.properties.config.Config.Category.WaypointBeacon;
 
 /**
  * Properties for in-game waypoint management and display.
  */
-public class WaypointProperties extends PropertiesBase implements Comparable<WaypointProperties>
+public class WaypointProperties extends ClientProperties implements Comparable<WaypointProperties>
 {
     @Config(category = Waypoint, master = true, key = "jm.waypoint.enable_manager")
     public final AtomicBoolean managerEnabled = new AtomicBoolean(true);

@@ -15,9 +15,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 
 import java.io.File;
 import java.nio.charset.Charset;

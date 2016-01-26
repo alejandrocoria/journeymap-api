@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.properties.config;
+package journeymap.common.properties.config;
 
 import com.google.gson.*;
 

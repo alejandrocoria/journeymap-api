@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -31,10 +31,10 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
     public int maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
-    PropertiesBase properties;
+    CommonProperties properties;
     AtomicInteger property;
 
-    public IntSliderButton(PropertiesBase properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
+    public IntSliderButton(CommonProperties properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
         super(prefix);
         minValue = minVal;

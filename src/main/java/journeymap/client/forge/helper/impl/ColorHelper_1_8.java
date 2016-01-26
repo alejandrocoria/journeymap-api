@@ -11,18 +11,17 @@ package journeymap.client.forge.helper.impl;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -39,9 +38,9 @@ import java.util.HashSet;
  */
 public class ColorHelper_1_8 implements IColorHelper
 {
-    private volatile BufferedImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
+    private volatile BufferedImage blocksTexture;
 
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.

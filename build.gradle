@@ -1,6 +1,10 @@
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
+        maven {
+            url "https://oss.sonatype.org/content/groups/staging"
+        }
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -27,6 +31,10 @@ version = "${project.minecraft_version}-${project.jm_major}.${project.jm_minor}.
 group = "${project.group_id}"
 archivesBaseName = "${project.mod_id}".toLowerCase()
 
+dependencies {
+    compile 'info.journeymap:journeymap-api:1.8.9-1.0'
+}
+
 minecraft {
     version = "${project.minecraft_version}-${project.forge_version}"
     mappings = "${project.snapshot}"
@@ -40,10 +48,6 @@ minecraft {
     replace "@MINOR@", project.jm_minor
     replace "@MICRO@", project.jm_micro
     replace "@PATCH@", project.jm_patch
-}
-
-dependencies {
-    compile fileTree(dir: 'libs', include: '*.*');
 }
 
 processResources {

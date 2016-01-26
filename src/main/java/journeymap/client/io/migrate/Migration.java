@@ -8,8 +8,8 @@
 
 package journeymap.client.io.migrate;
 
-import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.version.Version;
 
 import java.util.concurrent.Callable;

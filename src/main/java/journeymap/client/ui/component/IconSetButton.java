@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
@@ -22,11 +22,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class IconSetButton extends Button implements IPropertyHolder<AtomicReference<String>, String>
 {
     final String messageKey;
-    final PropertiesBase baseProperties;
+    final CommonProperties baseProperties;
     final AtomicReference<String> valueHolder;
     final ArrayList<Object> validNames;
 
-    public IconSetButton(PropertiesBase baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
+    public IconSetButton(CommonProperties baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
     {
         super(0, 0, Constants.getString(messageKey, ""));
         this.baseProperties = baseProperties;

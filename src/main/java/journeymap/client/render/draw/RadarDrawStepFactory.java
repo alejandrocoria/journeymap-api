@@ -11,13 +11,13 @@ package journeymap.client.render.draw;
 import com.google.common.base.Strings;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.properties.InGameMapProperties;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 

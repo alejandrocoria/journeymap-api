@@ -10,9 +10,9 @@ package journeymap.client.command;
 
 import com.mojang.authlib.GameProfile;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.ServerConfigurationManager;

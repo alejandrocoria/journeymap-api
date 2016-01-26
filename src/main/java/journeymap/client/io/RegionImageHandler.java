@@ -10,13 +10,13 @@ package journeymap.client.io;
 
 
 import journeymap.client.Constants;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.map.TileDrawStep;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Level;
 

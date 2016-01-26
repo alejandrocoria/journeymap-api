@@ -13,8 +13,8 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
-import journeymap.client.properties.config.Config;
 import journeymap.client.task.multi.RenderSpec;
+import journeymap.common.properties.config.Config;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 import java.util.Arrays;
@@ -22,13 +22,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.client.properties.config.Config.Category.*;
+import static journeymap.common.properties.config.Config.Category.*;
 
 /**
  * Properties for basic mod configuration.
  */
-public class CoreProperties extends PropertiesBase implements Comparable<CoreProperties>
+public class CoreProperties extends ClientProperties implements Comparable<CoreProperties>
 {
+
     @Config(category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class)
     public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
 

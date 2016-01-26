@@ -11,12 +11,12 @@ package journeymap.client.cartography.render;
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.*;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.world.ChunkCoordIntPair;
 
 /**

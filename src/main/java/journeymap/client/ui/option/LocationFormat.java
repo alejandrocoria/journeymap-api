@@ -9,9 +9,10 @@
 package journeymap.client.ui.option;
 
 import journeymap.client.Constants;
-import journeymap.client.properties.PropertiesBase;
 import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.common.Journeymap;
+import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.StringListProvider;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -102,7 +103,7 @@ public class LocationFormat
     {
         LocationFormat locationFormat;
 
-        public Button(PropertiesBase properties, AtomicReference<String> valueHolder)
+        public Button(CommonProperties properties, AtomicReference<String> valueHolder)
         {
             super(Arrays.asList(locationFormatIds), Constants.getString("jm.common.location_format"), properties, valueHolder);
             if (locationFormat == null)

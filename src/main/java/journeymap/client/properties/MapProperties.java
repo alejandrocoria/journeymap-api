@@ -11,18 +11,18 @@ package journeymap.client.properties;
 import com.google.common.base.Objects;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.model.MapType;
-import journeymap.client.properties.config.Config;
+import journeymap.common.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.client.properties.config.Config.Category.Inherit;
+import static journeymap.common.properties.config.Config.Category.Inherit;
 
 /**
  * Shared Properties for the various map types.
  */
-public abstract class MapProperties extends PropertiesBase implements Comparable<MapProperties>
+public abstract class MapProperties extends ClientProperties implements Comparable<MapProperties>
 {
     @Config(category = Inherit, key = "jm.common.show_mobs")
     public final AtomicBoolean showMobs = new AtomicBoolean(true);

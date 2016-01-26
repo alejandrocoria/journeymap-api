@@ -9,9 +9,9 @@
 package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;

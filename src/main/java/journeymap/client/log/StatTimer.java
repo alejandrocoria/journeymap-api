@@ -10,6 +10,7 @@ package journeymap.client.log;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.logging.log4j.Logger;
 

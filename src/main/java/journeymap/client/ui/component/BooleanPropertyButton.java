@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,10 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<AtomicBoolean, Boolean>
 {
-    final PropertiesBase properties;
+    final CommonProperties properties;
     final AtomicBoolean valueHolder;
 
-    public BooleanPropertyButton(String labelOn, String labelOff, PropertiesBase properties, AtomicBoolean valueHolderParam)
+    public BooleanPropertyButton(String labelOn, String labelOff, CommonProperties properties, AtomicBoolean valueHolderParam)
     {
         super(labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
         this.valueHolder = valueHolderParam;

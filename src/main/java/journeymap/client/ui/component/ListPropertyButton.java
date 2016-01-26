@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
@@ -24,14 +24,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ListPropertyButton<T> extends Button implements IPropertyHolder<AtomicReference<T>, T>
 {
-    protected final PropertiesBase properties;
+    protected final CommonProperties properties;
     protected final AtomicReference<T> valueHolder;
     protected final List<T> values;
     protected final String baseLabel;
     protected final String glyph = "\u21D5";
     protected final String labelPattern = "%1$s : %2$s %3$s %2$s";
 
-    public ListPropertyButton(Collection<T> values, String label, PropertiesBase properties, AtomicReference<T> valueHolder)
+    public ListPropertyButton(Collection<T> values, String label, CommonProperties properties, AtomicReference<T> valueHolder)
     {
         super("");
         this.valueHolder = valueHolder;

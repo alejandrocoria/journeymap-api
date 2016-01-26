@@ -49,6 +49,8 @@ public enum ClientAPI implements IClientAPI
         return JourneymapClient.getInstance().isMapping();
     }
 
+    // TODO:  RESET ?
+
     @Override
     public void show(Displayable displayable)
     {

@@ -12,9 +12,10 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;
-import journeymap.client.properties.PropertiesBase;
-import journeymap.client.ui.option.StringListProvider;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.StringListProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import org.apache.logging.log4j.Level;
@@ -181,7 +182,7 @@ public class JMLogger
 
         // Add config files
         JourneymapClient jm = JourneymapClient.getInstance();
-        List<? extends PropertiesBase> configs = Arrays.asList(
+        List<? extends CommonProperties> configs = Arrays.asList(
                 JourneymapClient.getMiniMapProperties1(),
                 JourneymapClient.getMiniMapProperties2(),
                 JourneymapClient.getFullMapProperties(),
@@ -190,7 +191,7 @@ public class JMLogger
                 JourneymapClient.getCoreProperties()
         );
 
-        for (PropertiesBase config : configs)
+        for (CommonProperties config : configs)
         {
             // TODO: Only show non-default values?
             sb.append(LogFormatter.LINEBREAK).append(config);

@@ -6,11 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.log;
-
-import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
-import journeymap.common.Journeymap;
+package journeymap.common.log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -51,7 +47,6 @@ public class LogFormatter
                 else if (thrown instanceof OutOfMemoryError)
                 {
                     OutOfMemoryWarnings++;
-                    ChatLog.announceI18N("jm.common.memory_warning", thrown.toString());
                     thrown.printStackTrace(System.err);
                     break;
                 }
@@ -60,9 +55,6 @@ public class LogFormatter
                     if (thrown instanceof LinkageError)
                     {
                         LinkageErrorWarnings++;
-                        String error = Constants.getString("jm.error.compatability", JourneymapClient.MOD_NAME, Journeymap.FORGE_VERSION);
-                        thrown.printStackTrace(System.err);
-                        ChatLog.announceError(error);
                         thrown.printStackTrace(System.err);
                         break;
                     }

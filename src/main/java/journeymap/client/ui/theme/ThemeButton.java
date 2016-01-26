@@ -10,11 +10,11 @@ package journeymap.client.ui.theme;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.properties.PropertiesBase;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.BooleanPropertyButton;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -54,7 +54,7 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
-    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, PropertiesBase properties, AtomicBoolean property)
+    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, CommonProperties properties, AtomicBoolean property)
     {
         super(labelOn, labelOff, properties, property);
         this.iconName = iconName;

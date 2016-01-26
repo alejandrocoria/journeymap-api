@@ -12,12 +12,12 @@ import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Level;
 

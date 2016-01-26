@@ -8,8 +8,8 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;

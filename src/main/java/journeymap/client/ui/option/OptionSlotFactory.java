@@ -14,10 +14,11 @@ import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
-import journeymap.client.properties.PropertiesBase;
-import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.*;
 import journeymap.common.Journeymap;
+import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.Config;
+import journeymap.common.properties.config.StringListProvider;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -110,9 +111,9 @@ public class OptionSlotFactory
         return categories;
     }
 
-    protected static void addSlots(HashMap<Config.Category, List<SlotMetadata>> mergedMap, Config.Category inheritedCategory, PropertiesBase properties)
+    protected static void addSlots(HashMap<Config.Category, List<SlotMetadata>> mergedMap, Config.Category inheritedCategory, CommonProperties properties)
     {
-        Class<? extends PropertiesBase> propertiesClass = properties.getClass();
+        Class<? extends CommonProperties> propertiesClass = properties.getClass();
         for (Map.Entry<Config.Category, List<SlotMetadata>> entry : buildSlots(null, inheritedCategory, propertiesClass, properties).entrySet())
         {
             Config.Category category = entry.getKey();
@@ -136,7 +137,7 @@ public class OptionSlotFactory
         }
     }
 
-    protected static HashMap<Config.Category, List<SlotMetadata>> buildSlots(HashMap<Config.Category, List<SlotMetadata>> map, Config.Category inheritedCategory, Class<? extends PropertiesBase> propertiesClass, PropertiesBase properties)
+    protected static HashMap<Config.Category, List<SlotMetadata>> buildSlots(HashMap<Config.Category, List<SlotMetadata>> map, Config.Category inheritedCategory, Class<? extends CommonProperties> propertiesClass, CommonProperties properties)
     {
         if (map == null)
         {
@@ -202,9 +203,9 @@ public class OptionSlotFactory
 
         // Check for parent class
         Class parentClass = propertiesClass.getSuperclass();
-        if (PropertiesBase.class.isAssignableFrom(parentClass))
+        if (CommonProperties.class.isAssignableFrom(parentClass))
         {
-            map = buildSlots(map, inheritedCategory, (Class<? extends PropertiesBase>) parentClass, properties);
+            map = buildSlots(map, inheritedCategory, (Class<? extends CommonProperties>) parentClass, properties);
         }
 
         return map;
@@ -233,7 +234,7 @@ public class OptionSlotFactory
      * @param field
      * @return
      */
-    static SlotMetadata<Boolean> getBooleanSlotMetadata(PropertiesBase properties, Field field)
+    static SlotMetadata<Boolean> getBooleanSlotMetadata(CommonProperties properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
         try
@@ -267,7 +268,7 @@ public class OptionSlotFactory
      * @param field
      * @return
      */
-    static SlotMetadata<Integer> getIntegerSlotMetadata(PropertiesBase properties, Field field)
+    static SlotMetadata<Integer> getIntegerSlotMetadata(CommonProperties properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
         try
@@ -298,7 +299,7 @@ public class OptionSlotFactory
      * @param field
      * @return
      */
-    static SlotMetadata<Double> getDoubleSlotMetadata(PropertiesBase properties, Field field)
+    static SlotMetadata<Double> getDoubleSlotMetadata(CommonProperties properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
         try
@@ -329,7 +330,7 @@ public class OptionSlotFactory
      * @param field
      * @return
      */
-    static SlotMetadata<String> getStringSlotMetadata(PropertiesBase properties, Field field)
+    static SlotMetadata<String> getStringSlotMetadata(CommonProperties properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
         try
@@ -367,7 +368,7 @@ public class OptionSlotFactory
         }
     }
 
-    static SlotMetadata<Enum> getEnumSlotMetadata(PropertiesBase properties, Field field)
+    static SlotMetadata<Enum> getEnumSlotMetadata(CommonProperties properties, Field field)
     {
         Config annotation = field.getAnnotation(Config.class);
         try

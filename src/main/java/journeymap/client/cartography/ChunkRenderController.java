@@ -14,9 +14,9 @@ import journeymap.client.cartography.render.EndRenderer;
 import journeymap.client.cartography.render.NetherRenderer;
 import journeymap.client.cartography.render.SurfaceRenderer;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;

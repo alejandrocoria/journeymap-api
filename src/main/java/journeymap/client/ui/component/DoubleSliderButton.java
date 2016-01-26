@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import journeymap.client.properties.PropertiesBase;
+import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
@@ -28,10 +28,10 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
     public double maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
-    PropertiesBase properties;
+    CommonProperties properties;
     AtomicDouble property;
 
-    public DoubleSliderButton(PropertiesBase properties, AtomicDouble property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
+    public DoubleSliderButton(CommonProperties properties, AtomicDouble property, String prefix, String suf, double minVal, double maxVal, boolean drawStr)
     {
         super(prefix);
         minValue = minVal;

@@ -15,13 +15,13 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.UIManager;
-import journeymap.client.ui.option.StringListProvider;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.config.StringListProvider;
 
 import java.io.File;
 import java.io.FileFilter;

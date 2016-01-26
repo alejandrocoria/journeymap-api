@@ -11,9 +11,9 @@ package journeymap.client.thread;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.task.multi.ITask;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 

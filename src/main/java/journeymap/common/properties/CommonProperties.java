@@ -6,19 +6,16 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.properties;
+package journeymap.common.properties;
 
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.client.Constants;
-import journeymap.client.io.FileHandler;
-import journeymap.client.log.LogFormatter;
-import journeymap.client.properties.config.AtomicBooleanSerializer;
-import journeymap.client.properties.config.AtomicIntegerSerializer;
-import journeymap.client.properties.config.AtomicReferenceSerializer;
-import journeymap.client.properties.config.ConfigValidation;
 import journeymap.common.Journeymap;
+import journeymap.common.properties.config.AtomicBooleanSerializer;
+import journeymap.common.properties.config.AtomicIntegerSerializer;
+import journeymap.common.properties.config.AtomicReferenceSerializer;
+import journeymap.common.properties.config.ConfigValidation;
 import journeymap.common.version.Version;
 
 import java.io.File;
@@ -31,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Base GSON-backed properties class.
  */
-public abstract class PropertiesBase
+public abstract class CommonProperties
 {
     // GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
@@ -39,14 +36,7 @@ public abstract class PropertiesBase
     // Flag the serializers can use to signal the file format needs to be updated
     protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
 
-    // Headers to output before file
-    private static final String[] HEADERS = {
-            "// " + Constants.getString("jm.config.file_header_1"),
-            "// " + Constants.getString("jm.config.file_header_2", Constants.CONFIG_DIR),
-            // "// " + Constants.getString("jm.config.file_header_3", Constants.DATA_DIR + File.separator + "**" + File.separator),
-            // "// " + Constants.getString("jm.config.file_header_4"),
-            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.info/help/wiki/Options_Manager")
-    };
+
 
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()
@@ -65,11 +55,11 @@ public abstract class PropertiesBase
     /**
      * Default constructor.
      */
-    protected PropertiesBase()
+    protected CommonProperties()
     {
     }
 
-    public static <T extends PropertiesBase> T reload(T properties, Class<T> propertiesClass)
+    public static <T extends CommonProperties> T reload(T properties, Class<T> propertiesClass)
     {
         if (properties != null)
         {
@@ -89,7 +79,7 @@ public abstract class PropertiesBase
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Failed to reload " + propertiesClass.getName(), t);
             return (properties != null) ? properties : reloadedProperties;
         }
     }
@@ -102,23 +92,25 @@ public abstract class PropertiesBase
     public abstract String getName();
 
     /**
-     * Gets the property file, looking first in the world config dir,
-     * then falling back to look in the standard config dir.
+     * Gets the property file.
      *
      * @return file
      */
-    public File getFile()
-    {
-        if (sourceFile == null)
-        {
-            sourceFile = new File(FileHandler.getWorldConfigDir(false), getFileName());
-            if (!sourceFile.canRead())
-            {
-                sourceFile = new File(FileHandler.StandardConfigDirectory, getFileName());
-            }
-        }
-        return sourceFile;
-    }
+    public abstract File getFile();
+
+    /**
+     * Whethere the current source file is associated with a specific world.
+     *
+     * @return
+     */
+    public abstract boolean isWorldConfig();
+
+    /**
+     * Gets an array of headers to prepend to the property file when saved.
+     *
+     * @return
+     */
+    public abstract String[] getHeaders();
 
     /**
      * Gets the filename for the instance.
@@ -128,17 +120,6 @@ public abstract class PropertiesBase
     protected String getFileName()
     {
         return String.format("journeymap.%s.config", this.getName());
-    }
-
-    /**
-     * Whethere the current source file is associated with a specific world.
-     *
-     * @return
-     */
-    public boolean isWorldConfig()
-    {
-        File worldConfigDir = FileHandler.getWorldConfigDir(false);
-        return (worldConfigDir != null && worldConfigDir.equals(getFile().getParentFile()));
     }
 
     /**
@@ -192,41 +173,13 @@ public abstract class PropertiesBase
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Couldn't copy config to world config: " + e, e);
             }
             return false;
         }
         else
         {
             throw new IllegalStateException("Can't create World config from itself.");
-        }
-    }
-
-    /**
-     * Copies world config over standard config
-     *
-     * @return
-     */
-    public boolean copyToStandardConfig()
-    {
-        if (isWorldConfig())
-        {
-            try
-            {
-                save();
-                File standardConfig = new File(FileHandler.StandardConfigDirectory, getFileName());
-                Files.copy(sourceFile, standardConfig);
-                return standardConfig.canRead();
-            }
-            catch (IOException e)
-            {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
-                return false;
-            }
-        }
-        else
-        {
-            throw new IllegalStateException("Can't replace standard config with itself.");
         }
     }
 
@@ -272,7 +225,7 @@ public abstract class PropertiesBase
                 // Header
                 String lineEnding = System.getProperty("line.separator");
                 StringBuilder sb = new StringBuilder();
-                for (String line : HEADERS)
+                for (String line : getHeaders())
                 {
                     sb.append(line).append(lineEnding);
                 }
@@ -290,7 +243,7 @@ public abstract class PropertiesBase
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
+                Journeymap.getLogger().error(String.format("Can't save config file %s: %s", propFile, e), e);
                 return false;
             }
         }
@@ -310,7 +263,7 @@ public abstract class PropertiesBase
      * @param <T> properties default instance
      * @return loaded instance
      */
-    public <T extends PropertiesBase> T load()
+    public <T extends CommonProperties> T load()
     {
         T instance = (T) this;
         File propFile = getFile();

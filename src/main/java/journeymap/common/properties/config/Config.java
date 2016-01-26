@@ -6,9 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.properties.config;
-
-import journeymap.client.ui.option.StringListProvider;
+package journeymap.common.properties.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

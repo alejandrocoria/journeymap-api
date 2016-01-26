@@ -9,7 +9,7 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.ui.option.StringListProvider;
+import journeymap.common.properties.config.StringListProvider;
 import se.rupy.http.Event;
 
 import java.util.Arrays;

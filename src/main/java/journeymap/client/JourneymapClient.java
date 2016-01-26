@@ -23,7 +23,6 @@ import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.io.migrate.Migration;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
-import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.*;
@@ -39,6 +38,8 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.CommonProperties;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -606,12 +607,12 @@ public class JourneymapClient implements CommonProxy
      */
     public void loadConfigProperties()
     {
-        coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
-        fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
-        miniMapProperties1 = PropertiesBase.reload(miniMapProperties1, MiniMapProperties.class);
-        miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties2.class);
-        webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
-        waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
+        coreProperties = CommonProperties.reload(coreProperties, CoreProperties.class);
+        fullMapProperties = CommonProperties.reload(fullMapProperties, FullMapProperties.class);
+        miniMapProperties1 = CommonProperties.reload(miniMapProperties1, MiniMapProperties.class);
+        miniMapProperties2 = CommonProperties.reload(miniMapProperties2, MiniMapProperties2.class);
+        webMapProperties = CommonProperties.reload(webMapProperties, WebMapProperties.class);
+        waypointProperties = CommonProperties.reload(waypointProperties, WaypointProperties.class);
     }
 
     /**

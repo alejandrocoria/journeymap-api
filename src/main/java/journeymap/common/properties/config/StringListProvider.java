@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.ui.option;
+package journeymap.common.properties.config;
 
 import java.util.List;
 
