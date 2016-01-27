@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
         maven {
             name = "forge"
@@ -20,26 +19,34 @@ ext {
     sharedManifest = manifest {
         attributes = ["Implementation-Title": "JourneyMap",
                 "Implementation-Version": project.version,
-                "Implementation-URL": "www.curse.com/mc-mods/minecraft/journeymap-32274"]
+                      "Implementation-URL": "http://journeymap.info"]
     }
 }
 
 version = "${project.minecraft_version}-${project.jm_major}.${project.jm_minor}.${project.jm_micro}${project.jm_patch}"
-group = "${project.group_id}"
-archivesBaseName = "${project.mod_id}".toLowerCase()
+group = project.group_id
+archivesBaseName = project.mod_id
+
+repositories {
+    // JourneyMap API releases are here
+    mavenCentral()
+
+    // JourneyMap API snapshots are here
+    maven { url 'https://oss.sonatype.org/content/groups/public/' }
+}
 
 dependencies {
-    compile 'info.journeymap:journeymap-api:1.8.9-1.0'
+    compile 'info.journeymap:journeymap-api:' + project.journeymap_api_version
     compile 'com.yahoo.platform.yui:yuicompressor:2.4.8'
 }
 
 minecraft {
     version = "${project.minecraft_version}-${project.forge_version}"
-    mappings = "${project.snapshot}"
+    mappings = project.mappings
     runDir = "run"
     makeObfSourceJar = false
 
-    replace "@JMVERSION@", "${project.jm_major}.${project.jm_minor}.${project.jm_micro}${project.jm_patch}"
+    replace "@JMVERSION@", project.version
     replace "@MCVERSION@", project.minecraft_version
     replace "@FORGEVERSION@", project.forge_version
     replace "@MAJOR@", project.jm_major
