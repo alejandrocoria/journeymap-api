@@ -8,7 +8,6 @@
 
 package journeymap.server.nbt;
 
-import journeymap.common.Journeymap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
@@ -53,7 +52,6 @@ public class WorldNbtIDSaveHandler
         // Migrate old worldID to new system.
         if (legacyData.getData().hasKey(LEGACY_WORLD_ID_KEY))
         {
-            Journeymap.getLogger().info("Migrating WorldId");
             String worldId = legacyData.getData().getString(LEGACY_WORLD_ID_KEY);
 
             legacyData.getData().removeTag(LEGACY_WORLD_ID_KEY);
@@ -68,13 +66,11 @@ public class WorldNbtIDSaveHandler
 
         if (data == null)
         {
-            Journeymap.getLogger().info("Creating WorldId");
             return createNewWorldID();
         }
 
         if (data.getData().hasKey(WORLD_ID_KEY))
         {
-            Journeymap.getLogger().info("Getting WorldId");
             return data.getData().getString(WORLD_ID_KEY);
         }
         return "noWorldIDFound";
