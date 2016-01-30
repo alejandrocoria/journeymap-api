@@ -14,19 +14,24 @@ import net.minecraft.world.World;
 import java.util.UUID;
 
 /**
- * TODO:  look for world_uuid first, then look for JourneyMapWorldID and migrate it to world_uuid if it exists, then create a new world_uuid if it doesn't exist
- *
  * Created by Mysticdrew on 10/27/2014.
  */
 public class WorldNbtIDSaveHandler
 {
     private NBTWorldSaveDataHandler data;
+    private NBTWorldSaveDataHandler legacyData;
     private World world;
+
+    private static final String LEGACY_DAT_FILE = "JourneyMapWorldID";
+    private static final String LEGACY_WORLD_ID_KEY = "JourneyMapWorldID";
+    private static final String DAT_FILE = "WorldUUID";
+    private static final String WORLD_ID_KEY = "world_uuid";
 
     public WorldNbtIDSaveHandler()
     {
         world = MinecraftServer.getServer().getEntityWorld();
-        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, "JourneyMapWorldID");
+        legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
+        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, DAT_FILE);
     }
 
     public String getWorldID()
@@ -42,14 +47,31 @@ public class WorldNbtIDSaveHandler
 
     private String getNBTWorldID()
     {
+
+        // TODO: Remove this migration when we update to MC 1.9+
+        // Migrate old worldID to new system.
+        if (legacyData.getData().hasKey(LEGACY_WORLD_ID_KEY))
+        {
+            String worldId = legacyData.getData().getString(LEGACY_WORLD_ID_KEY);
+
+            legacyData.getData().removeTag(LEGACY_WORLD_ID_KEY);
+            legacyData.markDirty();
+
+            data = new NBTWorldSaveDataHandler(DAT_FILE);
+            world.getPerWorldStorage().setData(WORLD_ID_KEY, data);
+            saveWorldID(worldId);
+
+            return worldId;
+        }
+
         if (data == null)
         {
             return createNewWorldID();
         }
-        else if (data.getData().hasKey("JourneyMapWorldID"))
+
+        if (data.getData().hasKey(WORLD_ID_KEY))
         {
-            //LogHelper.info("World ID: " + data.getData().getString("JourneyMapWorldID"));
-            return data.getData().getString("JourneyMapWorldID");
+            return data.getData().getString(WORLD_ID_KEY);
         }
         return "noWorldIDFound";
     }
@@ -57,16 +79,15 @@ public class WorldNbtIDSaveHandler
     private String createNewWorldID()
     {
         String worldID = UUID.randomUUID().toString();
-        data = new NBTWorldSaveDataHandler("JourneyMapWorldID");
-        world.getPerWorldStorage().setData("JourneyMapWorldID", data);
+        data = new NBTWorldSaveDataHandler(DAT_FILE);
+        world.getPerWorldStorage().setData(WORLD_ID_KEY, data);
         saveWorldID(worldID);
-        //LogHelper.info("Created New World ID: " + worldID);
         return worldID;
     }
 
     private void saveWorldID(String worldID)
     {
-        data.getData().setString("JourneyMapWorldID", worldID);
+        data.getData().setString(WORLD_ID_KEY, worldID);
         data.markDirty();
     }
 }
