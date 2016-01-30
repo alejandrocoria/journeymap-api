@@ -336,6 +336,19 @@ public class ModInfo
         });
     }
 
+    public void singleUse()
+    {
+        if (Config.isConfirmedDisabled(config))
+        {
+            return;
+        }
+        else if (config.isEnabled())
+        {
+            reportAppView();
+        }
+        config.disable();
+    }
+
     private void optOut()
     {
         if (Config.isConfirmedDisabled(config))

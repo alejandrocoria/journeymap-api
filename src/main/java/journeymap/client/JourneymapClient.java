@@ -272,10 +272,6 @@ public class JourneymapClient implements CommonProxy
                 return;
             }
 
-            // Init ModInfo
-            ModInfo modInfo = new ModInfo("UA-28839029-4", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition());
-            modInfo.reportAppView();
-
             // Trigger statics on EntityList (may not be needed anymore?)
             EntityRegistry.instance();
 
@@ -343,8 +339,11 @@ public class JourneymapClient implements CommonProxy
             WebServer.setEnabled(webMapProperties.enabled.get(), false);
             initialized = true;
 
-
             VersionCheck.getVersionAvailable();
+
+            // Init ModInfo
+            ModInfo modInfo = new ModInfo("UA-28839029-4", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition());
+            modInfo.singleUse();
 
             // threadLogging = getLogger().isTraceEnabled();
         }

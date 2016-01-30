@@ -192,6 +192,12 @@ public class Config implements Serializable
         return status;
     }
 
+    void disable()
+    {
+        this.enable = false;
+        confirmStatus();
+    }
+
     public void confirmStatus()
     {
         String newStatus = generateStatusString(this);
