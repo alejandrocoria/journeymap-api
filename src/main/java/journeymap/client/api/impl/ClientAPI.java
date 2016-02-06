@@ -1,27 +1,21 @@
 package journeymap.client.api.impl;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
+import journeymap.client.api.display.Context;
 import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.Displayable;
-import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.api.event.ClientEvent;
+import journeymap.client.api.event.DisplayUpdateEvent;
 import journeymap.client.api.util.PluginHelper;
-import journeymap.client.log.StatTimer;
-import journeymap.client.model.Waypoint;
-import journeymap.client.waypoint.WaypointStore;
+import journeymap.client.render.draw.DrawStep;
 import journeymap.common.Journeymap;
-import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.helpers.Strings;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of the journeymap-api IClientAPI.
@@ -32,24 +26,23 @@ public enum ClientAPI implements IClientAPI
     INSTANCE;
 
     private final Logger LOGGER = Journeymap.getLogger();
-    private final LoadingCache<String, ModObjects> modObjectsCache =
-            CacheBuilder.newBuilder().build(
-                    new CacheLoader<String, ModObjects>()
-                    {
-                        public ModObjects load(String modId)
-                        {
-                            return new ModObjects(modId);
-                        }
-                    });
-    private StatTimer eventTimer = StatTimer.get("pluginClientEvent", 1, 500);
+    private final List<DrawStep> lastDrawSteps = new ArrayList<DrawStep>();
+    private final EventThrottle<DisplayUpdateEvent> displayUpdateEventEventThrottle = new EventThrottle<DisplayUpdateEvent>(1000);
+    private HashMap<String, PluginWrapper> cache = new HashMap<String, PluginWrapper>();
+    private boolean drawStepsUpdateNeeded = true;
 
     @Override
-    public boolean isActive()
+    public boolean isActive(Enum<? extends Context>... enums)
     {
+        // TODO
         return JourneymapClient.getInstance().isMapping();
     }
 
-    // TODO:  RESET ?
+    @Override
+    public void subscribe(EnumSet<ClientEvent.Type> enumSet)
+    {
+        System.out.println("Subscribe isn't implemented yet.  You're gonna get eveything.");
+    }
 
     @Override
     public void show(Displayable displayable)
@@ -58,17 +51,8 @@ public enum ClientAPI implements IClientAPI
         {
             if (playerAccepts(displayable))
             {
-                ModObjects modObjects = modObjectsCache.getUnchecked(displayable.getModId());
-                DisplayablePair displayablePair = modObjects.add(displayable);
-
-                // Waypoints can be handled immediately
-                if (displayable.getDisplayType() == DisplayType.Waypoint)
-                {
-                    ModWaypoint modWaypoint = (ModWaypoint) displayable;
-                    Waypoint waypoint = new Waypoint(modWaypoint);
-                    WaypointStore.instance().save(waypoint);
-                    displayablePair.setInternal(waypoint);
-                }
+                getPlugin(displayable.getModId()).show(displayable);
+                drawStepsUpdateNeeded = true;
             }
         }
         catch (Throwable t)
@@ -80,22 +64,17 @@ public enum ClientAPI implements IClientAPI
     @Override
     public void remove(Displayable displayable)
     {
-        remove(displayable.getModId(), displayable.getDisplayType(), displayable.getDisplayId());
-    }
-
-    @Override
-    public void remove(String modId, DisplayType displayType, String displayId)
-    {
         try
         {
-            if (playerAccepts(modId, displayType))
+            if (playerAccepts(displayable))
             {
-                modObjectsCache.getUnchecked(modId).remove(displayType, displayId);
+                getPlugin(displayable.getModId()).remove(displayable);
+                drawStepsUpdateNeeded = true;
             }
         }
         catch (Throwable t)
         {
-            logError(String.format("Error removing displayable: %s %s %s", modId, displayType, displayId), t);
+            logError("Error removing displayable: " + displayable, t);
         }
     }
 
@@ -106,52 +85,52 @@ public enum ClientAPI implements IClientAPI
         {
             if (playerAccepts(modId, displayType))
             {
-                modObjectsCache.getUnchecked(modId).removeAll(displayType);
+                getPlugin(modId).removeAll(displayType);
+                drawStepsUpdateNeeded = true;
             }
         }
         catch (Throwable t)
         {
-            logError(String.format("Error removing all displayables: %s %s", modId, displayType), t);
+            logError("Error removing all displayables: " + displayType, t);
         }
     }
 
     @Override
     public void removeAll(String modId)
     {
-        modObjectsCache.invalidate(modId);
+        try
+        {
+            for (DisplayType displayType : DisplayType.values())
+            {
+                removeAll(modId, displayType);
+                drawStepsUpdateNeeded = true;
+            }
+
+            getPlugin(modId).removeAll();
+        }
+        catch (Throwable t)
+        {
+            logError("Error removing all displayables for mod: " + modId, t);
+        }
     }
 
     @Override
     public boolean exists(Displayable displayable)
     {
-        return exists(displayable.getModId(), displayable.getDisplayType(), displayable.getDisplayId());
-    }
-
-    @Override
-    public boolean exists(String modId, DisplayType displayType, String displayId)
-    {
-        return modObjectsCache.getUnchecked(modId).exists(displayType, displayId);
-    }
-
-    @Override
-    public List<String> getShownIds(String modId, DisplayType displayType)
-    {
         try
         {
-            List<DisplayablePair> pairs = new ArrayList<DisplayablePair>(modObjectsCache.getUnchecked(modId).getDisplayablePairs(displayType));
-            ArrayList<String> ids = new ArrayList<String>(pairs.size());
-            for (DisplayablePair pair : pairs)
+            if (playerAccepts(displayable))
             {
-                ids.add(pair.getDisplayable().getDisplayId());
+                return getPlugin(displayable.getModId()).exists(displayable);
             }
-            return ids;
         }
         catch (Throwable t)
         {
-            logError(String.format("Error in getShownIds(): %s %s", modId, displayType), t);
-            return Collections.emptyList();
+            logError("Error checking exists: " + displayable, t);
         }
+        return false;
     }
+
 
     @Override
     public boolean playerAccepts(String modId, DisplayType displayType)
@@ -166,70 +145,87 @@ public enum ClientAPI implements IClientAPI
     }
 
     /**
-     * Notify plugins that the map displays have started.
-     * @param dimension
-     */
-    public void notifyDisplayStarted(int dimension)
-    {
-        notifyPlugins(new ClientEvent(ClientEvent.Type.DISPLAY_STARTED, dimension));
-    }
-
-    /**
-     * Notify plugins that a death waypoint has been created.
-     *
-     * @param point death point
-     * @return true if the death waypoint should be used.
-     */
-    public boolean notifyDeathWaypoint(final BlockPos point, int dimension)
-    {
-        ClientEvent event = new ClientEvent(ClientEvent.Type.DEATH_WAYPOINT, dimension, point);
-        notifyPlugins(event);
-        return !event.isCancelled();
-    }
-
-    /**
      * Notify plugins of client event.
      *
      * @param clientEvent event
      */
-    public void notifyPlugins(final ClientEvent clientEvent)
+    public void fireClientEvent(final ClientEvent clientEvent, boolean immediate)
     {
+        if (!immediate && clientEvent instanceof DisplayUpdateEvent)
+        {
+            displayUpdateEventEventThrottle.add((DisplayUpdateEvent) clientEvent);
+            return;
+        }
+
         try
         {
-            List<IClientPlugin> plugins = PluginHelper.INSTANCE.getPlugins();
-            if (plugins != null && !plugins.isEmpty())
+            for (PluginWrapper wrapper : cache.values())
             {
-                boolean cancelled = clientEvent.isCancelled();
-                // TODO: Add clientEvent.isCancellable()
-                boolean cancellable = (clientEvent.type == ClientEvent.Type.DEATH_WAYPOINT);
-
-                for (IClientPlugin plugin : plugins)
-                {
-                    eventTimer.start();
-                    try
-                    {
-                        plugin.onEvent(clientEvent);
-                        if (cancellable && !cancelled && clientEvent.isCancelled())
-                        {
-                            cancelled = true;
-                            LOGGER.info(String.format("Plugin %s cancelled event: %s", plugin.getClass(), clientEvent.type));
-                        }
-                    }
-                    catch (Throwable t)
-                    {
-                        LOGGER.error(String.format("Plugin %s errored during event: %s", plugin.getClass(), clientEvent.type), t);
-                    }
-                    finally
-                    {
-                        eventTimer.stop();
-                    }
-                }
+                wrapper.notify(clientEvent);
             }
         }
         catch (Throwable t)
         {
-            logError("Error in notifyPlugins(): " + clientEvent, t);
+            logError("Error in fireClientEvent(): " + clientEvent, t);
         }
+    }
+
+    public void fireNextClientEvent()
+    {
+        if (displayUpdateEventEventThrottle.canRelease())
+        {
+            fireClientEvent(displayUpdateEventEventThrottle.get(), true);
+        }
+    }
+
+    /**
+     * Get all draw steps from all plugins. Builds and sorts the list only when needed.
+     * @param list
+     * @return
+     */
+    public List<DrawStep> getDrawSteps(List<DrawStep> list)
+    {
+        if (drawStepsUpdateNeeded)
+        {
+            lastDrawSteps.clear();
+            for (PluginWrapper pluginWrapper : cache.values())
+            {
+                pluginWrapper.getDrawSteps(lastDrawSteps);
+            }
+            Collections.sort(lastDrawSteps, new Comparator<DrawStep>()
+            {
+                @Override
+                public int compare(DrawStep o1, DrawStep o2)
+                {
+                    return Integer.compare(o1.getDisplayOrder(), o2.getDisplayOrder());
+                }
+            });
+            drawStepsUpdateNeeded = false;
+        }
+        list.addAll(lastDrawSteps);
+        return list;
+    }
+
+    private PluginWrapper getPlugin(String modId)
+    {
+        if (Strings.isEmpty(modId))
+        {
+            throw new IllegalArgumentException("Invalid modId: " + modId);
+        }
+
+        PluginWrapper pluginWrapper = cache.get(modId);
+        if (pluginWrapper == null)
+        {
+            IClientPlugin plugin = PluginHelper.INSTANCE.getPlugins().get(modId);
+            if (plugin == null)
+            {
+                throw new IllegalArgumentException("No plugin found for modId: " + modId);
+            }
+            pluginWrapper = new PluginWrapper(plugin);
+            cache.put(modId, pluginWrapper);
+        }
+
+        return pluginWrapper;
     }
 
     /**
@@ -242,8 +238,13 @@ public enum ClientAPI implements IClientAPI
         LOGGER.info(String.format("[%s] %s", getClass().getSimpleName(), message));
     }
 
+    private void logError(String message)
+    {
+        LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message));
+    }
+
     private void logError(String message, Throwable t)
     {
-        LOGGER.info(String.format("[%s] %s", getClass().getSimpleName(), message), t);
+        LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message), t);
     }
 }

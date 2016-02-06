@@ -15,6 +15,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -158,6 +159,24 @@ public class DrawEntityStep implements DrawStep
         {
             DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
         }
+    }
+
+    @Override
+    public int getDisplayOrder()
+    {
+        return customName != null ? 1 : 0;
+    }
+
+    @Override
+    public String getModId()
+    {
+        return Journeymap.MOD_ID;
+    }
+
+    @Override
+    public String getGroupName()
+    {
+        return null;
     }
 
     public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep>

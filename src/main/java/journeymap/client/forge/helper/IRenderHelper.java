@@ -8,8 +8,6 @@
 
 package journeymap.client.forge.helper;
 
-import java.awt.*;
-
 /**
  * Interface used to encapsulate compile-time differences between Minecraft/Forge versions
  * with respect to OpenGL operations.
@@ -19,6 +17,8 @@ public interface IRenderHelper
     public void sizeDisplay(double width, double height);
 
     public void startDrawingQuads(boolean useColor);
+
+    public void addVertex(double x, double y, double z, int[] rgba);
 
     public void addVertexWithUV(double x, double y, double z, double u, double v);
 

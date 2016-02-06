@@ -11,6 +11,7 @@ package journeymap.client.model;
 
 import com.google.common.base.Objects;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -266,6 +267,8 @@ public class MapState
         {
             drawScale = drawScale * .5f;
         }
+
+        ClientAPI.INSTANCE.getDrawSteps(drawStepList);
 
         if (FeatureManager.isAllowed(Feature.RadarAnimals))
         {

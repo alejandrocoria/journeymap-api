@@ -11,6 +11,7 @@ package journeymap.client.ui.fullscreen;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.display.Context;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -18,7 +19,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
@@ -51,6 +51,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Level;
@@ -71,7 +72,7 @@ import java.util.List;
 public class Fullscreen extends JmUI
 {
     final static MapState state = new MapState();
-    final static GridRenderer gridRenderer = new GridRenderer(5);
+    final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Fullscreen, 5);
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
@@ -647,7 +648,7 @@ public class Fullscreen extends JmUI
         }
 
         // Invoke layer delegate
-        BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+        BlockPos blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
         layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
     }
 
@@ -698,7 +699,7 @@ public class Fullscreen extends JmUI
 
         if (!isScrolling && which == -1)
         {
-            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+            BlockPos blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
             layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
     }

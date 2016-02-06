@@ -210,9 +210,34 @@ public final class RGB
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF, alpha & 0xFF};
     }
 
+    /**
+     * Creates an array with four elements [r,g,b,a]
+     *
+     * @param rgb   color integer
+     * @param alpha alpha (0-255)
+     * @return array
+     */
+    public static int[] ints(int rgb, float alpha)
+    {
+        return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF, (int) (alpha * 255 + 0.5) & 0xFF};
+    }
+
+
     public static float[] floats(int rgb)
     {
         return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f};
+    }
+
+    /**
+     * Creates an array with four elements [r,g,b,a]
+     *
+     * @param rgb   color integer
+     * @param alpha alpha (0-255)
+     * @return array
+     */
+    public static float[] floats(int rgb, float alpha)
+    {
+        return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f, clampFloat(alpha)};
     }
 
     /**

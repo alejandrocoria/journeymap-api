@@ -13,7 +13,6 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
@@ -23,6 +22,7 @@ import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -39,8 +39,8 @@ public class WaypointLayer implements LayerDelegate.Layer
 {
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
-    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0, 0));
-    BlockCoordIntPair lastCoord = null;
+    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockPos(0, 0, 0));
+    BlockPos lastCoord = null;
 
     long lastClick = 0;
     long startHover = 0;
@@ -54,7 +54,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
     {
         if (!WaypointsData.isManagerEnabled())
         {
@@ -80,12 +80,12 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Get search area
         int proximity = getProximity();
 
-        AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.x - proximity, -1, blockCoord.z - proximity,
-                blockCoord.x + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.z + proximity);
+        AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
+                blockCoord.getX() + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.getZ() + proximity);
 
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(ForgeHelper.INSTANCE.newVec3(lastCoord.x, 1, lastCoord.z)))
+            if (!area.isVecInside(ForgeHelper.INSTANCE.newVec3(lastCoord.getX(), 1, lastCoord.getZ())))
             {
                 selected = null;
                 lastCoord = blockCoord;
@@ -136,7 +136,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
     {
         if (!WaypointsData.isManagerEnabled())
         {
@@ -167,22 +167,22 @@ public class WaypointLayer implements LayerDelegate.Layer
         }
 
         // Check chunk
-        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.x >> 4, blockCoord.z >> 4));
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
         int y = -1;
         if (chunkMD != null && !chunkMD.getChunk().isEmpty())
         {
-            y = Math.max(1, chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
+            y = Math.max(1, chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15));
         }
 
         // Create waypoint
-        BlockPos blockPos = new BlockPos(blockCoord.x, 0, blockCoord.z);
+        BlockPos blockPos = new BlockPos(blockCoord.getX(), 0, blockCoord.getZ());
         Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, mc.thePlayer.dimension);
         UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;
     }
 
-    private void sortByDistance(List<Waypoint> waypoints, final BlockCoordIntPair blockCoord, final int dimension)
+    private void sortByDistance(List<Waypoint> waypoints, final BlockPos blockCoord, final int dimension)
     {
         Collections.sort(waypoints, new Comparator<Waypoint>()
         {
@@ -194,8 +194,8 @@ public class WaypointLayer implements LayerDelegate.Layer
 
             private double getDistance(Waypoint waypoint)
             {
-                double dx = waypoint.getX() - blockCoord.x;
-                double dz = waypoint.getZ() - blockCoord.z;
+                double dx = waypoint.getX() - blockCoord.getX();
+                double dz = waypoint.getZ() - blockCoord.getZ();
                 return (Math.sqrt(dx * dx + dz * dz));
             }
         });
@@ -217,15 +217,15 @@ public class WaypointLayer implements LayerDelegate.Layer
 
     private void unclick()
     {
-        clickDrawStep.blockCoord = new BlockCoordIntPair(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        clickDrawStep.blockCoord = new BlockPos(Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
         drawStepList.remove(clickDrawStep);
     }
 
     class BlockOutlineDrawStep implements DrawStep
     {
-        BlockCoordIntPair blockCoord;
+        BlockPos blockCoord;
 
-        BlockOutlineDrawStep(BlockCoordIntPair blockCoord)
+        BlockOutlineDrawStep(BlockPos blockCoord)
         {
             this.blockCoord = blockCoord;
         }
@@ -245,8 +245,8 @@ public class WaypointLayer implements LayerDelegate.Layer
                 return;
             }
 
-            double x = blockCoord.x;
-            double z = blockCoord.z;
+            double x = blockCoord.getX();
+            double z = blockCoord.getZ();
             double size = Math.pow(2, gridRenderer.getZoom());
             double thick = gridRenderer.getZoom() < 2 ? 1 : 2;
 
@@ -266,6 +266,24 @@ public class WaypointLayer implements LayerDelegate.Layer
                 DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() + size, size + (thick * thick), thick, RGB.WHITE_RGB, 255);
                 DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, 150);
             }
+        }
+
+        @Override
+        public int getDisplayOrder()
+        {
+            return 0;
+        }
+
+        @Override
+        public String getModId()
+        {
+            return Journeymap.MOD_ID;
+        }
+
+        @Override
+        public String getGroupName()
+        {
+            return null;
         }
     }
 }

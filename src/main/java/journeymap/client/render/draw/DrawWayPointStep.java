@@ -28,7 +28,7 @@ public class DrawWayPointStep implements DrawStep
     final TextureImpl texture;
     final boolean isEdit;
     Point2D.Double lastPosition;
-    Point2D.Double lastWindowPosition;
+    //Point2D.Double lastWindowPosition;
     boolean lastOnScreen;
     boolean showLabel;
 
@@ -113,14 +113,14 @@ public class DrawWayPointStep implements DrawStep
         Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
         pixel.setLocation(pixel.getX() + halfBlock + xOffset, pixel.getY() + halfBlock + yOffset);
         lastPosition = pixel;
-        lastWindowPosition = gridRenderer.getWindowPosition(lastPosition);
+        //lastWindowPosition = gridRenderer.getWindowPosition(lastPosition);
         return pixel;
     }
 
-    public Point2D.Double getLastWindowPosition()
-    {
-        return lastWindowPosition;
-    }
+//    public Point2D.Double getLastWindowPosition()
+//    {
+//        return lastWindowPosition;
+//    }
 
     public int getTextureHeight()
     {
@@ -140,6 +140,24 @@ public class DrawWayPointStep implements DrawStep
     public void setOnScreen(boolean lastOnScreen)
     {
         this.lastOnScreen = lastOnScreen;
+    }
+
+    @Override
+    public int getDisplayOrder()
+    {
+        return 0;
+    }
+
+    @Override
+    public String getModId()
+    {
+        return waypoint.getOrigin();
+    }
+
+    @Override
+    public String getGroupName()
+    {
+        return waypoint.getWaypointGroupName();
     }
 
     public static class SimpleCacheLoader extends CacheLoader<Waypoint, DrawWayPointStep>

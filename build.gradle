@@ -35,8 +35,14 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public/' }
 }
 
+configurations.all {
+    // Check for snapshots more frequently than Gradle's default of 1 day. 0 = every build.
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
-    compile 'info.journeymap:journeymap-api:' + project.journeymap_api_version
+    compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
+    runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
     compile 'com.yahoo.platform.yui:yuicompressor:2.4.8'
 }
 

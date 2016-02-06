@@ -9,6 +9,7 @@
 package journeymap.client.ui.minimap;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.display.Context;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
@@ -27,13 +28,11 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
-import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
@@ -51,9 +50,8 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
-    private final static GridRenderer gridRenderer = new GridRenderer(3);
+    private final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Minimap, 3);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private final Logger logger = Journeymap.getLogger();
     private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
@@ -637,6 +635,9 @@ public class MiniMap
         double ypad = 0;
         Rectangle2D.Double viewPort = new Rectangle2D.Double(this.dv.textureX + xpad, this.dv.textureY + ypad, this.dv.minimapWidth - (2 * xpad), this.dv.minimapHeight - (2 * ypad));
         gridRenderer.setViewPort(viewPort);
+
+        // Fire display update
+        gridRenderer.fireDisplayUpdateEvent();
     }
 
     private void updateLabels()

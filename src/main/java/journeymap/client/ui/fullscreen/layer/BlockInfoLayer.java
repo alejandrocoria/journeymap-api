@@ -13,15 +13,16 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
     LocationFormat locationFormat = new LocationFormat();
     LocationFormat.LocationFormatKeys locationFormatKeys;
-    BlockCoordIntPair lastCoord = null;
+    BlockPos lastCoord = null;
     long lastClicked = 0;
     int lastMouseX;
     int lastMouseY;
@@ -50,7 +51,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
     {
         if (!blockCoord.equals(lastCoord))
         {
@@ -61,23 +62,23 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             lastCoord = blockCoord;
 
             // Get block under mouse
-            Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
+            Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.getX() >> 4, blockCoord.getZ() >> 4);
             String info;
             if (!chunk.isEmpty())
             {
                 ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
-                int blockY = chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
-                String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.x, blockY, blockCoord.z).biomeName;
+                int blockY = chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15);
+                String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.getX(), blockY, blockCoord.getZ()).biomeName;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
-                        blockCoord.x,
-                        blockCoord.z,
+                        blockCoord.getX(),
+                        blockCoord.getZ(),
                         blockY,
                         (blockY >> 4)) + " " + biome;
             }
             else
             {
-                info = Constants.getString("jm.common.location_xz_verbose", blockCoord.x, blockCoord.z);
+                info = Constants.getString("jm.common.location_xz_verbose", blockCoord.getX(), blockCoord.getZ());
             }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
@@ -97,14 +98,13 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
+    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
     {
         return Collections.EMPTY_LIST;
     }
 
     class BlockInfoStep implements DrawStep
     {
-
         Integer bgColor = RGB.DARK_GRAY_RGB;
         Integer fgColor = RGB.WHITE_RGB;
         double fontScale = 1;
@@ -135,7 +135,24 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
+        }
 
+        @Override
+        public int getDisplayOrder()
+        {
+            return 0;
+        }
+
+        @Override
+        public String getModId()
+        {
+            return Journeymap.MOD_ID;
+        }
+
+        @Override
+        public String getGroupName()
+        {
+            return null;
         }
     }
 }

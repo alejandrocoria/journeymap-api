@@ -9,10 +9,12 @@
 package journeymap.client.render.map;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.display.Context;
+import journeymap.client.api.event.DisplayUpdateEvent;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionImageCache;
@@ -20,6 +22,8 @@ import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -54,6 +58,8 @@ public class GridRenderer
     private final TreeMap<TilePos, Tile> grid = new TreeMap<TilePos, Tile>();
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final int maxGlErrors = 20;
+    private final Context.UI contextUi;
+
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
     private int glErrors = 0;
@@ -62,6 +68,7 @@ public class GridRenderer
     private double srcSize;
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
+    private AxisAlignedBB blockBounds = null;
     private int lastHeight = -1;
     private int lastWidth = -1;
     private MapType mapType;
@@ -77,8 +84,9 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
-    public GridRenderer(int gridSize)
+    public GridRenderer(Context.UI contextUi, int gridSize)
     {
+        this.contextUi = contextUi;
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
@@ -114,6 +122,11 @@ public class GridRenderer
         {
             TileDrawStepCache.clear();
         }
+    }
+
+    public Context.UI getDisplay()
+    {
+        return contextUi;
     }
 
     public void setViewPort(Rectangle2D.Double viewPort)
@@ -215,6 +228,12 @@ public class GridRenderer
             Tile newCenterTile = findTile(tileX, tileZ, zoom);
             populateGrid(newCenterTile);
 
+            // Notify plugins
+            if (contextUi == Context.UI.Fullscreen)
+            {
+                fireDisplayUpdateEvent();
+            }
+
             if (debug)
             {
                 logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
@@ -228,6 +247,14 @@ public class GridRenderer
             }
         }
         return true;
+    }
+
+    public void fireDisplayUpdateEvent()
+    {
+        if (mapType != null && blockBounds != null)
+        {
+            ClientAPI.INSTANCE.fireClientEvent(new DisplayUpdateEvent(contextUi, mapType.apiContextMapType(), blockBounds, mapType.dimension, zoom), false);
+        }
     }
 
     public void updateTiles(MapType mapType, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
@@ -319,7 +346,12 @@ public class GridRenderer
         return centerPixelOffset;
     }
 
-    public BlockCoordIntPair getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
+    public AxisAlignedBB getBlockBounds()
+    {
+        return blockBounds;
+    }
+
+    public BlockPos getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
     {
         double centerPixelX = screenWidth / 2.0;
         double centerPixelZ = screenHeight / 2.0;
@@ -331,7 +363,12 @@ public class GridRenderer
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
-        return new BlockCoordIntPair(x, z);
+        return new BlockPos(x, 0, z);
+    }
+
+    public Point2D.Double getBlockPixelInGrid(BlockPos pos)
+    {
+        return getBlockPixelInGrid(pos.getX(), pos.getZ());
     }
 
     public Point2D.Double getBlockPixelInGrid(double x, double z)
@@ -508,6 +545,7 @@ public class GridRenderer
      */
     private boolean isOnScreen(TilePos pos)
     {
+        // TODO
         return true;
         //return isOnScreen(pos.startX + centerPixelOffset.x, pos.startZ + centerPixelOffset.y, Tile.LOAD_RADIUS, Tile.LOAD_RADIUS);
     }
@@ -521,6 +559,17 @@ public class GridRenderer
     public boolean isOnScreen(Point2D.Double pixel)
     {
         return screenBounds.contains(pixel);
+    }
+
+    /**
+     * This is a pixel check, not a location check
+     *
+     * @param bounds checked
+     * @return true if on screen
+     */
+    public boolean isOnScreen(Rectangle2D.Double bounds)
+    {
+        return screenBounds.intersects(bounds);
     }
 
     /**
@@ -570,7 +619,7 @@ public class GridRenderer
      */
     private void updateBounds(int width, int height)
     {
-        if (screenBounds == null || lastWidth != width || lastHeight != height)
+        if (screenBounds == null || lastWidth != width || lastHeight != height || blockBounds == null)
         {
             lastWidth = width;
             lastHeight = height;
@@ -583,6 +632,10 @@ public class GridRenderer
             {
                 screenBounds = new Rectangle2D.Double((width - viewPort.width) / 2, (height - viewPort.height) / 2, viewPort.width, viewPort.height);
             }
+
+            BlockPos upperLeft = getBlockUnderMouse(screenBounds.getMinX(), screenBounds.getMaxY(), (int) screenBounds.width, (int) screenBounds.height);
+            BlockPos lowerRight = getBlockUnderMouse(screenBounds.getMaxX(), screenBounds.getMinY(), (int) screenBounds.width, (int) screenBounds.height);
+            blockBounds = new AxisAlignedBB(upperLeft, lowerRight.up(ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight()));
         }
     }
 

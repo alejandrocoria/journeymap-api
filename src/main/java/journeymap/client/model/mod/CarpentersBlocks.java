@@ -39,7 +39,6 @@ public class CarpentersBlocks
         @Override
         public boolean initialize(BlockMD blockMD)
         {
-
             GameRegistry.UniqueIdentifier uid = blockMD.getUid();
             if (uid.modId.equals(MODID))
             {

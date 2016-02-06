@@ -9,6 +9,8 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.event.ClientEvent;
+import journeymap.client.api.event.DeathWaypointEvent;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
@@ -96,6 +98,13 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 counter++;
                 mc.mcProfiler.endSection();
             }
+            else if (counter == 5 || counter == 15)
+            {
+                mc.mcProfiler.startSection("clientApiEvents");
+                ClientAPI.INSTANCE.fireNextClientEvent();
+                counter++;
+                mc.mcProfiler.endSection();
+            }
             else
             {
                 counter++;
@@ -129,7 +138,10 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 BlockPos pos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
                 int dim = ForgeHelper.INSTANCE.getPlayerDimension();
-                if (ClientAPI.INSTANCE.notifyDeathWaypoint(pos, dim))
+
+                ClientEvent event = new DeathWaypointEvent(pos, dim);
+                ClientAPI.INSTANCE.fireClientEvent(event, true);
+                if (!event.isCancelled())
                 {
                     Waypoint deathpoint = Waypoint.at(pos, Waypoint.Type.Death, dim);
                     WaypointStore.instance().save(deathpoint);

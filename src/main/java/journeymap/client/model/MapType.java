@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import journeymap.client.api.display.Context;
 import journeymap.client.data.DataCache;
 
 import java.util.HashMap;
@@ -83,6 +84,21 @@ public class MapType
     public static String toCacheKey(Name name, Integer vSlice, int dimension)
     {
         return "" + dimension + name + vSlice;
+    }
+
+    public Context.MapType apiContextMapType()
+    {
+        switch (name)
+        {
+            case day:
+                return Context.MapType.Day;
+            case night:
+                return Context.MapType.Night;
+            case underground:
+                return Context.MapType.Underground;
+            default:
+                return Context.MapType.Any;
+        }
     }
 
     public String toCacheKey()

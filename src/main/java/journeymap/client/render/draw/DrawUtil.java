@@ -9,13 +9,19 @@
 package journeymap.client.render.draw;
 
 
+import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import java.awt.geom.Point2D;
+import java.nio.DoubleBuffer;
+import java.util.List;
 
 /**
  * Useful drawing routines that utilize the Minecraft Tessellator.
@@ -23,6 +29,8 @@ import org.lwjgl.opengl.GL12;
 public class DrawUtil
 {
     public static double zLevel = 0;
+
+    private static DoubleBuffer lineBuffer = BufferUtils.createDoubleBuffer(4);
 
     private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
@@ -339,10 +347,10 @@ public class DrawUtil
         // Draw
         int[] rgba = RGB.ints(color, alpha);
         renderHelper.startDrawingQuads(true);
-        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1, rgba);
-        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgba);
-        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0, rgba);
-        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0, rgba);
+        renderHelper.addVertex(x, height + y, zLevel, rgba);
+        renderHelper.addVertex(x + width, height + y, zLevel, rgba);
+        renderHelper.addVertex(x + width, y, zLevel, rgba);
+        renderHelper.addVertex(x, y, zLevel, rgba);
         renderHelper.draw();
 
         // Clean up
@@ -350,6 +358,62 @@ public class DrawUtil
         renderHelper.glEnableTexture2D();
         renderHelper.glEnableAlpha();
         renderHelper.glDisableBlend();
+    }
+
+    public static void drawPolygon(List<Point2D.Double> screenPoints, ShapeProperties shapeProperties, double rotation)
+    {
+        // Prep
+        renderHelper.glEnableBlend();
+        renderHelper.glDisableTexture2D();
+        renderHelper.glDisableAlpha();
+        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+
+        // Draw Fill
+        if (shapeProperties.getFillOpacity() >= 0.01F)
+        {
+            int[] rgba = RGB.ints(shapeProperties.getFillColor(), shapeProperties.getFillOpacity());
+            renderHelper.startDrawingQuads(true);
+            for (Point2D.Double point : screenPoints)
+            {
+                renderHelper.addVertex(point.x, point.y, zLevel, rgba);
+            }
+            renderHelper.draw();
+        }
+
+        // Draw Outline
+        if (shapeProperties.getStrokeOpacity() >= 0.01F && shapeProperties.getStrokeWidth() > 0)
+        {
+            float[] rgba = RGB.floats(shapeProperties.getStrokeColor(), shapeProperties.getFillOpacity());
+            renderHelper.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            GL11.glLineWidth(shapeProperties.getStrokeWidth() * 10);
+
+            int lastIndex = screenPoints.size() - 1;
+            Point2D.Double first, second;
+            int j;
+            for (int i = 0; i <= lastIndex; i++)
+            {
+                j = (i < lastIndex) ? i + 1 : 0;
+                first = screenPoints.get(i);
+                second = screenPoints.get(j);
+                lineBuffer.put(new double[]{first.x, first.y, second.x, second.y});
+                GL11.glVertexPointer(2, 0, lineBuffer);
+                GL11.glDrawArrays(GL11.GL_LINES, 0, 2);
+                lineBuffer.clear();
+            }
+        }
+
+        // Clean up
+        renderHelper.glColor4f(1, 1, 1, 1);
+        renderHelper.glEnableTexture2D();
+        renderHelper.glEnableAlpha();
+        renderHelper.glDisableBlend();
+
+//        // TODO TEMP
+//        int c = 0;
+//        for (Point2D.Double point : screenPoints)
+//        {
+//            drawCenteredLabel("" + (c++), point.x, point.y, 0x000000, 255, 0xffffff, 255, 1, rotation);
+//        }
     }
 
     /**
