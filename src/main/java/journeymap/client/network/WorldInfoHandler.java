@@ -12,6 +12,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.WorldIDPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -101,11 +102,14 @@ public class WorldInfoHandler
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
+        if (event.entity instanceof EntityPlayerMP)
         {
-            if (ForgeHelper.INSTANCE.getEntityName(event.entity).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
+            if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
             {
-                requestWorldID();
+                if (ForgeHelper.INSTANCE.getEntityName(event.entity).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
+                {
+                    requestWorldID();
+                }
             }
         }
     }
