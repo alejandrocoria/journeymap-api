@@ -33,6 +33,11 @@ public enum ClientAPI implements IClientAPI
     private ClientEventManager clientEventManager = new ClientEventManager(plugins.values());
     private boolean drawStepsUpdateNeeded = true;
 
+    private ClientAPI()
+    {
+        log("built with JourneyMap API " + IClientAPI.API_VERSION);
+    }
+
     @Override
     public UIState getUIState(Context.UI ui)
     {
