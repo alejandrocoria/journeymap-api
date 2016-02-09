@@ -99,6 +99,11 @@ public class UIManager
     {
         try
         {
+            if (MiniMap.uiState().active)
+            {
+                MiniMap.updateUIState(false);
+            }
+
             T ui = uiClass.newInstance();
             return open(ui);
         }
@@ -146,14 +151,19 @@ public class UIManager
     {
         try
         {
+            boolean doDraw = false;
             if (miniMap.getCurrentMinimapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
-                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
+                doDraw = currentScreen == null || currentScreen instanceof GuiChat;
                 if (doDraw)
                 {
                     miniMap.drawMap();
                 }
+            }
+            if (doDraw && !MiniMap.uiState().active)
+            {
+                MiniMap.updateUIState(true);
             }
         }
         catch (Throwable e)

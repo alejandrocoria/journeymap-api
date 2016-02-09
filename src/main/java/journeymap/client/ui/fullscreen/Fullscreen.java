@@ -12,6 +12,7 @@ package journeymap.client.ui.fullscreen;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.util.UIState;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -115,6 +116,11 @@ public class Fullscreen extends JmUI
     public static synchronized MapState state()
     {
         return state;
+    }
+
+    public static synchronized UIState uiState()
+    {
+        return gridRenderer.getUIState();
     }
 
     public void reset()
@@ -648,7 +654,7 @@ public class Fullscreen extends JmUI
         }
 
         // Invoke layer delegate
-        BlockPos blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+        BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
         layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
     }
 
@@ -699,7 +705,7 @@ public class Fullscreen extends JmUI
 
         if (!isScrolling && which == -1)
         {
-            BlockPos blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+            BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
             layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
     }
@@ -1056,6 +1062,8 @@ public class Fullscreen extends JmUI
     @Override
     public void close()
     {
+        gridRenderer.updateUIState(false);
+
         if (chat != null)
         {
             chat.close();

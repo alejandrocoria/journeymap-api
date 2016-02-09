@@ -1,15 +1,16 @@
 package journeymap.client.api.impl;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
-import journeymap.client.api.event.DisplayUpdateEvent;
 import journeymap.client.api.util.PluginHelper;
+import journeymap.client.api.util.UIState;
 import journeymap.client.render.draw.DrawStep;
+import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.helpers.Strings;
@@ -27,21 +28,39 @@ public enum ClientAPI implements IClientAPI
 
     private final Logger LOGGER = Journeymap.getLogger();
     private final List<DrawStep> lastDrawSteps = new ArrayList<DrawStep>();
-    private final EventThrottle<DisplayUpdateEvent> displayUpdateEventEventThrottle = new EventThrottle<DisplayUpdateEvent>(1000);
-    private HashMap<String, PluginWrapper> cache = new HashMap<String, PluginWrapper>();
+
+    private HashMap<String, PluginWrapper> plugins = new HashMap<String, PluginWrapper>();
+    private ClientEventManager clientEventManager = new ClientEventManager(plugins.values());
     private boolean drawStepsUpdateNeeded = true;
 
     @Override
-    public boolean isActive(Enum<? extends Context>... enums)
+    public UIState getUIState(Context.UI ui)
     {
-        // TODO
-        return JourneymapClient.getInstance().isMapping();
+        switch (ui)
+        {
+            case Minimap:
+                return MiniMap.uiState();
+            case Fullscreen:
+                return Fullscreen.uiState();
+            default:
+                return null;
+        }
     }
 
     @Override
-    public void subscribe(EnumSet<ClientEvent.Type> enumSet)
+    public void subscribe(String modId, EnumSet<ClientEvent.Type> enumSet)
     {
-        System.out.println("Subscribe isn't implemented yet.  You're gonna get eveything.");
+        try
+        {
+            getPlugin(modId).subscribe(enumSet);
+
+            // Refresh master set of event types
+            clientEventManager.updateSubscribedTypes();
+        }
+        catch (Throwable t)
+        {
+            logError("Error subscribing: " + t, t);
+        }
     }
 
     @Override
@@ -145,37 +164,12 @@ public enum ClientAPI implements IClientAPI
     }
 
     /**
-     * Notify plugins of client event.
-     *
-     * @param clientEvent event
+     * Gets the manager of client event handling.
+     * @return clientEventManager
      */
-    public void fireClientEvent(final ClientEvent clientEvent, boolean immediate)
+    public ClientEventManager getClientEventManager()
     {
-        if (!immediate && clientEvent instanceof DisplayUpdateEvent)
-        {
-            displayUpdateEventEventThrottle.add((DisplayUpdateEvent) clientEvent);
-            return;
-        }
-
-        try
-        {
-            for (PluginWrapper wrapper : cache.values())
-            {
-                wrapper.notify(clientEvent);
-            }
-        }
-        catch (Throwable t)
-        {
-            logError("Error in fireClientEvent(): " + clientEvent, t);
-        }
-    }
-
-    public void fireNextClientEvent()
-    {
-        if (displayUpdateEventEventThrottle.canRelease())
-        {
-            fireClientEvent(displayUpdateEventEventThrottle.get(), true);
-        }
+        return clientEventManager;
     }
 
     /**
@@ -188,7 +182,7 @@ public enum ClientAPI implements IClientAPI
         if (drawStepsUpdateNeeded)
         {
             lastDrawSteps.clear();
-            for (PluginWrapper pluginWrapper : cache.values())
+            for (PluginWrapper pluginWrapper : plugins.values())
             {
                 pluginWrapper.getDrawSteps(lastDrawSteps);
             }
@@ -213,7 +207,7 @@ public enum ClientAPI implements IClientAPI
             throw new IllegalArgumentException("Invalid modId: " + modId);
         }
 
-        PluginWrapper pluginWrapper = cache.get(modId);
+        PluginWrapper pluginWrapper = plugins.get(modId);
         if (pluginWrapper == null)
         {
             IClientPlugin plugin = PluginHelper.INSTANCE.getPlugins().get(modId);
@@ -222,7 +216,7 @@ public enum ClientAPI implements IClientAPI
                 throw new IllegalArgumentException("No plugin found for modId: " + modId);
             }
             pluginWrapper = new PluginWrapper(plugin);
-            cache.put(modId, pluginWrapper);
+            plugins.put(modId, pluginWrapper);
         }
 
         return pluginWrapper;
@@ -233,7 +227,7 @@ public enum ClientAPI implements IClientAPI
      *
      * @param message
      */
-    private void log(String message)
+    void log(String message)
     {
         LOGGER.info(String.format("[%s] %s", getClass().getSimpleName(), message));
     }
@@ -243,7 +237,7 @@ public enum ClientAPI implements IClientAPI
         LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message));
     }
 
-    private void logError(String message, Throwable t)
+    void logError(String message, Throwable t)
     {
         LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message), t);
     }

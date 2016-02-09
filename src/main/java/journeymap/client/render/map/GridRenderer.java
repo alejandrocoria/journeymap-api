@@ -10,8 +10,11 @@ package journeymap.client.render.map;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.DisplayUpdateEvent;
 import journeymap.client.api.impl.ClientAPI;
+import journeymap.client.api.impl.ClientEventManager;
+import journeymap.client.api.util.UIState;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
@@ -59,9 +62,9 @@ public class GridRenderer
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final int maxGlErrors = 20;
     private final Context.UI contextUi;
-
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
+    private UIState uiState;
     private int glErrors = 0;
 
     private int gridSize; // 5 = 2560px.
@@ -83,10 +86,12 @@ public class GridRenderer
     private FloatBuffer projMatrixBuf;
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
+    private journeymap.client.api.util.UIState UIState;
 
     public GridRenderer(Context.UI contextUi, int gridSize)
     {
         this.contextUi = contextUi;
+        this.uiState = new UIState(contextUi, false, 0, 0, null, null, null);
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
@@ -205,6 +210,11 @@ public class GridRenderer
 
         if ((blockX == centerBlockX) && (blockZ == centerBlockZ) && (zoom == this.zoom) && !mapTypeChanged && !grid.isEmpty())
         {
+            // Check ui state
+            if (!Objects.equals(mapType.apiMapType, this.uiState.mapType))
+            {
+                updateUIState(true);
+            }
             // Nothing needs to change
             return false;
         }
@@ -214,8 +224,8 @@ public class GridRenderer
         this.zoom = zoom;
 
         // Get zoomed tile coords
-        final int tileX = Tile.blockPosToTile((int) Math.floor(centerBlockX), this.zoom);
-        final int tileZ = Tile.blockPosToTile((int) Math.floor(centerBlockZ), this.zoom);
+        final int tileX = Tile.blockPosToTile((int) Math.floor(blockX), this.zoom);
+        final int tileZ = Tile.blockPosToTile((int) Math.floor(blockZ), this.zoom);
 
         // Check key of center tile
         final String newCenterKey = Tile.toCacheKey(tileX, tileZ, zoom);
@@ -229,11 +239,6 @@ public class GridRenderer
             populateGrid(newCenterTile);
 
             // Notify plugins
-            if (contextUi == Context.UI.Fullscreen)
-            {
-                fireDisplayUpdateEvent();
-            }
-
             if (debug)
             {
                 logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
@@ -246,15 +251,9 @@ public class GridRenderer
                 g.drawLine(0, mc.displayHeight / 2, mc.displayWidth, mc.displayHeight / 2);
             }
         }
-        return true;
-    }
 
-    public void fireDisplayUpdateEvent()
-    {
-        if (mapType != null && blockBounds != null)
-        {
-            ClientAPI.INSTANCE.fireClientEvent(new DisplayUpdateEvent(contextUi, mapType.apiContextMapType(), blockBounds, mapType.dimension, zoom), false);
-        }
+        updateUIState(true);
+        return true;
     }
 
     public void updateTiles(MapType mapType, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
@@ -351,7 +350,7 @@ public class GridRenderer
         return blockBounds;
     }
 
-    public BlockPos getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
+    public BlockPos getBlockAtScreenPoint(double mouseX, double mouseY, int screenWidth, int screenHeight)
     {
         double centerPixelX = screenWidth / 2.0;
         double centerPixelZ = screenHeight / 2.0;
@@ -632,10 +631,37 @@ public class GridRenderer
             {
                 screenBounds = new Rectangle2D.Double((width - viewPort.width) / 2, (height - viewPort.height) / 2, viewPort.width, viewPort.height);
             }
+        }
+    }
 
-            BlockPos upperLeft = getBlockUnderMouse(screenBounds.getMinX(), screenBounds.getMaxY(), (int) screenBounds.width, (int) screenBounds.height);
-            BlockPos lowerRight = getBlockUnderMouse(screenBounds.getMaxX(), screenBounds.getMinY(), (int) screenBounds.width, (int) screenBounds.height);
+    public void updateUIState(boolean isActive)
+    {
+        if (isActive && (screenBounds == null || blockBounds == null))
+        {
+            return;
+        }
+
+        UIState newState = null;
+        if (isActive)
+        {
+            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMinY(), (int) screenBounds.width, (int) screenBounds.height);
+            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMaxY(), (int) screenBounds.width, (int) screenBounds.height);
             blockBounds = new AxisAlignedBB(upperLeft, lowerRight.up(ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight()));
+            newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType, new BlockPos(centerBlockX, 0, centerBlockZ), blockBounds);
+        }
+        else
+        {
+            newState = new UIState(contextUi, false, mapType.dimension, zoom, null, null, null);
+        }
+
+        if (!newState.equals(this.uiState))
+        {
+            this.uiState = newState;
+            ClientEventManager clientEventManager = ClientAPI.INSTANCE.getClientEventManager();
+            if (clientEventManager.canFireClientEvent(ClientEvent.Type.DISPLAY_UPDATE))
+            {
+                clientEventManager.fireDisplayUpdateEvent(new DisplayUpdateEvent(uiState));
+            }
         }
     }
 
@@ -656,6 +682,7 @@ public class GridRenderer
     public void setContext(File worldDir, MapType mapType)
     {
         this.worldDir = worldDir;
+        boolean mapTypeChanged = (this.mapType == mapType);
         this.mapType = mapType;
     }
 
@@ -749,5 +776,10 @@ public class GridRenderer
     public int getHeight()
     {
         return lastHeight;
+    }
+
+    public UIState getUIState()
+    {
+        return uiState;
     }
 }

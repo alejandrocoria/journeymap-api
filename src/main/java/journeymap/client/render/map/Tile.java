@@ -206,7 +206,6 @@ public class Tile
 
     public Point2D blockPixelOffsetInTile(double x, double z)
     {
-
         if (x < ulBlock.x || Math.floor(x) > lrBlock.x || z < ulBlock.y || Math.floor(z) > lrBlock.y)
         {
             throw new RuntimeException("Block " + x + "," + z + " isn't in " + this);

@@ -11,19 +11,18 @@ package journeymap.client.model;
 import journeymap.client.api.display.Context;
 import journeymap.client.data.DataCache;
 
-import java.util.HashMap;
-
 /**
  * Encapsulate irreducible complexity of map type-related properties.
  */
 public class MapType
 {
-    private static HashMap<Integer, MapType> cache = new HashMap<Integer, MapType>(256); // Max 4 names * 8 slices * 8 dimensions
     public final Integer vSlice;
     public final Name name;
     public final int dimension;
+    public final Context.MapType apiMapType;
     private final int theHashCode;
     private final String theCacheKey;
+
 
     public MapType(Name name, Integer vSlice, int dimension)
     {
@@ -32,6 +31,7 @@ public class MapType
         this.name = name;
         this.vSlice = vSlice;
         this.dimension = dimension;
+        this.apiMapType = toApiContextMapType(name);
         this.theCacheKey = toCacheKey(name, vSlice, dimension);
         this.theHashCode = theCacheKey.hashCode();
     }
@@ -86,7 +86,7 @@ public class MapType
         return "" + dimension + name + vSlice;
     }
 
-    public Context.MapType apiContextMapType()
+    private Context.MapType toApiContextMapType(Name name)
     {
         switch (name)
         {

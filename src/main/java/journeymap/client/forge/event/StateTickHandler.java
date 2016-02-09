@@ -9,7 +9,6 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.DeathWaypointEvent;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -101,7 +100,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             else if (counter == 5 || counter == 15)
             {
                 mc.mcProfiler.startSection("clientApiEvents");
-                ClientAPI.INSTANCE.fireNextClientEvent();
+                ClientAPI.INSTANCE.getClientEventManager().fireNextClientEvents();
                 counter++;
                 mc.mcProfiler.endSection();
             }
@@ -132,28 +131,33 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             }
 
             WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
-            boolean doCreate = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
+            boolean enabled = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
+            boolean cancelled = false;
 
-            if (doCreate)
+            BlockPos pos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+            if (enabled)
             {
-                BlockPos pos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
                 int dim = ForgeHelper.INSTANCE.getPlayerDimension();
 
-                ClientEvent event = new DeathWaypointEvent(pos, dim);
-                ClientAPI.INSTANCE.fireClientEvent(event, true);
+                DeathWaypointEvent event = new DeathWaypointEvent(pos, dim);
+                ClientAPI.INSTANCE.getClientEventManager().fireDeathpointEvent(event);
                 if (!event.isCancelled())
                 {
                     Waypoint deathpoint = Waypoint.at(pos, Waypoint.Type.Death, dim);
                     WaypointStore.instance().save(deathpoint);
                 }
+                else
+                {
+                    cancelled = true;
+                }
             }
 
-            Journeymap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
+            Journeymap.getLogger().info(String.format("%s died at %s. Deathpoints enabled: %s. Deathpoint created: %s",
                     ForgeHelper.INSTANCE.getEntityName(player),
-                    MathHelper.floor_double(player.posX),
-                    MathHelper.floor_double(player.posY),
-                    MathHelper.floor_double(player.posZ),
-                    doCreate));
+                    pos,
+                    enabled,
+                    cancelled ? "cancelled" : true));
+
 
         }
         catch (Throwable t)

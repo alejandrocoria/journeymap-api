@@ -33,7 +33,7 @@ public class DrawPolygonStep implements DrawStep
 
     private List<Point2D.Double> screenPoints;
     private Rectangle2D.Double screenBounds;
-    private double[] lastGridSettings = new double[0];
+    private double[] lastArgs = new double[0];
     private double[] lastLabelSettings = new double[0];
     private boolean showLabel = true;
 
@@ -53,11 +53,12 @@ public class DrawPolygonStep implements DrawStep
         final int zoom = gridRenderer.getZoom();
         if (polygon.getMinZoom() <= zoom && polygon.getMaxZoom() >= zoom)
         {
-            double[] currentValues = new double[]{gridRenderer.getCenterBlockX(), gridRenderer.getCenterBlockZ(), xOffset, yOffset, zoom};
-            if (!Arrays.equals(currentValues, lastGridSettings) || lastLabelSettings.length == 0)
+            // use an array of doubles to compare the current args to previous ones
+            double[] currentArgs = new double[]{gridRenderer.getCenterBlockX() + xOffset, gridRenderer.getCenterBlockZ() + yOffset, zoom};
+            if (!Arrays.equals(currentArgs, lastArgs) || lastLabelSettings.length == 0)
             {
                 updateRenderValues(xOffset, yOffset, gridRenderer);
-                lastGridSettings = currentValues;
+                lastArgs = currentArgs;
             }
 
             if (gridRenderer.isOnScreen(screenBounds))

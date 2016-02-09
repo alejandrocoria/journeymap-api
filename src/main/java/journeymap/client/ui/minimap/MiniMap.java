@@ -10,6 +10,7 @@ package journeymap.client.ui.minimap;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.util.UIState;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
@@ -84,6 +85,16 @@ public class MiniMap
     public static synchronized MapState state()
     {
         return state;
+    }
+
+    public static synchronized UIState uiState()
+    {
+        return gridRenderer.getUIState();
+    }
+
+    public static void updateUIState(boolean isActive)
+    {
+        gridRenderer.updateUIState(isActive);
     }
 
     private void initGridRenderer()
@@ -637,7 +648,7 @@ public class MiniMap
         gridRenderer.setViewPort(viewPort);
 
         // Fire display update
-        gridRenderer.fireDisplayUpdateEvent();
+        updateUIState(true);
     }
 
     private void updateLabels()

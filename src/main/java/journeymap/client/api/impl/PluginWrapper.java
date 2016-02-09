@@ -21,7 +21,7 @@ import java.util.List;
  * Aggregates objects passed to the ClientAPI for a specific mod.
  */
 @ParametersAreNonnullByDefault
-public class PluginWrapper
+class PluginWrapper
 {
     private final IClientPlugin plugin;
     private final String modId;
@@ -30,16 +30,18 @@ public class PluginWrapper
     private final HashBasedTable<String, Overlay, DrawStep> overlays = HashBasedTable.create();
     private final HashBasedTable<String, ModWaypoint, Waypoint> waypoints = HashBasedTable.create();
 
+    private EnumSet<ClientEvent.Type> subscribedClientEventTypes = EnumSet.noneOf(ClientEvent.Type.class);
+
+    /**
+     * Constructor.
+     *
+     * @param plugin the plugin
+     */
     public PluginWrapper(IClientPlugin plugin)
     {
         this.modId = plugin.getModId();
         this.plugin = plugin;
         this.eventTimer = StatTimer.get("pluginClientEvent_" + modId, 1, 200);
-    }
-
-    public void subscribe(EnumSet<ClientEvent.Type> enumSet)
-    {
-
     }
 
     /**
@@ -165,15 +167,44 @@ public class PluginWrapper
         }
     }
 
+    /**
+     * Populates a list with all overlay drawsteps.
+     * @return list
+     */
     public List<DrawStep> getDrawSteps()
     {
         return new ArrayList<DrawStep>(overlays.values());
     }
 
+    /**
+     * Populates the provided list with all overlay drawsteps.
+     * @param list  list
+     * @return same list
+     */
     public List<DrawStep> getDrawSteps(List<DrawStep> list)
     {
         list.addAll(overlays.values());
         return list;
+    }
+
+    /**
+     * Subscribe to a set of event types.
+     *
+     * @param enumSet can be empty, but not null.
+     */
+    public void subscribe(EnumSet<ClientEvent.Type> enumSet)
+    {
+        subscribedClientEventTypes = EnumSet.copyOf(enumSet);
+    }
+
+    /**
+     * Event types subscribed to.
+     *
+     * @return a set, which may be empty.
+     */
+    public EnumSet<ClientEvent.Type> getSubscribedClientEventTypes()
+    {
+        return subscribedClientEventTypes;
     }
 
     /**
@@ -183,6 +214,11 @@ public class PluginWrapper
      */
     public void notify(final ClientEvent clientEvent)
     {
+        if (!subscribedClientEventTypes.contains(clientEvent.type))
+        {
+            return;
+        }
+
         try
         {
             boolean cancelled = clientEvent.isCancelled();
