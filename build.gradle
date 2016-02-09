@@ -17,9 +17,11 @@ ext {
     srcWebDir = "src/main/resources/assets/journeymap/web/"
     implSrc = "build/resources/java/journeymap/feature/impl/"
     sharedManifest = manifest {
-        attributes = ["Implementation-Title": "JourneyMap",
+        attributes = [
+                "Implementation-Title": "JourneyMap",
                 "Implementation-Version": project.version,
-                      "Implementation-URL": "http://journeymap.info"]
+                "Implementation-URL"  : "http://journeymap.info"
+        ]
     }
 }
 
@@ -40,10 +42,16 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+configurations {
+    // custom config of jars that will be included in the journeymap jar
+    includeInJar
+}
+
 dependencies {
     compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
     runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
-    compile 'com.yahoo.platform.yui:yuicompressor:2.4.8'
+    runtime 'com.yahoo.platform.yui:yuicompressor:2.4.8'
+    includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
 }
 
 minecraft {
@@ -89,6 +97,19 @@ task copyCss(type: Copy, dependsOn: copyJs) {
     include 'journeymap.js'
 }
 
+task includeJars(type: Copy) {
+    dependsOn configurations.includeInJar
+    from {
+        configurations.includeInJar.asFileTree.each {
+            from(zipTree(it))
+        }
+        // Exclude the jar itself
+        null
+    }
+    into file("${project.buildDir}/classes/main")
+    include "journeymap/**"
+}
+
 task filter() {
     def subdir = new File("tmp")
 
@@ -123,13 +144,14 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
+task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar']) {
     version = "${version}-${project.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
         duplicatesStrategy = 'exclude'
         exclude("journeymap/client/feature/impl/NoRadar.class")
     }
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : project.forge_version, jmedition : project.unlimited
@@ -140,13 +162,14 @@ task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
     }
 }
 
-task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
+task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
     version = "${version}-${project.fairPlay}".toLowerCase()
 
     from(sourceSets.main.output) {
         exclude("journeymap/client/feature/impl/Unlimited.class")
         exclude("journeymap/client/feature/impl/NoRadar.class")
     }
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : project.forge_version, jmedition : project.fairPlay
