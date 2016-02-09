@@ -36,7 +36,7 @@ class DisplayUpdateEventThrottle
      */
     public void add(DisplayUpdateEvent event)
     {
-        switch (event.mapState.ui)
+        switch (event.uiState.ui)
         {
             case Fullscreen:
                 fullscreenQueue.offer(event);
@@ -48,7 +48,7 @@ class DisplayUpdateEventThrottle
 //                webmapQueue.offer(event);
 //                break;
             default:
-                throw new UnsupportedOperationException("Can't throttle events for UI." + event.mapState.ui);
+                throw new UnsupportedOperationException("Can't throttle events for UI." + event.uiState.ui);
         }
     }
 
