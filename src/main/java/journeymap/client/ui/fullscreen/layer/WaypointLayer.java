@@ -54,7 +54,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
+    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale)
     {
         if (!WaypointsData.isManagerEnabled())
         {
@@ -136,17 +136,12 @@ public class WaypointLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
+    public List<DrawStep> onMouseClick(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, int button, boolean doubleClick, float fontScale)
     {
         if (!WaypointsData.isManagerEnabled())
         {
             return Collections.EMPTY_LIST;
         }
-
-        // check for double-click
-        long sysTime = Minecraft.getSystemTime();
-        boolean doubleClick = sysTime - this.lastClick < 450L;
-        this.lastClick = sysTime;
 
         if (!drawStepList.contains(clickDrawStep))
         {
@@ -180,6 +175,12 @@ public class WaypointLayer implements LayerDelegate.Layer
         UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;
+    }
+
+    @Override
+    public boolean propagateClick()
+    {
+        return true;
     }
 
     private void sortByDistance(List<Waypoint> waypoints, final BlockPos blockCoord, final int dimension)
@@ -251,7 +252,7 @@ public class WaypointLayer implements LayerDelegate.Layer
             double thick = gridRenderer.getZoom() < 2 ? 1 : 2;
 
             Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x, z);
-            pixel.setLocation(pixel.getX() + xOffset, pixel.getY() + yOffset);
+            pixel.setLocation(pixel.getX() + xOffset, gridRenderer.getHeight() - pixel.getY() + yOffset);
             if (gridRenderer.isOnScreen(pixel))
             {
                 DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, 150);
@@ -278,12 +279,6 @@ public class WaypointLayer implements LayerDelegate.Layer
         public String getModId()
         {
             return Journeymap.MOD_ID;
-        }
-
-        @Override
-        public String getGroupName()
-        {
-            return null;
         }
     }
 }

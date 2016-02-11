@@ -244,7 +244,7 @@ public class MapState
         return playerBiome;
     }
 
-    public List<DrawStep> getDrawSteps()
+    public List<? extends DrawStep> getDrawSteps()
     {
         return drawStepList;
     }
@@ -268,7 +268,7 @@ public class MapState
             drawScale = drawScale * .5f;
         }
 
-        ClientAPI.INSTANCE.getDrawSteps(drawStepList);
+        ClientAPI.INSTANCE.getDrawSteps(drawStepList, mc.theWorld.provider.getDimensionId(), gridRenderer.getUIState().ui);
 
         if (FeatureManager.isAllowed(Feature.RadarAnimals))
         {

@@ -173,12 +173,6 @@ public class DrawEntityStep implements DrawStep
         return Journeymap.MOD_ID;
     }
 
-    @Override
-    public String getGroupName()
-    {
-        return null;
-    }
-
     public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep>
     {
         @Override

@@ -8,7 +8,7 @@ import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.PluginHelper;
 import journeymap.client.api.util.UIState;
-import journeymap.client.render.draw.DrawStep;
+import journeymap.client.render.draw.OverlayDrawStep;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
@@ -27,11 +27,13 @@ public enum ClientAPI implements IClientAPI
     INSTANCE;
 
     private final Logger LOGGER = Journeymap.getLogger();
-    private final List<DrawStep> lastDrawSteps = new ArrayList<DrawStep>();
+    private final List<OverlayDrawStep> lastDrawSteps = new ArrayList<OverlayDrawStep>();
 
     private HashMap<String, PluginWrapper> plugins = new HashMap<String, PluginWrapper>();
     private ClientEventManager clientEventManager = new ClientEventManager(plugins.values());
     private boolean drawStepsUpdateNeeded = true;
+    private Context.UI lastUi = Context.UI.Any;
+    private int lastDimension = Integer.MIN_VALUE;
 
     private ClientAPI()
     {
@@ -180,29 +182,38 @@ public enum ClientAPI implements IClientAPI
     /**
      * Get all draw steps from all plugins. Builds and sorts the list only when needed.
      * @param list
-     * @return
+     * @param dimension
+     * @param ui
      */
-    public List<DrawStep> getDrawSteps(List<DrawStep> list)
+    public void getDrawSteps(List list, int dimension, Context.UI ui)
     {
+        if(ui != lastUi || dimension!=lastDimension)
+        {
+            drawStepsUpdateNeeded = true;
+            lastUi = ui;
+            lastDimension = dimension;
+        }
+
         if (drawStepsUpdateNeeded)
         {
+            // TODO, this is inefficient
             lastDrawSteps.clear();
             for (PluginWrapper pluginWrapper : plugins.values())
             {
-                pluginWrapper.getDrawSteps(lastDrawSteps);
+                pluginWrapper.getDrawSteps(lastDrawSteps, dimension, ui);
             }
-            Collections.sort(lastDrawSteps, new Comparator<DrawStep>()
+            Collections.sort(lastDrawSteps, new Comparator<OverlayDrawStep>()
             {
                 @Override
-                public int compare(DrawStep o1, DrawStep o2)
+                public int compare(OverlayDrawStep o1, OverlayDrawStep o2)
                 {
                     return Integer.compare(o1.getDisplayOrder(), o2.getDisplayOrder());
                 }
             });
             drawStepsUpdateNeeded = false;
         }
+
         list.addAll(lastDrawSteps);
-        return list;
     }
 
     private PluginWrapper getPlugin(String modId)

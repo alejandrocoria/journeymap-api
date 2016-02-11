@@ -310,7 +310,7 @@ public final class RGB
     }
 
     /**
-     * Returns an int guaranteed to be between 0 and 1, inclusive.
+     * Returns an int guaranteed to be between 0 and 255, inclusive.
      *
      * @param value
      * @return
@@ -320,4 +320,14 @@ public final class RGB
         return value < 0 ? 0 : (value > 255 ? 255 : value);
     }
 
+    /**
+     * Returns an int guaranteed to be between 0 and 255, inclusive.
+     *
+     * @param value
+     * @return
+     */
+    public static int toClampedInt(float value)
+    {
+        return clampInt((int) (value * 255));
+    }
 }

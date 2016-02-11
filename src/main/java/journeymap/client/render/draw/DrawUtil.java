@@ -365,19 +365,30 @@ public class DrawUtil
         // Prep
         renderHelper.glEnableBlend();
         renderHelper.glDisableTexture2D();
-        renderHelper.glDisableAlpha();
+        renderHelper.glEnableAlpha();
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
         // Draw Fill
         if (shapeProperties.getFillOpacity() >= 0.01F)
         {
-            int[] rgba = RGB.ints(shapeProperties.getFillColor(), shapeProperties.getFillOpacity());
-            renderHelper.startDrawingQuads(true);
-            for (Point2D.Double point : screenPoints)
+            float[] rgba = RGB.floats(shapeProperties.getFillColor(), shapeProperties.getFillOpacity());
+            renderHelper.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+
+            int lastIndex = screenPoints.size() - 1;
+            Point2D.Double first, second;
+            int j;
+            GL11.glBegin(GL11.GL_POLYGON);
+            for (int i = 0; i <= lastIndex; i++)
             {
-                renderHelper.addVertex(point.x, point.y, zLevel, rgba);
+                j = (i < lastIndex) ? i + 1 : 0;
+                first = screenPoints.get(i);
+                second = screenPoints.get(j);
+
+                GL11.glVertex2d(first.getX(), first.getY());
+                GL11.glVertex2d(second.getX(), second.getY());
+
             }
-            renderHelper.draw();
+            GL11.glEnd();
         }
 
         // Draw Outline
@@ -385,21 +396,25 @@ public class DrawUtil
         {
             float[] rgba = RGB.floats(shapeProperties.getStrokeColor(), shapeProperties.getFillOpacity());
             renderHelper.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
-            GL11.glLineWidth(shapeProperties.getStrokeWidth() * 10);
+            float stroke = shapeProperties.getStrokeWidth();
+            GL11.glLineWidth(stroke);
 
             int lastIndex = screenPoints.size() - 1;
             Point2D.Double first, second;
             int j;
+
+            GL11.glBegin(GL11.GL_LINE_STRIP);
             for (int i = 0; i <= lastIndex; i++)
             {
                 j = (i < lastIndex) ? i + 1 : 0;
                 first = screenPoints.get(i);
                 second = screenPoints.get(j);
-                lineBuffer.put(new double[]{first.x, first.y, second.x, second.y});
-                GL11.glVertexPointer(2, 0, lineBuffer);
-                GL11.glDrawArrays(GL11.GL_LINES, 0, 2);
-                lineBuffer.clear();
+
+                GL11.glVertex2d(first.getX(), first.getY());
+                GL11.glVertex2d(second.getX(), second.getY());
+
             }
+            GL11.glEnd();
         }
 
         // Clean up

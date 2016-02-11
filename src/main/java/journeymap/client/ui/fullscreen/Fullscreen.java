@@ -52,7 +52,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Level;
@@ -654,8 +653,8 @@ public class Fullscreen extends JmUI
         }
 
         // Invoke layer delegate
-        BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
-        layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
+        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), mc.displayHeight - Mouse.getEventY());
+        layerDelegate.onMouseClicked(mc, gridRenderer, mousePosition, mouseButton, getMapFontScale());
     }
 
     @Override
@@ -705,8 +704,8 @@ public class Fullscreen extends JmUI
 
         if (!isScrolling && which == -1)
         {
-            BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
-            layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), mc.displayHeight - Mouse.getEventY());
+            layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
         }
     }
 

@@ -2,19 +2,21 @@ package journeymap.client.api.impl;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.display.*;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawPolygonStep;
-import journeymap.client.render.draw.DrawStep;
+import journeymap.client.render.draw.OverlayDrawStep;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,7 +29,9 @@ class PluginWrapper
     private final String modId;
     private final StatTimer eventTimer;
 
-    private final HashBasedTable<String, Overlay, DrawStep> overlays = HashBasedTable.create();
+    private final HashMap<Integer, HashBasedTable<String, Overlay, OverlayDrawStep>> dimensionOverlays =
+            new HashMap<Integer, HashBasedTable<String, Overlay, OverlayDrawStep>>();
+
     private final HashBasedTable<String, ModWaypoint, Waypoint> waypoints = HashBasedTable.create();
 
     private EnumSet<ClientEvent.Type> subscribedClientEventTypes = EnumSet.noneOf(ClientEvent.Type.class);
@@ -45,6 +49,22 @@ class PluginWrapper
     }
 
     /**
+     * Get (create if needed) a table for the overlays in a dimension.
+     * @param dimension the current dim
+     * @return a table
+     */
+    private HashBasedTable<String, Overlay, OverlayDrawStep> getOverlays(int dimension)
+    {
+        HashBasedTable<String, Overlay, OverlayDrawStep> table = dimensionOverlays.get(dimension);
+        if(table==null)
+        {
+            table = HashBasedTable.create();
+            dimensionOverlays.put(dimension, table);
+        }
+        return table;
+    }
+
+    /**
      * Add (or update) a displayable object to the player's maps. If you modify a Displayable after it
      * has been added, call this method again to ensure the maps reflect your changes.
      */
@@ -55,7 +75,7 @@ class PluginWrapper
         {
             case Polygon:
                 PolygonOverlay overlay = (PolygonOverlay) displayable;
-                overlays.put(displayId, overlay, new DrawPolygonStep(overlay));
+                getOverlays(((PolygonOverlay) displayable).getDimension()).put(displayId, overlay, new DrawPolygonStep(overlay));
                 break;
             case Waypoint:
                 ModWaypoint modWaypoint = (ModWaypoint) displayable;
@@ -80,7 +100,7 @@ class PluginWrapper
                 remove((ModWaypoint) displayable);
                 break;
             default:
-                overlays.remove(displayId, displayable);
+                getOverlays(((PolygonOverlay) displayable).getDimension()).remove(displayId, displayable);
                 break;
         }
     }
@@ -118,12 +138,15 @@ class PluginWrapper
         }
         else
         {
-            List<Displayable> list = new ArrayList<Displayable>(overlays.columnKeySet());
-            for (Displayable displayable : list)
+            for(HashBasedTable<String, Overlay, OverlayDrawStep> overlays : dimensionOverlays.values())
             {
-                if (displayable.getDisplayType() == displayType)
+                List<Displayable> list = new ArrayList<Displayable>(overlays.columnKeySet());
+                for (Displayable displayable : list)
                 {
-                    remove(displayable);
+                    if (displayable.getDisplayType() == displayType)
+                    {
+                        remove(displayable);
+                    }
                 }
             }
         }
@@ -143,9 +166,9 @@ class PluginWrapper
             }
         }
 
-        if (!overlays.isEmpty())
+        if (!dimensionOverlays.isEmpty())
         {
-            overlays.clear();
+            dimensionOverlays.clear();
         }
     }
 
@@ -163,28 +186,32 @@ class PluginWrapper
             case Waypoint:
                 return waypoints.containsRow(displayId);
             default:
-                return overlays.containsRow(displayId);
+                if(displayable instanceof Overlay)
+                {
+                    int dimension = ((Overlay) displayable).getDimension();
+                    return getOverlays(dimension).containsRow(displayId);
+                }
         }
-    }
-
-    /**
-     * Populates a list with all overlay drawsteps.
-     * @return list
-     */
-    public List<DrawStep> getDrawSteps()
-    {
-        return new ArrayList<DrawStep>(overlays.values());
+        return false;
     }
 
     /**
      * Populates the provided list with all overlay drawsteps.
-     * @param list  list
-     * @return same list
+     * @param list
+     * @param dimension
+     * @param ui
      */
-    public List<DrawStep> getDrawSteps(List<DrawStep> list)
+    public void getDrawSteps(List<OverlayDrawStep> list, int dimension, Context.UI ui)
     {
-        list.addAll(overlays.values());
-        return list;
+        HashBasedTable<String, Overlay, OverlayDrawStep> table = getOverlays(dimension);
+        for( Table.Cell<String, Overlay, OverlayDrawStep> cell : table.cellSet())
+        {
+            EnumSet<Context.UI> activeUIs = cell.getColumnKey().getActiveUIs();
+            if(activeUIs.contains(Context.UI.Any) || activeUIs.contains(ui))
+            {
+                list.add(cell.getValue());
+            }
+        }
     }
 
     /**

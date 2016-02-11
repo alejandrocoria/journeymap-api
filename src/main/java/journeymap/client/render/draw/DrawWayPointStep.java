@@ -154,12 +154,6 @@ public class DrawWayPointStep implements DrawStep
         return waypoint.getOrigin();
     }
 
-    @Override
-    public String getGroupName()
-    {
-        return waypoint.getWaypointGroupName();
-    }
-
     public static class SimpleCacheLoader extends CacheLoader<Waypoint, DrawWayPointStep>
     {
         @Override

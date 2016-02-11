@@ -25,12 +25,13 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by mwoodman on 2/26/14.
+ * Shows info about the block under the mouse.
  */
 public class BlockInfoLayer implements LayerDelegate.Layer
 {
@@ -51,7 +52,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
+    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale)
     {
         if (!blockCoord.equals(lastCoord))
         {
@@ -82,11 +83,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
-            blockInfoStep.update(info, gridWidth / 2, gridHeight - infoHeight);
+            blockInfoStep.update(info, gridRenderer.getWidth() / 2, gridRenderer.getHeight() - infoHeight);
         }
         else
         {
-            blockInfoStep.update(blockInfoStep.text, gridWidth / 2, blockInfoStep.y);
+            blockInfoStep.update(blockInfoStep.text, gridRenderer.getWidth() / 2, blockInfoStep.y);
         }
 
         return drawStepList;
@@ -98,9 +99,15 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseClick(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockPos blockCoord)
+    public List<DrawStep> onMouseClick(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, int button, boolean doubleClick, float fontScale)
     {
         return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public boolean propagateClick()
+    {
+        return true;
     }
 
     class BlockInfoStep implements DrawStep
@@ -147,12 +154,6 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         public String getModId()
         {
             return Journeymap.MOD_ID;
-        }
-
-        @Override
-        public String getGroupName()
-        {
-            return null;
         }
     }
 }

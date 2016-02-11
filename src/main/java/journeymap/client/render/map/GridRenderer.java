@@ -350,10 +350,11 @@ public class GridRenderer
         return blockBounds;
     }
 
-    public BlockPos getBlockAtScreenPoint(double mouseX, double mouseY, int screenWidth, int screenHeight)
+    public BlockPos getBlockAtScreenPoint(double mouseX, double mouseY)
     {
-        double centerPixelX = screenWidth / 2.0;
-        double centerPixelZ = screenHeight / 2.0;
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        double centerPixelX = mc.displayWidth / 2.0;
+        double centerPixelZ = mc.displayHeight / 2.0;
 
         double blockSize = (int) Math.pow(2, zoom);
 
@@ -372,13 +373,13 @@ public class GridRenderer
 
     public Point2D.Double getBlockPixelInGrid(double x, double z)
     {
-
+        Minecraft mc = ForgeHelper.INSTANCE.getClient();
         double localBlockX = x - centerBlockX;
         double localBlockZ = z - centerBlockZ;
 
         int blockSize = (int) Math.pow(2, zoom);
-        double pixelOffsetX = lastWidth / 2 + (localBlockX * blockSize);
-        double pixelOffsetZ = lastHeight / 2 + (localBlockZ * blockSize);
+        double pixelOffsetX = mc.displayWidth / 2.0 + (localBlockX * blockSize);
+        double pixelOffsetZ = mc.displayHeight / 2.0 + (localBlockZ * blockSize);
 
         return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
     }
@@ -644,8 +645,8 @@ public class GridRenderer
         UIState newState = null;
         if (isActive)
         {
-            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMinY(), (int) screenBounds.width, (int) screenBounds.height);
-            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMaxY(), (int) screenBounds.width, (int) screenBounds.height);
+            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMinY());
+            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMaxY());
             blockBounds = new AxisAlignedBB(upperLeft, lowerRight.up(ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight()));
             newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType, new BlockPos(centerBlockX, 0, centerBlockZ), blockBounds);
         }
