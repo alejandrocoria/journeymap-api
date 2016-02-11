@@ -8,7 +8,6 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.api.display.Context;
 import journeymap.client.api.display.IOverlayListener;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.impl.ClientAPI;
@@ -32,23 +31,27 @@ import java.util.Objects;
  */
 public class ModOverlayLayer implements LayerDelegate.Layer
 {
-    List<OverlayDrawStep> allDrawSteps = new ArrayList<OverlayDrawStep>();
-    List<OverlayDrawStep> visibleSteps = new ArrayList<OverlayDrawStep>();
-    List<OverlayDrawStep> touchedSteps = new ArrayList<OverlayDrawStep>();
-    BlockPos lastCoord;
-    Point2D.Double lastMousePosition;
-    UIState uiState;
-    boolean propagateClick;
+    protected List<OverlayDrawStep> allDrawSteps = new ArrayList<OverlayDrawStep>();
+    protected List<OverlayDrawStep> visibleSteps = new ArrayList<OverlayDrawStep>();
+    protected List<OverlayDrawStep> touchedSteps = new ArrayList<OverlayDrawStep>();
+    protected BlockPos lastCoord;
+    protected Point2D.Double lastMousePosition;
+    protected UIState lastUiState;
+    protected boolean propagateClick;
 
+    /**
+     * Compares state of args to prior args and refreshes the relevant drawsteps
+     * from mods, triggering events as needed.
+     */
     private void ensureCurrent(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord)
     {
-        if (!Objects.equals(blockCoord, lastCoord) || lastMousePosition == null || uiState == null)
+        if (!Objects.equals(blockCoord, lastCoord) || lastMousePosition == null || !Objects.equals(lastUiState, gridRenderer.getUIState()))
         {
             lastCoord = blockCoord;
-            uiState = ClientAPI.INSTANCE.getUIState(Context.UI.Fullscreen);
+            lastUiState = gridRenderer.getUIState();
             lastMousePosition = new Point2D.Double(mousePosition.x, mousePosition.y);
             allDrawSteps.clear();
-            ClientAPI.INSTANCE.getDrawSteps(allDrawSteps, mc.theWorld.provider.getDimensionId(), Context.UI.Fullscreen);
+            ClientAPI.INSTANCE.getDrawSteps(allDrawSteps, lastUiState);
             updateOverlayState(gridRenderer, mousePosition, blockCoord);
         }
     }
@@ -192,7 +195,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
         {
             try
             {
-                listener.onActivate(uiState);
+                listener.onActivate(lastUiState);
             }
             catch (Throwable t)
             {
@@ -207,7 +210,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
         {
             try
             {
-                listener.onDeactivate(uiState);
+                listener.onDeactivate(lastUiState);
             }
             catch (Throwable t)
             {
@@ -222,7 +225,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
         {
             try
             {
-                listener.onMouseMove(uiState, mousePosition, blockCoord);
+                listener.onMouseMove(lastUiState, mousePosition, blockCoord);
             }
             catch (Throwable t)
             {
@@ -237,7 +240,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
         {
             try
             {
-                return listener.onMouseClick(uiState, mousePosition, blockCoord, button, doubleClick);
+                return listener.onMouseClick(lastUiState, mousePosition, blockCoord, button, doubleClick);
             }
             catch (Throwable t)
             {
@@ -253,7 +256,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
         {
             try
             {
-                listener.onMouseOut(uiState, mousePosition, blockCoord);
+                listener.onMouseOut(lastUiState, mousePosition, blockCoord);
             }
             catch (Throwable t)
             {

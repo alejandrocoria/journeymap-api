@@ -33,6 +33,7 @@ public enum ClientAPI implements IClientAPI
     private ClientEventManager clientEventManager = new ClientEventManager(plugins.values());
     private boolean drawStepsUpdateNeeded = true;
     private Context.UI lastUi = Context.UI.Any;
+    private Context.MapType lastMapType = Context.MapType.Any;
     private int lastDimension = Integer.MIN_VALUE;
 
     private ClientAPI()
@@ -181,26 +182,23 @@ public enum ClientAPI implements IClientAPI
 
     /**
      * Get all draw steps from all plugins. Builds and sorts the list only when needed.
-     * @param list
-     * @param dimension
-     * @param ui
      */
-    public void getDrawSteps(List list, int dimension, Context.UI ui)
+    public void getDrawSteps(List<? super OverlayDrawStep> list, UIState uiState)
     {
-        if(ui != lastUi || dimension!=lastDimension)
+        if (uiState.ui != lastUi || uiState.dimension != lastDimension || uiState.mapType != lastMapType)
         {
             drawStepsUpdateNeeded = true;
-            lastUi = ui;
-            lastDimension = dimension;
+            lastUi = uiState.ui;
+            lastDimension = uiState.dimension;
+            lastMapType = uiState.mapType;
         }
 
         if (drawStepsUpdateNeeded)
         {
-            // TODO, this is inefficient
             lastDrawSteps.clear();
             for (PluginWrapper pluginWrapper : plugins.values())
             {
-                pluginWrapper.getDrawSteps(lastDrawSteps, dimension, ui);
+                pluginWrapper.getDrawSteps(lastDrawSteps, uiState);
             }
             Collections.sort(lastDrawSteps, new Comparator<OverlayDrawStep>()
             {

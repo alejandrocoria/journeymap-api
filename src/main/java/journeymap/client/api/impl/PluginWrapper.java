@@ -6,6 +6,7 @@ import com.google.common.collect.Table;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.display.*;
 import journeymap.client.api.event.ClientEvent;
+import journeymap.client.api.util.UIState;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawPolygonStep;
@@ -197,17 +198,13 @@ class PluginWrapper
 
     /**
      * Populates the provided list with all overlay drawsteps.
-     * @param list
-     * @param dimension
-     * @param ui
      */
-    public void getDrawSteps(List<OverlayDrawStep> list, int dimension, Context.UI ui)
+    public void getDrawSteps(List<OverlayDrawStep> list, UIState uiState)
     {
-        HashBasedTable<String, Overlay, OverlayDrawStep> table = getOverlays(dimension);
+        HashBasedTable<String, Overlay, OverlayDrawStep> table = getOverlays(uiState.dimension);
         for( Table.Cell<String, Overlay, OverlayDrawStep> cell : table.cellSet())
         {
-            EnumSet<Context.UI> activeUIs = cell.getColumnKey().getActiveUIs();
-            if(activeUIs.contains(Context.UI.Any) || activeUIs.contains(ui))
+            if (cell.getColumnKey().isActiveIn(uiState.ui, uiState.mapType))
             {
                 list.add(cell.getValue());
             }
