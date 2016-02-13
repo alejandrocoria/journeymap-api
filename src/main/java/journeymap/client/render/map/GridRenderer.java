@@ -86,12 +86,11 @@ public class GridRenderer
     private FloatBuffer projMatrixBuf;
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
-    private journeymap.client.api.util.UIState UIState;
 
     public GridRenderer(Context.UI contextUi, int gridSize)
     {
         this.contextUi = contextUi;
-        this.uiState = new UIState(contextUi, false, 0, 0, null, null, null);
+        this.uiState = UIState.newInactive(contextUi);
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
@@ -626,7 +625,8 @@ public class GridRenderer
 
             if (viewPort == null)
             {
-                screenBounds = new Rectangle2D.Double(0, 0, width, height);
+                int pad = 32;
+                screenBounds = new Rectangle2D.Double(-pad, -pad, width + pad, height + pad);
             }
             else
             {
@@ -637,7 +637,7 @@ public class GridRenderer
 
     public void updateUIState(boolean isActive)
     {
-        if (isActive && (screenBounds == null || blockBounds == null))
+        if (isActive && (screenBounds == null))
         {
             return;
         }
@@ -645,14 +645,23 @@ public class GridRenderer
         UIState newState = null;
         if (isActive)
         {
-            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMinY());
-            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMaxY());
-            blockBounds = new AxisAlignedBB(upperLeft, lowerRight.up(ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight()));
-            newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType, new BlockPos(centerBlockX, 0, centerBlockZ), blockBounds);
+            // Pad the BB by two chunks
+            int worldHeight = ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight();
+            int pad = 32;
+
+            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMaxY());
+            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMinY());
+
+            blockBounds = new AxisAlignedBB(upperLeft.add(-pad, 0, -pad), lowerRight.add(pad, worldHeight, pad));
+
+            newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType,
+                    new BlockPos(centerBlockX, 0, centerBlockZ),
+                    blockBounds,
+                    screenBounds);
         }
         else
         {
-            newState = new UIState(contextUi, false, mapType.dimension, zoom, null, null, null);
+            newState = UIState.newInactive(contextUi);
         }
 
         if (!newState.equals(this.uiState))

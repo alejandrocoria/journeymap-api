@@ -9,6 +9,7 @@ import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.UIState;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.Waypoint;
+import journeymap.client.render.draw.DrawMarkerStep;
 import journeymap.client.render.draw.DrawPolygonStep;
 import journeymap.client.render.draw.OverlayDrawStep;
 import journeymap.client.waypoint.WaypointStore;
@@ -75,8 +76,12 @@ class PluginWrapper
         switch (displayable.getDisplayType())
         {
             case Polygon:
-                PolygonOverlay overlay = (PolygonOverlay) displayable;
-                getOverlays(((PolygonOverlay) displayable).getDimension()).put(displayId, overlay, new DrawPolygonStep(overlay));
+                PolygonOverlay polygon = (PolygonOverlay) displayable;
+                getOverlays(polygon.getDimension()).put(displayId, polygon, new DrawPolygonStep(polygon));
+                break;
+            case Marker:
+                MarkerOverlay marker = (MarkerOverlay) displayable;
+                getOverlays(marker.getDimension()).put(displayId, marker, new DrawMarkerStep(marker));
                 break;
             case Waypoint:
                 ModWaypoint modWaypoint = (ModWaypoint) displayable;
@@ -204,7 +209,7 @@ class PluginWrapper
         HashBasedTable<String, Overlay, OverlayDrawStep> table = getOverlays(uiState.dimension);
         for( Table.Cell<String, Overlay, OverlayDrawStep> cell : table.cellSet())
         {
-            if (cell.getColumnKey().isActiveIn(uiState.ui, uiState.mapType))
+            if (cell.getColumnKey().isActiveIn(uiState))
             {
                 list.add(cell.getValue());
             }

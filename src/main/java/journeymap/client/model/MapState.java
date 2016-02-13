@@ -268,7 +268,7 @@ public class MapState
             drawScale = drawScale * .5f;
         }
 
-        ClientAPI.INSTANCE.getDrawSteps(drawStepList, mc.theWorld.provider.getDimensionId(), gridRenderer.getUIState().ui);
+        ClientAPI.INSTANCE.getDrawSteps(drawStepList, gridRenderer.getUIState());
 
         if (FeatureManager.isAllowed(Feature.RadarAnimals))
         {

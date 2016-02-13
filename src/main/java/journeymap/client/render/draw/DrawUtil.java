@@ -360,7 +360,7 @@ public class DrawUtil
         renderHelper.glDisableBlend();
     }
 
-    public static void drawPolygon(List<Point2D.Double> screenPoints, ShapeProperties shapeProperties, double rotation)
+    public static void drawPolygon(double xOffset, double yOffset, List<Point2D.Double> screenPoints, ShapeProperties shapeProperties)
     {
         // Prep
         renderHelper.glEnableBlend();
@@ -384,8 +384,8 @@ public class DrawUtil
                 first = screenPoints.get(i);
                 second = screenPoints.get(j);
 
-                GL11.glVertex2d(first.getX(), first.getY());
-                GL11.glVertex2d(second.getX(), second.getY());
+                GL11.glVertex2d(first.getX() + xOffset, first.getY() + yOffset);
+                GL11.glVertex2d(second.getX() + xOffset, second.getY() + yOffset);
 
             }
             GL11.glEnd();
@@ -410,8 +410,8 @@ public class DrawUtil
                 first = screenPoints.get(i);
                 second = screenPoints.get(j);
 
-                GL11.glVertex2d(first.getX(), first.getY());
-                GL11.glVertex2d(second.getX(), second.getY());
+                GL11.glVertex2d(first.getX() + xOffset, first.getY() + yOffset);
+                GL11.glVertex2d(second.getX() + xOffset, second.getY() + yOffset);
 
             }
             GL11.glEnd();
@@ -422,13 +422,6 @@ public class DrawUtil
         renderHelper.glEnableTexture2D();
         renderHelper.glEnableAlpha();
         renderHelper.glDisableBlend();
-
-//        // TODO TEMP
-//        int c = 0;
-//        for (Point2D.Double point : screenPoints)
-//        {
-//            drawCenteredLabel("" + (c++), point.x, point.y, 0x000000, 255, 0xffffff, 255, 1, rotation);
-//        }
     }
 
     /**
