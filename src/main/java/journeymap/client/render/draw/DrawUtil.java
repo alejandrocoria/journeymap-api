@@ -488,6 +488,11 @@ public class DrawUtil
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
+    public static void drawColoredImage(TextureImpl texture, double displayWidth, double displayHeight, int alpha, Integer color, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, x, y, displayWidth * scale, displayHeight * scale, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
     public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)
     {
         drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);

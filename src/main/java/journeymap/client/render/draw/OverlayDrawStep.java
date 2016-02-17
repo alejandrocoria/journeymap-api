@@ -8,15 +8,35 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * DrawStep specific to an overlay.
+ * Describes additional DrawStep functionality specific to an Overlay.
  */
 public interface OverlayDrawStep extends DrawStep
 {
+    /**
+     * Gets the overlay related to this DrawStep
+     *
+     * @return
+     */
     Overlay getOverlay();
 
+    /**
+     * Gets the screen bounds of the DrawStep
+     * @return
+     */
     Rectangle2D.Double getBounds();
 
+    /**
+     * Evaluates whether the DrawStep is on screen
+     * @param xOffset
+     * @param yOffset
+     * @param gridRenderer
+     * @return
+     */
     boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer);
 
+    /**
+     * Sets the position of the overlay title (tooltip)
+     * @param titlePosition
+     */
     void setTitlePosition(@Nullable Point2D.Double titlePosition);
 }

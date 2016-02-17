@@ -227,7 +227,34 @@ public enum ClientAPI implements IClientAPI
             IClientPlugin plugin = PluginHelper.INSTANCE.getPlugins().get(modId);
             if (plugin == null)
             {
-                throw new IllegalArgumentException("No plugin found for modId: " + modId);
+                // TODO REMOVE THIS temp
+                if(modId.equals("journeymap"))
+                {
+                    plugin = new IClientPlugin()
+                    {
+                        @Override
+                        public void initialize(IClientAPI jmClientApi)
+                        {
+
+                        }
+
+                        @Override
+                        public String getModId()
+                        {
+                            return "journeymap";
+                        }
+
+                        @Override
+                        public void onEvent(ClientEvent event)
+                        {
+
+                        }
+                    };
+                }
+                else
+                {
+                    throw new IllegalArgumentException("No plugin found for modId: " + modId);
+                }
             }
             pluginWrapper = new PluginWrapper(plugin);
             plugins.put(modId, pluginWrapper);

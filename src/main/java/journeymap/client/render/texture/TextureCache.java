@@ -8,6 +8,7 @@
 
 package journeymap.client.render.texture;
 
+import com.google.common.cache.LoadingCache;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
@@ -18,6 +19,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 
 import javax.imageio.ImageIO;
@@ -42,8 +44,11 @@ public class TextureCache
     private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length / 2) + 1));
     //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+
     private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+
+    private final LoadingCache<ResourceLocation, TextureImpl> resourceIcons = ResourceLocationTexture.createCache();
 
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<Runnable>(8), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
@@ -303,6 +308,14 @@ public class TextureCache
         }
     }
 
+    public TextureImpl getResourceTexture(ResourceLocation resourceLocation)
+    {
+        synchronized (resourceIcons)
+        {
+            return resourceIcons.getUnchecked(resourceLocation);
+        }
+    }
+
     public TextureImpl getThemeTexture(Theme theme, String iconPath)
     {
         return getThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
@@ -517,11 +530,12 @@ public class TextureCache
             entityIcons.clear();
         }
 
-        synchronized (themeImages)
+        synchronized (resourceIcons)
         {
-            ExpireTextureTask.queue(themeImages.values());
-            themeImages.clear();
+            resourceIcons.invalidateAll();
         }
+
+        purgeThemeImages();
     }
 
     public void purgeThemeImages()

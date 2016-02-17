@@ -45,14 +45,19 @@ public class ModOverlayLayer implements LayerDelegate.Layer
      */
     private void ensureCurrent(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord)
     {
-        if (!Objects.equals(blockCoord, lastCoord) || lastMousePosition == null || !Objects.equals(lastUiState, gridRenderer.getUIState()))
+        UIState currentUiState = gridRenderer.getUIState();
+        boolean uiStateChange = !Objects.equals(lastUiState, currentUiState);
+
+        if (uiStateChange || !Objects.equals(blockCoord, lastCoord) || lastMousePosition == null)
         {
             lastCoord = blockCoord;
-            lastUiState = gridRenderer.getUIState();
-            lastMousePosition = new Point2D.Double(mousePosition.x, mousePosition.y);
+            lastUiState = currentUiState;
+            lastMousePosition = mousePosition;
+
             allDrawSteps.clear();
-            ClientAPI.INSTANCE.getDrawSteps(allDrawSteps, lastUiState);
-            updateOverlayState(gridRenderer, mousePosition, blockCoord);
+            ClientAPI.INSTANCE.getDrawSteps(allDrawSteps, currentUiState);
+
+            updateOverlayState(gridRenderer, mousePosition, blockCoord, uiStateChange);
         }
     }
 
@@ -132,7 +137,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
      * Organizes overlays by whether they're displayed and/or "touched" under the mouse.
      * Fires events on IOverlayListeners: onActivate, onMouseOut, onDeactivate
      */
-    private void updateOverlayState(GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord)
+    private void updateOverlayState(GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, boolean uiStateChange)
     {
         Rectangle2D.Double bounds;
         for (OverlayDrawStep overlayDrawStep : allDrawSteps)
@@ -150,6 +155,10 @@ public class ModOverlayLayer implements LayerDelegate.Layer
                     visibleSteps.add(overlayDrawStep);
                     fireActivate(listener);
                 }
+                else if (uiStateChange)
+                {
+                    fireActivate(listener);
+                }
 
                 bounds = overlayDrawStep.getBounds();
                 if (bounds != null && bounds.contains(mousePosition))
@@ -165,7 +174,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
                     {
                         touchedSteps.remove(overlayDrawStep);
                         overlayDrawStep.setTitlePosition(null);
-                        fireDeActivate(listener);
+                        fireOnMouseOut(listener, mousePosition, blockCoord);
                     }
                 }
             }

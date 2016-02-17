@@ -12,10 +12,6 @@ package journeymap.client.ui.fullscreen;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
-import journeymap.client.api.display.MarkerOverlay;
-import journeymap.client.api.display.Overlay;
-import journeymap.client.api.impl.ClientAPI;
-import journeymap.client.api.model.MapImage;
 import journeymap.client.api.util.UIState;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
@@ -58,7 +54,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -153,19 +148,6 @@ public class Fullscreen extends JmUI
         {
             UIManager.getInstance().openSplash(this);
         }
-
-        // TODO REMOVE
-        Overlay markerOverlay = new MarkerOverlay("journeymap", "test", mc.thePlayer.getBedLocation(),
-                new MapImage(new ResourceLocation("examplemod:images/bed.png"), 32, 32)
-                        .setAnchorX(-16)
-                        .setAnchorY(32)
-        )
-                .setDimension(0)
-                .setLabel("Bed")
-                .setTitle(mc.thePlayer.getBedLocation().toString());
-
-        ClientAPI.INSTANCE.show(markerOverlay);
-
     }
 
     @Override
@@ -1060,6 +1042,11 @@ public class Fullscreen extends JmUI
         // Reset timer
         state.updateLastRefresh();
         timer.stop();
+
+        // Trigger a mouse move event in the layer delegate so draw steps can update if needed
+        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), Mouse.getEventY());
+        layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
+
     }
 
     void openChat(String defaultText)

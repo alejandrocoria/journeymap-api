@@ -18,14 +18,18 @@ import journeymap.common.Journeymap;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 /**
  * Draws a marker image.
  */
 public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
 {
-    Point2D.Double markerPosition;
-    TextureImpl iconTexture;
+    private Point2D.Double markerPosition;
+    private volatile Future<TextureImpl> iconFuture;
+    private TextureImpl iconTexture;
+    private boolean hasError;
 
     /**
      * Draw a marker on the map.
@@ -45,31 +49,69 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
             return;
         }
 
-        MapImage icon = overlay.getIcon();
-        if (iconTexture == null)
+        ensureTexture();
+
+        if (!hasError && iconTexture != null)
         {
-            try
-            {
-                // TODO TextureCache this
-                iconTexture = new TextureImpl(icon.getImage(), true);
-            }
-            catch (Exception e)
-            {
-                Journeymap.getLogger().error("Error getting MarkerOverlay image texture: " + e, e);
-                iconTexture = TextureCache.instance().getWaypointOffscreen();
-            }
+            MapImage icon = overlay.getIcon();
+
+            DrawUtil.drawColoredImage(iconTexture,
+                    icon.getDisplayWidth(),
+                    icon.getDisplayHeight(),
+                    RGB.toClampedInt(icon.getOpacity()),
+                    icon.getColor(),
+                    markerPosition.x + xOffset - icon.getAnchorX(),
+                    markerPosition.y + yOffset - icon.getAnchorY(),
+                    drawScale, icon.getRotation());
         }
-
-        int alpha = RGB.toClampedInt(icon.getOpacity());
-
-        DrawUtil.drawColoredImage(iconTexture, alpha, icon.getColor(),
-                markerPosition.x + xOffset - icon.getAnchorX(),
-                markerPosition.y + yOffset - icon.getAnchorY(),
-                drawScale, rotation);
 
         super.drawText(xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
     }
 
+    /**
+     * Fetch and bind the marker icon texture as needed.
+     */
+    protected void ensureTexture()
+    {
+        if (iconTexture != null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (iconFuture == null || iconFuture.isCancelled())
+            {
+                iconFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+                {
+                    @Override
+                    public TextureImpl call() throws Exception
+                    {
+                        MapImage icon = overlay.getIcon();
+                        return TextureCache.instance().getResourceTexture(icon.getImageLocation());
+                    }
+                });
+            }
+            else
+            {
+                if (iconFuture.isDone())
+                {
+                    iconTexture = iconFuture.get();
+                    if (iconTexture.isBindNeeded())
+                    {
+                        iconTexture.bindTexture();
+                    }
+                    iconFuture = null;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Error getting MarkerOverlay image texture: " + e, e);
+            hasError = true;
+        }
+
+    }
 
     @Override
     protected void updatePositions(GridRenderer gridRenderer)
@@ -78,8 +120,8 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
 
         markerPosition = gridRenderer.getBlockPixelInGrid(overlay.getPoint());
 
-        double iconWidth = icon.getWidth();
-        double iconHeight = icon.getHeight();
+        double iconWidth = icon.getDisplayWidth();
+        double iconHeight = icon.getTextureHeight();
 
         // Mouse Y is 0 at bottom of screen, so need to offset rectangle by height
         this.screenBounds = new Rectangle2D.Double(
@@ -87,6 +129,5 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                 gridRenderer.getHeight() - markerPosition.y - (iconHeight / 2.0),
                 iconWidth, iconHeight);
     }
-
 
 }

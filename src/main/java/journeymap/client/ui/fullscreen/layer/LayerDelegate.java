@@ -24,7 +24,6 @@ import java.util.List;
  */
 public class LayerDelegate
 {
-
     long lastClick = 0;
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();

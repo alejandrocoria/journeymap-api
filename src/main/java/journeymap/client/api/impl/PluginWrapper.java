@@ -14,6 +14,7 @@ import journeymap.client.render.draw.DrawPolygonStep;
 import journeymap.client.render.draw.OverlayDrawStep;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -95,19 +96,27 @@ class PluginWrapper
     }
 
     /**
-     * Remove a displayable from the player's maps.
+     * Remove a displayable from API management
      */
     public void remove(Displayable displayable)
     {
         String displayId = displayable.getDisplayId();
-        switch (displayable.getDisplayType())
+        try
         {
-            case Waypoint:
-                remove((ModWaypoint) displayable);
-                break;
-            default:
-                getOverlays(((PolygonOverlay) displayable).getDimension()).remove(displayId, displayable);
-                break;
+            switch (displayable.getDisplayType())
+            {
+                case Waypoint:
+                    remove((ModWaypoint) displayable);
+                    break;
+                default:
+                    Overlay overlay = (Overlay) displayable;
+                    getOverlays(overlay.getDimension()).remove(displayId, displayable);
+                    break;
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error removing DrawMarkerStep: " + t, LogFormatter.toString(t));
         }
     }
 

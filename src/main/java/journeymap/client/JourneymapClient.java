@@ -502,11 +502,6 @@ public class JourneymapClient implements CommonProxy
         {
             if ((isMapping()) && mc != null)
             {
-                String dim = ".";
-                if (mc.theWorld != null && mc.theWorld.provider != null)
-                {
-                    dim = " dimension " + ForgeHelper.INSTANCE.getDimension(mc.theWorld) + ".";
-                }
                 logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
             }
 
