@@ -39,4 +39,11 @@ public interface OverlayDrawStep extends DrawStep
      * @param titlePosition
      */
     void setTitlePosition(@Nullable Point2D.Double titlePosition);
+
+    /**
+     * Enable or disable the DrawStep
+     *
+     * @param enabled
+     */
+    public void setEnabled(boolean enabled);
 }

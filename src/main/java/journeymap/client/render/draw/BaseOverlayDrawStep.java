@@ -25,6 +25,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     protected Point2D.Double titlePosition = null;
     protected UIState lastUiState = null;
     protected boolean dragging = false;
+    protected boolean enabled = true;
 
     protected BaseOverlayDrawStep(T overlay)
     {
@@ -98,6 +99,11 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      */
     public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer)
     {
+        if (!enabled)
+        {
+            return false;
+        }
+
         UIState uiState = gridRenderer.getUIState();
 
         // Check active
@@ -159,5 +165,11 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     public Overlay getOverlay()
     {
         return overlay;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

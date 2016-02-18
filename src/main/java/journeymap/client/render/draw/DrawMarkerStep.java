@@ -54,10 +54,13 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         if (!hasError && iconTexture != null)
         {
             MapImage icon = overlay.getIcon();
-
-            DrawUtil.drawColoredImage(iconTexture,
+            DrawUtil.drawColoredSprite(iconTexture,
                     icon.getDisplayWidth(),
                     icon.getDisplayHeight(),
+                    icon.getTextureX(),
+                    icon.getTextureY(),
+                    icon.getTextureWidth(),
+                    icon.getTextureHeight(),
                     RGB.toClampedInt(icon.getOpacity()),
                     icon.getColor(),
                     markerPosition.x + xOffset - icon.getAnchorX(),

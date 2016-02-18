@@ -15,12 +15,10 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.awt.geom.Point2D;
-import java.nio.DoubleBuffer;
 import java.util.List;
 
 /**
@@ -29,9 +27,6 @@ import java.util.List;
 public class DrawUtil
 {
     public static double zLevel = 0;
-
-    private static DoubleBuffer lineBuffer = BufferUtils.createDoubleBuffer(4);
-
     private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
 
     /**
@@ -251,10 +246,19 @@ public class DrawUtil
         drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    {
+        drawQuad(texture, x, y, width, height, 0, 0, 1, 1, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
     /**
      * @param texture
      * @param x
      * @param y
+     * @param minU
+     * @param minV
+     * @param maxU
+     * @param maxV
      * @param width
      * @param height
      * @param color
@@ -263,7 +267,7 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, final double minU, final double minV, final double maxU, final double maxV, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
         GL11.glPushMatrix();
 
@@ -310,13 +314,13 @@ public class DrawUtil
                 GL11.glTranslated(-transX, -transY, 0);
             }
 
-            final int direction = flip ? -1 : 1;
+            final double direction = flip ? -maxU : maxU;
 
             renderHelper.startDrawingQuads(false);
-            renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1);
-            renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, 1);
-            renderHelper.addVertexWithUV(x + width, y, zLevel, direction, 0);
-            renderHelper.addVertexWithUV(x, y, zLevel, 0, 0);
+            renderHelper.addVertexWithUV(x, height + y, zLevel, minU, maxV);
+            renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, maxV);
+            renderHelper.addVertexWithUV(x + width, y, zLevel, direction, minV);
+            renderHelper.addVertexWithUV(x, y, zLevel, minU, minV);
             renderHelper.draw();
 
             // Ensure normal alpha blending afterward, just in case
@@ -488,9 +492,13 @@ public class DrawUtil
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
-    public static void drawColoredImage(TextureImpl texture, double displayWidth, double displayHeight, int alpha, Integer color, double x, double y, float scale, double rotation)
+    public static void drawColoredSprite(TextureImpl texture, double displayWidth, double displayHeight, double spriteX, double spriteY, double spriteWidth, double spriteHeight, int alpha, Integer color, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, displayWidth * scale, displayHeight * scale, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        double minU = spriteX / texture.getWidth();
+        double minV = spriteY / texture.getHeight();
+        double maxU = (spriteX + spriteWidth) / texture.getWidth();
+        double maxV = (spriteY + spriteHeight) / texture.getHeight();
+        drawQuad(texture, x, y, displayWidth * scale, displayHeight * scale, minU, minV, maxU, maxV, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)

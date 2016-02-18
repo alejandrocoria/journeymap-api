@@ -110,7 +110,11 @@ class PluginWrapper
                     break;
                 default:
                     Overlay overlay = (Overlay) displayable;
-                    getOverlays(overlay.getDimension()).remove(displayId, displayable);
+                    OverlayDrawStep drawStep = getOverlays(overlay.getDimension()).remove(displayId, displayable);
+                    if (drawStep != null)
+                    {
+                        drawStep.setEnabled(false);
+                    }
                     break;
             }
         }
