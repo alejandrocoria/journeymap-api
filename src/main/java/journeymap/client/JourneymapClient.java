@@ -24,6 +24,7 @@ import journeymap.client.io.migrate.Migration;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
+import journeymap.client.model.RegionImageCache;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.*;
 import journeymap.client.render.map.TileDrawStepCache;
@@ -152,6 +153,7 @@ public class JourneymapClient implements CommonProxy
         instance.initialized = false;
         EventHandlerManager.unregisterAll();
         instance.stopMapping();
+        ClientAPI.INSTANCE.purge();
         DataCache.instance().purge();
     }
 
@@ -486,10 +488,13 @@ public class JourneymapClient implements CommonProxy
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
+            int dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld);
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
-                    ForgeHelper.INSTANCE.getDimension(mc.theWorld),
+                    dimension,
                     memory));
+
+            ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
         }
     }
 
@@ -503,6 +508,7 @@ public class JourneymapClient implements CommonProxy
             if ((isMapping()) && mc != null)
             {
                 logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
+                RegionImageCache.instance().flushToDisk(false);
             }
 
             if (multithreadTaskController != null)
@@ -511,6 +517,10 @@ public class JourneymapClient implements CommonProxy
                 multithreadTaskController.clear();
                 multithreadTaskController = null;
             }
+
+            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension(mc.theWorld) : 0;
+
+            ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
         }
     }
 

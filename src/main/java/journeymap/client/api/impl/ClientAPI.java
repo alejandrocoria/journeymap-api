@@ -141,6 +141,24 @@ public enum ClientAPI implements IClientAPI
         }
     }
 
+    /**
+     * Remove all mod plugins.
+     */
+    public void purge()
+    {
+        try
+        {
+            this.drawStepsUpdateNeeded = true;
+            this.lastDrawSteps.clear();
+            this.plugins.clear();
+            this.clientEventManager.purge();
+        }
+        catch (Throwable t)
+        {
+            logError("Error purging: " + t, t);
+        }
+    }
+
     @Override
     public boolean exists(Displayable displayable)
     {

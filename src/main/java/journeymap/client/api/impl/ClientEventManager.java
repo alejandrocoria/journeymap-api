@@ -48,6 +48,33 @@ public class ClientEventManager
     }
 
     /**
+     * Notify plugins of MAPPING_STARTED
+     * @param started    if true, event is MAPPING_STARTED
+     * @param dimension  if false, event is MAPPING_STOPPED
+     */
+    public void fireMappingEvent(boolean started, int dimension)
+    {
+        ClientEvent.Type type = started ? ClientEvent.Type.MAPPING_STARTED : ClientEvent.Type.MAPPING_STOPPED;
+        if (plugins.isEmpty() || !subscribedClientEventTypes.contains(type))
+        {
+            return;
+        }
+
+        ClientEvent clientEvent = new ClientEvent(type, dimension);
+        for (PluginWrapper wrapper : plugins)
+        {
+            try
+            {
+                wrapper.notify(clientEvent);
+            }
+            catch (Throwable t)
+            {
+                ClientAPI.INSTANCE.logError("Error in fireMappingEvent(): " + clientEvent, t);
+            }
+        }
+    }
+
+    /**
      * Notify plugins of client event.
      *
      * @param clientEvent event
@@ -123,5 +150,14 @@ public class ClientEventManager
                 }
             }
         }
+    }
+
+    /**
+     * Clear all listeners
+     */
+    void purge()
+    {
+        this.plugins.clear();
+        this.subscribedClientEventTypes.clear();
     }
 }
