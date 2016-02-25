@@ -628,6 +628,9 @@ public class GridRenderer
             {
                 screenBounds = new Rectangle2D.Double((width - viewPort.width) / 2, (height - viewPort.height) / 2, viewPort.width, viewPort.height);
             }
+
+            // Flag draw steps to rerender
+            ClientAPI.INSTANCE.flagOverlaysForRerender();
         }
     }
 

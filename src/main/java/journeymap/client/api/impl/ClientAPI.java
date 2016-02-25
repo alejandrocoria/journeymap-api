@@ -300,4 +300,12 @@ public enum ClientAPI implements IClientAPI
     {
         LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message), t);
     }
+
+    public void flagOverlaysForRerender()
+    {
+        for (OverlayDrawStep overlayDrawStep : lastDrawSteps)
+        {
+            overlayDrawStep.getOverlay().flagForRerender();
+        }
+    }
 }
