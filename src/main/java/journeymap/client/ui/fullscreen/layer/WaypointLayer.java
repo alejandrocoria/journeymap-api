@@ -54,9 +54,6 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         drawStepList.clear();
 
-        click(gridRenderer, blockCoord);
-
-
         if (!WaypointsData.isManagerEnabled())
         {
             return drawStepList;
@@ -75,6 +72,10 @@ public class WaypointLayer implements LayerDelegate.Layer
         if (clickDrawStep.blockCoord != null && !blockCoord.equals(clickDrawStep.blockCoord))
         {
             unclick();
+        }
+        else
+        {
+            drawStepList.add(clickDrawStep);
         }
 
         AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
@@ -101,7 +102,7 @@ public class WaypointLayer implements LayerDelegate.Layer
 
         if (now - startHover < hoverDelay)
         {
-            return Collections.EMPTY_LIST;
+            return drawStepList;
         }
 
         int dimension = mc.thePlayer.dimension;
@@ -241,7 +242,6 @@ public class WaypointLayer implements LayerDelegate.Layer
 
             if (xOffset != 0 || yOffset != 0)
             {
-                unclick();
                 return;
             }
 
