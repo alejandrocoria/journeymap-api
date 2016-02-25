@@ -343,8 +343,9 @@ public class JourneymapClient implements CommonProxy
 
             VersionCheck.getVersionAvailable();
 
-            // ModInfo single use
-            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition(), true);
+            // ModInfo with a single ping
+            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition(), false);
+            modInfo.reportAppView();
 
             // threadLogging = getLogger().isTraceEnabled();
         }
