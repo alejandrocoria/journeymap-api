@@ -32,7 +32,7 @@ import java.util.*;
 public class ModInfo
 {
 
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.2";
     public static final Logger LOGGER = LogManager.getLogger("modinfo");
 
     private final Minecraft minecraft = Minecraft.getMinecraft();
@@ -44,7 +44,7 @@ public class ModInfo
     private Config config;
     private Client client;
 
-    public ModInfo(String trackingId, String reportingLanguageCode, String modId, String modName, String modVersion)
+    public ModInfo(String trackingId, String reportingLanguageCode, String modId, String modName, String modVersion, boolean singleUse)
     {
         this.trackingId = trackingId;
         this.modId = modId;
@@ -55,7 +55,12 @@ public class ModInfo
         {
             this.reportingLocale = getLocale(reportingLanguageCode);
             this.config = Config.getInstance(this.modId);
-            if (this.config.isEnabled())
+
+            if (singleUse)
+            {
+                singleUse();
+            }
+            else if (this.config.isEnabled())
             {
                 this.client = createClient();
                 if (Config.generateStatusString(modId, false).equals(config.getStatus()))
