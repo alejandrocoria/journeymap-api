@@ -37,7 +37,7 @@ public class LayerDelegate
 
     public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale)
     {
-        BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(mousePosition.x, mousePosition.y);
+        BlockPos blockCoord = gridRenderer.getBlockAtPixel(mousePosition);
 
         drawSteps.clear();
         for (Layer layer : layers)
@@ -55,7 +55,7 @@ public class LayerDelegate
 
     public void onMouseClicked(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, int button, float fontScale)
     {
-        BlockPos blockCoord = gridRenderer.getBlockAtScreenPoint(mousePosition.x, mousePosition.y);
+        BlockPos blockCoord = gridRenderer.getBlockAtPixel(mousePosition);
 
         // check for double-click
         long sysTime = Minecraft.getSystemTime();

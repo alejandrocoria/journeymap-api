@@ -2,16 +2,18 @@ package journeymap.client.render.texture;
 
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -36,7 +38,17 @@ public class ResourceLocationTexture extends TextureImpl
 
         // Check to see if TextureManager already has this - avoid binding it twice
         TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-        ITextureObject existingTexture = textureManager.getTexture(location);
+        ITextureObject existingTexture = null;
+
+        try
+        {
+            existingTexture = textureManager.getTexture(location);
+        }
+        catch (Exception e)
+        {
+            // Oh well
+        }
+
         if (existingTexture != null)
         {
             this.glTextureId = existingTexture.getGlTextureId();
@@ -60,18 +72,20 @@ public class ResourceLocationTexture extends TextureImpl
      */
     private static BufferedImage resolveImage(ResourceLocation location)
     {
+        if(location.getResourceDomain().equals("fake"))
+        {
+            return null;
+        }
         IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
         try
         {
-            InputStream is = resourceManager.getResource(location).getInputStream();
-            if (is == null)
-            {
-                throw new IOException("Resource not found: " + location);
-            }
+            IResource resource = resourceManager.getResource(location);
+            InputStream is = resource.getInputStream();
             return TextureUtil.readBufferedImage(is);
         }
         catch (Exception e)
         {
+            Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
             return null;
         }
     }

@@ -9,6 +9,7 @@ import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.UIState;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.Waypoint;
+import journeymap.client.render.draw.DrawImageStep;
 import journeymap.client.render.draw.DrawMarkerStep;
 import journeymap.client.render.draw.DrawPolygonStep;
 import journeymap.client.render.draw.OverlayDrawStep;
@@ -83,6 +84,10 @@ class PluginWrapper
             case Marker:
                 MarkerOverlay marker = (MarkerOverlay) displayable;
                 getOverlays(marker.getDimension()).put(displayId, marker, new DrawMarkerStep(marker));
+                break;
+            case Image:
+                ImageOverlay imageOverlay = (ImageOverlay) displayable;
+                getOverlays(imageOverlay.getDimension()).put(displayId, imageOverlay, new DrawImageStep(imageOverlay));
                 break;
             case Waypoint:
                 ModWaypoint modWaypoint = (ModWaypoint) displayable;

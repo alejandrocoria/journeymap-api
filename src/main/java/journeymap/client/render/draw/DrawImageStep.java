@@ -8,13 +8,14 @@
 
 package journeymap.client.render.draw;
 
-import journeymap.client.api.display.MarkerOverlay;
+import journeymap.client.api.display.ImageOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
+import net.minecraft.util.ResourceLocation;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -22,11 +23,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
- * Draws a marker image.
+ * Draws an image overlay
  */
-public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
+public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
 {
-    private Point2D.Double markerPosition;
+    private Point2D.Double northWestPosition;
+    private Point2D.Double southEastPosition;
     private volatile Future<TextureImpl> iconFuture;
     private TextureImpl iconTexture;
     private boolean hasError;
@@ -36,7 +38,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
      *
      * @param marker
      */
-    public DrawMarkerStep(MarkerOverlay marker)
+    public DrawImageStep(ImageOverlay marker)
     {
         super(marker);
     }
@@ -51,30 +53,24 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
 
         ensureTexture();
 
-        //overlay.getIcon().setAnchorY(64);
-
-
-        //overlay.setTitle(overlay.getPoint().getX() + "," + overlay.getPoint().getZ());
-
-//        DrawUtil.drawRectangle(screenBounds.x + xOffset, screenBounds.y + yOffset, screenBounds.width, screenBounds.height, 0xffffff, 100);
-//
-//        double halfBlock = lastUiState.blockSize/2;
-//        DrawUtil.drawRectangle(markerPosition.x - halfBlock + xOffset, markerPosition.y - halfBlock + yOffset, lastUiState.blockSize, lastUiState.blockSize, 0xffffff, 200);
-
         if (!hasError && iconTexture != null)
         {
-            MapImage icon = overlay.getIcon();
+            MapImage icon = overlay.getImage();
+
+            double width = screenBounds.width;
+            double height = screenBounds.height;
+
             DrawUtil.drawColoredSprite(iconTexture,
-                    icon.getDisplayWidth(),
-                    icon.getDisplayHeight(),
-                    icon.getTextureX(),
-                    icon.getTextureY(),
-                    icon.getTextureWidth(),
-                    icon.getTextureHeight(),
+                    width,
+                    height,
+                    0,
+                    0,
+                    iconTexture.getWidth(),
+                    iconTexture.getHeight(),
                     icon.getColor(),
                     icon.getOpacity(),
-                    markerPosition.x + xOffset - icon.getAnchorX(),
-                    markerPosition.y + yOffset - icon.getAnchorY(),
+                    northWestPosition.x + xOffset,
+                    northWestPosition.y + yOffset,
                     drawScale, icon.getRotation());
         }
 
@@ -100,8 +96,19 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                     @Override
                     public TextureImpl call() throws Exception
                     {
-                        MapImage icon = overlay.getIcon();
-                        return TextureCache.instance().getResourceTexture(icon.getImageLocation());
+                        MapImage image = overlay.getImage();
+                        ResourceLocation resourceLocation = image.getImageLocation();
+                        if (resourceLocation == null)
+                        {
+                            resourceLocation = new ResourceLocation("fake:" + overlay.getGuid());
+                            TextureImpl texture = TextureCache.instance().getResourceTexture(resourceLocation);
+                            texture.setImage(image.getImage(), true);
+                            return texture;
+                        }
+                        else
+                        {
+                            return TextureCache.instance().getResourceTexture(resourceLocation);
+                        }
                     }
                 });
             }
@@ -120,7 +127,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Error getting MarkerOverlay image texture: " + e, e);
+            Journeymap.getLogger().error("Error getting ImageOverlay marimage texture: " + e, e);
             hasError = true;
         }
 
@@ -129,33 +136,16 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     @Override
     protected void updatePositions(GridRenderer gridRenderer)
     {
-        MapImage icon = overlay.getIcon();
+        northWestPosition = gridRenderer.getBlockPixelInGrid(overlay.getNorthWestPoint());
+        southEastPosition = gridRenderer.getBlockPixelInGrid(overlay.getSouthEastPoint());
 
-        // Get marker position
-        markerPosition = gridRenderer.getBlockPixelInGrid(overlay.getPoint());
-
-        // Start screenbounds to cover the block
-        this.screenBounds.setRect(markerPosition.x, markerPosition.y, lastUiState.blockSize, lastUiState.blockSize);
-
-        // Center marker within block
-        int halfBlock = (int) lastUiState.blockSize / 2;
-        markerPosition.setLocation(markerPosition.x + halfBlock, markerPosition.y + halfBlock);
+        this.screenBounds = new Rectangle2D.Double(northWestPosition.x, northWestPosition.y, 0, 0);
+        screenBounds.add(southEastPosition);
 
         // Center label
         TextProperties textProperties = overlay.getTextProperties();
-        labelPosition.setLocation(markerPosition.x + textProperties.getOffsetX(), markerPosition.y + textProperties.getOffsetY());
-
-        // Expand screenbounds to include label position
-        // TODO: Doesn't really include the text of the label, though
-        screenBounds.add(labelPosition);
-
-        // Expand screenbounds to include the icon
-        Rectangle2D.Double iconBounds = new Rectangle2D.Double(markerPosition.x - icon.getAnchorX(),
-                markerPosition.y - icon.getAnchorY(),
-                icon.getDisplayWidth(),
-                icon.getDisplayHeight());
-        screenBounds.add(iconBounds);
-
+        labelPosition.setLocation(screenBounds.getCenterX() + textProperties.getOffsetX(),
+                screenBounds.getCenterY() + textProperties.getOffsetY());
     }
 
 }

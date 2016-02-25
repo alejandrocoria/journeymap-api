@@ -8,14 +8,11 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.ChunkMD;
 import journeymap.client.model.Waypoint;
-import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.DrawWayPointStep;
@@ -26,7 +23,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
@@ -38,31 +34,33 @@ import java.util.*;
 public class WaypointLayer implements LayerDelegate.Layer
 {
     private final long hoverDelay = 100;
-    private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
-    private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockPos(0, 0, 0));
+    private final List<DrawStep> drawStepList;
+    private final BlockOutlineDrawStep clickDrawStep;
     BlockPos lastCoord = null;
 
-    long lastClick = 0;
     long startHover = 0;
 
     DrawWayPointStep selectedWaypointStep = null;
     Waypoint selected = null;
 
-
     public WaypointLayer()
     {
+        drawStepList = new ArrayList<DrawStep>(1);
+        clickDrawStep = new BlockOutlineDrawStep(new BlockPos(0, 0, 0));
     }
 
     @Override
     public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale)
     {
+        drawStepList.clear();
+
+        click(gridRenderer, blockCoord);
+
+
         if (!WaypointsData.isManagerEnabled())
         {
-            return Collections.EMPTY_LIST;
+            return drawStepList;
         }
-
-        drawStepList.clear();
-        drawStepList.add(clickDrawStep);
 
         if (lastCoord == null)
         {
@@ -71,14 +69,13 @@ public class WaypointLayer implements LayerDelegate.Layer
 
         long now = Minecraft.getSystemTime();
 
-        // Add click draw step
-        if (!blockCoord.equals(clickDrawStep.blockCoord))
+        // Be generous to allow shaky user movement
+        int proximity = (int) Math.max(1, 8 / gridRenderer.getUIState().blockSize);
+
+        if (clickDrawStep.blockCoord != null && !blockCoord.equals(clickDrawStep.blockCoord))
         {
             unclick();
         }
-
-        // Get search area
-        int proximity = getProximity();
 
         AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
                 blockCoord.getX() + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.getZ() + proximity);
@@ -90,7 +87,7 @@ public class WaypointLayer implements LayerDelegate.Layer
                 selected = null;
                 lastCoord = blockCoord;
                 startHover = now;
-                return Collections.EMPTY_LIST;
+                return drawStepList;
             }
         }
         else
@@ -140,7 +137,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         if (!WaypointsData.isManagerEnabled())
         {
-            return Collections.EMPTY_LIST;
+            return drawStepList;
         }
 
         if (!drawStepList.contains(clickDrawStep))
@@ -148,30 +145,25 @@ public class WaypointLayer implements LayerDelegate.Layer
             drawStepList.add(clickDrawStep);
         }
 
-        if (!doubleClick || !blockCoord.equals(clickDrawStep.blockCoord))
+        if (!doubleClick)
         {
-            clickDrawStep.blockCoord = blockCoord;
-            return drawStepList;
+            click(gridRenderer, blockCoord);
         }
-
-        // Edit selected waypoint
-        if (selected != null)
+        else
         {
-            UIManager.getInstance().openWaypointManager(selected, new Fullscreen()); // TODO: This could be a problem
-            return drawStepList;
+            // Edit selected waypoint
+            if (selected != null)
+            {
+                UIManager.getInstance().openWaypointManager(selected, new Fullscreen()); // TODO: This could be a problem
+                return drawStepList;
+            }
+            else
+            {
+                // Create waypoint
+                Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.thePlayer.dimension);
+                UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
+            }
         }
-
-        // Check chunk
-        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
-        int y = -1;
-        if (chunkMD != null && !chunkMD.getChunk().isEmpty())
-        {
-            y = Math.max(1, chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15));
-        }
-
-        // Create waypoint
-        Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.thePlayer.dimension);
-        UIManager.getInstance().openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
 
         return drawStepList;
     }
@@ -208,22 +200,26 @@ public class WaypointLayer implements LayerDelegate.Layer
         drawStepList.add(selectedWaypointStep);
     }
 
-    private int getProximity()
+    private void click(GridRenderer gridRenderer, BlockPos blockCoord)
     {
-        FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
-        int blockSize = (int) Math.max(1, Math.pow(2, fullMapProperties.zoomLevel.get()));
-        return Math.max(1, 8 / blockSize);
+        clickDrawStep.blockCoord = lastCoord = blockCoord;
+        clickDrawStep.pixel = gridRenderer.getBlockPixelInGrid(blockCoord);
+        if (!drawStepList.contains(clickDrawStep))
+        {
+            drawStepList.add(clickDrawStep);
+        }
     }
 
     private void unclick()
     {
-        clickDrawStep.blockCoord = new BlockPos(Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
+        clickDrawStep.blockCoord = null;
         drawStepList.remove(clickDrawStep);
     }
 
     class BlockOutlineDrawStep implements DrawStep
     {
         BlockPos blockCoord;
+        Point2D.Double pixel;
 
         BlockOutlineDrawStep(BlockPos blockCoord)
         {
@@ -233,6 +229,10 @@ public class WaypointLayer implements LayerDelegate.Layer
         @Override
         public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
+            if (blockCoord == null)
+            {
+                return;
+            }
 
             if (Mouse.isButtonDown(0))
             {
@@ -245,26 +245,27 @@ public class WaypointLayer implements LayerDelegate.Layer
                 return;
             }
 
-            double x = blockCoord.getX();
-            double z = blockCoord.getZ();
-            double size = Math.pow(2, gridRenderer.getZoom());
+            double size = gridRenderer.getUIState().blockSize;
             double thick = gridRenderer.getZoom() < 2 ? 1 : 2;
 
-            Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(x + +xOffset, z + +yOffset);
+            final double x = pixel.x + xOffset;
+            final double y = pixel.y + yOffset;
+
             if (gridRenderer.isOnScreen(pixel))
             {
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, 150);
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() - thick, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x - (thick * thick), y - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x - thick, y - thick, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
 
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY(), thick, size, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x - (thick * thick), y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x - thick, y, thick, size, RGB.WHITE_RGB, 150);
 
-                DrawUtil.drawRectangle(pixel.getX() + size, pixel.getY(), thick, size, RGB.WHITE_RGB, 150);
-                DrawUtil.drawRectangle(pixel.getX() + size + thick, pixel.getY() - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x + size, y, thick, size, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x + size + thick, y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
 
-                DrawUtil.drawRectangle(pixel.getX() - thick, pixel.getY() + size, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
-                DrawUtil.drawRectangle(pixel.getX() - (thick * thick), pixel.getY() + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x - thick, y + size, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x - (thick * thick), y + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, 150);
             }
+
         }
 
         @Override

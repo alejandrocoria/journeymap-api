@@ -653,7 +653,7 @@ public class Fullscreen extends JmUI
         }
 
         // Invoke layer delegate
-        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), Mouse.getEventY());
+        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
         layerDelegate.onMouseClicked(mc, gridRenderer, mousePosition, mouseButton, getMapFontScale());
     }
 
@@ -704,7 +704,7 @@ public class Fullscreen extends JmUI
 
         if (!isScrolling && which == -1)
         {
-            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), Mouse.getEventY());
+            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
             layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
         }
     }
@@ -1044,7 +1044,7 @@ public class Fullscreen extends JmUI
         timer.stop();
 
         // Trigger a mouse move event in the layer delegate so draw steps can update if needed
-        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), Mouse.getEventY());
+        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
         layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
 
     }

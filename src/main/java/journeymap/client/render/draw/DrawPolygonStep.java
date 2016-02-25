@@ -9,11 +9,11 @@
 package journeymap.client.render.draw;
 
 import journeymap.client.api.display.PolygonOverlay;
+import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
 import net.minecraft.util.BlockPos;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
 {
-    protected List<Point2D.Double> screenPoints;
+    protected List<Point2D.Double> screenPoints = new ArrayList<Point2D.Double>();
 
     /**
      * Draw a polygon on the map.
@@ -37,6 +37,11 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
+        if (overlay.getOuterArea().getPoints().isEmpty())
+        {
+            return;
+        }
+
         if (!isOnScreen(xOffset, yOffset, gridRenderer))
         {
             return;
@@ -51,32 +56,35 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     @Override
     protected void updatePositions(GridRenderer gridRenderer)
     {
+        if (overlay.getOuterArea().getPoints().isEmpty())
+        {
+            return;
+        }
+
         // Convert the polygon block positions to screen positions
-        final double blockSize = Math.pow(2, gridRenderer.getZoom());
         final List<BlockPos> points = overlay.getOuterArea().getPoints();
-        this.screenPoints = new ArrayList<Point2D.Double>(points.size());
-        this.screenBounds = null;
+        this.screenPoints.clear();
 
         for (BlockPos pos : points)
         {
             Point2D.Double pixel = gridRenderer.getBlockPixelInGrid(pos);
             pixel.setLocation(pixel.getX(), pixel.getY());
-            screenPoints.add(pixel);
-            if (this.screenBounds == null)
+
+            if (this.screenPoints.isEmpty())
             {
-                this.screenBounds = new Rectangle2D.Double(pixel.x, pixel.y, 0, 0);
+                this.screenBounds.setRect(pixel.x, pixel.y, 1, 1);
             }
             else
             {
                 this.screenBounds.add(pixel);
             }
+            screenPoints.add(pixel);
         }
 
-        // Mouse Y is 0 at bottom of screen, so need to offset rectangle by height
-        if (screenBounds != null)
-        {
-            screenBounds.setRect(screenBounds.x, gridRenderer.getHeight() - screenBounds.y - screenBounds.height, screenBounds.width, screenBounds.height);
-        }
+        // Center label
+        TextProperties textProperties = overlay.getTextProperties();
+        labelPosition.setLocation(screenBounds.getCenterX() + textProperties.getOffsetX(),
+                screenBounds.getCenterY() + textProperties.getOffsetY());
 
 
         // TODO: Triangulate the polygon

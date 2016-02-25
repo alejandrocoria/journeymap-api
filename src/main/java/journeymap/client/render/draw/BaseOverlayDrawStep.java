@@ -1,7 +1,6 @@
 package journeymap.client.render.draw;
 
 import com.google.common.base.Strings;
-import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
@@ -11,7 +10,6 @@ import journeymap.client.render.map.GridRenderer;
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.EnumSet;
 import java.util.Objects;
 
 /**
@@ -22,7 +20,8 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     public final T overlay;
 
     protected Rectangle2D.Double screenBounds = new Rectangle2D.Double();
-    protected Point2D.Double titlePosition = null;
+    protected Point2D.Double titlePosition = new Point2D.Double();
+    protected Point2D.Double labelPosition = new Point2D.Double();
     protected UIState lastUiState = null;
     protected boolean dragging = false;
     protected boolean enabled = true;
@@ -33,7 +32,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     }
 
     /**
-     * Update positions of screenBounds and other points as needed.
+     * Update positions of screenBounds, labelPosition, and other points as needed.
      *
      * @param gridRenderer
      */
@@ -52,41 +51,39 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     protected void drawText(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         TextProperties textProperties = overlay.getTextProperties();
-        EnumSet<Context.UI> activeUIs = textProperties.getActiveUIs();
-        int zoom = gridRenderer.getZoom();
-        boolean showLabel = (textProperties.getActiveUIs().contains(Context.UI.Any) || activeUIs.contains(Context.UI.Fullscreen))
-                && (zoom >= textProperties.getMinZoom() && zoom <= textProperties.getMaxZoom());
-        if (showLabel)
-        {
-            DrawUtil.drawLabel(overlay.getLabel(),
-                    screenBounds.getCenterX() + xOffset,
-                    gridRenderer.getHeight() - screenBounds.getMinY() - (screenBounds.getHeight() / 2.0) + yOffset,
-                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
-                    textProperties.getBackgroundColor(),
-                    RGB.toClampedInt(textProperties.getBackgroundOpacity()),
-                    textProperties.getColor(),
-                    RGB.toClampedInt(textProperties.getOpacity()),
-                    textProperties.getScale() * fontScale,
-                    textProperties.hasFontShadow(),
-                    rotation);
 
-            if (titlePosition != null)
+        if (textProperties.isActiveIn(gridRenderer.getUIState()))
+        {
+            String labelText = overlay.getLabel();
+            if (labelPosition != null && !Strings.isNullOrEmpty(labelText))
             {
-                String title = overlay.getTitle();
-                if (!Strings.isNullOrEmpty(title))
-                {
-                    DrawUtil.drawLabel(title,
-                            titlePosition.x + 5 + xOffset,
-                            gridRenderer.getHeight() - titlePosition.y + yOffset,
-                            DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
-                            textProperties.getBackgroundColor(),
-                            RGB.toClampedInt(textProperties.getBackgroundOpacity()),
-                            textProperties.getColor(),
-                            RGB.toClampedInt(textProperties.getOpacity()),
-                            textProperties.getScale() * fontScale,
-                            textProperties.hasFontShadow(),
-                            rotation);
-                }
+                DrawUtil.drawLabel(overlay.getLabel(),
+                        labelPosition.x + xOffset,
+                        labelPosition.y + yOffset,
+                        DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
+                        textProperties.getBackgroundColor(),
+                        RGB.toClampedInt(textProperties.getBackgroundOpacity()),
+                        textProperties.getColor(),
+                        RGB.toClampedInt(textProperties.getOpacity()),
+                        textProperties.getScale() * fontScale,
+                        textProperties.hasFontShadow(),
+                        rotation);
+            }
+
+            String titleText = overlay.getTitle();
+            if (titlePosition != null && !Strings.isNullOrEmpty(titleText))
+            {
+                DrawUtil.drawLabel(titleText,
+                        titlePosition.x + 5 + xOffset,
+                        titlePosition.y + yOffset,
+                        DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
+                        textProperties.getBackgroundColor(),
+                        RGB.toClampedInt(textProperties.getBackgroundOpacity()),
+                        textProperties.getColor(),
+                        RGB.toClampedInt(textProperties.getOpacity()),
+                        textProperties.getScale() * fontScale,
+                        textProperties.hasFontShadow(),
+                        rotation);
             }
         }
     }
@@ -126,14 +123,19 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
         }
 
         // Update positions after drag or if the UIState changed
-        if (draggingDone || !Objects.equals(uiState, lastUiState))
+        if (draggingDone || overlay.getNeedsRerender() || !Objects.equals(uiState, lastUiState))
         {
             // Update positions first
             lastUiState = uiState;
             updatePositions(gridRenderer);
+            overlay.clearFlagForRerender();
         }
 
         // Verify screenbounds within grid
+        if (screenBounds == null)
+        {
+            return false;
+        }
         return gridRenderer.isOnScreen(screenBounds);
     }
 

@@ -349,16 +349,13 @@ public class GridRenderer
         return blockBounds;
     }
 
-    public BlockPos getBlockAtScreenPoint(double mouseX, double mouseY)
+    public BlockPos getBlockAtPixel(Point2D.Double pixel)
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
-        double centerPixelX = mc.displayWidth / 2.0;
-        double centerPixelZ = mc.displayHeight / 2.0;
+        double centerPixelX = lastWidth / 2.0;
+        double centerPixelZ = lastHeight / 2.0;
 
-        double blockSize = (int) Math.pow(2, zoom);
-
-        double deltaX = (centerPixelX - mouseX) / blockSize;
-        double deltaZ = (centerPixelZ - mouseY) / blockSize;
+        double deltaX = ((centerPixelX - pixel.x) / uiState.blockSize);
+        double deltaZ = ((centerPixelZ - (lastHeight - pixel.y)) / uiState.blockSize);
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
@@ -370,11 +367,11 @@ public class GridRenderer
         return getBlockPixelInGrid(pos.getX(), pos.getZ());
     }
 
-    public Point2D.Double getBlockPixelInGrid(double x, double z)
+    public Point2D.Double getBlockPixelInGrid(double blockX, double blockZ)
     {
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
-        double localBlockX = x - centerBlockX;
-        double localBlockZ = z - centerBlockZ;
+        double localBlockX = blockX - centerBlockX;
+        double localBlockZ = blockZ - centerBlockZ;
 
         int blockSize = (int) Math.pow(2, zoom);
         double pixelOffsetX = mc.displayWidth / 2.0 + (localBlockX * blockSize);
@@ -594,7 +591,6 @@ public class GridRenderer
      */
     public boolean isOnScreen(double startX, double startY, int width, int height)
     {
-
         if (screenBounds == null)
         {
             return false;
@@ -649,8 +645,8 @@ public class GridRenderer
             int worldHeight = ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight();
             int pad = 32;
 
-            BlockPos upperLeft = getBlockAtScreenPoint(screenBounds.getMinX(), screenBounds.getMaxY());
-            BlockPos lowerRight = getBlockAtScreenPoint(screenBounds.getMaxX(), screenBounds.getMinY());
+            BlockPos upperLeft = getBlockAtPixel(new Point2D.Double(screenBounds.getMinX(), screenBounds.getMinY()));
+            BlockPos lowerRight = getBlockAtPixel(new Point2D.Double(screenBounds.getMaxX(), screenBounds.getMaxY()));
 
             blockBounds = new AxisAlignedBB(upperLeft.add(-pad, 0, -pad), lowerRight.add(pad, worldHeight, pad));
 
