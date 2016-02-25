@@ -121,22 +121,22 @@ public class ThemeCompassPoints
         {
             if (showNorth)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
+                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
             }
 
             if (showSouth)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
+                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
             }
 
             if (showWest)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
+                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
             }
 
             if (showEast)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 255, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
+                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
             }
         }
     }

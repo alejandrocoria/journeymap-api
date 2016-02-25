@@ -311,7 +311,7 @@ public class MiniMap
                 {
                     stopMapRotation(rotation);
                     GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime)));
+                    float alpha = Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime))) / 255f;
                     Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
                     dv.getMapTypeStatus(state.getCurrentMapType()).draw(windowCenter, alpha, 0);
                     GL11.glTranslated(-dv.translateX, -dv.translateY, 0);

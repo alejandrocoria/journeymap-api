@@ -282,9 +282,16 @@ public class DrawUtil
             renderHelper.glEnableTexture2D();
             renderHelper.glBindTexture(texture.getGlTextureId());
 
+            if(alpha>1)
+            {
+                // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
+                alpha = alpha/255f;
+            }
+
             if (blend && color != null)
             {
                 float[] c = RGB.floats(color);
+
                 renderHelper.glColor4f(c[0], c[1], c[2], alpha);
             }
             else
@@ -487,23 +494,30 @@ public class DrawUtil
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
     }
 
-    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, float scale, double rotation)
+    public static void drawColoredImage(TextureImpl texture, float alpha, Integer color, double x, double y, float scale, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
-    public static void drawColoredSprite(TextureImpl texture, double displayWidth, double displayHeight, double spriteX, double spriteY, double spriteWidth, double spriteHeight, int alpha, Integer color, double x, double y, float scale, double rotation)
+    public static void drawColoredSprite(final TextureImpl texture, final double displayWidth, final double displayHeight, final double spriteX, final double spriteY, final double spriteWidth, final double spriteHeight, final Integer color, final float alpha, final double x, final double y, final float scale, final double rotation)
     {
-        double minU = spriteX / texture.getWidth();
-        double minV = spriteY / texture.getHeight();
-        double maxU = (spriteX + spriteWidth) / texture.getWidth();
-        double maxV = (spriteY + spriteHeight) / texture.getHeight();
+        final double texWidth = texture.getWidth();
+        final double texHeight = texture.getHeight();
+        final double minU = Math.max(0, spriteX / texWidth);
+        final double minV = Math.max(0, spriteY / texHeight);
+        final double maxU = Math.min(1, (spriteX + spriteWidth) / texWidth);
+        final double maxV = Math.min(1, (spriteY + spriteHeight) / texHeight);
         drawQuad(texture, x, y, displayWidth * scale, displayHeight * scale, minU, minV, maxU, maxV, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)
     {
         drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, int width, int height, double rotation)
+    {
+        drawQuad(texture, x, y, width, height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
     /**

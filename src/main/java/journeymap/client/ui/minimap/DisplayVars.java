@@ -408,7 +408,7 @@ public class DisplayVars
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }
 
-        void draw(Point2D.Double mapCenter, int alpha, double rotation)
+        void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             x = mapCenter.getX() - (tex.getWidth() / 2);
             y = mapCenter.getY() - tex.getHeight() - 8;
