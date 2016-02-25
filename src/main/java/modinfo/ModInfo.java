@@ -55,14 +55,13 @@ public class ModInfo
         {
             this.reportingLocale = getLocale(reportingLanguageCode);
             this.config = Config.getInstance(this.modId);
-
+            this.client = createClient();
             if (singleUse)
             {
                 singleUse();
             }
             else if (this.config.isEnabled())
             {
-                this.client = createClient();
                 if (Config.generateStatusString(modId, false).equals(config.getStatus()))
                 {
                     optIn();
@@ -347,7 +346,7 @@ public class ModInfo
         {
             return;
         }
-        else if (config.isEnabled())
+        else
         {
             reportAppView();
         }
