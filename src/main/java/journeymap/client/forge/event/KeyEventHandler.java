@@ -79,61 +79,54 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public static boolean onKeypress(boolean minimapOnly)
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        final int i = Keyboard.getEventKey();
-
         try
         {
-            // This seems to prevent the keycode from "staying"
-            boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
-            //GuiScreen.isCtrlKeyDown();
+            boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
 
-            if (controlDown && Constants.isPressed(Constants.KB_MAP))
+            if (controlDown && Constants.KB_MAP.isKeyDown())
             {
                 UIManager.getInstance().toggleMinimap();
                 return true;
             }
-            else if (controlDown && Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+            else if (controlDown && Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 Tile.switchTileRenderType();
                 return true;
             }
-            else if (controlDown && Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+            else if (controlDown && Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 Tile.switchTileDisplayQuality();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+            else if (Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 MiniMap.state().zoomIn();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+            else if (Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 MiniMap.state().zoomOut();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
+            else if (Constants.KB_MAP_DAY.isKeyDown() || Constants.KB_MAP_NIGHT.isKeyDown())
             {
                 MiniMap.state().toggleMapType();
-                KeyBinding.unPressAllKeys();
                 return true;
             }
-            else if (Constants.isPressed(Constants.KB_MINIMAP_PRESET))
+            else if (Constants.KB_MINIMAP_PRESET.isKeyDown())
             {
                 UIManager.getInstance().switchMiniMapPreset();
                 return true;
             }
-            else if (controlDown && Constants.isPressed(Constants.KB_WAYPOINT))
+            else if (controlDown && Constants.KB_WAYPOINT.isKeyDown())
             {
-                KeyBinding.unPressAllKeys();
                 UIManager.getInstance().openWaypointManager(null, null);
                 return true;
             }
 
             if (!minimapOnly)
             {
-                if (Constants.KB_MAP.isPressed())
+                if (Constants.KB_MAP.isKeyDown())
                 {
                     if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
                     {
@@ -150,7 +143,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    if (Constants.KB_WAYPOINT.isPressed())
+                    if (Constants.KB_WAYPOINT.isKeyDown())
                     {
                         if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
                         {
@@ -179,7 +172,11 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent()
     public void onKeyboardEvent(InputEvent.KeyInputEvent event)
     {
-        KeyEventHandler.onKeypress(false);
+        boolean clearKeys = KeyEventHandler.onKeypress(false);
+        if (clearKeys)
+        {
+            KeyBinding.unPressAllKeys();
+        }
     }
 }
 

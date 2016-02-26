@@ -140,37 +140,7 @@ public class Constants
      */
     public static String getKeyName(KeyBinding keyBinding)
     {
-        return Keyboard.getKeyName(getKeyCode(keyBinding));
-    }
-
-    /**
-     * Get the keycode for a binding.
-     *
-     * @param keyBinding
-     * @return
-     */
-    private static int getKeyCode(KeyBinding keyBinding)
-    {
-        return keyBinding.getKeyCode();
-    }
-
-    /**
-     * Whether a keybinding is pressed.
-     *
-     * @param keyBinding
-     * @return
-     */
-    public static boolean isPressed(KeyBinding keyBinding)
-    {
-        try
-        {
-            return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
-        }
-        catch (Throwable t)
-        {
-            Journeymap.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
-            return false;
-        }
+        return Keyboard.getKeyName(keyBinding.getKeyCode());
     }
 
     /**

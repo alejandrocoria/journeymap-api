@@ -764,14 +764,15 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (i == Keyboard.KEY_ESCAPE || Constants.isPressed(Constants.KB_MAP))
+        if (i == Keyboard.KEY_ESCAPE || i == Constants.KB_MAP.getKeyCode())
         {
             UIManager.getInstance().closeAll();
             return;
         }
-        boolean controlDown = Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
 
-        if (Constants.isPressed(Constants.KB_MAP_ZOOMIN))
+        boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+
+        if (i == Constants.KB_MAP_ZOOMIN.getKeyCode())
         {
             if (controlDown)
             {
@@ -784,7 +785,7 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (Constants.isPressed(Constants.KB_MAP_ZOOMOUT))
+        if (i == Constants.KB_MAP_ZOOMOUT.getKeyCode())
         {
             if (controlDown)
             {
@@ -797,20 +798,20 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
+        if (i == Constants.KB_MAP_DAY.getKeyCode() || i == Constants.KB_MAP_NIGHT.getKeyCode())
         {
             state.toggleMapType();
             KeyBinding.unPressAllKeys();
             return;
         }
 
-        if (Constants.isPressed(Constants.KB_MAP_NIGHT))
+        if (i == Constants.KB_MAP_NIGHT.getKeyCode())
         {
             state.setMapType(MapType.Name.night);
             return;
         }
 
-        if (Constants.isPressed(Constants.KB_WAYPOINT))
+        if (i == Constants.KB_WAYPOINT.getKeyCode())
         {
             Waypoint waypoint = Waypoint.of(mc.thePlayer);
             UIManager.getInstance().openWaypointEditor(waypoint, true, null);
@@ -818,49 +819,49 @@ public class Fullscreen extends JmUI
         }
 
         // North
-        if (Constants.isPressed(mc.gameSettings.keyBindForward))
+        if (i == mc.gameSettings.keyBindForward.getKeyCode())
         {
             moveCanvas(0, -16);
             return;
         }
 
         // West
-        if (Constants.isPressed(mc.gameSettings.keyBindLeft))
+        if (i == mc.gameSettings.keyBindLeft.getKeyCode())
         {
             moveCanvas(-16, 0);
             return;
         }
 
         // South
-        if (Constants.isPressed(mc.gameSettings.keyBindBack))
+        if (i == mc.gameSettings.keyBindBack.getKeyCode())
         {
             moveCanvas(0, 16);
             return;
         }
 
         // East
-        if (Constants.isPressed(mc.gameSettings.keyBindRight))
+        if (i == mc.gameSettings.keyBindRight.getKeyCode())
         {
             moveCanvas(16, 0);
             return;
         }
 
         // Open inventory
-        if (Constants.isPressed(mc.gameSettings.keyBindInventory))
+        if (i == mc.gameSettings.keyBindInventory.getKeyCode())
         {
             UIManager.getInstance().openInventory();
             return;
         }
 
         // Open chat
-        if (Constants.isPressed(mc.gameSettings.keyBindChat))
+        if (i == mc.gameSettings.keyBindChat.getKeyCode())
         {
             openChat("");
             return;
         }
 
         // Open chat with command prefix (Minecraft.java does this in runTick() )
-        if (Constants.isPressed(mc.gameSettings.keyBindCommand))
+        if (i == mc.gameSettings.keyBindCommand.getKeyCode())
         {
             openChat("/");
             return;
