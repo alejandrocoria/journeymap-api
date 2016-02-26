@@ -35,6 +35,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;
     SlotMetadata lastPressed = null;
+    SlotMetadata currentToolTip = null;
     Integer colorToolbarBgStart = new Color(0, 0, 100).getRGB();
     Integer colorToolbarBgEnd = new Color(0, 0, 100).getRGB();
 
@@ -81,8 +82,13 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
-    // public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
+    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+    {
+        // ?
+    }
+
+    @Override
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         int margin = 0;
         if (parent.getCurrentColumnWidth() > 0)
@@ -123,7 +129,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
             }
         }
 
-        return tooltipMetadata;
+        this.currentToolTip = tooltipMetadata;
     }
 
     @Override
@@ -197,6 +203,12 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     public SlotMetadata getLastPressed()
     {
         return lastPressed;
+    }
+
+    @Override
+    public SlotMetadata getCurrentTooltip()
+    {
+        return currentToolTip;
     }
 
     @Override

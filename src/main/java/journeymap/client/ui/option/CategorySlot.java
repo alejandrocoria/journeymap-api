@@ -34,6 +34,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     int currentColumns;
     int currentColumnWidth;
     SlotMetadata masterSlot;
+    SlotMetadata currentTooltip;
     LinkedList<SlotMetadata> childMetadataList = new LinkedList<SlotMetadata>();
     List<ScrollListPane.ISlot> childSlots = new ArrayList<ScrollListPane.ISlot>();
     String glyphClosed = "\u25B6";
@@ -193,10 +194,13 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     }
 
     @Override
-    // 1.7
-    // public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
-    // 1.8
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
+    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+    {
+
+    }
+
+    @Override
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         currentSlotIndex = slotIndex;
         button.setWidth(listWidth);
@@ -218,9 +222,9 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
         if (button.mouseOver(mouseX, mouseY))
         {
-            return metadata;
+            currentTooltip = metadata;
         }
-        return null;
+        currentTooltip = null;
     }
 
     private void updateButtonLabel()
@@ -287,6 +291,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     public SlotMetadata getLastPressed()
     {
         return null;
+    }
+
+    @Override
+    public SlotMetadata getCurrentTooltip()
+    {
+        return currentTooltip;
     }
 
     public boolean contains(SlotMetadata slotMetadata)

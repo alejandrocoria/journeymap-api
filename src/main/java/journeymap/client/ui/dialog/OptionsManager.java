@@ -245,10 +245,6 @@ public class OptionsManager extends JmUI
             }
             else
             {
-                // 1.7
-                // optionsListPane.func_148122_a(width, height, headerHeight, this.height - 30);
-
-                // 1.8
                 optionsListPane.setDimensions(width, height, headerHeight, this.height - 30);
                 optionsListPane.updateSlots();
             }
@@ -428,7 +424,7 @@ public class OptionsManager extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
-        boolean pressed = optionsListPane.mousePressed(mouseX, mouseY, mouseEvent);
+        boolean pressed = optionsListPane.mouseClicked(mouseX, mouseY, mouseEvent);
         if (pressed)
         {
             checkPressedButton();

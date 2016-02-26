@@ -25,7 +25,6 @@ import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -290,23 +289,16 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         return null;
     }
 
-    // 1.7
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
-    {
-        return drawSlot(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
-    }
-
-    // 1.8
-    public SlotMetadata drawSlot(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
+    @Override
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         Minecraft mc = manager.getMinecraft();
         this.width = listWidth;
         setPosition(x, y);
 
-
         if (this.waypoint == null)
         {
-            return null;
+            return;
         }
 
         boolean hover = manager.isSelected(this) || (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + manager.rowHeight);
@@ -328,10 +320,14 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
-
-
-        return null; // TODO return hovered SlotMetadata
     }
+
+    @Override
+    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+    {
+        // ?
+    }
+
 
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
@@ -365,6 +361,12 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
     @Override
     public SlotMetadata getLastPressed()
+    {
+        return null; // TODO
+    }
+
+    @Override
+    public SlotMetadata getCurrentTooltip()
     {
         return null; // TODO
     }
