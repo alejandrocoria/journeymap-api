@@ -102,7 +102,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
             {
                 buttons.fitWidths(fontRenderer);
                 buttons.layoutHorizontal(x + listWidth - hgap, y, false, hgap);
-                DrawUtil.drawGradientRect(x, y, listWidth, slotHeight, colorToolbarBgStart, 40, colorToolbarBgEnd, 150);
+                DrawUtil.drawGradientRect(x, y, listWidth, slotHeight, colorToolbarBgStart, .15f, colorToolbarBgEnd, .6f);
             }
             else
             {

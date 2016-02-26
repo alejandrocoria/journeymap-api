@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
-import journeymap.client.cartography.RGB;
 import journeymap.client.render.map.GridRenderer;
 
 import javax.annotation.Nullable;
@@ -62,9 +61,9 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
                         labelPosition.y + yOffset,
                         DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
                         textProperties.getBackgroundColor(),
-                        RGB.toClampedInt(textProperties.getBackgroundOpacity()),
+                        textProperties.getBackgroundOpacity(),
                         textProperties.getColor(),
-                        RGB.toClampedInt(textProperties.getOpacity()),
+                        textProperties.getOpacity(),
                         textProperties.getScale() * fontScale,
                         textProperties.hasFontShadow(),
                         rotation);
@@ -78,9 +77,9 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
                         titlePosition.y + yOffset,
                         DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
                         textProperties.getBackgroundColor(),
-                        RGB.toClampedInt(textProperties.getBackgroundOpacity()),
+                        textProperties.getBackgroundOpacity(),
                         textProperties.getColor(),
-                        RGB.toClampedInt(textProperties.getOpacity()),
+                        textProperties.getOpacity(),
                         textProperties.getScale() * fontScale,
                         textProperties.hasFontShadow(),
                         rotation);

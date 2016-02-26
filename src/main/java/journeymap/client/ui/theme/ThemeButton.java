@@ -198,11 +198,11 @@ public class ThemeButton extends BooleanPropertyButton
 
         if (!buttonSpec.useThemeImages)
         {
-            DrawUtil.drawColoredImage(textureIcon, 1f, RGB.BLACK_RGB, drawX + .5, drawY + .5, iconScale, 0);
+            DrawUtil.drawColoredImage(textureIcon, RGB.BLACK_RGB, 1f, drawX + .5, drawY + .5, iconScale, 0);
         }
 
         Integer iconColor = getIconColor(isMouseOver);
-        DrawUtil.drawColoredImage(textureIcon, 1f, iconColor, drawX, drawY, iconScale, 0);
+        DrawUtil.drawColoredImage(textureIcon, iconColor, 1f, drawX, drawY, iconScale, 0);
     }
 
     public void drawNativeButton(Minecraft minecraft, int mouseX, int mouseY)

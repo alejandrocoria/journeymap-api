@@ -8,13 +8,11 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.theme.Theme;
-import net.minecraft.client.gui.FontRenderer;
 
 /**
- * Encapsulation of key attributes.
+ * Encapsulation of key attributes needed to render a minimap label.
  */
 class LabelVars
 {
@@ -22,12 +20,12 @@ class LabelVars
     final double y;
     final double fontScale;
     final boolean fontShadow;
-    DrawUtil.HAlign hAlign;
-    DrawUtil.VAlign vAlign;
-    Integer bgColor;
-    int bgAlpha;
-    Integer fgColor;
-    private DisplayVars displayVars;
+    final DrawUtil.HAlign hAlign;
+    final DrawUtil.VAlign vAlign;
+    final Integer bgColor;
+    final float bgAlpha;
+    final Integer fgColor;
+    final DisplayVars displayVars;
 
     LabelVars(DisplayVars displayVars, double x, double y, DrawUtil.HAlign hAlign, DrawUtil.VAlign vAlign, double fontScale, Theme.LabelSpec labelSpec)
     {
@@ -39,27 +37,12 @@ class LabelVars
         this.fontScale = fontScale;
         this.fontShadow = labelSpec.shadow;
         this.bgColor = Theme.getColor(labelSpec.backgroundColor);
-        this.bgAlpha = labelSpec.backgroundAlpha;
+        this.bgAlpha = Theme.getAlpha(labelSpec.backgroundAlpha);
         this.fgColor = Theme.getColor(labelSpec.foregroundColor);
     }
 
     void draw(String text)
     {
-        boolean isUnicode = false;
-        FontRenderer fontRenderer = null;
-        if (displayVars.forceUnicode)
-        {
-            fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
-            isUnicode = fontRenderer.getUnicodeFlag();
-            if (!isUnicode)
-            {
-                fontRenderer.setUnicodeFlag(true);
-            }
-        }
-        DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, fgColor, 255, fontScale, fontShadow);
-        if (displayVars.forceUnicode && !isUnicode)
-        {
-            fontRenderer.setUnicodeFlag(false);
-        }
+        DrawUtil.drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, fgColor, 1f, fontScale, fontShadow);
     }
 }

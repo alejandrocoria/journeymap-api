@@ -65,7 +65,6 @@ public class DisplayVars
     final LocationFormat.LocationFormatKeys locationFormatKeys;
     final boolean locationFormatVerbose;
     int marginX, marginY;
-    boolean forceUnicode;
     MapTypeStatus mapTypeStatus;
     MapPresetStatus mapPresetStatus;
 
@@ -375,7 +374,7 @@ public class DisplayVars
             this.name = Integer.toString(miniMapId);
         }
 
-        void draw(Point2D.Double mapCenter, int alpha, double rotation)
+        void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, color, alpha, scale, true, rotation);
         }
@@ -412,8 +411,8 @@ public class DisplayVars
         {
             x = mapCenter.getX() - (tex.getWidth() / 2);
             y = mapCenter.getY() - tex.getHeight() - 8;
-            DrawUtil.drawColoredImage(tex, alpha, opposite, mapCenter.getX() - ((tex.getWidth() * bgScale) / 2), mapCenter.getY() - (tex.getHeight() * bgScale) + scaleHeightOffset - 8, bgScale, rotation);
-            DrawUtil.drawColoredImage(tex, alpha, color, x, y, 1, 0);
+            DrawUtil.drawColoredImage(tex, opposite, alpha, mapCenter.getX() - ((tex.getWidth() * bgScale) / 2), mapCenter.getY() - (tex.getHeight() * bgScale) + scaleHeightOffset - 8, bgScale, rotation);
+            DrawUtil.drawColoredImage(tex, color, alpha, x, y, 1, 0);
         }
     }
 

@@ -235,13 +235,13 @@ public class RenderWaypointBeacon
                     double labelY = (0 - halfTexHeight) - 8;
 
                     // Depth label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 150, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .6f, waypoint.getSafeColor(), 1f, fontScale, false);
 
                     renderHelper.glDisableDepth();
                     renderHelper.glDepthMask(false);
 
                     // Front label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 100, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .4f, waypoint.getSafeColor(), 1f, fontScale, false);
 
                     GL11.glPopMatrix();
                 }
@@ -269,7 +269,7 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
+                DrawUtil.drawColoredImage(texture, waypoint.getColor(), 1f, 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
 
                 GL11.glPopMatrix();
             }

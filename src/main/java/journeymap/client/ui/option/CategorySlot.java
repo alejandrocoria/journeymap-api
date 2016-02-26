@@ -204,8 +204,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setHeight(slotHeight);
         button.drawButton(mc, mouseX, mouseY);
 
-        DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, RGB.BLACK_RGB, 50);
-        DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 0, button.getLabelColor(), 255, 1, true);
+        DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, RGB.BLACK_RGB, .2f);
+        DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 0, button.getLabelColor(), 1f, 1, true);
 
         if (masterSlot != null && selected)
         {

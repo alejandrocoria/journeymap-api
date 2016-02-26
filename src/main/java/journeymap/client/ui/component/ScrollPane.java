@@ -262,7 +262,7 @@ public class ScrollPane extends GuiSlot
     protected void drawContainerBackground(Tessellator tess)
     {
         int width = getWidth();
-        int alpha = 100;
+        float alpha = .4f;
 
         // Tinted scrollbar area
         DrawUtil.drawRectangle(0, top, width, paneHeight, Color.BLACK.getRGB(), alpha);
@@ -271,7 +271,7 @@ public class ScrollPane extends GuiSlot
         // Frame
         if (showFrame)
         {
-            alpha = 255;
+            alpha = 1f;
             DrawUtil.drawRectangle(-1, -1, width + 2, 1, frameColor, alpha);
             DrawUtil.drawRectangle(-1, paneHeight, width + 2, 1, frameColor, alpha);
 

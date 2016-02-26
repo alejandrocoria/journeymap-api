@@ -451,7 +451,7 @@ public class GridRenderer
 
             for (String message : messages.values())
             {
-                DrawUtil.drawLabel(message, centerX, centerZ += 20, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 255, RGB.WHITE_RGB, 255, 1, true);
+                DrawUtil.drawLabel(message, centerX, centerZ += 20, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 1f, RGB.WHITE_RGB, 1f, 1, true);
             }
         }
 

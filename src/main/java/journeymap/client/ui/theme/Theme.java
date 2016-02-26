@@ -86,7 +86,7 @@ public class Theme implements Comparable<Theme>
     /**
      * Hex string to Color int.
      */
-    public static Integer getColor(String hexColor)
+    public static int getColor(String hexColor)
     {
         if (!Strings.isNullOrEmpty(hexColor))
         {
@@ -98,10 +98,17 @@ public class Theme implements Comparable<Theme>
             catch (Exception e)
             {
                 FMLLog.warning("Journeymap theme has an invalid color string: " + hexColor);
-
             }
         }
         return RGB.WHITE_RGB;
+    }
+
+    /**
+     * Int alpha (0-255) to float (0f-1f)
+     */
+    public static float getAlpha(int alpha)
+    {
+        return RGB.toScaledFloat(alpha);
     }
 
     @Override

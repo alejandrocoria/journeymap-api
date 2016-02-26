@@ -183,20 +183,20 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
             if (isDrawFrame())
             {
-                DrawUtil.drawRectangle(xPosition, yPosition, width, 1, smallFrameColorLight, 255); // Top
-                DrawUtil.drawRectangle(xPosition, yPosition, 1, height, smallFrameColorLight, 255); // Left
+                DrawUtil.drawRectangle(xPosition, yPosition, width, 1, smallFrameColorLight, 1f); // Top
+                DrawUtil.drawRectangle(xPosition, yPosition, 1, height, smallFrameColorLight, 1f); // Left
 
-                DrawUtil.drawRectangle(xPosition, yPosition + height - 1, width - 1, 1, smallFrameColorDark, 255); // Bottom
-                DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 255); // Right
+                DrawUtil.drawRectangle(xPosition, yPosition + height - 1, width - 1, 1, smallFrameColorDark, 1f); // Bottom
+                DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 1f); // Right
             }
 
             if (isDrawBackground())
             {
-                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 255);
+                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 1f);
             }
             else if (this.isEnabled() && isHovered())
             {
-                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, 128);
+                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, .5f);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
@@ -208,7 +208,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
                 if (drawBackground)
                 {
-                    int alpha = 185;
+                    float alpha = .7f;
                     int widthOffset = width - ((this.height >= 20) ? 3 : 2);
                     DrawUtil.drawRectangle(this.getX() + 1, this.getY() + 1, widthOffset, height - 2, disabledBgColor, alpha);
                 }
@@ -229,7 +229,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
                 }
             }
 
-            DrawUtil.drawCenteredLabel(this.displayString, this.getCenterX(), this.getMiddleY(), null, 0, varLabelColor, 255, 1, drawLabelShadow);
+            DrawUtil.drawCenteredLabel(this.displayString, this.getCenterX(), this.getMiddleY(), null, 0, varLabelColor, 1f, 1, drawLabelShadow);
         }
     }
 
@@ -245,7 +245,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         if (isDrawButton())
         {
-            DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, smallFrameColorDark, 255);
+            DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, smallFrameColorDark, 1f);
         }
     }
 

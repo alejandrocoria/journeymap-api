@@ -156,7 +156,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     //@Override
     public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height)
     {
-        DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, background, 100);
+        DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, background, .4f);
     }
 
     protected void drawLabels(Minecraft mc, int x, int y, Integer color)
@@ -185,7 +185,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     protected void drawWaypoint(int x, int y)
     {
         TextureImpl wpTexture = waypoint.getTexture();
-        DrawUtil.drawColoredImage(wpTexture, 255, waypoint.getColor(), x, y - (wpTexture.getHeight() / 2), 0);
+        DrawUtil.drawColoredImage(wpTexture, waypoint.getColor(), 1f, x, y - (wpTexture.getHeight() / 2), 0);
     }
 
     protected void enableWaypoint(boolean enable)
@@ -315,7 +315,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonListRight.setOptions(true, hover, true);
 
         Integer color = hover ? backgroundHover : background;
-        int alpha = hover ? 255 : 100;
+        float alpha = hover ? 1f : .4f;
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, color, alpha);
 
         int margin = manager.getMargin();

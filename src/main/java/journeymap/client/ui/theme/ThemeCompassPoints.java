@@ -32,9 +32,9 @@ public class ThemeCompassPoints
     final boolean showSouth;
     final boolean showEast;
     final boolean showWest;
-    final int bgAlpha;
+    final float bgAlpha;
     final Integer bgColor;
-    final int fgAlpha;
+    final float fgAlpha;
     final Integer fgColor;
     final double fontScale;
     final int compassLabelHeight;
@@ -61,8 +61,8 @@ public class ThemeCompassPoints
         this.fontScale = miniMapProperties.compassFontScale.get();
         this.compassLabelHeight = labelHeight;
 
-        bgAlpha = minimapSpec.compassLabel.backgroundAlpha;
-        fgAlpha = minimapSpec.compassLabel.foregroundAlpha;
+        bgAlpha = Theme.getAlpha(minimapSpec.compassLabel.backgroundAlpha);
+        fgAlpha = Theme.getAlpha(minimapSpec.compassLabel.foregroundAlpha);
         bgColor = Theme.getColor(minimapSpec.compassLabel.backgroundColor);
         fgColor = Theme.getColor(minimapSpec.compassLabel.foregroundColor);
 
@@ -121,22 +121,22 @@ public class ThemeCompassPoints
         {
             if (showNorth)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
+                DrawUtil.drawColoredImage(compassPointTex, compassPointColor, 1f, pointNorth.getX() - xOffset, pointNorth.getY() - yOffset, compassPointScale, 0);
             }
 
             if (showSouth)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
+                DrawUtil.drawColoredImage(compassPointTex, compassPointColor, 1f, pointSouth.getX() - xOffset, pointSouth.getY() - yOffset, compassPointScale, 180);
             }
 
             if (showWest)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
+                DrawUtil.drawColoredImage(compassPointTex, compassPointColor, 1f, pointWest.getX() - xOffset, pointWest.getY() - yOffset, compassPointScale, -90);
             }
 
             if (showEast)
             {
-                DrawUtil.drawColoredImage(compassPointTex, 1f, compassPointColor, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
+                DrawUtil.drawColoredImage(compassPointTex, compassPointColor, 1f, pointEast.getX() - xOffset, pointEast.getY() - yOffset, compassPointScale, 90);
             }
         }
     }

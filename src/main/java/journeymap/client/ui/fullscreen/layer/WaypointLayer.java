@@ -253,17 +253,17 @@ public class WaypointLayer implements LayerDelegate.Layer
 
             if (gridRenderer.isOnScreen(pixel))
             {
-                DrawUtil.drawRectangle(x - (thick * thick), y - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, 150);
-                DrawUtil.drawRectangle(x - thick, y - thick, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x - (thick * thick), y - (thick * thick), size + (thick * 4), thick, RGB.BLACK_RGB, .6f);
+                DrawUtil.drawRectangle(x - thick, y - thick, size + (thick * thick), thick, RGB.WHITE_RGB, .6f);
 
-                DrawUtil.drawRectangle(x - (thick * thick), y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
-                DrawUtil.drawRectangle(x - thick, y, thick, size, RGB.WHITE_RGB, 150);
+                DrawUtil.drawRectangle(x - (thick * thick), y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, .6f);
+                DrawUtil.drawRectangle(x - thick, y, thick, size, RGB.WHITE_RGB, .6f);
 
-                DrawUtil.drawRectangle(x + size, y, thick, size, RGB.WHITE_RGB, 150);
-                DrawUtil.drawRectangle(x + size + thick, y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x + size, y, thick, size, RGB.WHITE_RGB, .6f);
+                DrawUtil.drawRectangle(x + size + thick, y - thick, thick, size + (thick * thick), RGB.BLACK_RGB, .6f);
 
-                DrawUtil.drawRectangle(x - thick, y + size, size + (thick * thick), thick, RGB.WHITE_RGB, 150);
-                DrawUtil.drawRectangle(x - (thick * thick), y + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, 150);
+                DrawUtil.drawRectangle(x - thick, y + size, size + (thick * thick), thick, RGB.WHITE_RGB, .6f);
+                DrawUtil.drawRectangle(x - (thick * thick), y + size + thick, size + (thick * 4), thick, RGB.BLACK_RGB, .6f);
             }
 
         }

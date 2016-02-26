@@ -116,7 +116,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         Integer fgColor = RGB.WHITE_RGB;
         double fontScale = 1;
         boolean fontShadow = false;
-        int alpha = 255;
+        float alpha = 1;
         int ticks = 20 * 5;
         private double x;
         private double y;
@@ -127,7 +127,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             this.text = text;
             this.x = x;
             this.y = y;
-            this.alpha = 255;
+            this.alpha = 1f;
             this.ticks = 20 * 5;
         }
 
@@ -136,9 +136,9 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         {
             if (ticks-- < 0 && alpha > 0)
             {
-                alpha -= 1; // Fade
+                alpha -= .01; // Fade
             }
-            if (alpha > 10 && text != null)
+            if (alpha > .1 && text != null)
             {
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }

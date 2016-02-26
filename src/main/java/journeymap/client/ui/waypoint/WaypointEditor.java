@@ -343,7 +343,7 @@ public class WaypointEditor extends JmUI
 
         dimScrollPane.drawScreen(x, y, par3);
 
-        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 255, RGB.LIGHT_GRAY_RGB, 255, 1, true);
+        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 1f, RGB.LIGHT_GRAY_RGB, 1f, 1, true);
 
         for (int k = 0; k < this.buttonList.size(); ++k)
         {
@@ -357,7 +357,7 @@ public class WaypointEditor extends JmUI
 
     protected void drawWaypoint(int x, int y)
     {
-        DrawUtil.drawColoredImage(wpTexture, 255, currentColor, x, y - (wpTexture.getHeight() / 2), 0);
+        DrawUtil.drawColoredImage(wpTexture, currentColor, 1f, x, y - (wpTexture.getHeight() / 2), 0);
     }
 
     protected void drawColorPicker(int x, int y, float size)

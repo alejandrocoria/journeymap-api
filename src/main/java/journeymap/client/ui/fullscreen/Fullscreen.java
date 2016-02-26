@@ -88,11 +88,11 @@ public class Fullscreen extends JmUI
     ThemeButton buttonTheme, buttonWaypointManager;
     ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
     ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
-    Integer bgColor = 0x222222;
-    Integer statusForegroundColor;
-    Integer statusBackgroundColor;
-    int statusForegroundAlpha;
-    int statusBackgroundAlpha;
+    int bgColor = 0x222222;
+    int statusForegroundColor;
+    int statusBackgroundColor;
+    float statusForegroundAlpha;
+    float statusBackgroundAlpha;
     StatTimer drawScreenTimer = StatTimer.get("Fullscreen.drawScreen");
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
@@ -268,9 +268,9 @@ public class Fullscreen extends JmUI
             // UI Colors
             bgColor = Theme.getColor(theme.fullscreen.mapBackgroundColor);
             statusForegroundColor = Theme.getColor(theme.fullscreen.statusLabel.foregroundColor);
-            statusForegroundAlpha = theme.fullscreen.statusLabel.foregroundAlpha;
+            statusForegroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.foregroundAlpha / 255));
             statusBackgroundColor = Theme.getColor(theme.fullscreen.statusLabel.backgroundColor);
-            statusBackgroundAlpha = theme.fullscreen.statusLabel.backgroundAlpha;
+            statusBackgroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.backgroundAlpha / 255));
 
             // Day Toggle
             buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day", null, null);
@@ -882,7 +882,7 @@ public class Fullscreen extends JmUI
     @Override
     public void drawBackground(int layer)
     {
-        DrawUtil.drawRectangle(0, 0, width, height, bgColor, 255);
+        DrawUtil.drawRectangle(0, 0, width, height, bgColor, 1f);
     }
 
     void drawMap()

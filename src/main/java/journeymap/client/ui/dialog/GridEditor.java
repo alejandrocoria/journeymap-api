@@ -241,9 +241,9 @@ public class GridEditor extends JmUI
         {
             colorX += x;
             colorY += y;
-            DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.darkGray.getRGB(), 200);
-            DrawUtil.drawRectangle(colorX - 1, colorY, 3, 1, activeColor, 255);
-            DrawUtil.drawRectangle(colorX, colorY - 1, 1, 3, activeColor, 255);
+            DrawUtil.drawRectangle(colorX - 2, colorY - 2, 5, 5, Color.darkGray.getRGB(), .8f);
+            DrawUtil.drawRectangle(colorX - 1, colorY, 3, 1, activeColor, 1f);
+            DrawUtil.drawRectangle(colorX, colorY - 1, 1, 3, activeColor, 1f);
         }
     }
 

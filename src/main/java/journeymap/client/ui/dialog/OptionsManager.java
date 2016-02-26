@@ -825,7 +825,7 @@ public class OptionsManager extends JmUI
                 }
             }
 
-            DrawUtil.drawLabel(this.displayString, labelX, this.getMiddleY(), hAlign, DrawUtil.VAlign.Middle, null, 0, labelColor, 255, 1, drawLabelShadow);
+            DrawUtil.drawLabel(this.displayString, labelX, this.getMiddleY(), hAlign, DrawUtil.VAlign.Middle, null, 0, labelColor, 1f, 1, drawLabelShadow);
         }
     }
 }

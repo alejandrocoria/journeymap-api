@@ -40,7 +40,7 @@ public class DrawUtil
      * @param color
      * @param bgAlpha
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, 0);
     }
@@ -49,7 +49,7 @@ public class DrawUtil
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
@@ -66,7 +66,7 @@ public class DrawUtil
      * @param bgAlpha
      * @param rotation
      */
-    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, double rotation)
+    public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, double rotation)
     {
         drawLabel(text, x, y, HAlign.Center, VAlign.Middle, bgColor, bgAlpha, color, alpha, fontScale, true, rotation);
     }
@@ -87,7 +87,7 @@ public class DrawUtil
      * @param fontScale
      * @param fontShadow
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow)
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, int color, float alpha, double fontScale, boolean fontShadow)
     {
         drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
@@ -109,11 +109,17 @@ public class DrawUtil
      * @param fontShadow
      * @param rotation
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, int bgAlpha, Integer color, int alpha, double fontScale, boolean fontShadow, double rotation)
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
         if (text == null || text.length() == 0)
         {
             return;
+        }
+
+        if (alpha > 1)
+        {
+            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
+            alpha = alpha / 255f;
         }
 
         final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
@@ -236,20 +242,62 @@ public class DrawUtil
         return fr.FONT_HEIGHT + (2 * vpad);
     }
 
-    private static void drawQuad(TextureImpl texture, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
-        drawQuad(texture, x, y, width, height, rotation, null, alpha, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
     }
 
-    private static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    public static void drawImage(TextureImpl texture, float alpha, double x, double y, boolean flip, float scale, double rotation)
     {
-        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, 0xffffff, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
     }
 
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, width, height, 0, 0, 1, 1, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawClampedImage(texture, 0xffffff, 1f, x, y, scale, rotation);
     }
+
+    public static void drawClampedImage(TextureImpl texture, int color, float alpha, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, color, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, float scale, double rotation)
+    {
+        drawQuad(texture, color, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
+    }
+
+    public static void drawColoredSprite(final TextureImpl texture, final double displayWidth, final double displayHeight, final double spriteX, final double spriteY, final double spriteWidth, final double spriteHeight, final Integer color, final float alpha, final double x, final double y, final float scale, final double rotation)
+    {
+        final double texWidth = texture.getWidth();
+        final double texHeight = texture.getHeight();
+        final double minU = Math.max(0, spriteX / texWidth);
+        final double minV = Math.max(0, spriteY / texHeight);
+        final double maxU = Math.min(1, (spriteX + spriteWidth) / texWidth);
+        final double maxV = Math.min(1, (spriteY + spriteHeight) / texHeight);
+        drawQuad(texture, color, alpha, x, y, displayWidth * scale, displayHeight * scale, minU, minV, maxU, maxV, rotation, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, double rotation)
+    {
+        drawQuad(texture, color, alpha, x, y, texture.getWidth(), texture.getHeight(), false, rotation);
+    }
+
+    public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, int width, int height, double rotation)
+    {
+        drawQuad(texture, color, alpha, x, y, width, height, false, rotation);
+    }
+
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    {
+        drawQuad(texture, 0xffffff, 1f, x, y, width, height, 0, 0, 1, 1, rotation, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
+    public static void drawQuad(TextureImpl texture, int color, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    {
+        drawQuad(texture, color, alpha, x, y, width, height, 0, 0, 1, 1, rotation, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+    }
+
 
     /**
      * @param texture
@@ -267,7 +315,7 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, final double minU, final double minV, final double maxU, final double maxV, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    public static void drawQuad(TextureImpl texture, int color, float alpha, final double x, final double y, final double width, final double height, final double minU, final double minV, final double maxU, final double maxV, double rotation, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
         GL11.glPushMatrix();
 
@@ -288,7 +336,7 @@ public class DrawUtil
                 alpha = alpha/255f;
             }
 
-            if (blend && color != null)
+            if (blend)
             {
                 float[] c = RGB.floats(color);
 
@@ -347,8 +395,13 @@ public class DrawUtil
         }
     }
 
-    public static void drawRectangle(double x, double y, double width, double height, int color, int alpha)
+    public static void drawRectangle(double x, double y, double width, double height, int color, float alpha)
     {
+        if (alpha > 1)
+        {
+            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
+            alpha = alpha / 255f;
+        }
         // Prep
         renderHelper.glEnableBlend();
         renderHelper.glDisableTexture2D();
@@ -439,8 +492,20 @@ public class DrawUtil
      * Draws a rectangle with a vertical gradient between the specified colors.
      * 0, top, this.width, this.height - top, -1072689136, -804253680
      */
-    public static void drawGradientRect(double x, double y, double width, double height, Integer startColor, int startAlpha, Integer endColor, int endAlpha)
+    public static void drawGradientRect(double x, double y, double width, double height, int startColor, float startAlpha, int endColor, float endAlpha)
     {
+        if (startAlpha > 1)
+        {
+            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
+            startAlpha = startAlpha / 255f;
+        }
+
+        if (endAlpha > 1)
+        {
+            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
+            endAlpha = endAlpha / 255f;
+        }
+
         int[] rgbaStart = RGB.ints(startColor, startAlpha);
         int[] rgbaEnd = RGB.ints(endColor, endAlpha);
 
@@ -474,51 +539,7 @@ public class DrawUtil
         renderHelper.draw();
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float alpha, float scale, double rotation)
-    {
-        drawQuad(texture, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
-    }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
-    {
-        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
-    }
-
-    public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
-    {
-        drawClampedImage(texture, null, x, y, scale, 1f, rotation);
-    }
-
-    public static void drawClampedImage(TextureImpl texture, Integer color, double x, double y, float scale, float alpha, double rotation)
-    {
-        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
-    }
-
-    public static void drawColoredImage(TextureImpl texture, float alpha, Integer color, double x, double y, float scale, double rotation)
-    {
-        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
-    }
-
-    public static void drawColoredSprite(final TextureImpl texture, final double displayWidth, final double displayHeight, final double spriteX, final double spriteY, final double spriteWidth, final double spriteHeight, final Integer color, final float alpha, final double x, final double y, final float scale, final double rotation)
-    {
-        final double texWidth = texture.getWidth();
-        final double texHeight = texture.getHeight();
-        final double minU = Math.max(0, spriteX / texWidth);
-        final double minV = Math.max(0, spriteY / texHeight);
-        final double maxU = Math.min(1, (spriteX + spriteWidth) / texWidth);
-        final double maxV = Math.min(1, (spriteY + spriteHeight) / texHeight);
-        drawQuad(texture, x, y, displayWidth * scale, displayHeight * scale, minU, minV, maxU, maxV, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
-    }
-
-    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)
-    {
-        drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
-    }
-
-    public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, int width, int height, double rotation)
-    {
-        drawQuad(texture, x, y, width, height, rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
-    }
 
     /**
      * Draw the entity's location and heading on the overlay image
@@ -556,12 +577,12 @@ public class DrawUtil
         if (flipInsteadOfRotate)
         {
             boolean flip = (heading % 180) < 90;
-            drawImage(texture, drawX, drawY, flip, alpha, scale, -rotation);
+            drawImage(texture, alpha, drawX, drawY, flip, scale, -rotation);
         }
         else
         {
             // Draw texture in rotated position
-            drawImage(texture, drawX, drawY, false, alpha, scale, heading);
+            drawImage(texture, alpha, drawX, drawY, false, scale, heading);
         }
     }
 

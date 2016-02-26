@@ -142,7 +142,7 @@ public class TileDrawStep
         final double endV = useScaled ? 1D : sy2 / size;
 
         // Background
-        DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, 200);
+        DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, .8f);
         renderHelper.glEnableBlend();
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         renderHelper.glEnableTexture2D();
@@ -173,8 +173,8 @@ public class TileDrawStep
         {
             int debugX = (int) startX;
             int debugY = (int) startY;
-            DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, RGB.GREEN_RGB, 200);
-            DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, RGB.RED_RGB, 200);
+            DrawUtil.drawRectangle(debugX, debugY, 3, endV * 512, RGB.GREEN_RGB, .8f);
+            DrawUtil.drawRectangle(debugX, debugY, endU * 512, 3, RGB.RED_RGB, .8f);
             DrawUtil.drawLabel(this.toString(), debugX + 5, debugY + 10, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
             DrawUtil.drawLabel(String.format("Tile Render Type: %s, Scaled: %s", Tile.debugGlSettings, useScaled), debugX + 5, debugY + 20, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
             long imageTimestamp = useScaled ? scaledTexture.getLastImageUpdate() : getRegionTextureHolder().getImageTimestamp();

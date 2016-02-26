@@ -330,4 +330,14 @@ public final class RGB
     {
         return clampInt((int) (value * 255));
     }
+
+    /**
+     * Returns a float scaled between 0-1 from an integer scaled between 0-255
+     * @param value
+     * @return
+     */
+    public static float toScaledFloat(int value)
+    {
+        return clampInt(value) / 255f;
+    }
 }

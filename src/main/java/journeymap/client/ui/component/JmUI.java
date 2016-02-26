@@ -152,9 +152,9 @@ public abstract class JmUI extends GuiScreen
 
     protected void drawTitle()
     {
-        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, RGB.BLACK_RGB, 100);
+        DrawUtil.drawRectangle(0, 0, this.width, headerHeight, RGB.BLACK_RGB, .4f);
         DrawUtil.drawLabel(this.title, this.width / 2, headerHeight / 2, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
-                RGB.BLACK_RGB, 0, Color.CYAN.getRGB(), 255, 1, true, 0);
+                RGB.BLACK_RGB, 0, Color.CYAN.getRGB(), 1f, 1, true, 0);
     }
 
     @Override

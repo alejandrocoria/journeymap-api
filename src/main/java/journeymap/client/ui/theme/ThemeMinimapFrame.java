@@ -50,8 +50,8 @@ public class ThemeMinimapFrame
     private float frameAlpha;
     private boolean isSquare;
     private boolean showReticle;
-    private int reticleAlpha;
-    private int reticleHeadingAlpha;
+    private float reticleAlpha;
+    private float reticleHeadingAlpha;
     private double reticleThickness;
     private double reticleHeadingThickness;
     private double reticleSegmentLength;
@@ -66,7 +66,7 @@ public class ThemeMinimapFrame
         this.width = width;
         this.height = height;
         this.frameColor = Theme.getColor(minimapSpec.frameColor);
-        this.frameAlpha = Math.max(0f, Math.min(1f, miniMapProperties.frameAlpha.get() / 100f));
+        this.frameAlpha = Theme.getAlpha(miniMapProperties.frameAlpha.get());
         this.reticleOrientation = miniMapProperties.reticleOrientation.get();
 
         if (minimapSpec instanceof Theme.Minimap.MinimapSquare)
@@ -104,8 +104,8 @@ public class ThemeMinimapFrame
 
         this.showReticle = miniMapProperties.showReticle.get();
         this.reticleColor = Theme.getColor(minimapSpec.reticleColor);
-        this.reticleAlpha = minimapSpec.reticleAlpha;
-        this.reticleHeadingAlpha = minimapSpec.reticleHeadingAlpha;
+        this.reticleAlpha = Theme.getAlpha(minimapSpec.reticleAlpha);
+        this.reticleHeadingAlpha = Theme.getAlpha(minimapSpec.reticleHeadingAlpha);
         this.reticleThickness = minimapSpec.reticleThickness;
         this.reticleHeadingThickness = minimapSpec.reticleHeadingThickness;
         this.reticleOffset = minimapSpec.reticleOffset;
@@ -131,24 +131,24 @@ public class ThemeMinimapFrame
     {
         if (isSquare)
         {
-            DrawUtil.drawRectangle(x, y, this.width, this.height, RGB.WHITE_RGB, 255);
+            DrawUtil.drawRectangle(x, y, this.width, this.height, RGB.WHITE_RGB, 1f);
         }
         else
         {
-            DrawUtil.drawQuad(textureCircleMask, x, y, this.width, this.height, 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+            DrawUtil.drawQuad(textureCircleMask, 0xffffff, 1f, x, y, this.width, this.height, 0, 0, 1, 1, 0, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
         }
     }
 
     public void drawReticle()
     {
-        reticleHeadingAlpha = 255;
+        reticleHeadingAlpha = 1f;
         if (showReticle && reticleAlpha > 0)
         {
             double centerX = x + (width / 2);
             double centerY = y + (height / 2);
 
             double thick = reticleThickness;
-            int alpha = reticleAlpha;
+            float alpha = reticleAlpha;
             if (reticleOrientation == ReticleOrientation.Compass)
             {
                 thick = reticleHeadingThickness;
@@ -200,19 +200,19 @@ public class ThemeMinimapFrame
         {
             if (isSquare)
             {
-                DrawUtil.drawClampedImage(textureTop, frameColor, x + (textureTopLeft.getWidth() / 2D), y - (textureTop.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureLeft, frameColor, x - (textureLeft.getWidth() / 2D), y + (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottom, frameColor, x + (textureBottomLeft.getWidth() / 2D), y + height - (textureBottom.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureRight, frameColor, x + width - (textureRight.getWidth() / 2D), y + (textureTopRight.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopLeft, frameColor, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureTopRight, frameColor, x + width - (textureTopRight.getWidth() / 2D), y - (textureTopRight.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, x - (textureBottomLeft.getWidth() / 2D), y + height - (textureBottomLeft.getHeight() / 2D), 1, frameAlpha, 0);
-                DrawUtil.drawClampedImage(textureBottomRight, frameColor, x + width - (textureBottomRight.getWidth() / 2D), y + height - (textureBottomRight.getHeight() / 2D), 1, frameAlpha, 0);
+                DrawUtil.drawClampedImage(textureTop, frameColor, frameAlpha, x + (textureTopLeft.getWidth() / 2D), y - (textureTop.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureLeft, frameColor, frameAlpha, x - (textureLeft.getWidth() / 2D), y + (textureTopLeft.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, frameAlpha, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottom, frameColor, frameAlpha, x + (textureBottomLeft.getWidth() / 2D), y + height - (textureBottom.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureRight, frameColor, frameAlpha, x + width - (textureRight.getWidth() / 2D), y + (textureTopRight.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopLeft, frameColor, frameAlpha, x - (textureTopLeft.getWidth() / 2D), y - (textureTopLeft.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureTopRight, frameColor, frameAlpha, x + width - (textureTopRight.getWidth() / 2D), y - (textureTopRight.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottomLeft, frameColor, frameAlpha, x - (textureBottomLeft.getWidth() / 2D), y + height - (textureBottomLeft.getHeight() / 2D), 1, 0);
+                DrawUtil.drawClampedImage(textureBottomRight, frameColor, frameAlpha, x + width - (textureBottomRight.getWidth() / 2D), y + height - (textureBottomRight.getHeight() / 2D), 1, 0);
             }
             else
             {
-                DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+                DrawUtil.drawQuad(textureCircle, frameColor, 1f, x, y, this.width, this.height, 0, 0, 1, 1, 0, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
             }
         }
     }
