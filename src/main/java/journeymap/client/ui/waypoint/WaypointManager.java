@@ -23,7 +23,6 @@ import journeymap.common.properties.config.Config;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.*;
@@ -297,7 +296,7 @@ public class WaypointManager extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
-        boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
+        boolean pressed = itemScrollPane.mouseClicked(mouseX, mouseY, mouseEvent);
         if (pressed)
         {
             checkPressedButton();
@@ -330,22 +329,7 @@ public class WaypointManager extends JmUI
     public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
-        int i = Mouse.getEventDWheel();
-
-        if (i != 0)
-        {
-            if (i > 1)
-            {
-                i = -1;
-            }
-
-            if (i < -1)
-            {
-                i = 1;
-            }
-
-            this.itemScrollPane.scrollBy(this.rowHeight * i);
-        }
+        itemScrollPane.handleMouseInput();
     }
 
     /**
@@ -431,6 +415,28 @@ public class WaypointManager extends JmUI
             return;
         }
 
+        if (i == Keyboard.KEY_UP)
+        {
+            this.itemScrollPane.scrollBy(-rowHeight);
+        }
+
+        if (i == Keyboard.KEY_DOWN)
+        {
+            this.itemScrollPane.scrollBy(rowHeight);
+        }
+
+        // Page Up
+        if (i == Keyboard.KEY_PRIOR)
+        {
+            this.itemScrollPane.scrollBy(-this.itemScrollPane.height);
+        }
+
+        // Page Down
+        if (i == Keyboard.KEY_NEXT)
+        {
+            this.itemScrollPane.scrollBy(this.itemScrollPane.height);
+        }
+
         if (i == Keyboard.KEY_HOME)
         {
             this.itemScrollPane.scrollBy(-this.itemScrollPane.getAmountScrolled());
@@ -438,7 +444,7 @@ public class WaypointManager extends JmUI
 
         if (i == Keyboard.KEY_END)
         {
-            this.itemScrollPane.scrollBy(items.size() * rowHeight);
+            this.itemScrollPane.scrollBy(this.itemScrollPane.func_148135_f());
         }
     }
 
