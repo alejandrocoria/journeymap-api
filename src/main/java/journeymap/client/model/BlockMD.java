@@ -826,6 +826,11 @@ public class BlockMD
         /**
          * Block should be ignored in topological maps
          */
-        NoTopo
+        NoTopo,
+
+        /**
+         * Block produces error when calling getColorMultiplier();
+         */
+        TintError;
     }
 }

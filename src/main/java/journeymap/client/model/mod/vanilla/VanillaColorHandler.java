@@ -4,11 +4,11 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.init.Blocks;
 
@@ -154,14 +154,19 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     {
         try
         {
-            return colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
+            if (!blockMD.hasFlag(BlockMD.Flag.TintError))
+            {
+                return colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
+            }
         }
         catch (Exception e)
         {
-            // Bugfix for NPE thrown by uk.co.shadeddimensions.ep3.block.BlockFrame.func_71920_b
-            JMLogger.logOnce("Block throws exception when calling colorMultiplier(): " + blockMD.getBlock().getUnlocalizedName(), e);
-            return RGB.WHITE_ARGB;
+            Journeymap.getLogger().warn(String.format("Error getting block color multiplier. Please report this exception to the mod author of '%s' blockstate '%s': %s",
+                    blockMD.getUid(), blockMD.getMeta(), LogFormatter.toPartialString(e)));
+
+            blockMD.addFlags(BlockMD.Flag.TintError);
         }
+        return RGB.WHITE_ARGB;
     }
 
     /**
