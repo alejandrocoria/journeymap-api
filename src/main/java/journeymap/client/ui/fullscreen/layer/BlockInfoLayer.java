@@ -13,6 +13,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
@@ -69,6 +70,14 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
                 int blockY = chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15);
+
+                BlockMD blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
+                if (blockMD.isAir())
+                {
+                    blockY--;
+                    blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
+                }
+
                 String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.getX(), blockY, blockCoord.getZ()).biomeName;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
@@ -76,6 +85,20 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                         blockCoord.getZ(),
                         blockY,
                         (blockY >> 4)) + " " + biome;
+
+                if (!blockMD.isAir())
+                {
+                    info = blockMD.getName() + " @ " + info;
+
+                    if (Journeymap.JM_VERSION.patch.equals("dev"))
+                    {
+                        info = RGB.toHexString(blockMD.getColor(chunkMD, blockCoord.getX(),
+                                blockCoord.getZ(),
+                                blockY)) + "  " + info;
+                    }
+                }
+
+
             }
             else
             {
