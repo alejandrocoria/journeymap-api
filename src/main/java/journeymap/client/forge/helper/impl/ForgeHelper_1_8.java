@@ -603,7 +603,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
             else
             {
                 ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
-                if (chunkMD.hasChunk())
+                if (chunkMD != null && chunkMD.hasChunk())
                 {
                     return chunkMD.getChunk().getBlockState(pos);
                 }

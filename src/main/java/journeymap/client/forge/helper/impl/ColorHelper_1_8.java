@@ -22,6 +22,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -75,13 +76,23 @@ public class ColorHelper_1_8 implements IColorHelper
     @Override
     public int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z)
     {
-        if (chunkMD == null)
+        BlockPos blockPos = new BlockPos(x, y, z);
+        if (chunkMD == null || !chunkMD.hasChunk())
         {
-            return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), new BlockPos(x, y, z));
+            return RGB.WHITE_RGB;
+            //return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
         }
         else
         {
-            return block.colorMultiplier(chunkMD.getWorld(), new BlockPos(x, y, z));
+            IBlockState blockState = chunkMD.getChunk().getBlockState(blockPos);
+            if (Blocks.air.getDefaultState().equals(blockState))
+            {
+                return RGB.WHITE_RGB;
+            }
+            else
+            {
+                return block.colorMultiplier(chunkMD.getWorld(), blockPos);
+            }
         }
     }
 
@@ -185,7 +196,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                logger.warn("Error getting block color from mod. Please report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
             }
             return null;
         }

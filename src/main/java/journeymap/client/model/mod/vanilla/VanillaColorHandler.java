@@ -116,7 +116,8 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
         }
         else
         {
-            Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD);
+            blockMD.getFlags().remove(BlockMD.Flag.CustomBiomeColor);
+            //Journeymap.getLogger().info("Custom biome tint not found for " + blockMD);
         }
         return color;
     }
@@ -152,21 +153,38 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      */
     protected Integer getTint(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        try
+        int tint = RGB.WHITE_RGB;
+
+        if (!blockMD.hasFlag(BlockMD.Flag.TintError))
         {
-            if (!blockMD.hasFlag(BlockMD.Flag.TintError))
+            try
             {
                 return colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
             }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
+                                "Please report this exception to the mod author of '%s' blockstate '%s': %s",
+                        blockMD.getUid(), blockMD.getMeta(), LogFormatter.toPartialString(e)));
+
+                blockMD.addFlags(BlockMD.Flag.TintError);
+            }
+        }
+
+        try
+        {
+            tint = colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(String.format("Error getting block color multiplier. Please report this exception to the mod author of '%s' blockstate '%s': %s",
+            Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
+                            "Please report this exception to the mod author of '%s' blockstate '%s': %s",
                     blockMD.getUid(), blockMD.getMeta(), LogFormatter.toPartialString(e)));
 
-            blockMD.addFlags(BlockMD.Flag.TintError);
+            blockMD.addFlags(BlockMD.Flag.TintError, BlockMD.Flag.Error);
         }
-        return RGB.WHITE_ARGB;
+
+        return tint;
     }
 
     /**
@@ -193,7 +211,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                    Journeymap.getLogger().info("Custom biome color will be used with " + blockMD);
+                    Journeymap.getLogger().debug("Custom biome color will be used with " + blockMD);
                 }
                 else
                 {
@@ -202,7 +220,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                     if (!RGB.isWhite(renderColor))
                     {
                         baseColor = RGB.multiply(baseColor, RGB.ALPHA_OPAQUE | renderColor); // Force opaque render color
-                        Journeymap.getLogger().info("Applied render color for " + blockMD);
+                        Journeymap.getLogger().debug("Applied render color for " + blockMD);
                     }
                 }
             }
@@ -214,7 +232,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             if (blockMD.hasFlag(BlockMD.Flag.TileEntity))
             {
                 // TODO: What to do about this?
-                Journeymap.getLogger().info("Iconloader ignoring tile entity: " + blockMD);
+                Journeymap.getLogger().debug("Iconloader ignoring tile entity: " + blockMD);
             }
             else if (colorHelper.failedFor(blockMD))
             {

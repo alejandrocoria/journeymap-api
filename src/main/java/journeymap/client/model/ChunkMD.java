@@ -162,7 +162,8 @@ public class ChunkMD
 
     public boolean hasChunk()
     {
-        return chunkReference.get() != null && !(chunkReference.get() instanceof EmptyChunk);
+        Chunk chunk = chunkReference.get();
+        return chunk != null && !(chunk instanceof EmptyChunk) && chunk.isLoaded();
     }
 
     public int getHeight(int x, int z)
