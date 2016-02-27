@@ -76,7 +76,9 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         include 'license.txt'
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'date' : getDate()
+        expand 'version': project.version,
+                'mcversion': project.minecraft.version,
+                'date': getDate()
     }
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
@@ -154,7 +156,11 @@ task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRada
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : project.forge_version, jmedition : project.unlimited
+        expand 'version': project.version,
+                'mcversion': project.minecraft.version,
+                'forgeversion': project.forge_version,
+                'jmedition': project.unlimited,
+                'apiversion': project.journeymap_api_version
     }
 
     manifest = project.manifest {
@@ -172,7 +178,11 @@ task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : project.forge_version, jmedition : project.fairPlay
+        expand 'version': project.version,
+                'mcversion': project.minecraft.version,
+                'forgeversion': project.forge_version,
+                'jmedition': project.fairPlay,
+                'apiversion': project.journeymap_api_version
     }
 }
 
