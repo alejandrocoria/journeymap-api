@@ -116,7 +116,14 @@ public class Splash extends JmUI
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonOptions = new Button(Constants.getString("jm.common.options_button"));
 
-        bottomButtons = new ButtonList(buttonOptions, buttonDonate, buttonClose);
+        bottomButtons = new ButtonList(buttonOptions, buttonDonate);
+
+        // Show the close button if not in Forge mod Config mode with no game running
+        if (mc.theWorld != null)
+        {
+            bottomButtons.add(buttonClose);
+        }
+
         bottomButtons.equalizeWidths(getFontRenderer());
         bottomButtons.setWidths(Math.max(100, buttonOptions.getWidth()));
         buttonDonate.setWidth(50);
@@ -303,7 +310,14 @@ public class Splash extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openOptionsManager(this);
+            if (returnDisplay != null && returnDisplay instanceof OptionsManager)
+            {
+                closeAndReturn();
+            }
+            else
+            {
+                UIManager.getInstance().openOptionsManager(this);
+            }
         }
     }
 

@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
@@ -41,7 +42,7 @@ public abstract class JmUI extends GuiScreen
     protected final String title;
     protected final int headerHeight = 35;
     protected final Logger logger = Journeymap.getLogger();
-    protected JmUI returnDisplay;
+    protected GuiScreen returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
 
@@ -50,16 +51,20 @@ public abstract class JmUI extends GuiScreen
         this(title, null);
     }
 
-    public JmUI(String title, JmUI returnDisplay)
+    public JmUI(String title, GuiScreen returnDisplay)
     {
         super();
         this.title = title;
         this.returnDisplay = returnDisplay;
-        if (this.returnDisplay != null && this.returnDisplay.returnDisplay != null)
+        if (this.returnDisplay != null && this.returnDisplay instanceof JmUI)
         {
             // Prevent users from getting into a stupid chain
             // Reallly should use a stack and prevent dups, but whatever.
-            this.returnDisplay.returnDisplay = null;
+            JmUI jmReturnDisplay = ((JmUI) this.returnDisplay);
+            if (jmReturnDisplay.returnDisplay instanceof JmUI)
+            {
+                jmReturnDisplay.returnDisplay = null;
+            }
         }
         JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
     }
@@ -155,6 +160,11 @@ public abstract class JmUI extends GuiScreen
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, RGB.BLACK_RGB, .4f);
         DrawUtil.drawLabel(this.title, this.width / 2, headerHeight / 2, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
                 RGB.BLACK_RGB, 0, Color.CYAN.getRGB(), 1f, 1, true, 0);
+
+        // Show API version
+        String apiVersion = "API v" + ClientAPI.API_VERSION;
+        DrawUtil.drawLabel(apiVersion, this.width - 10, headerHeight / 2, DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle,
+                RGB.BLACK_RGB, 0, 0xcccccc, 1f, .5f, true, 0);
     }
 
     @Override
@@ -164,9 +174,16 @@ public abstract class JmUI extends GuiScreen
     }
 
     @Override
-    public void drawBackground(int layer)
+    public void drawBackground(int tint)
     {
-        drawDefaultBackground();
+        if (this.mc.theWorld == null)
+        {
+            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+        }
+        else
+        {
+            drawDefaultBackground();
+        }
     }
 
     protected abstract void layoutButtons();
@@ -235,7 +252,14 @@ public abstract class JmUI extends GuiScreen
     {
         if (returnDisplay == null)
         {
-            UIManager.getInstance().openFullscreenMap();
+            if (mc.theWorld != null)
+            {
+                UIManager.getInstance().openFullscreenMap();
+            }
+            else
+            {
+                UIManager.getInstance().closeAll();
+            }
         }
         else
         {
@@ -261,7 +285,7 @@ public abstract class JmUI extends GuiScreen
         drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
     }
 
-    public JmUI getReturnDisplay()
+    public GuiScreen getReturnDisplay()
     {
         return returnDisplay;
     }

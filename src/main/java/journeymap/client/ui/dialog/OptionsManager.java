@@ -35,6 +35,7 @@ import journeymap.common.properties.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.input.Keyboard;
 
@@ -68,18 +69,17 @@ public class OptionsManager extends JmUI
     protected boolean forceMinimapUpdate;
     protected ButtonList editGridButtons = new ButtonList();
 
-
     public OptionsManager()
     {
         this(null);
     }
 
-    public OptionsManager(JmUI returnDisplay)
+    public OptionsManager(GuiScreen returnDisplay)
     {
         this(returnDisplay, openCategories.toArray(new Config.Category[0]));
     }
 
-    public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
+    public OptionsManager(GuiScreen returnDisplay, Config.Category... initialCategories)
     {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
@@ -293,7 +293,11 @@ public class OptionsManager extends JmUI
                 }
             }
 
-            updateRenderStats();
+            // No world if Forge has opened this class directly as a config UI
+            if (mc.theWorld != null)
+            {
+                updateRenderStats();
+            }
 
             String[] lastTooltip = optionsListPane.lastTooltip;
             long lastTooltipTime = optionsListPane.lastTooltipTime;
@@ -654,64 +658,70 @@ public class OptionsManager extends JmUI
         JourneymapClient.getMiniMapProperties2().ensureValid();
         JourneymapClient.getWaypointProperties().ensureValid();
 
-        // Ensure minimap is back to the one used before this opened
-        UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
-
-        for (Config.Category category : changedCategories)
+        // No world if Forge has opened this class directly as a config UI
+        if (mc.theWorld != null)
         {
-            switch (category)
+            // Ensure minimap is back to the one used before this opened
+            UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
+
+            for (Config.Category category : changedCategories)
             {
-                case MiniMap1:
+                switch (category)
                 {
-                    DataCache.instance().resetRadarCaches();
-                    UIManager.getInstance().getMiniMap().reset();
-                    break;
-                }
-                case MiniMap2:
-                {
-                    DataCache.instance().resetRadarCaches();
-                    break;
-                }
-                case FullMap:
-                {
-                    DataCache.instance().resetRadarCaches();
-                    ThemeFileHandler.getCurrentTheme(true);
-                    break;
-                }
-                case WebMap:
-                {
-                    DataCache.instance().resetRadarCaches();
-                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
-                    break;
-                }
-                case Waypoint:
-                {
-                    WaypointStore.instance().reset();
-                }
-                case WaypointBeacon:
-                {
-                    break;
-                }
-                case Cartography:
-                {
-                    RenderSpec.resetRenderSpecs();
-                    TileDrawStepCache.instance().invalidateAll();
-                    MiniMap.state().requireRefresh();
-                    Fullscreen.state().requireRefresh();
-                    MapPlayerTask.forceNearbyRemap();
-                    break;
-                }
-                case Advanced:
-                {
-                    SoftResetTask.queue();
-                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
-                    break;
+                    case MiniMap1:
+                    {
+                        DataCache.instance().resetRadarCaches();
+                        UIManager.getInstance().getMiniMap().reset();
+                        break;
+                    }
+                    case MiniMap2:
+                    {
+                        DataCache.instance().resetRadarCaches();
+                        break;
+                    }
+                    case FullMap:
+                    {
+                        DataCache.instance().resetRadarCaches();
+                        ThemeFileHandler.getCurrentTheme(true);
+                        break;
+                    }
+                    case WebMap:
+                    {
+                        DataCache.instance().resetRadarCaches();
+                        WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
+                        break;
+                    }
+                    case Waypoint:
+                    {
+                        WaypointStore.instance().reset();
+                    }
+                    case WaypointBeacon:
+                    {
+                        break;
+                    }
+                    case Cartography:
+                    {
+                        RenderSpec.resetRenderSpecs();
+                        TileDrawStepCache.instance().invalidateAll();
+                        MiniMap.state().requireRefresh();
+                        Fullscreen.state().requireRefresh();
+                        MapPlayerTask.forceNearbyRemap();
+                        break;
+                    }
+                    case Advanced:
+                    {
+                        SoftResetTask.queue();
+                        WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
+                        break;
+                    }
                 }
             }
+
+            UIManager.getInstance().getMiniMap().reset();
+            UIManager.getInstance().getMiniMap().updateDisplayVars(true);
         }
 
-        UIManager.getInstance().getMiniMap().reset();
-        if (this.returnDisplay instanceof Fullscreen)
+        if (this.returnDisplay != null && this.returnDisplay instanceof Fullscreen)
         {
             ((Fullscreen) returnDisplay).reset();
         }
@@ -725,17 +735,7 @@ public class OptionsManager extends JmUI
             }
         }
 
-        // Ensure MiniMap is reset, regardless
-        UIManager.getInstance().getMiniMap().updateDisplayVars(true);
-
-        if (returnDisplay == null)
-        {
-            UIManager.getInstance().openFullscreenMap();
-        }
-        else
-        {
-            UIManager.getInstance().open(returnDisplay);
-        }
+        super.closeAndReturn();
     }
 
     Map<Config.Category, List<SlotMetadata>> getToolbars()

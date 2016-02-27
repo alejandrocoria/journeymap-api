@@ -115,7 +115,7 @@ public class UIManager
         }
     }
 
-    public <T extends JmUI> T open(T ui)
+    public <T extends GuiScreen> T open(T ui)
     {
         closeCurrent();
         logger.debug("Opening UI " + ui.getClass().getSimpleName());
