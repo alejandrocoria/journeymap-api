@@ -148,7 +148,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
             boolean currentlyActive = visibleSteps.contains(overlayDrawStep);
             boolean currentlyTouched = touchedSteps.contains(overlayDrawStep);
 
-            if (overlayDrawStep.isOnScreen(0,0,gridRenderer))
+            if (overlayDrawStep.isOnScreen(0,0,gridRenderer, 0))
             {
                 if (!currentlyActive)
                 {

@@ -11,6 +11,7 @@ package journeymap.client.render.draw;
 import journeymap.client.api.display.MarkerOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
+import journeymap.client.cartography.RGB;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -44,7 +45,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (!isOnScreen(xOffset, yOffset, gridRenderer))
+        if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
             return;
         }
@@ -64,6 +65,10 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         if (!hasError && iconTexture != null)
         {
             MapImage icon = overlay.getIcon();
+
+            // TODO: Remove this
+            icon.centerAnchors();
+
             DrawUtil.drawColoredSprite(iconTexture,
                     icon.getDisplayWidth(),
                     icon.getDisplayHeight(),
@@ -75,7 +80,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                     icon.getOpacity(),
                     markerPosition.x + xOffset - icon.getAnchorX(),
                     markerPosition.y + yOffset - icon.getAnchorY(),
-                    drawScale, icon.getRotation());
+                    drawScale, icon.getRotation() - rotation);
         }
 
         super.drawText(xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
@@ -127,15 +132,12 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     }
 
     @Override
-    protected void updatePositions(GridRenderer gridRenderer)
+    protected void updatePositions(GridRenderer gridRenderer, double rotation)
     {
         MapImage icon = overlay.getIcon();
 
         // Get marker position
         markerPosition = gridRenderer.getBlockPixelInGrid(overlay.getPoint());
-
-        // Start screenbounds to cover the block
-        this.screenBounds.setRect(markerPosition.x, markerPosition.y, lastUiState.blockSize, lastUiState.blockSize);
 
         // Center marker within block
         int halfBlock = (int) lastUiState.blockSize / 2;
@@ -143,7 +145,20 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
 
         // Center label
         TextProperties textProperties = overlay.getTextProperties();
-        labelPosition.setLocation(markerPosition.x + textProperties.getOffsetX(), markerPosition.y + textProperties.getOffsetY());
+        int xShift = (rotation % 360 == 0) ? -textProperties.getOffsetX() : textProperties.getOffsetX();
+        int yShift = (rotation % 360 == 0) ? -textProperties.getOffsetY() : textProperties.getOffsetY();
+        if(xShift!=0 && yShift!=0)
+        {
+            Point2D shiftedPoint = gridRenderer.shiftWindowPosition(markerPosition.x, markerPosition.y, xShift, yShift);
+            labelPosition.setLocation(shiftedPoint.getX(), shiftedPoint.getY());
+        }
+        else
+        {
+            labelPosition.setLocation(markerPosition.x, markerPosition.y);
+        }
+
+        // Start screenbounds to cover the block
+        this.screenBounds.setRect(markerPosition.x, markerPosition.y, lastUiState.blockSize, lastUiState.blockSize);
 
         // Expand screenbounds to include label position
         // TODO: Doesn't really include the text of the label, though

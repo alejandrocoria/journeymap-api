@@ -10,6 +10,7 @@ package journeymap.client.ui.minimap;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -181,6 +182,7 @@ public class MiniMap
                 {
                     state.refresh(mc, player, miniMapProperties);
                 }
+                ClientAPI.INSTANCE.flagOverlaysForRerender();
             }
             else
             {

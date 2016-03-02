@@ -42,7 +42,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
             return;
         }
 
-        if (!isOnScreen(xOffset, yOffset, gridRenderer))
+        if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
             return;
         }
@@ -54,7 +54,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
 
 
     @Override
-    protected void updatePositions(GridRenderer gridRenderer)
+    protected void updatePositions(GridRenderer gridRenderer, double rotation)
     {
         if (overlay.getOuterArea().getPoints().isEmpty())
         {

@@ -1,6 +1,7 @@
 package journeymap.client.render.draw;
 
 import com.google.common.base.Strings;
+import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
@@ -35,7 +36,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      *
      * @param gridRenderer
      */
-    protected abstract void updatePositions(GridRenderer gridRenderer);
+    protected abstract void updatePositions(GridRenderer gridRenderer, double rotation);
 
     /**
      * Draw label and/or title
@@ -93,7 +94,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      * @param gridRenderer
      * @return false if not rendered
      */
-    public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer)
+    public boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer, double rotation)
     {
         if (!enabled)
         {
@@ -122,11 +123,11 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
         }
 
         // Update positions after drag or if the UIState changed
-        if (draggingDone || overlay.getNeedsRerender() || !Objects.equals(uiState, lastUiState))
+        if (draggingDone || uiState.ui== Context.UI.Minimap || overlay.getNeedsRerender() || !Objects.equals(uiState, lastUiState))
         {
             // Update positions first
             lastUiState = uiState;
-            updatePositions(gridRenderer);
+            updatePositions(gridRenderer, rotation);
             overlay.clearFlagForRerender();
         }
 

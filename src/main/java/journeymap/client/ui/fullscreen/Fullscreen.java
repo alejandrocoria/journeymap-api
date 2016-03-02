@@ -12,6 +12,7 @@ package journeymap.client.ui.fullscreen;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
@@ -1098,6 +1099,7 @@ public class Fullscreen extends JmUI
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
         gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+        ClientAPI.INSTANCE.flagOverlaysForRerender();
         setFollow(false);
     }
 

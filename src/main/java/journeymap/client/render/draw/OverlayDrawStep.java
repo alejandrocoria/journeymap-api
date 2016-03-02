@@ -32,7 +32,7 @@ public interface OverlayDrawStep extends DrawStep
      * @param gridRenderer
      * @return
      */
-    boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer);
+    boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer, double rotation);
 
     /**
      * Sets the position of the overlay title (tooltip)

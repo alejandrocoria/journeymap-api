@@ -46,7 +46,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
     @Override
     public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (!isOnScreen(xOffset, yOffset, gridRenderer))
+        if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
             return;
         }
@@ -134,7 +134,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
     }
 
     @Override
-    protected void updatePositions(GridRenderer gridRenderer)
+    protected void updatePositions(GridRenderer gridRenderer, double rotation)
     {
         northWestPosition = gridRenderer.getBlockPixelInGrid(overlay.getNorthWestPoint());
         southEastPosition = gridRenderer.getBlockPixelInGrid(overlay.getSouthEastPoint());
