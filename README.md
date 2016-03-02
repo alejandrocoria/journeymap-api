@@ -24,12 +24,19 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 * In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
 
 ```
-    gradlew.bat setupDecompWorkspace idea
+    gradlew.bat setupDecompWorkspace
 ```
 
 * Open journeymap.ipr in IDEA
 * Import Project from Gradle when prompted
-* Edit the Minecraft Client run configuration, add your credentials to `Program Arguments`: 
+* Close the Project when import is done.
+* In a command window, invoke this Gradle task to create the Run configuration:
+
+```
+    gradlew.bat genIntellijRuns
+```
+* Open journeymap.ipr in IDEA again
+* Edit the "Minecraft Client" run configuration, add your credentials to `Program Arguments`: 
 
 ```
     --username name@email.address --password foo
