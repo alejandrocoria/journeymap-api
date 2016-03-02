@@ -16,7 +16,7 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 ```
     git clone https://techbrew@bitbucket.org/TeamJM/journeymap.git
     cd journeymap
-    git fetch && git checkout 5.1.1_1.8
+    git fetch && git checkout (branchname)
 ```
 
 ### 2. Setup JourneyMap with Forge for IntelliJ IDEA
@@ -27,15 +27,15 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
     gradlew.bat setupDecompWorkspace
 ```
 
-* Open journeymap.ipr in IDEA
-* Import Project from Gradle when prompted
+* Open IDEA. Import New Project > Browse to journeymap\build.gradle
+* Check "Auto-import" and then press the Import / OK button.
 * Close the Project when import is done.
 * In a command window, invoke this Gradle task to create the Run configuration:
 
 ```
     gradlew.bat genIntellijRuns
 ```
-* Open journeymap.ipr in IDEA again
+* Open journeymap.ipr in IDEA
 * Edit the "Minecraft Client" run configuration, add your credentials to `Program Arguments`: 
 
 ```
