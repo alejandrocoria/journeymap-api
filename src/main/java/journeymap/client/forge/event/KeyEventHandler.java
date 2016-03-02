@@ -91,27 +91,27 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             else if (controlDown && Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 Tile.switchTileRenderType();
-                return true;
+                return false;
             }
             else if (controlDown && Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 Tile.switchTileDisplayQuality();
-                return true;
+                return false;
             }
             else if (Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 MiniMap.state().zoomIn();
-                return true;
+                return false;
             }
             else if (Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 MiniMap.state().zoomOut();
-                return true;
+                return false;
             }
             else if (Constants.KB_MAP_DAY.isKeyDown() || Constants.KB_MAP_NIGHT.isKeyDown())
             {
                 MiniMap.state().toggleMapType();
-                return true;
+                return false;
             }
             else if (Constants.KB_MINIMAP_PRESET.isKeyDown())
             {
