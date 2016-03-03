@@ -186,7 +186,7 @@ task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar
                 'date': getDate(),
                 'mcversion': project.minecraft.version,
                 'forgeversion': project.forge_version,
-                'jmedition': project.unlimited,
+                'jmedition': project.fairplay,
                 'apiversion': project.journeymap_api_version
     }
 }
