@@ -173,7 +173,7 @@ task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRada
 }
 
 task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
-    version = "${version}-${project.fairPlay}".toLowerCase()
+    version = "${version}-${project.fairplay}".toLowerCase()
 
     from(sourceSets.main.output) {
         exclude("journeymap/client/feature/impl/Unlimited.class")
