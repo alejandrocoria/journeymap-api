@@ -505,11 +505,12 @@ public class ForgeHelper_1_8 implements IForgeHelper
     @Override
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z)
     {
-        // 1.7
-        // return chunk.getBlockMetadata(x,y,z);
-
-        // 1.8
-        return chunk.getBlockMetadata(new BlockPos(x, y, z));
+        try
+        {
+            return chunk.getBlockMetadata(new BlockPos(x, y, z));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override
