@@ -75,10 +75,13 @@ processResources {
     inputs.property "mcversion", project.minecraft.version
 
     from(sourceSets.main.resources.srcDirs) {
-        include 'license.txt'
+        include 'license.txt','mcmod.info'
         expand 'version': project.version,
+                'date': getDate(),
                 'mcversion': project.minecraft.version,
-                'date': getDate()
+                'forgeversion': project.forge_version,
+                'jmedition': project.unlimited,
+                'apiversion': project.journeymap_api_version
     }
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
@@ -155,8 +158,9 @@ task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRada
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include 'license.txt','mcmod.info'
         expand 'version': project.version,
+                'date': getDate(),
                 'mcversion': project.minecraft.version,
                 'forgeversion': project.forge_version,
                 'jmedition': project.unlimited,
@@ -177,11 +181,12 @@ task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include 'license.txt','mcmod.info'
         expand 'version': project.version,
+                'date': getDate(),
                 'mcversion': project.minecraft.version,
                 'forgeversion': project.forge_version,
-                'jmedition': project.fairPlay,
+                'jmedition': project.unlimited,
                 'apiversion': project.journeymap_api_version
     }
 }
