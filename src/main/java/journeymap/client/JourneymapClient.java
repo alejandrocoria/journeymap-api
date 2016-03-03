@@ -495,6 +495,7 @@ public class JourneymapClient implements CommonProxy
                     memory));
 
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
+            UIManager.getInstance().getMiniMap().reset();
         }
     }
 
@@ -519,6 +520,7 @@ public class JourneymapClient implements CommonProxy
             }
 
             int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension(mc.theWorld) : 0;
+            UIManager.getInstance().getMiniMap().reset();
 
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
         }
