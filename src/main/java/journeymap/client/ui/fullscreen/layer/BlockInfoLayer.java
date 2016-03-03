@@ -70,11 +70,12 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             {
                 ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
                 int blockY = chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15);
-
+                blockY = Math.max(blockY, 0);
                 BlockMD blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
                 if (blockMD.isAir())
                 {
                     blockY--;
+                    blockY = Math.max(blockY, 0);
                     blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
                 }
 
