@@ -211,60 +211,68 @@ public class EntityHelper
     public static String getFileName(Entity entity)
     {
 
-        Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
-
-        // Manually handle horses
-        if (entityRender instanceof RenderHorse)
+        try
         {
-            EntityHorse horse = ((EntityHorse) entity);
-            final int type = ((EntityHorse) entity).getHorseType();
-            switch (type)
+            Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
+
+            // Manually handle horses
+            if (entityRender instanceof RenderHorse)
             {
-                case 1:
-                    return "horse/donkey.png";
-
-                case 2:
-                    return "horse/mule.png";
-
-                case 3:
-                    return "horse/horse_zombie.png";
-
-                case 4:
-                    return "horse/horse_skeleton.png";
-                case 0:
+                EntityHorse horse = ((EntityHorse) entity);
+                final int type = ((EntityHorse) entity).getHorseType();
+                switch (type)
                 {
-                    String variantTexture = horse.getVariantTexturePaths()[0];
-                    if (variantTexture.startsWith("textures/entity/"))
-                    {
-                        return variantTexture.split("textures/entity/")[1];
-                    }
-                }
-                default:
-                    return "horse/horse_brown.png";
-            }
-        }
+                    case 1:
+                        return "horse/donkey.png";
 
-        // Non-horse mobs
-        ResourceLocation loc = RenderFacade.getEntityTexture(entityRender, entity);
-        if (loc == null)
-        {
-            JMLogger.logOnce("Can't get entityTexture for " + entity.getClass() + " via " + entityRender.getClass(), null);
-            return null;
-        }
-        if (loc.getResourceDomain().equals("minecraft"))
-        {
-            String tex = loc.getResourcePath();
-            String search = "/entity/";
-            int i = tex.lastIndexOf(search);
-            if (i >= 0)
-            {
-                tex = tex.substring(i + search.length());
+                    case 2:
+                        return "horse/mule.png";
+
+                    case 3:
+                        return "horse/horse_zombie.png";
+
+                    case 4:
+                        return "horse/horse_skeleton.png";
+                    case 0:
+                    {
+                        String variantTexture = horse.getVariantTexturePaths()[0];
+                        if (variantTexture.startsWith("textures/entity/"))
+                        {
+                            return variantTexture.split("textures/entity/")[1];
+                        }
+                    }
+                    default:
+                        return "horse/horse_brown.png";
+                }
             }
-            return tex;
+
+            // Non-horse mobs
+            ResourceLocation loc = RenderFacade.getEntityTexture(entityRender, entity);
+            if (loc == null)
+            {
+                JMLogger.logOnce("Can't get entityTexture for " + entity.getClass() + " via " + entityRender.getClass(), null);
+                return null;
+            }
+            if (loc.getResourceDomain().equals("minecraft"))
+            {
+                String tex = loc.getResourcePath();
+                String search = "/entity/";
+                int i = tex.lastIndexOf(search);
+                if (i >= 0)
+                {
+                    tex = tex.substring(i + search.length());
+                }
+                return tex;
+            }
+            else
+            {
+                return loc.getResourceDomain() + "/" + loc.getResourcePath();
+            }
         }
-        else
+        catch (Throwable t)
         {
-            return loc.getResourceDomain() + "/" + loc.getResourcePath();
+            JMLogger.logOnce("Can't get entityTexture for " + entity.getName(), t);
+            return null;
         }
     }
 
