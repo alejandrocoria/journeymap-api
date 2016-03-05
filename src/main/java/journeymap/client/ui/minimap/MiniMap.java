@@ -100,6 +100,7 @@ public class MiniMap
 
     private void initGridRenderer()
     {
+        gridRenderer.clear();
         state.requireRefresh();
         if (player == null || player.isDead)
         {
@@ -114,7 +115,7 @@ public class MiniMap
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), mapType);
-        gridRenderer.center(mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+        gridRenderer.center(state.getWorldDir(), mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
 
         boolean highQuality = JourneymapClient.getCoreProperties().tileHighDisplayQuality.get();
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
@@ -190,7 +191,7 @@ public class MiniMap
             }
 
             // Update the grid
-            boolean moved = gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+            boolean moved = gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
                 boolean showCaves = shouldShowCaves();

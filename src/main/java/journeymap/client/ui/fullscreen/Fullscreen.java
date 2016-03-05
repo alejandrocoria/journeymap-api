@@ -931,7 +931,7 @@ public class Fullscreen extends JmUI
 
             if (state.follow.get())
             {
-                gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+                gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
             }
             gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
             gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
@@ -984,7 +984,7 @@ public class Fullscreen extends JmUI
             int x = waypoint.getX();
             int z = waypoint.getZ();
 
-            gridRenderer.center(state.getCurrentMapType(), x, z, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), x, z, fullMapProperties.zoomLevel.get());
             refreshState();
             updateScreen();
         }
@@ -1020,7 +1020,7 @@ public class Fullscreen extends JmUI
         // Center core renderer
         if (state.follow.get())
         {
-            gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
         }
         else
         {
