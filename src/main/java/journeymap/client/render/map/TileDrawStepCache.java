@@ -14,9 +14,11 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
+import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +29,8 @@ public class TileDrawStepCache
 {
     private final Logger logger = Journeymap.getLogger();
     private final Cache<String, TileDrawStep> drawStepCache;
-    private Path lastDimDir;
+    private File worldDir;
+    private MapType mapType;
 
     private TileDrawStepCache()
     {
@@ -63,6 +66,21 @@ public class TileDrawStepCache
         instance().invalidateAll();
     }
 
+    public static void setContext(File worldDir, MapType mapType)
+    {
+        if(!worldDir.equals(Holder.INSTANCE.worldDir))
+        {
+            instance().invalidateAll();
+        }
+        Holder.INSTANCE.worldDir = worldDir;
+        Holder.INSTANCE.mapType = mapType;
+    }
+
+    public static long size()
+    {
+        return instance().size();
+    }
+
     private TileDrawStep _getOrCreate(final MapType mapType, RegionCoord regionCoord, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         checkWorldChange(regionCoord);
@@ -79,10 +97,10 @@ public class TileDrawStepCache
 
     private void checkWorldChange(RegionCoord regionCoord)
     {
-        if (!regionCoord.dimDir.equals(lastDimDir))
+        if (!regionCoord.worldDir.equals(this.worldDir))
         {
-            lastDimDir = regionCoord.dimDir;
             drawStepCache.invalidateAll();
+            RegionImageCache.instance().clear();
         }
     }
 

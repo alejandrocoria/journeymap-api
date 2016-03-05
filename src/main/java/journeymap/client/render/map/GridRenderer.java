@@ -162,12 +162,12 @@ public class GridRenderer
 
     public void move(final int deltaBlockX, final int deltaBlockZ)
     {
-        center(mapType, centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
+        center(worldDir, mapType, centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
     }
 
     public boolean center()
     {
-        return center(mapType, centerBlockX, centerBlockZ, zoom);
+        return center(worldDir, mapType, centerBlockX, centerBlockZ, zoom);
     }
 
     public boolean hasUnloadedTile()
@@ -203,9 +203,13 @@ public class GridRenderer
         return false;
     }
 
-    public boolean center(MapType mapType, final double blockX, final double blockZ, final int zoom)
+    public boolean center(File worldDir, MapType mapType, final double blockX, final double blockZ, final int zoom)
     {
-        boolean mapTypeChanged = !Objects.equals(mapType, this.mapType);
+        boolean mapTypeChanged = !Objects.equals(worldDir, this.worldDir) || !Objects.equals(mapType, this.mapType);
+
+        if(!Objects.equals(worldDir, this.worldDir)) {
+            this.worldDir = worldDir;
+        }
 
         if ((blockX == centerBlockX) && (blockZ == centerBlockZ) && (zoom == this.zoom) && !mapTypeChanged && !grid.isEmpty())
         {
@@ -691,8 +695,8 @@ public class GridRenderer
     public void setContext(File worldDir, MapType mapType)
     {
         this.worldDir = worldDir;
-        boolean mapTypeChanged = (this.mapType == mapType);
         this.mapType = mapType;
+        TileDrawStepCache.setContext(worldDir, mapType);
     }
 
     public void updateRotation(double rotation)
@@ -763,7 +767,7 @@ public class GridRenderer
 
     public boolean setZoom(int zoom)
     {
-        return center(mapType, centerBlockX, centerBlockZ, zoom);
+        return center(worldDir, mapType, centerBlockX, centerBlockZ, zoom);
     }
 
     public int getRenderSize()
@@ -773,7 +777,17 @@ public class GridRenderer
 
     public void clear()
     {
-        grid.clear();
+        if(TileDrawStepCache.size()>0 || grid.size()>0)
+        {
+            Journeymap.getLogger().info(String.format("GridRenderer[%s] and TileDrawStepCache[%s] cleared in %s",
+                    grid.size(),
+                    TileDrawStepCache.size(),
+                    uiState));
+
+            TileDrawStepCache.clear();
+            grid.clear();
+        }
+
         messages.clear();
     }
 
