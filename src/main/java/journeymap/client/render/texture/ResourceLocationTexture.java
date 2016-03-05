@@ -35,6 +35,7 @@ public class ResourceLocationTexture extends TextureImpl
     public ResourceLocationTexture(ResourceLocation location, boolean retainImage, boolean bindImmediately)
     {
         super(null, resolveImage(location), retainImage, false);
+        this.description = location.toString();
 
         // Check to see if TextureManager already has this - avoid binding it twice
         TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
