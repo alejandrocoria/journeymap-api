@@ -777,17 +777,7 @@ public class GridRenderer
 
     public void clear()
     {
-        if(TileDrawStepCache.size()>0 || grid.size()>0)
-        {
-            Journeymap.getLogger().info(String.format("GridRenderer[%s] and TileDrawStepCache[%s] cleared in %s",
-                    grid.size(),
-                    TileDrawStepCache.size(),
-                    uiState));
-
-            TileDrawStepCache.clear();
-            grid.clear();
-        }
-
+        grid.clear();
         messages.clear();
     }
 
