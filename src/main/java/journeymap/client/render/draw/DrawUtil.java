@@ -92,24 +92,86 @@ public class DrawUtil
         drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
 
+    public static void drawLabels(final String[] lines, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
+    {
+        if(lines.length==0)
+        {
+            return;
+        }
+        else if(lines.length==1)
+        {
+            drawLabel(lines[0], x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, rotation);
+            return;
+        }
+
+        final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+
+        final double vpad = fontRenderer.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
+        final double lineHeight = fontRenderer.FONT_HEIGHT * fontScale;
+        double bgHeight = (lineHeight * lines.length) + vpad;
+        double bgWidth = 0;
+        if (bgColor != null && bgAlpha > 0)
+        {
+            for(String line : lines)
+            {
+                bgWidth = Math.max(bgWidth, fontRenderer.getStringWidth(line) * fontScale);
+            }
+
+            if((bgWidth%2) ==0 )
+            {
+                bgWidth++;
+            }
+        }
+
+        if(lines.length>1)
+        {
+            switch (vAlign)
+            {
+                case Above:
+                {
+                    y = y - (lineHeight * lines.length);
+                    bgHeight += (vpad/2);
+                    break;
+                }
+                case Middle:
+                {
+                    y = y - (bgHeight/2);
+                    break;
+                }
+                case Below:
+                {
+                    break;
+                }
+            }
+        }
+
+        for(String line : lines)
+        {
+            drawLabel(line, x, y, hAlign, vAlign, bgColor, bgAlpha, bgWidth, bgHeight, color, alpha, fontScale, fontShadow, rotation);
+            bgColor = null;
+            y += (lineHeight);
+        }
+    }
+
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
+    {
+        double bgWidth = 0;
+        double bgHeight = 0;
+        if (bgColor != null && bgAlpha > 0)
+        {
+            final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+            bgWidth = fontRenderer.getStringWidth(text);
+            bgHeight = getLabelHeight(fontRenderer, fontShadow);
+        }
+
+        drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, bgWidth, bgHeight, color, alpha, fontScale, fontShadow, rotation);
+    }
+
     /**
      * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
-     *
-     * @param text
-     * @param x
-     * @param y
-     * @param hAlign
-     * @param vAlign
-     * @param bgColor
-     * @param bgAlpha
-     * @param color
-     * @param alpha
-     * @param fontScale
-     * @param fontShadow
-     * @param rotation
      */
-    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
+    public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, double bgWidth, double bgHeight, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
         if (text == null || text.length() == 0)
         {
@@ -124,7 +186,7 @@ public class DrawUtil
 
         final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         final boolean drawRect = (bgColor != null && alpha > 0);
-        final int width = fontRenderer.getStringWidth(text);
+        final double width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
 
         if (!drawRect && fontRenderer.getUnicodeFlag())
@@ -153,16 +215,19 @@ public class DrawUtil
                 case Left:
                 {
                     textX = x - width;
+                    rectX = textX;
                     break;
                 }
                 case Center:
                 {
                     textX = x - (width / 2) + (fontScale > 1 ? .5 : 0);
+                    rectX = x - (Math.max(1, bgWidth)/2) + (fontScale > 1 ? .5 : 0);
                     break;
                 }
                 case Right:
                 {
                     textX = x;
+                    rectX = x;
                     break;
                 }
             }
@@ -207,8 +272,7 @@ public class DrawUtil
             if (bgColor != null && bgAlpha > 0)
             {
                 final int hpad = 2;
-                final double rectHeight = getLabelHeight(fontRenderer, fontShadow);
-                drawRectangle(textX - hpad - .5, rectY, width + (2 * hpad), rectHeight, bgColor, bgAlpha);
+                drawRectangle(rectX - hpad - .5, rectY, bgWidth + (2 * hpad), bgHeight, bgColor, bgAlpha);
             }
 
             // String positioning uses ints
@@ -238,8 +302,8 @@ public class DrawUtil
 
     public static int getLabelHeight(FontRenderer fr, boolean fontShadow)
     {
-        final int vpad = fr.getUnicodeFlag() ? 0 : fontShadow ? 3 : 2;
-        return fr.FONT_HEIGHT + (2 * vpad);
+        final int vpad = fr.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
+        return fr.FONT_HEIGHT + vpad;
     }
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
