@@ -11,7 +11,6 @@ package journeymap.client.render.draw;
 import journeymap.client.api.display.MarkerOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
-import journeymap.client.cartography.RGB;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -43,7 +42,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
@@ -66,9 +65,6 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         {
             MapImage icon = overlay.getIcon();
 
-            // TODO: Remove this
-            icon.centerAnchors();
-
             DrawUtil.drawColoredSprite(iconTexture,
                     icon.getDisplayWidth(),
                     icon.getDisplayHeight(),
@@ -83,7 +79,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                     drawScale, icon.getRotation() - rotation);
         }
 
-        super.drawText(xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
     }
 
     /**

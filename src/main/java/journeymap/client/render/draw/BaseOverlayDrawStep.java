@@ -40,7 +40,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
 
     /**
      * Draw label and/or title
-     *
+     *  @param pass
      * @param xOffset
      * @param yOffset
      * @param gridRenderer
@@ -48,8 +48,13 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      * @param fontScale
      * @param rotation
      */
-    protected void drawText(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    protected void drawText(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
+        if(pass!=Pass.Text)
+        {
+            return;
+        }
+
         TextProperties textProperties = overlay.getTextProperties();
 
         if (textProperties.isActiveIn(gridRenderer.getUIState()))
