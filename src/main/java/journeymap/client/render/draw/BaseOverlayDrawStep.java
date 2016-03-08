@@ -54,59 +54,59 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      */
     protected void drawText(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if(pass!=Pass.Text)
-        {
-            return;
-        }
-
         TextProperties textProperties = overlay.getTextProperties();
 
         if (textProperties.isActiveIn(gridRenderer.getUIState()))
         {
-            if (labelPosition != null)
+            if(pass==Pass.Text)
             {
-                if(labelLines == null)
+                if (labelPosition != null)
                 {
-                    updateTextFields();
-                }
+                    if (labelLines == null)
+                    {
+                        updateTextFields();
+                    }
 
-                if(labelLines != null)
-                {
-                    double x = labelPosition.x + xOffset;
-                    double y = labelPosition.y + yOffset;
+                    if (labelLines != null)
+                    {
+                        double x = labelPosition.x + xOffset;
+                        double y = labelPosition.y + yOffset;
 
-                    DrawUtil.drawLabels(labelLines, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
-                            textProperties.getBackgroundColor(),
-                            textProperties.getBackgroundOpacity(),
-                            textProperties.getColor(),
-                            textProperties.getOpacity(),
-                            textProperties.getScale() * fontScale,
-                            textProperties.hasFontShadow(),
-                            rotation);
+                        DrawUtil.drawLabels(labelLines, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
+                                textProperties.getBackgroundColor(),
+                                textProperties.getBackgroundOpacity(),
+                                textProperties.getColor(),
+                                textProperties.getOpacity(),
+                                textProperties.getScale() * fontScale,
+                                textProperties.hasFontShadow(),
+                                rotation);
+                    }
                 }
             }
-
-            if (titlePosition != null)
+            else if(pass==Pass.Tooltip)
             {
-                if(titleLines == null)
+                if (titlePosition != null)
                 {
-                    updateTextFields();
-                }
+                    if (titleLines == null)
+                    {
+                        updateTextFields();
+                    }
 
-                if(titleLines != null)
-                {
-                    double x = titlePosition.x + 5 + xOffset;
-                    double y = titlePosition.y + yOffset;
+                    if (titleLines != null)
+                    {
+                        double x = titlePosition.x + 5 + xOffset;
+                        double y = titlePosition.y + yOffset;
 
-                    DrawUtil.drawLabels(titleLines, x, y,
-                            DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
-                            textProperties.getBackgroundColor(),
-                            textProperties.getBackgroundOpacity(),
-                            textProperties.getColor(),
-                            textProperties.getOpacity(),
-                            textProperties.getScale() * fontScale,
-                            textProperties.hasFontShadow(),
-                            rotation);
+                        DrawUtil.drawLabels(titleLines, x, y,
+                                DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
+                                textProperties.getBackgroundColor(),
+                                textProperties.getBackgroundOpacity(),
+                                textProperties.getColor(),
+                                textProperties.getOpacity(),
+                                textProperties.getScale() * fontScale,
+                                textProperties.hasFontShadow(),
+                                rotation);
+                    }
                 }
             }
         }
