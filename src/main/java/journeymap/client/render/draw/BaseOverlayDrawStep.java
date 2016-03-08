@@ -171,7 +171,6 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             String labelText = overlay.getLabel();
             if (!Strings.isNullOrEmpty(labelText))
             {
-                labelText = labelText.replaceAll(" ", "\\\\n"); // TODO REMOVE
                 this.labelLines = labelText.split("\\\\n");
             }
             else
@@ -185,8 +184,6 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             String titleText = overlay.getTitle();
             if (!Strings.isNullOrEmpty(titleText))
             {
-                titleText = titleText.replaceAll(" away", ""); // TODO REMOVE
-                titleText = titleText.replaceAll(" ", "\\\\n"); // TODO REMOVE
                 this.titleLines = titleText.split("\\\\n");
             }
             else
