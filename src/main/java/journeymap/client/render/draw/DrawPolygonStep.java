@@ -54,7 +54,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
                 DrawUtil.drawPolygon(xOffset, yOffset, screenPoints, overlay.getShapeProperties());
             }
         }
-        else if(onScreen && pass == Pass.Text)
+        else if(onScreen)
         {
             super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
         }

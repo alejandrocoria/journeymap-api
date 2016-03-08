@@ -67,6 +67,11 @@ public class DrawEntityStep implements DrawStep
     @Override
     public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
+        if(pass==Pass.Tooltip)
+        {
+            return;
+        }
+
         EntityLivingBase entityLiving = entityLivingRef.get();
         if(pass==Pass.Object)
         {

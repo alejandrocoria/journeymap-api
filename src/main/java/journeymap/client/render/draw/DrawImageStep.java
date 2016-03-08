@@ -51,30 +51,36 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
             return;
         }
 
-        ensureTexture();
-
-        if (!hasError && iconTexture != null)
+        if(pass == Pass.Object)
         {
-            MapImage icon = overlay.getImage();
+            ensureTexture();
 
-            double width = screenBounds.width;
-            double height = screenBounds.height;
+            if (!hasError && iconTexture != null)
+            {
 
-            DrawUtil.drawColoredSprite(iconTexture,
-                    width,
-                    height,
-                    0,
-                    0,
-                    iconTexture.getWidth(),
-                    iconTexture.getHeight(),
-                    icon.getColor(),
-                    icon.getOpacity(),
-                    northWestPosition.x + xOffset,
-                    northWestPosition.y + yOffset,
-                    drawScale, icon.getRotation());
+                MapImage icon = overlay.getImage();
+
+                double width = screenBounds.width;
+                double height = screenBounds.height;
+
+                DrawUtil.drawColoredSprite(iconTexture,
+                        width,
+                        height,
+                        0,
+                        0,
+                        iconTexture.getWidth(),
+                        iconTexture.getHeight(),
+                        icon.getColor(),
+                        icon.getOpacity(),
+                        northWestPosition.x + xOffset,
+                        northWestPosition.y + yOffset,
+                        drawScale, icon.getRotation());
+            }
         }
-
-        super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        else
+        {
+            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        }
     }
 
     /**
