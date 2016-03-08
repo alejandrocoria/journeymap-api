@@ -5,6 +5,7 @@ import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.map.GridRenderer;
 
 import javax.annotation.Nullable;
@@ -25,6 +26,9 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     protected UIState lastUiState = null;
     protected boolean dragging = false;
     protected boolean enabled = true;
+
+    protected String[] labelLines;
+    protected String[] titleLines;
 
     protected BaseOverlayDrawStep(T overlay)
     {
@@ -59,36 +63,51 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
 
         if (textProperties.isActiveIn(gridRenderer.getUIState()))
         {
-            String labelText = overlay.getLabel();
-            if (labelPosition != null && !Strings.isNullOrEmpty(labelText))
+            if (labelPosition != null)
             {
-                DrawUtil.drawLabel(overlay.getLabel(),
-                        labelPosition.x + xOffset,
-                        labelPosition.y + yOffset,
-                        DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
-                        textProperties.getBackgroundColor(),
-                        textProperties.getBackgroundOpacity(),
-                        textProperties.getColor(),
-                        textProperties.getOpacity(),
-                        textProperties.getScale() * fontScale,
-                        textProperties.hasFontShadow(),
-                        rotation);
+                if(labelLines == null)
+                {
+                    updateTextFields();
+                }
+
+                if(labelLines != null)
+                {
+                    double x = labelPosition.x + xOffset;
+                    double y = labelPosition.y + yOffset;
+
+                    DrawUtil.drawLabels(labelLines, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle,
+                            textProperties.getBackgroundColor(),
+                            textProperties.getBackgroundOpacity(),
+                            textProperties.getColor(),
+                            textProperties.getOpacity(),
+                            textProperties.getScale() * fontScale,
+                            textProperties.hasFontShadow(),
+                            rotation);
+                }
             }
 
-            String titleText = overlay.getTitle();
-            if (titlePosition != null && !Strings.isNullOrEmpty(titleText))
+            if (titlePosition != null)
             {
-                DrawUtil.drawLabel(titleText,
-                        titlePosition.x + 5 + xOffset,
-                        titlePosition.y + yOffset,
-                        DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
-                        textProperties.getBackgroundColor(),
-                        textProperties.getBackgroundOpacity(),
-                        textProperties.getColor(),
-                        textProperties.getOpacity(),
-                        textProperties.getScale() * fontScale,
-                        textProperties.hasFontShadow(),
-                        rotation);
+                if(titleLines == null)
+                {
+                    updateTextFields();
+                }
+
+                if(titleLines != null)
+                {
+                    double x = titlePosition.x + 5 + xOffset;
+                    double y = titlePosition.y + yOffset;
+
+                    DrawUtil.drawLabels(titleLines, x, y,
+                            DrawUtil.HAlign.Right, DrawUtil.VAlign.Above,
+                            textProperties.getBackgroundColor(),
+                            textProperties.getBackgroundOpacity(),
+                            textProperties.getColor(),
+                            textProperties.getOpacity(),
+                            textProperties.getScale() * fontScale,
+                            textProperties.hasFontShadow(),
+                            rotation);
+                }
             }
         }
     }
@@ -133,6 +152,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             // Update positions first
             lastUiState = uiState;
             updatePositions(gridRenderer, rotation);
+
             overlay.clearFlagForRerender();
         }
 
@@ -142,6 +162,38 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             return false;
         }
         return gridRenderer.isOnScreen(screenBounds);
+    }
+
+    protected void updateTextFields()
+    {
+        if(labelPosition != null)
+        {
+            String labelText = overlay.getLabel();
+            if (!Strings.isNullOrEmpty(labelText))
+            {
+                labelText = labelText.replaceAll(" ", "\\\\n"); // TODO REMOVE
+                this.labelLines = labelText.split("\\\\n");
+            }
+            else
+            {
+                this.labelLines = null;
+            }
+        }
+
+        if(titlePosition != null)
+        {
+            String titleText = overlay.getTitle();
+            if (!Strings.isNullOrEmpty(titleText))
+            {
+                titleText = titleText.replaceAll(" away", ""); // TODO REMOVE
+                titleText = titleText.replaceAll(" ", "\\\\n"); // TODO REMOVE
+                this.titleLines = titleText.split("\\\\n");
+            }
+            else
+            {
+                this.titleLines = null;
+            }
+        }
     }
 
     @Override
