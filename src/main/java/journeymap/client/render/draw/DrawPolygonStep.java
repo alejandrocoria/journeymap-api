@@ -24,6 +24,8 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
 {
     protected List<Point2D.Double> screenPoints = new ArrayList<Point2D.Double>();
 
+    boolean onScreen;
+
     /**
      * Draw a polygon on the map.
      *
@@ -35,21 +37,27 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if (overlay.getOuterArea().getPoints().isEmpty())
+        if(pass == Pass.Object)
         {
-            return;
-        }
+            if (overlay.getOuterArea().getPoints().isEmpty())
+            {
+                onScreen = false;
+                return;
+            }
 
-        if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
+            onScreen = isOnScreen(xOffset, yOffset, gridRenderer, rotation);
+
+            if(onScreen)
+            {
+                DrawUtil.drawPolygon(xOffset, yOffset, screenPoints, overlay.getShapeProperties());
+            }
+        }
+        else if(onScreen && pass == Pass.Text)
         {
-            return;
+            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
         }
-
-        DrawUtil.drawPolygon(xOffset, yOffset, screenPoints, overlay.getShapeProperties());
-
-        super.drawText(xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
     }
 
 
@@ -58,6 +66,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     {
         if (overlay.getOuterArea().getPoints().isEmpty())
         {
+            onScreen = false;
             return;
         }
 

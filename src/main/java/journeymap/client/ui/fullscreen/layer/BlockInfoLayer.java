@@ -156,13 +156,13 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         @Override
-        public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
             if (ticks-- < 0 && alpha > 0)
             {
                 alpha -= .01; // Fade
             }
-            if (alpha > .1 && text != null)
+            if (pass==Pass.Text && alpha > .1 && text != null)
             {
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
