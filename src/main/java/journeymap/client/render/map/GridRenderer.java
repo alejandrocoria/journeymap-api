@@ -407,9 +407,12 @@ public class GridRenderer
     {
         if (enabled)
         {
-            for (DrawStep drawStep : drawSteps)
+            for(DrawStep.Pass pass : DrawStep.Pass.values())
             {
-                drawStep.draw(xOffset, yOffset, this, drawScale, fontScale, rotation);
+                for (DrawStep drawStep : drawSteps)
+                {
+                    drawStep.draw(pass, xOffset, yOffset, this, drawScale, fontScale, rotation);
+                }
             }
         }
     }

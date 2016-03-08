@@ -28,7 +28,6 @@ public class DrawWayPointStep implements DrawStep
     final TextureImpl texture;
     final boolean isEdit;
     Point2D.Double lastPosition;
-    //Point2D.Double lastWindowPosition;
     boolean lastOnScreen;
     boolean showLabel;
 
@@ -64,7 +63,7 @@ public class DrawWayPointStep implements DrawStep
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         if (!waypoint.isInPlayerDimension())
         {
@@ -74,19 +73,23 @@ public class DrawWayPointStep implements DrawStep
         Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, true);
         if (gridRenderer.isOnScreen(pixel))
         {
-            if (showLabel)
+            if (showLabel && pass==Pass.Text)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.getHeight() : texture.getHeight());
                 DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .7f, fontColor, 1f, fontScale, false, rotation);
             }
-            if (isEdit)
+            else if (isEdit && pass==Pass.Object)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
                 DrawUtil.drawColoredImage(editTex, color, 1f, pixel.getX() - (editTex.getWidth() / 2), pixel.getY() - editTex.getHeight() / 2, -rotation);
             }
-            DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+
+            if(pass==Pass.Object)
+            {
+                DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+            }
         }
-        else if (!isEdit)
+        else if (!isEdit && pass==Pass.Object)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, color, 1f, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
@@ -94,9 +97,12 @@ public class DrawWayPointStep implements DrawStep
         }
     }
 
-    public void drawOffscreen(Point2D pixel, double rotation)
+    public void drawOffscreen(Pass pass, Point2D pixel, double rotation)
     {
-        DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+        if(pass==Pass.Object)
+        {
+            DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+        }
     }
 
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
@@ -115,21 +121,6 @@ public class DrawWayPointStep implements DrawStep
         lastPosition = pixel;
         //lastWindowPosition = gridRenderer.getWindowPosition(lastPosition);
         return pixel;
-    }
-
-//    public Point2D.Double getLastWindowPosition()
-//    {
-//        return lastWindowPosition;
-//    }
-
-    public int getTextureHeight()
-    {
-        return texture.getHeight();
-    }
-
-    public int getTextureSize()
-    {
-        return Math.max(texture.getHeight(), texture.getWidth());
     }
 
     public boolean isOnScreen()

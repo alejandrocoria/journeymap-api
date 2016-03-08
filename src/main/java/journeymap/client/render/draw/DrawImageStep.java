@@ -44,7 +44,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
@@ -74,7 +74,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
                     drawScale, icon.getRotation());
         }
 
-        super.drawText(xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
     }
 
     /**

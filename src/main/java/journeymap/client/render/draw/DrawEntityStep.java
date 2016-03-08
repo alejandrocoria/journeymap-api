@@ -43,6 +43,7 @@ public class DrawEntityStep implements DrawStep
     WeakReference<EntityLivingBase> entityLivingRef;
     String customName;
     boolean flip;
+    Point2D screenPosition;
 
     private DrawEntityStep(EntityLivingBase entityLiving)
     {
@@ -64,21 +65,28 @@ public class DrawEntityStep implements DrawStep
     }
 
     @Override
-    public void draw(double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
-        if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
-                || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
+        if(pass==Pass.Object)
         {
-            return;
+            if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
+                    || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
+            {
+                screenPosition = null;
+                return;
+            }
+            else
+            {
+                screenPosition = gridRenderer.getPixel(entityLiving.posX, entityLiving.posZ);
+            }
         }
 
-        Point2D pixel = gridRenderer.getPixel(entityLiving.posX, entityLiving.posZ);
-        if (pixel != null)
+        if (screenPosition != null)
         {
             double heading = entityLiving.rotationYawHead;
-            double drawX = pixel.getX() + xOffset;
-            double drawY = pixel.getY() + yOffset;
+            double drawX = screenPosition.getX() + xOffset;
+            double drawY = screenPosition.getY() + yOffset;
 
             float alpha = 1f;
             if (entityLiving.posY > minecraft.thePlayer.posY)
@@ -88,19 +96,19 @@ public class DrawEntityStep implements DrawStep
 
             if (entityLiving instanceof EntityPlayer)
             {
-                int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
-                float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
-                drawPlayer(drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
+                //int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
+                //float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
+                drawPlayer(pass, drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
 
             }
             else
             {
-                drawCreature(drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
+                drawCreature(pass, drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
             }
         }
     }
 
-    private void drawPlayer(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
+    private void drawPlayer(Pass pass, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving == null)
@@ -108,31 +116,38 @@ public class DrawEntityStep implements DrawStep
             return;
         }
 
-        if (locatorTexture != null && showHeading)
+        if(pass == Pass.Object)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            if (locatorTexture != null && showHeading)
+            {
+                DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            }
+
+            if (texture != null)
+            {
+                DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale * .75f, rotation);
+            }
         }
 
-        if (texture != null)
+        if(pass == Pass.Text)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale * .75f, rotation);
-        }
-        int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
-        Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
+            int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
+            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
 
-        Team team = entityLiving.getTeam();
-        if (team == null || !(entityLiving instanceof EntityPlayer))
-        {
-            DrawUtil.drawLabel(ForgeHelper.INSTANCE.getEntityName(entityLiving), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.GREEN_RGB, 1f, fontScale, false, rotation);
-        }
-        else
-        {
-            String playerName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), ForgeHelper.INSTANCE.getEntityName(entityLiving));
-            DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.WHITE_RGB, 1f, fontScale, false, rotation);
+            Team team = entityLiving.getTeam();
+            if (team == null || !(entityLiving instanceof EntityPlayer))
+            {
+                DrawUtil.drawLabel(ForgeHelper.INSTANCE.getEntityName(entityLiving), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.GREEN_RGB, 1f, fontScale, false, rotation);
+            }
+            else
+            {
+                String playerName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), ForgeHelper.INSTANCE.getEntityName(entityLiving));
+                DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.WHITE_RGB, 1f, fontScale, false, rotation);
+            }
         }
     }
 
-    private void drawCreature(double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
+    private void drawCreature(Pass pass, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, float drawScale, double fontScale, double rotation)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving == null)
@@ -140,24 +155,33 @@ public class DrawEntityStep implements DrawStep
             return;
         }
 
-        Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
+        //Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
 
-        if (locatorTexture != null && showHeading)
+        if(pass == Pass.Object)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            if (locatorTexture != null && showHeading)
+            {
+                DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            }
         }
 
         int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
-        //entityDTO.customName = EnumChatFormatting.LIGHT_PURPLE  + entityDTO.entityLiving.getCommandSenderName(); // TODO REMOVE
-        if (customName != null)
+
+        if(pass == Pass.Text)
         {
-            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
-            DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, RGB.WHITE_RGB, labelFgAlpha, fontScale, rotation);
+            if (customName != null)
+            {
+                Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
+                DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, RGB.WHITE_RGB, labelFgAlpha, fontScale, rotation);
+            }
         }
 
-        if (texture != null)
+        if(pass == Pass.Object)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
+            if (texture != null)
+            {
+                DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
+            }
         }
     }
 

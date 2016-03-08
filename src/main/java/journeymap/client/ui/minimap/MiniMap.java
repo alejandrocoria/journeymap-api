@@ -23,10 +23,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.MiniMapProperties;
-import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.draw.DrawWayPointStep;
-import journeymap.client.render.draw.RadarDrawStepFactory;
-import journeymap.client.render.draw.WaypointDrawStepFactory;
+import journeymap.client.render.draw.*;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -418,15 +415,28 @@ public class MiniMap
     private void drawOnMapWaypoints(double rotation)
     {
         boolean showLabel = miniMapProperties.showWaypointLabels.get();
-        for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
+
+        for(DrawStep.Pass pass : DrawStep.Pass.values())
         {
-            Point2D.Double waypointPos = drawWayPointStep.getPosition(0, 0, gridRenderer, true);
-            boolean onScreen = isOnScreen(waypointPos, centerPoint, centerRect);
-            drawWayPointStep.setOnScreen(onScreen);
-            if (onScreen)
+            for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
             {
-                drawWayPointStep.setShowLabel(showLabel);
-                drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
+                boolean onScreen = false;
+                if(pass == DrawStep.Pass.Object)
+                {
+                    Point2D.Double waypointPos = drawWayPointStep.getPosition(0, 0, gridRenderer, true);
+                    onScreen = isOnScreen(waypointPos, centerPoint, centerRect);
+                    drawWayPointStep.setOnScreen(onScreen);
+                }
+                else
+                {
+                    onScreen = drawWayPointStep.isOnScreen();
+                }
+
+                if (onScreen)
+                {
+                    drawWayPointStep.setShowLabel(showLabel);
+                    drawWayPointStep.draw(pass, 0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
+                }
             }
         }
     }
@@ -443,7 +453,7 @@ public class MiniMap
                         dv.minimapSpec.waypointOffset);
 
                 //point = drawWayPointStep.getPosition(0, 0, gridRenderer, false);
-                drawWayPointStep.drawOffscreen(point, rotation);
+                drawWayPointStep.drawOffscreen(DrawStep.Pass.Object, point, rotation);
             }
         }
     }
