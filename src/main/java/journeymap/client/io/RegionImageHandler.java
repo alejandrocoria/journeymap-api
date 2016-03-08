@@ -101,7 +101,7 @@ public class RegionImageHandler
             }
             catch (Exception e)
             {
-                String error = "Region file produced error: " + regionFile + ": " + LogFormatter.toString(e);
+                String error = "Region file produced error: " + regionFile + ": " + LogFormatter.toPartialString(e);
                 Journeymap.getLogger().error(error);
             }
         }
