@@ -37,7 +37,7 @@ public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
-    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 5, "dev"));
+    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 1, 6, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";

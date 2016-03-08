@@ -50,7 +50,8 @@ configurations {
 dependencies {
     compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
     runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
-    runtime 'com.yahoo.platform.yui:yuicompressor:2.4.8'
+    runtime group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
+    //testCompile group: 'org.junit', name: 'junit', version: '4.8.1'
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
 }
 
