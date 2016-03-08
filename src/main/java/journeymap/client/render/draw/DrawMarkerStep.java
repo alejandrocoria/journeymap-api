@@ -49,37 +49,32 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
             return;
         }
 
-        ensureTexture();
-
-        //overlay.getIcon().setAnchorY(64);
-
-
-        //overlay.setTitle(overlay.getPoint().getX() + "," + overlay.getPoint().getZ());
-
-//        DrawUtil.drawRectangle(screenBounds.x + xOffset, screenBounds.y + yOffset, screenBounds.width, screenBounds.height, 0xffffff, 100);
-//
-//        double halfBlock = lastUiState.blockSize/2;
-//        DrawUtil.drawRectangle(markerPosition.x - halfBlock + xOffset, markerPosition.y - halfBlock + yOffset, lastUiState.blockSize, lastUiState.blockSize, 0xffffff, 200);
-
-        if (!hasError && iconTexture != null)
+        if(pass == Pass.Object)
         {
-            MapImage icon = overlay.getIcon();
+            ensureTexture();
 
-            DrawUtil.drawColoredSprite(iconTexture,
-                    icon.getDisplayWidth(),
-                    icon.getDisplayHeight(),
-                    icon.getTextureX(),
-                    icon.getTextureY(),
-                    icon.getTextureWidth(),
-                    icon.getTextureHeight(),
-                    icon.getColor(),
-                    icon.getOpacity(),
-                    markerPosition.x + xOffset - icon.getAnchorX(),
-                    markerPosition.y + yOffset - icon.getAnchorY(),
-                    drawScale, icon.getRotation() - rotation);
+            if (!hasError && iconTexture != null)
+            {
+                MapImage icon = overlay.getIcon();
+
+                DrawUtil.drawColoredSprite(iconTexture,
+                        icon.getDisplayWidth(),
+                        icon.getDisplayHeight(),
+                        icon.getTextureX(),
+                        icon.getTextureY(),
+                        icon.getTextureWidth(),
+                        icon.getTextureHeight(),
+                        icon.getColor(),
+                        icon.getOpacity(),
+                        markerPosition.x + xOffset - icon.getAnchorX(),
+                        markerPosition.y + yOffset - icon.getAnchorY(),
+                        drawScale, icon.getRotation() - rotation);
+            }
         }
-
-        super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        else
+        {
+            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+        }
     }
 
     /**

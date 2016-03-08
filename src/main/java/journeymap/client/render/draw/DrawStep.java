@@ -20,7 +20,8 @@ public interface DrawStep
     enum Pass
     {
         Object,
-        Text
+        Text,
+        Tooltip
     }
 
     public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation);
