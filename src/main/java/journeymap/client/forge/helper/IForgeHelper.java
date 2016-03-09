@@ -38,8 +38,6 @@ import java.util.Iterator;
  */
 public interface IForgeHelper
 {
-    public IRenderHelper getRenderHelper();
-
     public IBlockAccess getIBlockAccess();
 
     public IColorHelper getColorHelper();

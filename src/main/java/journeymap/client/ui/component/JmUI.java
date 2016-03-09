@@ -13,7 +13,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
+
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public abstract class JmUI extends GuiScreen
 {
-    protected static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+
     protected final String title;
     protected final int headerHeight = 35;
     protected final Logger logger = Journeymap.getLogger();
@@ -298,8 +299,8 @@ public abstract class JmUI extends GuiScreen
         {
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
             RenderHelper.disableStandardItemLighting();
-            renderHelper.glDisableLighting();
-            renderHelper.glDisableDepth();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
             int maxLineWidth = 0;
             Iterator iterator = tooltip.iterator();
 
@@ -375,8 +376,8 @@ public abstract class JmUI extends GuiScreen
 
             this.zLevel = 0.0F;
             itemRender.zLevel = 0.0F;
-            renderHelper.glEnableLighting();
-            renderHelper.glEnableDepth();
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
             RenderHelper.enableStandardItemLighting();
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         }

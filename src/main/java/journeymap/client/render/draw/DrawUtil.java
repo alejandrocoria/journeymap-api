@@ -12,9 +12,12 @@ package journeymap.client.render.draw;
 import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -27,7 +30,9 @@ import java.util.List;
 public class DrawUtil
 {
     public static double zLevel = 0;
-    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+
+    static Tessellator tessellator = Tessellator.getInstance();
+    static WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
@@ -194,7 +199,7 @@ public class DrawUtil
             height--;
         }
 
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         try
         {
@@ -202,7 +207,7 @@ public class DrawUtil
             {
                 x = x / fontScale;
                 y = y / fontScale;
-                renderHelper.glScaled(fontScale, fontScale, 0);
+                GlStateManager.scale(fontScale, fontScale, 0);
             }
 
             double textX = x;
@@ -259,13 +264,13 @@ public class DrawUtil
             if (rotation != 0)
             {
                 // Move origin to x,y
-                GL11.glTranslated(x, y, 0);
+                GlStateManager.translate(x, y, 0);
 
                 // Rotatate around origin
-                GL11.glRotated(-rotation, 0, 0, 1.0f);
+                GlStateManager.rotate((float) -rotation, 0, 0, 1.0f);
 
                 // Offset the radius
-                GL11.glTranslated(-x, -y, 0);
+                GlStateManager.translate(-x, -y, 0);
             }
 
             // Draw background
@@ -282,7 +287,7 @@ public class DrawUtil
             double dTextY = textY - intTextY;
 
             // Use translation for the double precision
-            GL11.glTranslated(dTextX, dTextY, 0);
+            GlStateManager.translate(dTextX, dTextY, 0);
 
             if (fontShadow)
             {
@@ -296,7 +301,7 @@ public class DrawUtil
         }
         finally
         {
-            GL11.glPopMatrix();
+            GlStateManager.popMatrix();
         }
     }
 
@@ -381,18 +386,18 @@ public class DrawUtil
      */
     public static void drawQuad(TextureImpl texture, int color, float alpha, final double x, final double y, final double width, final double height, final double minU, final double minV, final double maxU, final double maxV, double rotation, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         try
         {
             if (blend)
             {
-                renderHelper.glEnableBlend();
-                renderHelper.glBlendFunc(glBlendSfactor, glBlendDFactor, 1, 0);
+                GlStateManager.enableBlend();
+                GlStateManager.tryBlendFuncSeparate(glBlendSfactor, glBlendDFactor, 1, 0);
             }
 
-            renderHelper.glEnableTexture2D();
-            renderHelper.glBindTexture(texture.getGlTextureId());
+            GlStateManager.enableTexture2D();
+            GlStateManager.bindTexture(texture.getGlTextureId());
 
             if(alpha>1)
             {
@@ -404,19 +409,19 @@ public class DrawUtil
             {
                 float[] c = RGB.floats(color);
 
-                renderHelper.glColor4f(c[0], c[1], c[2], alpha);
+                GlStateManager.color(c[0], c[1], c[2], alpha);
             }
             else
             {
-                renderHelper.glColor4f(1, 1, 1, alpha);
+                GlStateManager.color(1, 1, 1, alpha);
             }
 
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
             int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, texEdgeBehavior);
 
             if (rotation != 0)
             {
@@ -424,38 +429,38 @@ public class DrawUtil
                 double transY = y + (height / 2);
 
                 // Move origin to center of texture
-                GL11.glTranslated(transX, transY, 0);
+                GlStateManager.translate(transX, transY, 0);
 
                 // Rotatate around origin
-                GL11.glRotated(rotation, 0, 0, 1.0f);
+                GlStateManager.rotate((float) rotation, 0, 0, 1.0f);
 
                 // Return origin
-                GL11.glTranslated(-transX, -transY, 0);
+                GlStateManager.translate(-transX, -transY, 0);
             }
 
             final double direction = flip ? -maxU : maxU;
 
-            renderHelper.startDrawingQuads(false);
-            renderHelper.addVertexWithUV(x, height + y, zLevel, minU, maxV);
-            renderHelper.addVertexWithUV(x + width, height + y, zLevel, direction, maxV);
-            renderHelper.addVertexWithUV(x + width, y, zLevel, direction, minV);
-            renderHelper.addVertexWithUV(x, y, zLevel, minU, minV);
-            renderHelper.draw();
+            startDrawingQuads(false);
+            addVertexWithUV(x, height + y, zLevel, minU, maxV);
+            addVertexWithUV(x + width, height + y, zLevel, direction, maxV);
+            addVertexWithUV(x + width, y, zLevel, direction, minV);
+            addVertexWithUV(x, y, zLevel, minU, minV);
+            draw();
 
             // Ensure normal alpha blending afterward, just in case
             if (blend)
             {
-                renderHelper.glColor4f(1, 1, 1, 1);
+                GlStateManager.color(1, 1, 1, 1);
                 if (glBlendSfactor != GL11.GL_SRC_ALPHA || glBlendDFactor != GL11.GL_ONE_MINUS_SRC_ALPHA)
                 {
-                    renderHelper.glEnableBlend();
-                    renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                    GlStateManager.enableBlend();
+                    GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
                 }
             }
         }
         finally
         {
-            GL11.glPopMatrix();
+            GlStateManager.popMatrix();
         }
     }
 
@@ -467,40 +472,40 @@ public class DrawUtil
             alpha = alpha / 255f;
         }
         // Prep
-        renderHelper.glEnableBlend();
-        renderHelper.glDisableTexture2D();
-        renderHelper.glDisableAlpha();
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
         // Draw
         int[] rgba = RGB.ints(color, alpha);
-        renderHelper.startDrawingQuads(true);
-        renderHelper.addVertex(x, height + y, zLevel, rgba);
-        renderHelper.addVertex(x + width, height + y, zLevel, rgba);
-        renderHelper.addVertex(x + width, y, zLevel, rgba);
-        renderHelper.addVertex(x, y, zLevel, rgba);
-        renderHelper.draw();
+        startDrawingQuads(true);
+        addVertex(x, height + y, zLevel, rgba);
+        addVertex(x + width, height + y, zLevel, rgba);
+        addVertex(x + width, y, zLevel, rgba);
+        addVertex(x, y, zLevel, rgba);
+        draw();
 
         // Clean up
-        renderHelper.glColor4f(1, 1, 1, 1);
-        renderHelper.glEnableTexture2D();
-        renderHelper.glEnableAlpha();
-        renderHelper.glDisableBlend();
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableBlend();
     }
 
     public static void drawPolygon(double xOffset, double yOffset, List<Point2D.Double> screenPoints, ShapeProperties shapeProperties)
     {
         // Prep
-        renderHelper.glEnableBlend();
-        renderHelper.glDisableTexture2D();
-        renderHelper.glEnableAlpha();
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
         // Draw Fill
         if (shapeProperties.getFillOpacity() >= 0.01F)
         {
             float[] rgba = RGB.floats(shapeProperties.getFillColor(), shapeProperties.getFillOpacity());
-            renderHelper.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            GlStateManager.color(rgba[0], rgba[1], rgba[2], rgba[3]);
 
             int lastIndex = screenPoints.size() - 1;
             Point2D.Double first, second;
@@ -523,7 +528,7 @@ public class DrawUtil
         if (shapeProperties.getStrokeOpacity() >= 0.01F && shapeProperties.getStrokeWidth() > 0)
         {
             float[] rgba = RGB.floats(shapeProperties.getStrokeColor(), shapeProperties.getFillOpacity());
-            renderHelper.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            GlStateManager.color(rgba[0], rgba[1], rgba[2], rgba[3]);
             float stroke = shapeProperties.getStrokeWidth();
             GL11.glLineWidth(stroke);
 
@@ -546,10 +551,10 @@ public class DrawUtil
         }
 
         // Clean up
-        renderHelper.glColor4f(1, 1, 1, 1);
-        renderHelper.glEnableTexture2D();
-        renderHelper.glEnableAlpha();
-        renderHelper.glDisableBlend();
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableBlend();
     }
 
     /**
@@ -573,34 +578,33 @@ public class DrawUtil
         int[] rgbaStart = RGB.ints(startColor, startAlpha);
         int[] rgbaEnd = RGB.ints(endColor, endAlpha);
 
-        renderHelper.glDisableTexture2D();
-        renderHelper.glEnableBlend();
-        renderHelper.glDisableAlpha();
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        renderHelper.startDrawingQuads(true);
-        renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1, rgbaEnd);
-        renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgbaEnd);
-        renderHelper.addVertexWithUV(x + width, y, zLevel, 1, 0, rgbaStart);
-        renderHelper.addVertexWithUV(x, y, zLevel, 0, 0, rgbaStart);
-        renderHelper.draw();
+        startDrawingQuads(true);
+        addVertexWithUV(x, height + y, zLevel, 0, 1, rgbaEnd);
+        addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgbaEnd);
+        addVertexWithUV(x + width, y, zLevel, 1, 0, rgbaStart);
+        addVertexWithUV(x, y, zLevel, 0, 0, rgbaStart);
+        draw();
 
-        renderHelper.glShadeModel(GL11.GL_FLAT);
-
-        renderHelper.glEnableTexture2D();
-        renderHelper.glEnableAlpha();
-        renderHelper.glEnableBlend();
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableBlend();
     }
 
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
-        renderHelper.startDrawingQuads(false);
-        renderHelper.addVertexWithUV(startX, endY, z, startU, endV);
-        renderHelper.addVertexWithUV(endX, endY, z, endU, endV);
-        renderHelper.addVertexWithUV(endX, startY, z, endU, startV);
-        renderHelper.addVertexWithUV(startX, startY, z, startU, startV);
-        renderHelper.draw();
+        startDrawingQuads(false);
+        addVertexWithUV(startX, endY, z, startU, endV);
+        addVertexWithUV(endX, endY, z, endU, endV);
+        addVertexWithUV(endX, startY, z, endU, startV);
+        addVertexWithUV(startX, startY, z, startU, startV);
+        draw();
     }
 
 
@@ -652,7 +656,71 @@ public class DrawUtil
 
     public static void sizeDisplay(double width, double height)
     {
-        renderHelper.sizeDisplay(width, height);
+        GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.loadIdentity();
+        GlStateManager.ortho(0.0D, width, height, 0.0D, 100.0D, 3000.0D);
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.loadIdentity();
+        GlStateManager.translate(0.0F, 0.0F, -2000.0F);
+    }
+
+    public static void draw()
+    {
+        tessellator.draw();
+    }
+
+    public static void startDrawingQuads(boolean useColor)
+    {
+        // 1.7.10
+        // tessellator.startDrawingQuads();
+
+        // 1.8
+        // worldrenderer.startDrawingQuads();
+
+        // 1.8.8
+        if(useColor)
+        {
+            // (floats) x,y,z + (floats) uv + (ints) r,g,b,a
+            worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        }
+        else
+        {
+            // (floats) x,y,z + (floats) u,v
+            worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        }
+    }
+
+    public static void addVertexWithUV(double x, double y, double z, double u, double v)
+    {
+        // 1.7.10
+        // tessellator.addVertexWithUV(x,y,z,u,v);
+
+        // 1.8
+        // worldrenderer.addVertexWithUV(x, y, z, u, v);
+
+        // 1.8.8
+        worldrenderer.pos(x, y, z).tex(u, v).endVertex();
+    }
+    
+    public static void addVertex(double x, double y, double z, int[] rgba)
+    {
+        // 1.7 and 1.8
+        // tessellator.setColorRGBA_I(rgb, a);
+        // worldrenderer.addVertexWithUV(x, y, z, u, v);
+
+        // 1.8.8
+        worldrenderer.pos(x, y, z).tex(1, 1).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
+    }
+    
+    public static void addVertexWithUV(double x, double y, double z, double u, double v, int[] rgba)
+    {
+        // 1.7 and 1.8
+        // tessellator.setColorRGBA_I(rgb, a);
+        // worldrenderer.addVertexWithUV(x, y, z, u, v);
+
+        // 1.8.8
+        worldrenderer.pos(x, y, z).tex(u, v).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
     }
 
     public enum HAlign

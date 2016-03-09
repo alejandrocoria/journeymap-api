@@ -12,6 +12,7 @@ import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -144,8 +145,8 @@ public class ScrollPane extends GuiSlot
     @Override
     public void drawScreen(int mX, int mY, float f) // func_148128_a
     {
-        GL11.glPushMatrix();
-        GL11.glTranslated(getX(), getY(), 0);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(getX(), getY(), 0);
 
         _mouseX = mX;
         _mouseY = mY;
@@ -162,7 +163,7 @@ public class ScrollPane extends GuiSlot
         lastVisibleIndex = -1;
 
         super.drawScreen(mX - getX(), mY - getY(), f);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     // 1.7
@@ -182,8 +183,8 @@ public class ScrollPane extends GuiSlot
         }
         lastVisibleIndex = Math.max(lastVisibleIndex, index);
 
-        GL11.glPushMatrix();
-        GL11.glTranslated(-getX(), -getY(), 0);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-getX(), -getY(), 0);
 
         final int margin = 4;
         final int itemX = getX() + (margin / 2);
@@ -223,7 +224,7 @@ public class ScrollPane extends GuiSlot
             }
         }
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public boolean inFullView(Scrollable item)
