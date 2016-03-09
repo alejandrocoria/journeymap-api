@@ -21,6 +21,7 @@ import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -401,7 +402,7 @@ public class ColorHelper_1_8 implements IColorHelper
             timer.start();
 
             int blocksTexId = ForgeHelper.INSTANCE.getClient().getTextureMapBlocks().getGlTextureId();
-            ForgeHelper.INSTANCE.getRenderHelper().glBindTexture(blocksTexId);
+            GlStateManager.bindTexture(blocksTexId);
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 

@@ -11,9 +11,9 @@ package journeymap.client.model;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -23,7 +23,6 @@ import java.awt.*;
  */
 public class GridSpec
 {
-    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     public final Style style;
     public final float red;
     public final float green;
@@ -70,20 +69,20 @@ public class GridSpec
     }
 
     /**
-     * MUST CALL renderHelper.glColor4f(1, 1, 1, alpha); when done
+     * MUST CALL GlStateManager.color(1, 1, 1, alpha); when done
      */
     public void beginTexture(int textureWrap, float mapAlpha)
     {
-        renderHelper.glEnableBlend();
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glEnableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.enableTexture2D();
 
-        renderHelper.glBindTexture(getTexture().getGlTextureId());
-        renderHelper.glColor4f(red, green, blue, alpha * mapAlpha);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
-        renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+        GlStateManager.bindTexture(getTexture().getGlTextureId());
+        GlStateManager.color(red, green, blue, alpha * mapAlpha);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
     }
 
     public TextureImpl getTexture()
@@ -98,8 +97,8 @@ public class GridSpec
 
     public void finishTexture()
     {
-        renderHelper.glColor4f(1, 1, 1, 1);
-        renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.clearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
     public Integer getColor()

@@ -9,6 +9,7 @@
 package journeymap.client.ui.fullscreen;
 
 import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class MapChat extends GuiChat
     @Override
     public void drawScreen(int par1, int par2, float par3)
     {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
         GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
         if (this.mc != null)
         {
@@ -116,7 +117,7 @@ public class MapChat extends GuiChat
                 this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
             }
         }
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
 
         if (hidden)
         {

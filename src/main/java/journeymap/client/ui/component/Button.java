@@ -10,12 +10,13 @@ package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
+
 import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
-    protected static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+    
 
     protected Integer smallFrameColorLight = new Color(160, 160, 160).getRGB();
     protected Integer smallFrameColorDark = new Color(120, 120, 120).getRGB();
@@ -176,7 +177,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             // Use small button colors
             minecraft.getTextureManager().bindTexture(buttonTextures);
-            ForgeHelper.INSTANCE.getRenderHelper().glColor4f(1, 1, 1, 1);
+            GlStateManager.color(1, 1, 1, 1);
 
             this.setHovered(mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height);
             int hoverState = this.getHoverState(this.isHovered());
