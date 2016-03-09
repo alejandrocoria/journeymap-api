@@ -10,7 +10,6 @@ package journeymap.client.model;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.renderer.GlStateManager;

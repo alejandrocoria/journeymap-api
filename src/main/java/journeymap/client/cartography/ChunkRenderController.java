@@ -45,7 +45,7 @@ public class ChunkRenderController
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
-        if(!JourneymapClient.getInstance().isMapping())
+        if (!JourneymapClient.getInstance().isMapping())
         {
             return false;
         }

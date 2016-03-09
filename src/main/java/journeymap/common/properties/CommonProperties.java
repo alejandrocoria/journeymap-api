@@ -37,7 +37,6 @@ public abstract class CommonProperties
     protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
 
 
-
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()

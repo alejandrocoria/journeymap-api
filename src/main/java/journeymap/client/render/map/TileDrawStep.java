@@ -10,7 +10,6 @@ package journeymap.client.render.map;
 
 import com.google.common.base.Objects;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;

@@ -17,7 +17,6 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -416,12 +415,12 @@ public class MiniMap
     {
         boolean showLabel = miniMapProperties.showWaypointLabels.get();
 
-        for(DrawStep.Pass pass : DrawStep.Pass.values())
+        for (DrawStep.Pass pass : DrawStep.Pass.values())
         {
             for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
             {
                 boolean onScreen = false;
-                if(pass == DrawStep.Pass.Object)
+                if (pass == DrawStep.Pass.Object)
                 {
                     Point2D.Double waypointPos = drawWayPointStep.getPosition(0, 0, gridRenderer, true);
                     onScreen = isOnScreen(waypointPos, centerPoint, centerRect);

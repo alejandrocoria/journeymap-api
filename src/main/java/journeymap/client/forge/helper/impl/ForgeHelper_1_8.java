@@ -500,7 +500,9 @@ public class ForgeHelper_1_8 implements IForgeHelper
         try
         {
             return chunk.getBlockMetadata(new BlockPos(x, y, z));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return 0;
         }
     }

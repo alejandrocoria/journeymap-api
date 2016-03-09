@@ -230,7 +230,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         @Override
         public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
-            if(pass!=Pass.Object)
+            if (pass != Pass.Object)
             {
                 return;
             }

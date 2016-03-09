@@ -11,8 +11,6 @@ package journeymap.client.ui.dialog;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
-
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;

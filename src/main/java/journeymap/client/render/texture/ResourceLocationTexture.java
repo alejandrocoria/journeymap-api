@@ -73,7 +73,7 @@ public class ResourceLocationTexture extends TextureImpl
      */
     private static BufferedImage resolveImage(ResourceLocation location)
     {
-        if(location.getResourceDomain().equals("fake"))
+        if (location.getResourceDomain().equals("fake"))
         {
             return null;
         }

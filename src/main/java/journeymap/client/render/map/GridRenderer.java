@@ -207,7 +207,8 @@ public class GridRenderer
     {
         boolean mapTypeChanged = !Objects.equals(worldDir, this.worldDir) || !Objects.equals(mapType, this.mapType);
 
-        if(!Objects.equals(worldDir, this.worldDir)) {
+        if (!Objects.equals(worldDir, this.worldDir))
+        {
             this.worldDir = worldDir;
         }
 
@@ -407,7 +408,7 @@ public class GridRenderer
     {
         if (enabled)
         {
-            for(DrawStep.Pass pass : DrawStep.Pass.values())
+            for (DrawStep.Pass pass : DrawStep.Pass.values())
             {
                 for (DrawStep drawStep : drawSteps)
                 {
