@@ -99,11 +99,11 @@ public class DrawUtil
 
     public static void drawLabels(final String[] lines, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
-        if(lines.length==0)
+        if (lines.length == 0)
         {
             return;
         }
-        else if(lines.length==1)
+        else if (lines.length == 1)
         {
             drawLabel(lines[0], x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, rotation);
             return;
@@ -117,30 +117,30 @@ public class DrawUtil
         double bgWidth = 0;
         if (bgColor != null && bgAlpha > 0)
         {
-            for(String line : lines)
+            for (String line : lines)
             {
                 bgWidth = Math.max(bgWidth, fontRenderer.getStringWidth(line) * fontScale);
             }
 
-            if((bgWidth%2) ==0 )
+            if ((bgWidth % 2) == 0)
             {
                 bgWidth++;
             }
         }
 
-        if(lines.length>1)
+        if (lines.length > 1)
         {
             switch (vAlign)
             {
                 case Above:
                 {
                     y = y - (lineHeight * lines.length);
-                    bgHeight += (vpad/2);
+                    bgHeight += (vpad / 2);
                     break;
                 }
                 case Middle:
                 {
-                    y = y - (bgHeight/2);
+                    y = y - (bgHeight / 2);
                     break;
                 }
                 case Below:
@@ -150,7 +150,7 @@ public class DrawUtil
             }
         }
 
-        for(String line : lines)
+        for (String line : lines)
         {
             drawLabel(line, x, y, hAlign, vAlign, bgColor, bgAlpha, bgWidth, bgHeight, color, alpha, fontScale, fontShadow, rotation);
             bgColor = null;
@@ -226,7 +226,7 @@ public class DrawUtil
                 case Center:
                 {
                     textX = x - (width / 2) + (fontScale > 1 ? .5 : 0);
-                    rectX = x - (Math.max(1, bgWidth)/2) + (fontScale > 1 ? .5 : 0);
+                    rectX = x - (Math.max(1, bgWidth) / 2) + (fontScale > 1 ? .5 : 0);
                     break;
                 }
                 case Right:
@@ -399,10 +399,10 @@ public class DrawUtil
             GlStateManager.enableTexture2D();
             GlStateManager.bindTexture(texture.getGlTextureId());
 
-            if(alpha>1)
+            if (alpha > 1)
             {
                 // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
-                alpha = alpha/255f;
+                alpha = alpha / 255f;
             }
 
             if (blend)
@@ -608,7 +608,6 @@ public class DrawUtil
     }
 
 
-
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
@@ -679,7 +678,7 @@ public class DrawUtil
         // worldrenderer.startDrawingQuads();
 
         // 1.8.8
-        if(useColor)
+        if (useColor)
         {
             // (floats) x,y,z + (floats) uv + (ints) r,g,b,a
             worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -702,7 +701,7 @@ public class DrawUtil
         // 1.8.8
         worldrenderer.pos(x, y, z).tex(u, v).endVertex();
     }
-    
+
     public static void addVertex(double x, double y, double z, int[] rgba)
     {
         // 1.7 and 1.8
@@ -712,7 +711,7 @@ public class DrawUtil
         // 1.8.8
         worldrenderer.pos(x, y, z).tex(1, 1).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
     }
-    
+
     public static void addVertexWithUV(double x, double y, double z, double u, double v, int[] rgba)
     {
         // 1.7 and 1.8

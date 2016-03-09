@@ -1,8 +1,7 @@
 package journeymap.common.properties.config2;
 
-import com.google.gson.*;
-
-import java.lang.reflect.Type;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * Created by Mark on 3/2/2016.
@@ -28,6 +27,45 @@ public class ConfigField<T>
         this.defaultValue = defaultValue;
     }
 
+    protected static String getString(String name, JsonObject jsonObject)
+    {
+        JsonElement element = jsonObject.get(name);
+        if (element == null)
+        {
+            return null;
+        }
+        else
+        {
+            return element.getAsString();
+        }
+    }
+
+    protected static boolean getBoolean(String name, JsonObject jsonObject)
+    {
+        JsonElement element = jsonObject.get(name);
+        if (element == null)
+        {
+            return false;
+        }
+        else
+        {
+            return element.getAsBoolean();
+        }
+    }
+
+    protected static int getInteger(String name, JsonObject jsonObject)
+    {
+        JsonElement element = jsonObject.get(name);
+        if (element == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return element.getAsInt();
+        }
+    }
+
     public String getKey()
     {
         return key;
@@ -43,15 +81,15 @@ public class ConfigField<T>
         return defaultValue;
     }
 
+    public T getValue()
+    {
+        return value;
+    }
+
     public ConfigField setValue(T value)
     {
         this.value = value;
         return this;
-    }
-
-    public T getValue()
-    {
-        return value;
     }
 
     public int getSortOrder()
@@ -93,45 +131,6 @@ public class ConfigField<T>
         jsonObject.addProperty("isMaster", this.isMaster);
         jsonObject.addProperty("sortOrder", this.sortOrder);
         return jsonObject;
-    }
-
-    protected static String getString(String name, JsonObject jsonObject)
-    {
-        JsonElement element = jsonObject.get(name);
-        if(element==null)
-        {
-            return null;
-        }
-        else
-        {
-            return element.getAsString();
-        }
-    }
-
-    protected static boolean getBoolean(String name, JsonObject jsonObject)
-    {
-        JsonElement element = jsonObject.get(name);
-        if(element==null)
-        {
-            return false;
-        }
-        else
-        {
-            return element.getAsBoolean();
-        }
-    }
-
-    protected static int getInteger(String name, JsonObject jsonObject)
-    {
-        JsonElement element = jsonObject.get(name);
-        if(element==null)
-        {
-            return 0;
-        }
-        else
-        {
-            return element.getAsInt();
-        }
     }
 
 }

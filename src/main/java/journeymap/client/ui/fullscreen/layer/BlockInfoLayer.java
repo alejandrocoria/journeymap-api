@@ -158,7 +158,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         @Override
         public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
         {
-            if(pass==Pass.Text)
+            if (pass == Pass.Text)
             {
                 if (ticks-- < 0 && alpha > 0)
                 {

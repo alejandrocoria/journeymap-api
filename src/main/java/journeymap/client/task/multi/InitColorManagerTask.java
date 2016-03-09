@@ -2,8 +2,6 @@ package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorManager;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;

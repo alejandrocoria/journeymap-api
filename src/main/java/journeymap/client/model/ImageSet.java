@@ -47,9 +47,10 @@ public abstract class ImageSet
 
     /**
      * Returns the number of imageHolders actually written to disk.
+     *
      * @param force write even if image isn't flagged as dirty
      * @return number of images that should be updated if async=true, or
-     *         number of images actually updated if async=false
+     * number of images actually updated if async=false
      */
     public int writeToDisk(boolean force, boolean async)
     {

@@ -39,7 +39,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     @Override
     public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             if (overlay.getOuterArea().getPoints().isEmpty())
             {
@@ -49,12 +49,12 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
 
             onScreen = isOnScreen(xOffset, yOffset, gridRenderer, rotation);
 
-            if(onScreen)
+            if (onScreen)
             {
                 DrawUtil.drawPolygon(xOffset, yOffset, screenPoints, overlay.getShapeProperties());
             }
         }
-        else if(onScreen)
+        else if (onScreen)
         {
             super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
         }

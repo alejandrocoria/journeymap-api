@@ -73,23 +73,23 @@ public class DrawWayPointStep implements DrawStep
         Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, true);
         if (gridRenderer.isOnScreen(pixel))
         {
-            if (showLabel && pass==Pass.Text)
+            if (showLabel && pass == Pass.Text)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.getHeight() : texture.getHeight());
                 DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .7f, fontColor, 1f, fontScale, false, rotation);
             }
-            else if (isEdit && pass==Pass.Object)
+            else if (isEdit && pass == Pass.Object)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
                 DrawUtil.drawColoredImage(editTex, color, 1f, pixel.getX() - (editTex.getWidth() / 2), pixel.getY() - editTex.getHeight() / 2, -rotation);
             }
 
-            if(pass==Pass.Object)
+            if (pass == Pass.Object)
             {
                 DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
             }
         }
-        else if (!isEdit && pass==Pass.Object)
+        else if (!isEdit && pass == Pass.Object)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, color, 1f, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
@@ -99,7 +99,7 @@ public class DrawWayPointStep implements DrawStep
 
     public void drawOffscreen(Pass pass, Point2D pixel, double rotation)
     {
-        if(pass==Pass.Object)
+        if (pass == Pass.Object)
         {
             DrawUtil.drawColoredImage(texture, color, 1f, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
         }

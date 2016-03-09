@@ -94,7 +94,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         // Set vanilla color handler
         blockMD.setBlockColorHandler(VanillaColorHandler.INSTANCE);
 
-        if(blockMD.isWater())
+        if (blockMD.isWater())
         {
             Journeymap.getLogger().info("Water! " + blockMD);
         }

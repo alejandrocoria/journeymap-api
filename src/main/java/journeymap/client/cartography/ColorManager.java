@@ -91,7 +91,7 @@ public class ColorManager
             Journeymap.getLogger().info("Loading blocks and textures...");
 
             boolean isMapping = JourneymapClient.getInstance().isMapping();
-            if(isMapping)
+            if (isMapping)
             {
                 JourneymapClient.getInstance().stopMapping();
             }
@@ -105,7 +105,7 @@ public class ColorManager
             // Init colors
             initBlockColors(blocksTextureChanged);
 
-            if(isMapping)
+            if (isMapping)
             {
                 JourneymapClient.getInstance().startMapping();
             }

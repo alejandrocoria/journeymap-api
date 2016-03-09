@@ -45,7 +45,7 @@ public class DeleteMapTask implements IMainThreadTask
             GridRenderer.setEnabled(false);
 
             boolean wasMapping = JourneymapClient.getInstance().isMapping();
-            if(wasMapping)
+            if (wasMapping)
             {
                 JourneymapClient.getInstance().stopMapping();
             }
@@ -60,7 +60,7 @@ public class DeleteMapTask implements IMainThreadTask
                 ChatLog.announceI18N("jm.common.deletemap_status_error");
             }
 
-            if(wasMapping)
+            if (wasMapping)
             {
                 JourneymapClient.getInstance().startMapping();
                 MapPlayerTask.forceNearbyRemap();

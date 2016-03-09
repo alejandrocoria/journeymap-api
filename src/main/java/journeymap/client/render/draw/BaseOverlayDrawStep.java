@@ -5,7 +5,6 @@ import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.map.GridRenderer;
 
 import javax.annotation.Nullable;
@@ -44,7 +43,8 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
 
     /**
      * Draw label and/or title
-     *  @param pass
+     *
+     * @param pass
      * @param xOffset
      * @param yOffset
      * @param gridRenderer
@@ -58,7 +58,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
 
         if (textProperties.isActiveIn(gridRenderer.getUIState()))
         {
-            if(pass==Pass.Text)
+            if (pass == Pass.Text)
             {
                 if (labelPosition != null)
                 {
@@ -83,7 +83,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
                     }
                 }
             }
-            else if(pass==Pass.Tooltip)
+            else if (pass == Pass.Tooltip)
             {
                 if (titlePosition != null)
                 {
@@ -147,7 +147,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
         }
 
         // Update positions after drag or if the UIState changed
-        if (draggingDone || uiState.ui== Context.UI.Minimap || overlay.getNeedsRerender() || !Objects.equals(uiState, lastUiState))
+        if (draggingDone || uiState.ui == Context.UI.Minimap || overlay.getNeedsRerender() || !Objects.equals(uiState, lastUiState))
         {
             // Update positions first
             lastUiState = uiState;
@@ -166,7 +166,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
 
     protected void updateTextFields()
     {
-        if(labelPosition != null)
+        if (labelPosition != null)
         {
             String labelText = overlay.getLabel();
             if (!Strings.isNullOrEmpty(labelText))
@@ -179,7 +179,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             }
         }
 
-        if(titlePosition != null)
+        if (titlePosition != null)
         {
             String titleText = overlay.getTitle();
             if (!Strings.isNullOrEmpty(titleText))
