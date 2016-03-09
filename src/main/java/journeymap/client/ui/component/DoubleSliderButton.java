@@ -11,6 +11,7 @@ package journeymap.client.ui.component;
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -76,7 +77,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
             if (this.isMouseOver() || this.dragging)
             {
 
-                renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
                 double sliderValue = getSliderValue();
                 GuiUtils.drawContinuousTexturedBox(buttonTextures, this.xPosition + 1 + (int) (sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);

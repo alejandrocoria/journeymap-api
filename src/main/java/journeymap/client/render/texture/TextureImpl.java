@@ -9,10 +9,9 @@
 package journeymap.client.render.texture;
 
 import com.google.common.base.Objects;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
 import org.lwjgl.opengl.GL11;
@@ -23,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
 {
-    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private final ReentrantLock bufferLock = new ReentrantLock();
     protected BufferedImage image;
     protected boolean retainImage;
@@ -154,17 +152,17 @@ public class TextureImpl extends AbstractTexture
         {
             try
             {
-                renderHelper.glBindTexture(super.getGlTextureId());
+                GlStateManager.bindTexture(super.getGlTextureId());
 
                 //Send texel data to OpenGL
 
                 // Setup wrap mode
-                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 
                 //Setup texture scaling filtering
-                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 

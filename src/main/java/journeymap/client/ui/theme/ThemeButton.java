@@ -16,6 +16,7 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.BooleanPropertyButton;
 import journeymap.common.properties.CommonProperties;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -209,11 +210,11 @@ public class ThemeButton extends BooleanPropertyButton
     {
         int magic = 20;
         minecraft.getTextureManager().bindTexture(buttonTextures);
-        renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         int k = this.getHoverState(isMouseOver());
-        renderHelper.glEnableBlend();
-        //renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableBlend();
+        //GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + k * magic, this.width / 2, this.height);
         this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + k * magic, this.width / 2, this.height);
         this.mouseDragged(minecraft, mouseX, mouseY);

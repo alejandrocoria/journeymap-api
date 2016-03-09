@@ -17,7 +17,7 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
+
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -28,6 +28,7 @@ import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,7 +45,6 @@ import java.awt.geom.Rectangle2D;
  */
 public class MiniMap
 {
-    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private static final MapState state = new MapState();
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
@@ -220,10 +220,10 @@ public class MiniMap
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
 
             // Ensure colors and alpha reset
-            renderHelper.glEnableBlend();
-            renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
-            renderHelper.glColor4f(1, 1, 1, 1);
-            renderHelper.glEnableDepth();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.enableDepth();
 
             // Mask the stencil
             beginStencil();
@@ -258,7 +258,7 @@ public class MiniMap
             try
             {
                 // Move origin to top-left corner
-                GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                GlStateManager.translate(dv.translateX, dv.translateY, 0);
 
                 // Draw grid
                 gridRenderer.draw(dv.terrainAlpha, 0, 0, miniMapProperties.showGrid.get());
@@ -284,7 +284,7 @@ public class MiniMap
                 }
 
                 // Return centerPoint to mid-screen
-                GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+                GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
 
                 // Draw Reticle
                 ReticleOrientation reticleOrientation = null;
@@ -310,11 +310,11 @@ public class MiniMap
                 if (now - lastMapChangeTime <= 1000)
                 {
                     stopMapRotation(rotation);
-                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                    GlStateManager.translate(dv.translateX, dv.translateY, 0);
                     float alpha = Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime))) / 255f;
                     Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
                     dv.getMapTypeStatus(state.getCurrentMapType()).draw(windowCenter, alpha, 0);
-                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+                    GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
                     startMapRotation(rotation);
                 }
 
@@ -322,11 +322,11 @@ public class MiniMap
                 if (now - initTime <= 1000)
                 {
                     stopMapRotation(rotation);
-                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                    GlStateManager.translate(dv.translateX, dv.translateY, 0);
                     float alpha = Math.min(255, Math.max(0, 1100 - (now - initTime))) / 255f;
                     Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
                     dv.getMapPresetStatus(state.getCurrentMapType(), miniMapProperties.getId()).draw(windowCenter, alpha, 0);
-                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+                    GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
                     startMapRotation(rotation);
                 }
 
@@ -361,7 +361,7 @@ public class MiniMap
                 }
 
                 // Move origin to top-left corner
-                GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                GlStateManager.translate(dv.translateX, dv.translateY, 0);
 
                 // Draw off-screen waypoints on top of frame
                 drawOffMapWaypoints(rotation);
@@ -370,7 +370,7 @@ public class MiniMap
                 if (dv.showCompass)
                 {
                     // Return centerPoint to mid-screen
-                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
+                    GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
                     dv.minimapCompassPoints.drawLabels(rotation);
                 }
 
@@ -378,7 +378,7 @@ public class MiniMap
             finally
             {
                 /***** END MATRIX: ROTATION *****/
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
             }
 
             // Draw minimap labels
@@ -460,15 +460,15 @@ public class MiniMap
 
     private void startMapRotation(double rotation)
     {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
         if (rotation % 360 != 0)
         {
             double width = dv.displayWidth / 2 + (dv.translateX);
             double height = dv.displayHeight / 2 + (dv.translateY);
 
-            GL11.glTranslated(width, height, 0);
-            GL11.glRotated(rotation, 0, 0, 1.0f);
-            GL11.glTranslated(-width, -height, 0);
+            GlStateManager.translate(width, height, 0);
+            GlStateManager.rotate((float) rotation, 0, 0, 1.0f);
+            GlStateManager.translate(-width, -height, 0);
         }
 
         gridRenderer.updateRotation(rotation);
@@ -476,7 +476,7 @@ public class MiniMap
 
     private void stopMapRotation(double rotation)
     {
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
         gridRenderer.updateRotation(rotation);
     }
 
@@ -544,13 +544,13 @@ public class MiniMap
 
             DrawUtil.zLevel = 1000;
 
-            renderHelper.glColorMask(false, false, false, false); // allows map tiles to be partially opaque
+            GlStateManager.colorMask(false, false, false, false); // allows map tiles to be partially opaque
             dv.minimapFrame.drawMask();
-            renderHelper.glColorMask(true, true, true, true);
+            GlStateManager.colorMask(true, true, true, true);
 
             DrawUtil.zLevel = 0;
-            renderHelper.glDepthMask(false); // otherwise entities and reticle not shown
-            renderHelper.glDepthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
+            GlStateManager.depthMask(false); // otherwise entities and reticle not shown
+            GlStateManager.depthFunc(GL11.GL_GREATER); // otherwise circle doesn't mask map tiles
         }
         catch (Throwable t)
         {
@@ -563,10 +563,10 @@ public class MiniMap
     {
         try
         {
-            //renderHelper.glDepthMask(false); // doesn't seem to matter
-            renderHelper.glDisableDepth(); // otherwise minimap frame not shown
-            //renderHelper.glDepthFunc(renderHelper.GL_LEQUAL);
-            //renderHelper.glColor4f(1, 1, 1, 1);
+            //GlStateManager.depthMask(false); // doesn't seem to matter
+            GlStateManager.disableDepth(); // otherwise minimap frame not shown
+            //GlStateManager.depthFunc(renderHelper.GL_LEQUAL);
+            //GlStateManager.color(1, 1, 1, 1);
         }
         catch (Throwable t)
         {
@@ -580,13 +580,13 @@ public class MiniMap
         {
             DrawUtil.zLevel = 0; // default
 
-            renderHelper.glDepthMask(true); // default
+            GlStateManager.depthMask(true); // default
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT); // defensive
-            renderHelper.glEnableDepth(); // default
-            renderHelper.glDepthFunc(GL11.GL_LEQUAL); // not default, but required by toolbar
-            renderHelper.glEnableAlpha(); // default
-            renderHelper.glColor4f(1, 1, 1, 1); // default
-            renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
+            GlStateManager.enableDepth(); // default
+            GlStateManager.depthFunc(GL11.GL_LEQUAL); // not default, but required by toolbar
+            GlStateManager.enableAlpha(); // default
+            GlStateManager.color(1, 1, 1, 1); // default
+            GlStateManager.clearColor(1, 1, 1, 1f); // defensive against shaders
 
         }
         catch (Throwable t)

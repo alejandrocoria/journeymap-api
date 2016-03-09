@@ -11,7 +11,6 @@ package journeymap.client.render.map;
 import com.google.common.base.Objects;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
@@ -20,6 +19,7 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
+import net.minecraft.client.renderer.GlStateManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
@@ -35,7 +35,6 @@ public class TileDrawStep
 {
     private static final Integer bgColor = 0x222222;
     private static final Logger logger = Journeymap.getLogger();
-    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     private static final RegionImageCache regionImageCache = RegionImageCache.instance();
 
     private final boolean debug = logger.isDebugEnabled();
@@ -143,21 +142,21 @@ public class TileDrawStep
 
         // Background
         DrawUtil.drawRectangle(startX, startY, endX - startX, endY - startY, bgColor, .8f);
-        renderHelper.glEnableBlend();
-        renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        renderHelper.glEnableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.enableTexture2D();
 
         // Tile
         if (textureId != -1)
         {
-            renderHelper.glBindTexture(textureId);
-            renderHelper.glColor4f(1, 1, 1, alpha);
+            GlStateManager.bindTexture(textureId);
+            GlStateManager.color(1, 1, 1, alpha);
 
             // http://gregs-blog.com/2008/01/17/opengl-texture-filter-parameters-explained/
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter); // GL11.GL_LINEAR_MIPMAP_NEAREST
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter); // GL11.GL_NEAREST
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
 
@@ -182,8 +181,8 @@ public class TileDrawStep
             DrawUtil.drawLabel(mapType + " tile age: " + age + " seconds old", debugX + 5, debugY + 30, DrawUtil.HAlign.Right, DrawUtil.VAlign.Below, RGB.WHITE_RGB, 255, RGB.BLUE_RGB, 255, 1.0, false);
         }
 
-        renderHelper.glColor4f(1, 1, 1, 1);
-        renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.clearColor(1, 1, 1, 1f); // defensive against shaders
 
         drawTimer.stop();
 

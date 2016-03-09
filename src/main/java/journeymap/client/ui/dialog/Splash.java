@@ -12,7 +12,7 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
+
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;
@@ -26,6 +26,7 @@ import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -35,7 +36,6 @@ import java.util.List;
 
 public class Splash extends JmUI
 {
-    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
     Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
@@ -212,10 +212,10 @@ public class Splash extends JmUI
             DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, RGB.LIGHT_GRAY_RGB, .8f, RGB.LIGHT_GRAY_RGB, .8f);
 
             brickTex.bindTexture();
-            renderHelper.glBindTexture(brickTex.getGlTextureId());
-            renderHelper.glColor4f(1, 1, 1, 1);
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
+            GlStateManager.bindTexture(brickTex.getGlTextureId());
+            GlStateManager.color(1, 1, 1, 1);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
 
             DrawUtil.drawBoundTexture(0, 0, listX, listY, 0, 8, 2, listX + listWidth, listY + listHeight);
 

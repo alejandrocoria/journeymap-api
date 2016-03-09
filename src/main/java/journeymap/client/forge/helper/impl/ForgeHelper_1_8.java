@@ -15,7 +15,6 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
-import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
@@ -62,15 +61,8 @@ import java.util.Random;
  */
 public class ForgeHelper_1_8 implements IForgeHelper
 {
-    private IRenderHelper renderHelper = new RenderHelper_1_8();
     private IBlockAccess blockAccess = new JmBlockAccess();
     private IColorHelper colorHelper = new ColorHelper_1_8();
-
-    @Override
-    public IRenderHelper getRenderHelper()
-    {
-        return renderHelper;
-    }
 
     @Override
     public IColorHelper getColorHelper()
