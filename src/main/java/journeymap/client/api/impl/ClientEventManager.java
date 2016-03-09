@@ -49,8 +49,9 @@ public class ClientEventManager
 
     /**
      * Notify plugins of MAPPING_STARTED
-     * @param started    if true, event is MAPPING_STARTED
-     * @param dimension  if false, event is MAPPING_STOPPED
+     *
+     * @param started   if true, event is MAPPING_STARTED
+     * @param dimension if false, event is MAPPING_STOPPED
      */
     public void fireMappingEvent(boolean started, int dimension)
     {

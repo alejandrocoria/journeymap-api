@@ -191,6 +191,7 @@ public final class RGB
 
     /**
      * Creates an array with three elements [r,g,b]
+     *
      * @param rgb color integer
      * @return array
      */
@@ -201,7 +202,8 @@ public final class RGB
 
     /**
      * Creates an array with four elements [r,g,b,a]
-     * @param rgb color integer
+     *
+     * @param rgb   color integer
      * @param alpha alpha (0-255)
      * @return array
      */
@@ -333,6 +335,7 @@ public final class RGB
 
     /**
      * Returns a float scaled between 0-1 from an integer scaled between 0-255
+     *
      * @param value
      * @return
      */

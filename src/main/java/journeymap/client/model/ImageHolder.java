@@ -176,13 +176,13 @@ public class ImageHolder implements IThreadedFileIO
      */
     protected boolean writeToDisk(boolean async)
     {
-        if (blank || texture==null || !texture.hasImage())
+        if (blank || texture == null || !texture.hasImage())
         {
             return false;
         }
         else
         {
-            if(async)
+            if (async)
             {
                 // Experimental:  Use Minecraft's IO manager thread
                 ThreadedFileIOBase.getThreadedIOInstance().queueIO(this);
@@ -197,14 +197,14 @@ public class ImageHolder implements IThreadedFileIO
 
     /**
      * Update the image file on disk.
-     *
+     * <p/>
      * Implements IThreaedFileIO, to be called by ThreadedFileIOBase.
      *
      * @return true if a retry is needed
      */
     public boolean writeNextIO()
     {
-        if(texture==null || !texture.hasImage())
+        if (texture == null || !texture.hasImage())
         {
             return false; // no retry
         }
@@ -261,7 +261,7 @@ public class ImageHolder implements IThreadedFileIO
     private void writeImageToFile() throws IOException
     {
         BufferedImage image = texture.getImage();
-        if(image!=null)
+        if (image != null)
         {
             File imageFile = imagePath.toFile();
             if (!imageFile.exists())

@@ -49,7 +49,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
             return;
         }
 
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             ensureTexture();
 
@@ -138,7 +138,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         TextProperties textProperties = overlay.getTextProperties();
         int xShift = (rotation % 360 == 0) ? -textProperties.getOffsetX() : textProperties.getOffsetX();
         int yShift = (rotation % 360 == 0) ? -textProperties.getOffsetY() : textProperties.getOffsetY();
-        if(xShift!=0 && yShift!=0)
+        if (xShift != 0 && yShift != 0)
         {
             Point2D shiftedPoint = gridRenderer.shiftWindowPosition(markerPosition.x, markerPosition.y, xShift, yShift);
             labelPosition.setLocation(shiftedPoint.getX(), shiftedPoint.getY());

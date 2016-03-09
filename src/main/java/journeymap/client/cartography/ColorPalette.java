@@ -84,6 +84,7 @@ public class ColorPalette
 
     /**
      * Constructor invoked by static create() method/
+     *
      * @param resourcePacks
      * @param modNames
      * @param basicColorMap
@@ -109,6 +110,7 @@ public class ColorPalette
 
     /**
      * Returns the active pallete.
+     *
      * @return
      */
     public static ColorPalette getActiveColorPalette()

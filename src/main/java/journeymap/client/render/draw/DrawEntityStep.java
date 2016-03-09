@@ -67,13 +67,13 @@ public class DrawEntityStep implements DrawStep
     @Override
     public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
     {
-        if(pass==Pass.Tooltip)
+        if (pass == Pass.Tooltip)
         {
             return;
         }
 
         EntityLivingBase entityLiving = entityLivingRef.get();
-        if(pass==Pass.Object)
+        if (pass == Pass.Object)
         {
             if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
                     || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
@@ -121,7 +121,7 @@ public class DrawEntityStep implements DrawStep
             return;
         }
 
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             if (locatorTexture != null && showHeading)
             {
@@ -134,7 +134,7 @@ public class DrawEntityStep implements DrawStep
             }
         }
 
-        if(pass == Pass.Text)
+        if (pass == Pass.Text)
         {
             int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
             Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
@@ -162,7 +162,7 @@ public class DrawEntityStep implements DrawStep
 
         //Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
 
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             if (locatorTexture != null && showHeading)
             {
@@ -172,7 +172,7 @@ public class DrawEntityStep implements DrawStep
 
         int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
 
-        if(pass == Pass.Text)
+        if (pass == Pass.Text)
         {
             if (customName != null)
             {
@@ -181,7 +181,7 @@ public class DrawEntityStep implements DrawStep
             }
         }
 
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             if (texture != null)
             {

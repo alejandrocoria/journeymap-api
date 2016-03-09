@@ -374,7 +374,7 @@ public class RenderWaypointBeacon
 
             int[] rgba = RGB.ints(color, 40);
             DrawUtil.startDrawingQuads(true);
-            
+
             DrawUtil.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
             DrawUtil.addVertexWithUV(x + .2, y, z + .2, 1, d29, rgba);
             DrawUtil.addVertexWithUV(x + .8, y, z + .2, 0, d29, rgba);

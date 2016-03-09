@@ -60,7 +60,7 @@ public class ColorHelper_1_8 implements IColorHelper
     @Override
     public boolean clearBlocksTexture()
     {
-        if(blocksTexture==null)
+        if (blocksTexture == null)
         {
             return false;
         }
@@ -256,7 +256,7 @@ public class ColorHelper_1_8 implements IColorHelper
             int x = 0, y = 0;
 
             int xStart, yStart, xStop, yStop;
-            if(icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
+            if (icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
             {
                 logger.warn("Couldn't get texture for " + icon.getIconName() + " because of an error matching it within the stitched blocks atlas.");
                 return null;

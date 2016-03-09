@@ -41,35 +41,35 @@ public class StringField extends ConfigField<String>
         this.value = getString("value", jsonObject);
 
         String validValuesStr = getString("validValues", jsonObject);
-        if(validValuesStr!=null && !validValuesStr.isEmpty())
+        if (validValuesStr != null && !validValuesStr.isEmpty())
         {
             this.validValues = validValuesStr.split(",");
         }
 
         String validValuesProviderClassStr = getString("validValuesProviderClass", jsonObject);
-        if(validValuesProviderClassStr!=null && !validValuesProviderClassStr.isEmpty())
+        if (validValuesProviderClassStr != null && !validValuesProviderClassStr.isEmpty())
         {
             try
             {
                 this.validValuesProviderClass = Class.forName(validValuesProviderClassStr);
                 List<String> validValuesList = new ArrayList<String>();
 
-                if(StringListProvider.class.isAssignableFrom(validValuesProviderClass))
+                if (StringListProvider.class.isAssignableFrom(validValuesProviderClass))
                 {
                     StringListProvider provider = (StringListProvider) validValuesProviderClass.newInstance();
                     this.defaultValue = provider.getDefaultString();
                     validValuesList = provider.getStrings();
                 }
-                else if(Enum.class.isAssignableFrom(validValuesProviderClass))
+                else if (Enum.class.isAssignableFrom(validValuesProviderClass))
                 {
                     EnumSet<? extends Enum> enumSet = EnumSet.allOf(validValuesProviderClass);
-                    for(Enum enumVal : enumSet)
+                    for (Enum enumVal : enumSet)
                     {
                         validValuesList.add(enumVal.name());
                     }
                 }
 
-                if(!validValuesList.isEmpty())
+                if (!validValuesList.isEmpty())
                 {
                     this.validValues = validValuesList.toArray(new String[validValuesList.size()]);
                 }
@@ -89,11 +89,11 @@ public class StringField extends ConfigField<String>
         final JsonObject jsonObject = super.serialize();
         jsonObject.addProperty("defaultValue", this.defaultValue);
         jsonObject.addProperty("value", this.value);
-        if(validValues!=null && validValues.length>0)
+        if (validValues != null && validValues.length > 0)
         {
             jsonObject.addProperty("validValues", Joiner.on(",").join(validValues));
         }
-        if(validValuesProviderClass!=null)
+        if (validValuesProviderClass != null)
         {
             jsonObject.addProperty("validValuesProviderClass", this.validValuesProviderClass.getName());
         }

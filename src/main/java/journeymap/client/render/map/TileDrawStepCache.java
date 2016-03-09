@@ -19,7 +19,6 @@ import journeymap.common.Journeymap;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,7 +67,7 @@ public class TileDrawStepCache
 
     public static void setContext(File worldDir, MapType mapType)
     {
-        if(!worldDir.equals(Holder.INSTANCE.worldDir))
+        if (!worldDir.equals(Holder.INSTANCE.worldDir))
         {
             instance().invalidateAll();
         }

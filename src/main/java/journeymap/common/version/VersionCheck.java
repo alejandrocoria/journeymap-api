@@ -133,7 +133,7 @@ public class VersionCheck
 
                         JsonObject project = new JsonParser().parse(rawResponse).getAsJsonObject();
                         JsonElement version = project.get("versions").getAsJsonObject().get(Loader.MC_VERSION);
-                        if(version==null)
+                        if (version == null)
                         {
                             Journeymap.getLogger().warn("No versions found online for " + Loader.MC_VERSION);
                         }
@@ -152,7 +152,7 @@ public class VersionCheck
                                         continue;
                                     }
                                     String name = file.get("name").getAsString();
-                                    if(!name.contains(Loader.MC_VERSION))
+                                    if (!name.contains(Loader.MC_VERSION))
                                     {
                                         continue;
                                     }

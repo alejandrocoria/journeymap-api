@@ -83,7 +83,7 @@ public class RegionImageCache
                         {
                             // Don't force it, but do it synchronously to ensure things aren't GCd before it's done.
                             int count = regionImageSet.writeToDisk(false, false);
-                            if (count>0 && Journeymap.getLogger().isDebugEnabled())
+                            if (count > 0 && Journeymap.getLogger().isDebugEnabled())
                             {
                                 Journeymap.getLogger().debug("Wrote to disk before removal from cache: " + regionImageSet);
                             }
@@ -119,8 +119,9 @@ public class RegionImageCache
 
     /**
      * Finalize images before they can be bound as textures or written to disk
+     *
      * @param forceFlush whether to force images to be written to disk
-     * @param async whether to do file writes on a different thread
+     * @param async      whether to do file writes on a different thread
      */
     public void updateTextures(boolean forceFlush, boolean async)
     {
@@ -150,6 +151,7 @@ public class RegionImageCache
 
     /**
      * Write all dirty images to disk if flushInterval has passed
+     *
      * @param async whether to do file writes on a different thread
      */
     private void autoFlush(boolean async)
@@ -166,6 +168,7 @@ public class RegionImageCache
 
     /**
      * Write all dirty images to disk.
+     *
      * @param async Whether to do file writes asynchronously
      */
     public void flushToDisk(boolean async)
@@ -174,7 +177,7 @@ public class RegionImageCache
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
             // Don't force writes that aren't necessary
-            count+=regionImageSet.writeToDisk(false, async);
+            count += regionImageSet.writeToDisk(false, async);
         }
         lastFlush = System.currentTimeMillis();
     }

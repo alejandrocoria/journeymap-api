@@ -191,6 +191,7 @@ public enum ClientAPI implements IClientAPI
 
     /**
      * Gets the manager of client event handling.
+     *
      * @return clientEventManager
      */
     public ClientEventManager getClientEventManager()
@@ -246,7 +247,7 @@ public enum ClientAPI implements IClientAPI
             if (plugin == null)
             {
                 // TODO REMOVE THIS temp
-                if(modId.equals("journeymap"))
+                if (modId.equals("journeymap"))
                 {
                     plugin = new IClientPlugin()
                     {

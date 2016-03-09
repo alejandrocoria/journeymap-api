@@ -54,13 +54,14 @@ class PluginWrapper
 
     /**
      * Get (create if needed) a table for the overlays in a dimension.
+     *
      * @param dimension the current dim
      * @return a table
      */
     private HashBasedTable<String, Overlay, OverlayDrawStep> getOverlays(int dimension)
     {
         HashBasedTable<String, Overlay, OverlayDrawStep> table = dimensionOverlays.get(dimension);
-        if(table==null)
+        if (table == null)
         {
             table = HashBasedTable.create();
             dimensionOverlays.put(dimension, table);
@@ -162,7 +163,7 @@ class PluginWrapper
         }
         else
         {
-            for(HashBasedTable<String, Overlay, OverlayDrawStep> overlays : dimensionOverlays.values())
+            for (HashBasedTable<String, Overlay, OverlayDrawStep> overlays : dimensionOverlays.values())
             {
                 List<Displayable> list = new ArrayList<Displayable>(overlays.columnKeySet());
                 for (Displayable displayable : list)
@@ -210,7 +211,7 @@ class PluginWrapper
             case Waypoint:
                 return waypoints.containsRow(displayId);
             default:
-                if(displayable instanceof Overlay)
+                if (displayable instanceof Overlay)
                 {
                     int dimension = ((Overlay) displayable).getDimension();
                     return getOverlays(dimension).containsRow(displayId);
@@ -225,7 +226,7 @@ class PluginWrapper
     public void getDrawSteps(List<OverlayDrawStep> list, UIState uiState)
     {
         HashBasedTable<String, Overlay, OverlayDrawStep> table = getOverlays(uiState.dimension);
-        for( Table.Cell<String, Overlay, OverlayDrawStep> cell : table.cellSet())
+        for (Table.Cell<String, Overlay, OverlayDrawStep> cell : table.cellSet())
         {
             if (cell.getColumnKey().isActiveIn(uiState))
             {

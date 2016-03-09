@@ -15,7 +15,6 @@ import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

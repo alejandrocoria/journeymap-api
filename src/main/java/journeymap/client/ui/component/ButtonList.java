@@ -38,9 +38,9 @@ public class ButtonList extends ArrayList<Button>
 
     public ButtonList(List<GuiButton> buttons)
     {
-        for(GuiButton button : buttons)
+        for (GuiButton button : buttons)
         {
-            if(button instanceof Button)
+            if (button instanceof Button)
             {
                 add((Button) button);
             }

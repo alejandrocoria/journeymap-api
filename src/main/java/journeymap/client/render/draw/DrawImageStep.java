@@ -51,7 +51,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
             return;
         }
 
-        if(pass == Pass.Object)
+        if (pass == Pass.Object)
         {
             ensureTexture();
 

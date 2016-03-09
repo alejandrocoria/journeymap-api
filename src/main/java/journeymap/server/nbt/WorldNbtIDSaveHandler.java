@@ -18,14 +18,13 @@ import java.util.UUID;
  */
 public class WorldNbtIDSaveHandler
 {
-    private NBTWorldSaveDataHandler data;
-    private NBTWorldSaveDataHandler legacyData;
-    private World world;
-
     private static final String LEGACY_DAT_FILE = "JourneyMapWorldID";
     private static final String LEGACY_WORLD_ID_KEY = "JourneyMapWorldID";
     private static final String DAT_FILE = "WorldUUID";
     private static final String WORLD_ID_KEY = "world_uuid";
+    private NBTWorldSaveDataHandler data;
+    private NBTWorldSaveDataHandler legacyData;
+    private World world;
 
     public WorldNbtIDSaveHandler()
     {
