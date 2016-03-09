@@ -272,11 +272,11 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     {
         if (strata.isEmpty())
         {
-            if(dayG2d!=null)
+            if (dayG2d != null)
             {
                 dayG2d.paintBadBlock(x, y, z);
             }
-            if(nightG2d!=null)
+            if (nightG2d != null)
             {
                 nightG2d.paintBadBlock(x, y, z);
             }
