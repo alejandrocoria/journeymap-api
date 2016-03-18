@@ -9,25 +9,25 @@
 package journeymap.client.ui.component;
 
 import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.BooleanField;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Button that wraps and syncs with an AtomicBoolean value owned by a config instance.
+ * Button that wraps and syncs with an BooleanField value owned by a config instance.
  */
-public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<AtomicBoolean, Boolean>
+public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<BooleanField, Boolean>
 {
     final CommonProperties properties;
-    final AtomicBoolean valueHolder;
+    final BooleanField valueHolder;
 
-    public BooleanPropertyButton(String labelOn, String labelOff, CommonProperties properties, AtomicBoolean valueHolderParam)
+    public BooleanPropertyButton(String labelOn, String labelOff, CommonProperties properties, BooleanField valueHolderParam)
     {
         super(labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
         this.valueHolder = valueHolderParam;
         this.properties = properties;
     }
 
-    public AtomicBoolean getValueHolder()
+    public BooleanField getValueHolder()
     {
         return valueHolder;
     }
@@ -75,7 +75,7 @@ public class BooleanPropertyButton extends OnOffButton implements IPropertyHolde
     }
 
     @Override
-    public AtomicBoolean getProperty()
+    public BooleanField getProperty()
     {
         return valueHolder;
     }

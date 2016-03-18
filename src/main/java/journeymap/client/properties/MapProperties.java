@@ -5,61 +5,39 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.model.MapType;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static journeymap.common.properties.config.Config.Category.Inherit;
+import static journeymap.common.properties.Category.Hidden;
+import static journeymap.common.properties.Category.Inherit;
 
 /**
  * Shared Properties for the various map types.
  */
 public abstract class MapProperties extends ClientProperties implements Comparable<MapProperties>
 {
-    @Config(category = Inherit, key = "jm.common.show_mobs")
-    public final AtomicBoolean showMobs = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_animals")
-    public final AtomicBoolean showAnimals = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_villagers")
-    public final AtomicBoolean showVillagers = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_pets")
-    public final AtomicBoolean showPets = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_players")
-    public final AtomicBoolean showPlayers = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_waypoints")
-    public final AtomicBoolean showWaypoints = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_self")
-    public final AtomicBoolean showSelf = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.show_grid")
-    public final AtomicBoolean showGrid = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.common.mob_icon_set", stringListProvider = IconSetFileHandler.IconSetStringListProvider.class)
-    public final AtomicReference<String> entityIconSetName = new AtomicReference<String>("2D");
-
-    public final AtomicInteger zoomLevel = new AtomicInteger(0);
+    public final BooleanField showMobs = new BooleanField(Inherit, "jm.common.show_mobs", true);
+    public final BooleanField showAnimals = new BooleanField(Inherit, "jm.common.show_animals", true);
+    public final BooleanField showVillagers = new BooleanField(Inherit, "jm.common.show_villagers", true);
+    public final BooleanField showPets = new BooleanField(Inherit, "jm.common.show_pets", true);
+    public final BooleanField showPlayers = new BooleanField(Inherit, "jm.common.show_players", true);
+    public final BooleanField showWaypoints = new BooleanField(Inherit, "jm.common.show_waypoints", true);
+    public final BooleanField showSelf = new BooleanField(Inherit, "jm.common.show_self", true);
+    public final BooleanField showGrid = new BooleanField(Inherit, "jm.common.show_grid", true);
+    public final StringField entityIconSetName = new StringField(Inherit, "jm.common.mob_icon_set", IconSetFileHandler.IconSetValuesProvider.class);
+    public final EnumField<MapType.Name> preferredMapType = new EnumField<MapType.Name>(Hidden, "", MapType.Name.day);
+    public final IntegerField zoomLevel = new IntegerField(Hidden, "", 0, 8, 0);
 
     protected MapProperties()
     {
     }
-
-    public abstract AtomicReference<String> getEntityIconSetName();
-
-    public abstract AtomicReference<MapType.Name> getPreferredMapType();
 
     @Override
     public boolean equals(Object o)
@@ -72,7 +50,6 @@ public abstract class MapProperties extends ClientProperties implements Comparab
         {
             return false;
         }
-
         MapProperties that = (MapProperties) o;
         return this.compareTo(that) == 0;
     }
@@ -87,7 +64,7 @@ public abstract class MapProperties extends ClientProperties implements Comparab
         result = 31 * result + showPlayers.hashCode();
         result = 31 * result + showWaypoints.hashCode();
         result = 31 * result + showSelf.hashCode();
-        result = 31 * result + getEntityIconSetName().hashCode();
+        result = 31 * result + entityIconSetName.hashCode();
         return result;
     }
 
@@ -110,6 +87,5 @@ public abstract class MapProperties extends ClientProperties implements Comparab
                 .add("showWaypoints", showWaypoints)
                 .add("zoomLevel", zoomLevel);
     }
-
 
 }

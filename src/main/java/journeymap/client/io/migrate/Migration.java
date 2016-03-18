@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
  */
 public class Migration
 {
-    Task[] tasks = new Task[]{new Migrate5_0_0()};
+    Task[] tasks = new Task[]{new Migrate5_2()};
 
     public boolean performTasks()
     {
@@ -39,7 +39,7 @@ public class Migration
 
         if (!success)
         {
-            Journeymap.getLogger().fatal("Migration failed! JourneyMap is likely to experience significant errors.");
+            Journeymap.getLogger().fatal("Migration failed! JourneyMap may experience significant errors.");
         }
 
         return success;

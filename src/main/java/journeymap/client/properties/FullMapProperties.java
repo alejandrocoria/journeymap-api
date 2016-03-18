@@ -5,23 +5,17 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.MapType;
-
-import java.util.concurrent.atomic.AtomicReference;
+import journeymap.common.properties.config.StringField;
 
 /**
  * Properties for the full map in-game.
  */
 public class FullMapProperties extends InGameMapProperties
 {
-    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
-
-    protected transient final String name = "fullmap";
-
     public FullMapProperties()
     {
     }
@@ -36,21 +30,9 @@ public class FullMapProperties extends InGameMapProperties
     }
 
     @Override
-    public AtomicReference<String> getEntityIconSetName()
-    {
-        return entityIconSetName;
-    }
-
-    @Override
-    public AtomicReference<MapType.Name> getPreferredMapType()
-    {
-        return preferredMapType;
-    }
-
-    @Override
     public String getName()
     {
-        return name;
+        return "fullmap";
     }
 
     @Override
@@ -68,7 +50,6 @@ public class FullMapProperties extends InGameMapProperties
         {
             return false;
         }
-
         FullMapProperties that = (FullMapProperties) o;
         return 0 == this.compareTo(that);
     }
@@ -79,7 +60,7 @@ public class FullMapProperties extends InGameMapProperties
         int result = super.hashCode();
         result = 31 * result + showGrid.hashCode();
         result = 31 * result + showCaves.hashCode();
-        result = 31 * result + name.hashCode();
+        result = 31 * result + getName().hashCode();
         return result;
     }
 
@@ -91,5 +72,4 @@ public class FullMapProperties extends InGameMapProperties
                 .add("showGrid", showGrid)
                 .toString();
     }
-
 }

@@ -12,12 +12,11 @@ import journeymap.client.Constants;
 import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.CommonProperties;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Encapsulates the variations of location formats.
@@ -52,7 +51,7 @@ public class LocationFormat
         return Constants.getString(getFormatKeys(id).label_key);
     }
 
-    public static class IdProvider implements StringListProvider
+    public static class IdProvider implements StringField.ValuesProvider
     {
         public IdProvider()
         {
@@ -103,7 +102,7 @@ public class LocationFormat
     {
         LocationFormat locationFormat;
 
-        public Button(CommonProperties properties, AtomicReference<String> valueHolder)
+        public Button(CommonProperties properties, StringField valueHolder)
         {
             super(Arrays.asList(locationFormatIds), Constants.getString("jm.common.location_format"), properties, valueHolder);
             if (locationFormat == null)

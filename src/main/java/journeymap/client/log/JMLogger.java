@@ -15,7 +15,7 @@ import journeymap.client.io.FileHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.CommonProperties;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import org.apache.logging.log4j.Level;
@@ -232,7 +232,7 @@ public class JMLogger
         }
     }
 
-    public static class LogLevelStringProvider implements StringListProvider
+    public static class LogLevelStringProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()

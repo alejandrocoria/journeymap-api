@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
 import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.StringField;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
@@ -19,14 +20,14 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Created by mwoodman on 6/24/2014.
  */
-public class IconSetButton extends Button implements IPropertyHolder<AtomicReference<String>, String>
+public class IconSetButton extends Button implements IPropertyHolder<StringField, String>
 {
     final String messageKey;
     final CommonProperties baseProperties;
-    final AtomicReference<String> valueHolder;
+    final StringField valueHolder;
     final ArrayList<Object> validNames;
 
-    public IconSetButton(CommonProperties baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
+    public IconSetButton(CommonProperties baseProperties, StringField valueHolder, List validNames, String messageKey)
     {
         super(0, 0, Constants.getString(messageKey, ""));
         this.baseProperties = baseProperties;
@@ -89,7 +90,7 @@ public class IconSetButton extends Button implements IPropertyHolder<AtomicRefer
     }
 
     @Override
-    public AtomicReference<String> getProperty()
+    public StringField getProperty()
     {
         return valueHolder;
     }

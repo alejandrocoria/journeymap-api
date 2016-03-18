@@ -19,7 +19,7 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
@@ -392,7 +392,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openOptionsManager(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
+            UIManager.getInstance().openOptionsManager(this, Category.Waypoint, Category.WaypointBeacon);
             return;
         }
     }
@@ -597,7 +597,7 @@ public class WaypointManager extends JmUI
         }
     }
 
-    Map<Config.Category, List<SlotMetadata>> getToolbars()
+    Map<Category, List<SlotMetadata>> getToolbars()
     {
         return Collections.EMPTY_MAP;
     }
