@@ -12,18 +12,15 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.common.Journeymap;
-import journeymap.common.properties.config.AtomicBooleanSerializer;
-import journeymap.common.properties.config.AtomicIntegerSerializer;
-import journeymap.common.properties.config.AtomicReferenceSerializer;
-import journeymap.common.properties.config.ConfigValidation;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.config.*;
 import journeymap.common.version.Version;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 /**
  * Base GSON-backed properties class.
@@ -33,21 +30,21 @@ public abstract class CommonProperties
     // GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
-    // Flag the serializers can use to signal the file format needs to be updated
-    protected static transient final AtomicBoolean configFormatChanged = new AtomicBoolean(false);
-
-
     // Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(AtomicBoolean.class, new AtomicBooleanSerializer(configFormatChanged))
-            .registerTypeAdapter(AtomicInteger.class, new AtomicIntegerSerializer(configFormatChanged))
-            .registerTypeAdapter(AtomicReference.class, new AtomicReferenceSerializer(configFormatChanged))
+            .registerTypeAdapter(BooleanField.class, new PropertiesSerializer.BooleanFieldSerializer(false))
+            .registerTypeAdapter(IntegerField.class, new PropertiesSerializer.IntegerFieldSerializer(false))
+            .registerTypeAdapter(StringField.class, new PropertiesSerializer.StringFieldSerializer(false))
+            .registerTypeAdapter(EnumField.class, new PropertiesSerializer.EnumFieldSerializer(false))
             .create();
+
     // Whether it's disabled
-    protected final AtomicBoolean disabled = new AtomicBoolean(false);
+    public Boolean disabled = false;
+
     // Version used to create config
-    protected Version configVersion = null;
+    public Version configVersion = null;
+
     // Current file reference
     protected transient File sourceFile = null;
 
@@ -128,7 +125,7 @@ public abstract class CommonProperties
      */
     public boolean isDisabled()
     {
-        return disabled.get();
+        return disabled;
     }
 
     /**
@@ -141,7 +138,7 @@ public abstract class CommonProperties
     {
         if (isWorldConfig())
         {
-            disabled.set(disable);
+            disabled = (disable);
             save();
         }
         else
@@ -248,7 +245,7 @@ public abstract class CommonProperties
         }
     }
 
-    public boolean toggle(final AtomicBoolean ab)
+    public boolean toggle(final BooleanField ab)
     {
         ab.set(!ab.get());
         save();
@@ -285,7 +282,7 @@ public abstract class CommonProperties
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
+            Journeymap.getLogger().error(String.format("Can't load config file %s: %s", propFile, LogFormatter.toPartialString(e)));
 
             try
             {
@@ -337,34 +334,70 @@ public abstract class CommonProperties
      */
     protected boolean validate()
     {
-        // Use annotations
-        boolean saveNeeded = validateConfigs();
+        // Check fields
+        boolean saveNeeded = validateFields();
 
         // Only world configs should be disabled.
         if (!isWorldConfig() && isDisabled())
         {
-            disabled.set(false);
+            disabled = (false);
             saveNeeded = true;
-        }
-
-        if (configFormatChanged.get())
-        {
-            saveNeeded = true;
-            configFormatChanged.set(false);
-            Journeymap.getLogger().info("File format will be updated for " + this.getFileName());
         }
 
         return saveNeeded;
     }
 
     /**
-     * Use @Config annotations to validate value ranges
+     * Use reflection to validate all fields
      *
      * @return
      */
-    protected boolean validateConfigs()
+    protected boolean validateFields()
     {
-        return ConfigValidation.validateConfigs(this);
+        try
+        {
+            boolean saveNeeded = false;
+
+            Class<?> theClass = getClass();
+
+            while(theClass.isAssignableFrom(CommonProperties.class))
+            {
+                for (Field field : getClass().getDeclaredFields())
+                {
+                    Class<?> fieldType = field.getType();
+
+                    if (ConfigField.class.isAssignableFrom(fieldType))
+                    {
+                        ConfigField configField = (ConfigField) field.get(this);
+                        if (configField == null)
+                        {
+                            Journeymap.getLogger().warn(theClass.getSimpleName() + " had null ConfigField for " + field.getName());
+                            saveNeeded = true;
+                        }
+                        else
+                        {
+                            boolean fieldSaveNeeded = configField.saveNeeded();
+                            if(fieldSaveNeeded)
+                            {
+                                Journeymap.getLogger().warn(theClass.getSimpleName() + " had problematic ConfigField for " + field.getName());
+                            }
+
+                            saveNeeded = fieldSaveNeeded || saveNeeded;
+                        }
+                    }
+                }
+
+                // Look for fields on the parent class too
+                theClass = theClass.getSuperclass();
+            }
+
+            return saveNeeded;
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Unexpected error in validateFields: " + LogFormatter.toString(t));
+            return false;
+        }
     }
 
     public void ensureValid()

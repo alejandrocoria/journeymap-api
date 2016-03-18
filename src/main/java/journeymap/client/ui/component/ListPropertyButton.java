@@ -10,6 +10,7 @@ package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
 import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
@@ -17,21 +18,20 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Base class for a property that has a list of values.
+ * Base class for a field that has a list of values.
  */
-public class ListPropertyButton<T> extends Button implements IPropertyHolder<AtomicReference<T>, T>
+public class ListPropertyButton<T> extends Button implements IPropertyHolder<ConfigField<T>, T>
 {
     protected final CommonProperties properties;
-    protected final AtomicReference<T> valueHolder;
+    protected final ConfigField<T> valueHolder;
     protected final List<T> values;
     protected final String baseLabel;
     protected final String glyph = "\u21D5";
     protected final String labelPattern = "%1$s : %2$s %3$s %2$s";
 
-    public ListPropertyButton(Collection<T> values, String label, CommonProperties properties, AtomicReference<T> valueHolder)
+    public ListPropertyButton(Collection<T> values, String label, CommonProperties properties, ConfigField<T> valueHolder)
     {
         super("");
         this.valueHolder = valueHolder;
@@ -55,7 +55,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
         displayString = getFormattedLabel(value.toString());
     }
 
-    public AtomicReference<T> getValueHolder()
+    public ConfigField<T> getValueHolder()
     {
         return valueHolder;
     }
@@ -132,7 +132,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
     }
 
     @Override
-    public AtomicReference<T> getProperty()
+    public ConfigField<T> getProperty()
     {
         return valueHolder;
     }

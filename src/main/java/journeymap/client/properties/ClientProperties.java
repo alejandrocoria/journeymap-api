@@ -21,7 +21,7 @@ public abstract class ClientProperties extends CommonProperties
             "// " + Constants.getString("jm.config.file_header_2", Constants.CONFIG_DIR),
             // "// " + Constants.getString("jm.config.file_header_3", Constants.DATA_DIR + File.separator + "**" + File.separator),
             // "// " + Constants.getString("jm.config.file_header_4"),
-            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.info/help/wiki/Options_Manager")
+            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.info/Options_Manager")
     };
 
     @Override

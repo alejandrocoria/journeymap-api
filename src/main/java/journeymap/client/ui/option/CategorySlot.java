@@ -14,7 +14,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ScrollListPane;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
 import net.minecraft.client.Minecraft;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     final String name;
     Minecraft mc = ForgeHelper.INSTANCE.getClient();
     SlotMetadata metadata;
-    Config.Category category;
+    Category category;
     int currentSlotIndex;
     Button button;
     int currentListWidth;
@@ -41,12 +41,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     String glyphOpen = "\u25BC";
     private boolean selected;
 
-    public CategorySlot(Config.Category category)
+    public CategorySlot(Category category)
     {
         this.category = category;
         this.name = Constants.getString(category.key);
         String tooltip = Constants.getString(category.key + ".tooltip");
-        boolean advanced = category == Config.Category.Advanced;
+        boolean advanced = category == Category.Advanced;
 
         button = new Button(name);
 //        button.setDefaultStyle(false);
@@ -304,7 +304,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return childMetadataList.contains(slotMetadata);
     }
 
-    public Config.Category getCategory()
+    public Category getCategory()
     {
         return category;
     }
