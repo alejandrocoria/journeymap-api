@@ -48,7 +48,7 @@ public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
             }
 
             // Exclude animals being ridden, since their positions lag behind the players on the map
-            if (entityLiving.riddenByEntity != null)
+            if (entityLiving.isBeingRidden())
             {
                 finalList.remove(entityDTO);
             }

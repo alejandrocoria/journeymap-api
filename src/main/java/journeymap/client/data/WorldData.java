@@ -23,6 +23,7 @@ import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
@@ -214,7 +215,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                         try
                         {
                             WorldProvider dimProvider = DimensionManager.getProvider(dim);
-                            dimProvider.getDimensionName(); // Force the name error
+                            dimProvider.getDimensionType().getName(); // Force the name error
                             dimProviders.put(dim, dimProvider);
                             Journeymap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
                         }
@@ -229,7 +230,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                         try
                         {
                             provider = DimensionManager.createProviderFor(dim);
-                            provider.getDimensionName(); // Force the name error
+                            provider.getDimensionType().getName(); // Force the name error
                             provider.setDimension(dim);
                             dimProviders.put(dim, provider);
                             Journeymap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
@@ -285,7 +286,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            return worldProvider.getDimensionName();
+            return worldProvider.getDimensionType().getName();
         }
         catch (Exception e)
         {
@@ -349,6 +350,14 @@ public class WorldData extends CacheLoader<Class, WorldData>
         public String getInternalNameSuffix()
         {
             return "fake";
+        }
+
+        @Override
+        public DimensionType getDimensionType()
+        {
+
+            //TODO: this needs to return the dim name
+            return null;
         }
     }
 }
