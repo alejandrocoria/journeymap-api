@@ -16,7 +16,6 @@ import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
@@ -25,7 +24,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -118,7 +116,7 @@ public class ColorHelper_1_9 implements IColorHelper
 
         // 1.9 TODO  I have no idea if this will work
         IBlockState blockState = blockMD.getBlock().getStateFromMeta(blockMD.getMeta());
-        return ((EnumDyeColor) blockState.getValue(BlockColored.COLOR)).getMapColor().colorValue;
+        return blockState.getMapColor().colorValue;
     }
 
     @Override
