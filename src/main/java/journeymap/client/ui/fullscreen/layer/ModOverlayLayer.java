@@ -17,7 +17,7 @@ import journeymap.client.render.draw.OverlayDrawStep;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

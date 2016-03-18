@@ -16,7 +16,7 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -286,7 +286,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
         if (!this.isEnabled() && showDisabledHoverText)
         {
-            list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
+            list.add(TextFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
         }
         return list;
     }

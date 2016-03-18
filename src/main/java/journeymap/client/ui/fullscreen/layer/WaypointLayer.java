@@ -21,8 +21,8 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;

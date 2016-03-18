@@ -20,9 +20,9 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.awt.*;
@@ -378,7 +378,7 @@ public class Waypoint implements Serializable
         return getZ() + .5d;
     }
 
-    public Vec3 getPosition()
+    public Vec3d getPosition()
     {
         return ForgeHelper.INSTANCE.newVec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }

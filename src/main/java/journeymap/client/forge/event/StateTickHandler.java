@@ -20,9 +20,9 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -179,7 +179,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             try
             {
                 String error = I18n.format("jm.error.java6");
-                ForgeHelper.INSTANCE.getClient().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(error));
+                ForgeHelper.INSTANCE.getClient().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(error));
                 Journeymap.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
             }
             catch (Exception e2)

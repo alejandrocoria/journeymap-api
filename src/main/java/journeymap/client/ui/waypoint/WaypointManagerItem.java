@@ -26,7 +26,7 @@ import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import java.awt.*;
 import java.util.Collection;
@@ -177,7 +177,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
         fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color);
 
-        String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
+        String name = waypointValid ? waypoint.getName() : TextFormatting.STRIKETHROUGH + waypoint.getName();
         fr.drawStringWithShadow(name, manager.colName, y + yOffset, color);
     }
 

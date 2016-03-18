@@ -53,8 +53,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -404,8 +404,8 @@ public class Fullscreen extends JmUI
             });
 
             String[] tooltips = new String[]{
-                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_name", theme.name),
-                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)
+                    TextFormatting.ITALIC + Constants.getString("jm.common.ui_theme_name", theme.name),
+                    TextFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)
             };
             buttonTheme.setAdditionalTooltips(Arrays.asList(tooltips));
 
@@ -485,7 +485,7 @@ public class Fullscreen extends JmUI
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
             buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
-            buttonGrid.setTooltip(EnumChatFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
+            buttonGrid.setTooltip(TextFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
             buttonGrid.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override

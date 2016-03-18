@@ -14,7 +14,7 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.ui.UIManager;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -49,7 +49,7 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
                 String text = event.message.getFormattedText();
                 if (!Strings.isNullOrEmpty(text))
                 {
-                    checkForControlCode(text.replaceAll(EnumChatFormatting.RESET.toString(), ""));
+                    checkForControlCode(text.replaceAll(TextFormatting.RESET.toString(), ""));
                 }
             }
             catch (Exception e)

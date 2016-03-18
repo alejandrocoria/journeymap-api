@@ -39,10 +39,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.realms.RealmsScreen;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
@@ -258,13 +258,13 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public Vec3 newVec3(double x, double y, double z)
+    public Vec3d newVec3(double x, double y, double z)
     {
         // 1.7
         // return Vec3.createVectorHelper(x, y, z);
 
         // 1.8
-        return new Vec3(x, y, z);
+        return new Vec3d(x, y, z);
     }
 
     /**
@@ -348,7 +348,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public Vec3 getEntityPositionVector(Entity entity)
+    public Vec3d getEntityPositionVector(Entity entity)
     {
         // 1.7
         // return entity.getPosition(1);

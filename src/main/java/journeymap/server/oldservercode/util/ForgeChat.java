@@ -3,7 +3,7 @@ package journeymap.server.oldservercode.util;
 import journeymap.common.Journeymap;
 import journeymap.server.oldservercode.chat.IChatHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.text.TextComponentString;
 
 
 /**
@@ -15,12 +15,12 @@ public class ForgeChat implements IChatHandler
     @Override
     public void sendChatMessage(String player, String message)
     {
-        ChatComponentText msg = new ChatComponentText(message);
+        TextComponentString msg = new TextComponentString(message);
         sendCommandResponse(player, msg);
 
     }
 
-    private void sendCommandResponse(String sender, ChatComponentText text)
+    private void sendCommandResponse(String sender, TextComponentString text)
     {
         EntityPlayerMP player = ForgePlayerUtil.instance.getPlayerEntityByName(sender);
         if (player != null)

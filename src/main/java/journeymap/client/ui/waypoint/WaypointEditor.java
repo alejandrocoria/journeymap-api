@@ -32,7 +32,7 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldProvider;
 import org.lwjgl.input.Keyboard;
 

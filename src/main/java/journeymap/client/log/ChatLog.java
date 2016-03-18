@@ -15,12 +15,12 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.List;
 public class ChatLog
 {
     // Announcements
-    static final List<ChatComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<ChatComponentTranslation>());
+    static final List<TextComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<TextComponentTranslation>());
     public static boolean enableAnnounceMod = false;
     private static boolean initialized = false;
 
@@ -43,9 +43,9 @@ public class ChatLog
      *
      * @param chat
      */
-    public static void queueAnnouncement(IChatComponent chat)
+    public static void queueAnnouncement(ITextComponent chat)
     {
-        ChatComponentTranslation wrap = new ChatComponentTranslation("jm.common.chat_announcement", new Object[]{chat});
+        TextComponentTranslation wrap = new TextComponentTranslation("jm.common.chat_announcement", new Object[]{chat});
         announcements.add(wrap);
     }
 
@@ -57,9 +57,9 @@ public class ChatLog
      */
     public static void announceURL(String message, String url)
     {
-        ChatComponentText chat = new ChatComponentText(message);
+        TextComponentString chat = new TextComponentString(message);
         chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(url)));
+        chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(url)));
         //chat.getChatStyle().setUnderlined(false);
         queueAnnouncement(chat);
     }
@@ -72,11 +72,11 @@ public class ChatLog
      */
     public static void announceFile(String message, File file)
     {
-        ChatComponentText chat = new ChatComponentText(message);
+        TextComponentString chat = new TextComponentString(message);
         try
         {
             chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
-            chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(file.getCanonicalPath())));
+            chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(file.getCanonicalPath())));
         }
         catch (Exception e)
         {
@@ -94,7 +94,7 @@ public class ChatLog
     public static void announceI18N(String key, Object... parms)
     {
         String text = Constants.getString(key, parms);
-        ChatComponentText chat = new ChatComponentText(text);
+        TextComponentString chat = new TextComponentString(text);
         queueAnnouncement(chat);
     }
 
@@ -131,7 +131,7 @@ public class ChatLog
 
         while (!announcements.isEmpty())
         {
-            ChatComponentTranslation message = announcements.remove(0);
+            TextComponentTranslation message = announcements.remove(0);
             if (message != null)
             {
                 try
@@ -188,7 +188,7 @@ public class ChatLog
     /**
      * Decorator to indicate log level should be ERROR.
      */
-    private static class ErrorChat extends ChatComponentText
+    private static class ErrorChat extends TextComponentString
     {
 
         public ErrorChat(String text)

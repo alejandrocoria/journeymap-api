@@ -13,7 +13,7 @@ import journeymap.client.render.map.GridRenderer;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

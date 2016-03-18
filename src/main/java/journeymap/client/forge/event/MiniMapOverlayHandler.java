@@ -16,7 +16,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -33,7 +33,7 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
 {
-    private static final String DEBUG_PREFIX = EnumChatFormatting.AQUA + "[JM] " + EnumChatFormatting.RESET;
+    private static final String DEBUG_PREFIX = TextFormatting.AQUA + "[JM] " + TextFormatting.RESET;
     private static final String DEBUG_SUFFIX = "";
     private static RenderGameOverlayEvent.ElementType EVENT_TYPE = RenderGameOverlayEvent.ElementType.ALL;
     private static boolean EVENT_PRE = true;

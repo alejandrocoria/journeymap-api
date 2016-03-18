@@ -14,8 +14,8 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.IPropertyHolder;
 import journeymap.client.ui.component.IntSliderButton;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,32 +193,32 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
         if (tooltipLines == null)
         {
-            ArrayList<ChatComponentTranslation> lines = new ArrayList<ChatComponentTranslation>(4);
+            ArrayList<TextComponentTranslation> lines = new ArrayList<TextComponentTranslation>(4);
             if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
             {
-                EnumChatFormatting nameColor = isToolbar() ? EnumChatFormatting.GREEN : (advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA);
-                lines.add(new ChatComponentTranslation("jm.config.tooltip_format", nameColor, this.name));
+                TextFormatting nameColor = isToolbar() ? TextFormatting.GREEN : (advanced ? TextFormatting.RED : TextFormatting.AQUA);
+                lines.add(new TextComponentTranslation("jm.config.tooltip_format", nameColor, this.name));
                 if (this.tooltip != null)
                 {
-                    lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
+                    lines.addAll(getWordWrappedLines(TextFormatting.YELLOW.toString(), this.tooltip));
                 }
 
                 if (button != null && button instanceof IntSliderButton)
                 {
-                    lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
+                    lines.addAll(getWordWrappedLines(TextFormatting.GRAY.toString() + TextFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));
                 }
 
                 if (this.range != null)
                 {
-                    lines.add(new ChatComponentTranslation("jm.config.tooltip_format", EnumChatFormatting.WHITE, this.range));
+                    lines.add(new TextComponentTranslation("jm.config.tooltip_format", TextFormatting.WHITE, this.range));
                 }
             }
 
             if (!lines.isEmpty())
             {
                 ArrayList<String> stringLines = new ArrayList<String>();
-                for (ChatComponentTranslation line : lines)
+                for (TextComponentTranslation line : lines)
                 {
                     stringLines.add(line.getUnformattedText().trim());
                 }
@@ -228,15 +228,15 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return tooltipLines;
     }
 
-    protected List<ChatComponentTranslation> getWordWrappedLines(String color, String original)
+    protected List<TextComponentTranslation> getWordWrappedLines(String color, String original)
     {
         FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
-        List<ChatComponentTranslation> list = new ArrayList<ChatComponentTranslation>();
+        List<TextComponentTranslation> list = new ArrayList<TextComponentTranslation>();
 
         int max = fontRenderer.getBidiFlag() ? 170 : 250;
         for (Object line : fontRenderer.listFormattedStringToWidth(original, max))
         {
-            list.add(new ChatComponentTranslation("jm.config.tooltip_format", color, line));
+            list.add(new TextComponentTranslation("jm.config.tooltip_format", color, line));
         }
         return list;
     }

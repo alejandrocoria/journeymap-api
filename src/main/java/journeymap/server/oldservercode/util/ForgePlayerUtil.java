@@ -1,9 +1,11 @@
 package journeymap.server.oldservercode.util;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOps;
+import net.minecraftforge.fml.server.FMLServerHandler;
 
 import java.util.UUID;
 
@@ -23,7 +25,7 @@ public class ForgePlayerUtil implements IPlayerUtil
      */
     public GameProfile getPlayerInfoById(UUID uuid)
     {
-        MinecraftServer server = MinecraftServer.getServer();
+        MinecraftServer server = FMLServerHandler.instance().getServer();
         // 1.8
         // GameProfile gameProfile = server.getPlayerProfileCache().func_152652_a(uuid);
 
@@ -40,7 +42,7 @@ public class ForgePlayerUtil implements IPlayerUtil
      */
     public GameProfile getPlayerProfileByName(String playerName)
     {
-        MinecraftServer server = MinecraftServer.getServer();
+        MinecraftServer server = FMLServerHandler.instance().getServer();
         GameProfile gameProfile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
         return gameProfile;
     }
@@ -56,7 +58,7 @@ public class ForgePlayerUtil implements IPlayerUtil
         EntityPlayerMP player = getPlayerEntityByName(playerName);
         if (player instanceof EntityPlayerMP)
         {
-            UserListOps ops = MinecraftServer.getServer().getConfigurationManager().getOppedPlayers();
+            UserListOps ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayers();
             for (String name : ops.getKeys())
             {
                 if (playerName.equals(name))
@@ -76,8 +78,8 @@ public class ForgePlayerUtil implements IPlayerUtil
      */
     public EntityPlayerMP getPlayerEntityByName(String name)
     {
-        MinecraftServer server = MinecraftServer.getServer();
-        return server.getConfigurationManager().getPlayerByUsername(name);
+        MinecraftServer server = FMLServerHandler.instance().getServer();;
+        return server.getPlayerList().getPlayerByUsername(name);
     }
 
     /**
@@ -88,7 +90,7 @@ public class ForgePlayerUtil implements IPlayerUtil
      */
     public EntityPlayerMP getPlayerEntityByUUID(UUID uuid)
     {
-        MinecraftServer server = MinecraftServer.getServer();
-        return server.getConfigurationManager().createPlayerForUser(getPlayerInfoById(uuid));
+        MinecraftServer server = FMLServerHandler.instance().getServer();;
+        return server.getPlayerList().createPlayerForUser(getPlayerInfoById(uuid));
     }
 }

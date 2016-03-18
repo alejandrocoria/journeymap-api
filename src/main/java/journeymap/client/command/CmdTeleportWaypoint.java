@@ -15,7 +15,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.server.management.PlayerList;
 
 /**
  * Created by mwoodman on 4/8/2014.
@@ -35,12 +35,12 @@ public class CmdTeleportWaypoint
         if (mc.getIntegratedServer() != null)
         {
             IntegratedServer mcServer = mc.getIntegratedServer();
-            ServerConfigurationManager configurationManager = null;
+            PlayerList configurationManager = null;
             GameProfile profile = null;
             try
             {
                 profile = new GameProfile(mc.thePlayer.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.thePlayer));
-                configurationManager = mcServer.getConfigurationManager();
+                configurationManager = mcServer.getPlayerList();
 
                 // 1.7
                 //return configurationManager.func_152596_g(profile);

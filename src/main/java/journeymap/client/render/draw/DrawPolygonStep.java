@@ -11,7 +11,7 @@ package journeymap.client.render.draw;
 import journeymap.client.api.display.PolygonOverlay;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

@@ -24,10 +24,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -101,10 +101,10 @@ public class RenderWaypointBeacon
         try
         {
             // Player coords
-            Vec3 playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
+            Vec3d playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
 
             // Move y up to put icon at eye height
-            Vec3 waypointVec = waypoint.getPosition().addVector(0, .118, 0);
+            Vec3d waypointVec = waypoint.getPosition().addVector(0, .118, 0);
 
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
@@ -119,7 +119,7 @@ public class RenderWaypointBeacon
             double maxRenderDistance = mc.gameSettings.renderDistanceChunks * 16;
             if (viewDistance > maxRenderDistance)
             {
-                Vec3 delta = waypointVec.subtract(playerVec).normalize();
+                Vec3d delta = waypointVec.subtract(playerVec).normalize();
                 waypointVec = playerVec.addVector(delta.xCoord * maxRenderDistance, delta.yCoord * maxRenderDistance, delta.zCoord * maxRenderDistance);
                 viewDistance = maxRenderDistance;
             }
@@ -193,7 +193,7 @@ public class RenderWaypointBeacon
 
                 if (waypointProperties.boldLabel.get())
                 {
-                    sb.append(EnumChatFormatting.BOLD);
+                    sb.append(TextFormatting.BOLD);
                 }
                 if (showName)
                 {

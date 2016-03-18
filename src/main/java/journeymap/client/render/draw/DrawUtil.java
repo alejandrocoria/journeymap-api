@@ -16,7 +16,7 @@ import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -32,7 +32,7 @@ public class DrawUtil
     public static double zLevel = 0;
 
     static Tessellator tessellator = Tessellator.getInstance();
-    static WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+    static VertexBuffer worldrenderer = tessellator.getWorldRenderer();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,

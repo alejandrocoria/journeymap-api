@@ -17,7 +17,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public class WaypointDrawStepFactory
         int dimension = player.dimension;
         int maxDistance = JourneymapClient.getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
-        Vec3 playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
+        Vec3d playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
         drawStepList.clear();
 
         try

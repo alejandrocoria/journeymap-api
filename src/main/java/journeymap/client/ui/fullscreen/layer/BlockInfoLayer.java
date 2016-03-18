@@ -23,7 +23,7 @@ import journeymap.client.ui.option.LocationFormat;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
 import java.awt.geom.Point2D;

@@ -6,7 +6,7 @@ import journeymap.server.oldservercode.mapcontrol.MappingOptionsHandler;
 import journeymap.server.oldservercode.network.PacketManager;
 import journeymap.server.oldservercode.reference.Codes;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -65,13 +65,13 @@ public class ForgeEvents
             if (options.disableRadar(playerName))
             {
                 Journeymap.getLogger().info("Disabling Radar for player: " + playerName);
-                player.addChatMessage(new ChatComponentTranslation(Codes.RADAR_CODE));
+                player.addChatMessage(new TextComponentTranslation(Codes.RADAR_CODE));
             }
 
             if (options.disableCaveMapping(playerName))
             {
                 Journeymap.getLogger().info("Disabling CaveMapping for player: " + playerName);
-                player.addChatMessage(new ChatComponentTranslation(Codes.CAVE_MAPPING_CODE));
+                player.addChatMessage(new TextComponentTranslation(Codes.CAVE_MAPPING_CODE));
             }
 
             if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())

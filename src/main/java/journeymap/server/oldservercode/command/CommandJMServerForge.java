@@ -1,8 +1,10 @@
 package journeymap.server.oldservercode.command;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
 
@@ -35,13 +37,14 @@ public class CommandJMServerForge extends CommandBase
         return "/jmserver help|worldid";
     }
 
+
     @Override
     // 1.7.10, 1.8
     // public String canCommandSenderUse()
     // 1.8.8
-    public boolean canCommandSenderUseCommand(ICommandSender sender)
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
     {
-        return super.canCommandSenderUseCommand(sender);
+        return super.checkPermission(server,sender);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class CommandJMServerForge extends CommandBase
     // 1.7.10, 1.8
     // public String execute()
     // 1.8.8
-    public void processCommand(ICommandSender sender, String[] args) throws WrongUsageException
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length > 0)
         {
