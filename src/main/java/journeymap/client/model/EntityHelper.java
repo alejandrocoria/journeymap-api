@@ -219,7 +219,7 @@ public class EntityHelper
             if (entityRender instanceof RenderHorse)
             {
                 EntityHorse horse = ((EntityHorse) entity);
-                final int type = ((EntityHorse) entity).getHorseType();
+                final int type = ((EntityHorse) entity).getHorseVariant();
                 switch (type)
                 {
                     case 1:

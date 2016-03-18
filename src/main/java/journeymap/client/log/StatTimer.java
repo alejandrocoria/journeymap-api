@@ -11,6 +11,7 @@ package journeymap.client.log;
 import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.text.TextFormatting;
 import org.apache.logging.log4j.Logger;
 
 import java.text.DecimalFormat;
@@ -456,7 +457,7 @@ public class StatTimer
 
     public String getLogReportString()
     {
-        return EnumChatFormatting.getTextWithoutFormattingCodes(getSimpleReportString());
+        return TextFormatting.getTextWithoutFormattingCodes(getSimpleReportString());
     }
 
     /**
@@ -476,19 +477,19 @@ public class StatTimer
                 final double avg = total / count;
 
                 final StringBuilder sb = new StringBuilder(name);
-                sb.append(EnumChatFormatting.DARK_GRAY);
-                sb.append(" count ").append(EnumChatFormatting.RESET);
+                sb.append(TextFormatting.DARK_GRAY);
+                sb.append(" count ").append(TextFormatting.RESET);
                 sb.append(count);
-                sb.append(EnumChatFormatting.DARK_GRAY);
-                sb.append(" avg ").append(EnumChatFormatting.RESET);
+                sb.append(TextFormatting.DARK_GRAY);
+                sb.append(" avg ").append(TextFormatting.RESET);
                 if (ranTooLongCount > 0)
                 {
-                    sb.append(EnumChatFormatting.RESET);
+                    sb.append(TextFormatting.RESET);
                 }
                 sb.append(df.format(avg));
-                sb.append(EnumChatFormatting.DARK_GRAY);
+                sb.append(TextFormatting.DARK_GRAY);
                 sb.append("ms");
-                sb.append(EnumChatFormatting.RESET);
+                sb.append(TextFormatting.RESET);
                 if (maxed)
                 {
                     sb.append("(MAXED)");

@@ -9,6 +9,7 @@ import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         setFlags(BlockTallGrass.class, HasAir, NoTopo);
         setFlags(BlockDoublePlant.class, Plant, NoTopo);
         setTextureSide(BlockDoublePlant.class, 2);
-        setFlags(BlockLeavesBase.class, OpenToSky, Foliage, NoTopo);
+        setFlags(BlockLeaves.class, OpenToSky, Foliage, NoTopo);
         setFlags(BlockVine.class, .2F, OpenToSky, CustomBiomeColor, Foliage, NoTopo, NoShadow);
         setFlags(BlockLilyPad.class, CustomBiomeColor, NoTopo);
         setFlags(BlockCrops.class, Crop, NoTopo);
@@ -100,7 +101,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Set flags based on material
-        Material material = blockMD.getBlock().getMaterial();
+        Material material = blockMD.getBlock().getMaterial(blockMD.getBlock().getDefaultState());
         blockMD.addFlags(materialFlags.get(material));
 
         // Set alpha based on material
