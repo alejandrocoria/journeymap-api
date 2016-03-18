@@ -92,7 +92,7 @@ public interface IForgeHelper
 
     public int getPrecipitationHeight(Chunk chunk, int x, int z);
 
-    public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
+    // public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
 
     public TileEntity getTileEntity(int blockX, int y, int blockZ);
 

@@ -79,7 +79,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                     blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
                 }
 
-                String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.getX(), blockY, blockCoord.getZ()).biomeName;
+                String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.getX(), blockY, blockCoord.getZ()).getBiomeName();
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockCoord.getX(),

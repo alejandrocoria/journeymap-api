@@ -344,13 +344,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
         @Override
         public DimensionType getDimensionType()
         {
-            return null;
-        }
-
-        @Override
-        public DimensionType getDimensionType()
-        {
-
             //TODO: this needs to return the dim name
             return null;
         }

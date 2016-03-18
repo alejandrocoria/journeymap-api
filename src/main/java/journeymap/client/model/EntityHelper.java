@@ -31,8 +31,8 @@ import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.*;
 
@@ -219,7 +219,7 @@ public class EntityHelper
             if (entityRender instanceof RenderHorse)
             {
                 EntityHorse horse = ((EntityHorse) entity);
-                final int type = ((EntityHorse) entity).getHorseType();
+                final int type = ((EntityHorse) entity).getHorseVariant();
                 switch (type)
                 {
                     case 1:

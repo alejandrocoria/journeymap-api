@@ -48,7 +48,7 @@ public class MappingMonitorTask implements IMainThreadTask
 
                 GuiScreen guiScreen = mc.currentScreen;
                 if (guiScreen instanceof GuiMainMenu ||
-                        guiScreen instanceof GuiSelectWorld ||
+                        guiScreen instanceof GuiWorldSelection ||
                         guiScreen instanceof GuiMultiplayer)
                 {
                     if (jm.getCurrentWorldId() != null)

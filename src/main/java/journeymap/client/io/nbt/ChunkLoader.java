@@ -64,13 +64,10 @@ public class ChunkLoader
 
     public static ChunkMD getChunkMdFromMemory(World world, int chunkX, int chunkZ)
     {
-        if (world.getChunkProvider().chunkExists(chunkX, chunkZ))
+        Chunk theChunk = world.getChunkProvider().getLoadedChunk(chunkX, chunkZ);
+        if (theChunk != null && ForgeHelper.INSTANCE.hasChunkData(theChunk))
         {
-            Chunk theChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-            if (ForgeHelper.INSTANCE.hasChunkData(theChunk))
-            {
-                return new ChunkMD(theChunk);
-            }
+            return new ChunkMD(theChunk);
         }
         return null;
     }
