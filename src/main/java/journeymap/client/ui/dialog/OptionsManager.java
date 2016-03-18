@@ -31,7 +31,7 @@ import journeymap.client.ui.option.OptionSlotFactory;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -47,10 +47,10 @@ import java.util.*;
  */
 public class OptionsManager extends JmUI
 {
-    protected static EnumSet<Config.Category> openCategories = EnumSet.noneOf(Config.Category.class);
+    protected static EnumSet<Category> openCategories = EnumSet.noneOf(Category.class);
 
     protected final int inGameMinimapId;
-    protected Config.Category[] initialCategories;
+    protected Category[] initialCategories;
     protected CheckBox minimap1PreviewButton;
     protected CheckBox minimap2PreviewButton;
     protected Button minimap1KeysButton, minimap2KeysButton;
@@ -64,8 +64,8 @@ public class OptionsManager extends JmUI
     protected SlotMetadata renderStatsSlotMetadata;
     protected CategorySlot cartographyCategorySlot;
     protected ScrollListPane<CategorySlot> optionsListPane;
-    protected Map<Config.Category, List<SlotMetadata>> toolbars;
-    protected EnumSet<Config.Category> changedCategories = EnumSet.noneOf(Config.Category.class);
+    protected Map<Category, List<SlotMetadata>> toolbars;
+    protected EnumSet<Category> changedCategories = EnumSet.noneOf(Category.class);
     protected boolean forceMinimapUpdate;
     protected ButtonList editGridButtons = new ButtonList();
 
@@ -76,10 +76,10 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(GuiScreen returnDisplay)
     {
-        this(returnDisplay, openCategories.toArray(new Config.Category[0]));
+        this(returnDisplay, openCategories.toArray(new Category[0]));
     }
 
-    public OptionsManager(GuiScreen returnDisplay, Config.Category... initialCategories)
+    public OptionsManager(GuiScreen returnDisplay, Category... initialCategories)
     {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
@@ -166,7 +166,7 @@ public class OptionsManager extends JmUI
                 optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
                 if (initialCategories != null)
                 {
-                    for (Config.Category initialCategory : initialCategories)
+                    for (Category initialCategory : initialCategories)
                     {
                         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
                         {
@@ -185,7 +185,7 @@ public class OptionsManager extends JmUI
                     if (rootSlot instanceof CategorySlot)
                     {
                         CategorySlot categorySlot = (CategorySlot) rootSlot;
-                        Config.Category category = categorySlot.getCategory();
+                        Category category = categorySlot.getCategory();
 
                         // Reset button
                         ResetButton resetButton = new ResetButton(category);
@@ -352,7 +352,7 @@ public class OptionsManager extends JmUI
             if (rootSlot instanceof CategorySlot)
             {
                 CategorySlot categorySlot = (CategorySlot) rootSlot;
-                if (categorySlot.getCategory() == Config.Category.Cartography)
+                if (categorySlot.getCategory() == Category.Cartography)
                 {
                     CoreProperties coreProperties = JourneymapClient.getCoreProperties();
                     for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
@@ -522,11 +522,11 @@ public class OptionsManager extends JmUI
         if (categorySlot != null)
         {
             // Track the category of the button so resets can happen when OptionsManager is closed
-            Config.Category category = categorySlot.getCategory();
+            Category category = categorySlot.getCategory();
             changedCategories.add(category);
 
             // If the button is MiniMap-related, force it to update
-            if (category == Config.Category.MiniMap1 || category == Config.Category.MiniMap2)
+            if (category == Category.MiniMap1 || category == Category.MiniMap2)
             {
                 refreshMinimapOptions();
                 DataCache.instance().resetRadarCaches();
@@ -534,7 +534,7 @@ public class OptionsManager extends JmUI
             }
 
             // If the button is Cartography-related, ensure valid
-            if (category == Config.Category.Cartography)
+            if (category == Category.Cartography)
             {
                 JourneymapClient.getCoreProperties().save();
                 RenderSpec.resetRenderSpecs();
@@ -607,7 +607,7 @@ public class OptionsManager extends JmUI
         }
     }
 
-    protected void resetOptions(Config.Category category)
+    protected void resetOptions(Category category)
     {
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
@@ -632,7 +632,7 @@ public class OptionsManager extends JmUI
 
     protected void refreshMinimapOptions()
     {
-        EnumSet cats = EnumSet.of(Config.Category.MiniMap1, Config.Category.MiniMap2);
+        EnumSet cats = EnumSet.of(Category.MiniMap1, Category.MiniMap2);
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
             if (cats.contains(categorySlot.getCategory()))
@@ -664,7 +664,7 @@ public class OptionsManager extends JmUI
             // Ensure minimap is back to the one used before this opened
             UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
 
-            for (Config.Category category : changedCategories)
+            for (Category category : changedCategories)
             {
                 switch (category)
                 {
@@ -738,12 +738,12 @@ public class OptionsManager extends JmUI
         super.closeAndReturn();
     }
 
-    Map<Config.Category, List<SlotMetadata>> getToolbars()
+    Map<Category, List<SlotMetadata>> getToolbars()
     {
         if (toolbars == null)
         {
-            this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
-            for (Config.Category category : Config.Category.values())
+            this.toolbars = new HashMap<Category, List<SlotMetadata>>();
+            for (Category category : Category.values())
             {
 //                String name = Constants.getString("jm.config.reset");
 //                String tooltip = Constants.getString("jm.config.reset.tooltip");
@@ -756,9 +756,9 @@ public class OptionsManager extends JmUI
 
     public static class ResetButton extends Button
     {
-        public final Config.Category category;
+        public final Category category;
 
-        public ResetButton(Config.Category category)
+        public ResetButton(Category category)
         {
             super(Constants.getString("jm.config.reset"));
             this.category = category;

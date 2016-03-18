@@ -5,7 +5,6 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
@@ -20,9 +19,10 @@ import journeymap.client.ui.minimap.Shape;
  */
 public class MiniMapProperties2 extends MiniMapProperties
 {
-    public MiniMapProperties2()
+    @Override
+    public String getName()
     {
-        super("minimap2");
+        return "minimap2";
     }
 
     @Override
@@ -70,7 +70,7 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("showReticle", showReticle)
                 .add("reticleOrientation", reticleOrientation)
                 .add("preferredMapType", preferredMapType)
-                .add("name", name)
+                .add("name", getName())
                 .add("id", getId())
                 .toString();
     }

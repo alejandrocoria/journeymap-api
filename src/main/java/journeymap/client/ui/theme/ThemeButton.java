@@ -15,6 +15,8 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.BooleanPropertyButton;
 import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
@@ -55,9 +57,9 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
-    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, CommonProperties properties, AtomicBoolean property)
+    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, CommonProperties properties, BooleanField field)
     {
-        super(labelOn, labelOff, properties, property);
+        super(labelOn, labelOff, properties, field);
         this.iconName = iconName;
         updateTheme(theme);
     }

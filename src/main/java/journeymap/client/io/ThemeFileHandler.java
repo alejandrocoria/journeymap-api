@@ -21,7 +21,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -325,7 +325,7 @@ public class ThemeFileHandler
         return null;
     }
 
-    public static class ThemeStringListProvider implements StringListProvider
+    public static class ThemeValuesProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()

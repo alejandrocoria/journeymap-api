@@ -5,56 +5,33 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
-import journeymap.client.model.MapType;
 import journeymap.client.service.MapApiService;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.common.properties.config.Config.Category.WebMap;
+import static journeymap.common.properties.Category.WebMap;
 
 /**
  * Properties for the web map in browser.
  */
 public class WebMapProperties extends MapProperties
 {
-    @Config(category = WebMap, master = true, key = "jm.webmap.enable", defaultBoolean = false)
-    public final AtomicBoolean enabled = new AtomicBoolean(false);
-
-    @Config(category = WebMap, key = "jm.advanced.port", minValue = 80, maxValue = 10000, defaultValue = 8080)
-    public final AtomicInteger port = new AtomicInteger(8080);
-
-    @Config(category = WebMap, key = "jm.webmap.google_domain", stringListProvider = MapApiService.TopLevelDomains.class)
-    public final AtomicReference<String> googleMapApiDomain = new AtomicReference<String>(".com");
-
-    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
-    protected transient final String name = "webmap";
+    public final BooleanField enabled = new BooleanField(WebMap, "jm.webmap.enable", false, true);
+    public final IntegerField port = new IntegerField(WebMap, "jm.advanced.port", 80, 10000, 8080);
+    public final StringField googleMapApiDomain = new StringField(WebMap, "jm.webmap.google_domain", MapApiService.TopLevelDomains.class);
 
     public WebMapProperties()
     {
     }
 
     @Override
-    public AtomicReference<String> getEntityIconSetName()
-    {
-        return entityIconSetName;
-    }
-
-    @Override
-    public AtomicReference<MapType.Name> getPreferredMapType()
-    {
-        return preferredMapType;
-    }
-
-    @Override
     public String getName()
     {
-        return name;
+        return "webmap";
     }
 
     @Override
@@ -72,7 +49,6 @@ public class WebMapProperties extends MapProperties
         {
             return false;
         }
-
         WebMapProperties that = (WebMapProperties) o;
         return 0 == this.compareTo(that);
     }
@@ -81,7 +57,7 @@ public class WebMapProperties extends MapProperties
     public int hashCode()
     {
         int result = super.hashCode();
-        result = 31 * result + name.hashCode();
+        result = 31 * result + getName().hashCode();
         result = 31 * result + port.hashCode();
         result = 31 * result + enabled.hashCode();
         return result;
@@ -99,8 +75,7 @@ public class WebMapProperties extends MapProperties
                 ", showPets=" + showPets +
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
-                ", entityIconSetName=" + getEntityIconSetName();
+                ", entityIconSetName=" + entityIconSetName;
     }
-
 
 }
