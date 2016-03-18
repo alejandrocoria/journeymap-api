@@ -68,12 +68,12 @@ public class ChunkMD
 
     public Block getBlock(int x, int y, int z)
     {
-        return getChunk().getBlock(x, y, z);
+        return getChunk().getBlockState(x, y, z).getBlock();
     }
 
     public BlockMD getBlockMD(int x, int y, int z)
     {
-        return BlockMD.get(getChunk().getBlockState(x, y, z), getBlockMeta(x, y, z));
+        return BlockMD.get(getChunk().getBlockState(x, y, z).getBlock(), getBlockMeta(x, y, z));
     }
 
     /**

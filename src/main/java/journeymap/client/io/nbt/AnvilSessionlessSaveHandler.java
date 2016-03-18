@@ -8,6 +8,7 @@
 
 package journeymap.client.io.nbt;
 
+import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.world.chunk.storage.AnvilSaveHandler;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class AnvilSessionlessSaveHandler extends AnvilSaveHandler
 {
     public AnvilSessionlessSaveHandler(File p_i2142_1_, String p_i2142_2_, boolean p_i2142_3_)
     {
-        super(p_i2142_1_, p_i2142_2_, p_i2142_3_);
+        super(p_i2142_1_, p_i2142_2_, p_i2142_3_, DataFixesManager.createFixer());
     }
 
 

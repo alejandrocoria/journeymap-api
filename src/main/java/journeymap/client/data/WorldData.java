@@ -23,6 +23,7 @@ import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
@@ -214,7 +215,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                         try
                         {
                             WorldProvider dimProvider = DimensionManager.getProvider(dim);
-                            dimProvider.getDimensionName(); // Force the name error
+                            dimProvider.getDimensionType().getName(); // Force the name error
                             dimProviders.put(dim, dimProvider);
                             Journeymap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
                         }
@@ -229,7 +230,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                         try
                         {
                             provider = DimensionManager.createProviderFor(dim);
-                            provider.getDimensionName(); // Force the name error
+                            provider.getDimensionType().getName(); // Force the name error
                             provider.setDimension(dim);
                             dimProviders.put(dim, provider);
                             Journeymap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
@@ -278,14 +279,14 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
     public static String getSafeDimensionName(WorldProvider worldProvider)
     {
-        if (worldProvider == null)
+        if (worldProvider == null || worldProvider.getDimensionType()==null)
         {
             return null;
         }
 
         try
         {
-            return worldProvider.getDimensionName();
+            return worldProvider.getDimensionType().getName();
         }
         catch (Exception e)
         {
@@ -336,19 +337,14 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         FakeDimensionProvider(int dimension)
         {
-            this.dimensionId = dimension;
+            setDimension(dimension);
+
         }
 
         @Override
-        public String getDimensionName()
+        public DimensionType getDimensionType()
         {
-            return Constants.getString("jm.common.dimension", this.dimensionId);
-        }
-
-        // New in 1.8, unused in 1.7
-        public String getInternalNameSuffix()
-        {
-            return "fake";
+            return null;
         }
     }
 }
