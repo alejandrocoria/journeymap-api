@@ -106,7 +106,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 // Can be null right after spawn/teleport before chunks loaded
                 if (biome != null)
                 {
-                    return biome.biomeName;
+                    return biome.getBiomeName();
                 }
                 //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
             }
