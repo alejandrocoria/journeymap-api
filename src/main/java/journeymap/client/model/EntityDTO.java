@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.entity.Entity;
@@ -115,13 +116,12 @@ public class EntityDTO implements Serializable
             // 1.8
             // String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
             // 1.8.8
-            UUID ownerUuid = ((EntityHorse) entity).getOwnerUniqueId();
-            if (currentPlayer != null && ownerUuid != null)
+            String ownerUuidString = ((EntityHorse) entity).getOwnerId();
+            if (!Strings.isNullOrEmpty(ownerUuidString))
             {
                 try
                 {
-                    UUID playerUuid = currentPlayer.getUniqueID();
-                    if (playerUuid.equals(ownerUuid))
+                    if (currentPlayer.getUniqueID().equals(UUID.fromString(ownerUuidString)))
                     {
                         owner = ForgeHelper.INSTANCE.getEntityName(currentPlayer);
                     }

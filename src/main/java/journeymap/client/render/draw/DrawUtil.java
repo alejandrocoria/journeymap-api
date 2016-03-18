@@ -32,7 +32,7 @@ public class DrawUtil
     public static double zLevel = 0;
 
     static Tessellator tessellator = Tessellator.getInstance();
-    static VertexBuffer worldrenderer = tessellator.getBuffer();
+    static VertexBuffer worldrenderer = tessellator.getWorldRenderer();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
