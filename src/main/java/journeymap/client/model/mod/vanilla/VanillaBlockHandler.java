@@ -101,9 +101,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Set flags based on material
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        Material material = block.getMaterial(blockState);
+        Material material = blockMD.getBlock().getMaterial(blockMD.getBlock().getDefaultState());
         blockMD.addFlags(materialFlags.get(material));
 
         // Set alpha based on material
@@ -114,6 +112,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Set flags based on exact block
+        Block block = blockMD.getBlock();
         if (blockFlags.containsKey(block))
         {
             blockMD.addFlags(blockFlags.get(block));
