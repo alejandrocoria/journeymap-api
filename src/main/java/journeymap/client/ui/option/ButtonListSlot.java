@@ -16,6 +16,7 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.ScrollListPane;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.*;
 import java.util.Collection;
@@ -29,7 +30,7 @@ import java.util.List;
 public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonListSlot>
 {
     static int hgap = 8;
-    Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    Minecraft mc = FMLClientHandler.instance().getClient();
     FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();

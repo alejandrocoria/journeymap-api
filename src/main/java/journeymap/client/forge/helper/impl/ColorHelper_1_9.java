@@ -9,7 +9,6 @@
 package journeymap.client.forge.helper.impl;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
@@ -29,6 +28,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -46,7 +46,7 @@ public class ColorHelper_1_9 implements IColorHelper
 {
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
-    BlockColors blockColors = ForgeHelper.INSTANCE.getClient().getBlockColors();
+    BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
     private volatile BufferedImage blocksTexture;
 
     /**
@@ -240,7 +240,7 @@ public class ColorHelper_1_9 implements IColorHelper
             }
         }
 
-        TextureAtlasSprite icon = ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
         return icon;
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
@@ -410,7 +410,7 @@ public class ColorHelper_1_9 implements IColorHelper
             blocksTexture = null;
             timer.start();
 
-            int blocksTexId = ForgeHelper.INSTANCE.getClient().getTextureMapBlocks().getGlTextureId();
+            int blocksTexId = FMLClientHandler.instance().getClient().getTextureMapBlocks().getGlTextureId();
             GlStateManager.bindTexture(blocksTexId);
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);

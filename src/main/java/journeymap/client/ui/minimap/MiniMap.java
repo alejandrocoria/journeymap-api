@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
@@ -50,7 +51,7 @@ public class MiniMap
     private static final long labelRefreshRate = 400;
     private final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Minimap, 3);
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    private final Minecraft mc = FMLClientHandler.instance().getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     private TextureImpl playerLocatorTex;

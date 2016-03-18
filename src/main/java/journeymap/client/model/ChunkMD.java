@@ -19,6 +19,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
@@ -340,7 +341,7 @@ public class ChunkMD
 
     public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, ChunkMD>
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
 
         @Override
         public ChunkMD load(ChunkCoordIntPair coord) throws Exception

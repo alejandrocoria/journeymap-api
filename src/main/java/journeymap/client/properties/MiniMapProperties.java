@@ -15,6 +15,7 @@ import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
 import journeymap.common.properties.config.Config;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -124,7 +125,7 @@ public class MiniMapProperties extends InGameMapProperties
      */
     public int getSize()
     {
-        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * ForgeHelper.INSTANCE.getClient().displayHeight));
+        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
     }
 
     @Override

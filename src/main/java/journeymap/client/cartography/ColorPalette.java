@@ -14,7 +14,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.BlockMD;
@@ -23,6 +22,7 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameData;
 
@@ -216,7 +216,7 @@ public class ColorPalette
 
     private static File getWorldPaletteFile()
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         return new File(FileHandler.getJMWorldDir(mc), JSON_FILENAME);
     }
 

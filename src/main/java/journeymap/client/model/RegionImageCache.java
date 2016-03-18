@@ -10,12 +10,12 @@ package journeymap.client.model;
 
 import com.google.common.cache.*;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +34,7 @@ public class RegionImageCache
     static final Logger logger = Journeymap.getLogger();
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
-    private Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+    private Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     /**
      * Underlying caches are to be managed by the DataCache.

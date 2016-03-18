@@ -9,10 +9,10 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.ingame.RenderWaypointBeacon;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,7 +24,7 @@ import java.util.EnumSet;
  */
 public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
 {
-    final Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    final Minecraft mc = FMLClientHandler.instance().getClient();
 
     public WaypointBeaconHandler()
     {

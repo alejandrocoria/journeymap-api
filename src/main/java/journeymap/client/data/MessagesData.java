@@ -11,8 +11,8 @@ package journeymap.client.data;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableMap;
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class MessagesData extends CacheLoader<Class, Map<String, Object>>
     {
         HashMap<String, Object> props = new HashMap<String, Object>();
         props.put("locale", Constants.getLocale());
-        props.put("lang", ForgeHelper.INSTANCE.getClient().gameSettings.language);
+        props.put("lang", FMLClientHandler.instance().getClient().gameSettings.language);
 
         Properties properties = FileHandler.getLangFile("en_US.lang");
         Enumeration<Object> allKeys = properties.keys();

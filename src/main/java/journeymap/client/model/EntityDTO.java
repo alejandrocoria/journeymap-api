@@ -19,6 +19,7 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
@@ -59,7 +60,7 @@ public class EntityDTO implements Serializable
 
     public void update(EntityLivingBase entity, boolean hostile)
     {
-        EntityPlayer currentPlayer = ForgeHelper.INSTANCE.getClient().thePlayer;
+        EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
         this.dimension = entity.dimension;
         this.posX = entity.posX;
         this.posY = entity.posY;

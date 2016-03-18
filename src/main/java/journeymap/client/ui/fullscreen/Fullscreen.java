@@ -53,8 +53,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -105,7 +106,7 @@ public class Fullscreen extends JmUI
     public Fullscreen()
     {
         super(null);
-        mc = ForgeHelper.INSTANCE.getClient();
+        mc = FMLClientHandler.instance().getClient();
         fullMapProperties = JourneymapClient.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();

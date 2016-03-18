@@ -15,6 +15,7 @@ import journeymap.client.ui.component.Button;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.world.WorldProvider;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ class DimensionsButton extends Button
 
         if (needInit || currentWorldProvider != null)
         {
-            currentWorldProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
+            currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
             needInit = false;
         }
         updateLabel();

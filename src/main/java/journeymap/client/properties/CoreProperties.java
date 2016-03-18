@@ -9,13 +9,13 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
 import journeymap.common.properties.config.Config;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -196,7 +196,7 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
             saveNeeded = true;
         }
 
-        int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
+        int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
         for (AtomicInteger prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
         {
             if (prop.get() > gameRenderDistance)

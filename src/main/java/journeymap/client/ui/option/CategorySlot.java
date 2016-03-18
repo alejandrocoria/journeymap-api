@@ -10,12 +10,12 @@ package journeymap.client.ui.option;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ScrollListPane;
 import journeymap.common.properties.config.Config;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.*;
 
@@ -25,7 +25,7 @@ import java.util.*;
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {
     final String name;
-    Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    Minecraft mc = FMLClientHandler.instance().getClient();
     SlotMetadata metadata;
     Config.Category category;
     int currentSlotIndex;

@@ -14,7 +14,6 @@ import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
@@ -23,6 +22,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 
 import java.awt.*;
@@ -107,7 +107,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected void updateOptions()
     {
-        World world = ForgeHelper.INSTANCE.getClient().theWorld;
+        World world = FMLClientHandler.instance().getClient().theWorld;
         int seaLevel = world.getActualHeight() / 2;
         orthoStep = 3;
         orthoRange = world.getActualHeight() >> orthoStep;

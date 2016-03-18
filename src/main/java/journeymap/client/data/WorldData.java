@@ -199,7 +199,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
-            WorldProvider playerProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
+            WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
             int dimId = ForgeHelper.INSTANCE.getDimension(playerProvider);
             dimProviders.put(dimId, playerProvider);
             requiredDims.remove(dimId);
@@ -297,7 +297,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     @Override
     public WorldData load(Class aClass) throws Exception
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
         IntegratedServer server = mc.getIntegratedServer();

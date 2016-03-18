@@ -11,7 +11,6 @@ package journeymap.client.forge.helper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
@@ -42,7 +41,7 @@ public interface IForgeHelper
 
     public IColorHelper getColorHelper();
 
-    public Minecraft getClient();
+    //public Minecraft getClient();
 
     public ScaledResolution getScaledResolution();
 

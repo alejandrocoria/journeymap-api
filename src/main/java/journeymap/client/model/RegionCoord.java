@@ -10,9 +10,9 @@ package journeymap.client.model;
 
 import com.google.common.cache.Cache;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.RegionLoader;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -102,7 +102,7 @@ public class RegionCoord implements Comparable<RegionCoord>
 
     public boolean exists()
     {
-        return RegionLoader.getRegionFile(ForgeHelper.INSTANCE.getClient(), getMinChunkX(), getMinChunkZ()).exists();
+        return RegionLoader.getRegionFile(FMLClientHandler.instance().getClient(), getMinChunkX(), getMinChunkZ()).exists();
     }
 
     public int getXOffset(int chunkX)

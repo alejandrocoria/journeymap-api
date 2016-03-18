@@ -21,8 +21,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,7 +38,7 @@ import java.util.EnumSet;
 public class StateTickHandler implements EventHandlerManager.EventHandler
 {
     static boolean javaChecked = false;
-    Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
     private boolean deathpointCreated;
 
@@ -179,7 +180,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             try
             {
                 String error = I18n.format("jm.error.java6");
-                ForgeHelper.INSTANCE.getClient().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(error));
+                FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(error));
                 Journeymap.getLogger().fatal("JourneyMap requires Java 7 or Java 8. Update your launcher profile to use a newer version of Java.");
             }
             catch (Exception e2)

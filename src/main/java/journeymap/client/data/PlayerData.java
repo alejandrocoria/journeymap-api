@@ -20,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
  * Provides game-related properties in a Map.
@@ -79,7 +80,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
     @Override
     public EntityDTO load(Class aClass) throws Exception
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
 
         EntityDTO dto = DataCache.instance().getEntityDTO(player);

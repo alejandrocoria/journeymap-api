@@ -10,7 +10,6 @@ package journeymap.client.ui;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.dialog.*;
@@ -27,6 +26,7 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +34,7 @@ public class UIManager
 {
     private final Logger logger = Journeymap.getLogger();
     private final MiniMap miniMap;
-    Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+    Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     private UIManager()
     {

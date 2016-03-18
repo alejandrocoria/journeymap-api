@@ -10,10 +10,10 @@ package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.*;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.GameData;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -96,7 +96,7 @@ public class DataService extends BaseService
                 }
                 else
                 {
-                    if (ForgeHelper.INSTANCE.getClient().theWorld == null)
+                    if (FMLClientHandler.instance().getClient().theWorld == null)
                     {
                         throwEventException(503, "World not connected", event, false);
                     }

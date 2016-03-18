@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -90,7 +91,7 @@ public class Waypoint implements Serializable
     protected boolean persistent;
 
     protected transient boolean dirty;
-    protected transient Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    protected transient Minecraft mc = FMLClientHandler.instance().getClient();
 
     /**
      * Default constructor Required by GSON

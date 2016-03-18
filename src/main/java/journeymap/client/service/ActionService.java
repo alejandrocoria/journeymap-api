@@ -9,7 +9,6 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.MapSaver;
 import journeymap.client.model.MapType;
@@ -19,6 +18,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
@@ -59,7 +59,7 @@ public class ActionService extends BaseService
         query.parse();
 
         // Check world
-        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {
@@ -102,7 +102,7 @@ public class ActionService extends BaseService
 
         Query query = event.query();
 
-        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         World theWorld = minecraft.theWorld;
 
 

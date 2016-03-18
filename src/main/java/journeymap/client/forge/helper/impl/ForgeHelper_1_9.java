@@ -77,22 +77,20 @@ public class ForgeHelper_1_9 implements IForgeHelper
         return blockAccess;
     }
 
-    @Override
-    public Minecraft getClient()
-    {
-        return FMLClientHandler.instance().getClient();
-    }
+//    @Override
+//    public Minecraft getClient()
+//    {
+//        return FMLClientHandler.instance().getClient();
+//    }
 
     @Override
     public ScaledResolution getScaledResolution()
     {
-        Minecraft mc = getClient();
-
         // 1.7.10, 1.8
         // return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 
         // 1.8.8
-        return new ScaledResolution(mc);
+        return new ScaledResolution(FMLClientHandler.instance().getClient());
     }
 
     @Override
@@ -112,7 +110,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         // return getClient().fontRenderer;
 
         // 1.8
-        return getClient().fontRendererObj;
+        return FMLClientHandler.instance().getClient().fontRendererObj;
     }
 
     @Override
@@ -122,7 +120,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         //return getClient().thePlayer.worldObj.provider.dimension;
 
         // 1.8
-        return getClient().thePlayer.worldObj.provider.getDimension();
+        return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.getDimension();
     }
 
     @Override
@@ -142,7 +140,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         // ??
 
         // 1.8
-        return getClient().theWorld;
+        return FMLClientHandler.instance().getClient().theWorld;
     }
 
     @Override
@@ -215,7 +213,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         // return RenderManager.instance;
 
         // 1.8
-        return getClient().getRenderManager();
+        return FMLClientHandler.instance().getClient().getRenderManager();
     }
 
     /**
@@ -294,7 +292,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
     public String getRealmsServerName()
     {
         String serverName = null;
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         if (!mc.isSingleplayer())
         {
             try
@@ -333,7 +331,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         }
         else
         {
-            mc = ForgeHelper.INSTANCE.getClient();
+            mc = FMLClientHandler.instance().getClient();
             ServerData serverData = mc.getCurrentServerData(); // 1.8 getServerData()
 
             if (serverData != null)

@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -47,7 +48,7 @@ public class WorldInfoHandler
     // Network wrapper of the channel for requests/response
     private static SimpleNetworkWrapper channel;
     // Handle to Minecraft client
-    Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    Minecraft mc = FMLClientHandler.instance().getClient();
 
     /**
      * Default constructor.

@@ -22,6 +22,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.properties.config.Config;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class WaypointManager extends JmUI
 
             if (buttonSortDistance == null)
             {
-                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(ForgeHelper.INSTANCE.getClient().thePlayer, true);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);

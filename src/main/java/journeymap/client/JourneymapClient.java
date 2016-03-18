@@ -45,6 +45,7 @@ import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -318,7 +319,7 @@ public class JourneymapClient implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Get ref to Minecraft
-            mc = ForgeHelper.INSTANCE.getClient();
+            mc = FMLClientHandler.instance().getClient();
 
             // Main thread task controller
             mainThreadTaskController = new MainTaskController(mc, this);

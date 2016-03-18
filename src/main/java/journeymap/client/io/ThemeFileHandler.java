@@ -13,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.UIManager;
@@ -22,6 +21,7 @@ import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.config.StringListProvider;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -71,7 +71,7 @@ public class ThemeFileHandler
 
     public static File getThemeIconDir()
     {
-        File dir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, Constants.THEME_ICON_DIR);
+        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.THEME_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
