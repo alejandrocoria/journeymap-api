@@ -83,11 +83,11 @@ class DimensionsButton extends Button
         {
             index = -1;
 
-            int currentDimension = ForgeHelper.INSTANCE.getDimension(currentWorldProvider);
+            int currentDimension = ForgeHelper.INSTANCE.getDimension();
 
             for (WorldProvider worldProvider : worldProviders)
             {
-                if (currentDimension == ForgeHelper.INSTANCE.getDimension(worldProvider))
+                if (currentDimension == ForgeHelper.INSTANCE.getDimension())
                 {
                     index = worldProviders.indexOf(worldProvider) + 1;
                     break;

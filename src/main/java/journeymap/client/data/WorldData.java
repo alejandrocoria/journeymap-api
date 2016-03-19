@@ -200,7 +200,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
             // Use the player's provider
             WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
-            int dimId = ForgeHelper.INSTANCE.getDimension(playerProvider);
+            int dimId = ForgeHelper.INSTANCE.getDimension();
             dimProviders.put(dimId, playerProvider);
             requiredDims.remove(dimId);
             Journeymap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
@@ -264,7 +264,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 @Override
                 public int compare(WorldProvider o1, WorldProvider o2)
                 {
-                    return Integer.valueOf(ForgeHelper.INSTANCE.getDimension(o1)).compareTo(ForgeHelper.INSTANCE.getDimension(o2));
+                    return Integer.valueOf(o1.getDimension()).compareTo(o2.getDimension());
                 }
             });
 
@@ -290,7 +290,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Exception e)
         {
-            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
+            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension());
         }
     }
 
@@ -304,7 +304,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         boolean multiplayer = server == null || server.getPublic();
 
         name = getWorldName(mc, false);
-        dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld.provider);
+        dimension = ForgeHelper.INSTANCE.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.theWorld.getWorldTime() % 24000L;

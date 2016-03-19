@@ -314,7 +314,7 @@ public class ChunkMD
 
     public int getDimension()
     {
-        return ForgeHelper.INSTANCE.getDimension(getWorld());
+        return ForgeHelper.INSTANCE.getDimension();
     }
 
     public void stopChunkRetention()

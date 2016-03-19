@@ -120,7 +120,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         //return getClient().thePlayer.worldObj.provider.dimension;
 
         // 1.8
-        return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.getDimension();
+        return getDimension();
     }
 
     @Override
@@ -170,22 +170,9 @@ public class ForgeHelper_1_9 implements IForgeHelper
     }
 
     @Override
-    public int getDimension(World world)
+    public int getDimension()
     {
-        // 1.7
-        // return world.provider.dimension;
-
-        // 1.8
-        return world.provider.getDimension();
-    }
-
-    @Override
-    public int getDimension(WorldProvider worldProvider)
-    {
-        // 1.7
-        // return worldProvider.dimensionId;
-
-        return worldProvider.getDimension();
+        return FMLClientHandler.instance().getClient().thePlayer.dimension;
     }
 
     @Override

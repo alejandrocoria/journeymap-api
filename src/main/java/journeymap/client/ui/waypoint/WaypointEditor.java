@@ -169,7 +169,7 @@ public class WaypointEditor extends JmUI
 
                 for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
-                    int dim = ForgeHelper.INSTANCE.getDimension(provider);
+                    int dim = ForgeHelper.INSTANCE.getDimension();
                     String dimName = Integer.toString(dim);
                     try
                     {

@@ -25,7 +25,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 
@@ -79,9 +78,7 @@ public interface IForgeHelper
 
     public Tessellator getTessellator();
 
-    public int getDimension(World world);
-
-    public int getDimension(WorldProvider worldProvider);
+    public int getDimension();
 
     public int getSavedLightValue(Chunk chunk, int x, int y, int z);
 

@@ -10,7 +10,6 @@ package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
 import journeymap.client.ui.UIManager;
@@ -472,7 +471,7 @@ public class WaypointManager extends JmUI
     protected void updateItems()
     {
         items.clear();
-        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : ForgeHelper.INSTANCE.getDimension(DimensionsButton.currentWorldProvider);
+        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : DimensionsButton.currentWorldProvider.getDimension();
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 
