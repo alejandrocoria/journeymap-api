@@ -24,6 +24,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
+import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
@@ -78,13 +79,14 @@ public class Fullscreen extends JmUI
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
     FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
+    CoreProperties coreProperties = JourneymapClient.getCoreProperties();
     boolean firstLayoutPass = true;
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
     int msx, msy, mx, my;
     Logger logger = Journeymap.getLogger();
     MapChat chat;
-    ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
+    ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonTopo, buttonCaves;
     ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
     ThemeButton buttonTheme, buttonWaypointManager;
     ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
@@ -289,6 +291,7 @@ public class Fullscreen extends JmUI
                     {
                         state.setMapType(MapType.Name.day);
                         buttonNight.setToggled(false);
+                        buttonTopo.setToggled(false);
                         if (state.isUnderground())
                         {
                             buttonCaves.setToggled(false);
@@ -315,6 +318,38 @@ public class Fullscreen extends JmUI
                     {
                         state.setMapType(MapType.night(state.getCurrentMapType().dimension));
                         buttonDay.setToggled(false);
+                        buttonTopo.setToggled(false);
+                        if (state.isUnderground())
+                        {
+                            buttonCaves.setToggled(false);
+                        }
+                        state.requireRefresh();
+                    }
+                    else if (state.getCurrentMapType().isNight())
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            });
+
+            // Topo Toggle
+            buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo", coreProperties.mapTopography);
+            buttonTopo.setDrawButton(coreProperties.mapTopography.get());
+            buttonTopo.addToggleListener(new OnOffButton.ToggleListener()
+            {
+                @Override
+                public boolean onToggle(OnOffButton button, boolean toggled)
+                {
+                    if (ForgeHelper.INSTANCE.hasNoSky(mc.theWorld))
+                    {
+                        return false;
+                    }
+                    if (toggled)
+                    {
+                        state.setMapType(MapType.topo(state.getCurrentMapType().dimension));
+                        buttonDay.setToggled(false);
+                        buttonNight.setToggled(false);
                         if (state.isUnderground())
                         {
                             buttonCaves.setToggled(false);
@@ -507,7 +542,7 @@ public class Fullscreen extends JmUI
             });
 
             // Toolbars
-            mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonNight, buttonDay);
+            mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonTopo, buttonNight, buttonDay);
             mapTypeToolbar.addAllButtons(this);
 
             optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
@@ -547,6 +582,7 @@ public class Fullscreen extends JmUI
         boolean isSky = !ForgeHelper.INSTANCE.hasNoSky(mc.theWorld);
         buttonDay.setEnabled(isSky);
         buttonNight.setEnabled(isSky);
+        buttonTopo.setEnabled(isSky);
         buttonCaves.setEnabled(isSky && state.isUnderground() && state.isCaveMappingAllowed());
         buttonFollow.setEnabled(!state.follow.get());
 
