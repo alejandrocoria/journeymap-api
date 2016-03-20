@@ -72,6 +72,9 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
     @Config(category = Cartography, key = "jm.common.map_style_bathymetry", defaultBoolean = false)
     public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
 
+    @Config(category = Cartography, key = "jm.common.map_style_topography", defaultBoolean = true)
+    public final AtomicBoolean mapTopography = new AtomicBoolean(true);
+
     @Config(category = Cartography, key = "jm.common.map_style_transparency", defaultBoolean = true)
     public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
 

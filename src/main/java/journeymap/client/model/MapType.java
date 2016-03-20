@@ -71,6 +71,16 @@ public class MapType
         return from(Name.night, null, player.dimension);
     }
 
+    public static MapType topo(int dimension)
+    {
+        return from(Name.topo, null, dimension);
+    }
+
+    public static MapType topo(EntityDTO player)
+    {
+        return from(Name.topo, null, player.dimension);
+    }
+
     public static MapType underground(EntityDTO player)
     {
         return from(Name.underground, player.chunkCoordY, player.dimension);
@@ -92,6 +102,8 @@ public class MapType
         {
             case day:
                 return Context.MapType.Day;
+            case topo:
+                return Context.MapType.Day; // TODO: Add to topo
             case night:
                 return Context.MapType.Night;
             case underground:
@@ -136,6 +148,11 @@ public class MapType
         return name == Name.night;
     }
 
+    public boolean isTopo()
+    {
+        return name == Name.topo;
+    }
+
     @Override
     public int hashCode()
     {
@@ -174,7 +191,7 @@ public class MapType
 
     public enum Name
     {
-        day, night, underground, surface
+        day, night, underground, surface, topo
     }
 
 }

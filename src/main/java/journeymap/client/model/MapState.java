@@ -134,9 +134,13 @@ public class MapState
         {
             return;
         }
+
+        boolean hasSky = !ForgeHelper.INSTANCE.hasNoSky(playerEntity);
+        boolean mapTopo = JourneymapClient.getCoreProperties().mapTopography.get();
+
         if (currentMapType.isUnderground())
         {
-            if (!ForgeHelper.INSTANCE.hasNoSky(playerEntity))
+            if (hasSky)
             {
                 lastMapProperties.showCaves.set(false);
                 setMapType(MapType.day(player));
@@ -150,7 +154,11 @@ public class MapState
         {
             setMapType(MapType.night(player));
         }
-        else if (currentMapType.isNight())
+        else if (currentMapType.isNight() && mapTopo)
+        {
+            setMapType(MapType.topo(player));
+        }
+        else if (currentMapType.isNight() || currentMapType.isTopo())
         {
             if (underground && caveMappingAllowed)
             {
