@@ -83,42 +83,42 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         {
             boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
 
-            if (controlDown && Constants.KB_MAP.isPressed())
+            if (controlDown && Constants.KB_MAP.isKeyDown())
             {
                 UIManager.getInstance().toggleMinimap();
                 return true;
             }
-            else if (controlDown && Constants.KB_MAP_ZOOMIN.isPressed())
+            else if (controlDown && Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 Tile.switchTileRenderType();
                 return false;
             }
-            else if (controlDown && Constants.KB_MAP_ZOOMOUT.isPressed())
+            else if (controlDown && Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 Tile.switchTileDisplayQuality();
                 return false;
             }
-            else if (Constants.KB_MAP_ZOOMIN.isPressed())
+            else if (Constants.KB_MAP_ZOOMIN.isKeyDown())
             {
                 MiniMap.state().zoomIn();
                 return false;
             }
-            else if (Constants.KB_MAP_ZOOMOUT.isPressed())
+            else if (Constants.KB_MAP_ZOOMOUT.isKeyDown())
             {
                 MiniMap.state().zoomOut();
                 return false;
             }
-            else if (Constants.KB_MAP_DAY.isPressed() || Constants.KB_MAP_NIGHT.isPressed())
+            else if (Constants.KB_MAP_DAY.isKeyDown() || Constants.KB_MAP_NIGHT.isKeyDown())
             {
                 MiniMap.state().toggleMapType();
                 return false;
             }
-            else if (Constants.KB_MINIMAP_PRESET.isPressed())
+            else if (Constants.KB_MINIMAP_PRESET.isKeyDown())
             {
                 UIManager.getInstance().switchMiniMapPreset();
                 return true;
             }
-            else if (controlDown && Constants.KB_WAYPOINT.isPressed())
+            else if (controlDown && Constants.KB_WAYPOINT.isKeyDown())
             {
                 UIManager.getInstance().openWaypointManager(null, null);
                 return true;
@@ -126,7 +126,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
             if (!minimapOnly)
             {
-                if (Constants.KB_MAP.isPressed())
+                if (Constants.KB_MAP.isKeyDown())
                 {
                     if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
@@ -143,7 +143,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    if (Constants.KB_WAYPOINT.isPressed())
+                    if (Constants.KB_WAYPOINT.isKeyDown())
                     {
                         if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {
