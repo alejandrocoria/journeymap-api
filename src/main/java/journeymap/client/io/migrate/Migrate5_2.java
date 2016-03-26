@@ -16,11 +16,10 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.GridSpecs;
-import journeymap.client.properties.ClientProperties;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
@@ -92,12 +91,12 @@ public class Migrate5_2 implements Migration.Task
             String path5_1 = Joiner.on(File.separator).join(Constants.JOURNEYMAP_DIR, "config", "5.1");
             File legacyConfigDir = new File(FileHandler.MinecraftDirectory, path5_1);
 
-            List<? extends CommonProperties> propertiesList = Arrays.asList(JourneymapClient.getCoreProperties(),
+            List<? extends PropertiesBase> propertiesList = Arrays.asList(JourneymapClient.getCoreProperties(),
                     JourneymapClient.getFullMapProperties(),
                     JourneymapClient.getMiniMapProperties(1), JourneymapClient.getMiniMapProperties(2),
                     JourneymapClient.getWaypointProperties(), JourneymapClient.getWebMapProperties());
 
-            for (CommonProperties properties : propertiesList)
+            for (PropertiesBase properties : propertiesList)
             {
                 File oldConfigfile = new File(legacyConfigDir, properties.getFile().getName());
                 if (oldConfigfile.canRead())
@@ -115,7 +114,7 @@ public class Migrate5_2 implements Migration.Task
         }
     }
 
-    private boolean updateValues(CommonProperties properties, File oldConfigFile)
+    private boolean updateValues(PropertiesBase properties, File oldConfigFile)
     {
         try
         {

@@ -14,8 +14,8 @@ import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
 
-import static journeymap.common.properties.Category.Hidden;
-import static journeymap.common.properties.Category.Inherit;
+import static journeymap.client.properties.ClientCategory.Hidden;
+import static journeymap.client.properties.ClientCategory.Inherit;
 
 /**
  * Shared Properties for the various map types.
