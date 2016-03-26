@@ -40,7 +40,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.PropertiesBase;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -71,7 +71,7 @@ public class JourneymapClient implements CommonProxy
     private volatile CoreProperties coreProperties;
     private volatile FullMapProperties fullMapProperties;
     private volatile MiniMapProperties miniMapProperties1;
-    private volatile MiniMapProperties2 miniMapProperties2;
+    private volatile MiniMapProperties miniMapProperties2;
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
@@ -609,12 +609,12 @@ public class JourneymapClient implements CommonProxy
      */
     public void loadConfigProperties()
     {
-        coreProperties = CommonProperties.reload(coreProperties, CoreProperties.class);
-        fullMapProperties = CommonProperties.reload(fullMapProperties, FullMapProperties.class);
-        miniMapProperties1 = CommonProperties.reload(miniMapProperties1, MiniMapProperties.class);
-        miniMapProperties2 = CommonProperties.reload(miniMapProperties2, MiniMapProperties2.class);
-        webMapProperties = CommonProperties.reload(webMapProperties, WebMapProperties.class);
-        waypointProperties = CommonProperties.reload(waypointProperties, WaypointProperties.class);
+        coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
+        fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
+        miniMapProperties1 = PropertiesBase.reload(miniMapProperties1, MiniMapProperties.class, 1);
+        miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties.class, 2);
+        webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
+        waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
     }
 
     /**

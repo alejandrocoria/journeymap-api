@@ -274,7 +274,7 @@ public class Fullscreen extends JmUI
             statusBackgroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.backgroundAlpha / 255));
 
             // Day Toggle
-            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day", null, null);
+            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
             buttonDay.setToggled(mapType.isDay(), false);
             buttonDay.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -326,7 +326,7 @@ public class Fullscreen extends JmUI
             });
 
             // Caves Toggle
-            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
+            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
             buttonCaves.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -469,22 +469,22 @@ public class Fullscreen extends JmUI
                 }
             });
 
-            buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties, fullMapProperties.showMobs);
+            buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties.showMobs);
             buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
-            buttonAnimals = new ThemeToggle(theme, "jm.common.show_animals", "animals", fullMapProperties, fullMapProperties.showAnimals);
+            buttonAnimals = new ThemeToggle(theme, "jm.common.show_animals", "animals", fullMapProperties.showAnimals);
             buttonAnimals.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonPets = new ThemeToggle(theme, "jm.common.show_pets", "pets", fullMapProperties, fullMapProperties.showPets);
+            buttonPets = new ThemeToggle(theme, "jm.common.show_pets", "pets", fullMapProperties.showPets);
             buttonPets.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonVillagers = new ThemeToggle(theme, "jm.common.show_villagers", "villagers", fullMapProperties, fullMapProperties.showVillagers);
+            buttonVillagers = new ThemeToggle(theme, "jm.common.show_villagers", "villagers", fullMapProperties.showVillagers);
             buttonVillagers.setDrawButton(FeatureManager.isAllowed(Feature.RadarVillagers));
 
-            buttonPlayers = new ThemeToggle(theme, "jm.common.show_players", "players", fullMapProperties, fullMapProperties.showPlayers);
+            buttonPlayers = new ThemeToggle(theme, "jm.common.show_players", "players", fullMapProperties.showPlayers);
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
-            buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
+            buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties.showGrid);
             buttonGrid.setTooltip(EnumChatFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
             buttonGrid.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -495,7 +495,7 @@ public class Fullscreen extends JmUI
                     if (shiftDown)
                     {
                         UIManager.getInstance().openGridEditor(Fullscreen.this);
-                        buttonGrid.setPropertyValue(true);
+                        buttonGrid.setValue(true);
                         return false;
                     }
                     return true;

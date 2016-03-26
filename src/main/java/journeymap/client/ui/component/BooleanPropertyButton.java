@@ -8,28 +8,25 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.common.properties.CommonProperties;
 import journeymap.common.properties.config.BooleanField;
 
 
 /**
  * Button that wraps and syncs with an BooleanField value owned by a config instance.
  */
-public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<BooleanField, Boolean>
+public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHolder<BooleanField>
 {
-    final CommonProperties properties;
-    final BooleanField valueHolder;
+    final BooleanField booleanField;
 
-    public BooleanPropertyButton(String labelOn, String labelOff, CommonProperties properties, BooleanField valueHolderParam)
+    public BooleanPropertyButton(String labelOn, String labelOff, BooleanField field)
     {
-        super(labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
-        this.valueHolder = valueHolderParam;
-        this.properties = properties;
+        super(labelOn, labelOff, (field != null) && field.get());
+        this.booleanField = field;
     }
 
-    public BooleanField getValueHolder()
+    public BooleanField getField()
     {
-        return valueHolder;
+        return booleanField;
     }
 
     @Override
@@ -37,46 +34,32 @@ public class BooleanPropertyButton extends OnOffButton implements IPropertyHolde
     {
         if (isEnabled())
         {
-            if (properties != null)
-            {
-                setToggled(properties.toggle(valueHolder));
-            }
-            else
-            {
-                setToggled(!toggled);
-            }
+            setToggled(booleanField.toggleAndSave());
         }
     }
 
     @Override
     public void refresh()
     {
-        if (valueHolder != null)
+        if (booleanField != null)
         {
-            setToggled(valueHolder.get());
+            setToggled(booleanField.get());
         }
     }
 
-    @Override
-    public Boolean getPropertyValue()
+    public void setValue(Boolean value)
     {
-        return valueHolder.get();
-    }
-
-    @Override
-    public void setPropertyValue(Boolean value)
-    {
-        if (valueHolder == null)
+        if (booleanField == null)
         {
             return;
         }
-        valueHolder.set(value);
-        properties.save();
+        booleanField.set(value);
+        booleanField.save();
     }
 
     @Override
-    public BooleanField getProperty()
+    public BooleanField getConfigField()
     {
-        return valueHolder;
+        return booleanField;
     }
 }

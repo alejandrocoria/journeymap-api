@@ -1,46 +1,80 @@
 package journeymap.common.properties;
 
-import journeymap.common.properties.config.ConfigField;
-import org.apache.logging.log4j.core.helpers.Strings;
+import com.google.common.base.Objects;
 
 /**
- * Options Manager category enum.
+ * Category for organizing ConfigFields in the Options Manager.
  */
-public enum Category
+public class Category implements Comparable<Category>
 {
-    Inherit(""),
-    Hidden("jm.config.category.hidden"),
-    MiniMap1("jm.config.category.minimap"),
-    MiniMap2("jm.config.category.minimap2"),
-    FullMap("jm.config.category.fullmap"),
-    WebMap("jm.config.category.webmap"),
-    Radar("jm.config.category.radar"),
-    Waypoint("jm.config.category.waypoint"),
-    WaypointBeacon("jm.config.category.waypoint_beacons"),
-    Cartography("jm.config.category.cartography"),
-    Advanced("jm.config.category.advanced");
+    String name;
+    String label;
+    String tooltip;
+    int order;
 
-    public final String key;
-
-    private Category(String key)
+    public Category(String name, int order, String label, String tooltip)
     {
-        this.key = key;
+        this.name = name;
+        this.order = order;
+        this.label = label;
+        this.tooltip = tooltip;
     }
 
-    public static Category fromKey(String key)
+    public String getName()
     {
-        if(Strings.isEmpty(key))
-        {
-            return Inherit;
-        }
+        return name;
+    }
 
-        for(Category value : Category.values())
+    public String getLabel()
+    {
+        return label == null ? getName() : label;
+    }
+
+    public String getTooltip()
+    {
+        return tooltip == null ? getLabel() : tooltip;
+    }
+
+    public int getOrder()
+    {
+        return order;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
         {
-            if(value.key.equals(key))
-            {
-                return value;
-            }
+            return true;
         }
-        return Inherit;
+        if (!(o instanceof Category))
+        {
+            return false;
+        }
+        Category category = (Category) o;
+        return Objects.equal(getName(), category.getName());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(getName());
+    }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
+
+    @Override
+    public int compareTo(Category o)
+    {
+        int result = Integer.compare(order, o.order);
+        if (result == 0)
+        {
+            result = name.compareTo(o.name);
+        }
+        return result;
     }
 }

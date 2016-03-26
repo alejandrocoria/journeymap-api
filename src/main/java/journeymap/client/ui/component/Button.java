@@ -27,8 +27,6 @@ import java.util.List;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
-
-
     protected Integer smallFrameColorLight = new Color(160, 160, 160).getRGB();
     protected Integer smallFrameColorDark = new Color(120, 120, 120).getRGB();
     protected Integer smallBgColor = new Color(100, 100, 100).getRGB();
