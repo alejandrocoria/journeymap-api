@@ -9,7 +9,6 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.common.properties.CommonProperties;
 import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -20,7 +19,7 @@ import org.lwjgl.input.Keyboard;
 /**
  * Created by Mark on 9/29/2014.
  */
-public class IntSliderButton extends Button implements IPropertyHolder<IntegerField, Integer>
+public class IntSliderButton extends Button implements IConfigFieldHolder<IntegerField>
 {
     public String prefix = "";
     /**
@@ -31,10 +30,9 @@ public class IntSliderButton extends Button implements IPropertyHolder<IntegerFi
     public int maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
-    CommonProperties properties;
     IntegerField field;
 
-    public IntSliderButton(CommonProperties properties, IntegerField field, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
+    public IntSliderButton(IntegerField field, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
         super(prefix);
         minValue = minVal;
@@ -42,7 +40,6 @@ public class IntSliderButton extends Button implements IPropertyHolder<IntegerFi
         this.prefix = prefix;
         suffix = suf;
         this.field = field;
-        this.properties = properties;
         setValue(field.get());
         super.disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
@@ -152,10 +149,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<IntegerFi
         if (this.dragging)
         {
             this.dragging = false;
-            if (properties != null)
-            {
-                properties.save();
-            }
+            field.save();
         }
     }
 
@@ -197,33 +191,17 @@ public class IntSliderButton extends Button implements IPropertyHolder<IntegerFi
         if (field.get() != value)
         {
             field.set(value);
-            if (!dragging && properties != null)
+            if (!dragging)
             {
-                properties.save();
+                field.save();
             }
         }
         updateLabel();
     }
 
     @Override
-    public IntegerField getProperty()
+    public IntegerField getConfigField()
     {
         return field;
-    }
-
-    @Override
-    public Integer getPropertyValue()
-    {
-        return field.get();
-    }
-
-    @Override
-    public void setPropertyValue(Integer value)
-    {
-        if (field == null)
-        {
-            return;
-        }
-        setValue(value);
     }
 }

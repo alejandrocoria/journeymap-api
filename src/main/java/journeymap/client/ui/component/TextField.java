@@ -14,16 +14,10 @@ import net.minecraft.client.gui.GuiTextField;
 import java.awt.*;
 
 /**
- * Created by mwoodman on 3/1/14.
+ * Extension of MC's text field
  */
 public class TextField extends GuiTextField
 {
-    // ReflectionHelper field indices
-    // 1.7 only
-    //protected static final int INDEX_X = 1;
-    //protected static final int INDEX_Y = 2;
-    //protected static final int INDEX_WIDTH = 3;
-    //protected static final int INDEX_HEIGHT = 4;
 
     protected final String numericRegex;
     protected final boolean numeric;

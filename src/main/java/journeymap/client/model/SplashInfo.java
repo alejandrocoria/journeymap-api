@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import journeymap.client.properties.ClientCategory;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.dialog.OptionsManager;
@@ -63,7 +64,7 @@ public class SplashInfo
 
                 if (uiClass.equals(OptionsManager.class) && action != null)
                 {
-                    Category category = Category.valueOf(action);
+                    Category category = ClientCategory.valueOf(action);
                     UIManager.getInstance().openOptionsManager(returnUi, category);
                     return;
                 }

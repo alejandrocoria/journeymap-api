@@ -7,26 +7,25 @@
  */
 package journeymap.client.properties;
 
-import com.google.common.base.Objects;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
-import journeymap.common.properties.PropertiesSerializer;
-import journeymap.common.properties.config.*;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 import java.util.Arrays;
 
-import static journeymap.common.properties.Category.*;
+import static journeymap.client.properties.ClientCategory.*;
 
 /**
  * Properties for basic mod configuration.
  */
-public class CoreProperties extends ClientProperties implements Comparable<CoreProperties>
+public class CoreProperties extends ClientPropertiesBase implements Comparable<CoreProperties>
 {
     public final StringField logLevel = new StringField(Advanced, "jm.advanced.loglevel", JMLogger.LogLevelStringProvider.class);
     public final IntegerField autoMapPoll = new IntegerField(Advanced, "jm.advanced.automappoll", 500, 10000, 2000);
@@ -79,6 +78,17 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
     {
     }
 
+    public static void main(String[] args)
+    {
+        CoreProperties c1 = new CoreProperties();
+        c1.getConfigFields();
+        String json = c1.toJsonString(false);
+        System.out.println(json);
+
+//        CoreProperties c2 = gson.fromJson(json, CoreProperties.class);
+//        System.out.println("Equal? " + c1.equals(c2));
+    }
+
     @Override
     public String getName()
     {
@@ -91,24 +101,19 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 
-    /**
-     * Should return true if save needed after validation.
-     *
-     * @return
-     */
     @Override
     protected boolean validate()
     {
-        boolean saveNeeded = super.validate();
+        boolean valid = super.validate();
         if (renderDistanceCaveMax.get() < renderDistanceCaveMin.get())
         {
             renderDistanceCaveMax.set(renderDistanceCaveMin.get());
-            saveNeeded = true;
+            valid = false;
         }
         if (renderDistanceSurfaceMax.get() < renderDistanceSurfaceMin.get())
         {
             renderDistanceSurfaceMax.set(renderDistanceSurfaceMin.get());
-            saveNeeded = true;
+            valid = false;
         }
         int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
         for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
@@ -116,10 +121,10 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
             if (prop.get() > gameRenderDistance)
             {
                 prop.set(gameRenderDistance);
-                saveNeeded = true;
+                valid = false;
             }
         }
-        return saveNeeded;
+        return valid;
     }
 
     public boolean hasValidCaveRenderDistances()
@@ -130,97 +135,5 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
     public boolean hasValidSurfaceRenderDistances()
     {
         return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        CoreProperties that = (CoreProperties) o;
-        return 0 == that.compareTo(this);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(announceMod, autoMapPoll, browserPoll, cacheAnimalsData, cacheMobsData, cachePlayerData,
-                cachePlayersData, cacheVillagersData, caveIgnoreGlass, checkUpdates, renderDelay, hideSneakingEntities,
-                logLevel, mapAntialiasing, mapBathymetry, mapCaveLighting, mapCrops, mapPlants, mapPlantShadows,
-                mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
-                getName(), radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
-                renderOverlayPreEvent, renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin,
-                renderDistanceSurfaceMax, revealShape, themeName, gridSpecs);
-    }
-
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper(this)
-                .add("announceMod", announceMod)
-                .add("autoMapPoll", autoMapPoll)
-                .add("browserPoll", browserPoll)
-                .add("cacheAnimalsData", cacheAnimalsData)
-                .add("cacheMobsData", cacheMobsData)
-                .add("cachePlayerData", cachePlayerData)
-                .add("cachePlayersData", cachePlayersData)
-                .add("cacheVillagersData", cacheVillagersData)
-                .add("caveIgnoreGlass", caveIgnoreGlass)
-                .add("isUpdateCheckEnabled", checkUpdates)
-                .add("renderDelay", renderDelay)
-                .add("hideSneakingEntities", hideSneakingEntities)
-                .add("logLevel", logLevel)
-                .add("mapAntialiasing", mapAntialiasing)
-                .add("mapBathymetry", mapBathymetry)
-                .add("mapCaveLighting", mapCaveLighting)
-                .add("mapCrops", mapCrops)
-                .add("mapPlants", mapPlants)
-                .add("mapPlantShadows", mapPlantShadows)
-                .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
-                .add("tileHighDisplayQuality", tileHighDisplayQuality)
-                .add("mapTransparency", mapTransparency)
-                .add("maxAnimalsData", maxAnimalsData)
-                .add("maxMobsData", maxMobsData)
-                .add("maxPlayersData", maxPlayersData)
-                .add("maxVillagersData", maxVillagersData)
-                .add("optionsManagerViewed", optionsManagerViewed)
-                .add("radarLateralDistance", radarLateralDistance)
-                .add("radarVerticalDistance", radarVerticalDistance)
-                .add("recordCacheStats", recordCacheStats)
-                .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
-                .add("renderOverlayPreEvent", renderOverlayPreEvent)
-                .add("renderDistanceCaveMin", renderDistanceCaveMin)
-                .add("renderDistanceCaveMax", renderDistanceCaveMax)
-                .add("renderDistanceSurfaceMin", renderDistanceSurfaceMin)
-                .add("renderDistanceSurfaceMax", renderDistanceSurfaceMax)
-                .add("revealShape", revealShape)
-                .add("themeName", themeName)
-                .add("tileRenderType", tileRenderType)
-                .toString();
-    }
-
-    public static void main(String[] args)
-    {
-        boolean verbose = true;
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                        .registerTypeAdapter(BooleanField.class, new PropertiesSerializer.BooleanFieldSerializer(verbose))
-                        .registerTypeAdapter(IntegerField.class, new PropertiesSerializer.IntegerFieldSerializer(verbose))
-                        .registerTypeAdapter(StringField.class, new PropertiesSerializer.StringFieldSerializer(verbose))
-                        .registerTypeAdapter(EnumField.class, new PropertiesSerializer.EnumFieldSerializer(verbose))
-                .create();
-
-        CoreProperties c1 = new CoreProperties();
-        String json = gson.toJson(c1);
-        System.out.println(json);
-
-        CoreProperties c2 = gson.fromJson(json, CoreProperties.class);
-        System.out.println("Equal? " + c1.equals(c2));
     }
 }

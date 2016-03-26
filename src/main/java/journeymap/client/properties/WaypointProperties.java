@@ -7,17 +7,16 @@
  */
 package journeymap.client.properties;
 
-import com.google.common.base.Objects;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.IntegerField;
 
-import static journeymap.common.properties.Category.Waypoint;
-import static journeymap.common.properties.Category.WaypointBeacon;
+import static journeymap.client.properties.ClientCategory.Waypoint;
+import static journeymap.client.properties.ClientCategory.WaypointBeacon;
 
 /**
  * Properties for in-game waypoint management and display.
  */
-public class WaypointProperties extends ClientProperties implements Comparable<WaypointProperties>
+public class WaypointProperties extends ClientPropertiesBase implements Comparable<WaypointProperties>
 {
     public final BooleanField managerEnabled = new BooleanField(Waypoint, "jm.waypoint.enable_manager", true, true);
     public final BooleanField beaconEnabled = new BooleanField(WaypointBeacon, "jm.waypoint.enable_beacons", true, true);
@@ -37,62 +36,6 @@ public class WaypointProperties extends ClientProperties implements Comparable<W
     public String getName()
     {
         return "waypoint";
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        WaypointProperties that = (WaypointProperties) o;
-        return 0 == this.compareTo(that);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = managerEnabled.hashCode();
-        result = 31 * result + beaconEnabled.hashCode();
-        result = 31 * result + showTexture.hashCode();
-        result = 31 * result + showStaticBeam.hashCode();
-        result = 31 * result + showRotatingBeam.hashCode();
-        result = 31 * result + showName.hashCode();
-        result = 31 * result + showDistance.hashCode();
-        result = 31 * result + autoHideLabel.hashCode();
-        result = 31 * result + boldLabel.hashCode();
-        result = 31 * result + fontScale.hashCode();
-        result = 31 * result + textureSmall.hashCode();
-        result = 31 * result + maxDistance.hashCode();
-        result = 31 * result + createDeathpoints.hashCode();
-        result = 31 * result + getName().hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper(this)
-                .add("autoHideLabel", autoHideLabel)
-                .add("beaconEnabled", beaconEnabled)
-                .add("boldLabel", boldLabel)
-                .add("createDeathpoints", createDeathpoints)
-                .add("fontScale", fontScale)
-                .add("managerEnabled", managerEnabled)
-                .add("maxDistance", maxDistance)
-                .add("name", getName())
-                .add("showDistance", showDistance)
-                .add("showName", showName)
-                .add("showRotatingBeam", showRotatingBeam)
-                .add("showStaticBeam", showStaticBeam)
-                .add("showTexture", showTexture)
-                .add("textureSmall", textureSmall)
-                .toString();
     }
 
     @Override

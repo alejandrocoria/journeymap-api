@@ -140,13 +140,23 @@ public class ThemeFileHandler
 
     public static List<String> getThemeNames()
     {
-        List<Theme> themes = getThemes();
+        List<Theme> themes = null;
+        try
+        {
+            themes = getThemes();
+        }
+        catch (Exception e)
+        {
+            themes = ThemePresets.getPresets();
+        }
+
         ArrayList<String> names = new ArrayList<String>(themes.size());
         for (Theme theme : themes)
         {
             names.add(theme.name);
         }
         return names;
+
     }
 
     public static Theme getCurrentTheme()
@@ -269,14 +279,27 @@ public class ThemeFileHandler
 
     public static Theme getDefaultTheme()
     {
-        Theme.DefaultPointer pointer = loadDefaultPointer();
-        pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
+        Theme theme = null;
+        File themeFile = null;
+        Theme.DefaultPointer pointer = null;
+        try
+        {
+            pointer = loadDefaultPointer();
+            pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
 
-        File themeFile = getThemeFile(pointer.directory, pointer.filename);
-        Theme theme = loadThemeFromFile(themeFile, false);
+            themeFile = getThemeFile(pointer.directory, pointer.filename);
+            theme = loadThemeFromFile(themeFile, false);
+        }
+        catch (Exception e)
+        {
+            JMLogger.logOnce("Default theme not found", e);
+        }
         if (theme == null)
         {
-            JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+            if (pointer != null)
+            {
+                JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+            }
             theme = ThemePresets.THEME_VICTORIAN;
         }
         return theme;
@@ -303,9 +326,9 @@ public class ThemeFileHandler
      */
     private static Theme.DefaultPointer loadDefaultPointer()
     {
-        ensureDefaultThemeFile();
         try
         {
+            ensureDefaultThemeFile();
             File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
             if (defaultThemeFile.exists())
             {

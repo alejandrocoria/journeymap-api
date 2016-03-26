@@ -8,9 +8,9 @@
 
 package journeymap.client.ui.option;
 
-import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.properties.ClientCategory;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ScrollListPane;
@@ -24,7 +24,6 @@ import java.util.*;
  */
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {
-    final String name;
     Minecraft mc = ForgeHelper.INSTANCE.getClient();
     SlotMetadata metadata;
     Category category;
@@ -44,11 +43,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     public CategorySlot(Category category)
     {
         this.category = category;
-        this.name = Constants.getString(category.key);
-        String tooltip = Constants.getString(category.key + ".tooltip");
-        boolean advanced = category == Category.Advanced;
-
-        button = new Button(name);
+        boolean advanced = (category == ClientCategory.Advanced);
+        button = new Button(category.getLabel());
 //        button.setDefaultStyle(false);
 //        button.setDrawLabelShadow(false);
 //        button.setLabelColors(new Color(10, 10, 100), new Color(10, 10, 100), null);
@@ -59,7 +55,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 //
 //        button.setBackgroundColors(smallBgColor, smallBgHoverColor, smallBgHoverColor2);
 
-        metadata = new SlotMetadata(button, name, tooltip, advanced);
+        metadata = new SlotMetadata(button, category.getLabel(), category.getTooltip(), advanced);
         updateButtonLabel();
     }
 
@@ -229,7 +225,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     private void updateButtonLabel()
     {
-        this.button.displayString = name;
+        this.button.displayString = category.getLabel();
     }
 
     public boolean isSelected()

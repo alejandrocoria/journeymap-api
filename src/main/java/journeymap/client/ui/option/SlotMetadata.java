@@ -11,8 +11,10 @@ package journeymap.client.ui.option;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
-import journeymap.client.ui.component.IPropertyHolder;
+import journeymap.client.ui.component.IConfigFieldHolder;
 import journeymap.client.ui.component.IntSliderButton;
+import journeymap.common.properties.PropertiesBase;
+import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
@@ -243,10 +245,29 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public void resetToDefaultValue()
     {
-        if (button != null && button instanceof IPropertyHolder)
+        if (button != null)
         {
-            ((IPropertyHolder) button).setPropertyValue(defaultValue);
+            if (button instanceof IConfigFieldHolder)
+            {
+                ConfigField configField = ((IConfigFieldHolder) button).getConfigField();
+                configField.setToDefault();
+            }
+            button.refresh();
         }
+    }
+
+    public boolean hasConfigField()
+    {
+        return button != null && button instanceof IConfigFieldHolder && ((IConfigFieldHolder) button).getConfigField() != null;
+    }
+
+    public PropertiesBase getProperties()
+    {
+        if (hasConfigField())
+        {
+            return ((IConfigFieldHolder) button).getConfigField().getOwner();
+        }
+        return null;
     }
 
     @Override
