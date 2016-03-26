@@ -9,14 +9,11 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.common.properties.CommonProperties;
 import journeymap.common.properties.config.BooleanField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Based on GuiCheckBox
@@ -24,21 +21,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CheckBox extends BooleanPropertyButton
 {
     public int boxWidth = 11;
-    BooleanField property;
-    CommonProperties properties;
     String glyph = "\u2714";
 
     public CheckBox(String displayString, boolean checked)
     {
-        this(displayString, null, null);
+        this(displayString, null);
         this.toggled = checked;
     }
 
-    public CheckBox(String displayString, BooleanField property, CommonProperties properties)
+    public CheckBox(String displayString, BooleanField field)
     {
-        super(displayString, displayString, properties, property);
-        this.property = property;
-        this.properties = properties;
+        super(displayString, displayString, field);
 
         this.height = fontRenderer.FONT_HEIGHT + 2;
         this.width = getFitWidth(fontRenderer);
@@ -104,14 +97,6 @@ public class CheckBox extends BooleanPropertyButton
         if (this.isEnabled() && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition && p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height)
         {
             toggle();
-            if (property != null)
-            {
-                property.set(this.toggled);
-            }
-            if (properties != null)
-            {
-                properties.save();
-            }
             return true;
         }
 

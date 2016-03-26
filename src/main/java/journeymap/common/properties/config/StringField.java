@@ -2,6 +2,7 @@ package journeymap.common.properties.config;
 
 import com.google.common.base.Joiner;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.Category;
 import org.apache.logging.log4j.core.helpers.Strings;
 
@@ -13,69 +14,147 @@ import java.util.List;
  */
 public class StringField extends ConfigField<String>
 {
-    transient Class<? extends ValuesProvider> valueProviderClass;
+    public static final String ATTR_VALUE_PROVIDER = "valueProvider";
+    public static final String ATTR_MULTILINE = "multiline";
 
-    public StringField()
+    protected StringField()
     {
+    }
+
+    public StringField(Category category, String key)
+    {
+        super(category, key);
     }
 
     public StringField(Category category, String key, String[] validValues, String defaultValue)
     {
         super(category, key);
         put(ATTR_VALID_VALUES, Joiner.on(",").join(validValues));
-        put(ATTR_DEFAULT, defaultValue);
-        put(ATTR_VALUE, defaultValue);
+        defaultValue(defaultValue);
+        setToDefault();
     }
 
     public StringField(Category category, String key, Class<? extends ValuesProvider> valueProviderClass)
     {
         super(category, key);
-        this.valueProviderClass = valueProviderClass;
-        try
+        if (valueProviderClass != null)
         {
-            ValuesProvider valuesProvider = valueProviderClass.newInstance();
-            put(ATTR_VALID_VALUES, Joiner.on(",").join(valuesProvider.getStrings()));
-            put(ATTR_DEFAULT, valuesProvider.getDefaultString());
-            put(ATTR_VALUE, valuesProvider.getDefaultString());
-        }
-        catch (Throwable t)
-        {
-            Journeymap.getLogger().error("Couldn't use ValuesProvider: " + valueProviderClass);
+            put(ATTR_VALUE_PROVIDER, valueProviderClass);
+            try
+            {
+                ValuesProvider valuesProvider = valueProviderClass.newInstance();
+                validValues(valuesProvider.getStrings());
+                defaultValue(valuesProvider.getDefaultString());
+                setToDefault();
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error(String.format("Couldn't use ValuesProvider %s: %s", valueProviderClass,
+                        LogFormatter.toString(t)));
+            }
         }
     }
 
     @Override
     public String getDefaultValue()
     {
-        return get(ATTR_DEFAULT);
+        return getStringAttr(ATTR_DEFAULT);
     }
 
     @Override
     public String get()
     {
-        return get(ATTR_VALUE);
+        return getStringAttr(ATTR_VALUE);
     }
 
     public Class<? extends ValuesProvider> getValuesProviderClass()
     {
-        return valueProviderClass;
+        Object value = get(ATTR_VALUE_PROVIDER);
+        if (value == null)
+        {
+            return null;
+        }
+        if (value instanceof Class)
+        {
+            return (Class<? extends ValuesProvider>) value;
+        }
+        if (value instanceof String)
+        {
+            try
+            {
+                value = Class.forName((String) value);
+                put(ATTR_VALUE_PROVIDER, value);
+                return (Class<? extends ValuesProvider>) value;
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().warn(String.format("Couldn't get ValuesProvider Class %s : %s", value, e.getMessage()));
+            }
+        }
+        return null;
     }
 
     @Override
     public boolean isValid()
     {
         boolean valid = super.isValid();
-        return valid && Arrays.asList(getValidValues()).contains(getDefaultValue());
+
+        List<String> validValues = getValidValues();
+        if (validValues != null)
+        {
+            valid = validValues.contains(get()) || valid;
+        }
+        return valid;
     }
 
-    public String[] getValidValues()
+    /**
+     * Gets the list of valid values, or null if there aren't any specified.
+     *
+     * @return list or null
+     */
+    public List<String> getValidValues()
     {
-        String validValuesString = get(ATTR_VALID_VALUES);
+        String validValuesString = getStringAttr(ATTR_VALID_VALUES);
         if(!Strings.isEmpty(validValuesString))
         {
-            return validValuesString.split(",");
+            return Arrays.asList(validValuesString.split(","));
         }
         return null;
+    }
+
+    /**
+     * Sets the valid values.
+     *
+     * @param values list
+     * @return this
+     */
+    public StringField validValues(Iterable<String> values)
+    {
+        put(ATTR_VALID_VALUES, Joiner.on(",").join(values));
+        return this;
+    }
+
+    /**
+     * Whether this should be displayed with multiple lines
+     *
+     * @return true if multiline
+     */
+    public boolean isMultiline()
+    {
+        Boolean val = getBooleanAttr(ATTR_MULTILINE);
+        return (val == null) ? false : val;
+    }
+
+    /**
+     * Sets whether this should be displayed with multiple lines
+     *
+     * @param isMultiline true if multiline
+     * @return this
+     */
+    public StringField multiline(boolean isMultiline)
+    {
+        put(ATTR_MULTILINE, isMultiline);
+        return this;
     }
 
     /**

@@ -8,8 +8,6 @@
 package journeymap.client.properties;
 
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.MapType;
-import journeymap.common.properties.config.StringField;
 
 /**
  * Properties for the full map in-game.
@@ -33,43 +31,5 @@ public class FullMapProperties extends InGameMapProperties
     public String getName()
     {
         return "fullmap";
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        if (!super.equals(o))
-        {
-            return false;
-        }
-        FullMapProperties that = (FullMapProperties) o;
-        return 0 == this.compareTo(that);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 31 * result + showGrid.hashCode();
-        result = 31 * result + showCaves.hashCode();
-        result = 31 * result + getName().hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return super.toStringHelper(this)
-                .add("preferredMapType", preferredMapType)
-                .add("showGrid", showGrid)
-                .toString();
     }
 }

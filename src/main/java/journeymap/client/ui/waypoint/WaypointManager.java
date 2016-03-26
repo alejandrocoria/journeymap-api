@@ -13,6 +13,7 @@ import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
+import journeymap.client.properties.ClientCategory;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.*;
 import journeymap.client.ui.fullscreen.Fullscreen;
@@ -392,7 +393,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openOptionsManager(this, Category.Waypoint, Category.WaypointBeacon);
+            UIManager.getInstance().openOptionsManager(this, ClientCategory.Waypoint, ClientCategory.WaypointBeacon);
             return;
         }
     }

@@ -16,7 +16,7 @@ import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 
-import static journeymap.common.properties.Category.*;
+import static journeymap.client.properties.ClientCategory.Inherit;
 
 /**
  * Properties for the minimap in-game.
@@ -37,11 +37,12 @@ public class MiniMapProperties extends InGameMapProperties
     public final BooleanField showCompass = new BooleanField(Inherit, "jm.minimap.show_compass", true);
     public final BooleanField showReticle = new BooleanField(Inherit, "jm.minimap.show_reticle", true);
     public final EnumField<ReticleOrientation> reticleOrientation = new EnumField<ReticleOrientation>(Inherit, "jm.minimap.reticle_orientation", ReticleOrientation.Compass);
-
+    protected final transient int id;
     protected boolean active = false;
 
-    public MiniMapProperties()
+    public MiniMapProperties(int id)
     {
+        this.id = id;
     }
 
     @Override
@@ -63,13 +64,11 @@ public class MiniMapProperties extends InGameMapProperties
 
     public int getId()
     {
-        return 1;
+        return id;
     }
 
     /**
      * Gets the size relative to current screen height.
-     *
-     * @return
      */
     public int getSize()
     {
@@ -79,80 +78,31 @@ public class MiniMapProperties extends InGameMapProperties
     @Override
     public void newFileInit()
     {
-        this.setActive(true);
-        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+        if (getId() == 1)
         {
-            super.fontScale.set(2);
-            compassFontScale.set(2);
+            this.setActive(true);
+            if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+            {
+                super.fontScale.set(2);
+                compassFontScale.set(2);
+            }
+        }
+        else
+        {
+            // Initial settings to give people an idea of what can be done
+            this.position.set(Position.TopCenter);
+            this.shape.set(Shape.Rectangle);
+            this.frameAlpha.set(60);
+            this.terrainAlpha.set(60);
+            this.orientation.set(Orientation.PlayerHeading);
+            this.reticleOrientation.set(ReticleOrientation.Compass);
+            this.sizePercent.set(30);
+            if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+            {
+                super.fontScale.set(2);
+                compassFontScale.set(2);
+            }
+            this.setActive(false);
         }
     }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        if (!super.equals(o))
-        {
-            return false;
-        }
-        MiniMapProperties that = (MiniMapProperties) o;
-        return 0 == this.compareTo(that);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 31 * result + (enabled != null ? enabled.hashCode() : 0);
-        result = 31 * result + (shape != null ? shape.hashCode() : 0);
-        result = 31 * result + (position != null ? position.hashCode() : 0);
-        result = 31 * result + (showFps != null ? showFps.hashCode() : 0);
-        result = 31 * result + (showBiome != null ? showBiome.hashCode() : 0);
-        result = 31 * result + (showLocation != null ? showLocation.hashCode() : 0);
-        result = 31 * result + showWaypointLabels.hashCode();
-        result = 31 * result + sizePercent.hashCode();
-        result = 31 * result + frameAlpha.hashCode();
-        result = 31 * result + terrainAlpha.hashCode();
-        result = 31 * result + orientation.hashCode();
-        result = 31 * result + compassFontScale.hashCode();
-        result = 31 * result + showCompass.hashCode();
-        result = 31 * result + showReticle.hashCode();
-        result = 31 * result + reticleOrientation.hashCode();
-        result = 31 * result + entityIconSetName.hashCode();
-        result = 31 * result + preferredMapType.hashCode();
-        result = 31 * result + getName().hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return super.toStringHelper(this)
-                .add("active", active)
-                .add("compassFontScale", compassFontScale)
-                .add("enabled", enabled)
-                .add("frameAlpha", frameAlpha)
-                .add("name", getName())
-                .add("orientation", orientation)
-                .add("position", position)
-                .add("preferredMapType", preferredMapType)
-                .add("reticleOrientation", reticleOrientation)
-                .add("shape", shape)
-                .add("showBiome", showBiome)
-                .add("showCompass", showCompass)
-                .add("showFps", showFps)
-                .add("showLocation", showLocation)
-                .add("showReticle", showReticle)
-                .add("sizePercent", sizePercent)
-                .add("terrainAlpha", terrainAlpha)
-                .toString();
-    }
-
 }

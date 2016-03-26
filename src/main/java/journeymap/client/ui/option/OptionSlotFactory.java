@@ -13,10 +13,13 @@ import com.google.common.io.Files;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
-import journeymap.client.ui.component.*;
+import journeymap.client.ui.component.CheckBox;
+import journeymap.client.ui.component.IntSliderButton;
+import journeymap.client.ui.component.ListPropertyButton;
+import journeymap.client.ui.component.ScrollListPane;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.*;
 
 import java.io.BufferedWriter;
@@ -26,8 +29,10 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 
+import static journeymap.client.properties.ClientCategory.*;
+
 /**
- * Created by Mark on 9/29/2014.
+ * Generates the UI slots in the Options Manager.
  */
 public class OptionSlotFactory
 {
@@ -40,12 +45,12 @@ public class OptionSlotFactory
     {
         HashMap<Category, List<SlotMetadata>> mergedMap = new HashMap<Category, List<SlotMetadata>>();
 
-        addSlots(mergedMap, Category.MiniMap1, JourneymapClient.getMiniMapProperties1());
-        addSlots(mergedMap, Category.MiniMap2, JourneymapClient.getMiniMapProperties2());
-        addSlots(mergedMap, Category.FullMap, JourneymapClient.getFullMapProperties());
-        addSlots(mergedMap, Category.WebMap, JourneymapClient.getWebMapProperties());
-        addSlots(mergedMap, Category.Waypoint, JourneymapClient.getWaypointProperties());
-        addSlots(mergedMap, Category.Advanced, JourneymapClient.getCoreProperties());
+        addSlots(mergedMap, MiniMap1, JourneymapClient.getMiniMapProperties1());
+        addSlots(mergedMap, MiniMap2, JourneymapClient.getMiniMapProperties2());
+        addSlots(mergedMap, FullMap, JourneymapClient.getFullMapProperties());
+        addSlots(mergedMap, WebMap, JourneymapClient.getWebMapProperties());
+        addSlots(mergedMap, Waypoint, JourneymapClient.getWaypointProperties());
+        addSlots(mergedMap, Advanced, JourneymapClient.getCoreProperties());
 
         List<CategorySlot> categories = new ArrayList<CategorySlot>();
         for (Map.Entry<Category, List<SlotMetadata>> entry : mergedMap.entrySet())
@@ -86,7 +91,7 @@ public class OptionSlotFactory
             {
                 CategorySlot categorySlot = (CategorySlot) rootSlot;
 
-                if (categorySlot.category == Category.MiniMap2)
+                if (categorySlot.category == MiniMap2)
                 {
                     continue;
                 }
@@ -96,7 +101,7 @@ public class OptionSlotFactory
                 categorySlot.sort();
                 for (SlotMetadata childSlot : categorySlot.getAllChildMetadata())
                 {
-                    doc(childSlot, categorySlot.getCategory() == Category.Advanced);
+                    doc(childSlot, categorySlot.getCategory() == Advanced);
                 }
                 docTable(false);
             }
@@ -107,13 +112,13 @@ public class OptionSlotFactory
         return categories;
     }
 
-    protected static void addSlots(HashMap<Category, List<SlotMetadata>> mergedMap, Category inheritedCategory, CommonProperties properties)
+    protected static void addSlots(HashMap<Category, List<SlotMetadata>> mergedMap, Category inheritedCategory, PropertiesBase properties)
     {
-        Class<? extends CommonProperties> propertiesClass = properties.getClass();
+        Class<? extends PropertiesBase> propertiesClass = properties.getClass();
         for (Map.Entry<Category, List<SlotMetadata>> entry : buildSlots(null, inheritedCategory, propertiesClass, properties).entrySet())
         {
             Category category = entry.getKey();
-            if (category == Category.Inherit)
+            if (category == Inherit)
             {
                 category = inheritedCategory;
             }
@@ -133,7 +138,7 @@ public class OptionSlotFactory
         }
     }
 
-    protected static HashMap<Category, List<SlotMetadata>> buildSlots(HashMap<Category, List<SlotMetadata>> map, Category inheritedCategory, Class<? extends CommonProperties> propertiesClass, CommonProperties properties)
+    protected static HashMap<Category, List<SlotMetadata>> buildSlots(HashMap<Category, List<SlotMetadata>> map, Category inheritedCategory, Class<? extends PropertiesBase> propertiesClass, PropertiesBase properties)
     {
         if (map == null)
         {
@@ -153,7 +158,7 @@ public class OptionSlotFactory
                     throw new RuntimeException(e);
                 }
 
-                if(configField.getCategory()== Category.Hidden)
+                if (configField.getCategory() == Hidden)
                 {
                     continue;
                 }
@@ -162,19 +167,19 @@ public class OptionSlotFactory
 
                 if (configField instanceof BooleanField)
                 {
-                    slotMetadata = getBooleanSlotMetadata(properties, (BooleanField) configField);
+                    slotMetadata = getBooleanSlotMetadata((BooleanField) configField);
                 }
                 else if (configField instanceof IntegerField)
                 {
-                    slotMetadata = getIntegerSlotMetadata(properties, (IntegerField) configField);
+                    slotMetadata = getIntegerSlotMetadata((IntegerField) configField);
                 }
                 else if (configField instanceof StringField)
                 {
-                    slotMetadata = getStringSlotMetadata(properties, (StringField) configField);
+                    slotMetadata = getStringSlotMetadata((StringField) configField);
                 }
                 else if (configField instanceof EnumField)
                 {
-                    slotMetadata = getEnumSlotMetadata(properties, (EnumField) configField);
+                    slotMetadata = getEnumSlotMetadata((EnumField) configField);
                 }
 
                 if (slotMetadata != null)
@@ -184,7 +189,7 @@ public class OptionSlotFactory
 
                     // Determine category
                     Category category = configField.getCategory();
-                    if (category == Category.Inherit)
+                    if (category == Inherit)
                     {
                         category = inheritedCategory;
                     }
@@ -206,9 +211,9 @@ public class OptionSlotFactory
 
         // Check for parent class
         Class parentClass = propertiesClass.getSuperclass();
-        if (CommonProperties.class.isAssignableFrom(parentClass))
+        if (PropertiesBase.class.isAssignableFrom(parentClass))
         {
-            map = buildSlots(map, inheritedCategory, (Class<? extends CommonProperties>) parentClass, properties);
+            map = buildSlots(map, inheritedCategory, (Class<? extends PropertiesBase>) parentClass, properties);
         }
 
         return map;
@@ -227,19 +232,17 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for a boolean property
-     *
-     * @param properties
      * @param field
      * @return
      */
-    static SlotMetadata<Boolean> getBooleanSlotMetadata(CommonProperties properties, BooleanField field)
+    static SlotMetadata<Boolean> getBooleanSlotMetadata(BooleanField field)
     {
             String name = Constants.getString(field.getKey());
             String tooltip = getTooltip(field);
             String defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
-            boolean advanced = field.getCategory() == Category.Advanced;
+        boolean advanced = field.getCategory() == Advanced;
 
-            CheckBox button = new CheckBox(name, field, properties);
+        CheckBox button = new CheckBox(name, field);
             SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
             slotMetadata.setMasterPropertyForCategory(field.isCategoryMaster());
             if (field.isCategoryMaster())
@@ -252,18 +255,17 @@ public class OptionSlotFactory
     /**
      * Create a slot for an Integer property
      *
-     * @param properties
      * @param field
      * @return
      */
-    static SlotMetadata<Integer> getIntegerSlotMetadata(CommonProperties properties, IntegerField field)
+    static SlotMetadata<Integer> getIntegerSlotMetadata(IntegerField field)
     {
         String name = Constants.getString(field.getKey());
         String tooltip = getTooltip(field);
         String defaultTip = Constants.getString("jm.config.default_numeric", (int) field.getMinValue(), (int) field.getMaxValue(), (int) field.getDefaultValue());
-        boolean advanced = field.getCategory() == Category.Advanced;
+        boolean advanced = field.getCategory() == Advanced;
 
-        IntSliderButton button = new IntSliderButton(properties, field, name + " : ", "", (int) field.getMinValue(), (int) field.getMaxValue(), true);
+        IntSliderButton button = new IntSliderButton(field, name + " : ", "", (int) field.getMinValue(), (int) field.getMaxValue(), true);
         button.setDefaultStyle(false);
         button.setDrawBackground(false);
         SlotMetadata<Integer> slotMetadata = new SlotMetadata<Integer>(button, name, tooltip, defaultTip, (int) field.getDefaultValue(), advanced);
@@ -273,17 +275,16 @@ public class OptionSlotFactory
     /**
      * Create a slot for a bound list of strings property
      *
-     * @param properties
      * @param field
      * @return
      */
-    static SlotMetadata<String> getStringSlotMetadata(CommonProperties properties, StringField field)
+    static SlotMetadata<String> getStringSlotMetadata(StringField field)
     {
         try
         {
             String name = Constants.getString(field.getKey());
             String tooltip = getTooltip(field);
-            boolean advanced = field.getCategory() == Category.Advanced;
+            boolean advanced = field.getCategory() == Advanced;
 
             ListPropertyButton<String> button = null;
             String defaultTip = null;
@@ -291,18 +292,18 @@ public class OptionSlotFactory
             // Exception: LocationProperty gets its own button
             if (LocationFormat.IdProvider.class.isAssignableFrom(field.getValuesProviderClass()))
             {
-                button = new LocationFormat.Button(properties, field);
+                button = new LocationFormat.Button(field);
                 defaultTip = Constants.getString("jm.config.default", ((LocationFormat.Button) button).getLabel(field.getDefaultValue()));
             }
             else
             {
-                button = new ListPropertyButton<String>(Arrays.asList(field.getValidValues()), name, properties, field);
+                button = new ListPropertyButton<String>(field.getValidValues(), name, field);
                 defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
             }
             button.setDefaultStyle(false);
             button.setDrawBackground(false);
             SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
-            slotMetadata.setValueList(Arrays.asList(field.getValidValues()));
+            slotMetadata.setValueList(field.getValidValues());
             return slotMetadata;
         }
         catch (Exception e)
@@ -314,21 +315,19 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for a bound list of strings property
-     *
-     * @param properties
      * @param field
      * @return
      */
-    static SlotMetadata<Enum> getEnumSlotMetadata(CommonProperties properties, EnumField field)
+    static SlotMetadata<Enum> getEnumSlotMetadata(EnumField field)
     {
         try
         {
             String name = Constants.getString(field.getKey());
             String tooltip = getTooltip(field);
-            boolean advanced = field.getCategory() == Category.Advanced;
+            boolean advanced = field.getCategory() == Advanced;
 
 
-            ListPropertyButton<Enum> button = new ListPropertyButton<Enum>(field.getValidValues(), name, properties, field);
+            ListPropertyButton<Enum> button = new ListPropertyButton<Enum>(field.getValidValues(), name, field);
             String defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
 
             button.setDefaultStyle(false);
@@ -381,7 +380,7 @@ public class OptionSlotFactory
         try
         {
             docWriter.newLine();
-            docWriter.append(String.format("==%s==", categorySlot.name.replace("Preset 1", "Preset (1 and 2)")));
+            docWriter.append(String.format("==%s==", categorySlot.getCategory().getName().replace("Preset 1", "Preset (1 and 2)")));
             docWriter.newLine();
             docWriter.append(String.format("''%s''", categorySlot.getMetadata().iterator().next().tooltip.replace("Preset 1", "Preset (1 and 2)")));
             docWriter.newLine();

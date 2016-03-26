@@ -11,7 +11,6 @@ package journeymap.client.ui.option;
 import journeymap.client.Constants;
 import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.common.Journeymap;
-import journeymap.common.properties.CommonProperties;
 import journeymap.common.properties.config.StringField;
 
 import java.util.Arrays;
@@ -102,9 +101,9 @@ public class LocationFormat
     {
         LocationFormat locationFormat;
 
-        public Button(CommonProperties properties, StringField valueHolder)
+        public Button(StringField valueHolder)
         {
-            super(Arrays.asList(locationFormatIds), Constants.getString("jm.common.location_format"), properties, valueHolder);
+            super(Arrays.asList(locationFormatIds), Constants.getString("jm.common.location_format"), valueHolder);
             if (locationFormat == null)
             {
                 locationFormat = new LocationFormat();

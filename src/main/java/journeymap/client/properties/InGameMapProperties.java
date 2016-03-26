@@ -7,13 +7,12 @@
  */
 package journeymap.client.properties;
 
-import com.google.common.base.Objects;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
 
-import static journeymap.common.properties.Category.Inherit;
+import static journeymap.client.properties.ClientCategory.Inherit;
 
 /**
  * Shared Properties for in-game map types.
@@ -31,49 +30,5 @@ public abstract class InGameMapProperties extends MapProperties
 
     protected InGameMapProperties()
     {
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        InGameMapProperties that = (InGameMapProperties) o;
-        return this.compareTo(that) == 0;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 31 * result + showCaves.hashCode();
-        result = 31 * result + fontScale.hashCode();
-        result = 31 * result + textureSmall.hashCode();
-        result = 31 * result + showWaypointLabels.hashCode();
-        result = 31 * result + locationFormatVerbose.hashCode();
-        result = 31 * result + locationFormat.hashCode();
-        result = 31 * result + showMobHeading.hashCode();
-        result = 31 * result + showPlayerHeading.hashCode();
-        return result;
-    }
-
-    @Override
-    protected Objects.ToStringHelper toStringHelper(MapProperties me)
-    {
-        return super.toStringHelper(me)
-                .add("fontScale", fontScale)
-                .add("locationFormat", locationFormat)
-                .add("locationFormatVerbose", locationFormatVerbose)
-                .add("showCaves", showCaves)
-                .add("showWaypointLabels", showWaypointLabels)
-                .add("showMobHeading", showMobHeading)
-                .add("showPlayerHeading", showPlayerHeading)
-                .add("textureSmall", textureSmall);
     }
 }

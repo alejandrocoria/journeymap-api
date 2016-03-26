@@ -1,12 +1,8 @@
 package journeymap.common.properties.config;
 
-import com.google.common.base.Joiner;
-import com.google.gson.*;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.EnumSet;
 
 /**
@@ -14,7 +10,9 @@ import java.util.EnumSet;
  */
 public class EnumField<E extends Enum> extends ConfigField<E>
 {
-    public EnumField()
+    public static final String ATTR_ENUM_TYPE = "enumType";
+
+    protected EnumField()
     {
     }
 
@@ -22,15 +20,15 @@ public class EnumField<E extends Enum> extends ConfigField<E>
     public EnumField(Category category, String key, E defaultValue)
     {
         super(category, key);
-        put(ATTR_ENUM_TYPE, getClass().getName());
-        put(ATTR_DEFAULT, defaultValue.name());
-        put(ATTR_VALUE, defaultValue.name());
+        put(ATTR_ENUM_TYPE, defaultValue.getClass().getName());
+        defaultValue(defaultValue);
+        setToDefault();
     }
 
     @Override
     public E getDefaultValue()
     {
-        return (E) getEnumAttr(ATTR_DEFAULT);
+        return (E) getEnumAttr(ATTR_DEFAULT, getEnumClass());
     }
 
     @Override
@@ -43,22 +41,28 @@ public class EnumField<E extends Enum> extends ConfigField<E>
     @Override
     public E get()
     {
-        return (E) getEnumAttr(ATTR_VALUE);
+        return (E) getEnumAttr(ATTR_VALUE, getEnumClass());
     }
 
 
     public Class<E> getEnumClass()
     {
-        String enumTypeName = get(ATTR_ENUM_TYPE);
-        if(enumTypeName!=null)
+        Object value = get(ATTR_ENUM_TYPE);
+        if (value instanceof Class)
+        {
+            return (Class<E>) value;
+        }
+        else if (value instanceof String)
         {
             try
             {
-                return (Class<E>) Class.forName(enumTypeName);
+                value = (Class<E>) Class.forName((String) value);
+                attributes.put(ATTR_ENUM_TYPE, value);
+                return (Class<E>) value;
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().warn(String.format("Couldn't get Enum Class %s : %s", enumTypeName, e.getMessage()));
+                Journeymap.getLogger().warn(String.format("Couldn't get Enum Class %s : %s", ATTR_ENUM_TYPE, e.getMessage()));
             }
         }
         return null;

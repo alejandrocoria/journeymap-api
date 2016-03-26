@@ -24,6 +24,11 @@ public class ConfigHandler
         ConfigHandler.configPath = configPath;
     }
 
+    public static File getConfigPath()
+    {
+        return configPath;
+    }
+
     /**
      * returns a config based on the world file, if the config file does not exists
      * this method starts the process of generating a new one.
