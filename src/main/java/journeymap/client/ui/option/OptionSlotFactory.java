@@ -118,7 +118,7 @@ public class OptionSlotFactory
         for (Map.Entry<Category, List<SlotMetadata>> entry : buildSlots(null, inheritedCategory, propertiesClass, properties).entrySet())
         {
             Category category = entry.getKey();
-            if (category == Inherit)
+            if (category == Category.Inherit)
             {
                 category = inheritedCategory;
             }
@@ -158,7 +158,7 @@ public class OptionSlotFactory
                     throw new RuntimeException(e);
                 }
 
-                if (configField.getCategory() == Hidden)
+                if (configField.getCategory() == Category.Hidden)
                 {
                     continue;
                 }
@@ -189,7 +189,7 @@ public class OptionSlotFactory
 
                     // Determine category
                     Category category = configField.getCategory();
-                    if (category == Inherit)
+                    if (category == Category.Inherit)
                     {
                         category = inheritedCategory;
                     }

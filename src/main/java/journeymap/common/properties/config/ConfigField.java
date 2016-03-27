@@ -33,6 +33,9 @@ public abstract class ConfigField<T>
     // Owning Properties class
     protected transient PropertiesBase owner;
 
+    // Field name used by owning properties class
+    protected transient String fieldName;
+
     public ConfigField()
     {
         put(ATTR_TYPE, getClass().getSimpleName());
@@ -111,9 +114,10 @@ public abstract class ConfigField<T>
 
     /**
      * Whether the field is valid.
+     * @param fix whether to try to fix problems
      * @return true if valid.
      */
-    public boolean isValid() {
+    public boolean validate(boolean fix) {
         return require(ATTR_TYPE, ATTR_VALUE, ATTR_DEFAULT);
     }
 
@@ -340,6 +344,10 @@ public abstract class ConfigField<T>
      */
     public ConfigField<T> defaultValue(T defaultValue)
     {
+        if(defaultValue==null)
+        {
+            Journeymap.getLogger().warn("defaultValue shouldn't be null");
+        }
         put(ATTR_DEFAULT, defaultValue);
         return this;
     }
@@ -356,19 +364,11 @@ public abstract class ConfigField<T>
         {
             Object attr = get(attrName);
             if(attr==null) {
-                Journeymap.getLogger().warn(String.format("%s is missing required attribute: %s", getClass(), attrName));
+                Journeymap.getLogger().warn(String.format("Missing required attribute '%s' in %s", attrName, getDeclaredField()));
                 pass = false;
             }
         }
         return pass;
-    }
-
-    /**
-     * Warn a property's value has to be adjusted.
-     */
-    protected void warnPropertyValue(Object oldValue, Object newValue)
-    {
-        Journeymap.getLogger().warn(String.format("Property %s.%s invalid: %s . Changing to: %s", getClass().getSimpleName(), getKey(), oldValue, newValue));
     }
 
     /**
@@ -402,12 +402,13 @@ public abstract class ConfigField<T>
     }
 
     /**
-     * Sets the owning properties class
+     * Sets the owning properties class and the fieldname it declared.
      *
      * @param properties owner
      */
-    public void setOwner(PropertiesBase properties)
+    public void setOwner(String fieldName, PropertiesBase properties)
     {
+        this.fieldName = fieldName;
         this.owner = properties;
     }
 
@@ -451,10 +452,20 @@ public abstract class ConfigField<T>
         return Objects.hashCode(getKey(), getCategory(), get());
     }
 
+    public String getDeclaredField()
+    {
+        if(owner==null)
+        {
+            return null;
+        }
+        return String.format("%s.%s", owner.getClass().getSimpleName(), fieldName);
+    }
+
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(attributes)
+        return Objects.toStringHelper(this)
+                .add("on", getDeclaredField())
                 .add("attributes", attributes)
                 .toString();
     }

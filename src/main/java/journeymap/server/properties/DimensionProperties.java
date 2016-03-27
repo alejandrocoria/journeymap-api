@@ -1,39 +1,55 @@
 package journeymap.server.properties;
 
+import com.google.common.io.Files;
 import journeymap.common.properties.config.BooleanField;
-import journeymap.common.properties.config.StringField;
+
+import java.io.File;
 
 /**
- * Port of oldservercode.config.Configuration
+ * Permissions which can be applied to a specific dimension.
  */
-public class DimensionProperties extends ServerPropertiesBase
+public class DimensionProperties extends PermissionProperties
 {
+    // Whether or not these properties should override GlobalProperties
+    public final BooleanField enabled = new BooleanField(ServerCategory.General, "Enable Configuration", false).categoryMaster(true);
     protected final Integer dimension;
-
-    protected BooleanField enabled = new BooleanField(ServerCategory.General, "Enable Configuration", false).categoryMaster(true);
-    protected BooleanField opCaveMapping = new BooleanField(ServerCategory.Cave, "Enable Op cave maps", true);
-    protected BooleanField playerCaveMapping = new BooleanField(ServerCategory.Cave, "Enable player cave maps", true);
-    protected StringField whiteListCaveMapping = new StringField(ServerCategory.Cave, "Player whitelist").multiline(true);
-    protected BooleanField opRadar = new BooleanField(ServerCategory.Radar, "Enable Op radar", true);
-    protected BooleanField playerRadar = new BooleanField(ServerCategory.Radar, "Enable player radar", true);
-    protected StringField whiteListRadar = new StringField(ServerCategory.Radar, "Player whitelist").multiline(true);
 
     /**
      * Constructor.
      *
-     * @param dimension
+     * @param dimension  the dimension id this applies to
      */
     public DimensionProperties(Integer dimension)
     {
-        this(dimension, String.format("Dimension %s Configuration", dimension),
+        super(String.format("Dimension %s Configuration", dimension),
                 "Overrides the Global Server Configuration for this dimension");
+        this.dimension = dimension;
     }
 
-    public DimensionProperties(Integer dimension, String displayName, String description)
+    public static void main(String[] args) throws Exception
     {
-        this.dimension = dimension;
-        this.displayName = displayName;
-        this.description = description;
+        boolean fix = true;
+
+        DimensionProperties p = new DimensionProperties(-1);
+        System.out.println(p.isValid(fix));
+
+        // Verbose result
+        System.out.println("DimensionProperties Verbose: " + p.toJsonString(true));
+
+        // Compact result
+        System.out.println("DimensionProperties Compact: " + p.toJsonString(false));
+
+        System.out.println("GlobalProperties Verbose: " + new GlobalProperties().toJsonString(true));
+
+        System.out.println("GlobalProperties Compact: " + new GlobalProperties().toJsonString(false));
+
+        GlobalProperties c1 = new GlobalProperties();
+        c1.isValid(true);
+
+        File temp = File.createTempFile(c1.getFileName(), ".json");
+        c1.save(temp, false);
+
+        System.out.println("GlobalProperties Compact File: \n\n" + Files.toString(temp, UTF8));
     }
 
     @Override

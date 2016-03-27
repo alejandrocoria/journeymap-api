@@ -7,17 +7,20 @@ import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import static journeymap.server.properties.ServerCategory.General;
 
 /**
- * Port of oldservercode.config.Configuration
+ * Properties which can be applied globally (unless overridden by a specific DimensionProperties.)
  */
-public class GlobalProperties extends DimensionProperties
+public class GlobalProperties extends PermissionProperties
 {
     protected BooleanField useWorldID = new BooleanField(General, "Use World ID", false);
     protected StringField worldID = new StringField(General, "World ID");
     protected BooleanField saveInWorldFolder = new BooleanField(General, "Save configs in world folder", false);
 
+    /**
+     * Constructor.
+     */
     public GlobalProperties()
     {
-        super(null, "Global Server Configuration", "Applies to all dimensions unless overridden.");
+        super("Global Server Configuration", "Applies to all dimensions unless overridden.");
     }
 
     @Override

@@ -22,6 +22,7 @@ import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.config.StringField;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -279,6 +280,11 @@ public class ThemeFileHandler
 
     public static Theme getDefaultTheme()
     {
+        if(FMLClientHandler.instance().getClient()==null)
+        {
+            return ThemePresets.THEME_VICTORIAN;
+        }
+
         Theme theme = null;
         File themeFile = null;
         Theme.DefaultPointer pointer = null;
@@ -292,8 +298,9 @@ public class ThemeFileHandler
         }
         catch (Exception e)
         {
-            JMLogger.logOnce("Default theme not found", e);
+            JMLogger.logOnce("Default theme not found in files", e);
         }
+
         if (theme == null)
         {
             if (pointer != null)

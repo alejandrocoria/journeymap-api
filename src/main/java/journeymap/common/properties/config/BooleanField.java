@@ -13,15 +13,14 @@ public class BooleanField extends ConfigField<Boolean>
     {
     }
 
-    public BooleanField(Category category)
+    public BooleanField(Category category, boolean defaultValue)
     {
-        super(category);
+        this(category, null, defaultValue);
     }
 
     public BooleanField(Category category, String key, boolean defaultValue)
     {
-        super(category, key);
-        defaultValue(defaultValue);
+        this(category, key, defaultValue, false);
     }
 
     public BooleanField(Category category, String key, boolean defaultValue, boolean isMaster)

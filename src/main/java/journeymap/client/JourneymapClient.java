@@ -40,7 +40,6 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.PropertiesBase;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -605,16 +604,48 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Load all the properties from their files.
+     * (Re)load all the properties from their files.
+     */
+    public void saveConfigProperties()
+    {
+        if (coreProperties != null)
+        {
+            coreProperties.save();
+        }
+        if (fullMapProperties != null)
+        {
+            fullMapProperties.save();
+        }
+        if (miniMapProperties1 != null)
+        {
+            miniMapProperties1.save();
+        }
+        if (miniMapProperties2 != null)
+        {
+            miniMapProperties2.save();
+        }
+        if (webMapProperties != null)
+        {
+            webMapProperties.save();
+        }
+        if (waypointProperties != null)
+        {
+            waypointProperties.save();
+        }
+    }
+
+    /**
+     * (Re)load all the properties from their files.
      */
     public void loadConfigProperties()
     {
-        coreProperties = PropertiesBase.reload(coreProperties, CoreProperties.class);
-        fullMapProperties = PropertiesBase.reload(fullMapProperties, FullMapProperties.class);
-        miniMapProperties1 = PropertiesBase.reload(miniMapProperties1, MiniMapProperties.class, 1);
-        miniMapProperties2 = PropertiesBase.reload(miniMapProperties2, MiniMapProperties.class, 2);
-        webMapProperties = PropertiesBase.reload(webMapProperties, WebMapProperties.class);
-        waypointProperties = PropertiesBase.reload(waypointProperties, WaypointProperties.class);
+        saveConfigProperties();
+        coreProperties = new CoreProperties().load();
+        fullMapProperties = new FullMapProperties().load();
+        miniMapProperties1 = new MiniMapProperties(1).load();
+        miniMapProperties2 = new MiniMapProperties(2).load();
+        webMapProperties = new WebMapProperties().load();
+        waypointProperties = new WaypointProperties().load();
     }
 
     /**
