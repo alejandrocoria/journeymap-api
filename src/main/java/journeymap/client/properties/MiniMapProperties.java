@@ -12,11 +12,12 @@ import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
+import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 
-import static journeymap.client.properties.ClientCategory.Inherit;
+import static journeymap.common.properties.Category.Inherit;
 
 /**
  * Properties for the minimap in-game.
@@ -67,6 +68,16 @@ public class MiniMapProperties extends InGameMapProperties
         return id;
     }
 
+    @Override
+    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    {
+        super.updateFrom(otherInstance);
+        if (otherInstance instanceof MiniMapProperties)
+        {
+            setActive(((MiniMapProperties) otherInstance).isActive());
+        }
+    }
+
     /**
      * Gets the size relative to current screen height.
      */
@@ -78,6 +89,7 @@ public class MiniMapProperties extends InGameMapProperties
     @Override
     public void newFileInit()
     {
+        super.newFileInit();
         if (getId() == 1)
         {
             this.setActive(true);

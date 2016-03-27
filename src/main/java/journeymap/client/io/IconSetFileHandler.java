@@ -95,7 +95,14 @@ public class IconSetFileHandler
         @Override
         public List<String> getStrings()
         {
-            return IconSetFileHandler.getEntityIconSetNames();
+            if(ForgeHelper.INSTANCE.getClient()!=null)
+            {
+                return IconSetFileHandler.getEntityIconSetNames();
+            }
+            else
+            {
+                return MOB_ICON_SETS;
+            }
         }
 
         @Override

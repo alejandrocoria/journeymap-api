@@ -24,6 +24,7 @@ public class IntegerField extends ConfigField<Integer>
         super(category, key);
         range(minValue, maxValue);
         defaultValue(defaultValue);
+        setToDefault();
         sortOrder(sortOrder);
     }
 
@@ -40,11 +41,22 @@ public class IntegerField extends ConfigField<Integer>
     }
 
     @Override
-    public boolean isValid()
+    public boolean validate(boolean fix)
     {
-        boolean valid = require(ATTR_MIN, ATTR_MAX) && super.isValid();
+        boolean valid = require(ATTR_MIN, ATTR_MAX) && super.validate(fix);
         Integer value = get();
-        return valid && value!=null && value >= getMinValue() && value<= getMaxValue();
+        if (value == null || !(value >= getMinValue() && value <= getMaxValue()))
+        {
+            if (fix)
+            {
+                setToDefault();
+            }
+            else
+            {
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     public IntegerField range(int min, int max)
@@ -66,7 +78,14 @@ public class IntegerField extends ConfigField<Integer>
 
     public Integer incrementAndGet()
     {
-        Integer value = get()+1;
+        Integer value = Math.min(getMaxValue(), get() + 1);
+        set(value);
+        return value;
+    }
+
+    public Integer decrementAndGet()
+    {
+        Integer value = Math.max(getMinValue(), get() - 1);
         set(value);
         return value;
     }

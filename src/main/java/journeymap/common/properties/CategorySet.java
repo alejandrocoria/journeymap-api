@@ -1,10 +1,10 @@
 package journeymap.common.properties;
 
-import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
- * Marker class to make serialization easier.
+ * Set of Categories. Simply a marker class for serialization.
  */
-public class CategorySet extends HashSet<Category>
+public class CategorySet extends TreeSet<Category>
 {
 }

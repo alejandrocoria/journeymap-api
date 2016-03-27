@@ -74,8 +74,8 @@ public class EnumField<E extends Enum> extends ConfigField<E>
     }
 
     @Override
-    public boolean isValid()
+    public boolean validate(boolean fix)
     {
-        return require(ATTR_ENUM_TYPE) && super.isValid();
+        return require(ATTR_ENUM_TYPE) && super.validate(fix);
     }
 }

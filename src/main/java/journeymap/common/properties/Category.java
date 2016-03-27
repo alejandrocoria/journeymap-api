@@ -7,6 +7,12 @@ import com.google.common.base.Objects;
  */
 public class Category implements Comparable<Category>
 {
+    // Category used to group a field within a category specified elsewhere
+    public static final Category Inherit = new Category("Inherit", 0, "", "");
+
+    // Category used to indicate the field shouldn't be visible in a UI
+    public static final Category Hidden = new Category("Hidden", 0, "", "");
+
     String name;
     String label;
     String tooltip;
