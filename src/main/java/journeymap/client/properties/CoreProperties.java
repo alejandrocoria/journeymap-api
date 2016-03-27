@@ -12,6 +12,9 @@ import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
+import journeymap.common.Journeymap;
+import journeymap.common.properties.Category;
+import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
@@ -67,23 +70,35 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final IntegerField tileRenderType = new IntegerField(Advanced, "jm.advanced.tile_render_type", 1, 4, 1);
 
     // Hidden (not shown in Options Manager
-    public final BooleanField mappingEnabled = new BooleanField(Hidden, "", true);
-    public final EnumField<RenderGameOverlayEvent.ElementType> renderOverlayEventTypeName = new EnumField<RenderGameOverlayEvent.ElementType>(Hidden, "", RenderGameOverlayEvent.ElementType.ALL);
-    public final BooleanField renderOverlayPreEvent = new BooleanField(Hidden, "", true);
-    public final StringField optionsManagerViewed = new StringField(Hidden, "", null);
-    public final StringField splashViewed = new StringField(Hidden, "", null);
+    public final BooleanField mappingEnabled = new BooleanField(Category.Hidden, "", true);
+    public final EnumField<RenderGameOverlayEvent.ElementType> renderOverlayEventTypeName = new EnumField<RenderGameOverlayEvent.ElementType>(Category.Hidden, "", RenderGameOverlayEvent.ElementType.ALL);
+    public final BooleanField renderOverlayPreEvent = new BooleanField(Category.Hidden, "", true);
+    public final StringField optionsManagerViewed = new StringField(Category.Hidden, "", null);
+    public final StringField splashViewed = new StringField(Category.Hidden, "", null);
     public final GridSpecs gridSpecs = new GridSpecs();
 
     public CoreProperties()
     {
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
-        CoreProperties c1 = new CoreProperties();
-        c1.getConfigFields();
-        String json = c1.toJsonString(false);
-        System.out.println(json);
+        //CoreProperties c1 = new CoreProperties();
+        boolean fix = true;
+        System.out.println(new CoreProperties().isValid(fix));
+
+        System.out.println(new FullMapProperties().isValid(fix));
+
+        System.out.println(new MiniMapProperties(1).isValid(fix));
+
+        System.out.println(new MiniMapProperties(2).isValid(fix));
+
+        System.out.println(new WaypointProperties().isValid(fix));
+        System.out.println(new WebMapProperties().isValid(fix));
+
+//        File temp = File.createTempFile(c1.getFileName(), ".json");
+//        c1.save(temp, false);
+//        System.out.println(Files.toString(temp, UTF8));
 
 //        CoreProperties c2 = gson.fromJson(json, CoreProperties.class);
 //        System.out.println("Equal? " + c1.equals(c2));
@@ -102,26 +117,37 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     }
 
     @Override
-    protected boolean validate()
+    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
-        boolean valid = super.validate();
-        if (renderDistanceCaveMax.get() < renderDistanceCaveMin.get())
+        super.updateFrom(otherInstance);
+        if (otherInstance instanceof CoreProperties)
         {
-            renderDistanceCaveMax.set(renderDistanceCaveMin.get());
-            valid = false;
+            this.gridSpecs.updateFrom(((CoreProperties) otherInstance).gridSpecs);
         }
-        if (renderDistanceSurfaceMax.get() < renderDistanceSurfaceMin.get())
+    }
+
+    @Override
+    protected boolean isValid(boolean fix)
+    {
+        boolean valid = super.isValid(fix);
+
+        if (ForgeHelper.INSTANCE.getClient() != null)
         {
-            renderDistanceSurfaceMax.set(renderDistanceSurfaceMin.get());
-            valid = false;
-        }
-        int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
-        for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
-        {
-            if (prop.get() > gameRenderDistance)
+            int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
+            for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
             {
-                prop.set(gameRenderDistance);
-                valid = false;
+                if (prop.get() > gameRenderDistance)
+                {
+                    Journeymap.getLogger().warn(String.format("Render distance %s is less than %s", gameRenderDistance, prop.getDeclaredField()));
+                    if (fix)
+                    {
+                        prop.set(gameRenderDistance);
+                    }
+                    else
+                    {
+                        valid = false;
+                    }
+                }
             }
         }
         return valid;

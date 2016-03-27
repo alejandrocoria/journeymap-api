@@ -15,6 +15,7 @@ import java.util.List;
 public class StringField extends ConfigField<String>
 {
     public static final String ATTR_VALUE_PROVIDER = "valueProvider";
+    public static final String ATTR_VALUE_PATTERN = "pattern";
     public static final String ATTR_MULTILINE = "multiline";
 
     protected StringField()
@@ -23,15 +24,21 @@ public class StringField extends ConfigField<String>
 
     public StringField(Category category, String key)
     {
-        super(category, key);
+        this(category, key, null, null);
     }
 
     public StringField(Category category, String key, String[] validValues, String defaultValue)
     {
         super(category, key);
-        put(ATTR_VALID_VALUES, Joiner.on(",").join(validValues));
-        defaultValue(defaultValue);
-        setToDefault();
+        if (validValues != null)
+        {
+            put(ATTR_VALID_VALUES, Joiner.on(",").join(validValues));
+        }
+        if (!Strings.isEmpty(defaultValue))
+        {
+            defaultValue(defaultValue);
+            setToDefault();
+        }
     }
 
     public StringField(Category category, String key, Class<? extends ValuesProvider> valueProviderClass)
@@ -46,6 +53,12 @@ public class StringField extends ConfigField<String>
                 validValues(valuesProvider.getStrings());
                 defaultValue(valuesProvider.getDefaultString());
                 setToDefault();
+
+                if (!getValidValues().contains(getDefaultValue()))
+                {
+                    Journeymap.getLogger().error(String.format("Default value '%s' isn't in one of the valid values '%s' for %s",
+                            getDefaultValue(), getStringAttr(ATTR_VALID_VALUES), this));
+                }
             }
             catch (Throwable t)
             {
@@ -67,6 +80,33 @@ public class StringField extends ConfigField<String>
         return getStringAttr(ATTR_VALUE);
     }
 
+    /**
+     * Sets a regex pattern used to ensureValid the value;
+     *
+     * @param regexPattern pattern
+     * @return this
+     */
+    public StringField pattern(String regexPattern)
+    {
+        put(ATTR_VALUE_PATTERN, regexPattern);
+        return this;
+    }
+
+    /**
+     * Gets the regex pattern used to ensureValid the value
+     *
+     * @return regex
+     */
+    public String getPattern()
+    {
+        return getStringAttr(ATTR_VALUE_PATTERN);
+    }
+
+    /**
+     * Class that provides default and valid values
+     *
+     * @return
+     */
     public Class<? extends ValuesProvider> getValuesProviderClass()
     {
         Object value = get(ATTR_VALUE_PROVIDER);
@@ -95,15 +135,54 @@ public class StringField extends ConfigField<String>
     }
 
     @Override
-    public boolean isValid()
+    public boolean validate(boolean fix)
     {
-        boolean valid = super.isValid();
+        boolean valid = require(ATTR_TYPE);
+
+        String value = get();
+        if (Strings.isNotEmpty(value))
+        {
+            String pattern = getPattern();
+            if (Strings.isNotEmpty(pattern))
+            {
+                boolean patternValid = value.matches(pattern);
+                if (!patternValid)
+                {
+                    Journeymap.getLogger().warn(String.format("Value '%s' doesn't match pattern '%s' for %s", value, pattern, this));
+                    if (fix && Strings.isNotEmpty(getDefaultValue()))
+                    {
+                        setToDefault();
+                        Journeymap.getLogger().warn(String.format("Value set to default '%s' for %s", getDefaultValue(), this));
+                    }
+                    else
+                    {
+                        valid = false;
+                    }
+                }
+            }
+        }
 
         List<String> validValues = getValidValues();
         if (validValues != null)
         {
-            valid = validValues.contains(get()) || valid;
+            if (!validValues.contains(value))
+            {
+                Journeymap.getLogger().warn(String.format("Value '%s' isn't in one of the valid values '%s' for %s", value,
+                        getStringAttr(ATTR_VALID_VALUES), this));
+
+                String defaultValue = getDefaultValue();
+                if (fix && Strings.isNotEmpty(defaultValue))
+                {
+                    setToDefault();
+                    Journeymap.getLogger().warn(String.format("Value set to default '%s' for %s", defaultValue, this));
+                }
+                else
+                {
+                    valid = false;
+                }
+            }
         }
+
         return valid;
     }
 

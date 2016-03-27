@@ -668,12 +668,7 @@ public class OptionsManager extends JmUI
         JourneymapClient.getCoreProperties().optionsManagerViewed.set(Journeymap.JM_VERSION.toString());
 
         // Just in case a property changed but wasn't saved.
-        JourneymapClient.getCoreProperties().ensureValid();
-        JourneymapClient.getWebMapProperties().ensureValid();
-        JourneymapClient.getFullMapProperties().ensureValid();
-        JourneymapClient.getMiniMapProperties1().ensureValid();
-        JourneymapClient.getMiniMapProperties2().ensureValid();
-        JourneymapClient.getWaypointProperties().ensureValid();
+        JourneymapClient.getInstance().saveConfigProperties();
 
         // No world if Forge has opened this class directly as a config UI
         if (mc.theWorld != null)

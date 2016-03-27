@@ -12,7 +12,7 @@ import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
 
-import static journeymap.client.properties.ClientCategory.Inherit;
+import static journeymap.common.properties.Category.Inherit;
 
 /**
  * Shared Properties for in-game map types.

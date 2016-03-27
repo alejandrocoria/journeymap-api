@@ -65,19 +65,29 @@ public class Version implements Comparable<Version>
      */
     public static Version from(String major, String minor, String micro, String patch, Version defaultVersion)
     {
+        Version result = null;
+
         try
         {
-            return new Version(parseInt(major), parseInt(minor), parseInt(micro), patch);
+            if (!major.contains("@")) // dev environment
+            {
+                result = new Version(parseInt(major), parseInt(minor), parseInt(micro), patch);
+            }
         }
         catch (Exception e)
         {
             Journeymap.getLogger().warn(String.format("Version had problems when parsed: %s, %s, %s, %s", major, minor, micro, patch));
+        }
+
+        if (result == null)
+        {
             if (defaultVersion == null)
             {
                 defaultVersion = new Version(0, 0, 0);
             }
-            return defaultVersion;
+            result = defaultVersion;
         }
+        return result;
     }
 
     /**

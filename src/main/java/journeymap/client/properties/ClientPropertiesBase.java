@@ -7,7 +7,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
-import journeymap.common.properties.config.BooleanField;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     };
 
     // Whether it's disabled
-    public BooleanField disabled = new BooleanField(ClientCategory.Hidden, "", false);
+    protected boolean disabled = false;
 
     /**
      * Gets the filename for the instance.
@@ -67,8 +67,12 @@ public abstract class ClientPropertiesBase extends PropertiesBase
      */
     public boolean isWorldConfig()
     {
-        File worldConfigDir = FileHandler.getWorldConfigDir(false);
-        return (worldConfigDir != null && worldConfigDir.equals(getFile().getParentFile()));
+        if (FMLClientHandler.instance().getClient() != null)
+        {
+            File worldConfigDir = FileHandler.getWorldConfigDir(false);
+            return (worldConfigDir != null && worldConfigDir.equals(getFile().getParentFile()));
+        }
+        return false;
     }
 
     /**
@@ -78,7 +82,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
      */
     public boolean isDisabled()
     {
-        return disabled.get();
+        return disabled;
     }
 
     /**
@@ -91,12 +95,22 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     {
         if (isWorldConfig())
         {
-            disabled.set(disable);
+            disabled = disable;
             save();
         }
         else
         {
             throw new IllegalStateException("Can't disable standard config.");
+        }
+    }
+
+    @Override
+    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    {
+        super.updateFrom(otherInstance);
+        if (otherInstance instanceof ClientPropertiesBase)
+        {
+            setDisabled(((ClientPropertiesBase) otherInstance).isDisabled());
         }
     }
 
@@ -132,23 +146,24 @@ public abstract class ClientPropertiesBase extends PropertiesBase
         }
     }
 
-    /**
-     * Validate fields, return whether they were all valid.
-     *
-     * @return true if all valid
-     */
-    protected boolean validate()
+    @Override
+    protected boolean isValid(boolean fix)
     {
-        // Check fields
-        boolean valid = validateFields();
+        boolean valid = super.isValid(fix);
 
         // Only world configs should be disabled.
         if (!isWorldConfig() && isDisabled())
         {
-            disabled.set(false);
-            valid = false;
+            Journeymap.getLogger().error("Non-world config shouldn't be disabled: " + getFileName());
+            if (fix)
+            {
+                disabled = false;
+            }
+            else
+            {
+                valid = false;
+            }
         }
-
         return valid;
     }
 

@@ -17,6 +17,7 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.lwjgl.input.Keyboard;
@@ -104,6 +105,11 @@ public class Constants
      */
     public static String getString(String key)
     {
+        if (FMLClientHandler.instance().getClient() == null)
+        {
+            return key;
+        }
+
         try
         {
             String result = I18n.format(key);
@@ -129,6 +135,11 @@ public class Constants
      */
     public static String getString(String key, Object... params)
     {
+        if (FMLClientHandler.instance().getClient() == null)
+        {
+            return String.format("%s (%s)", key, Joiner.on(",").join(params));
+        }
+
         try
         {
             String result = I18n.format(key, params);

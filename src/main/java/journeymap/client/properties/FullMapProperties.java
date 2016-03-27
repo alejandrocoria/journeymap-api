@@ -21,6 +21,7 @@ public class FullMapProperties extends InGameMapProperties
     @Override
     public void newFileInit()
     {
+        super.newFileInit();
         if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
         {
             super.fontScale.set(2);
