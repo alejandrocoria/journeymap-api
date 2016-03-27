@@ -1,8 +1,10 @@
 package journeymap.common.properties.config;
 
 import com.google.gson.*;
+import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.CategorySet;
+import journeymap.common.version.Version;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -11,12 +13,12 @@ import java.util.Set;
 /**
  * Serializers for Config classes.
  */
-public abstract class Utils<T extends ConfigField>
+public abstract class JsonHelper<T extends ConfigField>
 {
     // Indicates full serialization should be used
     protected final boolean verbose;
 
-    public Utils(Boolean verbose)
+    public JsonHelper(Boolean verbose)
     {
         this.verbose = verbose;
     }
@@ -106,9 +108,31 @@ public abstract class Utils<T extends ConfigField>
     }
 
     /**
+     * Handles CategorySet instances.
+     */
+    public static class VersionSerializer implements JsonSerializer<Version>, JsonDeserializer<Version>
+    {
+        public VersionSerializer(boolean verbose)
+        {
+        }
+
+        @Override
+        public JsonElement serialize(Version src, Type typeOfSrc, JsonSerializationContext context)
+        {
+            return context.serialize(src.toString());
+        }
+
+        @Override
+        public Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+        {
+            return Version.from(json.getAsString(), Journeymap.JM_VERSION);
+        }
+    }
+
+    /**
      * Handles BooleanField instances.
      */
-    public static class BooleanFieldSerializer extends Utils<BooleanField> implements JsonSerializer<BooleanField>, JsonDeserializer<BooleanField>
+    public static class BooleanFieldSerializer extends JsonHelper<BooleanField> implements JsonSerializer<BooleanField>, JsonDeserializer<BooleanField>
     {
         public BooleanFieldSerializer(boolean verbose)
         {
@@ -131,7 +155,7 @@ public abstract class Utils<T extends ConfigField>
     /**
      * Handles IntegerField instances.
      */
-    public static class IntegerFieldSerializer extends Utils<IntegerField> implements JsonSerializer<IntegerField>, JsonDeserializer<IntegerField>
+    public static class IntegerFieldSerializer extends JsonHelper<IntegerField> implements JsonSerializer<IntegerField>, JsonDeserializer<IntegerField>
     {
         public IntegerFieldSerializer(boolean verbose)
         {
@@ -154,7 +178,7 @@ public abstract class Utils<T extends ConfigField>
     /**
      * Handles StringField instances.
      */
-    public static class StringFieldSerializer extends Utils<StringField> implements JsonSerializer<StringField>, JsonDeserializer<StringField>
+    public static class StringFieldSerializer extends JsonHelper<StringField> implements JsonSerializer<StringField>, JsonDeserializer<StringField>
     {
         public StringFieldSerializer(boolean verbose)
         {
@@ -177,7 +201,7 @@ public abstract class Utils<T extends ConfigField>
     /**
      * Handles EnumField instances.
      */
-    public static class EnumFieldSerializer extends Utils<EnumField> implements JsonSerializer<EnumField>, JsonDeserializer<EnumField>
+    public static class EnumFieldSerializer extends JsonHelper<EnumField> implements JsonSerializer<EnumField>, JsonDeserializer<EnumField>
     {
         public EnumFieldSerializer(boolean verbose)
         {
