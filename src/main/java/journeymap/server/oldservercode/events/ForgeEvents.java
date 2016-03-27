@@ -23,11 +23,11 @@ public class ForgeEvents
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if (event.entity instanceof EntityPlayerMP)
+        if (event.getEntity() instanceof EntityPlayerMP)
         {
-            String worldName = event.world.getWorldInfo().getWorldName();
+            String worldName = event.getWorld().getWorldInfo().getWorldName();
             new UserJoinWorldThread(
-                    (EntityPlayerMP) event.entity,
+                    (EntityPlayerMP) event.getEntity(),
                     ConfigHandler.getConfigByWorldName(worldName).getWorldID()
             ).start();
         }

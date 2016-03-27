@@ -61,17 +61,17 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         {
             if (mc.gameSettings.showDebugInfo)
             {
-                event.left.add(null);
+                event.getLeft().add(null);
                 if (JourneymapClient.getCoreProperties().mappingEnabled.get())
                 {
                     for (String line : MapPlayerTask.getDebugStats())
                     {
-                        event.left.add(DEBUG_PREFIX + line + DEBUG_SUFFIX);
+                        event.getLeft().add(DEBUG_PREFIX + line + DEBUG_SUFFIX);
                     }
                 }
                 else
                 {
-                    event.left.add(Constants.getString("jm.common.enable_mapping_false_text") + DEBUG_SUFFIX);
+                    event.getLeft().add(Constants.getString("jm.common.enable_mapping_false_text") + DEBUG_SUFFIX);
                 }
 
                 if (mc.gameSettings.showDebugProfilerChart)
@@ -82,11 +82,11 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
                         statTimerCheck = System.currentTimeMillis();
                     }
 
-                    event.left.add(null);
+                    event.getLeft().add(null);
 
                     for (String line : statTimerReport)
                     {
-                        event.left.add(line);
+                        event.getLeft().add(line);
                     }
                 }
             }
@@ -102,7 +102,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            if (event.type == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
+            if (event.getType() == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
             {
                 if (jm == null)
                 {

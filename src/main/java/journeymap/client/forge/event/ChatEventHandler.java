@@ -42,11 +42,11 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void invoke(ClientChatReceivedEvent event)
     {
-        if (event.message != null)
+        if (event.getMessage() != null)
         {
             try
             {
-                String text = event.message.getFormattedText();
+                String text = event.getMessage().getFormattedText();
                 if (!Strings.isNullOrEmpty(text))
                 {
                     checkForControlCode(text.replaceAll(TextFormatting.RESET.toString(), ""));

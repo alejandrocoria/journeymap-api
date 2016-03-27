@@ -128,17 +128,15 @@ public class MapSaver
      */
     private void prepareFiles()
     {
-
         try
         {
-
             // Build save file name
             final Minecraft mc = FMLClientHandler.instance().getClient();
             final String date = dateFormat.format(new Date());
             final boolean isUnderground = mapType.isUnderground();
             final StringBuilder sb = new StringBuilder(date).append("_");
             sb.append(WorldData.getWorldName(mc, false)).append("_");
-            sb.append(WorldData.getSafeDimensionName(mc.theWorld.provider)).append("_");
+            sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.theWorld.provider))).append("_");
             if (isUnderground)
             {
                 sb.append("slice").append(mapType.dimension);

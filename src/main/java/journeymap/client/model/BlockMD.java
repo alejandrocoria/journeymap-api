@@ -23,7 +23,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class BlockMD
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
     private final Block block;
     private final int meta;
-    private final GameRegistry.UniqueIdentifier uid;
+    private final String uid;
     private final String name;
     private EnumSet<Flag> flags;
     private int textureSide;
@@ -58,13 +57,13 @@ public class BlockMD
      */
     private BlockMD(Block block, int meta)
     {
-        this(block, meta, GameRegistry.findUniqueIdentifierFor(block), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(block, meta, block.getRegistryName(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
 
     /**
      * Private constructor
      */
-    private BlockMD(Block block, int meta, GameRegistry.UniqueIdentifier uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    private BlockMD(Block block, int meta, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
     {
         this.block = block;
         this.meta = meta;
@@ -93,8 +92,8 @@ public class BlockMD
         modBlockDelegate = new ModBlockDelegate();
 
         // Dummy blocks
-        AIRBLOCK = new BlockMD(Blocks.air, 0, new GameRegistry.UniqueIdentifier("minecraft:air"), "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
-        VOIDBLOCK = new BlockMD(null, 0, new GameRegistry.UniqueIdentifier("journeymap:void"), "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        AIRBLOCK = new BlockMD(Blocks.air, 0, "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
+        VOIDBLOCK = new BlockMD(null, 0, "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
 
         // Load all registered block+metas
         Collection<BlockMD> all = getAll();
@@ -203,7 +202,7 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
-                GameRegistry.UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(block);
+                String uid = block.getRegistryName();
                 if (uid == null)
                 {
                     Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
@@ -597,7 +596,7 @@ public class BlockMD
      *
      * @return
      */
-    public GameRegistry.UniqueIdentifier getUid()
+    public String getUid()
     {
         return uid;
     }
@@ -745,7 +744,7 @@ public class BlockMD
     @Override
     public String toString()
     {
-        return String.format("BlockMD [%s:%s:%s] (%s)", uid.modId, uid.name, meta, Joiner.on(",").join(flags));
+        return String.format("BlockMD [%s:%s] (%s)", uid, meta, Joiner.on(",").join(flags));
     }
 
     /**

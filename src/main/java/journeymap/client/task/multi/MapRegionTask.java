@@ -22,7 +22,7 @@ import journeymap.client.model.*;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
@@ -92,7 +92,7 @@ public class MapRegionTask extends BaseMapTask
     @Override
     public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), DataFixesManager.createFixer());
+        AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), new DataFixer(-1));
 
         int missing = 0;
         for (ChunkCoordIntPair coord : retainedCoords)

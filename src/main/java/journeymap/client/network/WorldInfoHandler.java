@@ -103,11 +103,11 @@ public class WorldInfoHandler
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if (event.entity instanceof EntityPlayerMP)
+        if (event.getEntity() instanceof EntityPlayerMP)
         {
             if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
             {
-                if (ForgeHelper.INSTANCE.getEntityName(event.entity).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
+                if (ForgeHelper.INSTANCE.getEntityName(event.getEntity()).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
                 {
                     requestWorldID();
                 }

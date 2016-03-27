@@ -30,10 +30,10 @@ public class TerraFirmaCraft
         @Override
         public boolean initialize(BlockMD blockMD)
         {
-            if (blockMD.getUid().modId.equals(MODID) || blockMD.getUid().modId.equals(MODID2))
+            if (blockMD.getUid().startsWith(MODID) || blockMD.getUid().startsWith(MODID2))
             {
-                String name = blockMD.getUid().name.toLowerCase();
-                if (name.equals("looserock") || name.equals("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
+                String name = blockMD.getUid().toLowerCase();
+                if (name.contains("looserock") || name.contains("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
                 {
                     blockMD.addFlags(HasAir, NoShadow, NoTopo);
                 }

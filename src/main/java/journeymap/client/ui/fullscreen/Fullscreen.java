@@ -1159,6 +1159,17 @@ public class Fullscreen extends JmUI
     }
 
     /**
+     * Set map type
+     *
+     * @param mapType
+     */
+    public void setMapType(String mapType)
+    {
+        state.setMapType(MapType.Name.valueOf(mapType));
+        refreshState();
+    }
+
+    /**
      * Set theme by name
      */
     public void setTheme(String name)

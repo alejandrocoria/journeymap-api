@@ -14,7 +14,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.world.WorldProvider;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.List;
@@ -25,8 +24,8 @@ import java.util.List;
 class DimensionsButton extends Button
 {
     static boolean needInit = true;
-    static WorldProvider currentWorldProvider;
-    final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
+    static WorldData.DimensionProvider currentWorldProvider;
+    final List<WorldData.DimensionProvider> dimensionProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
 
     public DimensionsButton()
     {
@@ -34,7 +33,7 @@ class DimensionsButton extends Button
 
         if (needInit || currentWorldProvider != null)
         {
-            currentWorldProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+            currentWorldProvider = new WorldData.WrappedProvider(FMLClientHandler.instance().getClient().thePlayer.worldObj.provider);
             needInit = false;
         }
         updateLabel();
@@ -62,9 +61,9 @@ class DimensionsButton extends Button
     public int getFitWidth(FontRenderer fr)
     {
         int maxWidth = 0;
-        for (WorldProvider worldProvider : worldProviders)
+        for (WorldData.DimensionProvider dimensionProvider : dimensionProviders)
         {
-            String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(worldProvider));
+            String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(dimensionProvider));
             maxWidth = Math.max(maxWidth, ForgeHelper.INSTANCE.getFontRenderer().getStringWidth(name));
         }
         return maxWidth + 12;
@@ -85,23 +84,23 @@ class DimensionsButton extends Button
 
             int currentDimension = ForgeHelper.INSTANCE.getDimension();
 
-            for (WorldProvider worldProvider : worldProviders)
+            for (WorldData.DimensionProvider dimensionProvider : dimensionProviders)
             {
                 if (currentDimension == ForgeHelper.INSTANCE.getDimension())
                 {
-                    index = worldProviders.indexOf(worldProvider) + 1;
+                    index = dimensionProviders.indexOf(dimensionProvider) + 1;
                     break;
                 }
             }
         }
 
-        if (index >= worldProviders.size() || index < 0)
+        if (index >= dimensionProviders.size() || index < 0)
         {
             currentWorldProvider = null; // "All"
         }
         else
         {
-            currentWorldProvider = worldProviders.get(index);
+            currentWorldProvider = dimensionProviders.get(index);
         }
 
         updateLabel();

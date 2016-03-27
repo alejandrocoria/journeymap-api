@@ -15,7 +15,7 @@ import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
@@ -101,7 +101,7 @@ public class RegionLoader
         final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
         final Stack<RegionCoord> stack = new Stack<RegionCoord>();
 
-        AnvilChunkLoader anvilChunkLoader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), DataFixesManager.createFixer());
+        AnvilChunkLoader anvilChunkLoader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), new DataFixer(-1));
 
         int validFileCount = 0;
         int existingImageCount = 0;
