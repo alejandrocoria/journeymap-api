@@ -11,9 +11,9 @@ import static journeymap.server.properties.ServerCategory.General;
  */
 public class GlobalProperties extends PermissionProperties
 {
-    protected BooleanField useWorldID = new BooleanField(General, "Use World ID", false);
-    protected StringField worldID = new StringField(General, "World ID");
-    protected BooleanField saveInWorldFolder = new BooleanField(General, "Save configs in world folder", false);
+    public final BooleanField useWorldID = new BooleanField(General, "Use World ID", false);
+    public final StringField worldID = new StringField(General, "World ID");
+    public final BooleanField saveInWorldFolder = new BooleanField(General, "Save configs in world folder", false);
 
     /**
      * Constructor.
@@ -23,31 +23,32 @@ public class GlobalProperties extends PermissionProperties
         super("Global Server Configuration", "Applies to all dimensions unless overridden.");
     }
 
-    @Override
+
     public String getName()
     {
         return "global";
     }
 
-    public String getWorldID()
+    @Override
+    protected void postLoad(boolean isNew)
     {
+        super.postLoad(isNew);
+
         if (this.saveInWorldFolder.get())
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-            return worldSaveHandler.getWorldID();
+            this.worldID.set(worldSaveHandler.getWorldID());
         }
-        return this.worldID.get();
     }
 
-    public void setWorldID(String worldID)
+    @Override
+    protected void preSave()
     {
+        super.preSave();
         if (this.saveInWorldFolder.get())
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-            worldSaveHandler.setWorldID(worldID);
-            this.worldID.set(null);
-            return;
+            worldSaveHandler.setWorldID(worldID.get());
         }
-        this.worldID.set(worldID);
     }
 }

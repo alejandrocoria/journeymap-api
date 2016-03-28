@@ -16,6 +16,7 @@ import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import static journeymap.common.properties.Category.Inherit;
 
@@ -59,8 +60,11 @@ public class MiniMapProperties extends InGameMapProperties
 
     public void setActive(boolean active)
     {
-        this.active = active;
-        save();
+        if (this.active != active)
+        {
+            this.active = active;
+            save();
+        }
     }
 
     public int getId()
@@ -69,7 +73,7 @@ public class MiniMapProperties extends InGameMapProperties
     }
 
     @Override
-    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
         if (otherInstance instanceof MiniMapProperties)
@@ -87,34 +91,39 @@ public class MiniMapProperties extends InGameMapProperties
     }
 
     @Override
-    public void newFileInit()
+    protected void postLoad(boolean isNew)
     {
-        super.newFileInit();
-        if (getId() == 1)
+        super.postLoad(isNew);
+
+        if (isNew)
         {
-            this.setActive(true);
-            if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+            if (getId() == 1)
             {
-                super.fontScale.set(2);
-                compassFontScale.set(2);
+                this.setActive(true);
+                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                {
+                    super.fontScale.set(2);
+                    compassFontScale.set(2);
+                }
             }
-        }
-        else
-        {
-            // Initial settings to give people an idea of what can be done
-            this.position.set(Position.TopCenter);
-            this.shape.set(Shape.Rectangle);
-            this.frameAlpha.set(60);
-            this.terrainAlpha.set(60);
-            this.orientation.set(Orientation.PlayerHeading);
-            this.reticleOrientation.set(ReticleOrientation.Compass);
-            this.sizePercent.set(30);
-            if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+            else
             {
-                super.fontScale.set(2);
-                compassFontScale.set(2);
+                // Initial settings to give people an idea of what can be done
+                this.setActive(false);
+                this.position.set(Position.TopRight);
+                this.shape.set(Shape.Rectangle);
+                this.frameAlpha.set(100);
+                this.terrainAlpha.set(100);
+                this.orientation.set(Orientation.North);
+                this.reticleOrientation.set(ReticleOrientation.Compass);
+                this.sizePercent.set(30);
+                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                {
+                    super.fontScale.set(2);
+                    compassFontScale.set(2);
+                }
+
             }
-            this.setActive(false);
         }
     }
 }

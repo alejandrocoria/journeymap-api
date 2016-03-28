@@ -137,7 +137,9 @@ public class StringField extends ConfigField<String>
     @Override
     public boolean validate(boolean fix)
     {
-        boolean valid = require(ATTR_TYPE);
+        boolean hasRequired = require(ATTR_TYPE);
+        boolean hasCategory = getCategory() != null;
+        boolean valid = hasRequired && hasCategory;
 
         String value = get();
         if (Strings.isNotEmpty(value))
