@@ -81,29 +81,6 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     {
     }
 
-    public static void main(String[] args) throws Exception
-    {
-        //CoreProperties c1 = new CoreProperties();
-        boolean fix = true;
-        System.out.println(new CoreProperties().isValid(fix));
-
-        System.out.println(new FullMapProperties().isValid(fix));
-
-        System.out.println(new MiniMapProperties(1).isValid(fix));
-
-        System.out.println(new MiniMapProperties(2).isValid(fix));
-
-        System.out.println(new WaypointProperties().isValid(fix));
-        System.out.println(new WebMapProperties().isValid(fix));
-
-//        File temp = File.createTempFile(c1.getFileName(), ".json");
-//        c1.save(temp, false);
-//        System.out.println(Files.toString(temp, UTF8));
-
-//        CoreProperties c2 = gson.fromJson(json, CoreProperties.class);
-//        System.out.println("Equal? " + c1.equals(c2));
-    }
-
     @Override
     public String getName()
     {
@@ -117,7 +94,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     }
 
     @Override
-    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
         if (otherInstance instanceof CoreProperties)
@@ -127,7 +104,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     }
 
     @Override
-    protected boolean isValid(boolean fix)
+    public boolean isValid(boolean fix)
     {
         boolean valid = super.isValid(fix);
 

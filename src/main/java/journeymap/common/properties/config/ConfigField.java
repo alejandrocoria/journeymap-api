@@ -118,7 +118,9 @@ public abstract class ConfigField<T>
      * @return true if valid.
      */
     public boolean validate(boolean fix) {
-        return require(ATTR_TYPE, ATTR_VALUE, ATTR_DEFAULT);
+        boolean hasRequired = require(ATTR_TYPE, ATTR_VALUE, ATTR_DEFAULT);
+        boolean hasCategory = getCategory() != null;
+        return hasRequired && hasCategory;
     }
 
     /**

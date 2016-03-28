@@ -11,6 +11,7 @@ package journeymap.common.properties;
 import com.google.common.base.Objects;
 import com.google.common.io.Files;
 import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.common.Journeymap;
@@ -29,10 +30,10 @@ import java.util.*;
  *
  * The basics of its design:
  *  1. A subclass of PropertiesBase declares fields that need to be persisted to a JSON file.
- *     - Declare fields as ConfigFields for anything that needs to be displayed in Options Manager, bound to a UI element, or validated.
+ *     - Declare public final fields as ConfigFields for anything that needs to be displayed in Options Manager, bound to a UI element, or validated.
  *     - Declare fields of other types if needed, but you'll need to include them in updateFrom() and isValid()
- *  2. Use load() to create a new instance and update the values from a JSON file.  Subclasses may need constructor args.
- *  3. Another ins
+ *  2. Use load() to update the values from a JSON file.  Subclasses may need constructor args.
+ *  3. Use save() to write the values to a JSON file.
  */
 public abstract class PropertiesBase
 {
@@ -44,9 +45,11 @@ public abstract class PropertiesBase
 
     // Set of all Categories used in fields
     protected CategorySet categories = new CategorySet();
+
     // Current file reference
     protected transient File sourceFile = null;
-    // Map of all ConfigFields
+
+    // Reflection-generated map of all ConfigFields
     private transient Map<String, ConfigField<?>> configFields;
 
     /**
@@ -58,12 +61,14 @@ public abstract class PropertiesBase
     public Gson getGson(boolean verbose)
     {
         GsonBuilder gb = new GsonBuilder()
-                .registerTypeAdapter(BooleanField.class, new JsonHelper.BooleanFieldSerializer(verbose))
-                .registerTypeAdapter(IntegerField.class, new JsonHelper.IntegerFieldSerializer(verbose))
-                .registerTypeAdapter(StringField.class, new JsonHelper.StringFieldSerializer(verbose))
-                .registerTypeAdapter(EnumField.class, new JsonHelper.EnumFieldSerializer(verbose))
-                .registerTypeAdapter(CategorySet.class, new JsonHelper.CategorySetSerializer(verbose))
-                .registerTypeAdapter(Version.class, new JsonHelper.VersionSerializer(verbose));
+                .setPrettyPrinting()
+                .serializeNulls()
+                .registerTypeAdapter(BooleanField.class, new GsonHelper.BooleanFieldSerializer(verbose))
+                .registerTypeAdapter(IntegerField.class, new GsonHelper.IntegerFieldSerializer(verbose))
+                .registerTypeAdapter(StringField.class, new GsonHelper.StringFieldSerializer(verbose))
+                .registerTypeAdapter(EnumField.class, new GsonHelper.EnumFieldSerializer(verbose))
+                .registerTypeAdapter(CategorySet.class, new GsonHelper.CategorySetSerializer(verbose))
+                .registerTypeAdapter(Version.class, new GsonHelper.VersionSerializer(verbose));
 
         List<ExclusionStrategy> exclusionStrategies = getExclusionStrategies(verbose);
         if (exclusionStrategies != null && !exclusionStrategies.isEmpty())
@@ -71,7 +76,7 @@ public abstract class PropertiesBase
             gb.setExclusionStrategies(exclusionStrategies.toArray(new ExclusionStrategy[exclusionStrategies.size()]));
         }
 
-        return gb.setPrettyPrinting().create();
+        return gb.create();
     }
 
     /**
@@ -142,14 +147,14 @@ public abstract class PropertiesBase
      * @param <T>        properties type
      * @return loaded instance
      */
-    protected <T extends PropertiesBase> T load(File configFile, boolean verbose)
+    public <T extends PropertiesBase> T load(File configFile, boolean verbose)
     {
         ensureInit();
         boolean saveNeeded = false;
 
         if (!configFile.canRead())
         {
-            this.newFileInit();
+            this.postLoad(true);
             saveNeeded = true;
         }
         else
@@ -159,6 +164,7 @@ public abstract class PropertiesBase
                 String jsonString = Files.toString(configFile, UTF8);
                 T jsonInstance = fromJsonString(jsonString, (Class<T>) this.getClass(), verbose);
                 this.updateFrom(jsonInstance);
+                this.postLoad(false);
                 saveNeeded = !this.isValid(false);
             }
             catch (Exception e)
@@ -189,22 +195,29 @@ public abstract class PropertiesBase
     }
 
     /**
+     * Override if a file needs to have initial configuration after being loaded.
+     * @param isNew whether the file is being created the first time
+     */
+    protected void postLoad(boolean isNew)
+    {
+        ensureInit();
+    }
+
+    /**
      * Copies values from another instance into this one.
      * Override this to include non-ConfigField members if necessary.
      *
      * @param otherInstance other
      * @param <T>           properties type
      */
-    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
-        for (Map.Entry<String, ConfigField<?>> entry : getConfigFields().entrySet())
+        for (Map.Entry<String, ConfigField<?>> otherEntry : otherInstance.getConfigFields().entrySet())
         {
-            ConfigField<?> myField = entry.getValue();
-            ConfigField<?> otherField = otherInstance.getConfigField(entry.getKey());
-            if (otherField != null)
-            {
-                myField.getAttributeMap().putAll(otherField.getAttributeMap());
-            }
+            String fieldName = otherEntry.getKey();
+            ConfigField<?> otherField = otherEntry.getValue();
+            ConfigField<?> myField = this.getConfigField(fieldName);
+            myField.getAttributeMap().putAll(otherField.getAttributeMap());
         }
     }
 
@@ -217,6 +230,14 @@ public abstract class PropertiesBase
         {
             getConfigFields();
         }
+    }
+
+    /**
+     * Override if a file needs to do custom work just prior to saving.
+     */
+    protected void preSave()
+    {
+        ensureInit();
     }
 
     /**
@@ -238,7 +259,7 @@ public abstract class PropertiesBase
      */
     public boolean save(File configFile, boolean verbose)
     {
-        ensureInit();
+        preSave();
         boolean canSave = isValid(true);
         if (!canSave)
         {
@@ -306,20 +327,12 @@ public abstract class PropertiesBase
     }
 
     /**
-     * Override if a new file needs to have initial configuration.
-     */
-    protected void newFileInit()
-    {
-        ensureInit();
-    }
-
-    /**
      * Whether state is valid
      *
      * @param fix whether to try to fix validation problems
      * @return true if valid
      */
-    protected boolean isValid(boolean fix)
+    public boolean isValid(boolean fix)
     {
         ensureInit();
         boolean valid = validateFields(fix);
@@ -376,10 +389,6 @@ public abstract class PropertiesBase
                             if (category != null)
                             {
                                 this.categories.add(category);
-                            }
-                            else
-                            {
-                                Journeymap.getLogger().error("missing category");
                             }
                         }
                         map.put(field.getName(), configField);
@@ -464,7 +473,30 @@ public abstract class PropertiesBase
      */
     public List<ExclusionStrategy> getExclusionStrategies(boolean verbose)
     {
-        return new ArrayList<ExclusionStrategy>();
+        ArrayList strategies = new ArrayList<ExclusionStrategy>();
+        if (!verbose)
+        {
+            // Don't serialize categories in compact form
+            strategies.add(new ExclusionStrategy()
+            {
+                @Override
+                public boolean shouldSkipField(FieldAttributes f)
+                {
+                    if (f.getDeclaringClass().equals(PropertiesBase.class))
+                    {
+                        return f.getName().equals("categories");
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz)
+                {
+                    return false;
+                }
+            });
+        }
+        return strategies;
     }
 
 
@@ -490,6 +522,12 @@ public abstract class PropertiesBase
         return toStringHelper.toString();
     }
 
+    /**
+     * Todo: Implement true deep equivalency?
+     *
+     * @param o
+     * @return
+     */
     @Override
     public final boolean equals(Object o)
     {
