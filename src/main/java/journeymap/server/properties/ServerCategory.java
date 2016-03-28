@@ -10,11 +10,12 @@ import java.util.List;
  */
 public class ServerCategory
 {
-    public static final List<Category> values = Arrays.asList(Category.Inherit, Category.Hidden, General, Radar, Cave);
     private static int order = 1;
     public static final Category General = create("General", "General Configuration");
     public static final Category Radar = create("Radar", "Radar Features");
     public static final Category Cave = create("Cave", "Cave Mapping");
+
+    public static final List<Category> values = Arrays.asList(Category.Inherit, Category.Hidden, General, Radar, Cave);
 
     public static Category valueOf(String name)
     {

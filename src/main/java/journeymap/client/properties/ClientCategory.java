@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class ClientCategory
 {
-    public static final List<Category> values = Arrays.asList(Category.Inherit, Category.Hidden,
-            MiniMap1, MiniMap2, FullMap, WebMap, Waypoint, WaypointBeacon, Cartography, Advanced);
     private static int order = 1;
     public static final Category MiniMap1 = create("MiniMap1", "jm.config.category.minimap");
     public static final Category MiniMap2 = create("MiniMap2", "jm.config.category.minimap2");
@@ -22,6 +20,9 @@ public class ClientCategory
     public static final Category WaypointBeacon = create("WaypointBeacon", "jm.config.category.waypoint_beacons");
     public static final Category Cartography = create("Cartography", "jm.config.category.cartography");
     public static final Category Advanced = create("Advanced", "jm.config.category.advanced");
+
+    public static final List<Category> values = Arrays.asList(Category.Inherit, Category.Hidden,
+            MiniMap1, MiniMap2, FullMap, WebMap, Waypoint, WaypointBeacon, Cartography, Advanced);
 
     private static Category create(String name, String key)
     {
