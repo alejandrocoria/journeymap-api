@@ -8,6 +8,7 @@
 package journeymap.client.properties;
 
 import journeymap.client.forge.helper.ForgeHelper;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
  * Properties for the full map in-game.
@@ -19,12 +20,16 @@ public class FullMapProperties extends InGameMapProperties
     }
 
     @Override
-    public void newFileInit()
+    public void postLoad(boolean isNew)
     {
-        super.newFileInit();
-        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+        super.postLoad(isNew);
+
+        if (isNew && FMLClientHandler.instance().getClient() != null)
         {
-            super.fontScale.set(2);
+            if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+            {
+                super.fontScale.set(2);
+            }
         }
     }
 

@@ -43,7 +43,8 @@ public class IntegerField extends ConfigField<Integer>
     @Override
     public boolean validate(boolean fix)
     {
-        boolean valid = require(ATTR_MIN, ATTR_MAX) && super.validate(fix);
+        boolean valid = super.validate(fix);
+        valid = require(ATTR_MIN, ATTR_MAX) && valid;
         Integer value = get();
         if (value == null || !(value >= getMinValue() && value <= getMaxValue()))
         {
