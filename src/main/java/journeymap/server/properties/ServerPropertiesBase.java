@@ -2,6 +2,7 @@ package journeymap.server.properties;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
+import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
 import journeymap.server.oldservercode.config.ConfigHandler;
 
@@ -48,9 +49,27 @@ public abstract class ServerPropertiesBase extends PropertiesBase
      * @param <T>           properties type
      */
     @Override
-    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
+    }
+
+    /**
+     * Get a Category known to this Properties instance (used in a field)
+     * by name.
+     *
+     * @param name category name
+     * @return category or null
+     */
+    @Override
+    public Category getCategoryByName(String name)
+    {
+        Category category = super.getCategoryByName(name);
+        if (category == null)
+        {
+            category = ServerCategory.valueOf(name);
+        }
+        return category;
     }
 
     /**
@@ -98,7 +117,7 @@ public abstract class ServerPropertiesBase extends PropertiesBase
      * @return true if valid
      */
     @Override
-    protected boolean isValid(boolean fix)
+    public boolean isValid(boolean fix)
     {
         boolean valid = super.isValid(fix);
         // new checks go here

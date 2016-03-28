@@ -98,14 +98,14 @@ public abstract class ClientPropertiesBase extends PropertiesBase
             disabled = disable;
             save();
         }
-        else
+        else if (disable)
         {
             throw new IllegalStateException("Can't disable standard config.");
         }
     }
 
     @Override
-    protected <T extends PropertiesBase> void updateFrom(T otherInstance)
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
         if (otherInstance instanceof ClientPropertiesBase)
@@ -147,7 +147,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     }
 
     @Override
-    protected boolean isValid(boolean fix)
+    public boolean isValid(boolean fix)
     {
         boolean valid = super.isValid(fix);
 
