@@ -1,11 +1,15 @@
 package journeymap.common.properties.config;
 
+import com.google.common.base.Joiner;
 import com.google.gson.*;
+import journeymap.client.cartography.RGB;
+import journeymap.client.model.GridSpec;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.CategorySet;
 import journeymap.common.version.Version;
 
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +112,7 @@ public abstract class GsonHelper<T extends ConfigField>
     }
 
     /**
-     * Handles CategorySet instances.
+     * Handles Version instances for both 5.1 and 5.2 configs
      */
     public static class VersionSerializer implements JsonSerializer<Version>, JsonDeserializer<Version>
     {
@@ -125,7 +129,84 @@ public abstract class GsonHelper<T extends ConfigField>
         @Override
         public Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
         {
-            return Version.from(json.getAsString(), Journeymap.JM_VERSION);
+            if (json.isJsonObject())
+            {
+                // Use basic deserialization (from 5.1)
+                JsonObject jo = json.getAsJsonObject();
+                return Version.from(
+                        jo.get("major").getAsString(),
+                        jo.get("minor").getAsString(),
+                        jo.get("micro").getAsString(),
+                        jo.get("patch").getAsString(),
+                        Journeymap.JM_VERSION
+                );
+            }
+            else
+            {
+                // Use string deserialization (from 5.2)
+                return Version.from(json.getAsString(), Journeymap.JM_VERSION);
+            }
+        }
+    }
+
+    /**
+     "day": {
+     "style": "Squares",
+     "red": 0.5,
+     "green": 0.5,
+     "blue": 0.5,
+     "alpha": 0.5,
+     "colorX": -1,
+     "colorY": -1
+     }
+     */
+
+    /**
+     * Handles Version instances for both 5.1 and 5.2 configs
+     */
+    public static class GridSpecSerializer implements JsonSerializer<GridSpec>, JsonDeserializer<GridSpec>
+    {
+        public GridSpecSerializer(boolean verbose)
+        {
+        }
+
+        @Override
+        public JsonElement serialize(GridSpec src, Type typeOfSrc, JsonSerializationContext context)
+        {
+            String string = Joiner.on(",").join(src.style, RGB.toHexString(src.getColor()), src.alpha, src.getColorX(), src.getColorY());
+            return context.serialize(string);
+        }
+
+        @Override
+        public GridSpec deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+        {
+            if (json.isJsonObject())
+            {
+                // Use basic deserialization (from 5.1)
+                JsonObject jo = json.getAsJsonObject();
+                GridSpec gridSpec = new GridSpec(
+                        GridSpec.Style.valueOf(GridSpec.Style.class, jo.get("style").getAsString()),
+                        jo.get("red").getAsFloat(),
+                        jo.get("green").getAsFloat(),
+                        jo.get("blue").getAsFloat(),
+                        jo.get("alpha").getAsFloat()
+                );
+                gridSpec.setColorCoords(jo.get("colorX").getAsInt(), jo.get("colorY").getAsInt());
+                return gridSpec;
+            }
+            else
+            {
+                // Use string deserialization (from 5.2)
+                String[] parts = json.getAsString().split(",");
+                GridSpec gridSpec = new GridSpec(
+                        GridSpec.Style.valueOf(GridSpec.Style.class, parts[0]),
+                        new Color(RGB.hexToInt(parts[1])),
+                        Float.parseFloat(parts[2])
+                );
+
+                gridSpec.setColorCoords(Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
+                return gridSpec;
+            }
         }
     }
 

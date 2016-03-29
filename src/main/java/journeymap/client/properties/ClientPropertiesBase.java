@@ -26,9 +26,6 @@ public abstract class ClientPropertiesBase extends PropertiesBase
             "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.info/Options_Manager")
     };
 
-    // Whether it's disabled
-    protected boolean disabled = false;
-
     /**
      * Gets the filename for the instance.
      *
@@ -75,43 +72,10 @@ public abstract class ClientPropertiesBase extends PropertiesBase
         return false;
     }
 
-    /**
-     * Whether this config is disabled and shouldn't be used.
-     *
-     * @return
-     */
-    public boolean isDisabled()
-    {
-        return disabled;
-    }
-
-    /**
-     * Set disabled - only works for world configs.
-     * Saves after the set.
-     *
-     * @param disable
-     */
-    public void setDisabled(boolean disable)
-    {
-        if (isWorldConfig())
-        {
-            disabled = disable;
-            save();
-        }
-        else if (disable)
-        {
-            throw new IllegalStateException("Can't disable standard config.");
-        }
-    }
-
     @Override
     public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
-        if (otherInstance instanceof ClientPropertiesBase)
-        {
-            setDisabled(((ClientPropertiesBase) otherInstance).isDisabled());
-        }
     }
 
     /**
@@ -150,20 +114,6 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     public boolean isValid(boolean fix)
     {
         boolean valid = super.isValid(fix);
-
-        // Only world configs should be disabled.
-        if (!isWorldConfig() && isDisabled())
-        {
-            Journeymap.getLogger().error("Non-world config shouldn't be disabled: " + getFileName());
-            if (fix)
-            {
-                disabled = false;
-            }
-            else
-            {
-                valid = false;
-            }
-        }
         return valid;
     }
 

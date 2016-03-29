@@ -14,6 +14,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import journeymap.client.model.GridSpec;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.config.*;
@@ -68,7 +69,8 @@ public abstract class PropertiesBase
                 .registerTypeAdapter(StringField.class, new GsonHelper.StringFieldSerializer(verbose))
                 .registerTypeAdapter(EnumField.class, new GsonHelper.EnumFieldSerializer(verbose))
                 .registerTypeAdapter(CategorySet.class, new GsonHelper.CategorySetSerializer(verbose))
-                .registerTypeAdapter(Version.class, new GsonHelper.VersionSerializer(verbose));
+                .registerTypeAdapter(Version.class, new GsonHelper.VersionSerializer(verbose))
+                .registerTypeAdapter(GridSpec.class, new GsonHelper.GridSpecSerializer(verbose));
 
         List<ExclusionStrategy> exclusionStrategies = getExclusionStrategies(verbose);
         if (exclusionStrategies != null && !exclusionStrategies.isEmpty())
@@ -217,7 +219,14 @@ public abstract class PropertiesBase
             String fieldName = otherEntry.getKey();
             ConfigField<?> otherField = otherEntry.getValue();
             ConfigField<?> myField = this.getConfigField(fieldName);
-            myField.getAttributeMap().putAll(otherField.getAttributeMap());
+            if (myField != null)
+            {
+                myField.getAttributeMap().putAll(otherField.getAttributeMap());
+            }
+            else
+            {
+                Journeymap.getLogger().warn("Missing field during updateFrom(): " + fieldName);
+            }
         }
     }
 

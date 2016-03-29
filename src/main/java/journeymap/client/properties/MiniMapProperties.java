@@ -50,7 +50,7 @@ public class MiniMapProperties extends InGameMapProperties
     @Override
     public String getName()
     {
-        return "minimap";
+        return String.format("minimap%s", (id > 1) ? id : "");
     }
 
     public boolean isActive()
