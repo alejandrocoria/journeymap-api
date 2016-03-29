@@ -8,6 +8,9 @@
 
 package journeymap.client.cartography;
 
+import com.google.common.base.Strings;
+import journeymap.common.Journeymap;
+
 import java.awt.*;
 
 /**
@@ -342,5 +345,25 @@ public final class RGB
     public static float toScaledFloat(int value)
     {
         return clampInt(value) / 255f;
+    }
+
+    /**
+     * Hex string to Color int.
+     */
+    public static int hexToInt(String hexColor)
+    {
+        if (!Strings.isNullOrEmpty(hexColor))
+        {
+            try
+            {
+                int color = Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
+                return color;
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().warn("Invalid color string: " + hexColor);
+            }
+        }
+        return RGB.WHITE_RGB;
     }
 }
