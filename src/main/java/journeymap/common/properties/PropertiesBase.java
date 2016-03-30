@@ -377,7 +377,7 @@ public abstract class PropertiesBase
      *
      * @return
      */
-    protected Map<String, ConfigField<?>> getConfigFields()
+    public Map<String, ConfigField<?>> getConfigFields()
     {
         if (this.configFields == null)
         {
