@@ -25,7 +25,6 @@ import journeymap.common.properties.config.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -115,7 +114,8 @@ public class OptionSlotFactory
     protected static void addSlots(HashMap<Category, List<SlotMetadata>> mergedMap, Category inheritedCategory, PropertiesBase properties)
     {
         Class<? extends PropertiesBase> propertiesClass = properties.getClass();
-        for (Map.Entry<Category, List<SlotMetadata>> entry : buildSlots(null, inheritedCategory, propertiesClass, properties).entrySet())
+        HashMap<Category, List<SlotMetadata>> slots = buildSlots(null, inheritedCategory, propertiesClass, properties);
+        for (Map.Entry<Category, List<SlotMetadata>> entry : slots.entrySet())
         {
             Category category = entry.getKey();
             if (category == Category.Inherit)
@@ -144,77 +144,65 @@ public class OptionSlotFactory
         {
             map = new HashMap<Category, List<SlotMetadata>>();
         }
-        for (Field field : propertiesClass.getDeclaredFields())
+
+        for (ConfigField configField : properties.getConfigFields().values())
         {
-            if (ConfigField.class.isAssignableFrom(field.getDeclaringClass()))
+            if (configField.getCategory() == Category.Hidden)
             {
-                ConfigField configField = null;
-                try
+                continue;
+            }
+
+            SlotMetadata slotMetadata = null;
+
+            if (configField instanceof BooleanField)
+            {
+                slotMetadata = getBooleanSlotMetadata((BooleanField) configField);
+            }
+            else if (configField instanceof IntegerField)
+            {
+                slotMetadata = getIntegerSlotMetadata((IntegerField) configField);
+            }
+            else if (configField instanceof StringField)
+            {
+                slotMetadata = getStringSlotMetadata((StringField) configField);
+            }
+            else if (configField instanceof EnumField)
+            {
+                slotMetadata = getEnumSlotMetadata((EnumField) configField);
+            }
+
+            if (slotMetadata != null)
+            {
+                // Set sort order
+                slotMetadata.setOrder(configField.getSortOrder());
+
+                // Determine category
+                Category category = configField.getCategory();
+                if (category == Category.Inherit)
                 {
-                    configField = (ConfigField) field.get(properties);
-                }
-                catch (IllegalAccessException e)
-                {
-                    throw new RuntimeException(e);
+                    category = inheritedCategory;
                 }
 
-                if (configField.getCategory() == Category.Hidden)
+                List<SlotMetadata> list = map.get(category);
+                if (list == null)
                 {
-                    continue;
+                    list = new ArrayList<SlotMetadata>();
+                    map.put(category, list);
                 }
-
-                SlotMetadata slotMetadata = null;
-
-                if (configField instanceof BooleanField)
-                {
-                    slotMetadata = getBooleanSlotMetadata((BooleanField) configField);
-                }
-                else if (configField instanceof IntegerField)
-                {
-                    slotMetadata = getIntegerSlotMetadata((IntegerField) configField);
-                }
-                else if (configField instanceof StringField)
-                {
-                    slotMetadata = getStringSlotMetadata((StringField) configField);
-                }
-                else if (configField instanceof EnumField)
-                {
-                    slotMetadata = getEnumSlotMetadata((EnumField) configField);
-                }
-
-                if (slotMetadata != null)
-                {
-                    // Set sort order
-                    slotMetadata.setOrder(configField.getSortOrder());
-
-                    // Determine category
-                    Category category = configField.getCategory();
-                    if (category == Category.Inherit)
-                    {
-                        category = inheritedCategory;
-                    }
-
-                    List<SlotMetadata> list = map.get(category);
-                    if (list == null)
-                    {
-                        list = new ArrayList<SlotMetadata>();
-                        map.put(category, list);
-                    }
-                    list.add(slotMetadata);
-                }
-                else
-                {
-                    Journeymap.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), configField));
-                }
+                list.add(slotMetadata);
+            }
+            else
+            {
+                Journeymap.getLogger().warn(String.format("Unable to create config gui for %s in %s", properties.getClass().getSimpleName(), configField));
             }
         }
 
-        // Check for parent class
-        Class parentClass = propertiesClass.getSuperclass();
-        if (PropertiesBase.class.isAssignableFrom(parentClass))
-        {
-            map = buildSlots(map, inheritedCategory, (Class<? extends PropertiesBase>) parentClass, properties);
-        }
+//        // Check for parent class
+//        Class parentClass = propertiesClass.getSuperclass();
+//        if (PropertiesBase.class.isAssignableFrom(parentClass))
+//        {
+//            map = buildSlots(map, inheritedCategory, (Class<? extends PropertiesBase>) parentClass, properties);
+//        }
 
         return map;
     }

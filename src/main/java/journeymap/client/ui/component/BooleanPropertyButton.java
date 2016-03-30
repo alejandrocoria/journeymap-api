@@ -34,7 +34,14 @@ public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHo
     {
         if (isEnabled())
         {
-            setToggled(booleanField.toggleAndSave());
+            if (booleanField != null)
+            {
+                setToggled(booleanField.toggleAndSave());
+            }
+            else
+            {
+                setToggled(!toggled);
+            }
         }
     }
 
@@ -51,10 +58,13 @@ public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHo
     {
         if (booleanField == null)
         {
-            return;
+            toggled = value;
         }
-        booleanField.set(value);
-        booleanField.save();
+        else
+        {
+            booleanField.set(value);
+            booleanField.save();
+        }
     }
 
     @Override

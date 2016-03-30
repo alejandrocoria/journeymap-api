@@ -188,6 +188,10 @@ public class OptionsManager extends JmUI
                     {
                         CategorySlot categorySlot = (CategorySlot) rootSlot;
                         Category category = categorySlot.getCategory();
+                        if (category == null)
+                        {
+                            String y = "udodis";
+                        }
 
                         // Reset button
                         ResetButton resetButton = new ResetButton(category);
@@ -416,7 +420,11 @@ public class OptionsManager extends JmUI
                 ? MapPlayerTask.getSimpleStats()
                 : Constants.getString("jm.common.enable_mapping_false_text");
 
-        renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
+        if (cartographyCategorySlot != null)
+        {
+            renderStatsButton.setWidth(cartographyCategorySlot.getCurrentColumnWidth());
+        }
+
     }
 
     @Override
@@ -757,10 +765,10 @@ public class OptionsManager extends JmUI
             this.toolbars = new HashMap<Category, List<SlotMetadata>>();
             for (Category category : ClientCategory.values)
             {
-//                String name = Constants.getString("jm.config.reset");
-//                String tooltip = Constants.getString("jm.config.reset.tooltip");
-//                SlotMetadata toolbarSlotMetadata = new SlotMetadata(new ResetButton(), name, tooltip);
-//                toolbars.put(category, Arrays.asList(toolbarSlotMetadata));
+                String name = Constants.getString("jm.config.reset");
+                String tooltip = Constants.getString("jm.config.reset.tooltip");
+                SlotMetadata toolbarSlotMetadata = new SlotMetadata(new ResetButton(category), name, tooltip);
+                toolbars.put(category, Arrays.asList(toolbarSlotMetadata));
             }
         }
         return toolbars;
