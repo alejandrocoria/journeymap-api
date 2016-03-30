@@ -145,9 +145,13 @@ public class Fullscreen extends JmUI
         initButtons();
 
         // Check for first-time use
-        if (!JourneymapClient.getCoreProperties().splashViewed.equals(Journeymap.JM_VERSION.toString()))
+        String splashViewed = JourneymapClient.getCoreProperties().splashViewed.get();
+        String thisVersion = Journeymap.JM_VERSION.toString();
+
+        if (!splashViewed.equals(thisVersion))
         {
             UIManager.getInstance().openSplash(this);
+            JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
         }
     }
 
