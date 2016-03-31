@@ -6,7 +6,7 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.io.migrate;
+package journeymap.client.task.migrate;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -17,6 +17,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.migrate.MigrationTask;
 import journeymap.common.properties.PropertiesBase;
 import journeymap.common.version.Version;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  * Migration from 5.1.x to 5.2
  */
-public class Migrate5_2 implements Migration.Task
+public class Migrate5_2 implements MigrationTask
 {
     // GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
@@ -47,9 +48,24 @@ public class Migrate5_2 implements Migration.Task
     }
 
     @Override
-    public Version getRequiredVersion()
+    public boolean isActive(Version currentVersion)
     {
-        return new Version(5, 2, 0);
+        if (currentVersion.toMajorMinorString().equals("5.2"))
+        {
+
+            if (JourneymapClient.getCoreProperties() == null)
+            {
+                JourneymapClient.getInstance().loadConfigProperties();
+            }
+
+            // Check current configs to see if they've already been updated
+            String optionsManagerViewed = JourneymapClient.getCoreProperties().optionsManagerViewed.get();
+            if (Strings.isNullOrEmpty(optionsManagerViewed))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -67,22 +83,14 @@ public class Migrate5_2 implements Migration.Task
     {
         try
         {
-            if (JourneymapClient.getCoreProperties() == null)
-            {
-                JourneymapClient.getInstance().loadConfigProperties();
-            }
-
-            // Check current configs to see if they've already been updated
-            String optionsManagerViewed = JourneymapClient.getCoreProperties().optionsManagerViewed.get();
-            if (!Strings.isNullOrEmpty(optionsManagerViewed))
+            String path5_1 = Joiner.on(File.separator).join(Constants.JOURNEYMAP_DIR, "config", "5.1");
+            File legacyConfigDir = new File(FileHandler.MinecraftDirectory, path5_1);
+            if (!legacyConfigDir.canRead())
             {
                 return true;
             }
 
             logger.info("Migrating configs from 5.1 to 5.2");
-
-            String path5_1 = Joiner.on(File.separator).join(Constants.JOURNEYMAP_DIR, "config", "5.1");
-            File legacyConfigDir = new File(FileHandler.MinecraftDirectory, path5_1);
 
             List<? extends PropertiesBase> propertiesList = Arrays.asList(
                     JourneymapClient.getCoreProperties(),
@@ -107,7 +115,6 @@ public class Migrate5_2 implements Migration.Task
                     {
                         logger.error(String.format("Unexpected error in migrateConfigs(): %s", LogFormatter.toString(t)));
                     }
-                    //updateValues(properties, oldConfigfile);
                 }
             }
 

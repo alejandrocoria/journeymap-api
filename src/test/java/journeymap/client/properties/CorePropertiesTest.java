@@ -64,4 +64,6 @@ public class CorePropertiesTest extends PropertiesBaseTest<CoreProperties>
         p.splashViewed.set(UUID.randomUUID().toString());
         return p;
     }
+
+
 }

@@ -20,7 +20,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.io.migrate.Migration;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
@@ -40,6 +39,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.migrate.Migration;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -261,7 +261,7 @@ public class JourneymapClient implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Migrate tasks
-            boolean migrationOk = new Migration().performTasks();
+            boolean migrationOk = new Migration("journeymap.client.task.migrate").performTasks();
 
             // Ensure logger inits
             logger = JMLogger.init();
