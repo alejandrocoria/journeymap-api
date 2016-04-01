@@ -44,7 +44,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final StringField themeName = new StringField(FullMap, "jm.common.ui_theme", ThemeFileHandler.ThemeValuesProvider.class);
     public final BooleanField caveIgnoreGlass = new BooleanField(Cartography, "jm.common.map_style_caveignoreglass", true);
     public final BooleanField mapBathymetry = new BooleanField(Cartography, "jm.common.map_style_bathymetry", false);
-    @Config(category = Cartography, key = "jm.common.map_style_topography", defaultBoolean = true)
+    public final BooleanField mapTopography = new BooleanField(Cartography, "jm.common.map_style_topography", false);
     public final BooleanField mapTransparency = new BooleanField(Cartography, "jm.common.map_style_transparency", true);
     public final BooleanField mapCaveLighting = new BooleanField(Cartography, "jm.common.map_style_cavelighting", true);
     public final BooleanField mapAntialiasing = new BooleanField(Cartography, "jm.common.map_style_antialiasing", true);
