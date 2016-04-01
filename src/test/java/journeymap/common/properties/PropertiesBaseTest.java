@@ -34,7 +34,7 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
      * Default instance should be valid with the fix flag
      */
     @Test
-    public void testDefaultInstanceValdity()
+    public void testDefaultInstanceValidity()
     {
         P p = createDefaultInstance();
         Assert.assertTrue(p.isValid(true));
@@ -44,7 +44,7 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
      * Randomized instance should be valid with the fix flag
      */
     @Test
-    public void testRandomizedInstanceValdity()
+    public void testRandomizedInstanceValidity()
     {
         P p = createRandomizedInstance();
         Assert.assertTrue(p.isValid(true));
