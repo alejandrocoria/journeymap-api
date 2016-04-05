@@ -98,7 +98,7 @@ public class MapRegionTask extends BaseMapTask
         for (ChunkCoordIntPair coord : retainedCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
-            if (chunkMD != null)
+            if (chunkMD != null && !chunkMD.getChunk().isEmpty())
             {
                 DataCache.instance().addChunkMD(chunkMD);
             }
@@ -107,9 +107,10 @@ public class MapRegionTask extends BaseMapTask
         for (ChunkCoordIntPair coord : chunkCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
-            if (chunkMD != null)
+            if (chunkMD != null && chunkMD.hasChunk())
             {
                 DataCache.instance().addChunkMD(chunkMD);
+                //System.out.println("Added: " + coord);
             }
             else
             {
@@ -119,7 +120,7 @@ public class MapRegionTask extends BaseMapTask
 
         if (chunkCoords.size() - missing > 0)
         {
-            logger.info(String.format("Potential chunks to map in %s: %s (out of %s)", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
+            logger.info(String.format("Potential chunks to map in %s: %s of %s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
             super.performTask(mc, jm, jmWorldDir, threadLogging);
         }
         else
@@ -134,7 +135,7 @@ public class MapRegionTask extends BaseMapTask
         lastTaskCompleted = System.currentTimeMillis();
 
         // Flush any images to disk, but do it synchronously on this thread.
-        RegionImageCache.instance().flushToDisk(false);
+        RegionImageCache.instance().flushToDisk(true, false);
         DataCache.instance().invalidateChunkMDCache();
         if (hadError || cancelled)
         {
@@ -264,7 +265,7 @@ public class MapRegionTask extends BaseMapTask
             if (regionLoader != null)
             {
                 // Write files synchronously before clearing
-                RegionImageCache.instance().flushToDisk(false);
+                RegionImageCache.instance().flushToDisk(true, false);
                 RegionImageCache.instance().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;

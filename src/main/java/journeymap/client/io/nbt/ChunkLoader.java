@@ -41,6 +41,7 @@ public class ChunkLoader
                     Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
                     if (chunk != null)
                     {
+                        chunk.setChunkLoaded(true);
                         chunk.generateSkylightMap();
                         return new ChunkMD(chunk, forceRetain);
                     }
@@ -48,6 +49,10 @@ public class ChunkLoader
                     {
                         logger.warn("AnvilChunkLoader returned null for chunk: " + coord);
                     }
+                }
+                else
+                {
+                    //logger.warn("AnvilChunkLoader didn't find data for for chunk: " + coord);
                 }
             }
             else
