@@ -80,6 +80,13 @@ public class StringField extends ConfigField<String>
         return getStringAttr(ATTR_VALUE);
     }
 
+    @Override
+    public StringField set(String value)
+    {
+        super.set(value);
+        return this;
+    }
+
     /**
      * Sets a regex pattern used to ensureValid the value;
      *

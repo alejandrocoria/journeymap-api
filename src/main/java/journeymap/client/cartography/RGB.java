@@ -364,6 +364,6 @@ public final class RGB
                 Journeymap.getLogger().warn("Invalid color string: " + hexColor);
             }
         }
-        return RGB.WHITE_RGB;
+        return RGB.BLACK_RGB;
     }
 }

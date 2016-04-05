@@ -508,6 +508,23 @@ public abstract class PropertiesBase
         return strategies;
     }
 
+    /**
+     * If the file exists, returns the lastModified timestamp.
+     *
+     * @return
+     */
+    public long lastModified()
+    {
+        File file = getFile();
+        if (file.canRead())
+        {
+            return file.lastModified();
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
     protected Objects.ToStringHelper toStringHelper()
     {
