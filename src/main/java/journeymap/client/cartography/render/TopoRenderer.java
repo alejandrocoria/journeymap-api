@@ -138,16 +138,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 {
                     BlockMD topBlockMd = null;
 
-                    int y = -1;
+                    int y = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
 
                     if (mapBathymetry)
                     {
                         y = getColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
-                    }
-
-                    if (y == -1)
-                    {
-                        y = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
                     }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);
@@ -202,10 +197,9 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         break;
                     }
-                    else if (propUnsetWaterHeight)
+                    else
                     {
                         setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
-                        propUnsetWaterHeight = false;
                     }
                 }
                 else if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoTopo))
