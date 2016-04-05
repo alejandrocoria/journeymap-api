@@ -19,6 +19,7 @@ import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.io.nbt.RegionLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.*;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -213,8 +214,7 @@ public class MapRegionTask extends BaseMapTask
                     }
                     else
                     {
-                        final long time = minecraft.theWorld.getWorldInfo().getWorldTime() % 24000L;
-                        mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
+                        mapType = Fullscreen.state().getMapType(false);
                     }
 
                     Boolean mapAll = params == null ? false : (Boolean) params;

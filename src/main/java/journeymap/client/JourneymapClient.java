@@ -71,6 +71,7 @@ public class JourneymapClient implements CommonProxy
     private volatile FullMapProperties fullMapProperties;
     private volatile MiniMapProperties miniMapProperties1;
     private volatile MiniMapProperties miniMapProperties2;
+    private volatile TopoProperties topoProperties;
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
@@ -142,6 +143,14 @@ public class JourneymapClient implements CommonProxy
     public static FullMapProperties getFullMapProperties()
     {
         return instance.fullMapProperties;
+    }
+
+    /**
+     * Get the core properties.
+     */
+    public static TopoProperties getTopoProperties()
+    {
+        return instance.topoProperties;
     }
 
     /**
@@ -624,6 +633,14 @@ public class JourneymapClient implements CommonProxy
         {
             miniMapProperties2.save();
         }
+        if (miniMapProperties2 != null)
+        {
+            miniMapProperties2.save();
+        }
+        if (topoProperties != null)
+        {
+            topoProperties.save();
+        }
         if (webMapProperties != null)
         {
             webMapProperties.save();
@@ -644,6 +661,7 @@ public class JourneymapClient implements CommonProxy
         fullMapProperties = new FullMapProperties().load();
         miniMapProperties1 = new MiniMapProperties(1).load();
         miniMapProperties2 = new MiniMapProperties(2).load();
+        topoProperties = new TopoProperties().load();
         webMapProperties = new WebMapProperties().load();
         waypointProperties = new WaypointProperties().load();
     }

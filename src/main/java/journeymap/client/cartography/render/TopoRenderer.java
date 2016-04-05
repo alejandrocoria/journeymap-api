@@ -9,6 +9,7 @@
 package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
@@ -17,6 +18,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.properties.TopoProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -24,21 +26,19 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 
-import java.awt.*;
-import java.util.ArrayList;
-
 /**
  * Generates topographical map images.
  */
 public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 {
     protected final Object chunkLock = new Object();
-    final Integer[] waterPalette;
-    final Integer[] landPalette;
+    private Integer[] waterPalette;
+    private Integer[] landPalette;
+    private int waterPaletteRange;
+    private int landPaletteRange;
     private final HeightsCache chunkSurfaceHeights;
     private final SlopesCache chunkSurfaceSlopes;
-    private final int waterPaletteRange;
-    private final int landPaletteRange;
+
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
     // Vertical size in blocks of each contour
@@ -46,83 +46,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     private double waterContourInterval;
     private double landContourInterval;
 
+    TopoProperties topoProperties;
+
+
     public TopoRenderer()
     {
-        // TODO: Get these from properties file
-        ArrayList<Integer> water = new ArrayList<Integer>(32);
-        water.add(new Color(0x000040).getRGB());
-        water.add(new Color(0x010159).getRGB());
-        water.add(new Color(0x020266).getRGB());
-        water.add(new Color(0x030372).getRGB());
-        water.add(new Color(0x05057F).getRGB());
-        water.add(new Color(0x080899).getRGB());
-        water.add(new Color(0x0D0DB2).getRGB());
-        water.add(new Color(0x0F0FBF).getRGB());
-        water.add(new Color(0x1818E5).getRGB());
-        water.add(new Color(0x1F1FFF).getRGB());
-        water.add(new Color(0x2A2AFF).getRGB());
-        water.add(new Color(0x4141FF).getRGB());
-        water.add(new Color(0x5858FF).getRGB());
-        water.add(new Color(0x6464FF).getRGB());
-        water.add(new Color(0x6F6FFF).getRGB());
-        water.add(new Color(0x7B7BFF).getRGB());
-        water.add(new Color(0x8686FF).getRGB());
-        water.add(new Color(0x9292FF).getRGB());
-        water.add(new Color(0x9D9DFF).getRGB());
-        water.add(new Color(0xA9A9FF).getRGB());
-        water.add(new Color(0xB4B4FF).getRGB());
-        water.add(new Color(0xC0C0FF).getRGB());
-        water.add(new Color(0xCCCCFF).getRGB());
-        water.add(new Color(0xDDDDFF).getRGB());
-        water.add(new Color(0xDFDfFF).getRGB());
-        water.add(new Color(0xE1E1FF).getRGB());
-        water.add(new Color(0xE4E4FF).getRGB());
-        water.add(new Color(0xE6E6FF).getRGB());
-        water.add(new Color(0xE9E9FF).getRGB());
-        water.add(new Color(0xEBEBFF).getRGB());
-        water.add(new Color(0xEDEDFF).getRGB());
-        water.add(new Color(0xEEEEFF).getRGB());
-
-        waterPaletteRange = water.size() - 1;
-        waterPalette = water.toArray(new Integer[0]);
-
-        // TODO: Get these from properties file
-        ArrayList<Integer> land = new ArrayList<Integer>(32);
-        land.add(new Color(1, 1, 1).getRGB());
-        land.add(new Color(10, 70, 90).getRGB());
-        land.add(new Color(20, 80, 90).getRGB());
-        land.add(new Color(30, 90, 100).getRGB());
-        land.add(new Color(40, 100, 100).getRGB());
-        land.add(new Color(50, 110, 100).getRGB());
-        land.add(new Color(70, 130, 100).getRGB());
-        land.add(new Color(80, 140, 100).getRGB());
-        land.add(new Color(90, 150, 100).getRGB());
-        land.add(new Color(100, 167, 107).getRGB());
-        land.add(new Color(172, 208, 165).getRGB());
-        land.add(new Color(148, 191, 139).getRGB());
-        land.add(new Color(168, 198, 143).getRGB());
-        land.add(new Color(189, 204, 150).getRGB());
-        land.add(new Color(209, 215, 171).getRGB());
-        land.add(new Color(225, 228, 181).getRGB());
-        land.add(new Color(239, 235, 192).getRGB());
-        land.add(new Color(232, 225, 182).getRGB());
-        land.add(new Color(222, 214, 163).getRGB());
-        land.add(new Color(211, 202, 157).getRGB());
-        land.add(new Color(202, 185, 130).getRGB());
-        land.add(new Color(195, 167, 107).getRGB());
-        land.add(new Color(185, 152, 90).getRGB());
-        land.add(new Color(170, 135, 83).getRGB());
-        land.add(new Color(172, 154, 124).getRGB());
-        land.add(new Color(186, 174, 154).getRGB());
-        land.add(new Color(202, 195, 184).getRGB());
-        land.add(new Color(224, 195, 216).getRGB());
-        land.add(new Color(224, 222, 216).getRGB());
-        land.add(new Color(224, 244, 216).getRGB());
-        land.add(new Color(245, 244, 242).getRGB());
-        land.add(new Color(255, 255, 255).getRGB());
-        landPaletteRange = land.size() - 1;
-        landPalette = land.toArray(new Integer[0]);
-
         // TODO: Write the caches to disk and we'll have some useful data available.
         this.cachePrefix = "Topo";
         columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
@@ -136,8 +64,17 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      */
     protected void updateOptions()
     {
-        // TODO:  Check timestamp of properties file, reload colors if needed
-        contourColor = Color.darkGray.getRGB();
+        super.updateOptions();
+
+        topoProperties = JourneymapClient.getTopoProperties();
+
+        contourColor = topoProperties.getContourColor();
+
+        waterPalette = topoProperties.getWaterColors();
+        waterPaletteRange = waterPalette.length - 1;
+
+        landPalette = topoProperties.getLandColors();
+        landPaletteRange = landPalette.length - 1;
 
         World world = FMLClientHandler.instance().getClient().theWorld;
         double worldHeight = world.getHeight();
@@ -152,6 +89,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     public boolean render(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
+
+        if (landPalette == null || landPalette.length < 1 || waterPalette == null || waterPalette.length < 1)
+        {
+            return false;
+        }
 
         try
         {
@@ -196,11 +138,16 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 {
                     BlockMD topBlockMd = null;
 
-                    int y = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
-                    // Bathymetry - need to use water height instead of standardY, so we get the color blend
+                    int y = -1;
+
                     if (mapBathymetry)
                     {
                         y = getColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                    }
+
+                    if (y == -1)
+                    {
+                        y = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
                     }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);
@@ -245,6 +192,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         try
         {
+            boolean propUnsetWaterHeight = true;
             BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             while (y > 0)
             {
@@ -254,6 +202,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         break;
                     }
+                    else if (propUnsetWaterHeight)
+                    {
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        propUnsetWaterHeight = false;
+                    }
                 }
                 else if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoTopo))
                 {
@@ -261,14 +214,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 }
                 y--;
                 blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-            }
-
-            if (blockMD.isWater() || blockMD.isIce())
-            {
-                if (mapBathymetry)
-                {
-                    setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
-                }
             }
         }
         catch (Exception e)
@@ -296,6 +241,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
 
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
+
+        if (Double.valueOf(waterContourInterval).isInfinite())
+        {
+            return slopes;
+        }
+
         float h;
         Float slope;
         double contourInterval;
@@ -306,7 +257,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             for (int x = 0; x < 16; x++)
             {
                 h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
-
 
                 BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, (int) h, z);
                 if (blockMD.isWater() || blockMD.isIce())
@@ -324,11 +274,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 hE = getSurfaceBlockHeight(chunkMd, x, z, offsetE, (int) h, chunkHeights);
 
                 // Shift to nearest contour
-                h = (int) Math.max(nearZero, h - (h % contourInterval));
-                hN = (int) Math.max(nearZero, hN - (hN % contourInterval));
-                hW = (int) Math.max(nearZero, hW - (hW % contourInterval));
-                hE = (int) Math.max(nearZero, hE - (hE % contourInterval));
-                hS = (int) Math.max(nearZero, hS - (hS % contourInterval));
+                h = (float) Math.max(nearZero, h - (h % contourInterval));
+                hN = (float) Math.max(nearZero, hN - (hN % contourInterval));
+                hW = (float) Math.max(nearZero, hW - (hW % contourInterval));
+                hE = (float) Math.max(nearZero, hE - (hE % contourInterval));
+                hS = (float) Math.max(nearZero, hS - (hS % contourInterval));
 
                 if (h != hN && hN == hW && hW == hE && hE == hS)
                 {
@@ -411,6 +361,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             ChunkCoordIntPair coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
+            columnPropertiesCache.invalidate(coord);
         }
     }
 }
