@@ -51,7 +51,7 @@ public class RegionImageCache
             public void run()
             {
                 // Don't flush asynchronously; do it in this thread
-                flushToDisk(false);
+                flushToDisk(true, false);
                 if (logger.isEnabled(Level.DEBUG))
                 {
                     logger.debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
@@ -141,7 +141,7 @@ public class RegionImageCache
         // Write to disk if needed
         if (forceFlush)
         {
-            flushToDisk(async);
+            flushToDisk(forceFlush, async);
         }
         else
         {
@@ -162,7 +162,7 @@ public class RegionImageCache
             {
                 logger.debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
-            flushToDisk(async);
+            flushToDisk(false, async);
         }
     }
 
@@ -171,13 +171,13 @@ public class RegionImageCache
      *
      * @param async Whether to do file writes asynchronously
      */
-    public void flushToDisk(boolean async)
+    public void flushToDisk(boolean force, boolean async)
     {
         int count = 0;
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
             // Don't force writes that aren't necessary
-            count += regionImageSet.writeToDisk(false, async);
+            count += regionImageSet.writeToDisk(force, async);
         }
         lastFlush = System.currentTimeMillis();
     }
