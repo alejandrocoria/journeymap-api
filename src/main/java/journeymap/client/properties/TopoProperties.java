@@ -11,6 +11,7 @@ import com.google.common.base.Objects;
 import journeymap.client.cartography.RGB;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
+import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.StringField;
 
 /**
@@ -18,21 +19,24 @@ import journeymap.common.properties.config.StringField;
  */
 public class TopoProperties extends ClientPropertiesBase implements Comparable<TopoProperties>
 {
-    public final StringField contour = new StringField(Category.Hidden, "").set("#222222");
+    private static final int MAX_COLORS = 128;
 
-    public final StringField land = new StringField(Category.Hidden, "").multiline(true).set(
+    private static final String DEFAULT_CONTOUR_COLOR = "#222222";
+
+    private static final String DEFAULT_LAND_COLORS =
             "#010101, #0a465a, #14505a, #1e5a64, #286464, #326e64, #468264, #508c64, " +
                     "#5a9664, #64a76b, #acd0a5, #94bf8b, #a8c68f, #bdcc96, #d1d7ab, #e1e4b5, " +
                     "#efebc0, #e8e1b6, #ded6a3, #d3ca9d, #cab982, #c3a76b, #b9985a, #aa8753, " +
-                    "#ac9a7c, #baae9a, #cac3b8, #e0c3d8, #e0ded8, #e0f4d8, #f5f4f2, #ffffff"
-    );
+                    "#ac9a7c, #baae9a, #cac3b8, #e0c3d8, #e0ded8, #e0f4d8, #f5f4f2, #ffffff";
 
-    public final StringField water = new StringField(Category.Hidden, "").multiline(true).set(
-            "#000040, #010159, #020266, #030372, #05057f, #080899, #0d0db2, #0f0fbf, " +
-                    "#1818e5, #1f1fff, #2a2aff, #4141ff, #5858ff, #6464ff, #6f6fff, #7b7bff, " +
-                    "#8686ff, #9292ff, #9d9dff, #a9a9ff, #b4b4ff, #c0c0ff, #ccccff, #ddddff, " +
-                    "#dfdfff, #e1e1ff, #e4e4ff, #e6e6ff, #e9e9ff, #ebebff, #ededff, #eeeeff"
-    );
+    private static final String DEFAULT_WATER_COLORS =
+            "#0b0b93, #0d1499, #13239b, #1b36ad, #2353c3, #1e73d5, #2e84df, #4b9be3, " +
+                    "#54a3e3, #63abeb, #73b3eb, #7bbbeb, #8bc9eb, #91cfeb, #9edaee, #b3ebf3";
+
+    public final BooleanField showContour = new BooleanField(Category.Hidden, true).set(true);
+    public final StringField contour = new StringField(Category.Hidden, "").set(DEFAULT_CONTOUR_COLOR);
+    public final StringField land = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_LAND_COLORS);
+    public final StringField water = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_WATER_COLORS);
 
     private transient Integer[] landColors;
     private transient Integer[] waterColors;
@@ -52,8 +56,14 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
     {
         if (landColors == null)
         {
-            landColors = getColors(land.get());
+            landColors = getColors("land", land.get());
+            if (landColors == null || landColors.length == 0)
+            {
+                error("TopoProperties reverting to default land colors");
+                landColors = getColors("land", DEFAULT_LAND_COLORS);
+            }
         }
+
         return landColors;
     }
 
@@ -61,13 +71,23 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
     {
         if (waterColors == null)
         {
-            waterColors = getColors(water.get());
+            waterColors = getColors("water", water.get());
+            if (waterColors == null || waterColors.length == 0)
+            {
+                error("TopoProperties reverting to default water colors");
+                waterColors = getColors("water", DEFAULT_WATER_COLORS);
+            }
         }
+
         return waterColors;
     }
 
     public Integer getContourColor()
     {
+        if (!showContour.get())
+        {
+            return null;
+        }
         if (contourColor == null)
         {
             contourColor = RGB.hexToInt(contour.get());
@@ -75,10 +95,21 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return contourColor;
     }
 
-    public Integer[] getColors(String colorString)
+    private Integer[] getColors(String name, String colorString)
     {
         String[] colors = colorString.split(",");
-        Integer[] colorInts = new Integer[colors.length];
+        int size = Math.min(MAX_COLORS, colors.length);
+        if (size == 0)
+        {
+            error(String.format("TopoProperties bad value for %s: %s", name, colorString));
+            return null;
+        }
+        else if (size > MAX_COLORS)
+        {
+            warn(String.format("TopoProperties will ignore more than %s colors for %s. Found: %s", MAX_COLORS, name, size));
+        }
+
+        Integer[] colorInts = new Integer[size];
         for (int i = 0; i < colors.length; i++)
         {
             colorInts[i] = RGB.hexToInt(colors[i].trim());
