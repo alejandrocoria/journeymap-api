@@ -12,7 +12,6 @@ import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
-import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
@@ -116,7 +115,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
             {
                 if (prop.get() > gameRenderDistance)
                 {
-                    Journeymap.getLogger().warn(String.format("Render distance %s is less than %s", gameRenderDistance, prop.getDeclaredField()));
+                    warn(String.format("Render distance %s is less than %s", gameRenderDistance, prop.getDeclaredField()));
                     if (fix)
                     {
                         prop.set(gameRenderDistance);

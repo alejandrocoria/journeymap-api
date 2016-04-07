@@ -41,6 +41,12 @@ public abstract class PropertiesBase
     // GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
+    // State enum for debugging
+    protected enum State
+    {
+        New, Initialized, FirstLoaded, FileLoaded, Valid, Invalid, SavedOk, SavedError
+    }
+
     // Version used to create config
     protected Version configVersion = null;
 
@@ -52,6 +58,17 @@ public abstract class PropertiesBase
 
     // Reflection-generated map of all ConfigFields
     private transient Map<String, ConfigField<?>> configFields;
+
+    // Current state, just used for debugging.
+    protected State currentState;
+
+    /**
+     * Default constructor.
+     */
+    protected PropertiesBase()
+    {
+        currentState = State.New;
+    }
 
     /**
      * Gets a Gson instance with registered adapters.
@@ -157,6 +174,7 @@ public abstract class PropertiesBase
         if (!configFile.canRead())
         {
             this.postLoad(true);
+            this.currentState = State.FirstLoaded;
             saveNeeded = true;
         }
         else
@@ -167,12 +185,12 @@ public abstract class PropertiesBase
                 T jsonInstance = fromJsonString(jsonString, (Class<T>) this.getClass(), verbose);
                 this.updateFrom(jsonInstance);
                 this.postLoad(false);
+                this.currentState = State.FileLoaded;
                 saveNeeded = !this.isValid(false);
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error(String.format("Can't load config file %s: %s", configFile,
-                        LogFormatter.toPartialString(e)));
+                error(String.format("Can't load config file %s", configFile), e);
 
                 try
                 {
@@ -181,7 +199,7 @@ public abstract class PropertiesBase
                 }
                 catch (Exception e3)
                 {
-                    Journeymap.getLogger().error(String.format("Can't rename config file %s: %s", configFile, e3.getMessage()));
+                    error(String.format("Can't rename config file %s: %s", configFile, e3.getMessage()));
                 }
 
             }
@@ -225,9 +243,10 @@ public abstract class PropertiesBase
             }
             else
             {
-                Journeymap.getLogger().warn("Missing field during updateFrom(): " + fieldName);
+                warn("Missing field during updateFrom(): " + fieldName);
             }
         }
+        this.configVersion = otherInstance.configVersion;
     }
 
     /**
@@ -238,6 +257,7 @@ public abstract class PropertiesBase
         if (configFields == null)
         {
             getConfigFields();
+            this.currentState = State.Initialized;
         }
     }
 
@@ -269,58 +289,60 @@ public abstract class PropertiesBase
     public boolean save(File configFile, boolean verbose)
     {
         preSave();
+        boolean saved = false;
         boolean canSave = isValid(true);
         if (!canSave)
         {
-            Journeymap.getLogger().error(String.format("Can't save invalid config to file: %s", this.getFileName()));
-            return false;
+            error(String.format("Can't save invalid config to file: %s", this.getFileName()));
         }
-
-        try
+        else
         {
-            // Check for existing file
-            if (!configFile.exists())
+            try
             {
-                Journeymap.getLogger().info(String.format("Creating config file: %s", configFile));
-                if (!configFile.getParentFile().exists())
+                // Check for existing file
+                if (!configFile.exists())
                 {
-                    configFile.getParentFile().mkdirs();
+                    info(String.format("Creating config file: %s", configFile));
+                    if (!configFile.getParentFile().exists())
+                    {
+                        configFile.getParentFile().mkdirs();
+                    }
                 }
-            }
-            else if (!isCurrent())
-            {
-                if (configVersion != null)
+                else if (!isCurrent())
                 {
-                    Journeymap.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, Journeymap.JM_VERSION, configFile));
+                    if (configVersion != null)
+                    {
+                        info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, Journeymap.JM_VERSION, configFile));
+                    }
+                    configVersion = Journeymap.JM_VERSION;
                 }
-                configVersion = Journeymap.JM_VERSION;
+
+                StringBuilder sb = new StringBuilder();
+
+                // Add Headers
+                String lineEnding = System.getProperty("line.separator");
+                for (String line : getHeaders())
+                {
+                    sb.append(line).append(lineEnding);
+                }
+                String header = sb.toString();
+
+                // Add Json body
+                String json = toJsonString(verbose);
+
+                // Write to file
+                Files.write(header + json, configFile, UTF8);
+
+                saved = true;
             }
-
-            StringBuilder sb = new StringBuilder();
-
-            // Add Headers
-            String lineEnding = System.getProperty("line.separator");
-            for (String line : getHeaders())
+            catch (Exception e)
             {
-                sb.append(line).append(lineEnding);
+                error(String.format("Can't save config file %s: %s", configFile, e), e);
             }
-            String header = sb.toString();
-
-            // Add Json body
-            String json = toJsonString(verbose);
-
-            // Write to file
-            Files.write(header + json, configFile, UTF8);
-
-            Journeymap.getLogger().debug("Saved " + configFile);
-
-            return true;
         }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().error(String.format("Can't save config file %s: %s", configFile, e), e);
-            return false;
-        }
+
+        this.currentState = saved ? State.SavedOk : State.SavedError;
+        return saved;
     }
 
     /**
@@ -350,14 +372,16 @@ public abstract class PropertiesBase
             if (fix)
             {
                 configVersion = Journeymap.JM_VERSION;
-                Journeymap.getLogger().info(String.format("Setting config file to version \"%s\": %s", configVersion, getFileName()));
+                info(String.format("Setting config file to version \"%s\": %s", configVersion, getFileName()));
             }
             else
             {
                 valid = false;
-                Journeymap.getLogger().info(String.format("Config file isn't current, has version \"%s\": %s", configVersion, getFileName()));
+                info(String.format("Config file isn't current, has version \"%s\": %s", configVersion, getFileName()));
             }
         }
+
+        this.currentState = valid ? State.Valid : State.Invalid;
         return valid;
     }
 
@@ -374,8 +398,6 @@ public abstract class PropertiesBase
     /**
      * Map (keyed by field name) of all ConfigFields defined on the class via reflection.
      * If the owning class isn't set yet, it's done so here.
-     *
-     * @return
      */
     public Map<String, ConfigField<?>> getConfigFields()
     {
@@ -406,7 +428,7 @@ public abstract class PropertiesBase
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error("Unexpected error getting fields: " + LogFormatter.toString(t));
+                error("Unexpected error getting fields: " + LogFormatter.toString(t));
             }
 
             this.configFields = Collections.unmodifiableMap(map);
@@ -451,7 +473,7 @@ public abstract class PropertiesBase
                 ConfigField<?> configField = entry.getValue();
                 if (configField == null)
                 {
-                    Journeymap.getLogger().warn(String.format("%s.%s is null",
+                    warn(String.format("%s.%s is null",
                             getClass().getSimpleName(),
                             entry.getKey()));
                     valid = false;
@@ -470,7 +492,7 @@ public abstract class PropertiesBase
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Unexpected error in validateFields: " + LogFormatter.toPartialString(t));
+            error("Unexpected error in validateFields: " + LogFormatter.toPartialString(t));
             return false;
         }
     }
@@ -510,8 +532,6 @@ public abstract class PropertiesBase
 
     /**
      * If the file exists, returns the lastModified timestamp.
-     *
-     * @return
      */
     public long lastModified()
     {
@@ -529,6 +549,7 @@ public abstract class PropertiesBase
     protected Objects.ToStringHelper toStringHelper()
     {
         Objects.ToStringHelper toStringHelper = Objects.toStringHelper(this)
+                .add("state", currentState)
                 .add("file", getFileName())
                 .add("configVersion", configVersion);
         return toStringHelper;
@@ -573,5 +594,45 @@ public abstract class PropertiesBase
     public final int hashCode()
     {
         return Objects.hashCode(getConfigFields());
+    }
+
+    /**
+     * Logs the message with the properties name and current state
+     *
+     * @param message
+     */
+    protected void info(String message)
+    {
+        Journeymap.getLogger().info(String.format("%s (%s) %s", getName(), currentState, message));
+    }
+
+    /**
+     * Logs the message with the properties name and current state
+     *
+     * @param message
+     */
+    protected void warn(String message)
+    {
+        Journeymap.getLogger().warn(String.format("%s (%s) %s", getName(), currentState, message));
+    }
+
+    /**
+     * Logs the message with the properties name and current state
+     *
+     * @param message
+     */
+    protected void error(String message)
+    {
+        Journeymap.getLogger().error(String.format("%s (%s) %s", getName(), currentState, message));
+    }
+
+    /**
+     * Logs the message with the properties name and current state
+     *
+     * @param message
+     */
+    protected void error(String message, Throwable throwable)
+    {
+        Journeymap.getLogger().error(String.format("%s (%s) %s : %s", getName(), currentState, message, LogFormatter.toString(throwable)));
     }
 }
