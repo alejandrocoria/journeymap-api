@@ -228,17 +228,17 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                                        final HeightsCache chunkHeights,
                                        final SlopesCache chunkSlopes)
     {
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
+
+        if (slopes != null)
+        {
+            return slopes;
+        }
+
         BlockCoordIntPair offsetN = new BlockCoordIntPair(0, -1);
         BlockCoordIntPair offsetW = new BlockCoordIntPair(-1, 0);
         BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
         BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
-
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
-
-        if (Double.valueOf(waterContourInterval).isInfinite())
-        {
-            return slopes;
-        }
 
         float h;
         Float slope;
