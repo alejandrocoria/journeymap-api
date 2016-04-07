@@ -100,7 +100,7 @@ public class ChunkPainter
                     if (color != lastColor)
                     {
                         lastColor = color;
-                        g2D.setPaint(RGB.paintOf(color));
+                        g2D.setPaint(new Color(color));
                     }
 
                     g2D.fillRect(x, z, 1, 1);
