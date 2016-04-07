@@ -42,7 +42,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
     // Vertical size in blocks of each contour
-    private int contourColor;
+    private Integer contourColor;
     private double waterContourInterval;
     private double landContourInterval;
 
@@ -66,20 +66,21 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         super.updateOptions();
 
+        World world = FMLClientHandler.instance().getClient().theWorld;
+        double worldHeight = world.getHeight();
+
         topoProperties = JourneymapClient.getTopoProperties();
 
         contourColor = topoProperties.getContourColor();
 
         waterPalette = topoProperties.getWaterColors();
         waterPaletteRange = waterPalette.length - 1;
+        waterContourInterval = worldHeight / Math.max(1, waterPalette.length);
 
         landPalette = topoProperties.getLandColors();
-        landPaletteRange = landPalette.length - 1;
 
-        World world = FMLClientHandler.instance().getClient().theWorld;
-        double worldHeight = world.getHeight();
-        landContourInterval = worldHeight / landPaletteRange;
-        waterContourInterval = worldHeight / waterPaletteRange;
+        landPaletteRange = landPalette.length - 1;
+        landContourInterval = worldHeight / Math.max(1, landPalette.length);
     }
 
     /**
@@ -172,10 +173,8 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             // Not in cache anymore
             return null;
         }
-        Integer y;
 
-        y = heights[x][z];
-
+        Integer y = heights[x][z];
         if (y != null)
         {
             // Already set
@@ -286,8 +285,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                 if (slope.isNaN() || slope.isInfinite())
                 {
-                    // Your math is bad and you should feel bad
-                    Journeymap.getLogger().warn(String.format("Bad topo slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+                    // Journeymap.getLogger().warn(String.format("Bad topo slope for %s at %s,%s: %s", chunkMd, x, z, slope));
                     slope = 1f;
                 }
 
@@ -302,7 +300,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
 
         int color;
-        if (slope > 1)
+        if (slope > 1 && contourColor!=null)
         {
             // Contour ring between ortho step
             color = contourColor;
