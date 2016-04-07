@@ -458,6 +458,20 @@ public class DataCache
         }
     }
 
+    public void stopChunkMDRetention()
+    {
+        synchronized (chunkMetadata)
+        {
+            for (ChunkMD chunkMD : chunkMetadata.asMap().values())
+            {
+                if (chunkMD != null)
+                {
+                    chunkMD.stopChunkRetention();
+                }
+            }
+        }
+    }
+
     public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, ChunkMD> listener)
     {
         synchronized (chunkMetadataRemovalListener)

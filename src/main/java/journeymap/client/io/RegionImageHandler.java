@@ -81,7 +81,7 @@ public class RegionImageHandler
 
     public static BufferedImage createBlankImage(int width, int height)
     {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
         Graphics2D graphics2D = img.createGraphics();
         graphics2D.setFont(new Font("Arial", Font.BOLD, 18));
         graphics2D.setBackground(Color.black);
