@@ -29,7 +29,7 @@ public class ForgeChat implements IChatHandler
         }
         else
         {
-            Journeymap.getLogger().info(text.getChatComponentText_TextValue());
+            Journeymap.getLogger().info(text.getText());
         }
     }
 }

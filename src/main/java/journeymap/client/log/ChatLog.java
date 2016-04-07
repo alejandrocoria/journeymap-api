@@ -15,12 +15,12 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -58,8 +58,8 @@ public class ChatLog
     public static void announceURL(String message, String url)
     {
         TextComponentString chat = new TextComponentString(message);
-        chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(url)));
+        chat.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+        chat.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(url)));
         //chat.getChatStyle().setUnderlined(false);
         queueAnnouncement(chat);
     }
@@ -75,8 +75,8 @@ public class ChatLog
         TextComponentString chat = new TextComponentString(message);
         try
         {
-            chat.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
-            chat.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(file.getCanonicalPath())));
+            chat.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath()));
+            chat.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(file.getCanonicalPath())));
         }
         catch (Exception e)
         {
@@ -145,7 +145,7 @@ public class ChatLog
                 finally
                 {
                     Level logLevel = message.getFormatArgs()[0] instanceof ErrorChat ? Level.ERROR : Level.INFO;
-                    Journeymap.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedTextForChat()));
+                    Journeymap.getLogger().log(logLevel, StringUtils.stripControlCodes(message.getUnformattedComponentText()));
                 }
             }
         }

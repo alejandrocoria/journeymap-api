@@ -57,7 +57,7 @@ public class BlockMD
      */
     private BlockMD(Block block, int meta)
     {
-        this(block, meta, block.getRegistryName(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(block, meta, block.getRegistryName().toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
 
     /**
@@ -202,7 +202,7 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
-                String uid = block.getRegistryName();
+                String uid = block.getRegistryName().toString();
                 if (uid == null)
                 {
                     Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
