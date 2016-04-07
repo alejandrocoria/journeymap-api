@@ -3,7 +3,6 @@ package journeymap.client.properties;
 import com.google.common.io.Files;
 import journeymap.client.Constants;
 import journeymap.client.io.FileHandler;
-import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
@@ -100,7 +99,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + e, e);
+                error("Couldn't copy config to world config: " + e, e);
             }
             return false;
         }
@@ -159,7 +158,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                error("Couldn't copy config to world config: " + LogFormatter.toString(e));
                 return false;
             }
         }
