@@ -230,11 +230,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
 
-        if (slopes != null)
-        {
-            return slopes;
-        }
-
         BlockCoordIntPair offsetN = new BlockCoordIntPair(0, -1);
         BlockCoordIntPair offsetW = new BlockCoordIntPair(-1, 0);
         BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
@@ -297,6 +292,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected boolean paintContour(final ChunkPainter painter, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
     {
+        if (!chunkMd.hasChunk())
+        {
+            return false;
+        }
+
         float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
 
         int color;

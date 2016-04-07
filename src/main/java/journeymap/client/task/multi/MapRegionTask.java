@@ -134,9 +134,12 @@ public class MapRegionTask extends BaseMapTask
     {
         lastTaskCompleted = System.currentTimeMillis();
 
-        // Flush any images to disk, but do it synchronously on this thread.
-        RegionImageCache.instance().flushToDisk(true, false);
-        DataCache.instance().invalidateChunkMDCache();
+        // Flush images to disk
+        RegionImageCache.instance().flushToDisk(true, true);
+
+        // Ensure no chunks are forcefully retained.
+        DataCache.instance().stopChunkMDRetention();
+
         if (hadError || cancelled)
         {
             logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
