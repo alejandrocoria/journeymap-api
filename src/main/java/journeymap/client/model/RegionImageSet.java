@@ -73,11 +73,14 @@ public class RegionImageSet extends ImageSet
 
     public boolean hasChunkUpdates()
     {
-        for (ImageHolder holder : this.imageHolders.values())
+        synchronized (imageHolders)
         {
-            if (holder.partialUpdate)
+            for (ImageHolder holder : this.imageHolders.values())
             {
-                return true;
+                if (holder.partialUpdate)
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -85,9 +88,12 @@ public class RegionImageSet extends ImageSet
 
     public void finishChunkUpdates()
     {
-        for (ImageHolder holder : this.imageHolders.values())
+        synchronized (imageHolders)
         {
-            holder.finishPartialImageUpdates();
+            for (ImageHolder holder : this.imageHolders.values())
+            {
+                holder.finishPartialImageUpdates();
+            }
         }
     }
 
