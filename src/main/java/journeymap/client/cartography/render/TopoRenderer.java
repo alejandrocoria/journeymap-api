@@ -38,6 +38,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     private int landPaletteRange;
     private final HeightsCache chunkSurfaceHeights;
     private final SlopesCache chunkSurfaceSlopes;
+    private long lastPropFileUpdate;
 
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
@@ -57,6 +58,14 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
         chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
         DataCache.instance().addChunkMDListener(this);
+
+        primarySlopeOffsets.clear();
+        secondarySlopeOffsets.clear();
+
+        primarySlopeOffsets.add(new BlockCoordIntPair(0, -1)); // North
+        primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
+        primarySlopeOffsets.add(new BlockCoordIntPair(0, 1)); // South
+        primarySlopeOffsets.add(new BlockCoordIntPair(1, 0)); // East
     }
 
     /**
@@ -70,17 +79,22 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         double worldHeight = world.getHeight();
 
         topoProperties = JourneymapClient.getTopoProperties();
+        if (System.currentTimeMillis() - lastPropFileUpdate > 5000 && lastPropFileUpdate < topoProperties.lastModified())
+        {
+            topoProperties.load();
+            lastPropFileUpdate = topoProperties.lastModified();
 
-        contourColor = topoProperties.getContourColor();
+            contourColor = topoProperties.getContourColor();
 
-        waterPalette = topoProperties.getWaterColors();
-        waterPaletteRange = waterPalette.length - 1;
-        waterContourInterval = worldHeight / Math.max(1, waterPalette.length);
+            waterPalette = topoProperties.getWaterColors();
+            waterPaletteRange = waterPalette.length - 1;
+            waterContourInterval = worldHeight / Math.max(1, waterPalette.length);
 
-        landPalette = topoProperties.getLandColors();
+            landPalette = topoProperties.getLandColors();
 
-        landPaletteRange = landPalette.length - 1;
-        landContourInterval = worldHeight / Math.max(1, landPalette.length);
+            landPaletteRange = landPalette.length - 1;
+            landContourInterval = worldHeight / Math.max(1, landPalette.length);
+        }
     }
 
     /**
@@ -230,10 +244,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
 
-        BlockCoordIntPair offsetN = new BlockCoordIntPair(0, -1);
-        BlockCoordIntPair offsetW = new BlockCoordIntPair(-1, 0);
-        BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
-        BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
+
 
         float h;
         Float slope;
@@ -256,26 +267,44 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     contourInterval = landContourInterval;
                 }
 
-                hN = getSurfaceBlockHeight(chunkMd, x, z, offsetN, (int) h, chunkHeights);
-                hW = getSurfaceBlockHeight(chunkMd, x, z, offsetW, (int) h, chunkHeights);
-                hS = getSurfaceBlockHeight(chunkMd, x, z, offsetS, (int) h, chunkHeights);
-                hE = getSurfaceBlockHeight(chunkMd, x, z, offsetE, (int) h, chunkHeights);
-
-                // Shift to nearest contour
-                h = (float) Math.max(nearZero, h - (h % contourInterval));
-                hN = (float) Math.max(nearZero, hN - (hN % contourInterval));
-                hW = (float) Math.max(nearZero, hW - (hW % contourInterval));
-                hE = (float) Math.max(nearZero, hE - (hE % contourInterval));
-                hS = (float) Math.max(nearZero, hS - (hS % contourInterval));
-
-                if (h != hN && hN == hW && hW == hE && hE == hS)
+                float[] heights = new float[primarySlopeOffsets.size()];
+                Float lastOffsetHeight = null;
+                boolean flatOffsets = true;
+                for (int i = 0; i < heights.length; i++)
                 {
-                    // ignore one-block elevation changes
+                    // Get height
+                    float offsetHeight = getSurfaceBlockHeight(chunkMd, x, z, primarySlopeOffsets.get(i), (int) h, chunkHeights);
+
+                    // Shift to nearest contour
+                    offsetHeight = (float) Math.max(nearZero, offsetHeight - (offsetHeight % contourInterval));
+                    heights[i] = offsetHeight;
+
+                    if (lastOffsetHeight == null)
+                    {
+                        lastOffsetHeight = offsetHeight;
+                    }
+                    else if (flatOffsets)
+                    {
+                        flatOffsets = (lastOffsetHeight == offsetHeight);
+                    }
+                }
+
+
+                // Shift height to nearest contour
+                h = (float) Math.max(nearZero, h - (h % contourInterval));
+
+                if (flatOffsets)
+                {
                     slope = 1f;
                 }
                 else
                 {
-                    slope = ((h / hN) + (h / hW) + (h / hE) + (h / hS)) / 4f;
+                    slope = 0f;
+                    for (float offsetHeight : heights)
+                    {
+                        slope += (h / offsetHeight);
+                    }
+                    slope = slope / heights.length;
                 }
 
                 if (slope.isNaN() || slope.isInfinite())
@@ -355,5 +384,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             chunkSurfaceSlopes.invalidate(coord);
             columnPropertiesCache.invalidate(coord);
         }
+    }
+
+    private void clearCaches()
+    {
+        chunkSurfaceHeights.invalidateAll();
+        chunkSurfaceSlopes.invalidateAll();
+        columnPropertiesCache.invalidateAll();
     }
 }

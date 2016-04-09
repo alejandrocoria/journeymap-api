@@ -23,15 +23,13 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
 
     private static final String DEFAULT_CONTOUR_COLOR = "#222222";
 
-    private static final String DEFAULT_LAND_COLORS =
-            "#010101, #0a465a, #14505a, #1e5a64, #286464, #326e64, #468264, #508c64, " +
-                    "#5a9664, #64a76b, #acd0a5, #94bf8b, #a8c68f, #bdcc96, #d1d7ab, #e1e4b5, " +
-                    "#efebc0, #e8e1b6, #ded6a3, #d3ca9d, #cab982, #c3a76b, #b9985a, #aa8753, " +
-                    "#ac9a7c, #baae9a, #cac3b8, #e0c3d8, #e0ded8, #e0f4d8, #f5f4f2, #ffffff";
+    private static final String DEFAULT_LAND_COLORS = "#000800,#000f00,#001700,#001f00,#002700,#002e00,#003600,#003e00," +
+            "#004600,#004d00,#005500,#036103,#066e06,#097a09,#0c860c,#0f930f,#139f13,#16ac16,#19b819,#1cc41c,#1fd11f," +
+            "#22dd22,#36e036,#4ae34a,#5ee65e,#72e972,#86ec86,#9bf09b,#aff3af,#c3f6c3,#d7f9d7,#ebfceb";
 
-    private static final String DEFAULT_WATER_COLORS =
-            "#0b0b93, #0d1499, #13239b, #1b36ad, #2353c3, #1e73d5, #2e84df, #4b9be3, " +
-                    "#54a3e3, #63abeb, #73b3eb, #7bbbeb, #8bc9eb, #91cfeb, #9edaee, #b3ebf3";
+    private static final String DEFAULT_WATER_COLORS = "#000040,#02024e,#03035d,#05056b,#070779,#080887,#0a0a96,#0b0ba4," +
+            "#1a1aaa,#2a2aaf,#3939b5,#4848bb,#5757c0,#6767c6,#7676cc,#8585d2,#9494d7,#a4a4dd,#b3b3e3,#c2c2e8,#d1d1ee," +
+            "#d7d7f0,#ddddf2,#e2e2f4,#e8e8f6,#eeeef9,#f4f4fb,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff";
 
     public final BooleanField showContour = new BooleanField(Category.Hidden, true);
     public final StringField contour = new StringField(Category.Hidden, "").set(DEFAULT_CONTOUR_COLOR);
