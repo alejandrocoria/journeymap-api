@@ -41,8 +41,11 @@ public class ChunkLoader
                     Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
                     if (chunk != null)
                     {
-                        chunk.setChunkLoaded(true);
-                        chunk.generateSkylightMap();
+                        if (!chunk.isLoaded())
+                        {
+                            chunk.setChunkLoaded(true);
+                            //chunk.generateSkylightMap();
+                        }
                         return new ChunkMD(chunk, forceRetain);
                     }
                     else
