@@ -1,25 +1,14 @@
-/* JourneyMap 5.1.1 Splash/About Dialog - de_DE  */
+/* JourneyMap 5.2.0 Splash/About Dialog - de_DE  */
+/* Only translate label values. Do not translate action values. */
 {
   "lines": [
     {
-      "label": "Neue 'Vault' Thematik. Hier klicken um sie auszuprobieren!",
-      "action": "fullscreen.Fullscreen#setTheme#Vault"
+      "label": "New Topographic map view. Click here to try it!",
+      "action": "fullscreen.Fullscreen#setMapType#topo"
     },
     {
-      "label": "Verbesserte Speicher und CPU Nutzung",
-      "action": ""
-    },
-    {
-      "label": "Genauere Biome- und Wasserfarben",
-      "action": ""
-    },
-    {
-      "label": "JourneyMapServer befindet sich jetzt in der gleichen jar-Datei",
-      "action": ""
-    },
-    {
-      "label": "Release für Minecraft 1.7.10 und 1.8",
-      "action": ""
+      "label": "Customize Topographic map colors. Click here for the wiki page.",
+      "action": "fullscreen.Fullscreen#launchTopographicWiki"
     }
   ]
 }

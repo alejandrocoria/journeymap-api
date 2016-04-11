@@ -42,8 +42,8 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
-    // Vertical size in blocks of each contour
-    private Integer contourColor;
+    private Integer landContourColor;
+    private Integer waterContourColor;
     private double waterContourInterval;
     private double landContourInterval;
 
@@ -84,7 +84,8 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             topoProperties.load();
             lastPropFileUpdate = topoProperties.lastModified();
 
-            contourColor = topoProperties.getContourColor();
+            landContourColor = topoProperties.getLandContourColor();
+            waterContourColor = topoProperties.getWaterContourColor();
 
             waterPalette = topoProperties.getWaterColors();
             waterPaletteRange = waterPalette.length - 1;
@@ -245,7 +246,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
 
 
-
         float h;
         Float slope;
         double contourInterval;
@@ -328,28 +328,30 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
 
-        int color;
-        if (slope > 1 && contourColor!=null)
+        Integer color = null;
+        if (slope > 1)
         {
-            // Contour ring between ortho step
-            color = contourColor;
+            if ((topBlockMd.isWater() || topBlockMd.isIce()))
+            {
+                if (waterContourColor != null)
+                {
+                    color = waterContourColor;
+                }
+            }
+            else if (landContourColor != null)
+            {
+                color = landContourColor;
+            }
         }
-        else
+
+        if (color == null)
         {
             if (topBlockMd.isLava())
             {
                 // Use standard lava color
                 color = topBlockMd.getColor();
             }
-            else if (topBlockMd.isWater())
-            {
-                // Get color from water palette
-                int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);
-                // Precautionary - ensure in range
-                index = Math.max(0, Math.min(index, waterPaletteRange));
-                color = waterPalette[index];
-            }
-            else if (topBlockMd.isIce())
+            else if (topBlockMd.isWater() || topBlockMd.isIce())
             {
                 // Get color from water palette
                 int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);

@@ -171,7 +171,7 @@ public abstract class PropertiesBase
         ensureInit();
         boolean saveNeeded = false;
 
-        if (!configFile.canRead())
+        if (!configFile.canRead() || configFile.length()==0)
         {
             this.postLoad(true);
             this.currentState = State.FirstLoaded;
