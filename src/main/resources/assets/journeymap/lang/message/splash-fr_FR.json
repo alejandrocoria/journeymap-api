@@ -1,9 +1,13 @@
-/* JourneyMap 5.1.6 Splash/About Dialog - fr_FR  et fr_CA */
+/* JourneyMap 5.2.0 Splash/About Dialog - fr_FR  et fr_CA */
 {
   "lines": [
     {
-      "label": "New Topographical map view. Click here to try it!",
+      "label": "New Topographic map view. Click here to try it!",
       "action": "fullscreen.Fullscreen#setMapType#topo"
+    },
+    {
+      "label": "Customize Topographic map colors. Click here for the wiki page.",
+      "action": "fullscreen.Fullscreen#launchTopographicWiki"
     }
   ]
 }

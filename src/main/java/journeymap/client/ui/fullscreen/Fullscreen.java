@@ -14,6 +14,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
+import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -1147,6 +1148,35 @@ public class Fullscreen extends JmUI
         catch (Exception e)
         {
             Journeymap.getLogger().error("Could not load Theme: " + LogFormatter.toString(e));
+        }
+    }
+
+    public void setMapType(String type)
+    {
+        try
+        {
+            state.setMapType(MapType.from(MapType.Name.valueOf(type), DataCache.getPlayer()));
+            buttonList.clear();
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Could not set maptype: " + LogFormatter.toString(e));
+        }
+    }
+
+    /**
+     * Launch the topographic info page
+     */
+    public void launchTopographicWiki()
+    {
+        String url = "http://journeymap.info/Topographic";
+        try
+        {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        }
+        catch (Throwable e)
+        {
+            Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 }
