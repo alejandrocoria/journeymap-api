@@ -10,9 +10,7 @@ package journeymap.client.ui.theme;
 
 import journeymap.client.Constants;
 import journeymap.client.render.texture.TextureImpl;
-import journeymap.common.properties.CommonProperties;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import journeymap.common.properties.config.BooleanField;
 
 /**
  * Toggle-type button for Theme
@@ -21,20 +19,20 @@ public class ThemeToggle extends ThemeButton
 {
     public ThemeToggle(Theme theme, String rawlabel, String iconName)
     {
-        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null, null);
+        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null);
     }
 
     public ThemeToggle(Theme theme, String labelOn, String labelOff, String iconName)
     {
-        super(theme, labelOn, labelOff, iconName, null, null);
+        super(theme, labelOn, labelOff, iconName, null);
     }
 
-    public ThemeToggle(Theme theme, String rawlabel, String iconName, CommonProperties properties, AtomicBoolean property)
+    public ThemeToggle(Theme theme, String rawlabel, String iconName, BooleanField field)
     {
-        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, properties, property);
-        if (property != null)
+        super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, field);
+        if (field != null)
         {
-            setToggled(property.get());
+            setToggled(field.get());
         }
     }
 

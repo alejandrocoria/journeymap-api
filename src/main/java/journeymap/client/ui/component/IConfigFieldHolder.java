@@ -8,14 +8,12 @@
 
 package journeymap.client.ui.component;
 
+import journeymap.common.properties.config.ConfigField;
+
 /**
- * Created by Mark on 10/10/2014.
+ * Indicates a class wraps a ConfigField.
  */
-public interface IPropertyHolder<H, T>
+public interface IConfigFieldHolder<T extends ConfigField>
 {
-    public H getProperty();
-
-    public T getPropertyValue();
-
-    public void setPropertyValue(T value);
+    public T getConfigField();
 }

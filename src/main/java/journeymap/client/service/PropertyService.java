@@ -13,12 +13,12 @@ import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.config.BooleanField;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provide player data
@@ -32,7 +32,7 @@ public class PropertyService extends BaseService
     private static final long serialVersionUID = 4412225358529161454L;
     FullMapProperties fullMapProperties;
     WebMapProperties webMapProperties;
-    HashMap<String, AtomicBoolean> propMap = new HashMap<String, AtomicBoolean>();
+    HashMap<String, BooleanField> propMap = new HashMap<String, BooleanField>();
 
     /**
      * Serves / saves property info

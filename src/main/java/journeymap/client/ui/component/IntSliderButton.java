@@ -9,19 +9,17 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Created by Mark on 9/29/2014.
  */
-public class IntSliderButton extends Button implements IPropertyHolder<AtomicInteger, Integer>
+public class IntSliderButton extends Button implements IConfigFieldHolder<IntegerField>
 {
     public String prefix = "";
     /**
@@ -32,19 +30,17 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
     public int maxValue = 0;
     public String suffix = "";
     public boolean drawString = true;
-    CommonProperties properties;
-    AtomicInteger property;
+    IntegerField field;
 
-    public IntSliderButton(CommonProperties properties, AtomicInteger property, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
+    public IntSliderButton(IntegerField field, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
         super(prefix);
         minValue = minVal;
         maxValue = maxVal;
         this.prefix = prefix;
         suffix = suf;
-        this.property = property;
-        this.properties = properties;
-        setValue(property.get());
+        this.field = field;
+        setValue(field.get());
         super.disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
@@ -115,7 +111,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
 
     public double getSliderValue()
     {
-        return (property.get() - minValue * 1d) / (maxValue - minValue);
+        return (field.get() - minValue * 1d) / (maxValue - minValue);
     }
 
     public void setSliderValue(double sliderValue)
@@ -138,7 +134,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
     {
         if (drawString)
         {
-            displayString = prefix + property.get() + suffix;
+            displayString = prefix + field.get() + suffix;
         }
     }
 
@@ -153,10 +149,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
         if (this.dragging)
         {
             this.dragging = false;
-            if (properties != null)
-            {
-                properties.save();
-            }
+            field.save();
         }
     }
 
@@ -188,43 +181,27 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
 
     public int getValue()
     {
-        return this.property.get();
+        return this.field.get();
     }
 
     public void setValue(int value)
     {
         value = Math.min(value, maxValue);
         value = Math.max(value, minValue);
-        if (property.get() != value)
+        if (field.get() != value)
         {
-            property.set(value);
-            if (!dragging && properties != null)
+            field.set(value);
+            if (!dragging)
             {
-                properties.save();
+                field.save();
             }
         }
         updateLabel();
     }
 
     @Override
-    public AtomicInteger getProperty()
+    public IntegerField getConfigField()
     {
-        return property;
-    }
-
-    @Override
-    public Integer getPropertyValue()
-    {
-        return property.get();
-    }
-
-    @Override
-    public void setPropertyValue(Integer value)
-    {
-        if (property == null)
-        {
-            return;
-        }
-        setValue(value);
+        return field;
     }
 }

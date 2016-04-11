@@ -14,14 +14,13 @@ import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.component.BooleanPropertyButton;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.BooleanField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Mark on 8/30/2014.
@@ -49,15 +48,15 @@ public class ThemeButton extends BooleanPropertyButton
 
     public ThemeButton(Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
-        super(labelOn, labelOff, null, null);
+        super(labelOn, labelOff, null);
         this.iconName = iconName;
         this.setToggled(toggled);
         updateTheme(theme);
     }
 
-    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, CommonProperties properties, AtomicBoolean property)
+    protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, BooleanField field)
     {
-        super(labelOn, labelOff, properties, property);
+        super(labelOn, labelOff, field);
         this.iconName = iconName;
         updateTheme(theme);
     }

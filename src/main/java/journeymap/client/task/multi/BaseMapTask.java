@@ -126,6 +126,10 @@ public abstract class BaseMapTask implements ITask
                         logger.warn("Error rendering chunk " + chunkMd + ": " + t.getMessage());
                     }
                 }
+                else
+                {
+                    //System.out.println("Lost: " + coord);
+                }
             }
 
             if (!jm.isMapping())

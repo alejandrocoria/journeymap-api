@@ -24,7 +24,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -64,11 +64,10 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             lastCoord = blockCoord;
 
             // Get block under mouse
-            Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.getX() >> 4, blockCoord.getZ() >> 4);
+            ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
             String info;
-            if (!chunk.isEmpty())
+            if (chunkMD != null && chunkMD.hasChunk())
             {
-                ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
                 int blockY = chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15);
                 blockY = Math.max(blockY, 0);
                 BlockMD blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());

@@ -24,7 +24,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +37,6 @@ import java.util.HashMap;
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
-    protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-    protected static final int COLOR_BLACK = Color.black.getRGB();
-    protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
     protected final DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties;
@@ -383,7 +379,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if (slope == null || slope.isNaN())
         {
-            Journeymap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+            Journeymap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd.getCoord(), x, z, slope));
             slope = 1f;
         }
         return slope;

@@ -8,28 +8,25 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.BooleanField;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Button that wraps and syncs with an AtomicBoolean value owned by a config instance.
+ * Button that wraps and syncs with an BooleanField value owned by a config instance.
  */
-public class BooleanPropertyButton extends OnOffButton implements IPropertyHolder<AtomicBoolean, Boolean>
+public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHolder<BooleanField>
 {
-    final CommonProperties properties;
-    final AtomicBoolean valueHolder;
+    final BooleanField booleanField;
 
-    public BooleanPropertyButton(String labelOn, String labelOff, CommonProperties properties, AtomicBoolean valueHolderParam)
+    public BooleanPropertyButton(String labelOn, String labelOff, BooleanField field)
     {
-        super(labelOn, labelOff, (valueHolderParam != null) && valueHolderParam.get());
-        this.valueHolder = valueHolderParam;
-        this.properties = properties;
+        super(labelOn, labelOff, (field != null) && field.get());
+        this.booleanField = field;
     }
 
-    public AtomicBoolean getValueHolder()
+    public BooleanField getField()
     {
-        return valueHolder;
+        return booleanField;
     }
 
     @Override
@@ -37,9 +34,9 @@ public class BooleanPropertyButton extends OnOffButton implements IPropertyHolde
     {
         if (isEnabled())
         {
-            if (properties != null)
+            if (booleanField != null)
             {
-                setToggled(properties.toggle(valueHolder));
+                setToggled(booleanField.toggleAndSave());
             }
             else
             {
@@ -51,32 +48,28 @@ public class BooleanPropertyButton extends OnOffButton implements IPropertyHolde
     @Override
     public void refresh()
     {
-        if (valueHolder != null)
+        if (booleanField != null)
         {
-            setToggled(valueHolder.get());
+            setToggled(booleanField.get());
+        }
+    }
+
+    public void setValue(Boolean value)
+    {
+        if (booleanField == null)
+        {
+            toggled = value;
+        }
+        else
+        {
+            booleanField.set(value);
+            booleanField.save();
         }
     }
 
     @Override
-    public Boolean getPropertyValue()
+    public BooleanField getConfigField()
     {
-        return valueHolder.get();
-    }
-
-    @Override
-    public void setPropertyValue(Boolean value)
-    {
-        if (valueHolder == null)
-        {
-            return;
-        }
-        valueHolder.set(value);
-        properties.save();
-    }
-
-    @Override
-    public AtomicBoolean getProperty()
-    {
-        return valueHolder;
+        return booleanField;
     }
 }

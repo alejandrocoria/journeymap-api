@@ -5,101 +5,52 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.model.MapType;
 import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.PropertiesBase;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static journeymap.common.properties.config.Config.Category.Inherit;
+import static journeymap.common.properties.Category.Inherit;
 
 /**
  * Properties for the minimap in-game.
  */
 public class MiniMapProperties extends InGameMapProperties
 {
-    @Config(category = Inherit, master = true, key = "jm.minimap.enable_minimap")
-    public final AtomicBoolean enabled = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.minimap.shape", defaultEnum = "Circle")
-    public final AtomicReference<Shape> shape = new AtomicReference<Shape>(Shape.Circle);
-
-    @Config(category = Inherit, key = "jm.minimap.position", defaultEnum = "TopRight")
-    public final AtomicReference<Position> position = new AtomicReference<Position>(Position.TopRight);
-
-    @Config(category = Inherit, key = "jm.minimap.show_fps", defaultBoolean = false)
-    public final AtomicBoolean showFps = new AtomicBoolean(false);
-
-    @Config(category = Inherit, key = "jm.minimap.show_biome")
-    public final AtomicBoolean showBiome = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.minimap.show_location")
-    public final AtomicBoolean showLocation = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.minimap.size", minValue = 1, maxValue = 100, defaultValue = 30)
-    public final AtomicInteger sizePercent = new AtomicInteger(30);
-
-    @Config(category = Inherit, key = "jm.minimap.frame_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
-    public final AtomicInteger frameAlpha = new AtomicInteger(100);
-
-    @Config(category = Inherit, key = "jm.minimap.terrain_alpha", minValue = 0, maxValue = 100, defaultValue = 100)
-    public final AtomicInteger terrainAlpha = new AtomicInteger(100);
-
-    @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "PlayerHeading")
-    public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
-
-    @Config(category = Inherit, key = "jm.minimap.compass_font_scale", minValue = 1, maxValue = 4, defaultValue = 1)
-    public final AtomicInteger compassFontScale = new AtomicInteger(1);
-
-    @Config(category = Inherit, key = "jm.minimap.show_compass")
-    public final AtomicBoolean showCompass = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.minimap.show_reticle")
-    public final AtomicBoolean showReticle = new AtomicBoolean(true);
-
-    @Config(category = Inherit, key = "jm.minimap.reticle_orientation", defaultEnum = "Compass")
-    public final AtomicReference<ReticleOrientation> reticleOrientation = new AtomicReference<ReticleOrientation>(ReticleOrientation.Compass);
-
-    public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
-    protected transient final String name;
+    public final BooleanField enabled = new BooleanField(Inherit, "jm.minimap.enable_minimap", true, true);
+    public final EnumField<Shape> shape = new EnumField<Shape>(Inherit, "jm.minimap.shape", Shape.Circle);
+    public final EnumField<Position> position = new EnumField<Position>(Inherit, "jm.minimap.position", Position.TopRight);
+    public final BooleanField showFps = new BooleanField(Inherit, "jm.minimap.show_fps", false);
+    public final BooleanField showBiome = new BooleanField(Inherit, "jm.minimap.show_biome", true);
+    public final BooleanField showLocation = new BooleanField(Inherit, "jm.minimap.show_location", true);
+    public final IntegerField sizePercent = new IntegerField(Inherit, "jm.minimap.size", 1, 100, 30);
+    public final IntegerField frameAlpha = new IntegerField(Inherit, "jm.minimap.frame_alpha", 0, 100, 100);
+    public final IntegerField terrainAlpha = new IntegerField(Inherit, "jm.minimap.terrain_alpha", 0, 100, 100);
+    public final EnumField<Orientation> orientation = new EnumField<Orientation>(Inherit, "jm.minimap.orientation.button", Orientation.PlayerHeading);
+    public final IntegerField compassFontScale = new IntegerField(Inherit, "jm.minimap.compass_font_scale", 1, 4, 1);
+    public final BooleanField showCompass = new BooleanField(Inherit, "jm.minimap.show_compass", true);
+    public final BooleanField showReticle = new BooleanField(Inherit, "jm.minimap.show_reticle", true);
+    public final EnumField<ReticleOrientation> reticleOrientation = new EnumField<ReticleOrientation>(Inherit, "jm.minimap.reticle_orientation", ReticleOrientation.Compass);
+    protected final transient int id;
     protected boolean active = false;
 
-    public MiniMapProperties()
+    public MiniMapProperties(int id)
     {
-        this("minimap");
-    }
-
-    protected MiniMapProperties(String name)
-    {
-        this.name = name;
-    }
-
-    @Override
-    public AtomicReference<String> getEntityIconSetName()
-    {
-        return entityIconSetName;
-    }
-
-    @Override
-    public AtomicReference<MapType.Name> getPreferredMapType()
-    {
-        return preferredMapType;
+        this.id = id;
     }
 
     @Override
     public String getName()
     {
-        return name;
+        return String.format("minimap%s", (id > 1) ? id : "");
     }
 
     public boolean isActive()
@@ -109,19 +60,30 @@ public class MiniMapProperties extends InGameMapProperties
 
     public void setActive(boolean active)
     {
-        this.active = active;
-        save();
+        if (this.active != active)
+        {
+            this.active = active;
+            save();
+        }
     }
 
     public int getId()
     {
-        return 1;
+        return id;
+    }
+
+    @Override
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
+    {
+        super.updateFrom(otherInstance);
+        if (otherInstance instanceof MiniMapProperties)
+        {
+            setActive(((MiniMapProperties) otherInstance).isActive());
+        }
     }
 
     /**
      * Gets the size relative to current screen height.
-     *
-     * @return
      */
     public int getSize()
     {
@@ -129,84 +91,39 @@ public class MiniMapProperties extends InGameMapProperties
     }
 
     @Override
-    public void newFileInit()
+    protected void postLoad(boolean isNew)
     {
-        this.setActive(true);
-        if (ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+        super.postLoad(isNew);
+
+        if (isNew)
         {
-            super.fontScale.set(2);
-            compassFontScale.set(2);
+            if (getId() == 1)
+            {
+                this.setActive(true);
+                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                {
+                    super.fontScale.set(2);
+                    compassFontScale.set(2);
+                }
+            }
+            else
+            {
+                // Initial settings to give people an idea of what can be done
+                this.setActive(false);
+                this.position.set(Position.TopRight);
+                this.shape.set(Shape.Rectangle);
+                this.frameAlpha.set(100);
+                this.terrainAlpha.set(100);
+                this.orientation.set(Orientation.North);
+                this.reticleOrientation.set(ReticleOrientation.Compass);
+                this.sizePercent.set(30);
+                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                {
+                    super.fontScale.set(2);
+                    compassFontScale.set(2);
+                }
+
+            }
         }
     }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        if (!super.equals(o))
-        {
-            return false;
-        }
-
-        MiniMapProperties that = (MiniMapProperties) o;
-        return 0 == this.compareTo(that);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 31 * result + (enabled != null ? enabled.hashCode() : 0);
-        result = 31 * result + (shape != null ? shape.hashCode() : 0);
-        result = 31 * result + (position != null ? position.hashCode() : 0);
-        result = 31 * result + (showFps != null ? showFps.hashCode() : 0);
-        result = 31 * result + (showBiome != null ? showBiome.hashCode() : 0);
-        result = 31 * result + (showLocation != null ? showLocation.hashCode() : 0);
-        result = 31 * result + showWaypointLabels.hashCode();
-        result = 31 * result + sizePercent.hashCode();
-        result = 31 * result + frameAlpha.hashCode();
-        result = 31 * result + terrainAlpha.hashCode();
-        result = 31 * result + orientation.hashCode();
-        result = 31 * result + compassFontScale.hashCode();
-        result = 31 * result + showCompass.hashCode();
-        result = 31 * result + showReticle.hashCode();
-        result = 31 * result + reticleOrientation.hashCode();
-        result = 31 * result + entityIconSetName.hashCode();
-        result = 31 * result + preferredMapType.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return super.toStringHelper(this)
-                .add("active", active)
-                .add("compassFontScale", compassFontScale)
-                .add("enabled", enabled)
-                .add("frameAlpha", frameAlpha)
-                .add("name", name)
-                .add("orientation", orientation)
-                .add("position", position)
-                .add("preferredMapType", preferredMapType)
-                .add("reticleOrientation", reticleOrientation)
-                .add("shape", shape)
-                .add("showBiome", showBiome)
-                .add("showCompass", showCompass)
-                .add("showFps", showFps)
-                .add("showLocation", showLocation)
-                .add("showReticle", showReticle)
-                .add("sizePercent", sizePercent)
-                .add("terrainAlpha", terrainAlpha)
-                .toString();
-    }
-
-
 }

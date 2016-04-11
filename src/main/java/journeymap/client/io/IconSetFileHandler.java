@@ -11,7 +11,7 @@ package journeymap.client.io;
 import journeymap.client.Constants;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
@@ -90,12 +90,19 @@ public class IconSetFileHandler
         return names;
     }
 
-    public static class IconSetStringListProvider implements StringListProvider
+    public static class IconSetValuesProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()
         {
-            return IconSetFileHandler.getEntityIconSetNames();
+            if (FMLClientHandler.instance().getClient() != null)
+            {
+                return IconSetFileHandler.getEntityIconSetNames();
+            }
+            else
+            {
+                return MOB_ICON_SETS;
+            }
         }
 
         @Override

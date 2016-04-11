@@ -5,156 +5,77 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
-import com.google.common.base.Objects;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
+import journeymap.common.properties.PropertiesBase;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static journeymap.common.properties.config.Config.Category.*;
+import static journeymap.client.properties.ClientCategory.*;
 
 /**
  * Properties for basic mod configuration.
  */
-public class CoreProperties extends ClientProperties implements Comparable<CoreProperties>
+public class CoreProperties extends ClientPropertiesBase implements Comparable<CoreProperties>
 {
+    public final StringField logLevel = new StringField(Advanced, "jm.advanced.loglevel", JMLogger.LogLevelStringProvider.class);
+    public final IntegerField autoMapPoll = new IntegerField(Advanced, "jm.advanced.automappoll", 500, 10000, 2000);
+    public final IntegerField cacheAnimalsData = new IntegerField(Advanced, "jm.advanced.cache_animals", 1000, 10000, 3100);
+    public final IntegerField cacheMobsData = new IntegerField(Advanced, "jm.advanced.cache_mobs", 1000, 10000, 3000);
+    public final IntegerField cachePlayerData = new IntegerField(Advanced, "jm.advanced.cache_player", 500, 2000, 1000);
+    public final IntegerField cachePlayersData = new IntegerField(Advanced, "jm.advanced.cache_players", 1000, 10000, 2000);
+    public final IntegerField cacheVillagersData = new IntegerField(Advanced, "jm.advanced.cache_villagers", 1000, 10000, 2200);
+    public final BooleanField announceMod = new BooleanField(Advanced, "jm.advanced.announcemod", true);
+    public final BooleanField checkUpdates = new BooleanField(Advanced, "jm.advanced.checkupdates", true);
+    public final BooleanField recordCacheStats = new BooleanField(Advanced, "jm.advanced.recordcachestats", false);
+    public final IntegerField browserPoll = new IntegerField(Advanced, "jm.advanced.browserpoll", 1000, 10000, 2000);
+    public final StringField themeName = new StringField(FullMap, "jm.common.ui_theme", ThemeFileHandler.ThemeValuesProvider.class);
+    public final BooleanField caveIgnoreGlass = new BooleanField(Cartography, "jm.common.map_style_caveignoreglass", true);
+    public final BooleanField mapBathymetry = new BooleanField(Cartography, "jm.common.map_style_bathymetry", false);
+    public final BooleanField mapTopography = new BooleanField(Cartography, "jm.common.map_style_topography", false);
+    public final BooleanField mapTransparency = new BooleanField(Cartography, "jm.common.map_style_transparency", true);
+    public final BooleanField mapCaveLighting = new BooleanField(Cartography, "jm.common.map_style_cavelighting", true);
+    public final BooleanField mapAntialiasing = new BooleanField(Cartography, "jm.common.map_style_antialiasing", true);
+    public final BooleanField mapPlantShadows = new BooleanField(Cartography, "jm.common.map_style_plantshadows", false);
+    public final BooleanField mapPlants = new BooleanField(Cartography, "jm.common.map_style_plants", false);
+    public final BooleanField mapCrops = new BooleanField(Cartography, "jm.common.map_style_crops", true);
+    public final BooleanField mapSurfaceAboveCaves = new BooleanField(Cartography, "jm.common.map_style_caveshowsurface", true);
+    public final IntegerField renderDistanceCaveMin = new IntegerField(Cartography, "jm.common.renderdistance_cave_min", 1, 32, 3, 101);
+    public final IntegerField renderDistanceCaveMax = new IntegerField(Cartography, "jm.common.renderdistance_cave_max", 1, 32, 3, 102);
+    public final IntegerField renderDistanceSurfaceMin = new IntegerField(Cartography, "jm.common.renderdistance_surface_min", 1, 32, 4, 103);
+    public final IntegerField renderDistanceSurfaceMax = new IntegerField(Cartography, "jm.common.renderdistance_surface_max", 1, 32, 7, 104);
+    public final IntegerField renderDelay = new IntegerField(Cartography, "jm.common.renderdelay", 0, 10, 2);
+    public final EnumField<RenderSpec.RevealShape> revealShape = new EnumField<RenderSpec.RevealShape>(Cartography, "jm.common.revealshape", RenderSpec.RevealShape.Circle);
+    public final BooleanField alwaysMapCaves = new BooleanField(Cartography, "jm.common.alwaysmapcaves", false);
+    public final BooleanField alwaysMapSurface = new BooleanField(Cartography, "jm.common.alwaysmapsurface", false);
+    public final BooleanField tileHighDisplayQuality = new BooleanField(Cartography, "jm.common.tile_display_quality", true);
+    public final IntegerField maxAnimalsData = new IntegerField(Advanced, "jm.common.radar_max_animals", 1, 128, 32);
+    public final IntegerField maxMobsData = new IntegerField(Advanced, "jm.common.radar_max_mobs", 1, 128, 32);
+    public final IntegerField maxPlayersData = new IntegerField(Advanced, "jm.common.radar_max_players", 1, 128, 32);
+    public final IntegerField maxVillagersData = new IntegerField(Advanced, "jm.common.radar_max_villagers", 1, 128, 32);
+    public final BooleanField hideSneakingEntities = new BooleanField(Advanced, "jm.common.radar_hide_sneaking", true);
+    public final IntegerField radarLateralDistance = new IntegerField(Advanced, "jm.common.radar_lateral_distance", 16, 512, 64);
+    public final IntegerField radarVerticalDistance = new IntegerField(Advanced, "jm.common.radar_vertical_distance", 8, 256, 16);
+    public final IntegerField tileRenderType = new IntegerField(Advanced, "jm.advanced.tile_render_type", 1, 4, 1);
 
-    @Config(category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class)
-    public final AtomicReference<String> logLevel = new AtomicReference<String>("INFO");
-
-    @Config(category = Advanced, key = "jm.advanced.automappoll", minValue = 500, maxValue = 10000, defaultValue = 2000)
-    public final AtomicInteger autoMapPoll = new AtomicInteger(2000);
-
-    @Config(category = Advanced, key = "jm.advanced.cache_animals", minValue = 1000, maxValue = 10000, defaultValue = 3100)
-    public final AtomicInteger cacheAnimalsData = new AtomicInteger(3100);
-
-    @Config(category = Advanced, key = "jm.advanced.cache_mobs", minValue = 1000, maxValue = 10000, defaultValue = 3000)
-    public final AtomicInteger cacheMobsData = new AtomicInteger(3000);
-
-    @Config(category = Advanced, key = "jm.advanced.cache_player", minValue = 500, maxValue = 2000, defaultValue = 1000)
-    public final AtomicInteger cachePlayerData = new AtomicInteger(1000);
-
-    @Config(category = Advanced, key = "jm.advanced.cache_players", minValue = 1000, maxValue = 10000, defaultValue = 2000)
-    public final AtomicInteger cachePlayersData = new AtomicInteger(2000);
-
-    @Config(category = Advanced, key = "jm.advanced.cache_villagers", minValue = 1000, maxValue = 10000, defaultValue = 2200)
-    public final AtomicInteger cacheVillagersData = new AtomicInteger(2200);
-
-    @Config(category = Advanced, key = "jm.advanced.announcemod", defaultBoolean = true)
-    public final AtomicBoolean announceMod = new AtomicBoolean(true);
-
-    @Config(category = Advanced, key = "jm.advanced.checkupdates", defaultBoolean = true)
-    public final AtomicBoolean checkUpdates = new AtomicBoolean(true);
-
-    @Config(category = Advanced, key = "jm.advanced.recordcachestats", defaultBoolean = false)
-    public final AtomicBoolean recordCacheStats = new AtomicBoolean(false);
-
-    @Config(category = Advanced, key = "jm.advanced.browserpoll", minValue = 1000, maxValue = 10000, defaultValue = 2000)
-    public final AtomicInteger browserPoll = new AtomicInteger(2000);
-
-    @Config(category = FullMap, key = "jm.common.ui_theme", stringListProvider = ThemeFileHandler.ThemeStringListProvider.class)
-    public final AtomicReference<String> themeName = new AtomicReference<String>(new ThemeFileHandler.ThemeStringListProvider().getDefaultString());
-
-    @Config(category = Cartography, key = "jm.common.map_style_caveignoreglass", defaultBoolean = true)
-    public final AtomicBoolean caveIgnoreGlass = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_bathymetry", defaultBoolean = false)
-    public final AtomicBoolean mapBathymetry = new AtomicBoolean(false);
-
-    @Config(category = Cartography, key = "jm.common.map_style_topography", defaultBoolean = true)
-    public final AtomicBoolean mapTopography = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_transparency", defaultBoolean = true)
-    public final AtomicBoolean mapTransparency = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_cavelighting", defaultBoolean = true)
-    public final AtomicBoolean mapCaveLighting = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_antialiasing", defaultBoolean = true)
-    public final AtomicBoolean mapAntialiasing = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_plantshadows", defaultBoolean = false)
-    public final AtomicBoolean mapPlantShadows = new AtomicBoolean(false);
-
-    @Config(category = Cartography, key = "jm.common.map_style_plants", defaultBoolean = false)
-    public final AtomicBoolean mapPlants = new AtomicBoolean(false);
-
-    @Config(category = Cartography, key = "jm.common.map_style_crops", defaultBoolean = true)
-    public final AtomicBoolean mapCrops = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.map_style_caveshowsurface", defaultBoolean = true)
-    public final AtomicBoolean mapSurfaceAboveCaves = new AtomicBoolean(true);
-
-    @Config(category = Cartography, key = "jm.common.renderdistance_cave_min", minValue = 1, maxValue = 32, defaultValue = 3, sortOrder = 101)
-    public final AtomicInteger renderDistanceCaveMin = new AtomicInteger(3);
-
-    @Config(category = Cartography, key = "jm.common.renderdistance_cave_max", minValue = 1, maxValue = 32, defaultValue = 3, sortOrder = 102)
-    public final AtomicInteger renderDistanceCaveMax = new AtomicInteger(3);
-
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface_min", minValue = 1, maxValue = 32, defaultValue = 4, sortOrder = 103)
-    public final AtomicInteger renderDistanceSurfaceMin = new AtomicInteger(4);
-
-    @Config(category = Cartography, key = "jm.common.renderdistance_surface_max", minValue = 1, maxValue = 32, defaultValue = 7, sortOrder = 104)
-    public final AtomicInteger renderDistanceSurfaceMax = new AtomicInteger(7);
-
-    @Config(category = Cartography, key = "jm.common.renderdelay", minValue = 0, maxValue = 10, defaultValue = 2)
-    public final AtomicInteger renderDelay = new AtomicInteger(2);
-
-    @Config(category = Cartography, key = "jm.common.revealshape", defaultEnum = "Circle")
-    public final AtomicReference<RenderSpec.RevealShape> revealShape = new AtomicReference<RenderSpec.RevealShape>(RenderSpec.RevealShape.Circle);
-
-    @Config(category = Cartography, key = "jm.common.alwaysmapcaves", defaultBoolean = false)
-    public final AtomicBoolean alwaysMapCaves = new AtomicBoolean();
-
-    @Config(category = Cartography, key = "jm.common.alwaysmapsurface", defaultBoolean = false)
-    public final AtomicBoolean alwaysMapSurface = new AtomicBoolean();
-
-    @Config(category = Cartography, key = "jm.common.tile_display_quality", defaultBoolean = true)
-    public final AtomicBoolean tileHighDisplayQuality = new AtomicBoolean(true);
-
-    @Config(category = Advanced, key = "jm.common.radar_max_animals", minValue = 1, maxValue = 128, defaultValue = 32)
-    public final AtomicInteger maxAnimalsData = new AtomicInteger(32);
-
-    @Config(category = Advanced, key = "jm.common.radar_max_mobs", minValue = 1, maxValue = 128, defaultValue = 32)
-    public final AtomicInteger maxMobsData = new AtomicInteger(32);
-
-    @Config(category = Advanced, key = "jm.common.radar_max_players", minValue = 1, maxValue = 128, defaultValue = 32)
-    public final AtomicInteger maxPlayersData = new AtomicInteger(32);
-
-    @Config(category = Advanced, key = "jm.common.radar_max_villagers", minValue = 1, maxValue = 128, defaultValue = 32)
-    public final AtomicInteger maxVillagersData = new AtomicInteger(32);
-
-    @Config(category = Advanced, key = "jm.common.radar_hide_sneaking", defaultBoolean = true)
-    public final AtomicBoolean hideSneakingEntities = new AtomicBoolean(true);
-
-    @Config(category = Advanced, key = "jm.common.radar_lateral_distance", minValue = 16, maxValue = 512, defaultValue = 64)
-    public final AtomicInteger radarLateralDistance = new AtomicInteger(64);
-
-    @Config(category = Advanced, key = "jm.common.radar_vertical_distance", minValue = 8, maxValue = 256, defaultValue = 16)
-    public final AtomicInteger radarVerticalDistance = new AtomicInteger(16);
-
-    @Config(category = Advanced, key = "jm.advanced.tile_render_type", minValue = 1, maxValue = 4, defaultValue = 1)
-    public final AtomicInteger tileRenderType = new AtomicInteger(1);
-
+    // Hidden (not shown in Options Manager
+    public final BooleanField mappingEnabled = new BooleanField(Category.Hidden, "", true);
+    public final EnumField<RenderGameOverlayEvent.ElementType> renderOverlayEventTypeName = new EnumField<RenderGameOverlayEvent.ElementType>(Category.Hidden, "", RenderGameOverlayEvent.ElementType.ALL);
+    public final BooleanField renderOverlayPreEvent = new BooleanField(Category.Hidden, "", true);
+    public final StringField optionsManagerViewed = new StringField(Category.Hidden, "", null);
+    public final StringField splashViewed = new StringField(Category.Hidden, "", null);
     public final GridSpecs gridSpecs = new GridSpecs();
-    public final AtomicBoolean mappingEnabled = new AtomicBoolean(true);
-    public final AtomicReference<String> renderOverlayEventTypeName = new AtomicReference<String>(RenderGameOverlayEvent.ElementType.ALL.name());
-    public final AtomicBoolean renderOverlayPreEvent = new AtomicBoolean(true);
-    public final AtomicReference<String> optionsManagerViewed = new AtomicReference<String>("");
-    public final AtomicReference<String> splashViewed = new AtomicReference<String>("");
-
-    protected transient final String name = "core";
 
     public CoreProperties()
     {
@@ -163,7 +84,7 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
     @Override
     public String getName()
     {
-        return name;
+        return "core";
     }
 
     @Override
@@ -172,44 +93,41 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
 
-    public RenderGameOverlayEvent.ElementType getRenderOverlayEventType()
+    @Override
+    public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
-        return Enum.valueOf(RenderGameOverlayEvent.ElementType.class, renderOverlayEventTypeName.get());
+        super.updateFrom(otherInstance);
+        if (otherInstance instanceof CoreProperties)
+        {
+            this.gridSpecs.updateFrom(((CoreProperties) otherInstance).gridSpecs);
+        }
     }
 
-    /**
-     * Should return true if save needed after validation.
-     *
-     * @return
-     */
     @Override
-    protected boolean validate()
+    public boolean isValid(boolean fix)
     {
-        boolean saveNeeded = super.validate();
+        boolean valid = super.isValid(fix);
 
-        if (renderDistanceCaveMax.get() < renderDistanceCaveMin.get())
+        if (FMLClientHandler.instance().getClient() != null)
         {
-            renderDistanceCaveMax.set(renderDistanceCaveMin.get());
-            saveNeeded = true;
-        }
-
-        if (renderDistanceSurfaceMax.get() < renderDistanceSurfaceMin.get())
-        {
-            renderDistanceSurfaceMax.set(renderDistanceSurfaceMin.get());
-            saveNeeded = true;
-        }
-
-        int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
-        for (AtomicInteger prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
-        {
-            if (prop.get() > gameRenderDistance)
+            int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
+            for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
             {
-                prop.set(gameRenderDistance);
-                saveNeeded = true;
+                if (prop.get() > gameRenderDistance)
+                {
+                    warn(String.format("Render distance %s is less than %s", gameRenderDistance, prop.getDeclaredField()));
+                    if (fix)
+                    {
+                        prop.set(gameRenderDistance);
+                    }
+                    else
+                    {
+                        valid = false;
+                    }
+                }
             }
         }
-
-        return saveNeeded;
+        return valid;
     }
 
     public boolean hasValidCaveRenderDistances()
@@ -220,79 +138,5 @@ public class CoreProperties extends ClientProperties implements Comparable<CoreP
     public boolean hasValidSurfaceRenderDistances()
     {
         return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        CoreProperties that = (CoreProperties) o;
-        return 0 == that.compareTo(this);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(announceMod, autoMapPoll, browserPoll, cacheAnimalsData, cacheMobsData, cachePlayerData,
-                cachePlayersData, cacheVillagersData, caveIgnoreGlass, checkUpdates, renderDelay, hideSneakingEntities,
-                logLevel, mapAntialiasing, mapBathymetry, mapCaveLighting, mapCrops, mapPlants, mapPlantShadows,
-                mapSurfaceAboveCaves, mapTransparency, maxAnimalsData, maxMobsData, maxPlayersData, maxVillagersData,
-                name, radarLateralDistance, radarVerticalDistance, recordCacheStats, renderOverlayEventTypeName,
-                renderOverlayPreEvent, renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin,
-                renderDistanceSurfaceMax, revealShape, themeName, gridSpecs);
-    }
-
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper(this)
-                .add("announceMod", announceMod)
-                .add("autoMapPoll", autoMapPoll)
-                .add("browserPoll", browserPoll)
-                .add("cacheAnimalsData", cacheAnimalsData)
-                .add("cacheMobsData", cacheMobsData)
-                .add("cachePlayerData", cachePlayerData)
-                .add("cachePlayersData", cachePlayersData)
-                .add("cacheVillagersData", cacheVillagersData)
-                .add("caveIgnoreGlass", caveIgnoreGlass)
-                .add("isUpdateCheckEnabled", checkUpdates)
-                .add("renderDelay", renderDelay)
-                .add("hideSneakingEntities", hideSneakingEntities)
-                .add("logLevel", logLevel)
-                .add("mapAntialiasing", mapAntialiasing)
-                .add("mapBathymetry", mapBathymetry)
-                .add("mapCaveLighting", mapCaveLighting)
-                .add("mapCrops", mapCrops)
-                .add("mapPlants", mapPlants)
-                .add("mapPlantShadows", mapPlantShadows)
-                .add("mapSurfaceAboveCaves", mapSurfaceAboveCaves)
-                .add("tileHighDisplayQuality", tileHighDisplayQuality)
-                .add("mapTransparency", mapTransparency)
-                .add("maxAnimalsData", maxAnimalsData)
-                .add("maxMobsData", maxMobsData)
-                .add("maxPlayersData", maxPlayersData)
-                .add("maxVillagersData", maxVillagersData)
-                .add("optionsManagerViewed", optionsManagerViewed)
-                .add("radarLateralDistance", radarLateralDistance)
-                .add("radarVerticalDistance", radarVerticalDistance)
-                .add("recordCacheStats", recordCacheStats)
-                .add("renderOverlayEventTypeName", renderOverlayEventTypeName)
-                .add("renderOverlayPreEvent", renderOverlayPreEvent)
-                .add("renderDistanceCaveMin", renderDistanceCaveMin)
-                .add("renderDistanceCaveMax", renderDistanceCaveMax)
-                .add("renderDistanceSurfaceMin", renderDistanceSurfaceMin)
-                .add("renderDistanceSurfaceMax", renderDistanceSurfaceMax)
-                .add("revealShape", revealShape)
-                .add("themeName", themeName)
-                .add("tileRenderType", tileRenderType)
-                .toString();
     }
 }

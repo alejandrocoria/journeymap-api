@@ -250,6 +250,8 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
+        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+
         if (returnDisplay == null)
         {
             if (mc.theWorld != null)
@@ -263,6 +265,10 @@ public abstract class JmUI extends GuiScreen
         }
         else
         {
+            if (returnDisplay instanceof JmUI)
+            {
+                ((JmUI) returnDisplay).returnDisplay = null;
+            }
             UIManager.getInstance().open(returnDisplay);
         }
     }

@@ -12,13 +12,14 @@ import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
+import journeymap.client.properties.ClientCategory;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.*;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -392,7 +393,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openOptionsManager(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
+            UIManager.getInstance().openOptionsManager(this, ClientCategory.Waypoint, ClientCategory.WaypointBeacon);
             return;
         }
     }
@@ -597,7 +598,7 @@ public class WaypointManager extends JmUI
         }
     }
 
-    Map<Config.Category, List<SlotMetadata>> getToolbars()
+    Map<Category, List<SlotMetadata>> getToolbars()
     {
         return Collections.EMPTY_MAP;
     }

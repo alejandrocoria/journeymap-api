@@ -9,28 +9,25 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.StringField;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by mwoodman on 6/24/2014.
  */
-public class IconSetButton extends Button implements IPropertyHolder<AtomicReference<String>, String>
+public class IconSetButton extends Button implements IConfigFieldHolder<StringField>
 {
     final String messageKey;
-    final CommonProperties baseProperties;
-    final AtomicReference<String> valueHolder;
+    final StringField field;
     final ArrayList<Object> validNames;
 
-    public IconSetButton(CommonProperties baseProperties, AtomicReference<String> valueHolder, List validNames, String messageKey)
+    public IconSetButton(StringField field, List validNames, String messageKey)
     {
         super(0, 0, Constants.getString(messageKey, ""));
-        this.baseProperties = baseProperties;
-        this.valueHolder = valueHolder;
+        this.field = field;
         this.validNames = new ArrayList<Object>(validNames);
         this.messageKey = messageKey;
         updateLabel();
@@ -41,13 +38,13 @@ public class IconSetButton extends Button implements IPropertyHolder<AtomicRefer
 
     protected void updateLabel()
     {
-        if (!validNames.contains(valueHolder.get()))
+        if (!validNames.contains(field.get()))
         {
-            valueHolder.set(validNames.get(0).toString());
-            baseProperties.save();
+            field.set(validNames.get(0).toString());
+            field.save();
         }
 
-        displayString = getSafeLabel(valueHolder.get());
+        displayString = getSafeLabel(field.get());
     }
 
     protected String getSafeLabel(String label)
@@ -75,39 +72,22 @@ public class IconSetButton extends Button implements IPropertyHolder<AtomicRefer
 
     public void nextValue()
     {
-        int index = validNames.indexOf(valueHolder.get()) + 1;
+        int index = validNames.indexOf(field.get()) + 1;
 
         if (index == validNames.size() || index < 0)
         {
             index = 0;
         }
 
-        valueHolder.set(validNames.get(index).toString());
-        baseProperties.save();
+        field.set(validNames.get(index).toString());
+        field.save();
 
         updateLabel();
     }
 
     @Override
-    public AtomicReference<String> getProperty()
+    public StringField getConfigField()
     {
-        return valueHolder;
-    }
-
-    @Override
-    public String getPropertyValue()
-    {
-        return valueHolder.get();
-    }
-
-    @Override
-    public void setPropertyValue(String value)
-    {
-        if (valueHolder == null)
-        {
-            return;
-        }
-        valueHolder.set(value);
-        baseProperties.save();
+        return field;
     }
 }
