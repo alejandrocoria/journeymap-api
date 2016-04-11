@@ -87,7 +87,7 @@ public class MiniMapProperties extends InGameMapProperties
      */
     public int getSize()
     {
-        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * FMLClientHandler.instance().getClient().displayHeight));
+        return (int) Math.max(128, Math.floor((sizePercent.get() / 100.0) * ForgeHelper.INSTANCE.getClient().displayHeight));
     }
 
     @Override
