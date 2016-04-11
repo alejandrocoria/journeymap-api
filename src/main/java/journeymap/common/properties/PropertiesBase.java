@@ -60,7 +60,7 @@ public abstract class PropertiesBase
     private transient Map<String, ConfigField<?>> configFields;
 
     // Current state, just used for debugging.
-    protected State currentState;
+    protected transient State currentState;
 
     /**
      * Default constructor.
