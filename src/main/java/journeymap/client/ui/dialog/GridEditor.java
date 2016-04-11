@@ -24,6 +24,9 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.properties.Category;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL12;
@@ -32,8 +35,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class GridEditor extends JmUI
 {
@@ -93,9 +94,9 @@ public class GridEditor extends JmUI
                 // Top
                 buttonStyle = new ListPropertyButton<GridSpec.Style>(EnumSet.allOf(GridSpec.Style.class),
                         Constants.getString("jm.common.grid_style"),
-                        null, new AtomicReference<GridSpec.Style>(spec.style));
+                        new EnumField<GridSpec.Style>(Category.Hidden, "", spec.style));
 
-                buttonOpacity = new IntSliderButton(null, new AtomicInteger((int) Math.ceil(spec.alpha * 100)), Constants.getString("jm.common.grid_opacity") + " : ", "", 0, 100, true);
+                buttonOpacity = new IntSliderButton(new IntegerField(Category.Hidden, "", 0, 100, (int) Math.ceil(spec.alpha * 100)), Constants.getString("jm.common.grid_opacity") + " : ", "", 0, 100, true);
                 topButtons = new ButtonList(buttonStyle, buttonOpacity);
                 topButtons.equalizeWidths(getFontRenderer());
 
@@ -407,7 +408,7 @@ public class GridEditor extends JmUI
         int colorX = activeSpec.getColorX();
         int colorY = activeSpec.getColorY();
 
-        GridSpec newSpec = new GridSpec(buttonStyle.getValueHolder().get(), new Color(activeColor), (float) buttonOpacity.getValue() / 100f).setColorCoords(colorX, colorY);
+        GridSpec newSpec = new GridSpec(buttonStyle.getField().get(), new Color(activeColor), (float) buttonOpacity.getValue() / 100f).setColorCoords(colorX, colorY);
 
         if (checkDay.getToggled())
         {

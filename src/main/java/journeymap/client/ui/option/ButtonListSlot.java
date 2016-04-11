@@ -174,7 +174,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     {
         for (SlotMetadata slot : buttonOptionMetadata.values())
         {
-            if (slot.button.keyTyped(c, i))
+            if (slot.button.isMouseOver() && slot.button.keyTyped(c, i))
             {
                 lastPressed = slot;
                 return true;

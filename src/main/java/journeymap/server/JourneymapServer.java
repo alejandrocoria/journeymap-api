@@ -10,6 +10,8 @@ package journeymap.server;
 
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.migrate.Migration;
 import journeymap.common.network.PacketHandler;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.oldservercode.chat.ChatHandler;
@@ -29,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -73,7 +76,22 @@ public class JourneymapServer implements CommonProxy
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event)
     {
-        ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
+        try
+        {
+            // Migrate tasks
+            boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
+
+            // TODO: Move the dir name to a constant
+            ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
+        }
+        catch (Throwable t)
+        {
+            if (logger == null)
+            {
+                logger = LogManager.getLogger(Journeymap.MOD_ID);
+            }
+            logger.error(LogFormatter.toString(t));
+        }
     }
 
     /**

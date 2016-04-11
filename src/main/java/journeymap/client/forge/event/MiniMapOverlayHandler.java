@@ -44,7 +44,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
 
     public static void checkEventConfig()
     {
-        EVENT_TYPE = JourneymapClient.getCoreProperties().getRenderOverlayEventType();
+        EVENT_TYPE = JourneymapClient.getCoreProperties().renderOverlayEventTypeName.get();
         EVENT_PRE = JourneymapClient.getCoreProperties().renderOverlayPreEvent.get();
     }
 

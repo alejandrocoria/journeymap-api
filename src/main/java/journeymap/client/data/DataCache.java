@@ -458,6 +458,20 @@ public class DataCache
         }
     }
 
+    public void stopChunkMDRetention()
+    {
+        synchronized (chunkMetadata)
+        {
+            for (ChunkMD chunkMD : chunkMetadata.asMap().values())
+            {
+                if (chunkMD != null)
+                {
+                    chunkMD.stopChunkRetention();
+                }
+            }
+        }
+    }
+
     public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, ChunkMD> listener)
     {
         synchronized (chunkMetadataRemovalListener)
@@ -487,7 +501,7 @@ public class DataCache
     public void purge()
     {
         // Flush images, do syncronously to ensure it's done before cache invalidates
-        RegionImageCache.instance().flushToDisk(false);
+        RegionImageCache.instance().flushToDisk(false, false);
 
         synchronized (managedCaches)
         {

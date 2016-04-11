@@ -9,7 +9,7 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 import se.rupy.http.Event;
 
 import java.util.Arrays;
@@ -50,7 +50,7 @@ public class MapApiService extends FileService
         throw event;
     }
 
-    public static class TopLevelDomains implements StringListProvider
+    public static class TopLevelDomains implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()

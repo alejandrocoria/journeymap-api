@@ -34,12 +34,9 @@ public class Constants
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     private static final Joiner path = Joiner.on(File.separator).useForNull("");
     private static final String END = null;
-    public static String JOURNEYMAP_DIR_LEGACY = "journeyMap";
-    public static String JOURNEYMAP_DIR_BACKUP = "journeymap_bak";
     public static String JOURNEYMAP_DIR = "journeymap";
     public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
     public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", Journeymap.JM_VERSION.toMajorMinorString(), END);
-    public static String CACHE_DIR = path.join(JOURNEYMAP_DIR, "cache", END);
     public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
     public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
     public static String MP_DATA_DIR = path.join(DATA_DIR, WorldType.mp, END);
@@ -107,12 +104,25 @@ public class Constants
      */
     public static String getString(String key)
     {
-        String result = I18n.format(key);
-        if (result.equals(key))
+        if (FMLClientHandler.instance().getClient() == null)
         {
-            Journeymap.getLogger().warn("Message key not found: " + key);
+            return key;
         }
-        return result;
+
+        try
+        {
+            String result = I18n.format(key);
+            if (result.equals(key))
+            {
+                Journeymap.getLogger().warn("Message key not found: " + key);
+            }
+            return result;
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().warn(String.format("Message key '%s' threw exception: %s", key, t.getMessage()));
+            return key;
+        }
     }
 
     /**
@@ -124,12 +134,25 @@ public class Constants
      */
     public static String getString(String key, Object... params)
     {
-        String result = I18n.format(key, params);
-        if (result.equals(key))
+        if (FMLClientHandler.instance().getClient() == null)
         {
-            Journeymap.getLogger().warn("Message key not found: " + key);
+            return String.format("%s (%s)", key, Joiner.on(",").join(params));
         }
-        return result;
+
+        try
+        {
+            String result = I18n.format(key, params);
+            if (result.equals(key))
+            {
+                Journeymap.getLogger().warn("Message key not found: " + key);
+            }
+            return result;
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().warn(String.format("Message key '%s' threw exception: %s", key, t.getMessage()));
+            return key;
+        }
     }
 
     /**

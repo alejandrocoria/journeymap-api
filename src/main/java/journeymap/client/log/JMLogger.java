@@ -14,8 +14,8 @@ import journeymap.client.feature.FeatureManager;
 import journeymap.client.io.FileHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.CommonProperties;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.PropertiesBase;
+import journeymap.common.properties.config.StringField;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeVersion;
 import org.apache.logging.log4j.Level;
@@ -182,7 +182,7 @@ public class JMLogger
 
         // Add config files
         JourneymapClient jm = JourneymapClient.getInstance();
-        List<? extends CommonProperties> configs = Arrays.asList(
+        List<? extends PropertiesBase> configs = Arrays.asList(
                 JourneymapClient.getMiniMapProperties1(),
                 JourneymapClient.getMiniMapProperties2(),
                 JourneymapClient.getFullMapProperties(),
@@ -191,7 +191,7 @@ public class JMLogger
                 JourneymapClient.getCoreProperties()
         );
 
-        for (CommonProperties config : configs)
+        for (PropertiesBase config : configs)
         {
             // TODO: Only show non-default values?
             sb.append(LogFormatter.LINEBREAK).append(config);
@@ -232,7 +232,7 @@ public class JMLogger
         }
     }
 
-    public static class LogLevelStringProvider implements StringListProvider
+    public static class LogLevelStringProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()

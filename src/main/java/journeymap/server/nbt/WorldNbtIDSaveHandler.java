@@ -50,7 +50,7 @@ public class WorldNbtIDSaveHandler
 
         // TODO: Remove this migration when we update to MC 1.9+
         // Migrate old worldID to new system.
-        if (legacyData.getData().hasKey(LEGACY_WORLD_ID_KEY))
+        if (legacyData != null && legacyData.getData().hasKey(LEGACY_WORLD_ID_KEY))
         {
             String worldId = legacyData.getData().getString(LEGACY_WORLD_ID_KEY);
 

@@ -24,9 +24,7 @@ import org.apache.logging.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.locks.ReentrantLock;
@@ -182,16 +180,16 @@ public class ImageHolder implements IThreadedFileIO
         }
         else
         {
-            if (async)
+//            if (async)
             {
                 // Experimental:  Use Minecraft's IO manager thread
                 ThreadedFileIOBase.getThreadedIOInstance().queueIO(this);
                 return true;
             }
-            else
-            {
-                return !writeNextIO();
-            }
+//            else
+//            {
+//                return !writeNextIO();
+//            }
         }
     }
 
@@ -263,15 +261,17 @@ public class ImageHolder implements IThreadedFileIO
         BufferedImage image = texture.getImage();
         if (image != null)
         {
+
             File imageFile = imagePath.toFile();
             if (!imageFile.exists())
             {
                 imageFile.getParentFile().mkdirs();
             }
 
-            BufferedOutputStream imageOutputStream = new BufferedOutputStream(new FileOutputStream(imageFile));
-            ImageIO.write(image, "PNG", imageOutputStream);
-            imageOutputStream.close();
+            //long start = System.nanoTime();
+            ImageIO.write(image, "PNG", imageFile);
+            //long stop = System.nanoTime();
+            //logger.info("image write: " + TimeUnit.NANOSECONDS.toMillis(stop-start) + "ms   " + imageFile);
 
             if (debug)
             {

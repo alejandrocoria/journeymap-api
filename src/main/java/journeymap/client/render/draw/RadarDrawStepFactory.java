@@ -48,7 +48,7 @@ public class RadarDrawStepFactory
 
             String playername = ForgeHelper.INSTANCE.getEntityName(FMLClientHandler.instance().getClient().thePlayer);
             TextureCache tc = TextureCache.instance();
-            String iconSetName = mapProperties.getEntityIconSetName().get();
+            String iconSetName = mapProperties.entityIconSetName.get();
 
             for (EntityDTO dto : entityDTOs)
             {

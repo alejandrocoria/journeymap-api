@@ -142,7 +142,6 @@ public class FullscreenActions extends JmUI
 
         buttonEnableMapping = new BooleanPropertyButton(Constants.getString("jm.common.enable_mapping_false"),
                 Constants.getString("jm.common.enable_mapping_true"),
-                JourneymapClient.getCoreProperties(),
                 JourneymapClient.getCoreProperties().mappingEnabled);
 
         buttonList.add(buttonAbout);

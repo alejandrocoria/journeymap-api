@@ -22,7 +22,7 @@ import journeymap.client.ui.waypoint.WaypointEditor;
 import journeymap.client.ui.waypoint.WaypointManager;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -332,7 +332,7 @@ public enum UIManager
         open(OptionsManager.class);
     }
 
-    public void openOptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
+    public void openOptionsManager(JmUI returnDisplay, Category... initialCategories)
     {
         try
         {

@@ -19,6 +19,7 @@ import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.io.nbt.RegionLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.*;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -98,7 +99,7 @@ public class MapRegionTask extends BaseMapTask
         for (ChunkCoordIntPair coord : retainedCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
-            if (chunkMD != null)
+            if (chunkMD != null && !chunkMD.getChunk().isEmpty())
             {
                 DataCache.instance().addChunkMD(chunkMD);
             }
@@ -107,9 +108,10 @@ public class MapRegionTask extends BaseMapTask
         for (ChunkCoordIntPair coord : chunkCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
-            if (chunkMD != null)
+            if (chunkMD != null && chunkMD.hasChunk())
             {
                 DataCache.instance().addChunkMD(chunkMD);
+                //System.out.println("Added: " + coord);
             }
             else
             {
@@ -119,7 +121,7 @@ public class MapRegionTask extends BaseMapTask
 
         if (chunkCoords.size() - missing > 0)
         {
-            logger.info(String.format("Potential chunks to map in %s: %s (out of %s)", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
+            logger.info(String.format("Potential chunks to map in %s: %s of %s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
             super.performTask(mc, jm, jmWorldDir, threadLogging);
         }
         else
@@ -133,9 +135,12 @@ public class MapRegionTask extends BaseMapTask
     {
         lastTaskCompleted = System.currentTimeMillis();
 
-        // Flush any images to disk, but do it synchronously on this thread.
-        RegionImageCache.instance().flushToDisk(false);
-        DataCache.instance().invalidateChunkMDCache();
+        // Flush images to disk
+        RegionImageCache.instance().flushToDisk(true, true);
+
+        // Ensure no chunks are forcefully retained.
+        DataCache.instance().stopChunkMDRetention();
+
         if (hadError || cancelled)
         {
             logger.warn("MapRegionTask cancelled %s hadError %s", cancelled, hadError);
@@ -214,8 +219,7 @@ public class MapRegionTask extends BaseMapTask
                     }
                     else
                     {
-                        final long time = minecraft.theWorld.getWorldInfo().getWorldTime() % 24000L;
-                        mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
+                        mapType = Fullscreen.state().getMapType(false);
                     }
 
                     Boolean mapAll = params == null ? false : (Boolean) params;
@@ -265,7 +269,7 @@ public class MapRegionTask extends BaseMapTask
             if (regionLoader != null)
             {
                 // Write files synchronously before clearing
-                RegionImageCache.instance().flushToDisk(false);
+                RegionImageCache.instance().flushToDisk(true, false);
                 RegionImageCache.instance().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;

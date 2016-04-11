@@ -5,125 +5,37 @@
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
-
 package journeymap.client.properties;
 
-import com.google.common.base.Objects;
-import journeymap.common.properties.config.Config;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.IntegerField;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static journeymap.common.properties.config.Config.Category.Waypoint;
-import static journeymap.common.properties.config.Config.Category.WaypointBeacon;
+import static journeymap.client.properties.ClientCategory.Waypoint;
+import static journeymap.client.properties.ClientCategory.WaypointBeacon;
 
 /**
  * Properties for in-game waypoint management and display.
  */
-public class WaypointProperties extends ClientProperties implements Comparable<WaypointProperties>
+public class WaypointProperties extends ClientPropertiesBase implements Comparable<WaypointProperties>
 {
-    @Config(category = Waypoint, master = true, key = "jm.waypoint.enable_manager")
-    public final AtomicBoolean managerEnabled = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, master = true, key = "jm.waypoint.enable_beacons")
-    public final AtomicBoolean beaconEnabled = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.show_texture")
-    public final AtomicBoolean showTexture = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.show_static_beam")
-    public final AtomicBoolean showStaticBeam = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.show_rotating_beam")
-    public final AtomicBoolean showRotatingBeam = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.show_name")
-    public final AtomicBoolean showName = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.show_distance")
-    public final AtomicBoolean showDistance = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.auto_hide_label")
-    public final AtomicBoolean autoHideLabel = new AtomicBoolean(true);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.bold_label", defaultBoolean = false)
-    public final AtomicBoolean boldLabel = new AtomicBoolean(false);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.font_scale", minValue = 1, maxValue = 3, defaultValue = 2)
-    public final AtomicInteger fontScale = new AtomicInteger(2);
-
-    @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
-    public final AtomicBoolean textureSmall = new AtomicBoolean(true);
-
-    @Config(category = Waypoint, key = "jm.waypoint.max_distance", minValue = 0, maxValue = 10000, defaultValue = 0)
-    public final AtomicInteger maxDistance = new AtomicInteger(0);
-
-    @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")
-    public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
-
-    protected transient final String name = "waypoint";
+    public final BooleanField managerEnabled = new BooleanField(Waypoint, "jm.waypoint.enable_manager", true, true);
+    public final BooleanField beaconEnabled = new BooleanField(WaypointBeacon, "jm.waypoint.enable_beacons", true, true);
+    public final BooleanField showTexture = new BooleanField(WaypointBeacon, "jm.waypoint.show_texture", true);
+    public final BooleanField showStaticBeam = new BooleanField(WaypointBeacon, "jm.waypoint.show_static_beam", true);
+    public final BooleanField showRotatingBeam = new BooleanField(WaypointBeacon, "jm.waypoint.show_rotating_beam", true);
+    public final BooleanField showName = new BooleanField(WaypointBeacon, "jm.waypoint.show_name", true);
+    public final BooleanField showDistance = new BooleanField(WaypointBeacon, "jm.waypoint.show_distance", true);
+    public final BooleanField autoHideLabel = new BooleanField(WaypointBeacon, "jm.waypoint.auto_hide_label", true);
+    public final BooleanField boldLabel = new BooleanField(WaypointBeacon, "jm.waypoint.bold_label", false);
+    public final IntegerField fontScale = new IntegerField(WaypointBeacon, "jm.waypoint.font_scale", 1, 3, 2);
+    public final BooleanField textureSmall = new BooleanField(WaypointBeacon, "jm.waypoint.texture_size", true);
+    public final IntegerField maxDistance = new IntegerField(Waypoint, "jm.waypoint.max_distance", 0, 10000, 0);
+    public final BooleanField createDeathpoints = new BooleanField(Waypoint, "jm.waypoint.create_deathpoints", true);
 
     @Override
     public String getName()
     {
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        WaypointProperties that = (WaypointProperties) o;
-        return 0 == this.compareTo(that);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = managerEnabled.hashCode();
-        result = 31 * result + beaconEnabled.hashCode();
-        result = 31 * result + showTexture.hashCode();
-        result = 31 * result + showStaticBeam.hashCode();
-        result = 31 * result + showRotatingBeam.hashCode();
-        result = 31 * result + showName.hashCode();
-        result = 31 * result + showDistance.hashCode();
-        result = 31 * result + autoHideLabel.hashCode();
-        result = 31 * result + boldLabel.hashCode();
-        result = 31 * result + fontScale.hashCode();
-        result = 31 * result + textureSmall.hashCode();
-        result = 31 * result + maxDistance.hashCode();
-        result = 31 * result + createDeathpoints.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper(this)
-                .add("autoHideLabel", autoHideLabel)
-                .add("beaconEnabled", beaconEnabled)
-                .add("boldLabel", boldLabel)
-                .add("createDeathpoints", createDeathpoints)
-                .add("fontScale", fontScale)
-                .add("managerEnabled", managerEnabled)
-                .add("maxDistance", maxDistance)
-                .add("name", name)
-                .add("showDistance", showDistance)
-                .add("showName", showName)
-                .add("showRotatingBeam", showRotatingBeam)
-                .add("showStaticBeam", showStaticBeam)
-                .add("showTexture", showTexture)
-                .add("textureSmall", textureSmall)
-                .toString();
+        return "waypoint";
     }
 
     @Override
@@ -131,5 +43,4 @@ public class WaypointProperties extends ClientProperties implements Comparable<W
     {
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
-
 }

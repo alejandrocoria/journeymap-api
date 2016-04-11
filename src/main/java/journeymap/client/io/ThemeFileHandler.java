@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.UIManager;
@@ -20,7 +21,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.StringListProvider;
+import journeymap.common.properties.config.StringField;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class ThemeFileHandler
 
     public static File getThemeIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.THEME_ICON_DIR);
+        File dir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, Constants.THEME_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
@@ -140,13 +141,23 @@ public class ThemeFileHandler
 
     public static List<String> getThemeNames()
     {
-        List<Theme> themes = getThemes();
+        List<Theme> themes = null;
+        try
+        {
+            themes = getThemes();
+        }
+        catch (Exception e)
+        {
+            themes = ThemePresets.getPresets();
+        }
+
         ArrayList<String> names = new ArrayList<String>(themes.size());
         for (Theme theme : themes)
         {
             names.add(theme.name);
         }
         return names;
+
     }
 
     public static Theme getCurrentTheme()
@@ -269,14 +280,33 @@ public class ThemeFileHandler
 
     public static Theme getDefaultTheme()
     {
-        Theme.DefaultPointer pointer = loadDefaultPointer();
-        pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
+        if(FMLClientHandler.instance().getClient()==null)
+        {
+            return ThemePresets.THEME_VICTORIAN;
+        }
 
-        File themeFile = getThemeFile(pointer.directory, pointer.filename);
-        Theme theme = loadThemeFromFile(themeFile, false);
+        Theme theme = null;
+        File themeFile = null;
+        Theme.DefaultPointer pointer = null;
+        try
+        {
+            pointer = loadDefaultPointer();
+            pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
+
+            themeFile = getThemeFile(pointer.directory, pointer.filename);
+            theme = loadThemeFromFile(themeFile, false);
+        }
+        catch (Exception e)
+        {
+            JMLogger.logOnce("Default theme not found in files", e);
+        }
+
         if (theme == null)
         {
-            JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+            if (pointer != null)
+            {
+                JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+            }
             theme = ThemePresets.THEME_VICTORIAN;
         }
         return theme;
@@ -303,9 +333,9 @@ public class ThemeFileHandler
      */
     private static Theme.DefaultPointer loadDefaultPointer()
     {
-        ensureDefaultThemeFile();
         try
         {
+            ensureDefaultThemeFile();
             File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
             if (defaultThemeFile.exists())
             {
@@ -325,7 +355,7 @@ public class ThemeFileHandler
         return null;
     }
 
-    public static class ThemeStringListProvider implements StringListProvider
+    public static class ThemeValuesProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()

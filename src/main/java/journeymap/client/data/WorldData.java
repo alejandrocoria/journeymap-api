@@ -317,7 +317,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
         browser_poll = Math.max(1000, JourneymapClient.getCoreProperties().browserPoll.get());
 
-        iconSetName = JourneymapClient.getFullMapProperties().getEntityIconSetName().get();
+        iconSetName = JourneymapClient.getFullMapProperties().entityIconSetName.get();
         iconSetNames = IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
 
         return this;

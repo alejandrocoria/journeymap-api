@@ -20,7 +20,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.io.migrate.Migration;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
@@ -40,12 +39,11 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.migrate.Migration;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -72,7 +70,8 @@ public class JourneymapClient implements CommonProxy
     private volatile CoreProperties coreProperties;
     private volatile FullMapProperties fullMapProperties;
     private volatile MiniMapProperties miniMapProperties1;
-    private volatile MiniMapProperties2 miniMapProperties2;
+    private volatile MiniMapProperties miniMapProperties2;
+    private volatile TopoProperties topoProperties;
     private volatile WebMapProperties webMapProperties;
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
@@ -144,6 +143,14 @@ public class JourneymapClient implements CommonProxy
     public static FullMapProperties getFullMapProperties()
     {
         return instance.fullMapProperties;
+    }
+
+    /**
+     * Get the core properties.
+     */
+    public static TopoProperties getTopoProperties()
+    {
+        return instance.topoProperties;
     }
 
     /**
@@ -263,7 +270,7 @@ public class JourneymapClient implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Migrate tasks
-            boolean migrationOk = new Migration().performTasks();
+            boolean migrationOk = new Migration("journeymap.client.task.migrate").performTasks();
 
             // Ensure logger inits
             logger = JMLogger.init();
@@ -319,7 +326,7 @@ public class JourneymapClient implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Get ref to Minecraft
-            mc = FMLClientHandler.instance().getClient();
+            mc = ForgeHelper.INSTANCE.getClient();
 
             // Main thread task controller
             mainThreadTaskController = new MainTaskController(mc, this);
@@ -489,7 +496,7 @@ public class JourneymapClient implements CommonProxy
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
-            int dimension = ForgeHelper.INSTANCE.getDimension();
+            int dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld);
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
                     dimension,
@@ -509,8 +516,8 @@ public class JourneymapClient implements CommonProxy
         {
             if ((isMapping()) && mc != null)
             {
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension()));
-                RegionImageCache.instance().flushToDisk(false);
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
+                RegionImageCache.instance().flushToDisk(false, true);
             }
 
             if (multithreadTaskController != null)
@@ -520,7 +527,7 @@ public class JourneymapClient implements CommonProxy
                 multithreadTaskController = null;
             }
 
-            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension() : 0;
+            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension(mc.theWorld) : 0;
 
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
         }
@@ -606,16 +613,57 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Load all the properties from their files.
+     * (Re)load all the properties from their files.
+     */
+    public void saveConfigProperties()
+    {
+        if (coreProperties != null)
+        {
+            coreProperties.save();
+        }
+        if (fullMapProperties != null)
+        {
+            fullMapProperties.save();
+        }
+        if (miniMapProperties1 != null)
+        {
+            miniMapProperties1.save();
+        }
+        if (miniMapProperties2 != null)
+        {
+            miniMapProperties2.save();
+        }
+        if (miniMapProperties2 != null)
+        {
+            miniMapProperties2.save();
+        }
+        if (topoProperties != null)
+        {
+            topoProperties.save();
+        }
+        if (webMapProperties != null)
+        {
+            webMapProperties.save();
+        }
+        if (waypointProperties != null)
+        {
+            waypointProperties.save();
+        }
+    }
+
+    /**
+     * (Re)load all the properties from their files.
      */
     public void loadConfigProperties()
     {
-        coreProperties = CommonProperties.reload(coreProperties, CoreProperties.class);
-        fullMapProperties = CommonProperties.reload(fullMapProperties, FullMapProperties.class);
-        miniMapProperties1 = CommonProperties.reload(miniMapProperties1, MiniMapProperties.class);
-        miniMapProperties2 = CommonProperties.reload(miniMapProperties2, MiniMapProperties2.class);
-        webMapProperties = CommonProperties.reload(webMapProperties, WebMapProperties.class);
-        waypointProperties = CommonProperties.reload(waypointProperties, WaypointProperties.class);
+        saveConfigProperties();
+        coreProperties = new CoreProperties().load();
+        fullMapProperties = new FullMapProperties().load();
+        miniMapProperties1 = new MiniMapProperties(1).load();
+        miniMapProperties2 = new MiniMapProperties(2).load();
+        topoProperties = new TopoProperties().load();
+        webMapProperties = new WebMapProperties().load();
+        waypointProperties = new WaypointProperties().load();
     }
 
     /**

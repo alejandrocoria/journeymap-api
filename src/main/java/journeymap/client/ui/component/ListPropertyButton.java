@@ -9,7 +9,7 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.cartography.RGB;
-import journeymap.common.properties.CommonProperties;
+import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
@@ -17,52 +17,46 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Base class for a property that has a list of values.
+ * Base class for a field that has a list of values.
  */
-public class ListPropertyButton<T> extends Button implements IPropertyHolder<AtomicReference<T>, T>
+public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<ConfigField<T>>
 {
-    protected final CommonProperties properties;
-    protected final AtomicReference<T> valueHolder;
+    protected final ConfigField<T> field;
     protected final List<T> values;
     protected final String baseLabel;
     protected final String glyph = "\u21D5";
     protected final String labelPattern = "%1$s : %2$s %3$s %2$s";
 
-    public ListPropertyButton(Collection<T> values, String label, CommonProperties properties, AtomicReference<T> valueHolder)
+    public ListPropertyButton(Collection<T> values, String label, ConfigField<T> field)
     {
         super("");
-        this.valueHolder = valueHolder;
-        this.properties = properties;
+        this.field = field;
         this.values = new ArrayList<T>(values);
         this.baseLabel = label;
-        setValue(valueHolder.get());
+        setValue(field.get());
         disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
     public void setValue(T value)
     {
-        if (!valueHolder.get().equals(value))
+        if (!field.get().equals(value))
         {
-            valueHolder.set(value);
-            if (properties != null)
-            {
-                properties.save();
-            }
+            field.set(value);
+            field.save();
         }
         displayString = getFormattedLabel(value.toString());
     }
 
-    public AtomicReference<T> getValueHolder()
+    public ConfigField<T> getField()
     {
-        return valueHolder;
+        return field;
     }
 
     public void nextOption()
     {
-        int index = values.indexOf(valueHolder.get()) + 1;
+        int index = values.indexOf(field.get()) + 1;
         if (index == values.size())
         {
             index = 0;
@@ -72,7 +66,7 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
 
     public void prevOption()
     {
-        int index = values.indexOf(valueHolder.get()) - 1;
+        int index = values.indexOf(field.get()) - 1;
         if (index == -1)
         {
             index = values.size() - 1;
@@ -128,32 +122,12 @@ public class ListPropertyButton<T> extends Button implements IPropertyHolder<Ato
     @Override
     public void refresh()
     {
-        setValue(valueHolder.get());
+        setValue(field.get());
     }
 
     @Override
-    public AtomicReference<T> getProperty()
+    public ConfigField<T> getConfigField()
     {
-        return valueHolder;
-    }
-
-    @Override
-    public T getPropertyValue()
-    {
-        return valueHolder.get();
-    }
-
-    @Override
-    public void setPropertyValue(T value)
-    {
-        if (valueHolder == null)
-        {
-            return;
-        }
-        valueHolder.set(value);
-        if (properties != null)
-        {
-            properties.save();
-        }
+        return field;
     }
 }

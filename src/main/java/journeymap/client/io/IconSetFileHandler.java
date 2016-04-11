@@ -9,10 +9,10 @@
 package journeymap.client.io;
 
 import journeymap.client.Constants;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.StringListProvider;
-import net.minecraftforge.fml.client.FMLClientHandler;
+import journeymap.common.properties.config.StringField;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class IconSetFileHandler
 
     public static File getEntityIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
+        File dir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
@@ -90,12 +90,19 @@ public class IconSetFileHandler
         return names;
     }
 
-    public static class IconSetStringListProvider implements StringListProvider
+    public static class IconSetValuesProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()
         {
-            return IconSetFileHandler.getEntityIconSetNames();
+            if(ForgeHelper.INSTANCE.getClient()!=null)
+            {
+                return IconSetFileHandler.getEntityIconSetNames();
+            }
+            else
+            {
+                return MOB_ICON_SETS;
+            }
         }
 
         @Override

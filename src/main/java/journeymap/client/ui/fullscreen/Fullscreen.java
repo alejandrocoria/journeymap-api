@@ -54,9 +54,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -108,7 +107,7 @@ public class Fullscreen extends JmUI
     public Fullscreen()
     {
         super(null);
-        mc = FMLClientHandler.instance().getClient();
+        mc = ForgeHelper.INSTANCE.getClient();
         fullMapProperties = JourneymapClient.getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
@@ -148,9 +147,13 @@ public class Fullscreen extends JmUI
         initButtons();
 
         // Check for first-time use
-        if (!coreProperties.splashViewed.get().equals(Journeymap.JM_VERSION.toString()))
+        String splashViewed = JourneymapClient.getCoreProperties().splashViewed.get();
+        String thisVersion = Journeymap.JM_VERSION.toString();
+
+        if (!splashViewed.equals(thisVersion))
         {
             UIManager.getInstance().openSplash(this);
+            JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
         }
     }
 
@@ -276,93 +279,57 @@ public class Fullscreen extends JmUI
             statusBackgroundColor = Theme.getColor(theme.fullscreen.statusLabel.backgroundColor);
             statusBackgroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.backgroundAlpha / 255));
 
-            // Day Toggle
-            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day", null, null);
-            buttonDay.setToggled(mapType.isDay(), false);
-            buttonDay.addToggleListener(new OnOffButton.ToggleListener()
+            // Maptype toggle listener
+            OnOffButton.ToggleListener mapTypeToggleListener = new OnOffButton.ToggleListener()
             {
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    if (toggled)
+                    buttonDay.setToggled(false, false);
+                    buttonNight.setToggled(false, false);
+                    buttonTopo.setToggled(false, false);
+                    if (state.isUnderground())
+                    {
+                        buttonCaves.setToggled(false, false);
+                    }
+
+                    if(button==buttonDay)
                     {
                         state.setMapType(MapType.Name.day);
-                        buttonNight.setToggled(false);
-                        buttonTopo.setToggled(false);
-                        if (state.isUnderground())
-                        {
-                            buttonCaves.setToggled(false);
-                        }
-                        state.requireRefresh();
                     }
-                    else if (state.getCurrentMapType().isDay())
+                    else if(button==buttonNight)
                     {
-                        return false;
+                        state.setMapType(MapType.Name.night);
                     }
+                    else if(button==buttonTopo)
+                    {
+                        state.setMapType(MapType.Name.topo);
+                    }
+
+                    button.setToggled(true, false);
+                    state.requireRefresh();
                     return true;
                 }
-            });
+            };
+
+            // Day Toggle
+            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
+            buttonDay.setToggled(mapType.isDay(), false);
+            buttonDay.addToggleListener(mapTypeToggleListener);
 
             // Night Toggle
             buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
             buttonNight.setToggled(mapType.isNight(), false);
-            buttonNight.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    if (toggled)
-                    {
-                        state.setMapType(MapType.night(state.getCurrentMapType().dimension));
-                        buttonDay.setToggled(false);
-                        buttonTopo.setToggled(false);
-                        if (state.isUnderground())
-                        {
-                            buttonCaves.setToggled(false);
-                        }
-                        state.requireRefresh();
-                    }
-                    else if (state.getCurrentMapType().isNight())
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-            });
+            buttonNight.addToggleListener(mapTypeToggleListener);
 
             // Topo Toggle
-            buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo", coreProperties, coreProperties.mapTopography);
+            buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo");
             buttonTopo.setDrawButton(coreProperties.mapTopography.get());
-            buttonTopo.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    if (ForgeHelper.INSTANCE.hasNoSky(mc.theWorld))
-                    {
-                        return false;
-                    }
-                    if (toggled)
-                    {
-                        state.setMapType(MapType.topo(state.getCurrentMapType().dimension));
-                        buttonDay.setToggled(false);
-                        buttonNight.setToggled(false);
-                        if (state.isUnderground())
-                        {
-                            buttonCaves.setToggled(false);
-                        }
-                        state.requireRefresh();
-                    }
-                    else if (state.getCurrentMapType().isNight())
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-            });
+            buttonTopo.setToggled(mapType.isTopo(), false);
+            buttonTopo.addToggleListener(mapTypeToggleListener);
 
             // Caves Toggle
-            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties, fullMapProperties.showCaves);
+            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
             buttonCaves.addToggleListener(new OnOffButton.ToggleListener()
             {
@@ -440,8 +407,8 @@ public class Fullscreen extends JmUI
             });
 
             String[] tooltips = new String[]{
-                    TextFormatting.ITALIC + Constants.getString("jm.common.ui_theme_name", theme.name),
-                    TextFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)
+                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_name", theme.name),
+                    EnumChatFormatting.ITALIC + Constants.getString("jm.common.ui_theme_author", theme.author)
             };
             buttonTheme.setAdditionalTooltips(Arrays.asList(tooltips));
 
@@ -505,23 +472,23 @@ public class Fullscreen extends JmUI
                 }
             });
 
-            buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties, fullMapProperties.showMobs);
+            buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties.showMobs);
             buttonMobs.setDrawButton(FeatureManager.isAllowed(Feature.RadarMobs));
 
-            buttonAnimals = new ThemeToggle(theme, "jm.common.show_animals", "animals", fullMapProperties, fullMapProperties.showAnimals);
+            buttonAnimals = new ThemeToggle(theme, "jm.common.show_animals", "animals", fullMapProperties.showAnimals);
             buttonAnimals.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonPets = new ThemeToggle(theme, "jm.common.show_pets", "pets", fullMapProperties, fullMapProperties.showPets);
+            buttonPets = new ThemeToggle(theme, "jm.common.show_pets", "pets", fullMapProperties.showPets);
             buttonPets.setDrawButton(FeatureManager.isAllowed(Feature.RadarAnimals));
 
-            buttonVillagers = new ThemeToggle(theme, "jm.common.show_villagers", "villagers", fullMapProperties, fullMapProperties.showVillagers);
+            buttonVillagers = new ThemeToggle(theme, "jm.common.show_villagers", "villagers", fullMapProperties.showVillagers);
             buttonVillagers.setDrawButton(FeatureManager.isAllowed(Feature.RadarVillagers));
 
-            buttonPlayers = new ThemeToggle(theme, "jm.common.show_players", "players", fullMapProperties, fullMapProperties.showPlayers);
+            buttonPlayers = new ThemeToggle(theme, "jm.common.show_players", "players", fullMapProperties.showPlayers);
             buttonPlayers.setDrawButton(!mc.isSingleplayer() && FeatureManager.isAllowed(Feature.RadarPlayers));
 
-            buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties, fullMapProperties.showGrid);
-            buttonGrid.setTooltip(TextFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
+            buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties.showGrid);
+            buttonGrid.setTooltip(EnumChatFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
             buttonGrid.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override
@@ -531,7 +498,7 @@ public class Fullscreen extends JmUI
                     if (shiftDown)
                     {
                         UIManager.getInstance().openGridEditor(Fullscreen.this);
-                        buttonGrid.setPropertyValue(true);
+                        buttonGrid.setValue(true);
                         return false;
                     }
                     return true;
@@ -1156,17 +1123,6 @@ public class Fullscreen extends JmUI
     public final boolean doesGuiPauseGame()
     {
         return false;
-    }
-
-    /**
-     * Set map type
-     *
-     * @param mapType
-     */
-    public void setMapType(String mapType)
-    {
-        state.setMapType(MapType.Name.valueOf(mapType));
-        refreshState();
     }
 
     /**

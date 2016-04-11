@@ -88,7 +88,7 @@ public class MapState
 
         this.underground = DataCache.getPlayer().underground;
         Integer vSlice = this.underground && showCaves ? player.chunkCoordY : null;
-        this.preferredMapType = MapType.from(mapProperties.getPreferredMapType().get(), vSlice, player.dimension);
+        this.preferredMapType = MapType.from(mapProperties.preferredMapType.get(), vSlice, player.dimension);
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
@@ -178,7 +178,7 @@ public class MapState
         {
             if (!mapType.isUnderground())
             {
-                lastMapProperties.getPreferredMapType().set(mapType.name);
+                lastMapProperties.preferredMapType.set(mapType.name);
                 preferredMapType = mapType;
             }
         }
@@ -210,7 +210,7 @@ public class MapState
         {
             if (preferredMapType == null)
             {
-                this.preferredMapType = MapType.from(lastMapProperties.getPreferredMapType().get(), DataCache.getPlayer());
+                this.preferredMapType = MapType.from(lastMapProperties.preferredMapType.get(), DataCache.getPlayer());
             }
             mapType = preferredMapType;
         }
@@ -327,7 +327,7 @@ public class MapState
 
     public boolean zoomIn()
     {
-        if (lastMapProperties.zoomLevel.get() < maxZoom)
+        if (lastMapProperties.zoomLevel.get()< maxZoom)
         {
             return setZoom(lastMapProperties.zoomLevel.get() + 1);
         }
@@ -336,7 +336,7 @@ public class MapState
 
     public boolean zoomOut()
     {
-        if (lastMapProperties.zoomLevel.get() > minZoom)
+        if (lastMapProperties.zoomLevel.get()> minZoom)
         {
             return setZoom(lastMapProperties.zoomLevel.get() - 1);
         }
