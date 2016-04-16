@@ -31,8 +31,6 @@ public final class RGB
     public static final int DARK_GRAY_RGB = 0x404040;
     public static final int LIGHT_GRAY_RGB = 0xC0C0C0;
 
-    transient private static final PixelPaint PIXEL_PAINT = new PixelPaint();
-
     /**
      * Don't instantiate.
      */
@@ -54,14 +52,6 @@ public final class RGB
     public static boolean isWhite(int rgb)
     {
         return rgb == WHITE_ARGB || rgb == WHITE_RGB;
-    }
-
-    /**
-     * Gets the PixelPaint singleton and sets the rgb color.
-     */
-    public static Paint paintOf(int rgb)
-    {
-        return PIXEL_PAINT.setColor(ALPHA_OPAQUE | rgb);
     }
 
     public static Integer max(Integer... colors)
