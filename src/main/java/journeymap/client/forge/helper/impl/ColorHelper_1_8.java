@@ -191,7 +191,7 @@ public class ColorHelper_1_8 implements IColorHelper
         catch (Throwable t)
         {
             failed.add(blockMD);
-            if (blockMD.getUid().modId.equals("minecraft"))
+            if (blockMD.getUid().startsWith("minecraft"))
             {
                 logger.warn("Error getting block color. Please report this exception to the JourneyMap mod author regarding " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
             }

@@ -16,7 +16,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -39,14 +38,14 @@ public class CarpentersBlocks
         @Override
         public boolean initialize(BlockMD blockMD)
         {
-            GameRegistry.UniqueIdentifier uid = blockMD.getUid();
-            if (uid.modId.equals(MODID))
+            String uid = blockMD.getUid();
+            if (uid.startsWith(MODID))
             {
-                if (uid.name.equals("blockCarpentersTorch"))
+                if (uid.contains("blockCarpentersTorch"))
                 {
                     blockMD.addFlags(HasAir, NoShadow);
                 }
-                else if (uid.name.equals("blockCarpentersLadder"))
+                else if (uid.contains("blockCarpentersLadder"))
                 {
                     blockMD.addFlags(OpenToSky);
                     blockMD.setModBlockHandler(this);
