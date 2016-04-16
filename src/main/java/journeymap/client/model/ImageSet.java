@@ -74,6 +74,7 @@ public abstract class ImageSet
      */
     private int writeToDisk(boolean force, boolean async)
     {
+        long now = System.currentTimeMillis();
         int count = 0;
         try
         {
@@ -81,10 +82,13 @@ public abstract class ImageSet
             {
                 for (ImageHolder imageHolder : imageHolders.values())
                 {
-                    if (force || imageHolder.isDirty())
+                    if (imageHolder.isDirty())
                     {
-                        imageHolder.writeToDisk(async);
-                        count++;
+                        if (force || (now - imageHolder.getImageTimestamp() > 10000))
+                        {
+                            imageHolder.writeToDisk(async);
+                            count++;
+                        }
                     }
                 }
             }

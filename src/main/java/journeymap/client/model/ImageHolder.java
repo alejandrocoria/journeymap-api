@@ -271,16 +271,30 @@ public class ImageHolder implements IThreadedFileIO
 
                 File temp = new File(imageFile.getParentFile(), imageFile.getName() + ".new");
 
-                ImageIO.write(image, "PNG", temp);
-                imageFile.delete();
-                temp.renameTo(imageFile);
+                ImageIO.write(image, "PNG", imageFile);
+
+                if (imageFile.exists())
+                {
+                    if (!imageFile.delete())
+                    {
+                        logger.warn("Couldn't delete old file " + imageFile.getName());
+                    }
+                }
+
+                if (temp.renameTo(imageFile))
+                {
+                    dirty = false;
+                }
+                else
+                {
+                    logger.warn("Couldn't rename temp file to " + imageFile.getName());
+                }
 
                 if (debug)
                 {
                     logger.debug("Wrote to disk: " + imageFile);
                 }
             }
-            dirty = false;
         }
         catch (IOException e)
         {

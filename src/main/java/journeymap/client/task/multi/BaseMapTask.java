@@ -24,7 +24,6 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,8 +32,6 @@ public abstract class BaseMapTask implements ITask
 {
     static final Logger logger = Journeymap.getLogger();
     protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
-    private static BufferedImage blankChunkImage = null;
-    private static BufferedImage blankChunkImageUnderground = null;
     final World world;
     final Collection<ChunkCoordIntPair> chunkCoords;
     final boolean flushCacheWhenDone;
