@@ -83,9 +83,9 @@ public class FullscreenActions extends JmUI
     /**
      * Launch the JourneyMap website in the native OS.
      */
-    public static void launchWebsite()
+    public static void launchWebsite(String path)
     {
-        String url = Journeymap.DOWNLOAD_URL;
+        String url = Journeymap.WEBSITE_URL + path;
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -237,7 +237,7 @@ public class FullscreenActions extends JmUI
         }
         if (guibutton == buttonCheck)
         {
-            launchWebsite();
+            launchWebsite("Download");
             UIManager.getInstance().openFullscreenMap();
             return;
         }
