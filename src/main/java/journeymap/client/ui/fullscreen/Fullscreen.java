@@ -12,7 +12,11 @@ package journeymap.client.ui.fullscreen;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
+import journeymap.client.api.display.Overlay;
+import journeymap.client.api.display.PolygonOverlay;
 import journeymap.client.api.impl.ClientAPI;
+import journeymap.client.api.model.MapPolygon;
+import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.api.util.UIState;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
@@ -54,6 +58,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Level;
@@ -63,7 +68,9 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -100,6 +107,8 @@ public class Fullscreen extends JmUI
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
+
+    List<Overlay> tempOverlays = new ArrayList<Overlay>();
 
     /**
      * Default constructor
@@ -989,8 +998,36 @@ public class Fullscreen extends JmUI
             int z = waypoint.getZ();
 
             gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), x, z, fullMapProperties.zoomLevel.get());
+
+            if (!waypoint.isPersistent())
+            {
+                addTempMarker(waypoint);
+            }
+
             refreshState();
             updateScreen();
+        }
+    }
+
+    public void addTempMarker(Waypoint waypoint)
+    {
+        try
+        {
+            BlockPos pos = waypoint.getBlockPos();
+
+            PolygonOverlay polygonOverlay = new PolygonOverlay(Journeymap.MOD_ID, waypoint.getName(), mc.thePlayer.dimension,
+                    new ShapeProperties().setStrokeColor(0x0000ff).setStrokeOpacity(1f).setStrokeWidth(1.5f),
+                    new MapPolygon(pos.add(-1, 0, 2), pos.add(2, 0, 2), pos.add(2, 0, -1), pos.add(-1, 0, -1)));
+
+            polygonOverlay.setActiveMapTypes(EnumSet.allOf(Context.MapType.class));
+            polygonOverlay.setActiveUIs(EnumSet.of(Context.UI.Fullscreen));
+            polygonOverlay.setLabel(waypoint.getName());
+            tempOverlays.add(polygonOverlay);
+            ClientAPI.INSTANCE.show(polygonOverlay);
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error showing temp location marker: " + LogFormatter.toPartialString(t));
         }
     }
 
@@ -1072,6 +1109,11 @@ public class Fullscreen extends JmUI
     @Override
     public void close()
     {
+        for (Overlay temp : tempOverlays)
+        {
+            ClientAPI.INSTANCE.remove(temp);
+        }
+
         gridRenderer.updateUIState(false);
 
         if (chat != null)

@@ -9,9 +9,13 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.cartography.ColorManager;
+import journeymap.client.command.ClientCommandInvoker;
+import journeymap.client.command.CmdChatPosition;
+import journeymap.client.command.CmdEditWaypoint;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
@@ -38,6 +42,12 @@ public class EventHandlerManager
         register(new TextureAtlasHandler());
         worldInfoHandler = new WorldInfoHandler();
         ColorManager.instance();
+
+        ClientCommandInvoker clientCommandInvoker = new ClientCommandInvoker();
+        clientCommandInvoker.register(new CmdChatPosition());
+        clientCommandInvoker.register(new CmdEditWaypoint());
+        ClientCommandHandler.instance.registerCommand(clientCommandInvoker);
+
     }
 
     public static void registerGuiHandlers()

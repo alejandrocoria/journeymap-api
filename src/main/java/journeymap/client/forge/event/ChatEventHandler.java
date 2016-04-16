@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.ui.UIManager;
+import journeymap.client.waypoint.WaypointParser;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.EnumChatFormatting;
@@ -29,7 +30,6 @@ import java.util.Set;
 @SideOnly(Side.CLIENT)
 public class ChatEventHandler implements EventHandlerManager.EventHandler
 {
-
     Set<String> featureControlCodes = FeatureManager.instance().getControlCodes();
 
     @Override
@@ -46,9 +46,11 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
         {
             try
             {
-                String text = event.message.getFormattedText();
+                String text = event.message.getUnformattedText();
                 if (!Strings.isNullOrEmpty(text))
                 {
+                    //EventHandlerManager.registerGeneralHandlers();
+                    WaypointParser.parseChatForWaypoints(event, text);
                     checkForControlCode(text.replaceAll(EnumChatFormatting.RESET.toString(), ""));
                 }
             }

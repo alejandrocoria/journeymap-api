@@ -25,6 +25,7 @@ import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -54,6 +55,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     Button buttonEdit;
     Button buttonFind;
     Button buttonTeleport;
+    Button buttonCopy;
     int hgap = 4;
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
@@ -73,11 +75,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonEnable = new OnOffButton(on, off, true); //$NON-NLS-1$
+        buttonEnable = new OnOffButton(on, off, true); 
         buttonEnable.setToggled(waypoint.isEnable());
-        buttonFind = new Button(Constants.getString("jm.waypoint.find")); //$NON-NLS-1$
+        buttonFind = new Button(Constants.getString("jm.waypoint.find"));
 
-        buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport")); //$NON-NLS-1$
+        buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport")); 
         buttonTeleport.setDrawButton(manager.canUserTeleport);
         buttonTeleport.setEnabled(manager.canUserTeleport);
 
@@ -85,10 +87,12 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonListLeft.setHeights(manager.rowHeight);
         buttonListLeft.fitWidths(fontRenderer);
 
-        buttonEdit = new Button(Constants.getString("jm.waypoint.edit")); //$NON-NLS-1$
-        buttonRemove = new Button(Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
+        buttonEdit = new Button(Constants.getString("jm.waypoint.edit"));
+        buttonRemove = new Button(Constants.getString("jm.waypoint.remove"));
+        buttonCopy = new Button(Constants.getString("jm.waypoint.copy"));
+        buttonCopy.setTooltip(Constants.getString("jm.waypoint.copy.tooltip"));
 
-        buttonListRight = new ButtonList(buttonEdit, buttonRemove);
+        buttonListRight = new ButtonList(buttonCopy, buttonEdit, buttonRemove);
         buttonListRight.setHeights(manager.rowHeight);
         buttonListRight.fitWidths(fontRenderer);
 
@@ -217,7 +221,12 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             return false;
         }
 
-        if (buttonRemove.mouseOver(mouseX, mouseY))
+        if (buttonCopy.mouseOver(mouseX, mouseY))
+        {
+            GuiScreen.setClipboardString(this.waypoint.toChatString());
+            mouseOver = true;
+        }
+        else if (buttonRemove.mouseOver(mouseX, mouseY))
         {
             manager.removeWaypoint(this);
             this.waypoint = null;
@@ -320,6 +329,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
+
+        if (buttonCopy.isMouseOver())
+        {
+            DrawUtil.drawLabel(Constants.getString("jm.waypoint.copy.tooltip"), mouseX, mouseY, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, 0x000000, .5f, 0xFFFF00, 1f, 1, true);
+        }
     }
 
     @Override

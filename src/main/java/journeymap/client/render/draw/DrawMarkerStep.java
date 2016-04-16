@@ -97,7 +97,18 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                     public TextureImpl call() throws Exception
                     {
                         MapImage icon = overlay.getIcon();
-                        return TextureCache.instance().getResourceTexture(icon.getImageLocation());
+                        if (icon.getImageLocation() != null)
+                        {
+                            return TextureCache.instance().getResourceTexture(icon.getImageLocation());
+                        }
+                        else if (icon.getImage() != null)
+                        {
+                            return new TextureImpl(icon.getImage());
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 });
             }
