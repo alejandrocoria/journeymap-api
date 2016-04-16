@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 
 public class RegionLoader
 {
-
     private static final Pattern anvilPattern = Pattern.compile("r\\.([^\\.]+)\\.([^\\.]+)\\.mca");
 
     final Logger logger = Journeymap.getLogger();
@@ -94,7 +93,7 @@ public class RegionLoader
         }
 
         // Flush synchronously so it's done before clearing
-        RegionImageCache.instance().flushToDisk(false, false);
+        RegionImageCache.instance().flushToDisk(false);
         RegionImageCache.instance().clear();
 
         final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);

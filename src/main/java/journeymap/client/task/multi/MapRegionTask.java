@@ -135,7 +135,7 @@ public class MapRegionTask extends BaseMapTask
         lastTaskCompleted = System.currentTimeMillis();
 
         // Flush images to disk
-        RegionImageCache.instance().flushToDisk(true, true);
+        RegionImageCache.instance().flushToDiskAsync(true);
 
         // Ensure no chunks are forcefully retained.
         DataCache.instance().stopChunkMDRetention();
@@ -268,7 +268,7 @@ public class MapRegionTask extends BaseMapTask
             if (regionLoader != null)
             {
                 // Write files synchronously before clearing
-                RegionImageCache.instance().flushToDisk(true, false);
+                RegionImageCache.instance().flushToDisk(true);
                 RegionImageCache.instance().clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;

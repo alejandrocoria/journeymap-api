@@ -11,7 +11,6 @@ package journeymap.client.model;
 import com.google.common.base.Objects;
 import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.log.StatTimer;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
@@ -27,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -36,13 +36,12 @@ public class ImageHolder implements IThreadedFileIO
 {
     final static Logger logger = Journeymap.getLogger();
     final MapType mapType;
-    final ReentrantLock writeLock = new ReentrantLock();
     final Path imagePath;
     final int imageSize;
     boolean blank = true;
     boolean dirty = true;
     boolean partialUpdate;
-    StatTimer writeToDiskTimer = StatTimer.get("ImageHolder.writeToDisk", 2, 1000);
+    private volatile ReentrantLock writeLock = new ReentrantLock();
     private volatile TextureImpl texture;
     private boolean debug;
 
@@ -139,6 +138,17 @@ public class ImageHolder implements IThreadedFileIO
     {
         if (!hasTexture())
         {
+            if(!imagePath.toFile().exists())
+            {
+                // check for .new that didn't finish renaming
+                File temp = new File(imagePath.toString() + ".new");
+                if(temp.exists())
+                {
+                    Journeymap.getLogger().warn("Recovered image file: " + temp);
+                    temp.renameTo(imagePath.toFile());
+                }
+            }
+
             BufferedImage image = RegionImageHandler.readRegionImage(imagePath.toFile(), false);
             if (image == null || image.getWidth() != imageSize || image.getHeight() != imageSize)
             {
@@ -180,16 +190,33 @@ public class ImageHolder implements IThreadedFileIO
         }
         else
         {
-//            if (async)
+            if (async)
             {
-                // Experimental:  Use Minecraft's IO manager thread
                 ThreadedFileIOBase.getThreadedIOInstance().queueIO(this);
                 return true;
             }
-//            else
-//            {
-//                return !writeNextIO();
-//            }
+            else
+            {
+                int tries = 0;
+                boolean success = false;
+                while(tries<5)
+                {
+                    if(writeNextIO())
+                    {
+                        tries++;
+                    }
+                    else
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                if(!success)
+                {
+                    Journeymap.getLogger().warn("Couldn't write file after 5 tries: " + this);
+                }
+                return success;
+            }
         }
     }
 
@@ -207,78 +234,78 @@ public class ImageHolder implements IThreadedFileIO
             return false; // no retry
         }
 
-        if (writeLock.tryLock())
+        try
         {
-            writeToDiskTimer.start();
-            File imageFile = imagePath.toFile();
-            try
+            if (writeLock.tryLock(250, TimeUnit.MILLISECONDS))
             {
                 writeImageToFile();
-            }
-            catch (IOException e)
-            {
-                if (imageFile.exists())
-                {
-                    try
-                    {
-                        logger.error("IOException updating file, will delete and retry: " + this + ": " + LogFormatter.toPartialString(e));
-                        imageFile.delete();
-                        writeImageToFile();
-                    }
-                    catch (Throwable e2)
-                    {
-                        logger.error("Exception after delete/retry: " + this + ": " + LogFormatter.toPartialString(e));
-                    }
-                }
-                else
-                {
-                    logger.error("IOException creating file: " + this + ": " + LogFormatter.toPartialString(e));
-                }
-            }
-            catch (Throwable e)
-            {
-                logger.error("Exception writing to disk: " + this + ": " + LogFormatter.toPartialString(e));
-            }
-            finally
-            {
                 writeLock.unlock();
-                writeToDiskTimer.stop();
                 return false; // don't retry
             }
-        }
-        else
-        {
-            if (debug)
+            else
             {
                 logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
+                return false; // do retry
             }
-            return true; // do retry
+        }
+        catch (InterruptedException e)
+        {
+            logger.warn("Timeout waiting for write lock  " + writeLock + " for " + this);
+            return false; // do retry
         }
     }
 
-    private void writeImageToFile() throws IOException
+    private void writeImageToFile()
     {
-        BufferedImage image = texture.getImage();
-        if (image != null)
+        File imageFile = imagePath.toFile();
+
+        try
         {
-
-            File imageFile = imagePath.toFile();
-            if (!imageFile.exists())
+            BufferedImage image = texture.getImage();
+            if (image != null)
             {
-                imageFile.getParentFile().mkdirs();
+                if (!imageFile.exists())
+                {
+                    imageFile.getParentFile().mkdirs();
+                }
+
+                File temp = new File(imageFile.getParentFile(), imageFile.getName() + ".new");
+
+                ImageIO.write(image, "PNG", temp);
+                imageFile.delete();
+                temp.renameTo(imageFile);
+
+                if (debug)
+                {
+                    logger.debug("Wrote to disk: " + imageFile);
+                }
             }
-
-            //long start = System.nanoTime();
-            ImageIO.write(image, "PNG", imageFile);
-            //long stop = System.nanoTime();
-            //logger.info("image write: " + TimeUnit.NANOSECONDS.toMillis(stop-start) + "ms   " + imageFile);
-
-            if (debug)
+            dirty = false;
+        }
+        catch (IOException e)
+        {
+            if (imageFile.exists())
             {
-                logger.debug("Wrote to disk: " + imageFile);
+                try
+                {
+                    logger.error("IOException updating file, will delete and retry: " + this + ": " + LogFormatter.toPartialString(e));
+                    imageFile.delete();
+                    writeImageToFile();
+                }
+                catch (Throwable e2)
+                {
+                    logger.error("Exception after delete/retry: " + this + ": " + LogFormatter.toPartialString(e));
+                }
+            }
+            else
+            {
+                logger.error("IOException creating file: " + this + ": " + LogFormatter.toPartialString(e));
             }
         }
-        dirty = false;
+        catch (Throwable e)
+        {
+            logger.error("Exception writing to disk: " + this + ": " + LogFormatter.toPartialString(e));
+        }
     }
 
     @Override

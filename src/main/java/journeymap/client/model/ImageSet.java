@@ -46,15 +46,34 @@ public abstract class ImageSet
     }
 
     /**
+     * Returns the number of imageHolders that should be updated.
+     *
+     * @param force write even if image isn't flagged as dirty
+     */
+    public int writeToDiskAsync(boolean force)
+    {
+        return writeToDisk(force, true);
+    }
+
+    /**
+     * Returns the number of imageHolders actually written to disk.
+     *
+     * @param force write even if image isn't flagged as dirty
+     */
+    public int writeToDisk(boolean force)
+    {
+        return writeToDisk(force, false);
+    }
+
+    /**
      * Returns the number of imageHolders actually written to disk.
      *
      * @param force write even if image isn't flagged as dirty
      * @return number of images that should be updated if async=true, or
      * number of images actually updated if async=false
      */
-    public int writeToDisk(boolean force, boolean async)
+    private int writeToDisk(boolean force, boolean async)
     {
-        long now = System.currentTimeMillis();
         int count = 0;
         try
         {
@@ -62,13 +81,10 @@ public abstract class ImageSet
             {
                 for (ImageHolder imageHolder : imageHolders.values())
                 {
-                    if (imageHolder.isDirty())
+                    if (force || imageHolder.isDirty())
                     {
-                        if (force || (now - imageHolder.getImageTimestamp() > 10000))
-                        {
-                            imageHolder.writeToDisk(async);
-                            count++;
-                        }
+                        imageHolder.writeToDisk(async);
+                        count++;
                     }
                 }
             }
