@@ -56,11 +56,6 @@ public class RegionImageSet extends ImageSet
                 regionCoord.getZOffset(chunkMd.getCoord().chunkZPos),
                 16, 16);
 
-//        BufferedImage copy = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-//        Graphics g2D = RegionImageHandler.initRenderingHints(copy.createGraphics());
-//        g2D.drawImage(current, 0, 0, null);
-//        g2D.dispose();
-//        return copy;
         return current;
     }
 

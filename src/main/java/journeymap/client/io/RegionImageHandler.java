@@ -81,12 +81,12 @@ public class RegionImageHandler
 
     public static BufferedImage createBlankImage(int width, int height)
     {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
-        Graphics2D graphics2D = img.createGraphics();
-        graphics2D.setFont(new Font("Arial", Font.BOLD, 18));
-        graphics2D.setBackground(Color.black);
-        graphics2D.setColor(Color.yellow);
-        graphics2D.drawString("BLANK", 0, 0);
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = initRenderingHints(img.createGraphics());
+        g.setColor(Color.black);
+        g.setComposite(AlphaComposite.Clear);
+        g.drawImage(img, 0, 0, width, height, null);
+        g.dispose();
         return img;
     }
 
@@ -138,10 +138,11 @@ public class RegionImageHandler
 
         if (image == null || image.getWidth() != initialWidth || imageHeight != initialHeight)
         {
-            image = new BufferedImage(initialWidth, initialHeight, BufferedImage.TYPE_INT_ARGB);
+            image = createBlankImage(initialWidth, initialHeight);
         }
         final Graphics2D g2D = initRenderingHints(image.createGraphics());
         g2D.clearRect(0, 0, imageWidth, imageHeight);
+        g2D.dispose();
 
         final RegionImageCache cache = RegionImageCache.instance();
 
@@ -237,10 +238,7 @@ public class RegionImageHandler
         // Scale if needed
         if (imageHeight != null && imageWidth != null && (initialHeight != imageHeight || initialWidth != imageWidth))
         {
-            final BufferedImage scaledImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-            final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
-            g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
-            g.dispose();
+            final BufferedImage scaledImage = createBlankImage(imageWidth, imageHeight);
             return scaledImage;
         }
         else

@@ -21,7 +21,9 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
 {
     private static final int MAX_COLORS = 128;
 
-    private static final String DEFAULT_CONTOUR_COLOR = "#222222";
+    private static final String DEFAULT_LAND_CONTOUR_COLOR = "#3F250B";
+
+    private static final String DEFAULT_WATER_CONTOUR_COLOR = "#000066";
 
     private static final String DEFAULT_LAND_COLORS = "#000800,#000f00,#001700,#001f00,#002700,#002e00,#003600,#003e00," +
             "#004600,#004d00,#005500,#036103,#066e06,#097a09,#0c860c,#0f930f,#139f13,#16ac16,#19b819,#1cc41c,#1fd11f," +
@@ -32,13 +34,15 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
             "#d7d7f0,#ddddf2,#e2e2f4,#e8e8f6,#eeeef9,#f4f4fb,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff";
 
     public final BooleanField showContour = new BooleanField(Category.Hidden, true);
-    public final StringField contour = new StringField(Category.Hidden, "").set(DEFAULT_CONTOUR_COLOR);
+    public final StringField landContour = new StringField(Category.Hidden, "").set(DEFAULT_LAND_CONTOUR_COLOR);
+    public final StringField waterContour = new StringField(Category.Hidden, "").set(DEFAULT_WATER_CONTOUR_COLOR);
     public final StringField land = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_LAND_COLORS);
     public final StringField water = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_WATER_COLORS);
 
     private transient Integer[] landColors;
     private transient Integer[] waterColors;
-    private transient Integer contourColor;
+    private transient Integer landContourColor;
+    private transient Integer waterContourColor;
 
     public TopoProperties()
     {
@@ -80,17 +84,30 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return waterColors;
     }
 
-    public Integer getContourColor()
+    public Integer getLandContourColor()
     {
         if (!showContour.get())
         {
             return null;
         }
-        if (contourColor == null)
+        if (landContourColor == null)
         {
-            contourColor = RGB.hexToInt(contour.get());
+            landContourColor = RGB.hexToInt(landContour.get());
         }
-        return contourColor;
+        return landContourColor;
+    }
+
+    public Integer getWaterContourColor()
+    {
+        if (!showContour.get())
+        {
+            return null;
+        }
+        if (waterContourColor == null)
+        {
+            waterContourColor = RGB.hexToInt(waterContour.get());
+        }
+        return waterContourColor;
     }
 
     private Integer[] getColors(String name, String colorString)
@@ -133,7 +150,7 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         super.postLoad(isNew);
         landColors = null;
         waterColors = null;
-        contourColor = null;
+        landContourColor = null;
     }
 
     @Override

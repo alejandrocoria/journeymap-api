@@ -43,7 +43,8 @@ public class ChunkPainter
      */
     public void paintBlock(final int x, final int z, final int color)
     {
-        image.setRGB(x, z, color);
+        // Use alpha mask since color is rgb, but bufferedimage is argb
+        image.setRGB(x, z, 0xFF000000 | color);
     }
 
     /**
