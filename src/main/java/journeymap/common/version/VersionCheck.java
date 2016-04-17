@@ -1,7 +1,7 @@
 /*
  * JourneyMap : A mod for Minecraft
  *
- * Copyright (c) 2011-2015 Mark Woodman.  All Rights Reserved.
+ * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
  * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
@@ -145,7 +145,7 @@ public class VersionCheck
                                 JsonObject file = files.next().getAsJsonObject();
                                 try
                                 {
-                                    // {"id":2264681,"url":"http:\/\/curse.com\/mc-mods\/minecraft\/journeymap-32274\/2264681","name":"journeymap-1.7.10-5.1.1b9-unlimited.jar","type":"beta","version":"1.7.10","downloads":1435,"created_at":"2015-10-31T02:50:09+0000"}
+                                    // {"id":2264681,"url":"http:\/\/curse.com\/mc-mods\/minecraft\/journeymap-32274\/2264681","name":"journeymap-1.7.10-5.1.1b9-unlimited.jar","type":"beta","version":"1.7.10","downloads":1435,"created_at":"2016-10-31T02:50:09+0000"}
                                     JsonElement type = file.get("type");
                                     if (currentIsRelease && !("release".equals(type.getAsString())))
                                     {
