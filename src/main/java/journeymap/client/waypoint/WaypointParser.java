@@ -130,10 +130,10 @@ public class WaypointParser
         List<String> matches = getWaypointStrings(unformattedText);
         if (matches != null)
         {
+            boolean changed = false;
             if (event.message instanceof ChatComponentTranslation)
             {
                 Object[] formatArgs = ((ChatComponentTranslation) event.message).getFormatArgs();
-                boolean changed = false;
                 for (int i = 0; i < formatArgs.length; i++)
                 {
                     if (matches.isEmpty())
@@ -145,6 +145,16 @@ public class WaypointParser
                     {
                         IChatComponent arg = (IChatComponent) formatArgs[i];
                         IChatComponent result = addWaypointMarkup(arg.getUnformattedText(), matches);
+                        if (result != null)
+                        {
+                            formatArgs[i] = result;
+                            changed = true;
+                        }
+                    }
+                    else if (formatArgs[i] instanceof String)
+                    {
+                        String arg = (String) formatArgs[i];
+                        IChatComponent result = addWaypointMarkup(arg, matches);
                         if (result != null)
                         {
                             formatArgs[i] = result;
@@ -164,13 +174,21 @@ public class WaypointParser
                 if (result != null)
                 {
                     event.message = result;
+                    changed = true;
                 }
             }
             else
             {
-                Journeymap.getLogger().warn("No implementation for handling waypoints in IChatComponent " + event.message.getClass());
+                Journeymap.getLogger().warn("No implementation for handling waypoints in IChatComponent: " + event.message.getClass());
             }
 
+            if (!changed)
+            {
+                Journeymap.getLogger().warn(String.format("Matched waypoint in chat but failed to update message for %s : %s\n%s",
+                        event.message.getClass(),
+                        event.message.getFormattedText(),
+                        IChatComponent.Serializer.componentToJson(event.message)));
+            }
         }
     }
 
