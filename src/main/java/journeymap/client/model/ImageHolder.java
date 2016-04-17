@@ -271,7 +271,7 @@ public class ImageHolder implements IThreadedFileIO
 
                 File temp = new File(imageFile.getParentFile(), imageFile.getName() + ".new");
 
-                ImageIO.write(image, "PNG", imageFile);
+                ImageIO.write(image, "PNG", temp);
 
                 if (imageFile.exists())
                 {
