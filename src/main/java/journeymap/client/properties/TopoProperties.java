@@ -8,6 +8,7 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
+import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
@@ -19,6 +20,12 @@ import journeymap.common.properties.config.StringField;
  */
 public class TopoProperties extends ClientPropertiesBase implements Comparable<TopoProperties>
 {
+    // Headers to output before file
+    private static final String[] HEADERS = {
+            "// " + Constants.getString("jm.config.file_header_1"),
+            "// " + Constants.getString("jm.config.file_header_5", "http://journeymap.info/Topographic")
+    };
+
     private static final int MAX_COLORS = 128;
 
     private static final String DEFAULT_LAND_CONTOUR_COLOR = "#3F250B";
@@ -151,6 +158,7 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         landColors = null;
         waterColors = null;
         landContourColor = null;
+        waterContourColor = null;
     }
 
     @Override
@@ -166,6 +174,12 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
     protected void preSave()
     {
         super.preSave();
+    }
+
+    @Override
+    public String[] getHeaders()
+    {
+        return HEADERS;
     }
 
     /**
