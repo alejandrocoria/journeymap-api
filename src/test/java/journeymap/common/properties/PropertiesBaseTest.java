@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
@@ -103,10 +104,9 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
 
     /**
      * Use JSON output to confirm equivalency.
-     * Todo: implement equals() on PropertiesBase?
      *
-     * @param p1
-     * @param p2
+     * @param p1 first
+     * @param p2 second
      */
     protected void assertEqual(P p1, P p2)
     {
@@ -130,9 +130,11 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void randomize(EnumField field)
     {
-        ArrayList<Enum> list = new ArrayList<Enum>(field.getValidValues());
+        EnumSet enumSet = field.getValidValues();
+        ArrayList<? extends Enum> list = new ArrayList<Enum>(enumSet);
         field.set(list.get(rand.nextInt(list.size())));
     }
 

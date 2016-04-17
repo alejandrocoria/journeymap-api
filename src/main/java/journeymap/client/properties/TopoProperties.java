@@ -28,14 +28,19 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
 
     private static final int MAX_COLORS = 128;
 
-    private static final String DEFAULT_LAND_CONTOUR_COLOR = "#3f250b";
-    private static final String DEFAULT_WATER_CONTOUR_COLOR = "#222266";
+    private static final String DEFAULT_LAND_CONTOUR_COLOR = "#3F250B";
 
-    private static final String DEFAULT_LAND_COLORS = "#000800,#000f00,#001700,#001f00,#002700,#002e00,#002e00,#114016,#23512c,#356343,#467559,#57866f,#699885,#70a18c,#76a992,#7daf96,#83b59b,#94bba1,#a5c0a7,#bcc4ad,#d3c9b3,#d3c1ac,#d4b8a4,#d4bcad,#d4c0b5,#d5c9c2,#d6d1ce,#dad7d6,#deddde,#e6e6e6,#eeeeee,#f2f3f2";
+    private static final String DEFAULT_WATER_CONTOUR_COLOR = "#000066";
 
-    private static final String DEFAULT_WATER_COLORS = "#000040,#02024e,#03035d,#05056b,#070779,#080887,#0a0a96,#0b0ba4,#1a1aaa,#2a2aaf,#3939b5,#4848bb,#5757c0,#6767c6,#7676cc,#8585d2,#9494d7,#a4a4dd,#b3b3e3,#c2c2e8,#d1d1ee,#d7d7f0,#ddddf2,#e2e2f4,#e8e8f6,#eeeef9,#f4f4fb,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff";
+    private static final String DEFAULT_LAND_COLORS = "#000800,#000f00,#001700,#001f00,#002700,#002e00,#003600,#003e00," +
+            "#004600,#004d00,#005500,#036103,#066e06,#097a09,#0c860c,#0f930f,#139f13,#16ac16,#19b819,#1cc41c,#1fd11f," +
+            "#22dd22,#36e036,#4ae34a,#5ee65e,#72e972,#86ec86,#9bf09b,#aff3af,#c3f6c3,#d7f9d7,#ebfceb";
 
-    public final BooleanField showContour = new BooleanField(Category.Hidden, true).set(true);
+    private static final String DEFAULT_WATER_COLORS = "#000040,#02024e,#03035d,#05056b,#070779,#080887,#0a0a96,#0b0ba4," +
+            "#1a1aaa,#2a2aaf,#3939b5,#4848bb,#5757c0,#6767c6,#7676cc,#8585d2,#9494d7,#a4a4dd,#b3b3e3,#c2c2e8,#d1d1ee," +
+            "#d7d7f0,#ddddf2,#e2e2f4,#e8e8f6,#eeeef9,#f4f4fb,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff";
+
+    public final BooleanField showContour = new BooleanField(Category.Hidden, true);
     public final StringField landContour = new StringField(Category.Hidden, "").set(DEFAULT_LAND_CONTOUR_COLOR);
     public final StringField waterContour = new StringField(Category.Hidden, "").set(DEFAULT_WATER_CONTOUR_COLOR);
     public final StringField land = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_LAND_COLORS);

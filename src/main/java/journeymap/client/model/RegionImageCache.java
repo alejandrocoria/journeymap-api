@@ -13,9 +13,6 @@ import journeymap.client.data.DataCache;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.common.Journeymap;
-import journeymap.common.thread.JMThreadFactory;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +31,6 @@ public class RegionImageCache
     static final Logger logger = Journeymap.getLogger();
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
-    private Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     /**
      * Underlying caches are to be managed by the DataCache.
@@ -43,21 +39,6 @@ public class RegionImageCache
     {
         this.regionImageSetsCache = DataCache.instance().getRegionImageSets();
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
-
-        // Add shutdown hook to flush cache to disk
-        Runtime.getRuntime().addShutdownHook(new JMThreadFactory("rcache").newThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                // Don't flush asynchronously; do it in this thread
-                flushToDisk(true, false);
-                if (logger.isEnabled(Level.DEBUG))
-                {
-                    logger.debug("RegionImageCache flushing to disk on shutdown"); //$NON-NLS-1$
-                }
-            }
-        }));
     }
 
     /**
@@ -82,7 +63,7 @@ public class RegionImageCache
                         if (regionImageSet != null)
                         {
                             // Don't force it, but do it synchronously to ensure things aren't GCd before it's done.
-                            int count = regionImageSet.writeToDisk(false, false);
+                            int count = regionImageSet.writeToDisk(false);
                             if (count > 0 && Journeymap.getLogger().isDebugEnabled())
                             {
                                 Journeymap.getLogger().debug("Wrote to disk before removal from cache: " + regionImageSet);
@@ -130,54 +111,55 @@ public class RegionImageCache
             if (regionImageSet.hasChunkUpdates())
             {
                 regionImageSet.finishChunkUpdates();
-                //logger.info("UPDATED: " + regionImageSet);
-            }
-            else
-            {
-                //logger.info("Should expire eventually: " + regionImageSet);
             }
         }
 
         // Write to disk if needed
-        if (forceFlush)
+        if (forceFlush || (lastFlush + flushInterval < System.currentTimeMillis()))
         {
-            flushToDisk(forceFlush, async);
-        }
-        else
-        {
-            autoFlush(async);
-        }
-    }
-
-    /**
-     * Write all dirty images to disk if flushInterval has passed
-     *
-     * @param async whether to do file writes on a different thread
-     */
-    private void autoFlush(boolean async)
-    {
-        if (lastFlush + flushInterval < System.currentTimeMillis())
-        {
-            if (logger.isEnabled(Level.DEBUG))
+            if (!forceFlush && logger.isEnabled(Level.DEBUG))
             {
                 logger.debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
-            flushToDisk(false, async);
+
+            if (async)
+            {
+                flushToDiskAsync(false);
+            }
+            else
+            {
+                flushToDisk(false);
+            }
         }
     }
 
     /**
-     * Write all dirty images to disk.
+     * Write all dirty images to disk asynchronously.
      *
-     * @param async Whether to do file writes asynchronously
+     * @param force Whether to force writes even if not needed.
      */
-    public void flushToDisk(boolean force, boolean async)
+    public void flushToDiskAsync(boolean force)
     {
         int count = 0;
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
             // Don't force writes that aren't necessary
-            count += regionImageSet.writeToDisk(force, async);
+            count += regionImageSet.writeToDiskAsync(force);
+        }
+        lastFlush = System.currentTimeMillis();
+    }
+
+    /**
+     * Write all dirty images to disk immediately.
+     *
+     * @param force Whether to force writes even if not needed.
+     */
+    public void flushToDisk(boolean force)
+    {
+        for (RegionImageSet regionImageSet : getRegionImageSets())
+        {
+            // Don't force writes that aren't necessary
+            regionImageSet.writeToDisk(force);
         }
         lastFlush = System.currentTimeMillis();
     }

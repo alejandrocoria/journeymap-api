@@ -35,8 +35,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.realms.RealmsScreen;
 import net.minecraft.tileentity.TileEntity;
@@ -55,7 +53,6 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import java.net.SocketAddress;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Implementation to encapsulate uses of methods/fields that have changed in 1.8
@@ -406,31 +403,18 @@ public class ForgeHelper_1_9 implements IForgeHelper
     @Override
     public String getBlockName(Block block, int meta)
     {
-        // Gotta love this.
-        Item item = Item.getItemFromBlock(block);
-        if (item == null)
+        String displayName = block.getLocalizedName();
+
+        try
         {
-            // 1.7
-            // item = block.getItemDropped(0, new Random(), 0);
-
-            // 1.8
-            item = block.getItemDropped(block.getStateFromMeta(0), new Random(), 0);
+            displayName = block.getStateFromMeta(meta).getBlock().getLocalizedName();
         }
-        if (item != null)
+        catch (IllegalArgumentException e)
         {
-            // 1.7
-            // ItemStack stack = new ItemStack(item, 1, block.damageDropped(meta));
-
-            // 1.8
-            ItemStack stack = new ItemStack(item, 1, block.damageDropped(block.getStateFromMeta(meta)));
-
-            String displayName = stack.getDisplayName();
-            if (!Strings.isNullOrEmpty(displayName))
-            {
-                return displayName;
-            }
+            e.printStackTrace();
         }
-        return null;
+
+        return displayName;
     }
 
     @Override

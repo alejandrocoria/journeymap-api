@@ -518,7 +518,7 @@ public class JourneymapClient implements CommonProxy
             if ((isMapping()) && mc != null)
             {
                 logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension()));
-                RegionImageCache.instance().flushToDisk(false, true);
+                RegionImageCache.instance().flushToDiskAsync(false);
             }
 
             if (multithreadTaskController != null)

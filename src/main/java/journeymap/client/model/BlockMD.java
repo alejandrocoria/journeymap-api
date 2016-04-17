@@ -19,9 +19,8 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
@@ -57,7 +56,7 @@ public class BlockMD
      */
     private BlockMD(Block block, int meta)
     {
-        this(block, meta, block.getRegistryName().toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(block, meta, Block.blockRegistry.getNameForObject(block).toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
 
     /**
@@ -202,8 +201,7 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
-                String uid = block.getRegistryName().toString();
-                if (uid == null)
+                if (Block.blockRegistry.getNameForObject(block) == null)
                 {
                     Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
                     return AIRBLOCK;
@@ -261,27 +259,13 @@ public class BlockMD
     public static Collection<Integer> getMetaValuesForBlock(Block block)
     {
         ArrayList<Integer> metas = new ArrayList<Integer>();
-        ArrayList<ItemStack> subBlocks = new ArrayList<ItemStack>();
-        try
+
+        for (IBlockState state : block.getBlockState().getValidStates())
         {
-            Item item = Item.getItemFromBlock(block);
-            if (item == null)
-            {
-                metas.add(0);
-            }
-            else
-            {
-                block.getSubBlocks(item, null, subBlocks);
-                for (ItemStack subBlockStack : subBlocks)
-                {
-                    metas.add(subBlockStack.getMetadata());
-                }
-            }
+            int meta = state.getBlock().getMetaFromState(state);
+            metas.add(meta);
         }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
-        }
+
         return metas;
     }
 

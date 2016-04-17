@@ -3,12 +3,16 @@
 {
   "lines": [
     {
-      "label": "New Topographic map view. Click here to try it!",
+      "label": "Waypoint sharing! Click here for the wiki page.",
+      "action": "dialog.FullscreenActions#launchWebsite#Waypoint_Sharing"
+    },
+    {
+      "label": "Topographic maps. Click here to try it!",
       "action": "fullscreen.Fullscreen#setMapType#topo"
     },
     {
       "label": "Customize Topographic map colors. Click here for the wiki page.",
-      "action": "fullscreen.Fullscreen#launchTopographicWiki"
+      "action": "dialog.FullscreenActions#launchWebsite#Topographic"
     }
   ]
 }

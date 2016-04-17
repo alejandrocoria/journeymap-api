@@ -96,7 +96,7 @@ public class Waypoint implements Serializable
     /**
      * Default constructor Required by GSON
      */
-    private Waypoint()
+    public Waypoint()
     {
     }
 
@@ -351,7 +351,11 @@ public class Waypoint implements Serializable
 
     public int getX()
     {
-        return (mc.thePlayer.dimension == -1) ? x / 8 : x;
+        if (mc != null && mc.thePlayer != null && mc.thePlayer.dimension == -1)
+        {
+            return x / 8;
+        }
+        return x;
     }
 
     public double getBlockCenteredX()
@@ -371,7 +375,11 @@ public class Waypoint implements Serializable
 
     public int getZ()
     {
-        return (mc.thePlayer.dimension == -1) ? z / 8 : z;
+        if (mc != null && mc.thePlayer != null && mc.thePlayer.dimension == -1)
+        {
+            return z / 8;
+        }
+        return z;
     }
 
     public double getBlockCenteredZ()
@@ -382,6 +390,11 @@ public class Waypoint implements Serializable
     public Vec3d getPosition()
     {
         return ForgeHelper.INSTANCE.newVec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+    }
+
+    public BlockPos getBlockPos()
+    {
+        return new BlockPos(getX(), getY(), getZ());
     }
 
     public int getR()
@@ -476,6 +489,18 @@ public class Waypoint implements Serializable
         this.persistent = persistent;
         this.dirty = persistent;
         return this;
+    }
+
+    public String toChatString()
+    {
+        if (dimensions.first() != 0)
+        {
+            return String.format("[name:%s, x:%s, y:%s, z:%s, dim:%s]", getName(), getX(), getY(), getZ(), dimensions.first());
+        }
+        else
+        {
+            return String.format("[name:%s, x:%s, y:%s, z:%s]", getName(), getX(), getY(), getZ());
+        }
     }
 
     @Override

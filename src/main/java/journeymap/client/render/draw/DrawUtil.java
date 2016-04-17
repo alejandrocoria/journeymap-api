@@ -210,8 +210,8 @@ public class DrawUtil
                 GlStateManager.scale(fontScale, fontScale, 0);
             }
 
-            double textX = x;
-            double textY = y;
+            float textX = (float) x;
+            float textY = (float) y;
             double rectX = x;
             double rectY = y;
 
@@ -219,20 +219,20 @@ public class DrawUtil
             {
                 case Left:
                 {
-                    textX = x - width;
+                    textX = (float) (x - width);
                     rectX = textX;
                     break;
                 }
                 case Center:
                 {
-                    textX = x - (width / 2) + (fontScale > 1 ? .5 : 0);
-                    rectX = x - (Math.max(1, bgWidth) / 2) + (fontScale > 1 ? .5 : 0);
+                    textX = (float) (x - (width / 2) + (fontScale > 1 ? .5 : 0));
+                    rectX = (float) (x - (Math.max(1, bgWidth) / 2) + (fontScale > 1 ? .5 : 0));
                     break;
                 }
                 case Right:
                 {
-                    textX = x;
-                    rectX = x;
+                    textX = (float) x;
+                    rectX = (float) x;
                     break;
                 }
             }
@@ -244,19 +244,19 @@ public class DrawUtil
                 case Above:
                 {
                     rectY = y - height;
-                    textY = rectY + vpad + (fontRenderer.getUnicodeFlag() ? 0 : 1);
+                    textY = (float) (rectY + vpad + (fontRenderer.getUnicodeFlag() ? 0 : 1));
                     break;
                 }
                 case Middle:
                 {
                     rectY = y - (height / 2) + (fontScale > 1 ? .5 : 0);
-                    textY = rectY + vpad;
+                    textY = (float) (rectY + vpad);
                     break;
                 }
                 case Below:
                 {
                     rectY = y;
-                    textY = rectY + vpad;
+                    textY = (float) (rectY + vpad);
                     break;
                 }
             }
@@ -281,22 +281,15 @@ public class DrawUtil
             }
 
             // String positioning uses ints
-            int intTextX = (int) Math.floor(textX);
-            int intTextY = (int) Math.floor(textY);
-            double dTextX = textX - intTextX;
-            double dTextY = textY - intTextY;
+//            int intTextX = (int) Math.floor(textX);
+//            int intTextY = (int) Math.floor(textY);
+//            double dTextX = textX - intTextX;
+//            double dTextY = textY - intTextY;
 
             // Use translation for the double precision
-            GlStateManager.translate(dTextX, dTextY, 0);
+            GlStateManager.translate(textX - Math.floor(textX), textY - Math.floor(textY), 0);
 
-            if (fontShadow)
-            {
-                fontRenderer.drawStringWithShadow(text, intTextX, intTextY, color);
-            }
-            else
-            {
-                fontRenderer.drawString(text, intTextX, intTextY, color);
-            }
+            fontRenderer.drawString(text, textX, textY, color, fontShadow);
 
         }
         finally

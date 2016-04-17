@@ -42,8 +42,10 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
+    // Vertical size in blocks of each contour
     private Integer landContourColor;
     private Integer waterContourColor;
+
     private double waterContourInterval;
     private double landContourInterval;
 
@@ -246,6 +248,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
 
 
+
         float h;
         Float slope;
         double contourInterval;
@@ -328,23 +331,20 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
 
-        Integer color = null;
-        if (slope > 1)
+        int color;
+        if (slope > 1 && landContourColor != null)
         {
-            if ((topBlockMd.isWater() || topBlockMd.isIce()))
+            if (topBlockMd.isWater() || topBlockMd.isIce())
             {
-                if (waterContourColor != null)
-                {
-                    color = waterContourColor;
-                }
+                // Contour ring between ortho step
+                color = waterContourColor;
             }
-            else if (landContourColor != null)
+            else
             {
                 color = landContourColor;
             }
         }
-
-        if (color == null)
+        else
         {
             if (topBlockMd.isLava())
             {

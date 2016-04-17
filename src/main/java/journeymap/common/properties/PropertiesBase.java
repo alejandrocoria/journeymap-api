@@ -74,7 +74,7 @@ public abstract class PropertiesBase
      * Gets a Gson instance with registered adapters.
      *
      * @param verbose whether to (de)serialize all field attributes. Useful if config is going between client/server.
-     * @return
+     * @return Gson object
      */
     public Gson getGson(boolean verbose)
     {
@@ -126,14 +126,14 @@ public abstract class PropertiesBase
     /**
      * Gets an array of headers to prepend to the property file when saved.
      *
-     * @return
+     * @return strings
      */
     public abstract String[] getHeaders();
 
     /**
      * Gets the filename for the instance.
      *
-     * @return
+     * @return filename
      */
     public abstract String getFileName();
 
