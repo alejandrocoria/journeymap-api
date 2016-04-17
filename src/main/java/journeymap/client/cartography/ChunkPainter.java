@@ -3,6 +3,7 @@ package journeymap.client.cartography;
 import journeymap.common.Journeymap;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -17,13 +18,11 @@ public class ChunkPainter
     public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static volatile AtomicLong badBlockCount = new AtomicLong(0);
 
-    Integer[][] colors = new Integer[16][16];
-    Graphics2D g2D;
+    BufferedImage image;
 
-    public ChunkPainter(Graphics2D g2D)
+    public ChunkPainter(BufferedImage image)
     {
-        this.g2D = g2D;
-        g2D.setComposite(ALPHA_OPAQUE);
+        this.image = image;
     }
 
     /**
@@ -31,7 +30,8 @@ public class ChunkPainter
      */
     public void paintDimOverlay(int x, int z, float alpha)
     {
-        Integer color = colors[x][z];
+        Integer color = image.getRGB(x, z);
+
         if (color != null)
         {
             paintBlock(x, z, RGB.adjustBrightness(color, alpha));
@@ -43,7 +43,7 @@ public class ChunkPainter
      */
     public void paintBlock(final int x, final int z, final int color)
     {
-        colors[x][z] = color;
+        image.setRGB(x, z, color);
     }
 
     /**
@@ -81,37 +81,7 @@ public class ChunkPainter
      */
     public void finishPainting()
     {
-        Integer color;
-        int lastColor = -1;
+        // nothing to do
 
-        try
-        {
-            for (int z = 0; z < 16; z++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    color = colors[x][z];
-                    if (color == null)
-                    {
-                        continue;
-                    }
-
-                    // Update color
-                    if (color != lastColor)
-                    {
-                        lastColor = color;
-                        g2D.setPaint(new Color(color));
-                    }
-
-                    g2D.fillRect(x, z, 1, 1);
-                }
-            }
-        }
-        finally
-        {
-            g2D.dispose();
-            g2D = null;
-            colors = null;
-        }
     }
 }

@@ -10,7 +10,6 @@ package journeymap.client.cartography;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.*;
-import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.*;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -49,9 +48,9 @@ public class ChunkRenderController
         }
 
         ChunkPainter undergroundG2D = null;
-        ChunkPainter dayG2D = null;
-        ChunkPainter nightG2D = null;
-        ChunkPainter topoG2D = null;
+        ChunkPainter cpDay = null;
+        ChunkPainter cpNight = null;
+        ChunkPainter cpTopo = null;
         boolean renderOkay = false;
         boolean mapTopo = mapType.isTopo() || (!mapType.isUnderground() && JourneymapClient.getCoreProperties().mapTopography.get());
 
@@ -63,7 +62,7 @@ public class ChunkRenderController
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
-                    undergroundG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(image.createGraphics()));
+                    undergroundG2D = new ChunkPainter(image);
                     switch (rCoord.dimension)
                     {
                         case -1:
@@ -106,22 +105,22 @@ public class ChunkRenderController
 
                 if (imageDay != null)
                 {
-                    dayG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
+                    cpDay = new ChunkPainter(imageDay);
                 }
 
                 if (imageNight != null)
                 {
-                    nightG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
+                    cpNight = new ChunkPainter(imageNight);
                 }
 
                 if (imageTopo != null)
                 {
-                    topoG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                    cpTopo = new ChunkPainter(imageTopo);
                 }
 
-                if (dayG2D != null)
+                if (cpDay != null)
                 {
-                    renderOkay = overWorldSurfaceRenderer.render(dayG2D, nightG2D, chunkMd);
+                    renderOkay = overWorldSurfaceRenderer.render(cpDay, cpNight, chunkMd);
                     if (renderOkay)
                     {
                         regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
@@ -130,9 +129,9 @@ public class ChunkRenderController
                     }
                 }
 
-                if (topoG2D != null)
+                if (cpTopo != null)
                 {
-                    renderOkay = topoRenderer.render(topoG2D, chunkMd, null);
+                    renderOkay = topoRenderer.render(cpTopo, chunkMd, null);
                     if (renderOkay)
                     {
                         regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
@@ -152,21 +151,21 @@ public class ChunkRenderController
         }
         finally
         {
-            if (dayG2D != null)
+            if (cpDay != null)
             {
-                dayG2D.finishPainting();
+                cpDay.finishPainting();
             }
-            if (nightG2D != null)
+            if (cpNight != null)
             {
-                nightG2D.finishPainting();
+                cpNight.finishPainting();
             }
             if (undergroundG2D != null)
             {
                 undergroundG2D.finishPainting();
             }
-            if (topoG2D != null)
+            if (cpTopo != null)
             {
-                topoG2D.finishPainting();
+                cpTopo.finishPainting();
             }
         }
 
