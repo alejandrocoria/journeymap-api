@@ -131,10 +131,10 @@ public class WaypointParser
         List<String> matches = getWaypointStrings(unformattedText);
         if (matches != null)
         {
+            boolean changed = false;
             if (event.getMessage() instanceof TextComponentTranslation)
             {
                 Object[] formatArgs = ((TextComponentTranslation) event.getMessage()).getFormatArgs();
-                boolean changed = false;
                 for (int i = 0; i < formatArgs.length; i++)
                 {
                     if (matches.isEmpty())
@@ -146,6 +146,16 @@ public class WaypointParser
                     {
                         ITextComponent arg = (ITextComponent) formatArgs[i];
                         ITextComponent result = addWaypointMarkup(arg.getUnformattedText(), matches);
+                        if (result != null)
+                        {
+                            formatArgs[i] = result;
+                            changed = true;
+                        }
+                    }
+                    else if (formatArgs[i] instanceof String)
+                    {
+                        String arg = (String) formatArgs[i];
+                        ITextComponent result = addWaypointMarkup(arg, matches);
                         if (result != null)
                         {
                             formatArgs[i] = result;
@@ -165,6 +175,7 @@ public class WaypointParser
                 if (result != null)
                 {
                     event.setMessage(result);
+                    changed = true;
                 }
             }
             else
@@ -172,6 +183,13 @@ public class WaypointParser
                 Journeymap.getLogger().warn("No implementation for handling waypoints in ITextComponent " + event.getMessage().getClass());
             }
 
+            if (!changed)
+            {
+                Journeymap.getLogger().warn(String.format("Matched waypoint in chat but failed to update message for %s : %s\n%s",
+                        event.getMessage().getClass(),
+                        event.getMessage().getFormattedText(),
+                        ITextComponent.Serializer.componentToJson(event.getMessage())));
+            }
         }
     }
 
