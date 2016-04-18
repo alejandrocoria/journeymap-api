@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
@@ -30,6 +31,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * Generic waypoint data holder
@@ -493,14 +495,30 @@ public class Waypoint implements Serializable
 
     public String toChatString()
     {
-        if (dimensions.first() != 0)
+        boolean useName = !(getName().equals(String.format("%s, %s", getX(), getZ())));
+        boolean useDim = dimensions.first() != 0;
+
+        List<String> parts = new ArrayList<String>();
+        List<Object> args = new ArrayList<Object>();
+        if (useName)
         {
-            return String.format("[name:%s, x:%s, y:%s, z:%s, dim:%s]", getName(), getX(), getY(), getZ(), dimensions.first());
+            parts.add("name:%s");
+            args.add(getName().replaceAll(",", " "));
         }
-        else
+
+        parts.add("x:%s, y:%s, z:%s");
+        args.add(getX());
+        args.add(getY());
+        args.add(getZ());
+
+        if (useDim)
         {
-            return String.format("[name:%s, x:%s, y:%s, z:%s]", getName(), getX(), getY(), getZ());
+            parts.add("dim:%s");
+            args.add(dimensions.first());
         }
+
+        String format = "[" + Joiner.on(", ").join(parts) + "]";
+        return String.format(format, args.toArray());
     }
 
     @Override
