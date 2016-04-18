@@ -60,8 +60,6 @@ public class Splash extends JmUI
     {
         super(Constants.getString("jm.common.splash_title", JourneymapClient.EDITION), returnDisplay);
 
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
-
         // Get splash strings
         info = FileHandler.getMessageModel(SplashInfo.class, "splash");
 
@@ -75,6 +73,8 @@ public class Splash extends JmUI
     @Override
     public void initGui()
     {
+        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();
         int minWidth = 0;

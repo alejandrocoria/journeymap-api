@@ -9,7 +9,6 @@
 package journeymap.client.ui.component;
 
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -66,7 +65,6 @@ public abstract class JmUI extends GuiScreen
                 jmReturnDisplay.returnDisplay = null;
             }
         }
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
     }
 
 
@@ -250,17 +248,15 @@ public abstract class JmUI extends GuiScreen
 
     protected void closeAndReturn()
     {
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
-
         if (returnDisplay == null)
         {
             if (mc.theWorld != null)
             {
-                UIManager.getInstance().openFullscreenMap();
+                UIManager.INSTANCE.openFullscreenMap();
             }
             else
             {
-                UIManager.getInstance().closeAll();
+                UIManager.INSTANCE.closeAll();
             }
         }
         else
@@ -269,7 +265,7 @@ public abstract class JmUI extends GuiScreen
             {
                 ((JmUI) returnDisplay).returnDisplay = null;
             }
-            UIManager.getInstance().open(returnDisplay);
+            UIManager.INSTANCE.open(returnDisplay);
         }
     }
 

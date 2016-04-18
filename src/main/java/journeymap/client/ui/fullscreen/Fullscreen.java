@@ -162,8 +162,7 @@ public class Fullscreen extends JmUI
 
         if (!splashViewed.equals(thisVersion))
         {
-            UIManager.getInstance().openSplash(this);
-            JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+            UIManager.INSTANCE.openSplash(this);
         }
     }
 
