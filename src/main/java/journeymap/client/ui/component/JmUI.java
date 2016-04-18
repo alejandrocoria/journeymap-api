@@ -297,7 +297,7 @@ public abstract class JmUI extends GuiScreen
     }
 
     @Override
-    protected void drawHoveringText(java.util.List tooltip, int mouseX, int mouseY, FontRenderer fontRenderer)
+    public void drawHoveringText(java.util.List tooltip, int mouseX, int mouseY, FontRenderer fontRenderer)
     {
         // Had to override here because GuiScreen doesn't right-justify bidi text, nor does it calculate mixed string widths correctly
         if (!tooltip.isEmpty())

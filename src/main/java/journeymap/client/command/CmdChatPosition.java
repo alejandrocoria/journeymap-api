@@ -3,8 +3,8 @@ package journeymap.client.command;
 import com.google.common.base.Joiner;
 import journeymap.client.JourneymapClient;
 import journeymap.client.task.main.IMainThreadTask;
+import journeymap.client.ui.waypoint.WaypointChat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -59,7 +59,7 @@ public class CmdChatPosition implements ICommand
             @Override
             public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
             {
-                FMLClientHandler.instance().getClient().displayGuiScreen(new GuiChat(pos));
+                FMLClientHandler.instance().getClient().displayGuiScreen(new WaypointChat(pos));
                 return null;
             }
 
