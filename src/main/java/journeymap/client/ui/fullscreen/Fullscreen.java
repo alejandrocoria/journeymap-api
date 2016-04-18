@@ -220,7 +220,7 @@ public class Fullscreen extends JmUI
         catch (Throwable e)
         {
             logger.log(Level.ERROR, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e));
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
         finally
         {
@@ -396,7 +396,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    UIManager.getInstance().openWaypointManager(null, Fullscreen.this);
+                    UIManager.INSTANCE.openWaypointManager(null, Fullscreen.this);
                     return true;
                 }
             });
@@ -409,7 +409,7 @@ public class Fullscreen extends JmUI
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
                     ThemeFileHandler.loadNextTheme();
-                    UIManager.getInstance().getMiniMap().reset();
+                    UIManager.INSTANCE.getMiniMap().reset();
                     buttonList.clear();
                     return false;
                 }
@@ -430,7 +430,7 @@ public class Fullscreen extends JmUI
                 {
                     try
                     {
-                        UIManager.getInstance().openOptionsManager();
+                        UIManager.INSTANCE.openOptionsManager();
                         return true;
                     }
                     catch (Exception e)
@@ -448,7 +448,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    UIManager.getInstance().openMapActions();
+                    UIManager.INSTANCE.openMapActions();
                     return true;
                 }
             });
@@ -476,7 +476,7 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
-                    UIManager.getInstance().closeAll();
+                    UIManager.INSTANCE.closeAll();
                     return true;
                 }
             });
@@ -506,7 +506,7 @@ public class Fullscreen extends JmUI
                     boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
                     if (shiftDown)
                     {
-                        UIManager.getInstance().openGridEditor(Fullscreen.this);
+                        UIManager.INSTANCE.openGridEditor(Fullscreen.this);
                         buttonGrid.setValue(true);
                         return false;
                     }
@@ -774,13 +774,13 @@ public class Fullscreen extends JmUI
 
         if (i == Keyboard.KEY_O)
         {
-            UIManager.getInstance().openOptionsManager();
+            UIManager.INSTANCE.openOptionsManager();
             return;
         }
 
         if (i == Keyboard.KEY_ESCAPE || i == Constants.KB_MAP.getKeyCode())
         {
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
             return;
         }
 
@@ -827,8 +827,15 @@ public class Fullscreen extends JmUI
 
         if (i == Constants.KB_WAYPOINT.getKeyCode())
         {
-            Waypoint waypoint = Waypoint.of(mc.thePlayer);
-            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+            if (controlDown)
+            {
+                UIManager.INSTANCE.openWaypointManager(null, this);
+            }
+            else
+            {
+                Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                UIManager.INSTANCE.openWaypointEditor(waypoint, true, null);
+            }
             return;
         }
 
@@ -863,7 +870,7 @@ public class Fullscreen extends JmUI
         // Open inventory
         if (i == mc.gameSettings.keyBindInventory.getKeyCode())
         {
-            UIManager.getInstance().openInventory();
+            UIManager.INSTANCE.openInventory();
             return;
         }
 
@@ -1181,9 +1188,9 @@ public class Fullscreen extends JmUI
             mmp.save();
             Theme theme = ThemeFileHandler.getThemeByName(name);
             ThemeFileHandler.setCurrentTheme(theme);
-            UIManager.getInstance().getMiniMap().reset();
+            UIManager.INSTANCE.getMiniMap().reset();
             ChatLog.announceI18N("jm.common.ui_theme_applied");
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
         catch (Exception e)
         {
