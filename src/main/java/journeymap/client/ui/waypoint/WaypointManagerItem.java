@@ -25,9 +25,9 @@ import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.*;
 import java.util.Collection;
@@ -55,7 +55,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     Button buttonEdit;
     Button buttonFind;
     Button buttonTeleport;
-    Button buttonCopy;
+    Button buttonChat;
     int hgap = 4;
     ButtonList buttonListLeft;
     ButtonList buttonListRight;
@@ -89,10 +89,10 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
         buttonEdit = new Button(Constants.getString("jm.waypoint.edit"));
         buttonRemove = new Button(Constants.getString("jm.waypoint.remove"));
-        buttonCopy = new Button(Constants.getString("jm.waypoint.copy"));
-        buttonCopy.setTooltip(Constants.getString("jm.waypoint.copy.tooltip"));
+        buttonChat = new Button(Constants.getString("jm.waypoint.chat"));
+        buttonChat.setTooltip(Constants.getString("jm.waypoint.chat.tooltip"));
 
-        buttonListRight = new ButtonList(buttonCopy, buttonEdit, buttonRemove);
+        buttonListRight = new ButtonList(buttonChat, buttonEdit, buttonRemove);
         buttonListRight.setHeights(manager.rowHeight);
         buttonListRight.fitWidths(fontRenderer);
 
@@ -221,9 +221,9 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             return false;
         }
 
-        if (buttonCopy.mouseOver(mouseX, mouseY))
+        if (buttonChat.mouseOver(mouseX, mouseY))
         {
-            GuiScreen.setClipboardString(this.waypoint.toChatString());
+            FMLClientHandler.instance().getClient().displayGuiScreen(new WaypointChat(this.waypoint));
             mouseOver = true;
         }
         else if (buttonRemove.mouseOver(mouseX, mouseY))
@@ -329,11 +329,6 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
-
-        if (buttonCopy.isMouseOver())
-        {
-            DrawUtil.drawLabel(Constants.getString("jm.waypoint.copy.tooltip"), mouseX, mouseY, DrawUtil.HAlign.Left, DrawUtil.VAlign.Below, 0x000000, .5f, 0xFFFF00, 1f, 1, true);
-        }
     }
 
     @Override
@@ -352,6 +347,14 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     @Override
     public String[] mouseHover(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
+        for (Button button : buttonListLeft)
+        {
+            if (button.isMouseOver())
+            {
+                manager.drawHoveringText(button.getTooltip(), x, y, ForgeHelper.INSTANCE.getFontRenderer());
+            }
+        }
+
         return new String[0]; // TODO
     }
 
