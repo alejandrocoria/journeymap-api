@@ -30,6 +30,7 @@ import java.util.Set;
 @SideOnly(Side.CLIENT)
 public class ChatEventHandler implements EventHandlerManager.EventHandler
 {
+
     Set<String> featureControlCodes = FeatureManager.instance().getControlCodes();
 
     @Override
@@ -46,10 +47,9 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
         {
             try
             {
-                String text = event.message.getUnformattedText();
+                String text = event.message.getFormattedText();
                 if (!Strings.isNullOrEmpty(text))
                 {
-                    //EventHandlerManager.registerGeneralHandlers();
                     WaypointParser.parseChatForWaypoints(event, text);
                     checkForControlCode(text.replaceAll(EnumChatFormatting.RESET.toString(), ""));
                 }

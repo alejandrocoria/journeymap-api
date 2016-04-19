@@ -8,8 +8,8 @@
 
 package journeymap.server.nbt;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.server.FMLServerHandler;
 
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ public class WorldNbtIDSaveHandler
 
     public WorldNbtIDSaveHandler()
     {
-        world = MinecraftServer.getServer().getEntityWorld();
+        world = FMLServerHandler.instance().getServer().getEntityWorld();
         legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
         data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, DAT_FILE);
     }

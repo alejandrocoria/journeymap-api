@@ -10,7 +10,6 @@ package journeymap.client.io;
 
 import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapType;
@@ -19,6 +18,7 @@ import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -128,17 +128,15 @@ public class MapSaver
      */
     private void prepareFiles()
     {
-
         try
         {
-
             // Build save file name
-            final Minecraft mc = ForgeHelper.INSTANCE.getClient();
+            final Minecraft mc = FMLClientHandler.instance().getClient();
             final String date = dateFormat.format(new Date());
             final boolean isUnderground = mapType.isUnderground();
             final StringBuilder sb = new StringBuilder(date).append("_");
             sb.append(WorldData.getWorldName(mc, false)).append("_");
-            sb.append(WorldData.getSafeDimensionName(mc.theWorld.provider)).append("_");
+            sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.theWorld.provider))).append("_");
             if (isUnderground)
             {
                 sb.append("slice").append(mapType.dimension);
@@ -150,7 +148,7 @@ public class MapSaver
             sb.append(".png");
 
             // Ensure screenshots directory
-            File screenshotsDir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, "screenshots");
+            File screenshotsDir = new File(FMLClientHandler.instance().getClient().mcDataDir, "screenshots");
             if (!screenshotsDir.exists())
             {
                 screenshotsDir.mkdir();

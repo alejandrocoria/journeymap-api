@@ -31,6 +31,8 @@ import org.apache.logging.log4j.Level;
  */
 public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 {
+    public static final String PROP_SHORE = "isShore";
+
     protected final Object chunkLock = new Object();
     private Integer[] waterPalette;
     private Integer[] landPalette;
@@ -68,6 +70,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         primarySlopeOffsets.add(new BlockCoordIntPair(-1, 0)); // West
         primarySlopeOffsets.add(new BlockCoordIntPair(0, 1)); // South
         primarySlopeOffsets.add(new BlockCoordIntPair(1, 0)); // East
+
     }
 
     /**
@@ -83,6 +86,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         topoProperties = JourneymapClient.getTopoProperties();
         if (System.currentTimeMillis() - lastPropFileUpdate > 5000 && lastPropFileUpdate < topoProperties.lastModified())
         {
+            Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
             topoProperties.load();
             lastPropFileUpdate = topoProperties.lastModified();
 
@@ -97,6 +101,8 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
             landPaletteRange = landPalette.length - 1;
             landContourInterval = worldHeight / Math.max(1, landPalette.length);
+
+            clearCaches();
         }
     }
 
@@ -176,7 +182,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().log(Level.WARN, LogFormatter.toString(t));
+            Journeymap.getLogger().log(Level.WARN, "Error in renderSurface: " + LogFormatter.toString(t));
         }
 
         return chunkOk;
@@ -203,19 +209,18 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         try
         {
-            boolean propUnsetWaterHeight = true;
             BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
             while (y > 0)
             {
                 if (blockMD.isWater() || blockMD.isIce())
                 {
-                    if (!mapBathymetry)
+                    if (mapBathymetry)
                     {
-                        break;
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
                     }
                     else
                     {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        break;
                     }
                 }
                 else if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoTopo))
@@ -247,12 +252,9 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
 
-
-
         float h;
         Float slope;
         double contourInterval;
-        float hN, hW, hE, hS;
         float nearZero = 0.0001f;
         for (int z = 0; z < 16; z++)
         {
@@ -261,22 +263,56 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
 
                 BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, (int) h, z);
-                if (blockMD.isWater() || blockMD.isIce())
+
+                boolean isWater = false;
+
+                if (blockMD.isWater() || blockMD.isIce() || (mapBathymetry && getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z) != null))
                 {
+                    isWater = true;
                     contourInterval = waterContourInterval;
                 }
                 else
                 {
+
                     contourInterval = landContourInterval;
                 }
 
                 float[] heights = new float[primarySlopeOffsets.size()];
                 Float lastOffsetHeight = null;
                 boolean flatOffsets = true;
+                boolean isShore = false;
                 for (int i = 0; i < heights.length; i++)
                 {
+                    BlockCoordIntPair offset = primarySlopeOffsets.get(i);
+
                     // Get height
-                    float offsetHeight = getSurfaceBlockHeight(chunkMd, x, z, primarySlopeOffsets.get(i), (int) h, chunkHeights);
+                    float offsetHeight = getSurfaceBlockHeight(chunkMd, x, z, offset, (int) h, chunkHeights);
+
+                    // If water, check for neighboring land
+                    if (isWater && !isShore)
+                    {
+                        // offset is either also  not set, try to manually find out
+                        ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
+                        final int newX = ((chunkMd.getCoord().chunkXPos << 4) + (x + offset.x)) & 15;
+                        final int newZ = ((chunkMd.getCoord().chunkZPos << 4) + (z + offset.z)) & 15;
+
+                        if (targetChunkMd != null)
+                        {
+                            if (mapBathymetry && getColumnProperty(PROP_WATER_HEIGHT, null, targetChunkMd, newX, newZ) == null)
+                            {
+                                isShore = true;
+                            }
+                            else
+                            {
+                                int ceiling = targetChunkMd.ceiling(newX, newZ);
+                                BlockMD offsetBlock = targetChunkMd.getTopBlockMD(newX, (int) ceiling, newZ);
+                                if (!offsetBlock.isWater() && !offsetBlock.isIce())
+                                {
+                                    isShore = true;
+                                }
+                            }
+                        }
+                    }
 
                     // Shift to nearest contour
                     offsetHeight = (float) Math.max(nearZero, offsetHeight - (offsetHeight % contourInterval));
@@ -290,6 +326,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         flatOffsets = (lastOffsetHeight == offsetHeight);
                     }
+                }
+
+                if (isWater)
+                {
+                    setColumnProperty(PROP_SHORE, isShore, chunkMd, x, z);
                 }
 
 
@@ -330,19 +371,13 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
 
         float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
+        boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
 
         int color;
-        if (slope > 1 && landContourColor != null)
+        if (slope > 1)
         {
-            if (topBlockMd.isWater() || topBlockMd.isIce())
-            {
-                // Contour ring between ortho step
-                color = waterContourColor;
-            }
-            else
-            {
-                color = landContourColor;
-            }
+            // Contour lines between intervals
+            color = isWater ? waterContourColor : landContourColor;
         }
         else
         {
@@ -351,23 +386,43 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 // Use standard lava color
                 color = topBlockMd.getColor();
             }
-            else if (topBlockMd.isWater() || topBlockMd.isIce())
+            else if (isWater)
             {
-                // Get color from water palette
-                int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);
-                // Precautionary - ensure in range
-                index = Math.max(0, Math.min(index, waterPaletteRange));
-                color = waterPalette[index];
+                if (Boolean.TRUE.equals(getColumnProperty(PROP_SHORE, Boolean.FALSE, chunkMd, x, z)))
+                {
+                    // water is touching land, use the contour color
+                    color = waterContourColor;
+                }
+                else
+                {
+                    // Get color from water palette
+                    int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);
+
+                    // Precautionary - ensure in range
+                    index = Math.max(0, Math.min(index, waterPaletteRange));
+                    color = waterPalette[index];
+
+                    // Darken downhill of contour line
+                    if (slope < 1)
+                    {
+                        color = RGB.adjustBrightness(color, .90f);
+                    }
+                }
             }
             else
             {
                 // Get color from land palette
                 int index = (int) Math.floor((y - (y % landContourInterval)) / landContourInterval);
+
                 // Precautionary - ensure in range
                 index = Math.max(0, Math.min(index, landPaletteRange));
                 color = landPalette[index];
-                // Darken next to contour ring if slope
-                color = RGB.adjustBrightness(color, slope);
+
+                // Darken downhill of contour line
+                if (slope < 1)
+                {
+                    color = RGB.adjustBrightness(color, .85f);
+                }
             }
         }
 
@@ -390,8 +445,17 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     private void clearCaches()
     {
-        chunkSurfaceHeights.invalidateAll();
-        chunkSurfaceSlopes.invalidateAll();
-        columnPropertiesCache.invalidateAll();
+        if (chunkSurfaceHeights != null)
+        {
+            chunkSurfaceHeights.invalidateAll();
+        }
+        if (chunkSurfaceSlopes != null)
+        {
+            chunkSurfaceSlopes.invalidateAll();
+        }
+        if (columnPropertiesCache != null)
+        {
+            columnPropertiesCache.invalidateAll();
+        }
     }
 }

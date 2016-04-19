@@ -30,11 +30,14 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
 
     private static final String DEFAULT_LAND_CONTOUR_COLOR = "#3F250B";
 
-    private static final String DEFAULT_WATER_CONTOUR_COLOR = "#000066";
+    private static final String DEFAULT_WATER_CONTOUR_COLOR = "#0000dd";
 
-    private static final String DEFAULT_LAND_COLORS = "#000800,#000f00,#001700,#001f00,#002700,#002e00,#003600,#003e00," +
-            "#004600,#004d00,#005500,#036103,#066e06,#097a09,#0c860c,#0f930f,#139f13,#16ac16,#19b819,#1cc41c,#1fd11f," +
-            "#22dd22,#36e036,#4ae34a,#5ee65e,#72e972,#86ec86,#9bf09b,#aff3af,#c3f6c3,#d7f9d7,#ebfceb";
+    private static final String DEFAULT_LAND_COLORS = "#010c02,#041105,#071609,#0a1b0c,#0d200f,#102513,#132a16,#162f19," +
+            "#19341c,#1b3a20,#1e3f23,#214426,#24492a,#274e2d,#2a5330,#2d5834,#375f41,#41674d,#4b6e5a,#557567,#5f7c73," +
+            "#698480,#738b8d,#7c929a,#8699a6,#90a1b3,#9aa8c0,#a4afcc,#aeb6d9,#b8bee6,#c2c5f2,#ccccff,#cccfff,#ccd2ff," +
+            "#ccd6ff,#ccd9ff,#ccdcff,#ccdfff,#cce2ff,#cce5ff,#cce9ff,#ccecff,#ccefff,#ccf2ff,#ccf5ff,#ccf9ff,#ccfcff," +
+            "#ccffff,#cfffff,#d2ffff,#d6ffff,#d9ffff,#dcffff,#dfffff,#e2ffff,#e5ffff,#e9ffff,#ecffff,#efffff,#f2ffff," +
+            "#f5ffff,#f9ffff,#fcffff,#ffffff";
 
     private static final String DEFAULT_WATER_COLORS = "#000040,#02024e,#03035d,#05056b,#070779,#080887,#0a0a96,#0b0ba4," +
             "#1a1aaa,#2a2aaf,#3939b5,#4848bb,#5757c0,#6767c6,#7676cc,#8585d2,#9494d7,#a4a4dd,#b3b3e3,#c2c2e8,#d1d1ee," +

@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -120,7 +121,7 @@ public class Journeymap
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
-        MinecraftServer server = MinecraftServer.getServer();
+        MinecraftServer server = FMLServerHandler.instance().getServer();
         JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
         getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
     }

@@ -16,13 +16,14 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
  * Created by mwoodman on 4/8/2014.
  */
 public class CmdTeleportWaypoint
 {
-    final Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    final Minecraft mc = FMLClientHandler.instance().getClient();
     final Waypoint waypoint;
 
     public CmdTeleportWaypoint(Waypoint waypoint)

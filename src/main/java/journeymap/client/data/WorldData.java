@@ -177,12 +177,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
-    public static List<WorldProvider> getDimensionProviders(List<Integer> requiredDimensionList)
+    public static List<DimensionProvider> getDimensionProviders(List<Integer> requiredDimensionList)
     {
         try
         {
             HashSet<Integer> requiredDims = new HashSet<Integer>(requiredDimensionList);
-            HashMap<Integer, WorldProvider> dimProviders = new HashMap<Integer, WorldProvider>();
+            HashMap<Integer, DimensionProvider> dimProviders = new HashMap<Integer, DimensionProvider>();
 
             Level logLevel = Level.DEBUG;
             Journeymap.getLogger().log(logLevel, String.format("Required dimensions from waypoints: %s", requiredDimensionList));
@@ -198,11 +198,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
-            WorldProvider playerProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
-            int dimId = ForgeHelper.INSTANCE.getDimension(playerProvider);
-            dimProviders.put(dimId, playerProvider);
+            WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+            int dimId = ForgeHelper.INSTANCE.getDimension();
+            DimensionProvider playerDimProvider = new WrappedProvider(playerProvider);
+            dimProviders.put(dimId, playerDimProvider);
             requiredDims.remove(dimId);
-            Journeymap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerProvider)));
+            Journeymap.getLogger().log(logLevel, String.format("Using player's provider for dim %s: %s", dimId, getSafeDimensionName(playerDimProvider)));
 
             // Get a provider for the rest
             for (int dim : requiredDims)
@@ -213,8 +214,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
                     {
                         try
                         {
-                            WorldProvider dimProvider = DimensionManager.getProvider(dim);
-                            dimProvider.getDimensionName(); // Force the name error
+                            WorldProvider worldProvider = DimensionManager.getProvider(dim);
+                            worldProvider.getDimensionName(); // Force the name error.
+                            DimensionProvider dimProvider = new WrappedProvider(worldProvider);
                             dimProviders.put(dim, dimProvider);
                             Journeymap.getLogger().log(logLevel, String.format("DimensionManager.getProvider(%s): %s", dim, getSafeDimensionName(dimProvider)));
                         }
@@ -231,8 +233,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
                             provider = DimensionManager.createProviderFor(dim);
                             provider.getDimensionName(); // Force the name error
                             provider.setDimension(dim);
-                            dimProviders.put(dim, provider);
-                            Journeymap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(playerProvider)));
+                            DimensionProvider dimProvider = new WrappedProvider(provider);
+                            dimProviders.put(dim, dimProvider);
+                            Journeymap.getLogger().log(logLevel, String.format("DimensionManager.createProviderFor(%s): %s", dim, getSafeDimensionName(dimProvider)));
                         }
                         catch (Throwable t)
                         {
@@ -250,20 +253,19 @@ public class WorldData extends CacheLoader<Class, WorldData>
             {
                 if (!dimProviders.containsKey(dim))
                 {
-                    WorldProvider provider = new FakeDimensionProvider(dim);
-                    dimProviders.put(dim, provider);
-                    Journeymap.getLogger().warn(String.format("Used FakeDimensionProvider for required dim: %s", dim));
+                    dimProviders.put(dim, new DummyProvider(dim));
+                    Journeymap.getLogger().warn(String.format("Used DummyProvider for required dim: %s", dim));
                 }
             }
 
             // Sort by dim and return
-            ArrayList<WorldProvider> providerList = new ArrayList<WorldProvider>(dimProviders.values());
-            Collections.sort(providerList, new Comparator<WorldProvider>()
+            ArrayList<DimensionProvider> providerList = new ArrayList<DimensionProvider>(dimProviders.values());
+            Collections.sort(providerList, new Comparator<DimensionProvider>()
             {
                 @Override
-                public int compare(WorldProvider o1, WorldProvider o2)
+                public int compare(DimensionProvider o1, DimensionProvider o2)
                 {
-                    return Integer.valueOf(ForgeHelper.INSTANCE.getDimension(o1)).compareTo(ForgeHelper.INSTANCE.getDimension(o2));
+                    return Integer.valueOf(o1.getDimension()).compareTo(o2.getDimension());
                 }
             });
 
@@ -276,34 +278,34 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
-    public static String getSafeDimensionName(WorldProvider worldProvider)
+    public static String getSafeDimensionName(DimensionProvider dimensionProvider)
     {
-        if (worldProvider == null)
+        if (dimensionProvider == null || dimensionProvider.getName()==null)
         {
             return null;
         }
 
         try
         {
-            return worldProvider.getDimensionName();
+            return dimensionProvider.getName();
         }
         catch (Exception e)
         {
-            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
+            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension());
         }
     }
 
     @Override
     public WorldData load(Class aClass) throws Exception
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         WorldInfo worldInfo = mc.theWorld.getWorldInfo();
 
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
         name = getWorldName(mc, false);
-        dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld.provider);
+        dimension = ForgeHelper.INSTANCE.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.theWorld.getWorldTime() % 24000L;
@@ -330,25 +332,63 @@ public class WorldData extends CacheLoader<Class, WorldData>
     }
 
     /**
-     * Stand-in for world provider that couldn't be found.
+     * Interface to abstract how ID and name are provided.
      */
-    static class FakeDimensionProvider extends WorldProvider
+    public static interface DimensionProvider
     {
-        FakeDimensionProvider(int dimension)
+        int getDimension();
+        String getName();
+    }
+
+    /**
+     * Wraps a world provider.
+     */
+    public static class WrappedProvider implements DimensionProvider
+    {
+        WorldProvider worldProvider;
+
+        public WrappedProvider(WorldProvider worldProvider)
         {
-            this.dimensionId = dimension;
+            this.worldProvider = worldProvider;
         }
 
         @Override
-        public String getDimensionName()
+        public int getDimension()
         {
-            return Constants.getString("jm.common.dimension", this.dimensionId);
+            return worldProvider.getDimensionId();
         }
 
-        // New in 1.8, unused in 1.7
-        public String getInternalNameSuffix()
+        @Override
+        public String getName()
         {
-            return "fake";
+            return worldProvider.getDimensionName();
         }
     }
+
+    /**
+     * Stand-in for world provider that couldn't be found.
+     */
+    static class DummyProvider implements DimensionProvider
+    {
+        final int dim;
+
+        DummyProvider(int dim)
+        {
+            this.dim = dim;
+        }
+
+        @Override
+        public int getDimension()
+        {
+            return dim;
+        }
+
+        @Override
+        public String getName()
+        {
+            return "Dimension " + dim;
+        }
+    }
+
+
 }

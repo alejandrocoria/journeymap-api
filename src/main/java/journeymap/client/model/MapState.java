@@ -327,7 +327,7 @@ public class MapState
 
     public boolean zoomIn()
     {
-        if (lastMapProperties.zoomLevel.get()< maxZoom)
+        if (lastMapProperties.zoomLevel.get() < maxZoom)
         {
             return setZoom(lastMapProperties.zoomLevel.get() + 1);
         }
@@ -336,7 +336,7 @@ public class MapState
 
     public boolean zoomOut()
     {
-        if (lastMapProperties.zoomLevel.get()> minZoom)
+        if (lastMapProperties.zoomLevel.get() > minZoom)
         {
             return setZoom(lastMapProperties.zoomLevel.get() - 1);
         }

@@ -52,6 +52,7 @@ public class BooleanField extends ConfigField<Boolean>
 
     /**
      * Toggle the boolean value
+     *
      * @return the new value
      */
     public boolean toggle()
@@ -74,6 +75,7 @@ public class BooleanField extends ConfigField<Boolean>
 
     /**
      * Whether this field is the master checkbox for the entire category
+     *
      * @return
      */
     public boolean isCategoryMaster()

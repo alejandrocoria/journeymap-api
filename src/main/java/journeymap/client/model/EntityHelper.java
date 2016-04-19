@@ -33,6 +33,7 @@ import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
         timer.start();
 
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         List<EntityDTO> list = new ArrayList();
 
         List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
@@ -136,7 +137,7 @@ public class EntityHelper
         StatTimer timer = StatTimer.get("EntityHelper.getPlayersNearby");
         timer.start();
 
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
         allPlayers.remove(mc.thePlayer);
 
@@ -219,7 +220,7 @@ public class EntityHelper
             if (entityRender instanceof RenderHorse)
             {
                 EntityHorse horse = ((EntityHorse) entity);
-                final int type = ((EntityHorse) entity).getHorseType();
+                final int type = ((EntityHorse) entity).getHorseVariant();
                 switch (type)
                 {
                     case 1:

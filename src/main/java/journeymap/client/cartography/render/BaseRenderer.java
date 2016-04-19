@@ -488,12 +488,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return y;
     }
 
-
     /**
-     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     * Get the col property at the coordinates + offsets.
+     * Returns null if target chunk not loaded.
      */
-    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal,
-                                     final HeightsCache chunkHeights)
+    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset)
     {
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
@@ -511,7 +510,46 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         if (targetChunkMd != null)
         {
-            Integer height = getSurfaceBlockHeight(targetChunkMd, blockX & 15, blockZ & 15, chunkHeights);
+            return getColumnProperty(name, defaultValue, targetChunkMd, x, z);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Get chunk using coord offsets.
+     * @return null if chunk not in memory
+     */
+    public ChunkMD getOffsetChunk(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset)
+    {
+        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
+        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
+        final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
+        if (targetCoord.equals(chunkMd.getCoord()))
+        {
+            return chunkMd;
+        }
+        else
+        {
+           return dataCache.getChunkMD(targetCoord);
+        }
+    }
+
+    /**
+     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     */
+    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal,
+                                     final HeightsCache chunkHeights)
+    {
+        ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
+        final int newX = ((chunkMd.getCoord().chunkXPos << 4) + (x + offset.x)) & 15;
+        final int newZ = ((chunkMd.getCoord().chunkZPos << 4) + (z + offset.z)) & 15;
+
+        if (targetChunkMd != null)
+        {
+            Integer height = getSurfaceBlockHeight(targetChunkMd, newX, newZ, chunkHeights);
             if (height == null)
             {
                 return defaultVal;
@@ -578,7 +616,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(e.getMessage());
+            Journeymap.getLogger().warn("Error in getColumnProperties(): " + e.getMessage());
             return null;
         }
     }

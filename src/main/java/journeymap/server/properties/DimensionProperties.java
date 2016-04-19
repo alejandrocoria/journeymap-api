@@ -14,7 +14,7 @@ public class DimensionProperties extends PermissionProperties
     /**
      * Constructor.
      *
-     * @param dimension  the dimension id this applies to
+     * @param dimension the dimension id this applies to
      */
     public DimensionProperties(Integer dimension)
     {

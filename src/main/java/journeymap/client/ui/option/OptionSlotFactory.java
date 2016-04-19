@@ -206,7 +206,7 @@ public class OptionSlotFactory
 
         return map;
     }
-    
+
     static String getTooltip(ConfigField configField)
     {
         String tooltipKey = configField.getKey() + ".tooltip";
@@ -225,15 +225,15 @@ public class OptionSlotFactory
      */
     static SlotMetadata<Boolean> getBooleanSlotMetadata(BooleanField field)
     {
-            String name = Constants.getString(field.getKey());
-            String tooltip = getTooltip(field);
-            String defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
+        String name = Constants.getString(field.getKey());
+        String tooltip = getTooltip(field);
+        String defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
         boolean advanced = field.getCategory() == Advanced;
 
         CheckBox button = new CheckBox(name, field);
-            SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
-            slotMetadata.setMasterPropertyForCategory(field.isCategoryMaster());
-            if (field.isCategoryMaster())
+        SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
+        slotMetadata.setMasterPropertyForCategory(field.isCategoryMaster());
+        if (field.isCategoryMaster())
             {
                 button.setLabelColors(RGB.CYAN_RGB, null, null);
             }
@@ -303,6 +303,7 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for a bound list of strings property
+     *
      * @param field
      * @return
      */

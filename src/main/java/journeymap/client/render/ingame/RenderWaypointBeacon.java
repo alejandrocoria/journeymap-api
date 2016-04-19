@@ -28,6 +28,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -41,7 +42,7 @@ public class RenderWaypointBeacon
     static final ResourceLocation beam = new ResourceLocation("textures/entity/beacon_beam.png");
     //    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
-    static Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    static Minecraft mc = FMLClientHandler.instance().getClient();
     static RenderManager renderManager = ForgeHelper.INSTANCE.getRenderManager();
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;

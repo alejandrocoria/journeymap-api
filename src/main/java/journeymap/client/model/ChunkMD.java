@@ -15,10 +15,12 @@ import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
@@ -68,12 +70,12 @@ public class ChunkMD
 
     public Block getBlock(int x, int y, int z)
     {
-        return getChunk().getBlock(x, y, z);
+        return getChunk().getBlock(new BlockPos(x, y, z));
     }
 
     public BlockMD getBlockMD(int x, int y, int z)
     {
-        return BlockMD.get(getChunk().getBlock(x, y, z), getBlockMeta(x, y, z));
+        return BlockMD.get(getBlock(x, y, z), getBlockMeta(x, y, z));
     }
 
     /**
@@ -313,7 +315,7 @@ public class ChunkMD
 
     public int getDimension()
     {
-        return ForgeHelper.INSTANCE.getDimension(getWorld());
+        return ForgeHelper.INSTANCE.getDimension();
     }
 
     public void stopChunkRetention()
@@ -340,7 +342,7 @@ public class ChunkMD
 
     public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, ChunkMD>
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
 
         @Override
         public ChunkMD load(ChunkCoordIntPair coord) throws Exception

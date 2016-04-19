@@ -8,13 +8,13 @@
 
 package journeymap.client.task.multi;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.thread.RunnableTask;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.profiler.Profiler;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ public class TaskController
     final static Logger logger = Journeymap.getLogger();
     final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
-    final Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+    final Minecraft minecraft = FMLClientHandler.instance().getClient();
     final ReentrantLock lock = new ReentrantLock();
 
     // Executor for task threads
@@ -115,7 +115,7 @@ public class TaskController
         ITaskManager taskManager = getManager(managerClass);
         if (taskManager != null)
         {
-            return taskManager.isEnabled(ForgeHelper.INSTANCE.getClient());
+            return taskManager.isEnabled(FMLClientHandler.instance().getClient());
         }
         else
         {
@@ -148,7 +148,7 @@ public class TaskController
 
     private void toggleTask(ITaskManager manager, boolean enable, Object params)
     {
-        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         if (manager.isEnabled(minecraft))
         {
             if (!enable)
@@ -194,7 +194,7 @@ public class TaskController
 
     public void performTasks()
     {
-        Profiler profiler = ForgeHelper.INSTANCE.getClient().mcProfiler;
+        Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;
         profiler.startSection("journeymapTask");
         StatTimer totalTimer = StatTimer.get("TaskController.performMultithreadTasks", 1, 500).start();
 

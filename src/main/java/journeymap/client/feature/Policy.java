@@ -8,9 +8,9 @@
 
 package journeymap.client.feature;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class Policy
 {
-    static Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    static Minecraft mc = FMLClientHandler.instance().getClient();
     final Feature feature;
     final boolean allowInSingleplayer;
     final boolean allowInMultiplayer;

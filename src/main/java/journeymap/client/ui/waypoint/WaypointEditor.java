@@ -33,7 +33,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.WorldProvider;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -167,9 +166,9 @@ public class WaypointEditor extends JmUI
 
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
 
-                for (WorldProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
+                for (WorldData.DimensionProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
                 {
-                    int dim = ForgeHelper.INSTANCE.getDimension(provider);
+                    int dim = provider.getDimension();
                     String dimName = Integer.toString(dim);
                     try
                     {
