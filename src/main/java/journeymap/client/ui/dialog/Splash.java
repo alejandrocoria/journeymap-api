@@ -45,7 +45,8 @@ public class Splash extends JmUI
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("Xariyl", "Xariyl", "jm.common.splash_patreon"),
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("bob10234", "Bobfilms", "jm.common.splash_patreon")
+            new SplashPerson("bob10234", "Bobfilms", "jm.common.splash_patreon"),
+            new SplashPerson("CaerMaster", "CaerMaster", "jm.common.splash_patreon")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
