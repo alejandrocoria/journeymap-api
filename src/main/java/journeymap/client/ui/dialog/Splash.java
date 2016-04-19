@@ -43,9 +43,9 @@ public class Splash extends JmUI
     ButtonList infoButtons;
 
     private List<SplashPerson> people = Arrays.asList(
+            new SplashPerson("Xariyl", "Xariyl", "jm.common.splash_patreon"),
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("bmangt2", "Opzon", "jm.common.splash_patreon"),
-            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
+            new SplashPerson("bob10234", "Bobfilms", "jm.common.splash_patreon")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
