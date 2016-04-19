@@ -44,6 +44,7 @@ import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -326,7 +327,7 @@ public class JourneymapClient implements CommonProxy
             timer = StatTimer.getDisposable("elapsed").start();
 
             // Get ref to Minecraft
-            mc = ForgeHelper.INSTANCE.getClient();
+            mc = FMLClientHandler.instance().getClient();
 
             // Main thread task controller
             mainThreadTaskController = new MainTaskController(mc, this);
@@ -496,7 +497,7 @@ public class JourneymapClient implements CommonProxy
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
-            int dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld);
+            int dimension = ForgeHelper.INSTANCE.getDimension();
             logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
                     File.separator,
                     dimension,
@@ -516,7 +517,7 @@ public class JourneymapClient implements CommonProxy
         {
             if ((isMapping()) && mc != null)
             {
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension()));
                 RegionImageCache.instance().flushToDiskAsync(false);
             }
 
@@ -527,7 +528,7 @@ public class JourneymapClient implements CommonProxy
                 multithreadTaskController = null;
             }
 
-            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension(mc.theWorld) : 0;
+            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension() : 0;
 
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
         }

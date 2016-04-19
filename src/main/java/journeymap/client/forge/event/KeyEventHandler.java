@@ -10,7 +10,6 @@ package journeymap.client.forge.event;
 
 
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.Tile;
@@ -20,6 +19,7 @@ import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -128,13 +128,13 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 if (Constants.KB_MAP.isKeyDown())
                 {
-                    if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
+                    if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
                         UIManager.getInstance().openFullscreenMap();
                     }
                     else
                     {
-                        if (ForgeHelper.INSTANCE.getClient().currentScreen instanceof Fullscreen)
+                        if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
                         {
                             UIManager.getInstance().closeAll();
                         }
@@ -145,9 +145,9 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 {
                     if (Constants.KB_WAYPOINT.isKeyDown())
                     {
-                        if (ForgeHelper.INSTANCE.getClient().currentScreen == null)
+                        if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {
-                            Minecraft mc = ForgeHelper.INSTANCE.getClient();
+                            Minecraft mc = FMLClientHandler.instance().getClient();
                             Waypoint waypoint = Waypoint.of(mc.thePlayer);
                             UIManager.getInstance().openWaypointEditor(waypoint, true, null);
                         }

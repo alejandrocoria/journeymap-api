@@ -8,6 +8,7 @@
 
 package journeymap.client.ui.option;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
@@ -17,7 +18,6 @@ import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumChatFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,22 +198,22 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
             ArrayList<ChatComponentTranslation> lines = new ArrayList<ChatComponentTranslation>(4);
             if (this.tooltip != null || this.range != null || this.defaultValue != null || advanced)
             {
-                EnumChatFormatting nameColor = isToolbar() ? EnumChatFormatting.GREEN : (advanced ? EnumChatFormatting.RED : EnumChatFormatting.AQUA);
+                ChatFormatting nameColor = isToolbar() ? ChatFormatting.GREEN : (advanced ? ChatFormatting.RED : ChatFormatting.AQUA);
                 lines.add(new ChatComponentTranslation("jm.config.tooltip_format", nameColor, this.name));
                 if (this.tooltip != null)
                 {
-                    lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
+                    lines.addAll(getWordWrappedLines(ChatFormatting.YELLOW.toString(), this.tooltip));
                 }
 
                 if (button != null && button instanceof IntSliderButton)
                 {
-                    lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
+                    lines.addAll(getWordWrappedLines(ChatFormatting.GRAY.toString() + ChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));
                 }
 
                 if (this.range != null)
                 {
-                    lines.add(new ChatComponentTranslation("jm.config.tooltip_format", EnumChatFormatting.WHITE, this.range));
+                    lines.add(new ChatComponentTranslation("jm.config.tooltip_format", ChatFormatting.WHITE, this.range));
                 }
             }
 

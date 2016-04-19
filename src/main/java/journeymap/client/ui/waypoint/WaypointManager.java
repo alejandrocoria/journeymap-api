@@ -10,7 +10,6 @@ package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
 import journeymap.client.command.CmdTeleportWaypoint;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.ClientCategory;
@@ -23,6 +22,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.properties.Category;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class WaypointManager extends JmUI
 
             if (buttonSortDistance == null)
             {
-                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(ForgeHelper.INSTANCE.getClient().thePlayer, true);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);
@@ -472,7 +472,7 @@ public class WaypointManager extends JmUI
     protected void updateItems()
     {
         items.clear();
-        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : ForgeHelper.INSTANCE.getDimension(DimensionsButton.currentWorldProvider);
+        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : DimensionsButton.currentWorldProvider.getDimension();
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 

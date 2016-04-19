@@ -122,7 +122,7 @@ public class RegionImageCache
                 logger.debug("RegionImageCache auto-flushing"); //$NON-NLS-1$
             }
 
-            if(async)
+            if (async)
             {
                 flushToDiskAsync(false);
             }

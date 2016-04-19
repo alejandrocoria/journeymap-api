@@ -138,11 +138,11 @@ public class ImageHolder implements IThreadedFileIO
     {
         if (!hasTexture())
         {
-            if(!imagePath.toFile().exists())
+            if (!imagePath.toFile().exists())
             {
                 // check for .new that didn't finish renaming
                 File temp = new File(imagePath.toString() + ".new");
-                if(temp.exists())
+                if (temp.exists())
                 {
                     Journeymap.getLogger().warn("Recovered image file: " + temp);
                     temp.renameTo(imagePath.toFile());
@@ -199,9 +199,9 @@ public class ImageHolder implements IThreadedFileIO
             {
                 int tries = 0;
                 boolean success = false;
-                while(tries<5)
+                while (tries < 5)
                 {
-                    if(writeNextIO())
+                    if (writeNextIO())
                     {
                         tries++;
                     }
@@ -211,7 +211,7 @@ public class ImageHolder implements IThreadedFileIO
                         break;
                     }
                 }
-                if(!success)
+                if (!success)
                 {
                     Journeymap.getLogger().warn("Couldn't write file after 5 tries: " + this);
                 }

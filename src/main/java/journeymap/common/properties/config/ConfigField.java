@@ -80,8 +80,9 @@ public abstract class ConfigField<T>
 
     /**
      * Put the attribute value into the field
+     *
      * @param attrName attribute name
-     * @param value attribute value
+     * @param value    attribute value
      * @return this
      */
     public ConfigField<T> put(String attrName, Object value)
@@ -92,32 +93,38 @@ public abstract class ConfigField<T>
 
     /**
      * Gets the default value.
+     *
      * @return T
      */
     public abstract T getDefaultValue();
 
     /**
      * Gets the field value.
+     *
      * @return T
      */
     public abstract T get();
 
     /**
      * Sets the field value
+     *
      * @param value T
      * @return this
      */
-    public ConfigField<T> set(T value) {
+    public ConfigField<T> set(T value)
+    {
         put(ATTR_VALUE, value);
         return this;
     }
 
     /**
      * Whether the field is valid.
+     *
      * @param fix whether to try to fix problems
      * @return true if valid.
      */
-    public boolean validate(boolean fix) {
+    public boolean validate(boolean fix)
+    {
         boolean hasRequired = require(ATTR_TYPE, ATTR_VALUE, ATTR_DEFAULT);
         boolean hasCategory = getCategory() != null;
         return hasRequired && hasCategory;
@@ -137,6 +144,7 @@ public abstract class ConfigField<T>
 
     /**
      * Get the label i18n key.
+     *
      * @return the label key
      */
     public String getKey()
@@ -182,6 +190,7 @@ public abstract class ConfigField<T>
 
     /**
      * Gets the label.
+     *
      * @return label
      */
     public String getLabel()
@@ -203,6 +212,7 @@ public abstract class ConfigField<T>
 
     /**
      * Gets the tooltip.
+     *
      * @return tooltip
      */
     public String getTooltip()
@@ -212,6 +222,7 @@ public abstract class ConfigField<T>
 
     /**
      * Gets the field type.
+     *
      * @return type
      */
     public String getType()
@@ -221,12 +232,14 @@ public abstract class ConfigField<T>
 
     /**
      * Gets the sort order for the field when displayed.
+     *
      * @return order
      */
     public int getSortOrder()
     {
         Integer order = getIntegerAttr(ATTR_ORDER);
-        if(order==null) {
+        if (order == null)
+        {
             order = 100;
         }
         return order;
@@ -246,6 +259,7 @@ public abstract class ConfigField<T>
 
     /**
      * Gets an Integer attribute value.
+     *
      * @param attrName attribute name
      * @return Integer or null
      */
@@ -256,7 +270,7 @@ public abstract class ConfigField<T>
         {
             return (Integer) value;
         }
-        else if(value instanceof String)
+        else if (value instanceof String)
         {
             try
             {
@@ -285,7 +299,7 @@ public abstract class ConfigField<T>
         {
             return (Boolean) value;
         }
-        else if(value instanceof String)
+        else if (value instanceof String)
         {
             try
             {
@@ -303,9 +317,10 @@ public abstract class ConfigField<T>
 
     /**
      * Get the attribute of the Enum type specified.
+     *
      * @param attrName attribute name
      * @param enumType Enum class
-     * @param <E> Enum
+     * @param <E>      Enum
      * @return Enum value of attribute
      */
     public <E extends Enum> E getEnumAttr(String attrName, Class<E> enumType)
@@ -315,7 +330,7 @@ public abstract class ConfigField<T>
         {
             return (E) value;
         }
-        else if(value instanceof String)
+        else if (value instanceof String)
         {
             try
             {
@@ -346,7 +361,7 @@ public abstract class ConfigField<T>
      */
     public ConfigField<T> defaultValue(T defaultValue)
     {
-        if(defaultValue==null)
+        if (defaultValue == null)
         {
             Journeymap.getLogger().warn("defaultValue shouldn't be null");
         }
@@ -356,16 +371,18 @@ public abstract class ConfigField<T>
 
     /**
      * Ensure the name attributes are present on the field.
+     *
      * @param attrNames attribute names required attribute names
      * @return true if all attributes are present
      */
     protected boolean require(String... attrNames)
     {
         boolean pass = true;
-        for(String attrName : attrNames)
+        for (String attrName : attrNames)
         {
             Object attr = get(attrName);
-            if(attr==null) {
+            if (attr == null)
+            {
                 Journeymap.getLogger().warn(String.format("Missing required attribute '%s' in %s", attrName, getDeclaredField()));
                 pass = false;
             }
@@ -456,7 +473,7 @@ public abstract class ConfigField<T>
 
     public String getDeclaredField()
     {
-        if(owner==null)
+        if (owner == null)
         {
             return null;
         }

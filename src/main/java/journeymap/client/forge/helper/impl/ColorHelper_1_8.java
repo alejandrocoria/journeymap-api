@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -232,7 +233,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
         }
 
-        TextureAtlasSprite icon = ForgeHelper.INSTANCE.getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
         return icon;
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
@@ -401,7 +402,7 @@ public class ColorHelper_1_8 implements IColorHelper
             blocksTexture = null;
             timer.start();
 
-            int blocksTexId = ForgeHelper.INSTANCE.getClient().getTextureMapBlocks().getGlTextureId();
+            int blocksTexId = FMLClientHandler.instance().getClient().getTextureMapBlocks().getGlTextureId();
             GlStateManager.bindTexture(blocksTexId);
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);

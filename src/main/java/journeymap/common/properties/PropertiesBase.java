@@ -28,13 +28,13 @@ import java.util.*;
 
 /**
  * Base GSON-backed properties class for use on client or server. Not threadsafe.
- *
+ * <p/>
  * The basics of its design:
- *  1. A subclass of PropertiesBase declares fields that need to be persisted to a JSON file.
- *     - Declare public final fields as ConfigFields for anything that needs to be displayed in Options Manager, bound to a UI element, or validated.
- *     - Declare fields of other types if needed, but you'll need to include them in updateFrom() and isValid()
- *  2. Use load() to update the values from a JSON file.  Subclasses may need constructor args.
- *  3. Use save() to write the values to a JSON file.
+ * 1. A subclass of PropertiesBase declares fields that need to be persisted to a JSON file.
+ * - Declare public final fields as ConfigFields for anything that needs to be displayed in Options Manager, bound to a UI element, or validated.
+ * - Declare fields of other types if needed, but you'll need to include them in updateFrom() and isValid()
+ * 2. Use load() to update the values from a JSON file.  Subclasses may need constructor args.
+ * 3. Use save() to write the values to a JSON file.
  */
 public abstract class PropertiesBase
 {
@@ -171,7 +171,7 @@ public abstract class PropertiesBase
         ensureInit();
         boolean saveNeeded = false;
 
-        if (!configFile.canRead())
+        if (!configFile.canRead() || configFile.length()==0)
         {
             this.postLoad(true);
             this.currentState = State.FirstLoaded;
@@ -216,6 +216,7 @@ public abstract class PropertiesBase
 
     /**
      * Override if a file needs to have initial configuration after being loaded.
+     *
      * @param isNew whether the file is being created the first time
      */
     protected void postLoad(boolean isNew)
@@ -282,8 +283,8 @@ public abstract class PropertiesBase
     /**
      * Saves the property object to file.
      *
-     * @param configFile      file to save config to
-     * @param verbose   whether to serialize all field attributes.
+     * @param configFile file to save config to
+     * @param verbose    whether to serialize all field attributes.
      * @return true if saved
      */
     public boolean save(File configFile, boolean verbose)
@@ -387,6 +388,7 @@ public abstract class PropertiesBase
 
     /**
      * Get a ConfigField by its field name
+     *
      * @param fieldName name
      * @return field or null
      */
@@ -459,7 +461,7 @@ public abstract class PropertiesBase
     /**
      * Validate all ConfigFields on the class, logging warnings where there are problems.
      *
-     * @param fix   set to true to try to correct the problems
+     * @param fix set to true to try to correct the problems
      * @return true if all valid
      */
     protected boolean validateFields(boolean fix)
@@ -499,6 +501,7 @@ public abstract class PropertiesBase
 
     /**
      * Override this to provide a customized way to exclude fields from serialization.
+     *
      * @param verbose true for verbose serialization
      * @return strategy impl or null
      */

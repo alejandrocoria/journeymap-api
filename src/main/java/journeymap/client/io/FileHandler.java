@@ -17,13 +17,13 @@ import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
 
@@ -43,7 +43,7 @@ public class FileHandler
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
-    public static final File MinecraftDirectory = ForgeHelper.INSTANCE.getClient().mcDataDir;
+    public static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
 
@@ -343,7 +343,7 @@ public class FileHandler
 
     public static File getWaypointDir()
     {
-        return getWaypointDir(getJMWorldDir(ForgeHelper.INSTANCE.getClient()));
+        return getWaypointDir(getJMWorldDir(FMLClientHandler.instance().getClient()));
     }
 
     public static File getWaypointDir(File jmWorldDir)
@@ -439,7 +439,7 @@ public class FileHandler
 
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
     {
-        File worldDir = getJMWorldDirForWorldId(ForgeHelper.INSTANCE.getClient(), null); // always use the "base" folder for multiplayer
+        File worldDir = getJMWorldDirForWorldId(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
         if (worldDir != null && worldDir.exists())
         {
             File worldConfigDir = new File(worldDir, "config");

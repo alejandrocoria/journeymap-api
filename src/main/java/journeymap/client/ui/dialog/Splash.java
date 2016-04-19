@@ -43,9 +43,9 @@ public class Splash extends JmUI
     ButtonList infoButtons;
 
     private List<SplashPerson> people = Arrays.asList(
+            new SplashPerson("Xariyl", "Xariyl", "jm.common.splash_patreon"),
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("bmangt2", "Opzon", "jm.common.splash_patreon"),
-            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
+            new SplashPerson("bob10234", "Bobfilms", "jm.common.splash_patreon")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
@@ -60,8 +60,6 @@ public class Splash extends JmUI
     {
         super(Constants.getString("jm.common.splash_title", JourneymapClient.EDITION), returnDisplay);
 
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
-
         // Get splash strings
         info = FileHandler.getMessageModel(SplashInfo.class, "splash");
 
@@ -75,6 +73,8 @@ public class Splash extends JmUI
     @Override
     public void initGui()
     {
+        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();
         int minWidth = 0;

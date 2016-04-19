@@ -20,6 +20,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class RadarDrawStepFactory
             TextureImpl entityIcon, locatorImg;
             boolean isPlayer, isPet;
 
-            String playername = ForgeHelper.INSTANCE.getEntityName(ForgeHelper.INSTANCE.getClient().thePlayer);
+            String playername = ForgeHelper.INSTANCE.getEntityName(FMLClientHandler.instance().getClient().thePlayer);
             TextureCache tc = TextureCache.instance();
             String iconSetName = mapProperties.entityIconSetName.get();
 

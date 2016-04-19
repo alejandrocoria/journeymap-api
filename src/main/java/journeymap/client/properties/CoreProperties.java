@@ -7,7 +7,6 @@
  */
 package journeymap.client.properties;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
@@ -19,6 +18,7 @@ import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.Arrays;
 
@@ -43,7 +43,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final StringField themeName = new StringField(FullMap, "jm.common.ui_theme", ThemeFileHandler.ThemeValuesProvider.class);
     public final BooleanField caveIgnoreGlass = new BooleanField(Cartography, "jm.common.map_style_caveignoreglass", true);
     public final BooleanField mapBathymetry = new BooleanField(Cartography, "jm.common.map_style_bathymetry", false);
-    public final BooleanField mapTopography = new BooleanField(Cartography, "jm.common.map_style_topography", false);
+    public final BooleanField mapTopography = new BooleanField(Cartography, "jm.common.map_style_topography", true);
     public final BooleanField mapTransparency = new BooleanField(Cartography, "jm.common.map_style_transparency", true);
     public final BooleanField mapCaveLighting = new BooleanField(Cartography, "jm.common.map_style_cavelighting", true);
     public final BooleanField mapAntialiasing = new BooleanField(Cartography, "jm.common.map_style_antialiasing", true);
@@ -108,9 +108,9 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     {
         boolean valid = super.isValid(fix);
 
-        if (ForgeHelper.INSTANCE.getClient() != null)
+        if (FMLClientHandler.instance().getClient() != null)
         {
-            int gameRenderDistance = ForgeHelper.INSTANCE.getClient().gameSettings.renderDistanceChunks;
+            int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
             for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
             {
                 if (prop.get() > gameRenderDistance)

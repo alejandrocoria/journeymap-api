@@ -13,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.UIManager;
@@ -72,7 +71,7 @@ public class ThemeFileHandler
 
     public static File getThemeIconDir()
     {
-        File dir = new File(ForgeHelper.INSTANCE.getClient().mcDataDir, Constants.THEME_ICON_DIR);
+        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.THEME_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
@@ -280,7 +279,7 @@ public class ThemeFileHandler
 
     public static Theme getDefaultTheme()
     {
-        if(FMLClientHandler.instance().getClient()==null)
+        if (FMLClientHandler.instance().getClient() == null)
         {
             return ThemePresets.THEME_VICTORIAN;
         }

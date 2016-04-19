@@ -8,10 +8,10 @@
 
 package journeymap.client.forge.helper;
 
+import com.sun.javafx.geom.Vec3d;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
@@ -26,7 +26,6 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 
@@ -42,7 +41,7 @@ public interface IForgeHelper
 
     public IColorHelper getColorHelper();
 
-    public Minecraft getClient();
+    //public Minecraft getClient();
 
     public ScaledResolution getScaledResolution();
 
@@ -64,7 +63,7 @@ public interface IForgeHelper
 
     public boolean hasCustomName(Entity entity);
 
-    public int getLightOpacity(BlockMD blockMD, int blockX, int blockY, int blockZ);
+    public int getLightOpacity(BlockMD blockMD, int worldX, int blockY, int worldZ);
 
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance);
 
@@ -80,9 +79,7 @@ public interface IForgeHelper
 
     public Tessellator getTessellator();
 
-    public int getDimension(World world);
-
-    public int getDimension(WorldProvider worldProvider);
+    public int getDimension();
 
     public int getSavedLightValue(Chunk chunk, int x, int y, int z);
 
@@ -92,7 +89,7 @@ public interface IForgeHelper
 
     public int getPrecipitationHeight(Chunk chunk, int x, int z);
 
-    public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
+    // public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
 
     public TileEntity getTileEntity(int blockX, int y, int blockZ);
 

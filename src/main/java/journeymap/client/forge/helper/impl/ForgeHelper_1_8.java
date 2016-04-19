@@ -72,17 +72,11 @@ public class ForgeHelper_1_8 implements IForgeHelper
     {
         return blockAccess;
     }
-
-    @Override
-    public Minecraft getClient()
-    {
-        return FMLClientHandler.instance().getClient();
-    }
-
+    
     @Override
     public ScaledResolution getScaledResolution()
     {
-        Minecraft mc = getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
 
         // 1.7.10, 1.8
         // return new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
@@ -105,20 +99,20 @@ public class ForgeHelper_1_8 implements IForgeHelper
     public FontRenderer getFontRenderer()
     {
         // 1.7
-        // return getClient().fontRenderer;
+        // return FMLClientHandler.instance().getClient().fontRenderer;
 
         // 1.8
-        return getClient().fontRendererObj;
+        return FMLClientHandler.instance().getClient().fontRendererObj;
     }
 
     @Override
     public int getPlayerDimension()
     {
         // 1.7
-        //return getClient().thePlayer.worldObj.provider.dimension;
+        //return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.dimension;
 
         // 1.8
-        return getClient().thePlayer.worldObj.provider.getDimensionId();
+        return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.getDimensionId();
     }
 
     @Override
@@ -138,7 +132,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // ??
 
         // 1.8
-        return getClient().theWorld;
+        return FMLClientHandler.instance().getClient().theWorld;
     }
 
     @Override
@@ -152,32 +146,23 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public int getLightOpacity(BlockMD blockMD, int x, int y, int z)
+    public int getLightOpacity(BlockMD blockMD, int worldX, int y, int worldZ)
     {
         // 1.7
         // return blockMD.getBlock().getLightOpacity(world, x & 15, y, z & 15);
 
         // 1.8
-        return blockMD.getBlock().getLightOpacity(blockAccess, new BlockPos(x, y, z));
+        return blockMD.getBlock().getLightOpacity(blockAccess, new BlockPos(worldX, y, worldZ));
     }
 
     @Override
-    public int getDimension(World world)
+    public int getDimension()
     {
         // 1.7
         // return world.provider.dimension;
 
         // 1.8
-        return world.provider.getDimensionId();
-    }
-
-    @Override
-    public int getDimension(WorldProvider worldProvider)
-    {
-        // 1.7
-        // return worldProvider.dimensionId;
-
-        return worldProvider.getDimensionId();
+        return getWorld().provider.getDimensionId();
     }
 
     @Override
@@ -205,7 +190,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // return RenderManager.instance;
 
         // 1.8
-        return getClient().getRenderManager();
+        return FMLClientHandler.instance().getClient().getRenderManager();
     }
 
     /**
@@ -284,7 +269,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
     public String getRealmsServerName()
     {
         String serverName = null;
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         if (!mc.isSingleplayer())
         {
             try
@@ -323,7 +308,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         }
         else
         {
-            mc = ForgeHelper.INSTANCE.getClient();
+            mc = FMLClientHandler.instance().getClient();
             ServerData serverData = mc.getCurrentServerData(); // 1.8 getServerData()
 
             if (serverData != null)
@@ -396,16 +381,6 @@ public class ForgeHelper_1_8 implements IForgeHelper
 
         // 1.8
         return chunk.getPrecipitationHeight(pos(chunk, x, 0, z)).getY();
-    }
-
-    @Override
-    public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ)
-    {
-        // 1.7
-        // return block.getLightOpacity(chunk.getWorld(), (this.getCoord().chunkXPos << 4) + localX, y, (this.getCoord().chunkZPos << 4) + localZ);
-
-        // 1.8
-        return block.getLightOpacity(chunk.getWorld(), pos(chunk, localX, 0, localZ));
     }
 
     @Override

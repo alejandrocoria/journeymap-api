@@ -10,7 +10,6 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.MapState;
@@ -30,6 +29,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
@@ -128,7 +128,7 @@ public class FullscreenActions extends JmUI
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
-        buttonAutomap.setEnabled(ForgeHelper.INSTANCE.getClient().isSingleplayer() && JourneymapClient.getCoreProperties().mappingEnabled.get());
+        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && JourneymapClient.getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));

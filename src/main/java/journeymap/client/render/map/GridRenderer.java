@@ -16,7 +16,6 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.impl.ClientEventManager;
 import journeymap.client.api.util.UIState;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
@@ -28,6 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -246,7 +246,7 @@ public class GridRenderer
             if (debug)
             {
                 logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
-                Minecraft mc = ForgeHelper.INSTANCE.getClient();
+                Minecraft mc = FMLClientHandler.instance().getClient();
                 BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = tmp.createGraphics();
                 g.setStroke(new BasicStroke(1));
@@ -374,7 +374,7 @@ public class GridRenderer
 
     public Point2D.Double getBlockPixelInGrid(double blockX, double blockZ)
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         double localBlockX = blockX - centerBlockX;
         double localBlockZ = blockZ - centerBlockZ;
 
@@ -653,7 +653,7 @@ public class GridRenderer
         if (isActive)
         {
             // Pad the BB by two chunks
-            int worldHeight = ForgeHelper.INSTANCE.getClient().theWorld.getActualHeight();
+            int worldHeight = FMLClientHandler.instance().getClient().theWorld.getActualHeight();
             int pad = 32;
 
             BlockPos upperLeft = getBlockAtPixel(new Point2D.Double(screenBounds.getMinX(), screenBounds.getMinY()));

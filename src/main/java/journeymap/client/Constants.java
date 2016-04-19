@@ -11,7 +11,6 @@ package journeymap.client;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.resources.I18n;
@@ -87,7 +86,7 @@ public class Constants
         Locale locale = Locale.getDefault();
         try
         {
-            String lang = ForgeHelper.INSTANCE.getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
+            String lang = FMLClientHandler.instance().getClient().getLanguageManager().getCurrentLanguage().getLanguageCode();
             locale = new Locale(lang);
         }
         catch (Exception e)
@@ -196,7 +195,7 @@ public class Constants
 
         try
         {
-            ResourcePackRepository resourcepackrepository = ForgeHelper.INSTANCE.getClient().getResourcePackRepository();
+            ResourcePackRepository resourcepackrepository = FMLClientHandler.instance().getClient().getResourcePackRepository();
             entries.addAll(resourcepackrepository.getRepositoryEntries());
         }
         catch (Throwable t)

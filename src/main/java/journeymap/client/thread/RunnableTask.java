@@ -9,12 +9,12 @@
 package journeymap.client.thread;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.task.multi.ITask;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -24,7 +24,7 @@ public class RunnableTask implements Runnable
 {
     static final JourneymapClient jm = JourneymapClient.getInstance();
     static final Logger logger = Journeymap.getLogger();
-    static final Minecraft mc = ForgeHelper.INSTANCE.getClient();
+    static final Minecraft mc = FMLClientHandler.instance().getClient();
     static final boolean threadLogging = jm.isThreadLogging();
 
     private final ExecutorService taskExecutor;

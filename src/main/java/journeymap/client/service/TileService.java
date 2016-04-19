@@ -10,7 +10,6 @@ package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.MapType;
@@ -19,6 +18,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import se.rupy.http.Event;
 import se.rupy.http.Query;
@@ -63,7 +63,7 @@ public class TileService extends FileService
         Query query = event.query();
         query.parse();
 
-        Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
         World theWorld = minecraft.theWorld;
         if (theWorld == null)
         {

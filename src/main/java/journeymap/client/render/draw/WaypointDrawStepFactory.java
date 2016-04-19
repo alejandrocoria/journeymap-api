@@ -8,6 +8,7 @@
 
 package journeymap.client.render.draw;
 
+import com.sun.javafx.geom.Vec3d;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -18,6 +19,7 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +36,7 @@ public class WaypointDrawStepFactory
 
     public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance, boolean showLabel)
     {
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
         int maxDistance = JourneymapClient.getWaypointProperties().maxDistance.get();

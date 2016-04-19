@@ -203,7 +203,7 @@ public class StringField extends ConfigField<String>
     public List<String> getValidValues()
     {
         String validValuesString = getStringAttr(ATTR_VALID_VALUES);
-        if(!Strings.isEmpty(validValuesString))
+        if (!Strings.isEmpty(validValuesString))
         {
             return Arrays.asList(validValuesString.split(","));
         }

@@ -260,7 +260,7 @@ public class BlockMD
     {
         ArrayList<Integer> metas = new ArrayList<Integer>();
 
-        for(IBlockState state : block.getBlockState().getValidStates())
+        for (IBlockState state : block.getBlockState().getValidStates())
         {
             int meta = state.getBlock().getMetaFromState(state);
             metas.add(meta);
