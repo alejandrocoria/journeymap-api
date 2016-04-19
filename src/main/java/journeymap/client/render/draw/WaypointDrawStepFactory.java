@@ -8,7 +8,6 @@
 
 package journeymap.client.render.draw;
 
-import com.sun.javafx.geom.Vec3d;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;

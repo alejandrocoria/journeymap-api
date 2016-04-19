@@ -8,7 +8,6 @@
 
 package journeymap.client.forge.helper;
 
-import com.sun.javafx.geom.Vec3d;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
