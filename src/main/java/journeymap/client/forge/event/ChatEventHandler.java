@@ -77,7 +77,7 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
             if (resetRequired)
             {
                 DataCache.instance().purge();
-                UIManager.getInstance().reset();
+                UIManager.INSTANCE.reset();
             }
         }
     }

@@ -55,7 +55,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 
         if (isManagerEnabled())
         {
-            list.addAll(WaypointStore.instance().getAll());
+            list.addAll(WaypointStore.INSTANCE.getAll());
         }
 
         return list;

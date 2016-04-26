@@ -300,7 +300,7 @@ public class DataCache
             if (WaypointsData.isManagerEnabled())
             {
                 // The store is the cache
-                return WaypointStore.instance().getAll();
+                return WaypointStore.INSTANCE.getAll();
             }
             else
             {

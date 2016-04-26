@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import journeymap.common.Journeymap;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
  * Color operations utility class.
@@ -355,5 +356,31 @@ public final class RGB
             }
         }
         return RGB.BLACK_RGB;
+    }
+
+    public static int randomColor()
+    {
+        Random random = new Random();
+        int r = random.nextInt(255);
+        int g = random.nextInt(255);
+        int b = random.nextInt(255);
+
+        int min = 100;
+        int max = Math.max(r, Math.max(g, b));
+        if (max < min)
+        {
+            if (r == max)
+            {
+                r = min;
+            } else if (g == max)
+            {
+                g = min;
+            } else
+            {
+                b = min;
+            }
+        }
+
+        return toInteger(r, g, b);
     }
 }

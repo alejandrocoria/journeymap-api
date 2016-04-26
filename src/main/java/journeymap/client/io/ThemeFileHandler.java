@@ -177,7 +177,7 @@ public class ThemeFileHandler
         }
         JourneymapClient.getCoreProperties().themeName.set(theme.name);
         getCurrentTheme(true);
-        UIManager.getInstance().getMiniMap().reset();
+        UIManager.INSTANCE.getMiniMap().reset();
     }
 
     public synchronized static Theme getCurrentTheme(boolean forceReload)

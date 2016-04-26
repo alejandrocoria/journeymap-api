@@ -59,7 +59,7 @@ public class CmdEditWaypoint implements ICommand
                         if (waypoint.isInPlayerDimension())
                         {
                             waypoint.setPersistent(false);
-                            UIManager.getInstance().openFullscreenMap(waypoint);
+                            UIManager.INSTANCE.openFullscreenMap(waypoint);
                         }
                         else
                         {
@@ -69,7 +69,7 @@ public class CmdEditWaypoint implements ICommand
                     }
                     else
                     {
-                        UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+                        UIManager.INSTANCE.openWaypointEditor(waypoint, true, null);
                     }
                     return null;
                 }

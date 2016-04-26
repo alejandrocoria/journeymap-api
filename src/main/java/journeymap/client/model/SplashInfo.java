@@ -65,7 +65,7 @@ public class SplashInfo
                 if (uiClass.equals(OptionsManager.class) && action != null)
                 {
                     Category category = ClientCategory.valueOf(action);
-                    UIManager.getInstance().openOptionsManager(returnUi, category);
+                    UIManager.INSTANCE.openOptionsManager(returnUi, category);
                     return;
                 }
                 else if (action != null)
@@ -74,7 +74,7 @@ public class SplashInfo
                     Method actionMethod;
                     try
                     {
-                        JmUI ui = UIManager.getInstance().open(uiClass, returnUi);
+                        JmUI ui = UIManager.INSTANCE.open(uiClass, returnUi);
 
                         if (arg == null)
                         {
@@ -94,7 +94,7 @@ public class SplashInfo
                     }
                 }
 
-                UIManager.getInstance().open(uiClass, returnUi);
+                UIManager.INSTANCE.open(uiClass, returnUi);
             }
             catch (Throwable t)
             {
