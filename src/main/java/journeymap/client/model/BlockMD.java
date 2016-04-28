@@ -203,7 +203,6 @@ public class BlockMD
             {
                 if (Block.blockRegistry.getNameForObject(block) == null)
                 {
-                    Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
                     return AIRBLOCK;
                 }
                 blockMD = new BlockMD(block, meta);
