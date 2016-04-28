@@ -448,11 +448,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         {
             if (ascending)
             {
-                return o1.waypoint.getName().compareTo(o2.waypoint.getName());
+                return o1.waypoint.getName().compareToIgnoreCase(o2.waypoint.getName());
             }
             else
             {
-                return o2.waypoint.getName().compareTo(o1.waypoint.getName());
+                return o2.waypoint.getName().compareToIgnoreCase(o1.waypoint.getName());
             }
         }
     }
