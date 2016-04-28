@@ -8,7 +8,6 @@
 
 package journeymap.client.ui.fullscreen;
 
-
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
@@ -157,10 +156,10 @@ public class Fullscreen extends JmUI
         initButtons();
 
         // Check for first-time use
-        String splashViewed = JourneymapClient.getCoreProperties().splashViewed.get();
         String thisVersion = Journeymap.JM_VERSION.toString();
+        String splashViewed = JourneymapClient.getCoreProperties().splashViewed.get();
 
-        if (!splashViewed.equals(thisVersion))
+        if (splashViewed == null || !thisVersion.equals(splashViewed))
         {
             UIManager.INSTANCE.openSplash(this);
         }
