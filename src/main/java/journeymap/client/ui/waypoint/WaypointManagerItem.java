@@ -240,7 +240,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
                 waypoint.setEnable(buttonEnable.getToggled());
                 if (waypoint.isDirty())
                 {
-                    WaypointStore.instance().save(waypoint);
+                    WaypointStore.INSTANCE.save(waypoint);
                 }
                 mouseOver = true;
             }
@@ -248,14 +248,14 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             {
                 if (buttonEdit.mouseOver(mouseX, mouseY))
                 {
-                    UIManager.getInstance().openWaypointEditor(waypoint, false, manager);
+                    UIManager.INSTANCE.openWaypointEditor(waypoint, false, manager);
                     mouseOver = true;
                 }
                 else
                 {
                     if (buttonFind.isEnabled() && buttonFind.mouseOver(mouseX, mouseY))
                     {
-                        UIManager.getInstance().openFullscreenMap(waypoint);
+                        UIManager.INSTANCE.openFullscreenMap(waypoint);
                         mouseOver = true;
                     }
                     else
@@ -264,7 +264,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
                         {
                             new CmdTeleportWaypoint(waypoint).run();
                             Fullscreen.state().follow.set(true);
-                            UIManager.getInstance().closeAll();
+                            UIManager.INSTANCE.closeAll();
                             mouseOver = true;
                         }
                     }

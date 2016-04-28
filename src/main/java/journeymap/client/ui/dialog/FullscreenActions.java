@@ -205,45 +205,45 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonSave)
         {
             save();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonClose)
         {
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonBrowser)
         {
             launchLocalhost();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonDonate)
         {
             launchPatreon();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonAutomap)
         {
-            UIManager.getInstance().open(AutoMapConfirmation.class);
+            UIManager.INSTANCE.open(AutoMapConfirmation.class);
             return;
         }
         if (guibutton == buttonDeleteMap)
         {
-            UIManager.getInstance().open(DeleteMapConfirmation.class);
+            UIManager.INSTANCE.open(DeleteMapConfirmation.class);
             return;
         }
         if (guibutton == buttonCheck)
         {
             launchWebsite("Download");
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonAbout)
         {
-            UIManager.getInstance().openSplash(this);
+            UIManager.INSTANCE.openSplash(this);
             return;
         }
         if (guibutton == buttonEnableMapping)
@@ -251,7 +251,7 @@ public class FullscreenActions extends JmUI
             buttonEnableMapping.toggle();
             if (JourneymapClient.getCoreProperties().mappingEnabled.get())
             {
-                UIManager.getInstance().openFullscreenMap();
+                UIManager.INSTANCE.openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
                 return;
             }
@@ -259,7 +259,7 @@ public class FullscreenActions extends JmUI
             {
                 JourneymapClient.getInstance().stopMapping();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
-                UIManager.getInstance().openFullscreenMap();
+                UIManager.INSTANCE.openFullscreenMap();
                 return;
             }
         }

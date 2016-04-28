@@ -380,7 +380,7 @@ public class WaypointManager extends JmUI
         if (guibutton == buttonAdd)
         {
             Waypoint waypoint = Waypoint.of(mc.thePlayer);
-            UIManager.getInstance().openWaypointEditor(waypoint, true, this);
+            UIManager.INSTANCE.openWaypointEditor(waypoint, true, this);
             return;
         }
         if (guibutton == buttonToggleAll)
@@ -393,7 +393,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonOptions)
         {
-            UIManager.getInstance().openOptionsManager(this, ClientCategory.Waypoint, ClientCategory.WaypointBeacon);
+            UIManager.INSTANCE.openOptionsManager(this, ClientCategory.Waypoint, ClientCategory.WaypointBeacon);
             return;
         }
     }
@@ -476,7 +476,7 @@ public class WaypointManager extends JmUI
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 
-        Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
+        Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
         boolean allOn = true;
         for (Waypoint waypoint : waypoints)
         {
@@ -571,7 +571,7 @@ public class WaypointManager extends JmUI
 
     public void removeWaypoint(WaypointManagerItem item)
     {
-        WaypointStore.instance().remove(item.waypoint);
+        WaypointStore.INSTANCE.remove(item.waypoint);
         this.items.remove(item);
     }
 
@@ -584,17 +584,17 @@ public class WaypointManager extends JmUI
     protected void closeAndReturn()
     {
         bottomButtons.setEnabled(false);
-        WaypointStore.instance().bulkSave();
+        WaypointStore.INSTANCE.bulkSave();
         Fullscreen.state().requireRefresh();
         bottomButtons.setEnabled(true);
 
         if (returnDisplay == null)
         {
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
         else
         {
-            UIManager.getInstance().open(returnDisplay);
+            UIManager.INSTANCE.open(returnDisplay);
         }
     }
 

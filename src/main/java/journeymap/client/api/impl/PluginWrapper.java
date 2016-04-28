@@ -93,7 +93,7 @@ class PluginWrapper
             case Waypoint:
                 ModWaypoint modWaypoint = (ModWaypoint) displayable;
                 Waypoint waypoint = new Waypoint(modWaypoint);
-                WaypointStore.instance().save(waypoint);
+                WaypointStore.INSTANCE.save(waypoint);
                 waypoints.put(displayId, modWaypoint, waypoint);
                 break;
             default:
@@ -144,7 +144,7 @@ class PluginWrapper
             // temporary one needed by store right now
             waypoint = new Waypoint(modWaypoint);
         }
-        WaypointStore.instance().remove(waypoint);
+        WaypointStore.INSTANCE.remove(waypoint);
     }
 
     /**

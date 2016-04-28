@@ -145,7 +145,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 if (!event.isCancelled())
                 {
                     Waypoint deathpoint = Waypoint.at(pos, Waypoint.Type.Death, dim);
-                    WaypointStore.instance().save(deathpoint);
+                    WaypointStore.INSTANCE.save(deathpoint);
                 }
                 else
                 {

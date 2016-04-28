@@ -10,6 +10,7 @@ package journeymap.client.waypoint;
 
 import com.google.common.io.Files;
 import journeymap.client.model.Waypoint;
+import journeymap.client.model.WaypointGroup;
 import journeymap.common.Journeymap;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class JmReader
             @Override
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".json");
+                return name.endsWith(".json") && (!name.equals(WaypointGroupStore.FILENAME));
             }
         });
 

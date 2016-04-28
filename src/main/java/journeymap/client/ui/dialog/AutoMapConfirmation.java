@@ -114,7 +114,7 @@ public class AutoMapConfirmation extends JmUI
             });
         }
 
-        UIManager.getInstance().openFullscreenMap();
+        UIManager.INSTANCE.openFullscreenMap();
     }
 
     @Override
@@ -124,7 +124,7 @@ public class AutoMapConfirmation extends JmUI
         {
             case Keyboard.KEY_ESCAPE:
             {
-                UIManager.getInstance().openMapActions();
+                UIManager.INSTANCE.openMapActions();
                 break;
             }
         }

@@ -25,7 +25,7 @@ class DimensionsButton extends Button
 {
     static boolean needInit = true;
     static WorldData.DimensionProvider currentWorldProvider;
-    final List<WorldData.DimensionProvider> dimensionProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
+    final List<WorldData.DimensionProvider> dimensionProviders = WorldData.getDimensionProviders(WaypointStore.INSTANCE.getLoadedDimensions());
 
     public DimensionsButton()
     {

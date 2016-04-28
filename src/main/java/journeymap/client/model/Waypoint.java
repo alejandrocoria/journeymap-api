@@ -18,6 +18,7 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.waypoint.WaypointGroupStore;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import org.apache.logging.log4j.core.helpers.Strings;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -38,7 +40,7 @@ import java.util.List;
  */
 public class Waypoint implements Serializable
 {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
 
     protected static final String ICON_NORMAL = "waypoint-normal.png";
@@ -50,8 +52,8 @@ public class Waypoint implements Serializable
     @Since(1)
     protected String name;
 
-    @Since(2)
-    protected String waypointGroupName;
+    @Since(3)
+    protected String groupName;
 
     @Since(2)
     protected String displayId;
@@ -92,6 +94,7 @@ public class Waypoint implements Serializable
     @Since(2)
     protected boolean persistent;
 
+    protected transient WaypointGroup group;
     protected transient boolean dirty;
     protected transient Minecraft mc = FMLClientHandler.instance().getClient();
 
@@ -124,7 +127,7 @@ public class Waypoint implements Serializable
         this.setOrigin(modWaypoint.getModId());
         this.displayId = modWaypoint.getDisplayId();
         this.setPersistent(modWaypoint.isPersistent());
-        this.setWaypointGroupName(modWaypoint.getWaypointGroupName());
+        this.setGroupName(modWaypoint.getWaypointGroupName());
     }
 
     public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension)
@@ -210,12 +213,13 @@ public class Waypoint implements Serializable
         return GSON.fromJson(json, Waypoint.class);
     }
 
-    public void setLocation(int x, int y, int z, int currentDimension)
+    public Waypoint setLocation(int x, int y, int z, int currentDimension)
     {
         this.x = (currentDimension == -1) ? x * 8 : x;
         this.y = y;
         this.z = (currentDimension == -1) ? z * 8 : z;
         updateId();
+        return setDirty();
     }
 
     public String updateId()
@@ -240,43 +244,40 @@ public class Waypoint implements Serializable
         return new ChunkCoordIntPair(x >> 4, z >> 4);
     }
 
-    public String getWaypointGroupName()
+    public Waypoint setGroup(WaypointGroup group)
     {
-        return waypointGroupName;
+        setOrigin(group.getOrigin());
+        this.groupName = group.getName();
+        this.group = group;
+        return setDirty();
     }
 
-    public Waypoint setWaypointGroupName(String waypointGroupName)
+    public Waypoint setGroupName(String groupName)
     {
-        this.waypointGroupName = waypointGroupName;
+        WaypointGroup group = WaypointGroupStore.INSTANCE.get(origin, groupName);
+        setGroup(group);
         return this;
     }
 
-    public void setRandomColor()
+    public WaypointGroup getGroup()
     {
-        Random random = new Random();
-        int r = random.nextInt(255);
-        int g = random.nextInt(255);
-        int b = random.nextInt(255);
-
-        int min = 100;
-        int max = Math.max(r, Math.max(g, b));
-        if (max < min)
+        if (group == null)
         {
-            if (r == max)
+            if (Strings.isEmpty(origin) || Strings.isEmpty(groupName))
             {
-                r = min;
-            }
-            else if (g == max)
+                setGroup(WaypointGroup.DEFAULT);
+            } else
             {
-                g = min;
-            }
-            else
-            {
-                b = min;
+                setGroup(WaypointGroupStore.INSTANCE.get(origin, groupName));
             }
         }
 
-        setColor(RGB.toInteger(r, g, b));
+        return this.group;
+    }
+
+    public Waypoint setRandomColor()
+    {
+        return setColor(RGB.randomColor());
     }
 
     public Integer getColor()
@@ -284,12 +285,13 @@ public class Waypoint implements Serializable
         return RGB.toInteger(r, g, b);
     }
 
-    public void setColor(Integer color)
+    public Waypoint setColor(Integer color)
     {
         int c[] = RGB.ints(color);
         this.r = c[0];
         this.g = c[1];
         this.b = c[2];
+        return setDirty();
     }
 
     public Integer getSafeColor()
@@ -306,9 +308,10 @@ public class Waypoint implements Serializable
         return this.dimensions;
     }
 
-    public void setDimensions(Collection<Integer> dims)
+    public Waypoint setDimensions(Collection<Integer> dims)
     {
         this.dimensions = new TreeSet<Integer>(dims);
+        return setDirty();
     }
 
     public boolean isTeleportReady()
@@ -336,9 +339,10 @@ public class Waypoint implements Serializable
         return name;
     }
 
-    public void setName(String name)
+    public Waypoint setName(String name)
     {
         this.name = name;
+        return setDirty();
     }
 
     public String getIcon()
@@ -346,9 +350,10 @@ public class Waypoint implements Serializable
         return icon;
     }
 
-    public void setIcon(String icon)
+    public Waypoint setIcon(String icon)
     {
         this.icon = icon;
+        return setDirty();
     }
 
     public int getX()
@@ -404,9 +409,10 @@ public class Waypoint implements Serializable
         return r;
     }
 
-    public void setR(int r)
+    public Waypoint setR(int r)
     {
         this.r = r;
+        return setDirty();
     }
 
     public int getG()
@@ -414,9 +420,10 @@ public class Waypoint implements Serializable
         return g;
     }
 
-    public void setG(int g)
+    public Waypoint setG(int g)
     {
         this.g = g;
+        return setDirty();
     }
 
     public int getB()
@@ -424,9 +431,10 @@ public class Waypoint implements Serializable
         return b;
     }
 
-    public void setB(int b)
+    public Waypoint setB(int b)
     {
         this.b = b;
+        return setDirty();
     }
 
     public boolean isEnable()
@@ -434,13 +442,14 @@ public class Waypoint implements Serializable
         return enable;
     }
 
-    public void setEnable(boolean enable)
+    public Waypoint setEnable(boolean enable)
     {
         if (enable != this.enable)
         {
             this.enable = enable;
-            this.dirty = true;
+            setDirty();
         }
+        return this;
     }
 
     public Type getType()
@@ -448,9 +457,10 @@ public class Waypoint implements Serializable
         return type;
     }
 
-    public void setType(Type type)
+    public Waypoint setType(Type type)
     {
         this.type = type;
+        return setDirty();
     }
 
     public String getOrigin()
@@ -458,14 +468,20 @@ public class Waypoint implements Serializable
         return origin;
     }
 
-    public void setOrigin(String origin)
+    public Waypoint setOrigin(String origin)
     {
         this.origin = origin;
+        return setDirty();
     }
 
     public String getFileName()
     {
-        return id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
+        String fileName = id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
+        if (fileName.equals(WaypointGroupStore.FILENAME))
+        {
+            fileName = "_" + fileName;
+        }
+        return fileName;
     }
 
     public boolean isDirty()
@@ -473,12 +489,18 @@ public class Waypoint implements Serializable
         return dirty;
     }
 
-    public void setDirty(boolean dirty)
+    public Waypoint setDirty()
+    {
+        return setDirty(true);
+    }
+
+    public Waypoint setDirty(boolean dirty)
     {
         if (isPersistent())
         {
             this.dirty = dirty;
         }
+        return this;
     }
 
     public boolean isPersistent()
