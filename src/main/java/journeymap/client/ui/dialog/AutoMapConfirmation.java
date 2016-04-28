@@ -10,10 +10,12 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.task.main.IMainThreadTask;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
@@ -75,20 +77,41 @@ public class AutoMapConfirmation extends JmUI
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        if (guibutton == buttonAll)
+        if (guibutton != buttonClose)
         {
-            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.TRUE);
-        }
-        if (guibutton == buttonMissing)
-        {
-            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, Boolean.FALSE);
-        }
-        if (guibutton == buttonNone)
-        {
-            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, false, null);
-        }
-        if (guibutton == buttonClose)
-        {
+            final boolean enable;
+            final Object arg;
+            if (guibutton == buttonAll)
+            {
+                enable = true;
+                arg = Boolean.TRUE;
+            }
+            else if (guibutton == buttonMissing)
+            {
+                enable = true;
+                arg = Boolean.FALSE;
+            }
+            else
+            {
+                enable = false;
+                arg = null;
+            }
+
+            JourneymapClient.getInstance().queueMainThreadTask(new IMainThreadTask()
+            {
+                @Override
+                public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
+                {
+                    JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, enable, arg);
+                    return null;
+                }
+
+                @Override
+                public String getName()
+                {
+                    return "Automap";
+                }
+            });
         }
 
         UIManager.getInstance().openFullscreenMap();

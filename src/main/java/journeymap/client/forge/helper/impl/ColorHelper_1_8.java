@@ -81,8 +81,7 @@ public class ColorHelper_1_8 implements IColorHelper
         BlockPos blockPos = new BlockPos(x, y, z);
         if (chunkMD == null || !chunkMD.hasChunk())
         {
-            return RGB.WHITE_RGB;
-            //return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
+            return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
         }
         else
         {
@@ -93,7 +92,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                return block.colorMultiplier(chunkMD.getWorld(), blockPos);
+                return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
             }
         }
     }
