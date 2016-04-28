@@ -364,7 +364,7 @@ public class GridRenderer
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
-        return new BlockPos(x, 0, z);
+        return new BlockPos(x, FMLClientHandler.instance().getClient().theWorld.getSeaLevel(), z);
     }
 
     public Point2D.Double getBlockPixelInGrid(BlockPos pos)
