@@ -9,6 +9,7 @@
 package journeymap.common.properties;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -237,15 +238,32 @@ public abstract class PropertiesBase
         {
             String fieldName = otherEntry.getKey();
             ConfigField<?> otherField = otherEntry.getValue();
+            if (Strings.isNullOrEmpty(fieldName) || otherField == null)
+            {
+                warn("Bad configField entry during updateFrom(): " + otherEntry);
+                continue;
+            }
+
+            if (otherField.getAttributeMap() == null)
+            {
+                warn("Bad configField source (no attributes) during updateFrom(): " + fieldName);
+                continue;
+            }
+
             ConfigField<?> myField = this.getConfigField(fieldName);
-            if (myField != null)
+            if (myField == null)
             {
-                myField.getAttributeMap().putAll(otherField.getAttributeMap());
+                warn("configField target doesn't exist during updateFrom(): " + fieldName);
+                continue;
             }
-            else
+
+            if (myField.getAttributeMap() == null)
             {
-                warn("Missing field during updateFrom(): " + fieldName);
+                warn("Bad configField target (no attributes) during updateFrom(): " + fieldName);
+                continue;
             }
+
+            myField.getAttributeMap().putAll(otherField.getAttributeMap());
         }
         this.configVersion = otherInstance.configVersion;
     }
