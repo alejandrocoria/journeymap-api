@@ -16,7 +16,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Level;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
@@ -365,11 +365,11 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
+    public void onRemoval(RemovalNotification<ChunkPos, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {
-            ChunkCoordIntPair coord = notification.getKey();
+            ChunkPos coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
 

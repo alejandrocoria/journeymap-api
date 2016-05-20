@@ -18,7 +18,7 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.option.KeyedEnum;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -42,10 +42,10 @@ public class RenderSpec
     private final int maxSecondaryRenderDistance;
     private final RevealShape revealShape;
     private ListMultimap<Integer, Offset> offsets = null;
-    private ArrayList<ChunkCoordIntPair> primaryRenderCoords;
-    private Comparator<ChunkCoordIntPair> comparator;
+    private ArrayList<ChunkPos> primaryRenderCoords;
+    private Comparator<ChunkPos> comparator;
     private int lastSecondaryRenderDistance;
-    private ChunkCoordIntPair lastPlayerCoord;
+    private ChunkPos lastPlayerCoord;
     private long lastTaskTime;
     private int lastTaskChunks;
     private double lastTaskAvgChunkTime;
@@ -70,25 +70,25 @@ public class RenderSpec
         this.maxSecondaryRenderDistance = rdMax;
         this.revealShape = JourneymapClient.getCoreProperties().revealShape.get();
 
-        lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkPos(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
         lastSecondaryRenderDistance = this.primaryRenderDistance;
     }
 
-    private static Double blockDistance(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord)
+    private static Double blockDistance(ChunkPos playerCoord, ChunkPos coord)
     {
         int x = playerCoord.getCenterXPos() - coord.getCenterXPos();
         int z = playerCoord.getCenterZPosition() - coord.getCenterZPosition();
         return Math.sqrt(x * x + z * z);
     }
 
-    private static Double chunkDistance(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord)
+    private static Double chunkDistance(ChunkPos playerCoord, ChunkPos coord)
     {
         int x = playerCoord.chunkXPos - coord.chunkXPos;
         int z = playerCoord.chunkZPos - coord.chunkZPos;
         return Math.sqrt(x * x + z * z);
     }
 
-    static boolean inRange(ChunkCoordIntPair playerCoord, ChunkCoordIntPair coord, int renderDistance, RenderSpec.RevealShape revealShape)
+    static boolean inRange(ChunkPos playerCoord, ChunkPos coord, int renderDistance, RenderSpec.RevealShape revealShape)
     {
         if (revealShape == RenderSpec.RevealShape.Circle)
         {
@@ -111,14 +111,14 @@ public class RenderSpec
         int offset = maxOffset;
         final int baseX = 0;
         final int baseZ = 0;
-        final ChunkCoordIntPair baseCoord = new ChunkCoordIntPair(baseX, baseZ);
+        final ChunkPos baseCoord = new ChunkPos(baseX, baseZ);
         while (offset >= minOffset)
         {
             for (int x = (baseX - offset); x <= (baseX + offset); x++)
             {
                 for (int z = (baseZ - offset); z <= (baseZ + offset); z++)
                 {
-                    ChunkCoordIntPair coord = new ChunkCoordIntPair(x, z);
+                    ChunkPos coord = new ChunkPos(x, z);
                     if (revealShape == RevealShape.Square || inRange(baseCoord, coord, offset, revealShape))
                     {
                         multimap.put(offset, new Offset(coord.chunkXPos, coord.chunkZPos));
@@ -170,7 +170,7 @@ public class RenderSpec
         lastSurfaceRenderSpec = null;
     }
 
-    protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
+    protected Collection<ChunkPos> getRenderAreaCoords()
     {
         // Lazy init offsets on first use
         if (offsets == null)
@@ -186,16 +186,16 @@ public class RenderSpec
             primaryRenderCoords = null;
             lastSecondaryRenderDistance = primaryRenderDistance;
         }
-        lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkPos(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
 
         // Add min distance coords around player
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())
         {
             List<Offset> primaryOffsets = offsets.get(primaryRenderDistance);
-            primaryRenderCoords = new ArrayList<ChunkCoordIntPair>(primaryOffsets.size());
+            primaryRenderCoords = new ArrayList<ChunkPos>(primaryOffsets.size());
             for (Offset offset : primaryOffsets)
             {
-                ChunkCoordIntPair primaryCoord = offset.from(lastPlayerCoord);
+                ChunkPos primaryCoord = offset.from(lastPlayerCoord);
                 primaryRenderCoords.add(primaryCoord);
                 dataCache.getChunkMD(primaryCoord);
             }
@@ -216,12 +216,12 @@ public class RenderSpec
 
             List<Offset> secondaryOffsets = offsets.get(lastSecondaryRenderDistance);
 
-            ArrayList<ChunkCoordIntPair> renderCoords = new ArrayList<ChunkCoordIntPair>(primaryRenderCoords.size() + secondaryOffsets.size());
+            ArrayList<ChunkPos> renderCoords = new ArrayList<ChunkPos>(primaryRenderCoords.size() + secondaryOffsets.size());
             renderCoords.addAll(primaryRenderCoords);
 
             for (Offset offset : secondaryOffsets)
             {
-                ChunkCoordIntPair secondaryCoord = offset.from(lastPlayerCoord);
+                ChunkPos secondaryCoord = offset.from(lastPlayerCoord);
                 renderCoords.add(secondaryCoord);
                 dataCache.getChunkMD(secondaryCoord);
             }
@@ -404,9 +404,9 @@ public class RenderSpec
             this.z = z;
         }
 
-        ChunkCoordIntPair from(ChunkCoordIntPair coord)
+        ChunkPos from(ChunkPos coord)
         {
-            return new ChunkCoordIntPair(coord.chunkXPos + x, coord.chunkZPos + z);
+            return new ChunkPos(coord.chunkXPos + x, coord.chunkZPos + z);
         }
 
         @Override

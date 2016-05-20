@@ -40,29 +40,29 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     private void preInitialize()
     {
         // Init flags and alphas to be set according to a Block's material.
-        setFlags(Material.barrier, HasAir, OpenToSky, NoShadow);
-        setFlags(Material.air, HasAir, OpenToSky, NoShadow);
-        setFlags(Material.glass, .4F, TransparentRoof);
+        setFlags(Material.BARRIER, HasAir, OpenToSky, NoShadow);
+        setFlags(Material.AIR, HasAir, OpenToSky, NoShadow);
+        setFlags(Material.GLASS, .4F, TransparentRoof);
         if (JourneymapClient.getCoreProperties().caveIgnoreGlass.get())
         {
-            setFlags(Material.glass, OpenToSky);
+            setFlags(Material.GLASS, OpenToSky);
         }
-        setFlags(Material.water, .3F, NoShadow, Water);
-        setFlags(Material.lava, NoShadow);
-        materialAlphas.put(Material.ice, .8F);
-        materialAlphas.put(Material.packedIce, .8F);
+        setFlags(Material.WATER, .3F, NoShadow, Water);
+        setFlags(Material.LAVA, NoShadow);
+        materialAlphas.put(Material.ICE, .8F);
+        materialAlphas.put(Material.PACKED_ICE, .8F);
 
         // Init flags and alphas on specific Block instances
-        setFlags(Blocks.iron_bars, .4F);
-        setFlags(Blocks.fire, NoShadow);
-        setTextureSide(Blocks.fire, 2);
-        setFlags(Blocks.iron_bars, TransparentRoof);
-        setFlags(Blocks.ladder, OpenToSky);
-        setFlags(Blocks.snow_layer, NoTopo);
-        setFlags(Blocks.tripwire, NoShadow);
-        setFlags(Blocks.tripwire_hook, NoShadow);
-        setFlags(Blocks.web, OpenToSky);
-        setTextureSide(Blocks.web, 2);
+        setFlags(Blocks.IRON_BARS, .4F);
+        setFlags(Blocks.FIRE, NoShadow);
+        setTextureSide(Blocks.FIRE, 2);
+        setFlags(Blocks.IRON_BARS, TransparentRoof);
+        setFlags(Blocks.LADDER, OpenToSky);
+        setFlags(Blocks.SNOW_LAYER, NoTopo);
+        setFlags(Blocks.TRIPWIRE, NoShadow);
+        setFlags(Blocks.TRIPWIRE_HOOK, NoShadow);
+        setFlags(Blocks.WEB, OpenToSky);
+        setTextureSide(Blocks.WEB, 2);
 
         // Init flags and alphas to be set according to a Block's parent class
         setFlags(BlockLog.class, OpenToSky, CustomBiomeColor, NoTopo);
@@ -168,13 +168,13 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Double-tall grass should be treated like BlockTallGrass:  ignored
-        if (block == Blocks.double_plant && blockMD.getMeta() == 2)
+        if (block == Blocks.DOUBLE_PLANT && blockMD.getMeta() == 2)
         {
             blockMD.addFlags(HasAir, NoTopo);
         }
 
         // Ferns unlike other BlockTallGrass will be treated like plants
-        if (block == Blocks.tallgrass && blockMD.getMeta() == 2)
+        if (block == Blocks.TALLGRASS && blockMD.getMeta() == 2)
         {
             blockMD.addFlags(Plant, CustomBiomeColor);
         }

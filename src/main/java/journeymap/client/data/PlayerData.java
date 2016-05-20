@@ -17,9 +17,9 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
@@ -61,7 +61,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 {
                     y = posY + 1;
 
-                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkPos(x >> 4, z >> 4));
                     if (chunkMD != null)
                     {
                         if (chunkMD.ceiling(x & 15, z & 15) <= y)
@@ -98,12 +98,12 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         int x = (MathHelper.floor_double(player.posX) >> 4) & 15;
         int z = (MathHelper.floor_double(player.posZ) >> 4) & 15;
 
-        ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ));
+        ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkPos(player.chunkCoordX, player.chunkCoordZ));
         if (playerChunk != null)
         {
             try
             {
-                BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                Biome biome = ForgeHelper.INSTANCE.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
                 // Can be null right after spawn/teleport before chunks loaded
                 if (biome != null)
                 {

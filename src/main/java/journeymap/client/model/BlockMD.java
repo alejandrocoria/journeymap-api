@@ -56,7 +56,7 @@ public class BlockMD
      */
     private BlockMD(Block block, int meta)
     {
-        this(block, meta, Block.blockRegistry.getNameForObject(block).toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(block, meta, Block.REGISTRY.getNameForObject(block).toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
 
     /**
@@ -91,7 +91,7 @@ public class BlockMD
         modBlockDelegate = new ModBlockDelegate();
 
         // Dummy blocks
-        AIRBLOCK = new BlockMD(Blocks.air, 0, "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
+        AIRBLOCK = new BlockMD(Blocks.AIR, 0, "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
         VOIDBLOCK = new BlockMD(null, 0, "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
 
         // Load all registered block+metas
@@ -201,7 +201,7 @@ public class BlockMD
             BlockMD blockMD = map.get(meta);
             if (blockMD == null)
             {
-                if (Block.blockRegistry.getNameForObject(block) == null)
+                if (Block.REGISTRY.getNameForObject(block) == null)
                 {
                     Journeymap.getLogger().warn(String.format("Can't find UID for block %s", block));
                     return AIRBLOCK;
@@ -502,7 +502,7 @@ public class BlockMD
      */
     public boolean isIce()
     {
-        return block == Blocks.ice;
+        return block == Blocks.ICE;
     }
 
     /**
@@ -512,7 +512,7 @@ public class BlockMD
      */
     public boolean isTorch()
     {
-        return block == Blocks.torch || block == Blocks.redstone_torch || block == Blocks.unlit_redstone_torch;
+        return block == Blocks.TORCH || block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH;
     }
 
     /**
@@ -542,7 +542,7 @@ public class BlockMD
      */
     public boolean isLava()
     {
-        return block == Blocks.lava || block == Blocks.flowing_lava;
+        return block == Blocks.LAVA || block == Blocks.FLOWING_LAVA;
     }
 
     /**

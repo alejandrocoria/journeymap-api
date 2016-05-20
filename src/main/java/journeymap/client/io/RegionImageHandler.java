@@ -17,7 +17,7 @@ import journeymap.client.render.map.TileDrawStep;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
@@ -126,7 +126,7 @@ public class RegionImageHandler
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
-    public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkCoordIntPair startCoord, final ChunkCoordIntPair endCoord, final MapType mapType,
+    public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
                                                              final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight,
                                                              final boolean allowNullImage, boolean showGrid)
     {
@@ -250,8 +250,8 @@ public class RegionImageHandler
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
-    public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkCoordIntPair startCoord,
-                                                                   final ChunkCoordIntPair endCoord, final MapType mapType,
+    public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkPos startCoord,
+                                                                   final ChunkPos endCoord, final MapType mapType,
                                                                    Integer zoom, boolean highQuality)
     {
         boolean isUnderground = mapType.isUnderground();

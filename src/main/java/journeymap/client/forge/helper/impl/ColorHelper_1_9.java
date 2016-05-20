@@ -89,7 +89,7 @@ public class ColorHelper_1_9 implements IColorHelper
         else
         {
             IBlockState blockState = chunkMD.getChunk().getBlockState(blockPos);
-            if (Blocks.air.getDefaultState().equals(blockState))
+            if (Blocks.AIR.getDefaultState().equals(blockState))
             {
                 return RGB.WHITE_RGB;
             }

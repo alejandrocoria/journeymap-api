@@ -24,7 +24,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             lastCoord = blockCoord;
 
             // Get block under mouse
-            ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
+            ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkPos(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
             String info;
             if (chunkMD != null && chunkMD.hasChunk())
             {

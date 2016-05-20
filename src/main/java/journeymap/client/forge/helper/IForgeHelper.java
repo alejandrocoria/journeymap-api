@@ -25,7 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 
 import java.net.SocketAddress;
@@ -94,9 +94,9 @@ public interface IForgeHelper
 
     public String getBlockName(Block block, int meta);
 
-    public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z);
+    public Biome getBiome(ChunkMD chunkMD, int x, int y, int z);
 
-    public BiomeGenBase getBiome(int x, int y, int z);
+    public Biome getBiome(int x, int y, int z);
 
     public int getBlockMeta(Chunk chunk, final int x, int y, final int z);
 

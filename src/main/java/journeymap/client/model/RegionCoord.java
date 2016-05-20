@@ -11,7 +11,7 @@ package journeymap.client.model;
 import com.google.common.cache.Cache;
 import journeymap.client.data.DataCache;
 import journeymap.client.io.nbt.RegionLoader;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
@@ -153,27 +153,27 @@ public class RegionCoord implements Comparable<RegionCoord>
         return getMaxChunkZ(regionZ);
     }
 
-    public ChunkCoordIntPair getMinChunkCoord()
+    public ChunkPos getMinChunkCoord()
     {
-        return new ChunkCoordIntPair(getMinChunkX(), getMinChunkZ());
+        return new ChunkPos(getMinChunkX(), getMinChunkZ());
     }
 
-    public ChunkCoordIntPair getMaxChunkCoord()
+    public ChunkPos getMaxChunkCoord()
     {
-        return new ChunkCoordIntPair(getMaxChunkX(), getMaxChunkZ());
+        return new ChunkPos(getMaxChunkX(), getMaxChunkZ());
     }
 
-    public List<ChunkCoordIntPair> getChunkCoordsInRegion()
+    public List<ChunkPos> getChunkCoordsInRegion()
     {
-        final List<ChunkCoordIntPair> list = new ArrayList<ChunkCoordIntPair>(1024);
-        final ChunkCoordIntPair min = getMinChunkCoord();
-        final ChunkCoordIntPair max = getMaxChunkCoord();
+        final List<ChunkPos> list = new ArrayList<ChunkPos>(1024);
+        final ChunkPos min = getMinChunkCoord();
+        final ChunkPos max = getMaxChunkCoord();
 
         for (int x = min.chunkXPos; x <= max.chunkXPos; x++)
         {
             for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
             {
-                list.add(new ChunkCoordIntPair(x, z));
+                list.add(new ChunkPos(x, z));
             }
         }
 

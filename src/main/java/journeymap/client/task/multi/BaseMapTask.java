@@ -20,7 +20,7 @@ import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 
@@ -31,16 +31,16 @@ import java.util.Iterator;
 public abstract class BaseMapTask implements ITask
 {
     static final Logger logger = Journeymap.getLogger();
-    protected static ChunkCoordIntPair[] keepAliveOffsets = new ChunkCoordIntPair[]{new ChunkCoordIntPair(0, -1), new ChunkCoordIntPair(-1, 0), new ChunkCoordIntPair(-1, -1)};
+    protected static ChunkPos[] keepAliveOffsets = new ChunkPos[]{new ChunkPos(0, -1), new ChunkPos(-1, 0), new ChunkPos(-1, -1)};
     final World world;
-    final Collection<ChunkCoordIntPair> chunkCoords;
+    final Collection<ChunkPos> chunkCoords;
     final boolean flushCacheWhenDone;
     final ChunkRenderController renderController;
     final int elapsedLimit;
     final MapType mapType;
     final boolean asyncFileWrites;
 
-    public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords, boolean flushCacheWhenDone, boolean asyncFileWrites, int elapsedLimit)
+    public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkPos> chunkCoords, boolean flushCacheWhenDone, boolean asyncFileWrites, int elapsedLimit)
     {
         this.renderController = renderController;
         this.world = world;
@@ -74,7 +74,7 @@ public abstract class BaseMapTask implements ITask
                 return;
             }
 
-            final Iterator<ChunkCoordIntPair> chunkIter = chunkCoords.iterator();
+            final Iterator<ChunkPos> chunkIter = chunkCoords.iterator();
 
             // Check the dimension
             int currentDimension = ForgeHelper.INSTANCE.getPlayerDimension();
@@ -108,7 +108,7 @@ public abstract class BaseMapTask implements ITask
                     throw new InterruptedException();
                 }
 
-                ChunkCoordIntPair coord = chunkIter.next();
+                ChunkPos coord = chunkIter.next();
                 ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
                 if (chunkMd != null && chunkMd.hasChunk())
                 {

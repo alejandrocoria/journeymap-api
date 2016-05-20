@@ -29,8 +29,8 @@ public class WorldNbtIDSaveHandler
     public WorldNbtIDSaveHandler()
     {
         world = FMLServerHandler.instance().getServer().getEntityWorld();
-        legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
-        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().loadData(NBTWorldSaveDataHandler.class, DAT_FILE);
+        legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
+        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, DAT_FILE);
     }
 
     public String getWorldID()

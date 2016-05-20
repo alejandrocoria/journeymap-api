@@ -20,7 +20,7 @@ import journeymap.client.model.MapType;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import java.io.File;
@@ -41,7 +41,7 @@ public class MapPlayerTask extends BaseMapTask
     private long startNs;
     private long elapsedNs;
 
-    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, MapType mapType, Collection<ChunkCoordIntPair> chunkCoords)
+    private MapPlayerTask(ChunkRenderController chunkRenderController, World world, MapType mapType, Collection<ChunkPos> chunkCoords)
     {
         super(chunkRenderController, world, mapType, chunkCoords, false, true, 10000);
     }
@@ -89,20 +89,20 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         List<ITask> tasks = new ArrayList<ITask>(2);
-        tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, mapType, new ArrayList<ChunkCoordIntPair>()));
+        tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, mapType, new ArrayList<ChunkPos>()));
 
         if (underground)
         {
             if (worldHasSky && JourneymapClient.getCoreProperties().alwaysMapSurface.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkPos>()));
             }
         }
         else
         {
             if (cavesAllowed && JourneymapClient.getCoreProperties().alwaysMapCaves.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.underground(player), new ArrayList<ChunkCoordIntPair>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.underground(player), new ArrayList<ChunkPos>()));
             }
         }
 

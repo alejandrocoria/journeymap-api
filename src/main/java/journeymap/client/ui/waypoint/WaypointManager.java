@@ -445,7 +445,7 @@ public class WaypointManager extends JmUI
 
         if (i == Keyboard.KEY_END)
         {
-            this.itemScrollPane.scrollBy(this.itemScrollPane.func_148135_f());
+            this.itemScrollPane.scrollBy(this.itemScrollPane.getMaxScroll());
         }
     }
 

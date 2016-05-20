@@ -24,7 +24,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.datafix.DataFixer;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
@@ -46,9 +46,9 @@ public class MapRegionTask extends BaseMapTask
     private static volatile long lastTaskCompleted;
 
     final RegionCoord rCoord;
-    final Collection<ChunkCoordIntPair> retainedCoords;
+    final Collection<ChunkPos> retainedCoords;
 
-    private MapRegionTask(ChunkRenderController renderController, World world, MapType mapType, RegionCoord rCoord, Collection<ChunkCoordIntPair> chunkCoords, Collection<ChunkCoordIntPair> retainCoords)
+    private MapRegionTask(ChunkRenderController renderController, World world, MapType mapType, RegionCoord rCoord, Collection<ChunkPos> chunkCoords, Collection<ChunkPos> retainCoords)
     {
         super(renderController, world, mapType, chunkCoords, true, false, 5000);
         this.rCoord = rCoord;
@@ -62,17 +62,17 @@ public class MapRegionTask extends BaseMapTask
 
         final World world = minecraft.theWorld;
 
-        final List<ChunkCoordIntPair> renderCoords = rCoord.getChunkCoordsInRegion();
-        final List<ChunkCoordIntPair> retainedCoords = new ArrayList<ChunkCoordIntPair>(renderCoords.size());
+        final List<ChunkPos> renderCoords = rCoord.getChunkCoordsInRegion();
+        final List<ChunkPos> retainedCoords = new ArrayList<ChunkPos>(renderCoords.size());
 
         HashMap<RegionCoord, Boolean> existingRegions = new HashMap<RegionCoord, Boolean>();
 
         // Ensure chunks north, west, nw are loaded for slope calculations
-        for (ChunkCoordIntPair coord : renderCoords)
+        for (ChunkPos coord : renderCoords)
         {
-            for (ChunkCoordIntPair keepAliveOffset : keepAliveOffsets)
+            for (ChunkPos keepAliveOffset : keepAliveOffsets)
             {
-                ChunkCoordIntPair keepAliveCoord = new ChunkCoordIntPair(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
+                ChunkPos keepAliveCoord = new ChunkPos(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
                 RegionCoord neighborRCoord = RegionCoord.fromChunkPos(rCoord.worldDir, mapType, keepAliveCoord.chunkXPos, keepAliveCoord.chunkZPos);
                 if (!existingRegions.containsKey(neighborRCoord))
                 {
@@ -96,7 +96,7 @@ public class MapRegionTask extends BaseMapTask
         AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), new DataFixer(-1));
 
         int missing = 0;
-        for (ChunkCoordIntPair coord : retainedCoords)
+        for (ChunkPos coord : retainedCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null && !chunkMD.getChunk().isEmpty())
@@ -105,7 +105,7 @@ public class MapRegionTask extends BaseMapTask
             }
         }
 
-        for (ChunkCoordIntPair coord : chunkCoords)
+        for (ChunkPos coord : chunkCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null && chunkMD.hasChunk())

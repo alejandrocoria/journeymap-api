@@ -255,15 +255,15 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
         // Flower colors look bad because the stem color is averaged in, overriding them is easier.
         // 1.8
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setColor(0x1E7EB6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setColor(0x8549B6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setColor(0x9DA1A7);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setColor(0xA3581A);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setColor(0xB0B0B0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setColor(0xB09AB0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setColor(0xB3B3B3);
-        BlockMD.get(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setColor(0xAFB401);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.POPPY.getMeta()).setColor(0x980406);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setColor(0x1E7EB6);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setColor(0x8549B6);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setColor(0x9DA1A7);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setColor(0x980406);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setColor(0xA3581A);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setColor(0xB0B0B0);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setColor(0xB09AB0);
+        BlockMD.get(Blocks.RED_FLOWER, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setColor(0xB3B3B3);
+        BlockMD.get(Blocks.YELLOW_FLOWER, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setColor(0xAFB401);
     }
 }

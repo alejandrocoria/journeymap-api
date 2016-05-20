@@ -208,7 +208,7 @@ public class ThemeButton extends BooleanPropertyButton
     public void drawNativeButton(Minecraft minecraft, int mouseX, int mouseY)
     {
         int magic = 20;
-        minecraft.getTextureManager().bindTexture(buttonTextures);
+        minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         int k = this.getHoverState(isMouseOver());
         GlStateManager.enableBlend();
