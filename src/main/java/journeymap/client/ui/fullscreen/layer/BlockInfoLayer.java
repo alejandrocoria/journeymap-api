@@ -92,7 +92,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
                     if (Journeymap.JM_VERSION.patch.equals("dev"))
                     {
-                        info = RGB.toHexString(blockMD.getColor(chunkMD, blockCoord.getX(),
+                        info = blockMD + " " + RGB.toHexString(blockMD.getColor(chunkMD, blockCoord.getX(),
                                 blockCoord.getZ(),
                                 blockY)) + "  " + info;
                     }

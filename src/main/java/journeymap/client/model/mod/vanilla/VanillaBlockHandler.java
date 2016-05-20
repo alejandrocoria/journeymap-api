@@ -9,7 +9,6 @@ import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         setTextureSide(BlockDoublePlant.class, 2);
         setFlags(BlockLeaves.class, OpenToSky, Foliage, NoTopo);
         setFlags(BlockVine.class, .2F, OpenToSky, CustomBiomeColor, Foliage, NoTopo, NoShadow);
-        setFlags(BlockLilyPad.class, CustomBiomeColor, NoTopo);
+        setFlags(BlockLilyPad.class, NoTopo, Plant, CustomBiomeColor);
         setFlags(BlockCrops.class, Crop, NoTopo);
         setTextureSide(BlockCrops.class, 2);
         setFlags(BlockFlower.class, Plant, NoTopo);

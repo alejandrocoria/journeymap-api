@@ -432,12 +432,19 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         try
         {
-            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+            BlockMD blockMD;
             boolean propUnsetWaterHeight = true;
 
             while (y > 0)
             {
-                if (blockMD.isWater())
+                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+
+                if (blockMD.isAir())
+                {
+                    y--;
+                    continue;
+                }
+                else if (blockMD.isWater())
                 {
                     if (!mapBathymetry)
                     {
@@ -448,31 +455,41 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                         setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
                         propUnsetWaterHeight = false;
                     }
+                    y--;
+                    continue;
                 }
-                else if (!blockMD.isAir())// && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                else if (blockMD.hasFlag(BlockMD.Flag.Plant))
                 {
-                    if (mapPlants && blockMD.hasFlag(BlockMD.Flag.Plant))
-                    {
-                        if (!mapPlantShadows)
-                        {
-                            y--;
-                        }
-                    }
-                    else if (mapCrops && blockMD.hasFlag(BlockMD.Flag.Crop))
-                    {
-                        if (!mapPlantShadows)
-                        {
-                            y--;
-                        }
-                    }
-                    else if (!blockMD.isLava() && blockMD.hasNoShadow())
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                     {
                         y--;
+                        continue;
                     }
+
+                    if (mapPlants)
+                    {
+                        break;
+                    }
+                }
+                else if (blockMD.hasFlag(BlockMD.Flag.Crop))
+                {
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    {
+                        y--;
+                        continue;
+                    }
+
+                    if (mapCrops)
+                    {
+                        break;
+                    }
+                }
+                else if (!blockMD.isLava() && blockMD.hasNoShadow())
+                {
+                    y--;
                     break;
                 }
-                y--;
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                break;
             }
         }
         catch (Exception e)

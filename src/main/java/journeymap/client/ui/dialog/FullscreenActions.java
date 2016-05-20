@@ -12,6 +12,7 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
+import journeymap.client.model.BlockMD;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
@@ -258,6 +259,7 @@ public class FullscreenActions extends JmUI
             else
             {
                 JourneymapClient.getInstance().stopMapping();
+                BlockMD.reset();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
                 UIManager.INSTANCE.openFullscreenMap();
                 return;
