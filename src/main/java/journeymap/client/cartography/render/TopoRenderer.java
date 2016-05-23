@@ -10,7 +10,6 @@ package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
@@ -26,6 +25,8 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Generates topographical map images.
@@ -111,7 +112,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
 
@@ -133,7 +134,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render the chunk image
-            return renderSurface(painter, chunkMd, vSlice, false);
+            return renderSurface(chunkImage, chunkMd, vSlice, false);
         }
         catch (Throwable e)
         {
@@ -150,7 +151,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the surface.
      */
-    protected boolean renderSurface(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    protected boolean renderSurface(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         boolean chunkOk = false;
 
@@ -173,11 +174,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);
                     if (topBlockMd == null)
                     {
-                        painter.paintBadBlock(x, y, z);
+                        paintBadBlock(chunkImage, x, y, z);
                         continue blockLoop;
                     }
 
-                    chunkOk = paintContour(painter, chunkMd, topBlockMd, x, y, z) || chunkOk;
+                    chunkOk = paintContour(chunkImage, chunkMd, topBlockMd, x, y, z) || chunkOk;
                 }
             }
         }
@@ -370,7 +371,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return FMLClientHandler.instance().getClient().theWorld.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
     }
 
-    protected boolean paintContour(final ChunkPainter painter, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
+    protected boolean paintContour(final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
     {
         if (!chunkMd.hasChunk())
         {
@@ -433,7 +434,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             }
         }
 
-        painter.paintBlock(x, z, color);
+        paintBlock(chunkImage, x, z, color);
 
         return true;
     }

@@ -348,6 +348,7 @@ public class OptionsManager extends JmUI
     private void updateRenderStats()
     {
         RenderSpec.getSurfaceSpec();
+        RenderSpec.getTopoSpec();
         RenderSpec.getUndergroundSpec();
 
         // Show validation on render distances

@@ -175,6 +175,8 @@ jm.common.renderstats_debug_cave=Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks 
 jm.common.renderstats_debug_cave_simple=Caves: %1$s = %2$s chunks in %3$sms (avg %4$sms)
 jm.common.renderstats_debug_surface=Surface: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
 jm.common.renderstats_debug_surface_simple=Surface: %1$s = %2$s chunks in %3$sms (avg %4$sms)
+jm.common.renderstats_debug_topo=Topo: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
+jm.common.renderstats_debug_topo_simple=Topo: %1$s = %2$s chunks in %3$sms (avg %4$sms)
 jm.common.revealshape=Reveal Shape
 jm.common.revealshape.tooltip=Shape of the map area revealed around you. Circle reveals fewer chunks than Square and will improve performance.
 jm.common.save_filename=Saving map to screenshots: %1$s

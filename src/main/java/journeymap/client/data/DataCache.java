@@ -406,7 +406,7 @@ public class DataCache
 
     public ChunkMD getChunkMD(ChunkCoordIntPair coord)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             ChunkMD chunkMD = null;
 

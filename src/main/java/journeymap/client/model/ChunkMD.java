@@ -36,7 +36,7 @@ public class ChunkMD
     public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
     public static final String PROP_LOADED = "loaded";
     public static final String PROP_LAST_RENDERED = "lastRendered";
-    final static DataCache dataCache = DataCache.instance();
+    final static DataCache dataCache = DataCache.instance(); // TODO REMOVE
     private final WeakReference<Chunk> chunkReference;
     private final ChunkCoordIntPair coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();

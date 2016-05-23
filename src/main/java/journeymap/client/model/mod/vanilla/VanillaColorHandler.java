@@ -158,32 +158,24 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
         if (!blockMD.hasFlag(BlockMD.Flag.TintError))
         {
+            if (!blockMD.isUseDefaultState())
+            {
+                try
+                {
+                    return colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
+                }
+                catch (Exception e)
+                {
+                    blockMD.setUseDefaultState(true);
+                }
+            }
+
+            // Use default blockstate if needed
             try
             {
-                return colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
+                tint = colorHelper.getColorMultiplier(chunkMD, BlockMD.get(blockMD.getBlockState().getBlock().getDefaultState()), blockPos);
             }
             catch (Exception e)
-            {
-                Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
-                                "Please report this exception to the mod author of '%s' blockstate '%s': %s",
-                        blockMD.getBlockState(), LogFormatter.toPartialString(e)));
-
-                blockMD.addFlags(BlockMD.Flag.TintError);
-            }
-        }
-
-        try
-        {
-            tint = colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
-        }
-        catch (Exception e)
-        {
-            try
-            {
-                tint = colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
-
-            }
-            catch (Exception e2)
             {
                 Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
                                 "Please report this exception to the mod author of '%s' blockstate '%s': %s",

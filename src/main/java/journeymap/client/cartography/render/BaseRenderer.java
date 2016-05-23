@@ -26,10 +26,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base class for methods reusable across renderers.
@@ -38,6 +41,9 @@ import java.util.HashMap;
  */
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
 {
+    public static final int COLOR_BLACK = Color.black.getRGB();
+    public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
+    public static volatile AtomicLong badBlockCount = new AtomicLong(0);
     public static final String PROP_WATER_HEIGHT = "waterHeight";
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
     protected final DataCache dataCache = DataCache.instance();
@@ -636,6 +642,54 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             Journeymap.getLogger().warn("Error in getColumnProperties(): " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Darken the existing color.
+     */
+    public void paintDimOverlay(BufferedImage image, int x, int z, float alpha)
+    {
+        Integer color = image.getRGB(x, z);
+        paintBlock(image, x, z, RGB.adjustBrightness(color, alpha));
+    }
+
+    /**
+     * Paint the block.
+     */
+    public void paintBlock(BufferedImage image, final int x, final int z, final int color)
+    {
+        // Use alpha mask since color is rgb, but bufferedimage is argb
+        image.setRGB(x, z, 0xFF000000 | color);
+    }
+
+    /**
+     * Paint the void.
+     */
+    public void paintVoidBlock(BufferedImage image, final int x, final int z)
+    {
+        paintBlock(image, x, z, COLOR_VOID);
+    }
+
+    /**
+     * Paint the void.
+     */
+    public void paintBlackBlock(BufferedImage image, final int x, final int z)
+    {
+        paintBlock(image, x, z, COLOR_BLACK);
+    }
+
+    /**
+     * It's a problem
+     */
+    public void paintBadBlock(BufferedImage image, final int x, final int y, final int z)
+    {
+        long count = badBlockCount.incrementAndGet();
+        if (count == 1 || count % 10240 == 0)
+        {
+            Journeymap.getLogger().warn(
+                    "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count
+            );
         }
     }
 
