@@ -128,45 +128,33 @@ public class ForgeHelper_1_8 implements IForgeHelper
     @Override
     public World getWorld()
     {
-        // 1.7
-        // ??
-
-        // 1.8
         return FMLClientHandler.instance().getClient().theWorld;
     }
+//
+//    @Override
+//    public World getWorld(Chunk chunk)
+//    {
+//        // 1.7
+//        // return getChunk().worldObj;
+//
+//        // 1.8
+//        return chunk.getWorld();
+//    }
 
     @Override
-    public World getWorld(Chunk chunk)
+    public int getLightOpacity(BlockMD blockMD, BlockPos blockPos)
     {
-        // 1.7
-        // return getChunk().worldObj;
-
-        // 1.8
-        return chunk.getWorld();
-    }
-
-    @Override
-    public int getLightOpacity(BlockMD blockMD, int worldX, int y, int worldZ)
-    {
-        // 1.7
-        // return blockMD.getBlock().getLightOpacity(world, x & 15, y, z & 15);
-
-        // 1.8
-        return blockMD.getBlock().getLightOpacity(blockAccess, new BlockPos(worldX, y, worldZ));
+        return blockMD.getBlockState().getBlock().getLightOpacity(blockAccess, blockPos);
     }
 
     @Override
     public int getDimension()
     {
-        // 1.7
-        // return world.provider.dimension;
-
-        // 1.8
         return getWorld().provider.getDimensionId();
     }
 
     @Override
-    public int getSavedLightValue(Chunk chunk, int localX, int y, int localZ)
+    public int getSavedLightValue(Chunk chunk, BlockPos blockPos)
     {
         // 1.7
         // return chunk.getSavedLightValue(getSkyBlock(), x, y, z);
@@ -174,7 +162,7 @@ public class ForgeHelper_1_8 implements IForgeHelper
         // 1.8
         try
         {
-            return chunk.getLightFor(getSkyBlock(), pos(chunk, localX, y, localZ));
+            return chunk.getLightFor(getSkyBlock(), blockPos);
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
@@ -350,139 +338,58 @@ public class ForgeHelper_1_8 implements IForgeHelper
     }
 
     @Override
-    public boolean canBlockSeeTheSky(Chunk chunk, int x, int y, int z)
+    public boolean canBlockSeeTheSky(Chunk chunk, BlockPos blockPos)
     {
         // 1.7
         // return chunk.canBlockSeeTheSky(x, y, z);
 
         // 1.8
-        return chunk.canSeeSky(new BlockPos(x, y, z));
+        return chunk.canSeeSky(blockPos);
+    }
+
+    public int toWorldX(Chunk chunk, int localX)
+    {
+        return (chunk.xPosition << 4) + localX;
+    }
+
+    public int toWorldZ(Chunk chunk, int localZ)
+    {
+        return (chunk.zPosition << 4) + localZ;
     }
 
     @Override
-    public int getHeight(Chunk chunk, int x, int z)
+    public int getHeight(Chunk chunk, BlockPos blockPos)
     {
-        // 1.7
-        // return chunk.getHeightValue(x, z);
-
-        // 1.8
-        // return chunk.getHeight(x, z);
-
-        // 1.8.8
-        return chunk.getHeightValue(x, z);
-
+        return chunk.getHeight(blockPos);
     }
 
     @Override
-    public int getPrecipitationHeight(Chunk chunk, int x, int z)
+    public int getPrecipitationHeight(BlockPos blockPos)
     {
-        // 1.7
-        // return chunk.getPrecipitationHeight(x, z);
-
-        // 1.8
-        return chunk.getPrecipitationHeight(pos(chunk, x, 0, z)).getY();
+        return getWorld().getPrecipitationHeight(blockPos).getY();
     }
 
     @Override
-    public TileEntity getTileEntity(int localX, int y, int localZ)
+    public TileEntity getTileEntity(BlockPos blockPos)
     {
-        // 1.7
-        // return world.getTileEntity(localX, y, localZ);
-
-        // 1.8
-        return blockAccess.getTileEntity(new BlockPos(localX, y, localZ));
+        return blockAccess.getTileEntity(blockPos);
     }
 
     @Override
-    public String getBlockName(Block block, int meta)
+    public BiomeGenBase getBiome(BlockPos blockPos)
     {
-        String displayName = block.getLocalizedName();
-
-        try
-        {
-            displayName = block.getStateFromMeta(meta).getBlock().getLocalizedName();
-        }
-        catch (IllegalArgumentException e)
-        {
-            e.printStackTrace();
-        }
-
-        return displayName;
-    }
-
-    @Override
-    public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z)
-    {
-        BlockPos pos = new BlockPos(x, y, z);
-        if (chunkMD != null && chunkMD.hasChunk())
-        {
-            try
-            {
-                Chunk chunk = chunkMD.getChunk();
-                BiomeGenBase biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
-                if (biome == null)
-                {
-                    return null;
-                }
-                return biome;
-            }
-            catch (Throwable throwable)
-            {
-                Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-                return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
-            }
-        }
-        else
-        {
-            // 1.8
-            // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
-
-            // 1.8.8
-            return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().getBiomeGenerator(pos, BiomeGenBase.plains);
-        }
-    }
-
-    @Override
-    public BiomeGenBase getBiome(int x, int y, int z)
-    {
-        // 1.7
-        // return world.getBiomeGenForCoords(x, y, z);
-
-        // 1.8
-        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
-        return getBiome(chunkMD, x, y, z);
-    }
-
-    @Override
-    public int getBlockMeta(Chunk chunk, final int x, int y, final int z)
-    {
-        try
-        {
-            return chunk.getBlockMetadata(new BlockPos(x, y, z));
-        }
-        catch (Exception e)
-        {
-            return 0;
-        }
+        return getWorld().getBiomeGenForCoords(blockPos);
     }
 
     @Override
     public boolean hasNoSky(Entity entity)
     {
-        // 1.7
-        // return hasNoSky(entity.worldObj);
-
-        // 1.8
         return hasNoSky(entity.getEntityWorld());
     }
 
     @Override
     public boolean hasChunkData(Chunk chunk)
     {
-        // 1.7
-        // return (chunk.isChunkLoaded && !chunk.isEmpty());
-
-        // 1.8
         return (chunk != null && chunk.isLoaded() && !(chunk instanceof EmptyChunk));
     }
 
@@ -496,10 +403,6 @@ public class ForgeHelper_1_8 implements IForgeHelper
     @Override
     public SocketAddress getSocketAddress(NetworkManager netManager)
     {
-        // 1.7
-        // return netManager.getSocketAddress();
-
-        // 1.8
         return netManager.getRemoteAddress();
     }
 
@@ -509,18 +412,9 @@ public class ForgeHelper_1_8 implements IForgeHelper
         return String.format("%s fps", Minecraft.getDebugFPS());
     }
 
-    /**
-     * Create a world BlockPos from chunk-local coords
-     *
-     * @param chunk
-     * @param localX
-     * @param y
-     * @param localZ
-     * @return
-     */
-    private BlockPos pos(Chunk chunk, int localX, int y, int localZ)
+    private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
     {
-        return new BlockPos((chunk.xPosition << 4) + localX, y, (chunk.zPosition << 4) + localZ);
+        return DataCache.instance().getChunkMD(new ChunkCoordIntPair(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     class JmBlockAccess implements IBlockAccess
@@ -624,11 +518,6 @@ public class ForgeHelper_1_8 implements IForgeHelper
         private boolean isValid(BlockPos pos)
         {
             return pos.getX() >= -30000000 && pos.getZ() >= -30000000 && pos.getX() < 30000000 && pos.getZ() < 30000000 && pos.getY() >= 0 && pos.getY() < 256;
-        }
-
-        private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
-        {
-            return DataCache.instance().getChunkMD(new ChunkCoordIntPair(pos.getX() >> 4, pos.getZ() >> 4));
         }
     }
 }

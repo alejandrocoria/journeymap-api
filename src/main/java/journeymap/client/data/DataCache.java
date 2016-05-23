@@ -17,6 +17,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.util.*;
@@ -397,6 +398,11 @@ public class DataCache
 //            return colors.getUnchecked(rgbInt);
 //        }
 //    }
+
+    public ChunkMD getChunkMD(BlockPos blockPos)
+    {
+        return getChunkMD(new ChunkCoordIntPair(blockPos.getX() >> 4, blockPos.getZ() >> 4));
+    }
 
     public ChunkMD getChunkMD(ChunkCoordIntPair coord)
     {

@@ -24,11 +24,11 @@ import java.awt.image.BufferedImage;
  */
 public class ChunkRenderController
 {
-    private final IChunkRenderer netherRenderer;
-    private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
-    private final TopoRenderer topoRenderer;
-    private final IChunkRenderer overWorldCaveRenderer;
+    private final BaseRenderer netherRenderer;
+    private final BaseRenderer endRenderer;
+    private final BaseRenderer topoRenderer;
+    private final BaseRenderer overWorldCaveRenderer;
 
     public ChunkRenderController()
     {
@@ -38,6 +38,49 @@ public class ChunkRenderController
         overWorldSurfaceRenderer = surfaceRenderer;
         overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
         topoRenderer = new TopoRenderer();
+    }
+
+    /**
+     * Get the renderer that would be used for the given params.
+     */
+    public BaseRenderer getRenderer(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
+    {
+        try
+        {
+            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            if (mapType.isUnderground())
+            {
+                BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
+                if (image != null)
+                {
+                    switch (rCoord.dimension)
+                    {
+                        case -1:
+                        {
+                            return netherRenderer;
+                        }
+                        case 1:
+                        {
+                            return endRenderer;
+                        }
+                        default:
+                        {
+                            return overWorldCaveRenderer;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return overWorldSurfaceRenderer;
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toPartialString(t)));
+
+        }
+        return null;
     }
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)

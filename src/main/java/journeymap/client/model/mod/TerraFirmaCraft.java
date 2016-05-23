@@ -11,6 +11,7 @@ package journeymap.client.model.mod;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaColorHandler;
+import net.minecraft.util.BlockPos;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -72,7 +73,7 @@ public class TerraFirmaCraft
         }
 
         @Override
-        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
+        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
         {
             return blockMD;
         }
@@ -82,7 +83,7 @@ public class TerraFirmaCraft
     public static class TfcWaterColorHandler extends VanillaColorHandler
     {
         @Override
-        protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
+        protected Integer loadTextureColor(BlockMD blockMD, BlockPos blockPos)
         {
             return WATER_COLOR;
         }

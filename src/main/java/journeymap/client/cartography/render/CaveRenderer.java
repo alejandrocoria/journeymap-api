@@ -17,6 +17,7 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 
 /**
@@ -60,6 +61,23 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         super.updateOptions();
 
         mapSurfaceAboveCaves = JourneymapClient.getCoreProperties().mapSurfaceAboveCaves.get();
+    }
+
+    @Override
+    public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
+    {
+        Integer vSlice = blockPos.getY() >> 4;
+        final int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
+        final int sliceMinY = sliceBounds[0];
+        final int sliceMaxY = sliceBounds[1];
+        HeightsCache heightsCache = chunkSliceHeights[vSlice];
+        Integer y = null;
+        if (heightsCache != null)
+        {
+            y = getSliceBlockHeight(chunkMd, blockPos.getX() & 15, vSlice, blockPos.getZ() & 15, sliceMinY, sliceMaxY, heightsCache);
+        }
+
+        return (y == null) ? blockPos.getY() : y;
     }
 
     /**

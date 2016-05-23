@@ -20,7 +20,9 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -50,7 +52,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapPlants;
     protected boolean mapPlantShadows;
     protected float[] ambientColor;
-
 
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
@@ -159,10 +160,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         else
         {
             ChunkMD chunkMD = stratum.getChunkMd();
-            basicColor = stratum.getBlockMD().getColor(chunkMD, chunkMD.toWorldX(stratum.getX()), stratum.getY(), chunkMD.toWorldZ(stratum.getZ()));
+            basicColor = stratum.getBlockMD().getColor(chunkMD, stratum.getBlockPos());
         }
 
-        if (stratum.getBlockMD().getBlock() == Blocks.glowstone || stratum.getBlockMD().getBlock() == Blocks.lit_redstone_lamp)
+        Block block = stratum.getBlockMD().getBlockState().getBlock();
+        if (block == Blocks.glowstone || block == Blocks.lit_redstone_lamp)
         {
             basicColor = RGB.adjustBrightness(basicColor, tweakBrightenLightsourceBlock); // magic #
         }
@@ -195,9 +197,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Initialize surface slopes in chunk.  This is the black magic
      * that serves as the stand-in for true bump-mapping.
      */
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice,
-                                       final HeightsCache chunkHeights,
-                                       final SlopesCache chunkSlopes)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
 
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
@@ -269,6 +269,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return slopes;
 
     }
+
+    public abstract int getBlockHeight(final ChunkMD chunkMd, BlockPos blockPos);
 
     /**
      * Get block height within slice.  Should lazy-populate sliceHeights. Can return null.
@@ -365,9 +367,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return new int[]{sliceMinY, sliceMaxY};
     }
 
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z,
-                             final HeightsCache chunkHeights,
-                             final SlopesCache chunkSlopes)
+    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
         Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.getCoord());
 
@@ -409,7 +409,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int localX, int localZ, final HeightsCache chunkHeights)
     {
         Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if (heights == null)
@@ -419,7 +419,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         Integer y;
 
-        y = heights[x][z];
+        y = heights[localX][localZ];
 
         if (y != null)
         {
@@ -428,7 +428,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         // Find the height.
-        y = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
+        y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
 
         try
         {
@@ -437,7 +437,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
             while (y > 0)
             {
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
 
                 if (blockMD.isAir())
                 {
@@ -452,7 +452,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     }
                     else if (propUnsetWaterHeight)
                     {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, localX, localZ);
                         propUnsetWaterHeight = false;
                     }
                     y--;
@@ -460,47 +460,48 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                 }
                 else if (blockMD.hasFlag(BlockMD.Flag.Plant))
                 {
-                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    if (!mapPlants)
                     {
                         y--;
                         continue;
                     }
 
-                    if (mapPlants)
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                     {
-                        break;
+                        y--;
                     }
                 }
                 else if (blockMD.hasFlag(BlockMD.Flag.Crop))
                 {
-                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    if (!mapCrops)
                     {
                         y--;
                         continue;
                     }
 
-                    if (mapCrops)
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                     {
-                        break;
+                        y--;
                     }
+
                 }
                 else if (!blockMD.isLava() && blockMD.hasNoShadow())
                 {
                     y--;
-                    break;
                 }
+
                 break;
             }
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + localX + "," + localZ + ": " + e);
         }
 
         //why is height 4 set on a chunk to the left?
         y = Math.max(0, y);
 
-        heights[x][z] = y;
+        heights[localX][localZ] = y;
 
         return y;
     }

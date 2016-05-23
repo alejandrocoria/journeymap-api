@@ -320,7 +320,7 @@ public class ColorPalette
                 Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + blockColor.uid);
                 continue;
             }
-            BlockMD blockMD = BlockMD.get(block, blockColor.meta);
+            BlockMD blockMD = BlockMD.get(block.getStateFromMeta(blockColor.meta));
             if (blockMD.hasFlag(BlockMD.Flag.Transparency))
             {
                 Float alpha = blockColor.alpha;
@@ -425,8 +425,9 @@ public class ColorPalette
         {
             this.name = blockMD.getName();
             // 1.8 needs the cast
-            this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
-            this.meta = blockMD.getMeta();
+            Block block = blockMD.getBlockState().getBlock();
+            this.uid = GameData.getBlockRegistry().getNameForObject(block).toString();
+            this.meta = block.getMetaFromState(blockMD.getBlockState());
 
             Color awtColor = new Color(intColor);
             this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());

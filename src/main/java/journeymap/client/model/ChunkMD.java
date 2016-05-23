@@ -13,7 +13,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.common.Journeymap;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -68,34 +68,48 @@ public class ChunkMD
         }
     }
 
-    public Block getBlock(int x, int y, int z)
+    public IBlockState getBlockState(int localX, int y, int localZ)
     {
-        return getChunk().getBlock(new BlockPos(x, y, z));
+        if (localX < 0 || localX > 15 || localZ < 0 || localZ > 15)
+        {
+            Journeymap.getLogger().warn("Expected local coords, got global coords");
+        }
+        return getBlockState(new BlockPos(toWorldX(localX), y, toWorldZ(localZ)));
     }
 
-    public BlockMD getBlockMD(int x, int y, int z)
+    public IBlockState getBlockState(BlockPos blockPos)
     {
-        return BlockMD.get(getBlock(x, y, z), getBlockMeta(x, y, z));
+        return ForgeHelper.INSTANCE.getWorld().getBlockState(blockPos);
+    }
+
+    public BlockMD getBlockMD(int localX, int y, int localZ)
+    {
+        return BlockMD.get(getBlockState(localX, y, localZ));
+    }
+
+    public BlockMD getBlockMD(BlockPos blockPos)
+    {
+        return BlockMD.get(getBlockState(blockPos));
     }
 
     /**
      * Added to do a safety check on the world height value
      */
-    public int getSavedLightValue(int x, int y, int z)
+    public int getSavedLightValue(int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getSavedLightValue(getChunk(), x, y, z);
+        return ForgeHelper.INSTANCE.getSavedLightValue(getChunk(), getBlockPos(localX, y, localZ));
     }
 
     /**
      * Get the top block ignoring transparent roof blocks, air. etc.
      */
-    public final BlockMD getTopBlockMD(final int x, int y, final int z)
+    public final BlockMD getTopBlockMD(final int localX, int y, final int localZ)
     {
         BlockMD topBlockMd = null;
 
         do
         {
-            topBlockMd = BlockMD.getBlockMD(this, x, y, z);
+            topBlockMd = BlockMD.getBlockMD(this, getBlockPos(localX, y, localZ));
 
             // Null check
             if (topBlockMd == null)
@@ -117,34 +131,27 @@ public class ChunkMD
     }
 
     /**
-     * Get the block meta from the chunk-local coords.
-     */
-    public int getBlockMeta(final int x, int y, final int z)
-    {
-        return ForgeHelper.INSTANCE.getBlockMeta(getChunk(), x, y, z);
-    }
-
-    /**
      * Finds the top sky-obscuring block in the column.
      */
-    public int ceiling(final int x, final int z)
+    public int ceiling(final int localX, final int localZ)
     {
-        final int chunkHeight = getPrecipitationHeight(x, z);
+        final int chunkHeight = getPrecipitationHeight(getBlockPos(localX, 0, localZ));
         int y = chunkHeight;
-
+        BlockPos blockPos = null;
         try
         {
             Chunk chunk = getChunk();
             BlockMD blockMD;
             while (y >= 0)
             {
-                blockMD = getBlockMD(x, y, z);
+                blockPos = getBlockPos(localX, y, localZ);
+                blockMD = getBlockMD(blockPos);
 
                 if (blockMD.isAir() || blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                 {
                     y--;
                 }
-                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(chunk, x, y, z))
+                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(chunk, blockPos))
                 {
                     y--;
                 }
@@ -156,7 +163,7 @@ public class ChunkMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(e + " at " + toWorldX(x) + "," + y + "," + toWorldX(x));
+            Journeymap.getLogger().warn(e + " at " + blockPos);
         }
 
         return Math.max(0, y);
@@ -168,19 +175,24 @@ public class ChunkMD
         return chunk != null && !(chunk instanceof EmptyChunk) && chunk.isLoaded();
     }
 
-    public int getHeight(int x, int z)
+    public int getHeight(BlockPos blockPos)
     {
-        return ForgeHelper.INSTANCE.getHeight(getChunk(), x, z);
+        return getChunk().getHeight(blockPos);
     }
 
-    public int getPrecipitationHeight(int x, int z)
+    public int getPrecipitationHeight(int localX, int localZ)
     {
-        return ForgeHelper.INSTANCE.getPrecipitationHeight(getChunk(), x, z);
+        return getChunk().getPrecipitationHeight(getBlockPos(localX, 0, localZ)).getY();
+    }
+
+    public int getPrecipitationHeight(BlockPos blockPos)
+    {
+        return getChunk().getPrecipitationHeight(blockPos).getY();
     }
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getLightOpacity(blockMD, toWorldX(localX), y, toWorldZ(localZ));
+        return ForgeHelper.INSTANCE.getLightOpacity(blockMD, getBlockPos(localX, y, localZ));
     }
 
     public Serializable getProperty(String name)
@@ -241,7 +253,7 @@ public class ChunkMD
 
     public World getWorld()
     {
-        return ForgeHelper.INSTANCE.getWorld(getChunk());
+        return ForgeHelper.INSTANCE.getWorld();
     }
 
     public int getWorldActualHeight()
@@ -262,9 +274,9 @@ public class ChunkMD
         return ForgeHelper.INSTANCE.hasNoSky(getWorld());
     }
 
-    public boolean canBlockSeeTheSky(int x, int y, int z)
+    public boolean canBlockSeeTheSky(int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), x, y, z);
+        return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), getBlockPos(localX, y, localZ));
     }
 
     public ChunkCoordIntPair getCoord()
@@ -292,6 +304,11 @@ public class ChunkMD
         long now = System.currentTimeMillis();
         setProperty(PROP_LAST_RENDERED, now);
         return now;
+    }
+
+    public BlockPos getBlockPos(int localX, int y, int localZ)
+    {
+        return new BlockPos(toWorldX(localX), y, toWorldZ(localZ));
     }
 
     public int toWorldX(int localX)

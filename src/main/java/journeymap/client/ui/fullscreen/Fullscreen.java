@@ -612,113 +612,132 @@ public class Fullscreen extends JmUI
 
     @Override
     public void handleMouseInput() throws IOException
-    { // handleMouseInput
-
-        if (chat != null && !chat.isHidden())
+    {
+        try
         {
-            chat.handleMouseInput();
-            //return;
-        }
-
-        // Scale mouse position to Gui Scale coords
-        mx = (Mouse.getEventX() * width) / mc.displayWidth;
-        my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
-
-        if (Mouse.getEventButtonState())
-        {
-            mouseClicked(mx, my, Mouse.getEventButton());
-        }
-        else
-        {
-            int wheel = Mouse.getEventDWheel();
-            if (wheel > 0)
+            if (chat != null && !chat.isHidden())
             {
-                zoomIn();
+                chat.handleMouseInput();
+                //return;
+            }
+
+            // Scale mouse position to Gui Scale coords
+            mx = (Mouse.getEventX() * width) / mc.displayWidth;
+            my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
+
+            if (Mouse.getEventButtonState())
+            {
+                mouseClicked(mx, my, Mouse.getEventButton());
             }
             else
             {
-                if (wheel < 0)
+                int wheel = Mouse.getEventDWheel();
+                if (wheel > 0)
                 {
-                    zoomOut();
+                    zoomIn();
                 }
                 else
                 {
-                    mouseReleased(mx, my, Mouse.getEventButton());
+                    if (wheel < 0)
+                    {
+                        zoomOut();
+                    }
+                    else
+                    {
+                        mouseReleased(mx, my, Mouse.getEventButton());
+                    }
                 }
             }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(LogFormatter.toPartialString(t));
         }
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        if (chat != null && !chat.isHidden())
+        try
         {
-            chat.mouseClicked(mouseX, mouseY, mouseButton);
+            if (chat != null && !chat.isHidden())
+            {
+                chat.mouseClicked(mouseX, mouseY, mouseButton);
+            }
+
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+
+            // Bail if over a button
+            if (isMouseOverButton(mouseX, mouseY))
+            {
+                return;
+            }
+
+            // Invoke layer delegate
+            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
+            layerDelegate.onMouseClicked(mc, gridRenderer, mousePosition, mouseButton, getMapFontScale());
         }
-
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-
-        // Bail if over a button
-        if (isMouseOverButton(mouseX, mouseY))
+        catch (Throwable t)
         {
-            return;
+            Journeymap.getLogger().error(LogFormatter.toPartialString(t));
         }
-
-        // Invoke layer delegate
-        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
-        layerDelegate.onMouseClicked(mc, gridRenderer, mousePosition, mouseButton, getMapFontScale());
     }
 
     @Override
-    // 1.7 mouseMovedOrUp
     protected void mouseReleased(int mouseX, int mouseY, int which)
     {
-        super.mouseReleased(mouseX, mouseY, which);
-
-        if (isMouseOverButton(mouseX, mouseY))
+        try
         {
-            return;
-        }
+            super.mouseReleased(mouseX, mouseY, which);
 
-        int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
-
-        if (Mouse.isButtonDown(0) && !isScrolling)
-        {
-            isScrolling = true;
-            msx = mx;
-            msy = my;
-        }
-        else
-        {
-            if (!Mouse.isButtonDown(0) && isScrolling)
+            if (isMouseOverButton(mouseX, mouseY))
             {
-                isScrolling = false;
-                int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
-                int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
+                return;
+            }
+
+            int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
+
+            if (Mouse.isButtonDown(0) && !isScrolling)
+            {
+                isScrolling = true;
                 msx = mx;
                 msy = my;
-
-                try
+            }
+            else
+            {
+                if (!Mouse.isButtonDown(0) && isScrolling)
                 {
-                    gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-                    gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
-                }
-                catch (Exception e)
-                {
-                    logger.error("Error moving grid: " + e);
-                }
+                    isScrolling = false;
+                    int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+                    int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
+                    msx = mx;
+                    msy = my;
 
-                setFollow(false);
-                refreshState();
+                    try
+                    {
+                        gridRenderer.move(-mouseDragX, -mouseDragY);
+                        gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+                        gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error("Error moving grid: " + e);
+                    }
+
+                    setFollow(false);
+                    refreshState();
+                }
+            }
+
+            if (!isScrolling && which == -1)
+            {
+                Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
+                layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
             }
         }
-
-        if (!isScrolling && which == -1)
+        catch (Throwable t)
         {
-            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
-            layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
+            Journeymap.getLogger().error(LogFormatter.toPartialString(t));
         }
     }
 

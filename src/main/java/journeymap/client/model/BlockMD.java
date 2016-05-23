@@ -21,6 +21,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
@@ -33,49 +37,57 @@ public class BlockMD
 {
     public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
     public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
-    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
+    private static final Map<IBlockState, BlockMD> cache = new HashMap<IBlockState, BlockMD>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
-    private final Block block;
-    private final int meta;
+    private IBlockState blockState;
     private final String uid;
     private final String name;
     private EnumSet<Flag> flags;
     private int textureSide;
-    private Integer overrideMeta;
     private Integer color;
     private float alpha;
     private String iconName;
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
-
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
+    private boolean useDefaultState;
 
     /**
      * Private constructor.
      */
-    private BlockMD(Block block, int meta)
+    private BlockMD(IBlockState blockState)
     {
-        this(block, meta, Block.blockRegistry.getNameForObject(block).toString(), BlockMD.getBlockName(block, meta), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(blockState, blockState.getBlock().getRegistryName(), BlockMD.getBlockName(blockState), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
 
     /**
      * Private constructor
      */
-    private BlockMD(Block block, int meta, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    private BlockMD(IBlockState blockState, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
     {
-        this.block = block;
-        this.meta = meta;
+        this.blockState = blockState;
         this.uid = uid;
         this.name = name;
         this.alpha = alpha;
         this.textureSide = textureSide;
         this.flags = flags;
         this.blockColorHandler = VanillaColorHandler.INSTANCE;
-        if (block != null)
+        if (blockState != null && blockState.getBlock() != null)
         {
             modBlockDelegate.initialize(this);
         }
+    }
+
+    public boolean isUseDefaultState()
+    {
+        return useDefaultState;
+    }
+
+    public BlockMD setUseDefaultState(boolean useDefaultState)
+    {
+        this.useDefaultState = useDefaultState;
+        return this;
     }
 
     /**
@@ -91,8 +103,8 @@ public class BlockMD
         modBlockDelegate = new ModBlockDelegate();
 
         // Dummy blocks
-        AIRBLOCK = new BlockMD(Blocks.air, 0, "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
-        VOIDBLOCK = new BlockMD(null, 0, "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        AIRBLOCK = new BlockMD(Blocks.air.getDefaultState(), "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
+        VOIDBLOCK = new BlockMD(null, "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
 
         // Load all registered block+metas
         Collection<BlockMD> all = getAll();
@@ -114,11 +126,7 @@ public class BlockMD
         List<BlockMD> allBlockMDs = new ArrayList<BlockMD>(512);
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
-            for (int meta : metas)
-            {
-                allBlockMDs.add(get(block, meta, metas.size()));
-            }
+            allBlockMDs.addAll(BlockMD.getAllBlockMDs(block));
         }
         return allBlockMDs;
     }
@@ -128,30 +136,33 @@ public class BlockMD
      */
     public static BlockMD getBlockMD(ChunkMD chunkMd, int localX, int y, int localZ)
     {
+        return getBlockMD(chunkMd, chunkMd.getBlockPos(localX, y, localZ));
+    }
+
+    /**
+     * Retrieves a BlockMD instance
+     */
+    public static BlockMD getBlockMD(ChunkMD chunkMd, BlockPos blockPos)
+    {
         try
         {
-            if (y >= 0)
+            if (blockPos.getY() >= 0)
             {
-                Block block = chunkMd.getBlock(localX, y, localZ);
-
-                if (block instanceof BlockAir)
+                IBlockState blockState = ForgeHelper.INSTANCE.getWorld().getBlockState(blockPos);
+                BlockMD blockMD = get(blockState);
+                if (blockMD.isAir())
                 {
-                    return AIRBLOCK;
-                }
-                else
-                {
-                    int meta = chunkMd.getBlockMeta(localX, y, localZ);
-                    BlockMD blockMD = get(block, meta);
-                    if (blockMD.hasFlag(Flag.SpecialHandling))
-                    {
-                        BlockMD delegated = ModBlockDelegate.handleBlock(chunkMd, blockMD, localX, y, localZ);
-                        if (delegated != null)
-                        {
-                            blockMD = delegated;
-                        }
-                    }
                     return blockMD;
                 }
+                else if (blockMD.hasFlag(Flag.SpecialHandling))
+                {
+                    BlockMD delegated = ModBlockDelegate.handleBlock(chunkMd, blockMD, blockPos);
+                    if (delegated != null)
+                    {
+                        blockMD = delegated;
+                    }
+                }
+                return blockMD;
             }
             else
             {
@@ -160,7 +171,7 @@ public class BlockMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, localX, y, localZ, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, blockPos, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -168,52 +179,27 @@ public class BlockMD
     /**
      * Retrieves/lazy-creates the corresponding BlockMD instance.
      */
-    public static BlockMD get(Block block, int meta)
-    {
-        return get(block, meta, null);
-    }
-
-    /**
-     * Retrieves/lazy-creates the corresponding BlockMD instance,
-     * preinitializing the inner map to subBlocks size if needed.
-     */
-    private static BlockMD get(Block block, int meta, Integer subBlocks)
+    public static BlockMD get(IBlockState blockState)
     {
         try
         {
-            if (block == null)
+            if (blockState == null)
             {
                 return AIRBLOCK;
             }
 
-            Map<Integer, BlockMD> map = cache.get(block);
-            if (map == null)
-            {
-                if (subBlocks == null)
-                {
-                    subBlocks = BlockMD.getMetaValuesForBlock(block).size();
-                }
-                int size = (int) Math.ceil(Math.max(1, subBlocks) * 1.25);
-                map = new HashMap<Integer, BlockMD>(size + (size / 2));
-                cache.put(block, map);
-            }
-
-            BlockMD blockMD = map.get(meta);
+            BlockMD blockMD = cache.get(blockState);
             if (blockMD == null)
             {
-                if (Block.blockRegistry.getNameForObject(block) == null)
-                {
-                    return AIRBLOCK;
-                }
-                blockMD = new BlockMD(block, meta);
-                map.put(meta, blockMD);
+                blockMD = new BlockMD(blockState);
+                cache.put(blockState, blockMD);
             }
 
             return blockMD;
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
@@ -229,43 +215,36 @@ public class BlockMD
     /**
      * Get a displayname for the block.
      */
-    private static String getBlockName(Block block, int meta)
+    private static String getBlockName(IBlockState blockState)
     {
-        String name = null;
+        String displayName = null;
         try
         {
-            name = ForgeHelper.INSTANCE.getBlockName(block, meta);
-            if (name == null)
+            Block block = blockState.getBlock();
+            Item item = Item.getItemFromBlock(block);
+            if (item != null)
             {
-                name = block.getUnlocalizedName().replaceAll("tile.", "").replaceAll("Block", "");
+                ItemStack idPicked = new ItemStack(item, 1, block.getMetaFromState(blockState));
+                displayName = StatCollector.translateToLocal(item.getUnlocalizedName(idPicked) + ".name");
             }
+
+            if (Strings.isNullOrEmpty(displayName))
+            {
+                displayName = block.getLocalizedName();
+            }
+
         }
-        catch (Throwable t)
+        catch (Exception e)
         {
-            Journeymap.getLogger().debug("Displayname not available for " + name);
+            Journeymap.getLogger().warn(String.format("Couldn't get display name for %s: %s ", blockState, e));
         }
 
-        if (Strings.isNullOrEmpty(name))
+        if (Strings.isNullOrEmpty(displayName) || displayName.contains("tile"))
         {
-            name = block.getClass().getSimpleName().replaceAll("Block", "");
-        }
-        return name;
-    }
-
-    /**
-     * Gets the meta variants possible for a given Block.
-     */
-    public static Collection<Integer> getMetaValuesForBlock(Block block)
-    {
-        ArrayList<Integer> metas = new ArrayList<Integer>();
-
-        for (IBlockState state : block.getBlockState().getValidStates())
-        {
-            int meta = state.getBlock().getMetaFromState(state);
-            metas.add(meta);
+            displayName = blockState.getBlock().getClass().getSimpleName().replaceAll("Block", "");
         }
 
-        return metas;
+        return displayName;
     }
 
     /**
@@ -273,18 +252,14 @@ public class BlockMD
      */
     public static Collection<BlockMD> getAllBlockMDs(Block block)
     {
-        if (cache.isEmpty())
+        List<IBlockState> states = block.getBlockState().getValidStates();
+        List<BlockMD> blockMDs = new ArrayList<BlockMD>(states.size());
+        for (IBlockState state : states)
         {
-            reset();
+            blockMDs.add(BlockMD.get(state));
         }
 
-        Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
-        List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
-        for (int meta : metas)
-        {
-            list.add(BlockMD.get(block, meta));
-        }
-        return list;
+        return blockMDs;
     }
 
     /**
@@ -378,9 +353,9 @@ public class BlockMD
     /**
      * Gets block color using world coordinates.
      */
-    public int getColor(ChunkMD chunkMD, int globalX, int y, int globalZ)
+    public int getColor(ChunkMD chunkMD, BlockPos blockPos)
     {
-        return blockColorHandler.getBlockColor(chunkMD, this, globalX, y, globalZ);
+        return blockColorHandler.getBlockColor(chunkMD, this, blockPos);
     }
 
     public Integer getColor()
@@ -469,9 +444,9 @@ public class BlockMD
      *
      * @return the block
      */
-    public Block getBlock()
+    public IBlockState getBlockState()
     {
-        return block;
+        return useDefaultState ? blockState.getBlock().getDefaultState() : blockState;
     }
 
     /**
@@ -491,7 +466,7 @@ public class BlockMD
      */
     public boolean isAir()
     {
-        return block instanceof BlockAir || hasFlag(Flag.HasAir);
+        return blockState.getBlock() instanceof BlockAir || hasFlag(Flag.HasAir);
     }
 
     /**
@@ -501,18 +476,9 @@ public class BlockMD
      */
     public boolean isIce()
     {
-        return block == Blocks.ice;
+        return blockState.getBlock() == Blocks.ice;
     }
 
-    /**
-     * Is torch.
-     *
-     * @return the boolean
-     */
-    public boolean isTorch()
-    {
-        return block == Blocks.torch || block == Blocks.redstone_torch || block == Blocks.unlit_redstone_torch;
-    }
 
     /**
      * Is water.
@@ -541,7 +507,7 @@ public class BlockMD
      */
     public boolean isLava()
     {
-        return block == Blocks.lava || block == Blocks.flowing_lava;
+        return blockState.getBlock() == Blocks.lava || blockState.getBlock() == Blocks.flowing_lava;
     }
 
     /**
@@ -584,15 +550,6 @@ public class BlockMD
         return uid;
     }
 
-    /**
-     * Gets meta
-     *
-     * @return
-     */
-    public int getMeta()
-    {
-        return meta;
-    }
 
     /**
      * Gets flags
@@ -602,16 +559,6 @@ public class BlockMD
     public EnumSet<Flag> getFlags()
     {
         return flags;
-    }
-
-    /**
-     * Has an override meta to use
-     *
-     * @return
-     */
-    public boolean hasOverrideMeta()
-    {
-        return overrideMeta != null;
     }
 
     /**
@@ -642,26 +589,6 @@ public class BlockMD
     public void setTextureSide(int textureSide)
     {
         this.textureSide = textureSide;
-    }
-
-    /**
-     * Returns the override meta to use when deriving color, or null if no override specified.
-     *
-     * @return
-     */
-    public Integer getOverrideMeta()
-    {
-        return overrideMeta;
-    }
-
-    /**
-     * Sets override meta.
-     *
-     * @param overrideMeta
-     */
-    public void setOverrideMeta(Integer overrideMeta)
-    {
-        this.overrideMeta = overrideMeta;
     }
 
     /**
@@ -702,32 +629,21 @@ public class BlockMD
             return false;
         }
 
-        BlockMD blockMD = (BlockMD) o;
+        //BlockMD blockMD = (BlockMD) o;
 
-        if (meta != blockMD.meta)
-        {
-            return false;
-        }
-        if (!uid.equals(blockMD.uid))
-        {
-            return false;
-        }
-
-        return true;
+        return blockState.equals(((BlockMD) o).blockState);
     }
 
     @Override
     public int hashCode()
     {
-        int result = uid.hashCode();
-        result = 31 * result + meta;
-        return result;
+        return uid.hashCode();
     }
 
     @Override
     public String toString()
     {
-        return String.format("BlockMD [%s:%s] (%s)", uid, meta, Joiner.on(",").join(flags));
+        return String.format("BlockMD [%s:%s] (%s)", uid, blockState, Joiner.on(",").join(flags));
     }
 
     /**

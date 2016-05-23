@@ -16,6 +16,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import org.apache.logging.log4j.Level;
 
@@ -49,6 +50,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     {
         super.updateOptions();
         this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
+    }
+
+    @Override
+    public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
+    {
+        Integer y = getSurfaceBlockHeight(chunkMd, blockPos.getX() & 15, blockPos.getZ() & 15, chunkSurfaceHeights);
+        return (y == null) ? blockPos.getY() : y;
     }
 
     /**

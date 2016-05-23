@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.registry.GameData;
 
 import static journeymap.client.model.BlockMD.Flag.*;
@@ -63,20 +64,11 @@ public class CarpentersBlocks
 
         /**
          * Get the block flagged with used to color the carpenter's block.
-         *
-         * @param chunkMD Containing chunk
-         * @param blockMD CarpentersBlock flagged with SpecialHandling
-         * @param localX  x local to chunk
-         * @param y       y
-         * @param localZ  z local to chunk
-         * @return block used to provide color
          */
         @Override
-        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
+        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
         {
-            final int blockX = chunkMD.toWorldX(localX);
-            final int blockZ = chunkMD.toWorldZ(localZ);
-            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockX, y, blockZ);
+            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockPos);
             if (tileEntity != null)
             {
                 final NBTTagCompound tag = new NBTTagCompound();
@@ -98,7 +90,7 @@ public class CarpentersBlocks
                             meta = Integer.parseInt(idMeta.substring(0, idMeta.length() - 1));
                         }
                         Block block = GameData.getBlockRegistry().getObjectById(id);
-                        blockMD = BlockMD.get(block, meta);
+                        blockMD = BlockMD.get(block.getStateFromMeta(meta));
                     }
                 }
             }

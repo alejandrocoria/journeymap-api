@@ -16,6 +16,7 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.impl.ClientEventManager;
 import journeymap.client.api.util.UIState;
 import journeymap.client.cartography.RGB;
+import journeymap.client.data.DataCache;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
@@ -364,7 +365,18 @@ public class GridRenderer
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
-        return new BlockPos(x, FMLClientHandler.instance().getClient().theWorld.getSeaLevel(), z);
+
+        int y = 0;
+        if (DataCache.getPlayer().underground)
+        {
+            y = MathHelper.floor_double(DataCache.getPlayer().posY);
+        }
+        else
+        {
+            y = FMLClientHandler.instance().getClient().theWorld.getSeaLevel();
+        }
+
+        return new BlockPos(x, y, z);
     }
 
     public Point2D.Double getBlockPixelInGrid(BlockPos pos)

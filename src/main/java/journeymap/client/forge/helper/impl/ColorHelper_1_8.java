@@ -76,12 +76,11 @@ public class ColorHelper_1_8 implements IColorHelper
     }
 
     @Override
-    public int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z)
+    public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        BlockPos blockPos = new BlockPos(x, y, z);
         if (chunkMD == null || !chunkMD.hasChunk())
         {
-            return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
+            return blockMD.getBlockState().getBlock().colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
         }
         else
         {
@@ -92,7 +91,7 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
+                return blockMD.getBlockState().getBlock().colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
             }
         }
     }
@@ -104,25 +103,13 @@ public class ColorHelper_1_8 implements IColorHelper
     @Override
     public int getRenderColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getRenderColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        return block.getRenderColor(blockState);
+        return blockMD.getBlockState().getBlock().getRenderColor(blockMD.getBlockState());
     }
 
     @Override
     public int getMapColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getMapColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        MapColor mapColor = block.getMapColor(blockState);
+        MapColor mapColor = blockMD.getBlockState().getBlock().getMapColor(blockMD.getBlockState());
         if (mapColor != null)
         {
             return mapColor.colorValue;
@@ -135,9 +122,6 @@ public class ColorHelper_1_8 implements IColorHelper
 
     /**
      * Derive block color from the corresponding texture.
-     *
-     * @param blockMD
-     * @return
      */
     @Override
     public Integer getTextureColor(BlockMD blockMD)
@@ -164,7 +148,7 @@ public class ColorHelper_1_8 implements IColorHelper
 
             if (blockIcon == null)
             {
-                if (blockMD.getBlock() instanceof ITileEntityProvider)
+                if (blockMD.getBlockState().getBlock() instanceof ITileEntityProvider)
                 {
                     logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
                     blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
@@ -212,27 +196,20 @@ public class ColorHelper_1_8 implements IColorHelper
             return null;
         }
 
-        Block block = blockMD.getBlock();
-        Integer overrideMeta = null;
-        if (blockMD.hasOverrideMeta())
-        {
-            overrideMeta = blockMD.getOverrideMeta();
-        }
-        int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
-
-        IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
+        IBlockState blockState = blockMD.getBlockState();
+        Block block = blockState.getBlock();
 
         // Always get the upper portion of a double plant for rendering
         if (block instanceof BlockDoublePlant)
         {
-            if (state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
+            if (blockState.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
             {
                 // cycle to upper
-                state = state.cycleProperty(BlockDoublePlant.HALF);
+                blockState = blockState.cycleProperty(BlockDoublePlant.HALF);
             }
         }
 
-        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
         return icon;
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
@@ -340,7 +317,7 @@ public class ColorHelper_1_8 implements IColorHelper
             color = RGB.toInteger(r, g, b);
 
             // Determine alpha
-            Block block = blockMD.getBlock();
+            Block block = blockMD.getBlockState().getBlock();
             float blockAlpha = 1f;
             if (unusable)
             {

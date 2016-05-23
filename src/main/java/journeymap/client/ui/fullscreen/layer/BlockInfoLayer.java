@@ -24,7 +24,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -53,38 +52,34 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale)
+    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockPos, float fontScale)
     {
-        if (!blockCoord.equals(lastCoord))
+        if (!blockPos.equals(lastCoord))
         {
             FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
 
             locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
 
-            lastCoord = blockCoord;
+            lastCoord = blockPos;
 
             // Get block under mouse
-            ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(blockCoord.getX() >> 4, blockCoord.getZ() >> 4));
-            String info;
+            ChunkMD chunkMD = DataCache.instance().getChunkMD(blockPos);
+            String info = "";
             if (chunkMD != null && chunkMD.hasChunk())
             {
-                int blockY = chunkMD.getPrecipitationHeight(blockCoord.getX() & 15, blockCoord.getZ() & 15);
-                blockY = Math.max(blockY, 0);
-                BlockMD blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
+                BlockMD blockMD = chunkMD.getBlockMD(blockPos.up());
                 if (blockMD.isAir())
                 {
-                    blockY--;
-                    blockY = Math.max(blockY, 0);
-                    blockMD = chunkMD.getBlockMD(blockCoord.getX(), blockY, blockCoord.getZ());
+                    blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
 
-                String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.getX(), blockY, blockCoord.getZ()).biomeName;
+                String biome = ForgeHelper.INSTANCE.getBiome(blockPos).biomeName;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
-                        blockCoord.getX(),
-                        blockCoord.getZ(),
-                        blockY,
-                        (blockY >> 4)) + " " + biome;
+                        blockPos.getX(),
+                        blockPos.getZ(),
+                        blockPos.getY(),
+                        (blockPos.getY() >> 4)) + " " + biome;
 
                 if (!blockMD.isAir())
                 {
@@ -92,17 +87,13 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
                     if (Journeymap.JM_VERSION.patch.equals("dev"))
                     {
-                        info = blockMD + " " + RGB.toHexString(blockMD.getColor(chunkMD, blockCoord.getX(),
-                                blockCoord.getZ(),
-                                blockY)) + "  " + info;
+                        info = RGB.toHexString(blockMD.getColor(chunkMD, blockPos)) + "  " + info;
                     }
                 }
-
-
             }
             else
             {
-                info = Constants.getString("jm.common.location_xz_verbose", blockCoord.getX(), blockCoord.getZ());
+                info = Constants.getString("jm.common.location_xz_verbose", blockPos.getX(), blockPos.getZ());
             }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();

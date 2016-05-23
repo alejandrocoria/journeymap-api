@@ -10,6 +10,7 @@ package journeymap.client.model.mod;
 
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.util.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class Miscellaneous
         }
 
         @Override
-        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
+        public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
         {
             // Should never be called
             return blockMD;
