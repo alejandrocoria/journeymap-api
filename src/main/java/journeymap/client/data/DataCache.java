@@ -434,7 +434,7 @@ public class DataCache
 
     public void addChunkMD(ChunkMD chunkMD)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
@@ -442,7 +442,7 @@ public class DataCache
 
     public Set<ChunkCoordIntPair> getCachedChunkCoordinates()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             return chunkMetadata.asMap().keySet();
         }
@@ -450,7 +450,7 @@ public class DataCache
 
     public void invalidateChunkMD(ChunkCoordIntPair coord)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.invalidate(coord);
         }
@@ -458,7 +458,7 @@ public class DataCache
 
     public void invalidateChunkMDCache()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.invalidateAll();
         }
@@ -466,7 +466,7 @@ public class DataCache
 
     public void stopChunkMDRetention()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             for (ChunkMD chunkMD : chunkMetadata.asMap().values())
             {
