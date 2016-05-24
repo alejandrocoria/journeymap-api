@@ -20,6 +20,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -436,11 +437,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         // Find the height.
         y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
 
+        if (y == 0)
+        {
+            return 0;
+        }
+
+        BlockMD blockMD;
+        boolean propUnsetWaterHeight = true;
+
         try
         {
-            BlockMD blockMD;
-            boolean propUnsetWaterHeight = true;
-
             while (y > 0)
             {
                 blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
@@ -476,6 +482,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     {
                         y--;
                     }
+
+                    break;
                 }
                 else if (blockMD.hasFlag(BlockMD.Flag.Crop))
                 {
@@ -490,6 +498,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                         y--;
                     }
 
+                    break;
+
                 }
                 else if (!blockMD.isLava() && blockMD.hasNoShadow())
                 {
@@ -501,7 +511,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + localX + "," + localZ + ": " + e);
+            Journeymap.getLogger().warn(String.format("Couldn't get safe surface block height for %s coords %s,%s: %s",
+                    chunkMd, localX, localZ, LogFormatter.toString(e)));
         }
 
         //why is height 4 set on a chunk to the left?

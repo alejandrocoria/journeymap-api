@@ -148,7 +148,7 @@ public class BlockMD
         {
             if (blockPos.getY() >= 0)
             {
-                IBlockState blockState = ForgeHelper.INSTANCE.getWorld().getBlockState(blockPos);
+                IBlockState blockState = ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
                 BlockMD blockMD = get(blockState);
                 if (blockMD.isAir())
                 {

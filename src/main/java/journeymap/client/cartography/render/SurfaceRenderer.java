@@ -143,6 +143,16 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
                     int standardY = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
 
+                    if(standardY==0)
+                    {
+                        paintVoidBlock(dayChunkImage, x, z);
+                        if (!cavePrePass && nightChunkImage != null)
+                        {
+                            paintVoidBlock(nightChunkImage, x, z);
+                        }
+                        continue blockLoop;
+                    }
+
                     // Should be painted only by cave renderer
                     if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
                     {

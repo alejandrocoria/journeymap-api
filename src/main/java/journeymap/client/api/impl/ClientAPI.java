@@ -282,6 +282,11 @@ public enum ClientAPI implements IClientAPI
         return pluginWrapper;
     }
 
+    public boolean isDrawStepsUpdateNeeded()
+    {
+        return drawStepsUpdateNeeded;
+    }
+
     /**
      * Log a message
      *

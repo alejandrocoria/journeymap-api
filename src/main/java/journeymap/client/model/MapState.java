@@ -373,6 +373,11 @@ public class MapState
     {
         EntityDTO player = DataCache.getPlayer();
 
+        if (ClientAPI.INSTANCE.isDrawStepsUpdateNeeded())
+        {
+            return true;
+        }
+
         if (MapPlayerTask.getlastTaskCompleted() - lastRefresh > 500)
         {
             return true;

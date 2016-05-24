@@ -79,7 +79,7 @@ public class ChunkMD
 
     public IBlockState getBlockState(BlockPos blockPos)
     {
-        return ForgeHelper.INSTANCE.getWorld().getBlockState(blockPos);
+        return ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
     }
 
     public BlockMD getBlockMD(int localX, int y, int localZ)
@@ -364,7 +364,10 @@ public class ChunkMD
         @Override
         public ChunkMD load(ChunkCoordIntPair coord) throws Exception
         {
-            return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+            synchronized(this)
+            {
+                return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+            }
         }
     }
 }

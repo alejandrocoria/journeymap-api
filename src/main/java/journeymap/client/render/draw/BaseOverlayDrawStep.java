@@ -171,7 +171,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             String labelText = overlay.getLabel();
             if (!Strings.isNullOrEmpty(labelText))
             {
-                this.labelLines = labelText.split("\\\\n");
+                this.labelLines = labelText.split("\n");
             }
             else
             {
@@ -184,7 +184,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
             String titleText = overlay.getTitle();
             if (!Strings.isNullOrEmpty(titleText))
             {
-                this.titleLines = titleText.split("\\\\n");
+                this.titleLines = titleText.split("\n");
             }
             else
             {
