@@ -60,7 +60,6 @@ public class MapRegionTask extends BaseMapTask
         this.rCoord = rCoord;
         this.retainedCoords = retainCoords;
         this.regionOverlay = createOverlay();
-        ClientAPI.INSTANCE.show(regionOverlay);
     }
 
     public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, MapType mapType, Minecraft minecraft)
@@ -98,6 +97,8 @@ public class MapRegionTask extends BaseMapTask
     @Override
     public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
+        ClientAPI.INSTANCE.show(regionOverlay);
+
         AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc));
 
         int missing = 0;
@@ -209,6 +210,8 @@ public class MapRegionTask extends BaseMapTask
             logger.info(String.format("Actual chunks mapped in %s: %s ", rCoord, mappedChunks));
             regionOverlay.setTitle(Constants.getString("jm.common.automap_region_chunks", mappedChunks));
         }
+
+        System.gc();
     }
 
     @Override
