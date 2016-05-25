@@ -73,7 +73,7 @@ public class BlockMD
         this.textureSide = textureSide;
         this.flags = flags;
         this.blockColorHandler = VanillaColorHandler.INSTANCE;
-        if (blockState != null && blockState.getBlock() != null)
+        if (blockState != null && blockState.getBlock() != null && uid != null)
         {
             modBlockDelegate.initialize(this);
         }
