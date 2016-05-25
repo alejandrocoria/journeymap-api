@@ -177,11 +177,7 @@ public class ColorHelper_1_8 implements IColorHelper
             failed.add(blockMD);
             if (blockMD.getUid().startsWith("minecraft"))
             {
-                logger.warn("Error getting block color. Please report this exception to the JourneyMap mod author regarding " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
-            }
-            else
-            {
-                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+                logger.warn(String.format("Error getting block color for %s. Cause: %s", blockMD, LogFormatter.toPartialString(t)));
             }
             return null;
         }
@@ -301,30 +297,17 @@ public class ColorHelper_1_8 implements IColorHelper
             }
             else
             {
-                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+                logger.warn("Texture was completely transparent in " + icon.getIconName() + " for " + blockMD);
             }
 
-            if (unusable)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-                String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
-                logger.debug(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
-                r = g = b = 0;
-            }
-
-
-            // Set color
-            color = RGB.toInteger(r, g, b);
-
-            // Determine alpha
             Block block = blockMD.getBlockState().getBlock();
-            float blockAlpha = 1f;
-            if (unusable)
+            float blockAlpha = 0f;
+
+            if (!unusable)
             {
-                blockAlpha = 0f;
-            }
-            else
-            {
+                // Set color
+                color = RGB.toInteger(r, g, b);
+
                 if (blockMD.hasFlag(BlockMD.Flag.Transparency))
                 {
                     blockAlpha = blockMD.getAlpha();
@@ -344,7 +327,37 @@ public class ColorHelper_1_8 implements IColorHelper
                     }
                 }
             }
-            //dataCache.getBlockMetadata().setAllAlpha(block, blockAlpha);
+
+            if (unusable)
+            {
+                if (!block.isOpaqueCube() || !block.getMaterial().isOpaque())
+                {
+                    unusable = false;
+                }
+                else
+                {
+                    logger.warn(String.format("Block is opaque, but texture was completely transparent: %s . Using MaterialMapColor instead for: %s", icon.getIconName(), blockMD));
+                    try
+                    {
+                        color = blockMD.getBlockState().getBlock().getMaterial().getMaterialMapColor().colorValue;
+                        unusable = false;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.warn(String.format("Failed to use MaterialMapColor, marking block transparent: %s", blockMD));
+                        blockAlpha = 0F;
+                        color = RGB.WHITE_RGB;
+                    }
+                }
+            }
+
+            if (unusable)
+            {
+                blockMD.addFlags(BlockMD.Flag.Error);
+            }
+
+            // Set alpha and color
+            //blockMD.setColor(color);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
         }
