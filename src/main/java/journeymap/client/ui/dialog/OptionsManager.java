@@ -39,6 +39,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -117,6 +118,10 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap1PreviewButton = new CheckBox(name, false);
                 minimap1PreviewButton.setTooltip(tooltip);
+                if (FMLClientHandler.instance().getClient().theWorld == null)
+                {
+                    minimap1PreviewButton.setEnabled(false);
+                }
             }
 
             if (minimap2PreviewButton == null)
@@ -125,6 +130,10 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap2PreviewButton = new CheckBox(name, false);
                 minimap2PreviewButton.setTooltip(tooltip);
+                if (FMLClientHandler.instance().getClient().theWorld == null)
+                {
+                    minimap2PreviewButton.setEnabled(false);
+                }
             }
 
             if (minimap1KeysButton == null)
@@ -200,7 +209,10 @@ public class OptionsManager extends JmUI
 
                         if (category == ClientCategory.MiniMap1)
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
+                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                {
+                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
+                                }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
@@ -208,7 +220,10 @@ public class OptionsManager extends JmUI
                             }
                         else if (category == ClientCategory.MiniMap2)
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
+                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                {
+                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
+                                }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
