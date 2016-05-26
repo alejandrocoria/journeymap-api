@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
@@ -24,6 +26,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.registry.GameData;
 
@@ -33,7 +36,7 @@ import java.util.*;
  * Block + meta = BlockMetaData.  Carries color, flags, and other
  * data points specific to a Block+meta combination.
  */
-public class BlockMD
+public class BlockMD implements Comparable<BlockMD>
 {
     public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
     public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
@@ -41,7 +44,7 @@ public class BlockMD
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
-    private IBlockState blockState;
+    private final IBlockState blockState;
     private final String uid;
     private final String name;
     private EnumSet<Flag> flags;
@@ -90,6 +93,16 @@ public class BlockMD
         return this;
     }
 
+    public Block getBlock()
+    {
+        return blockState.getBlock();
+    }
+
+    public int getMeta()
+    {
+        return blockState.getBlock().getMetaFromState(blockState);
+    }
+
     /**
      * Preloads the cache with all registered blocks and their subblocks.
      */
@@ -128,6 +141,7 @@ public class BlockMD
         {
             allBlockMDs.addAll(BlockMD.getAllBlockMDs(block));
         }
+        Collections.sort(allBlockMDs);
         return allBlockMDs;
     }
 
@@ -175,6 +189,20 @@ public class BlockMD
             return AIRBLOCK;
         }
     }
+
+    /**
+     * Finds BlockMD by block uid + meta
+     */
+    public static BlockMD get(String uid, int meta)
+    {
+        Block block = GameData.getBlockRegistry().getObject(new ResourceLocation(uid));
+        if (block == null)
+        {
+            return null;
+        }
+        return BlockMD.get(block.getStateFromMeta(meta));
+    }
+
 
     /**
      * Retrieves/lazy-creates the corresponding BlockMD instance.
@@ -252,13 +280,22 @@ public class BlockMD
      */
     public static Collection<BlockMD> getAllBlockMDs(Block block)
     {
-        List<IBlockState> states = block.getBlockState().getValidStates();
+        List<IBlockState> states = new ArrayList<IBlockState>(block.getBlockState().getValidStates());
+        Collections.sort(states, new Comparator<IBlockState>()
+        {
+            @Override
+            public int compare(IBlockState o1, IBlockState o2)
+            {
+                return Integer.compare(o1.getBlock().getMetaFromState(o1), o2.getBlock().getMetaFromState(o2));
+            }
+        });
+
         List<BlockMD> blockMDs = new ArrayList<BlockMD>(states.size());
         for (IBlockState state : states)
         {
             blockMDs.add(BlockMD.get(state));
         }
-
+        //Collections.sort(blockMDs);
         return blockMDs;
     }
 
@@ -629,8 +666,6 @@ public class BlockMD
             return false;
         }
 
-        //BlockMD blockMD = (BlockMD) o;
-
         return blockState.equals(((BlockMD) o).blockState);
     }
 
@@ -644,6 +679,19 @@ public class BlockMD
     public String toString()
     {
         return String.format("BlockMD [%s:%s] (%s)", uid, blockState, Joiner.on(",").join(flags));
+    }
+
+    @Override
+    public int compareTo(BlockMD that)
+    {
+        Ordering ordering = Ordering.natural().nullsLast();
+        return ComparisonChain.start()
+                .compare(this.uid, that.uid, ordering)
+                .compare(this.getMeta(), that.getMeta(), ordering)
+                .compare(this.name, that.name, ordering)
+                .compare(this.color, that.color, ordering)
+                .compare(this.alpha, that.alpha, ordering)
+                .result();
     }
 
     /**

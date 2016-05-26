@@ -330,7 +330,7 @@ public class ColorHelper_1_8 implements IColorHelper
 
             if (unusable)
             {
-                if (!block.isOpaqueCube() || !block.getMaterial().isOpaque())
+                if (!block.getMaterial().isOpaque())
                 {
                     unusable = false;
                 }

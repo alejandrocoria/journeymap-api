@@ -347,8 +347,7 @@ public final class RGB
         {
             try
             {
-                int color = Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
-                return color;
+                return ALPHA_OPAQUE | Integer.parseInt(hexColor.replaceFirst("#", ""), 16);
             }
             catch (Exception e)
             {
