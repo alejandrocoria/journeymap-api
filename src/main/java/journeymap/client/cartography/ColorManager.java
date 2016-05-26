@@ -167,7 +167,7 @@ public class ColorManager
             int count = 0;
             for (BlockMD blockMD : BlockMD.getAll())
             {
-                if (blockMD.ensureColor())
+                if (!blockMD.isAir() && blockMD.ensureColor())
                 {
                     count++;
                 }

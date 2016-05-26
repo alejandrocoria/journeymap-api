@@ -605,7 +605,7 @@ public class ColorPalette
 
         boolean isInflated()
         {
-            return (this.uid != null && this.meta == null && this.alpha == null && this.color == null);
+            return (this.uid != null && this.meta != null && this.alpha != null && this.color != null);
         }
 
         @Override
