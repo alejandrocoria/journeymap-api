@@ -133,7 +133,7 @@ public class MapRegionTask extends BaseMapTask
             }
             finally
             {
-                regionOverlay.getShapeProperties().setFillColor(0xffffff).setStrokeColor(0xffffff);
+                regionOverlay.getShapeProperties().setFillColor(0xffffff).setFillOpacity(.1f).setStrokeColor(0xffffff);
                 String label = String.format("%s\nRegion [%s,%s]", Constants.getString("jm.common.automap_region_complete"), rCoord.regionX, rCoord.regionZ);
                 regionOverlay.setLabel(label);
                 regionOverlay.flagForRerender();
@@ -184,7 +184,7 @@ public class MapRegionTask extends BaseMapTask
         regionOverlay.setOverlayGroupName(groupName)
                 .setLabel(label)
                 .setTextProperties(textProps)
-                .setActiveUIs(EnumSet.of(Context.UI.Any))
+                .setActiveUIs(EnumSet.of(Context.UI.Fullscreen, Context.UI.Webmap))
                 .setActiveMapTypes(EnumSet.of(Context.MapType.Any));
 
         return regionOverlay;
@@ -211,7 +211,25 @@ public class MapRegionTask extends BaseMapTask
             regionOverlay.setTitle(Constants.getString("jm.common.automap_region_chunks", mappedChunks));
         }
 
-        System.gc();
+        long usedPct = getMemoryUsage();
+        if (usedPct >= 85)
+        {
+            logger.warn(String.format("Memory usage at %2d%%, forcing garbage collection", usedPct));
+            System.gc();
+            usedPct = getMemoryUsage();
+        }
+        logger.info(String.format("Memory usage at %2d%%", usedPct));
+    }
+
+    /**
+     * Get percent of memory used.  Calculated the same way MC does it in GuiOverlayDebug.
+     */
+    private long getMemoryUsage()
+    {
+        long max = Runtime.getRuntime().maxMemory();
+        long total = Runtime.getRuntime().totalMemory();
+        long free = Runtime.getRuntime().freeMemory();
+        return (total - free) * 100L / max;
     }
 
     @Override

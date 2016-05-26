@@ -590,9 +590,12 @@ public class JourneymapClient implements CommonProxy
     {
         try
         {
-            if (isMapping())
+            synchronized (this)
             {
-                multithreadTaskController.performTasks();
+                if (isMapping())
+                {
+                    multithreadTaskController.performTasks();
+                }
             }
         }
         catch (Throwable t)
