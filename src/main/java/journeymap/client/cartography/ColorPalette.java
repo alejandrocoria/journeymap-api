@@ -275,6 +275,11 @@ public class ColorPalette
         // Use table to sort/organize by Block, then color
         for (BlockMD blockMD : BlockMD.getAll())
         {
+            if (blockMD.isAir())
+            {
+                continue;
+            }
+
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
                 Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + blockMD);
