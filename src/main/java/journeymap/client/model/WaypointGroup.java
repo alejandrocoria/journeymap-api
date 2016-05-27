@@ -1,27 +1,15 @@
 package journeymap.client.model;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.cache.*;
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.io.FileHandler;
 import journeymap.client.waypoint.WaypointGroupStore;
-import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
-import journeymap.common.log.LogFormatter;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Group of waypoints
@@ -30,26 +18,26 @@ import java.util.concurrent.TimeUnit;
 @ParametersAreNonnullByDefault
 public class WaypointGroup implements Comparable<WaypointGroup>
 {
-    public static final WaypointGroup DEFAULT = new WaypointGroup(Journeymap.MOD_ID, Constants.getString("jm.config.category.waypoint"));
-    public static final int VERSION = 3;
+    public static final WaypointGroup DEFAULT = new WaypointGroup(Journeymap.MOD_ID, Constants.getString("jm.config.category.waypoint")).setEnable(true);
+    public static final double VERSION = 5.2;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
 
-    @Since(1)
+    @Since(5.2)
     protected String name;
 
-    @Since(1)
+    @Since(5.2)
     protected String origin;
 
-    @Since(1)
+    @Since(5.2)
     protected String icon;
 
-    @Since(1)
+    @Since(5.2)
     protected String color;
 
-    @Since(1)
+    @Since(5.2)
     protected boolean enable;
 
-    @Since(1)
+    @Since(5.2)
     protected int order;
 
     protected transient boolean dirty;

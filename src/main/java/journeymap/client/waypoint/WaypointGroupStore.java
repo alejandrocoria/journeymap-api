@@ -11,7 +11,6 @@ import journeymap.common.log.LogFormatter;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -83,36 +82,44 @@ public enum WaypointGroupStore
      */
     private void load()
     {
-        try
+        File groupFile = new File(FileHandler.getWaypointDir(), FILENAME);
+        if (groupFile.exists())
         {
-            File groupFile = new File(FileHandler.getWaypointDir(), FILENAME);
-            if (groupFile.exists())
+            HashMap<String, WaypointGroup> map = new HashMap<String, WaypointGroup>(0);
+
+            try
             {
-                HashMap<String, WaypointGroup> map = new HashMap<String, WaypointGroup>(0);
                 String groupsString = Files.toString(groupFile, Charset.forName("UTF-8"));
                 map = WaypointGroup.GSON.fromJson(groupsString, map.getClass());
-                if (!map.isEmpty())
-                {
-                    cache.invalidateAll();
-                    cache.putAll(map);
-                    Journeymap.getLogger().info("Loaded WaypointGroups from file");
-                } else
-                {
-                    Journeymap.getLogger().info("WaypointGroups file was empty");
-                }
-            } else
-            {
-                Journeymap.getLogger().info("WaypointGroups file doesn't exist");
             }
-        } catch (Exception e)
-        {
-            Journeymap.getLogger().error("Error loading WaypointGroups from file: " + LogFormatter.toPartialString(e));
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error(String.format("Error reading WaypointGroups file %s: %s", groupFile, LogFormatter.toPartialString(e)));
+                try
+                {
+                    groupFile.renameTo(new File(groupFile.getParentFile(), groupFile.getName() + ".bad"));
+                }
+                catch (Exception e2)
+                {
+                    Journeymap.getLogger().error(String.format("Error renaming bad WaypointGroups file %s: %s", groupFile, LogFormatter.toPartialString(e)));
+                }
+            }
+
+            if (!map.isEmpty())
+            {
+                cache.invalidateAll();
+                cache.putAll(map);
+                Journeymap.getLogger().info(String.format("Loaded WaypointGroups file %s", groupFile));
+
+                // Ensure default is there.
+                cache.put(WaypointGroup.DEFAULT.getKey(), WaypointGroup.DEFAULT);
+                return;
+            }
         }
 
-        /**
-         * Ensure default group
-         */
-        putIfNew(WaypointGroup.DEFAULT);
+        // Add default and save file
+        cache.put(WaypointGroup.DEFAULT.getKey(), WaypointGroup.DEFAULT);
+        save(true);
     }
 
     public void save()
@@ -137,9 +144,10 @@ public enum WaypointGroupStore
 
         if (doWrite)
         {
+            TreeMap<String, WaypointGroup> map = null;
             try
             {
-                TreeMap<String, WaypointGroup> map = new TreeMap<String, WaypointGroup>(new Comparator<String>()
+                map = new TreeMap<String, WaypointGroup>(new Comparator<String>()
                 {
                     final String defaultKey = WaypointGroup.DEFAULT.getKey();
 
@@ -154,22 +162,39 @@ public enum WaypointGroupStore
 
                 map.putAll(cache.asMap());
 
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error(String.format("Error preparing WaypointGroups: %s", LogFormatter.toPartialString(e)));
+                return;
+            }
+
+            File groupFile = null;
+            try
+            {
                 File waypointDir = FileHandler.getWaypointDir();
                 if (!waypointDir.exists())
                 {
                     waypointDir.mkdirs();
                 }
-                File groupFile = new File(waypointDir, FILENAME);
+                groupFile = new File(waypointDir, FILENAME);
+
+                boolean isNew = groupFile.exists();
                 Files.write(WaypointGroup.GSON.toJson(map), groupFile, Charset.forName("UTF-8"));
 
                 for (WaypointGroup group : cache.asMap().values())
                 {
                     group.setDirty(false);
                 }
-                Journeymap.getLogger().info("Wrote WaypointGroups to file");
-            } catch (Exception e)
+
+                if (isNew)
+                {
+                    Journeymap.getLogger().info("Created WaypointGroups file: " + groupFile);
+                }
+            }
+            catch (Exception e)
             {
-                Journeymap.getLogger().error("Error writing WaypointGroups to file: " + LogFormatter.toPartialString(e));
+                Journeymap.getLogger().error(String.format("Error writing WaypointGroups file %s: %s", groupFile, LogFormatter.toPartialString(e)));
             }
         }
     }
