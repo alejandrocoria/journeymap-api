@@ -10,7 +10,6 @@ package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
@@ -21,10 +20,13 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.TopoProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Generates topographical map images.
@@ -110,7 +112,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
 
@@ -132,7 +134,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render the chunk image
-            return renderSurface(painter, chunkMd, vSlice, false);
+            return renderSurface(chunkImage, chunkMd, vSlice, false);
         }
         catch (Throwable e)
         {
@@ -149,7 +151,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the surface.
      */
-    protected boolean renderSurface(final ChunkPainter painter, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    protected boolean renderSurface(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         boolean chunkOk = false;
 
@@ -172,11 +174,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);
                     if (topBlockMd == null)
                     {
-                        painter.paintBadBlock(x, y, z);
+                        paintBadBlock(chunkImage, x, y, z);
                         continue blockLoop;
                     }
 
-                    chunkOk = paintContour(painter, chunkMd, topBlockMd, x, y, z) || chunkOk;
+                    chunkOk = paintContour(chunkImage, chunkMd, topBlockMd, x, y, z) || chunkOk;
                 }
             }
         }
@@ -188,7 +190,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return chunkOk;
     }
 
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int localX, int localZ, final HeightsCache chunkHeights)
     {
         Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if (heights == null)
@@ -197,7 +199,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             return null;
         }
 
-        Integer y = heights[x][z];
+        Integer y = heights[localX][localZ];
         if (y != null)
         {
             // Already set
@@ -205,18 +207,18 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         }
 
         // Find the actual height.
-        y = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
+        y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
 
         try
         {
-            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
             while (y > 0)
             {
                 if (blockMD.isWater() || blockMD.isIce())
                 {
                     if (mapBathymetry)
                     {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, localX, localZ);
                     }
                     else
                     {
@@ -228,17 +230,17 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     break;
                 }
                 y--;
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
             }
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().debug("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().debug("Couldn't get safe surface block height at " + localX + "," + localZ + ": " + e);
         }
 
         y = Math.max(0, y);
 
-        heights[x][z] = y;
+        heights[localX][localZ] = y;
 
         return y;
     }
@@ -363,7 +365,13 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return slopes;
     }
 
-    protected boolean paintContour(final ChunkPainter painter, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
+    @Override
+    public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
+    {
+        return FMLClientHandler.instance().getClient().theWorld.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
+    }
+
+    protected boolean paintContour(final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
     {
         if (!chunkMd.hasChunk())
         {
@@ -426,7 +434,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             }
         }
 
-        painter.paintBlock(x, z, color);
+        paintBlock(chunkImage, x, z, color);
 
         return true;
     }

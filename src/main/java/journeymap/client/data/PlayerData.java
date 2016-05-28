@@ -95,15 +95,11 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
      */
     private String getPlayerBiome(EntityPlayer player)
     {
-        int x = (MathHelper.floor_double(player.posX) >> 4) & 15;
-        int z = (MathHelper.floor_double(player.posZ) >> 4) & 15;
-
-        ChunkMD playerChunk = DataCache.instance().getChunkMD(new ChunkPos(player.chunkCoordX, player.chunkCoordZ));
-        if (playerChunk != null)
+        if (player != null)
         {
             try
             {
-                Biome biome = ForgeHelper.INSTANCE.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+                Biome biome = ForgeHelper.INSTANCE.getBiome(player.getPosition());
                 // Can be null right after spawn/teleport before chunks loaded
                 if (biome != null)
                 {

@@ -71,13 +71,13 @@ public class DeleteMapConfirmation extends JmUI
         if (guibutton == buttonAll || guibutton == buttonCurrent)
         {
             DeleteMapTask.queue(guibutton == buttonAll);
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
 
         if (guibutton == buttonClose)
         {
-            UIManager.getInstance().openMapActions();
+            UIManager.INSTANCE.openMapActions();
             return;
         }
     }
@@ -89,7 +89,7 @@ public class DeleteMapConfirmation extends JmUI
         {
             case Keyboard.KEY_ESCAPE:
             {
-                UIManager.getInstance().openMapActions();
+                UIManager.INSTANCE.openMapActions();
                 break;
             }
         }

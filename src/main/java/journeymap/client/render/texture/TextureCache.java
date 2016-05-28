@@ -470,7 +470,7 @@ public class TextureCache
             img = downloadImage(new URL(skinPath));
             if (img == null)
             {
-                img = downloadImage(new URL("https://minecraft.net/images/steve.png"));
+                img = downloadImage(new URL("http://skins.minecraft.net/MinecraftSkins/Herobrine.png"));
             }
         }
         catch (Throwable e)

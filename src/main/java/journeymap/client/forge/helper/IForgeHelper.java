@@ -9,7 +9,6 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
-import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -21,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -54,7 +54,7 @@ public interface IForgeHelper
 
     public World getWorld();
 
-    public World getWorld(Chunk chunk);
+    //public World getWorld(Chunk chunk);
 
     public RenderManager getRenderManager();
 
@@ -62,7 +62,7 @@ public interface IForgeHelper
 
     public boolean hasCustomName(Entity entity);
 
-    public int getLightOpacity(BlockMD blockMD, int blockX, int blockY, int blockZ);
+    public int getLightOpacity(BlockMD blockMD, BlockPos blockPos);
 
     public AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance);
 
@@ -80,25 +80,19 @@ public interface IForgeHelper
 
     public int getDimension();
 
-    public int getSavedLightValue(Chunk chunk, int x, int y, int z);
+    public int getSavedLightValue(Chunk chunk, BlockPos blockPos);
 
-    public boolean canBlockSeeTheSky(Chunk chunk, int x, int y, int z);
+    public boolean canBlockSeeTheSky(Chunk chunk, BlockPos blockPos);
 
-    public int getHeight(Chunk chunk, int x, int z);
+    public int getHeight(Chunk chunk, BlockPos blockPos);
 
-    public int getPrecipitationHeight(Chunk chunk, int x, int z);
+    public int getPrecipitationHeight(BlockPos blockPos);
 
     // public int getLightOpacity(Chunk chunk, Block block, int localX, int y, int localZ);
 
-    public TileEntity getTileEntity(int blockX, int y, int blockZ);
+    public TileEntity getTileEntity(BlockPos blockPos);
 
-    public String getBlockName(Block block, int meta);
-
-    public Biome getBiome(ChunkMD chunkMD, int x, int y, int z);
-
-    public Biome getBiome(int x, int y, int z);
-
-    public int getBlockMeta(Chunk chunk, final int x, int y, final int z);
+    public Biome getBiome(BlockPos blockPos);
 
     public boolean hasNoSky(Entity entity);
 

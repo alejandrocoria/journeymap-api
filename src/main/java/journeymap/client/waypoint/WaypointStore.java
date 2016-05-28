@@ -8,39 +8,39 @@
 
 package journeymap.client.waypoint;
 
+import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.Waypoint;
+import journeymap.client.model.WaypointGroup;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Disk-backed cache for Waypoints.
+ * Enum singleton. Manages disk-backed caches for Waypoints and WaypointGroups
  */
-public class WaypointStore
+@ParametersAreNonnullByDefault
+public enum WaypointStore
 {
+    INSTANCE;
+
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final Cache<String, Waypoint> cache = CacheBuilder.newBuilder().build();
+    private final Cache<Long, Waypoint> groupCache = CacheBuilder.newBuilder().build();
     private final Set<Integer> dimensions = new HashSet<Integer>();
     private boolean loaded = false;
-
-    private WaypointStore()
-    {
-    }
-
-    public static WaypointStore instance()
-    {
-        return Holder.INSTANCE;
-    }
 
     private boolean writeToFile(Waypoint waypoint)
     {
@@ -69,6 +69,18 @@ public class WaypointStore
     public Collection<Waypoint> getAll()
     {
         return cache.asMap().values();
+    }
+
+    public Collection<Waypoint> getAll(final WaypointGroup group)
+    {
+        return Maps.filterEntries(cache.asMap(), new Predicate<Map.Entry<String, Waypoint>>()
+        {
+            @Override
+            public boolean apply(@Nullable Map.Entry<String, Waypoint> input)
+            {
+                return input != null && Objects.equals(group, input.getValue().getGroup());
+            }
+        }).values();
     }
 
     public void add(Waypoint waypoint)
@@ -186,11 +198,6 @@ public class WaypointStore
     public List<Integer> getLoadedDimensions()
     {
         return new ArrayList<Integer>(dimensions);
-    }
-
-    private static class Holder
-    {
-        private static final WaypointStore INSTANCE = new WaypointStore();
     }
 
 

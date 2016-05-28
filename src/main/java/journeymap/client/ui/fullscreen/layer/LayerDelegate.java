@@ -8,12 +8,20 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
+import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.ChunkRenderController;
+import journeymap.client.cartography.render.BaseRenderer;
+import journeymap.client.data.DataCache;
+import journeymap.client.io.FileHandler;
+import journeymap.client.model.ChunkMD;
+import journeymap.client.model.RegionCoord;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -37,7 +45,7 @@ public class LayerDelegate
 
     public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale)
     {
-        BlockPos blockCoord = gridRenderer.getBlockAtPixel(mousePosition);
+        BlockPos blockCoord = getBlockPos(mc, gridRenderer, mousePosition);
 
         drawSteps.clear();
         for (Layer layer : layers)
@@ -78,6 +86,25 @@ public class LayerDelegate
                 Journeymap.getLogger().error(LogFormatter.toString(e));
             }
         }
+    }
+
+    private BlockPos getBlockPos(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition)
+    {
+        BlockPos seaLevel = gridRenderer.getBlockAtPixel(mousePosition);
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(seaLevel);
+        if (chunkMD != null)
+        {
+            ChunkRenderController crc = JourneymapClient.getInstance().getChunkRenderController();
+            if (crc != null)
+            {
+                ChunkPos chunkCoord = chunkMD.getCoord();
+                RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.chunkXPos, chunkCoord.chunkZPos);
+                BaseRenderer chunkRenderer = crc.getRenderer(rCoord, gridRenderer.getMapType(), chunkMD);
+                int blockY = chunkRenderer.getBlockHeight(chunkMD, seaLevel);
+                return new BlockPos(seaLevel.getX(), blockY, seaLevel.getZ());
+            }
+        }
+        return seaLevel;
     }
 
     public List<DrawStep> getDrawSteps()

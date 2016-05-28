@@ -318,7 +318,7 @@ public class Splash extends JmUI
             }
             else
             {
-                UIManager.getInstance().openOptionsManager(this);
+                UIManager.INSTANCE.openOptionsManager(this);
             }
         }
     }

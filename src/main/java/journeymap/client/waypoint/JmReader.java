@@ -32,7 +32,7 @@ public class JmReader
             @Override
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".json");
+                return name.endsWith(".json") && (!name.equals(WaypointGroupStore.FILENAME));
             }
         });
 

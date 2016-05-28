@@ -1,4 +1,4 @@
-### JourneyMap 5.1.1 Resource Bundle - en_US
+### JourneyMap 5.2.0 Resource Bundle - en_US
 ### Notes for translators:
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
@@ -55,6 +55,9 @@ jm.common.automap_status=Auto-mapping surface (%1$s).
 jm.common.automap_status_underground=Auto-mapping slice %1$s (%2$s).
 jm.common.automap_text=Automatically map regions (single-player)
 jm.common.automap_title=Auto-Map...
+jm.common.automap_region_start=Auto-Mapping
+jm.common.automap_region_complete=Auto-Mapped
+jm.common.automap_region_chunks=Chunks mapped: %1$s
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Close
 jm.common.day=Day
@@ -175,6 +178,8 @@ jm.common.renderstats_debug_cave=Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks 
 jm.common.renderstats_debug_cave_simple=Caves: %1$s = %2$s chunks in %3$sms (avg %4$sms)
 jm.common.renderstats_debug_surface=Surface: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
 jm.common.renderstats_debug_surface_simple=Surface: %1$s = %2$s chunks in %3$sms (avg %4$sms)
+jm.common.renderstats_debug_topo=Topo: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
+jm.common.renderstats_debug_topo_simple=Topo: %1$s = %2$s chunks in %3$sms (avg %4$sms)
 jm.common.revealshape=Reveal Shape
 jm.common.revealshape.tooltip=Shape of the map area revealed around you. Circle reveals fewer chunks than Square and will improve performance.
 jm.common.save_filename=Saving map to screenshots: %1$s

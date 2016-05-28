@@ -12,6 +12,7 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
+import journeymap.client.model.BlockMD;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
@@ -205,45 +206,45 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonSave)
         {
             save();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonClose)
         {
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonBrowser)
         {
             launchLocalhost();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonDonate)
         {
             launchPatreon();
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonAutomap)
         {
-            UIManager.getInstance().open(AutoMapConfirmation.class);
+            UIManager.INSTANCE.open(AutoMapConfirmation.class);
             return;
         }
         if (guibutton == buttonDeleteMap)
         {
-            UIManager.getInstance().open(DeleteMapConfirmation.class);
+            UIManager.INSTANCE.open(DeleteMapConfirmation.class);
             return;
         }
         if (guibutton == buttonCheck)
         {
             launchWebsite("Download");
-            UIManager.getInstance().openFullscreenMap();
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonAbout)
         {
-            UIManager.getInstance().openSplash(this);
+            UIManager.INSTANCE.openSplash(this);
             return;
         }
         if (guibutton == buttonEnableMapping)
@@ -251,15 +252,16 @@ public class FullscreenActions extends JmUI
             buttonEnableMapping.toggle();
             if (JourneymapClient.getCoreProperties().mappingEnabled.get())
             {
-                UIManager.getInstance().openFullscreenMap();
+                UIManager.INSTANCE.openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
                 return;
             }
             else
             {
                 JourneymapClient.getInstance().stopMapping();
+                BlockMD.reset();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
-                UIManager.getInstance().openFullscreenMap();
+                UIManager.INSTANCE.openFullscreenMap();
                 return;
             }
         }

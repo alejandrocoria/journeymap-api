@@ -166,7 +166,7 @@ public class WaypointEditor extends JmUI
 
                 Collection<Integer> wpDims = originalWaypoint.getDimensions();
 
-                for (WorldData.DimensionProvider provider : WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions()))
+                for (WorldData.DimensionProvider provider : WorldData.getDimensionProviders(WaypointStore.INSTANCE.getLoadedDimensions()))
                 {
                     int dim = provider.getDimension();
                     String dimName = Integer.toString(dim);
@@ -226,7 +226,7 @@ public class WaypointEditor extends JmUI
         catch (Throwable t)
         {
             Journeymap.getLogger().error(LogFormatter.toString(t));
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
     }
 
@@ -573,7 +573,7 @@ public class WaypointEditor extends JmUI
 
     protected void remove()
     {
-        WaypointStore.instance().remove(originalWaypoint);
+        WaypointStore.INSTANCE.remove(originalWaypoint);
         refreshAndClose(null);
     }
 
@@ -584,8 +584,8 @@ public class WaypointEditor extends JmUI
             return;
         }
         updateWaypointFromForm();
-        WaypointStore.instance().remove(originalWaypoint);
-        WaypointStore.instance().save(editedWaypoint);
+        WaypointStore.INSTANCE.remove(originalWaypoint);
+        WaypointStore.INSTANCE.save(editedWaypoint);
         refreshAndClose(editedWaypoint);
     }
 
@@ -664,7 +664,7 @@ public class WaypointEditor extends JmUI
     {
         if (returnDisplay != null && returnDisplay instanceof WaypointManager)
         {
-            UIManager.getInstance().openWaypointManager(focusWaypoint, new Fullscreen());
+            UIManager.INSTANCE.openWaypointManager(focusWaypoint, new Fullscreen());
             return;
         }
 
@@ -678,11 +678,11 @@ public class WaypointEditor extends JmUI
     {
         if (returnDisplay == null)
         {
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
         else
         {
-            UIManager.getInstance().open(returnDisplay);
+            UIManager.INSTANCE.open(returnDisplay);
         }
     }
 

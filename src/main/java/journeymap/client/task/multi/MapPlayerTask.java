@@ -106,6 +106,11 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
+        if (worldHasSky && !underground && JourneymapClient.getCoreProperties().mapTopography.get())
+        {
+            tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.topo(player), new ArrayList<ChunkPos>()));
+        }
+
         return new MapPlayerTaskBatch(tasks);
     }
 
@@ -113,36 +118,24 @@ public class MapPlayerTask extends BaseMapTask
     {
         try
         {
-            boolean showLastUnderground = false;
-            boolean showLastSurface = false;
+            ArrayList<String> lines = new ArrayList<String>(3);
 
             if (DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapCaves.get())
             {
-                showLastUnderground = true;
+                lines.add(RenderSpec.getUndergroundSpec().getDebugStats());
             }
 
             if (!DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapSurface.get())
             {
-                showLastSurface = true;
+                lines.add(RenderSpec.getSurfaceSpec().getDebugStats());
             }
 
-            if (!showLastSurface && !showLastUnderground)
+            if (!DataCache.getPlayer().underground && JourneymapClient.getCoreProperties().mapTopography.get())
             {
-                return new String[0];
+                lines.add(RenderSpec.getTopoSpec().getDebugStats());
             }
 
-            if (showLastSurface != showLastUnderground)
-            {
-                if (showLastSurface)
-                {
-                    return new String[]{RenderSpec.getSurfaceSpec().getDebugStats()};
-                }
-                return new String[]{RenderSpec.getUndergroundSpec().getDebugStats()};
-            }
-            else
-            {
-                return new String[]{RenderSpec.getSurfaceSpec().getDebugStats(), RenderSpec.getUndergroundSpec().getDebugStats()};
-            }
+            return lines.toArray(new String[lines.size()]);
         }
         catch (Throwable t)
         {
@@ -197,7 +190,21 @@ public class MapPlayerTask extends BaseMapTask
     {
         startNs = System.nanoTime();
 
-        final RenderSpec renderSpec = mapType.isUnderground() ? RenderSpec.getUndergroundSpec() : RenderSpec.getSurfaceSpec();
+        RenderSpec renderSpec = null;
+
+        if (mapType.isUnderground())
+        {
+            renderSpec = RenderSpec.getUndergroundSpec();
+        }
+        else if (mapType.isTopo())
+        {
+            renderSpec = RenderSpec.getTopoSpec();
+        }
+        else
+        {
+            renderSpec = RenderSpec.getSurfaceSpec();
+        }
+
         chunkCoords.addAll(renderSpec.getRenderAreaCoords());
         this.scheduledChunks = chunkCoords.size();
     }
@@ -310,6 +317,10 @@ public class MapPlayerTask extends BaseMapTask
                     if (mapPlayerTask.mapType.isUnderground())
                     {
                         RenderSpec.getUndergroundSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
+                    }
+                    else if (mapPlayerTask.mapType.isTopo())
+                    {
+                        RenderSpec.getTopoSpec().setLastTaskInfo(mapPlayerTask.scheduledChunks, mapPlayerTask.elapsedNs);
                     }
                     else
                     {

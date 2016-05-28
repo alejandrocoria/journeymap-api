@@ -24,11 +24,11 @@ import java.awt.image.BufferedImage;
  */
 public class ChunkRenderController
 {
-    private final IChunkRenderer netherRenderer;
-    private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
-    private final TopoRenderer topoRenderer;
-    private final IChunkRenderer overWorldCaveRenderer;
+    private final BaseRenderer netherRenderer;
+    private final BaseRenderer endRenderer;
+    private final BaseRenderer topoRenderer;
+    private final BaseRenderer overWorldCaveRenderer;
 
     public ChunkRenderController()
     {
@@ -40,20 +40,11 @@ public class ChunkRenderController
         topoRenderer = new TopoRenderer();
     }
 
-    public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
+    /**
+     * Get the renderer that would be used for the given params.
+     */
+    public BaseRenderer getRenderer(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
-        if (!JourneymapClient.getInstance().isMapping())
-        {
-            return false;
-        }
-
-        ChunkPainter undergroundG2D = null;
-        ChunkPainter cpDay = null;
-        ChunkPainter cpNight = null;
-        ChunkPainter cpTopo = null;
-        boolean renderOkay = false;
-        boolean mapTopo = mapType.isTopo() || (!mapType.isUnderground() && JourneymapClient.getCoreProperties().mapTopography.get());
-
         try
         {
             RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
@@ -62,79 +53,98 @@ public class ChunkRenderController
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
-                    undergroundG2D = new ChunkPainter(image);
                     switch (rCoord.dimension)
                     {
                         case -1:
                         {
-                            renderOkay = netherRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
-                            break;
+                            return netherRenderer;
                         }
                         case 1:
                         {
-                            renderOkay = endRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
-                            break;
+                            return endRenderer;
                         }
                         default:
                         {
-                            renderOkay = overWorldCaveRenderer.render(undergroundG2D, chunkMd, mapType.vSlice);
+                            return overWorldCaveRenderer;
                         }
-                    }
-
-                    if (renderOkay)
-                    {
-                        regionImageSet.setChunkImage(chunkMd, mapType, image);
                     }
                 }
             }
             else
             {
-                BufferedImage imageDay = null;
-                BufferedImage imageNight = null;
-                BufferedImage imageTopo = null;
+                return overWorldSurfaceRenderer;
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toPartialString(t)));
 
-                if (!mapType.isTopo())
-                {
-                    imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
-                    imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
-                }
-                if (mapTopo)
-                {
-                    imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
-                }
+        }
+        return null;
+    }
 
-                if (imageDay != null)
-                {
-                    cpDay = new ChunkPainter(imageDay);
-                }
+    public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
+    {
+        if (!JourneymapClient.getInstance().isMapping())
+        {
+            return false;
+        }
 
-                if (imageNight != null)
-                {
-                    cpNight = new ChunkPainter(imageNight);
-                }
+        boolean renderOkay = false;
 
-                if (imageTopo != null)
+        try
+        {
+            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            if (mapType.isUnderground())
+            {
+                BufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);
+                if (chunkSliceImage != null)
                 {
-                    cpTopo = new ChunkPainter(imageTopo);
-                }
+                    switch (rCoord.dimension)
+                    {
+                        case -1:
+                        {
+                            renderOkay = netherRenderer.render(chunkSliceImage, chunkMd, mapType.vSlice);
+                            break;
+                        }
+                        case 1:
+                        {
+                            renderOkay = endRenderer.render(chunkSliceImage, chunkMd, mapType.vSlice);
+                            break;
+                        }
+                        default:
+                        {
+                            renderOkay = overWorldCaveRenderer.render(chunkSliceImage, chunkMd, mapType.vSlice);
+                        }
+                    }
 
-                if (cpDay != null)
+                    if (renderOkay)
+                    {
+                        regionImageSet.setChunkImage(chunkMd, mapType, chunkSliceImage);
+                    }
+                }
+            }
+            else
+            {
+                if (mapType.isTopo())
                 {
-                    renderOkay = overWorldSurfaceRenderer.render(cpDay, cpNight, chunkMd);
+                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                    renderOkay = topoRenderer.render(imageTopo, chunkMd, null);
+                    if (renderOkay)
+                    {
+                        regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
+                        chunkMd.setRendered();
+                    }
+                }
+                else
+                {
+                    BufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
+                    BufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
+                    renderOkay = overWorldSurfaceRenderer.render(imageDay, imageNight, chunkMd);
                     if (renderOkay)
                     {
                         regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
                         regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
-                        chunkMd.setRendered();
-                    }
-                }
-
-                if (cpTopo != null)
-                {
-                    renderOkay = topoRenderer.render(cpTopo, chunkMd, null);
-                    if (renderOkay)
-                    {
-                        regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
                         chunkMd.setRendered();
                     }
                 }
@@ -148,25 +158,6 @@ public class ChunkRenderController
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
-        }
-        finally
-        {
-            if (cpDay != null)
-            {
-                cpDay.finishPainting();
-            }
-            if (cpNight != null)
-            {
-                cpNight.finishPainting();
-            }
-            if (undergroundG2D != null)
-            {
-                undergroundG2D.finishPainting();
-            }
-            if (cpTopo != null)
-            {
-                cpTopo.finishPainting();
-            }
         }
 
         if (!renderOkay)

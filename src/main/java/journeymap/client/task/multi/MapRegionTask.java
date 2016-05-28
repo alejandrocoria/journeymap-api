@@ -8,7 +8,15 @@
 
 package journeymap.client.task.multi;
 
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.display.Context;
+import journeymap.client.api.display.DisplayType;
+import journeymap.client.api.display.PolygonOverlay;
+import journeymap.client.api.impl.ClientAPI;
+import journeymap.client.api.model.MapPolygon;
+import journeymap.client.api.model.ShapeProperties;
+import journeymap.client.api.model.TextProperties;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
@@ -23,7 +31,8 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.datafix.DataFixer;
+import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
@@ -31,10 +40,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Maps an entire Minecraft region (512x512)
@@ -45,6 +51,7 @@ public class MapRegionTask extends BaseMapTask
     private static final Logger logger = Journeymap.getLogger();
     private static volatile long lastTaskCompleted;
 
+    final PolygonOverlay regionOverlay;
     final RegionCoord rCoord;
     final Collection<ChunkPos> retainedCoords;
 
@@ -53,13 +60,11 @@ public class MapRegionTask extends BaseMapTask
         super(renderController, world, mapType, chunkCoords, true, false, 5000);
         this.rCoord = rCoord;
         this.retainedCoords = retainCoords;
+        this.regionOverlay = createOverlay();
     }
 
     public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, MapType mapType, Minecraft minecraft)
     {
-
-        int missing = 0;
-
         final World world = minecraft.theWorld;
 
         final List<ChunkPos> renderCoords = rCoord.getChunkCoordsInRegion();
@@ -93,7 +98,9 @@ public class MapRegionTask extends BaseMapTask
     @Override
     public final void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), new DataFixer(-1));
+        ClientAPI.INSTANCE.show(regionOverlay);
+
+        AnvilChunkLoader loader = new AnvilChunkLoader(FileHandler.getWorldSaveDir(mc), DataFixesManager.createFixer());
 
         int missing = 0;
         for (ChunkPos coord : retainedCoords)
@@ -111,7 +118,6 @@ public class MapRegionTask extends BaseMapTask
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 DataCache.instance().addChunkMD(chunkMD);
-                //System.out.println("Added: " + coord);
             }
             else
             {
@@ -121,13 +127,68 @@ public class MapRegionTask extends BaseMapTask
 
         if (chunkCoords.size() - missing > 0)
         {
-            logger.info(String.format("Potential chunks to map in %s: %s of %s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
-            super.performTask(mc, jm, jmWorldDir, threadLogging);
+            try
+            {
+                logger.info(String.format("Potential chunks to map in %s: %s of %s", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
+                super.performTask(mc, jm, jmWorldDir, threadLogging);
+            }
+            finally
+            {
+                regionOverlay.getShapeProperties().setFillColor(0xffffff).setFillOpacity(.15f).setStrokeColor(0xffffff);
+                String label = String.format("%s\nRegion [%s,%s]", Constants.getString("jm.common.automap_region_complete"), rCoord.regionX, rCoord.regionZ);
+                regionOverlay.setLabel(label);
+                regionOverlay.flagForRerender();
+            }
         }
         else
         {
             logger.info(String.format("Skipping empty region: %s", rCoord));
         }
+    }
+
+    protected PolygonOverlay createOverlay()
+    {
+        String displayId = "AutoMap" + rCoord;
+        String groupName = "AutoMap";
+        String label = String.format("%s\nRegion [%s,%s]", Constants.getString("jm.common.automap_region_start"), rCoord.regionX, rCoord.regionZ);
+
+        // Style the polygon
+        ShapeProperties shapeProps = new ShapeProperties()
+                .setStrokeWidth(2)
+                .setStrokeColor(0x0000ff).setStrokeOpacity(.7f)
+                .setFillColor(0x00ff00).setFillOpacity(.2f);
+
+        // Style the text
+        TextProperties textProps = new TextProperties()
+                .setBackgroundColor(0x000022)
+                .setBackgroundOpacity(.5f)
+                .setColor(0x00ff00)
+                .setOpacity(1f)
+                .setFontShadow(true);
+
+        // Define the shape
+        int x = this.rCoord.getMinChunkX() << 4;
+        int y = 70;
+        int z = this.rCoord.getMinChunkZ() << 4;
+        int maxX = (this.rCoord.getMaxChunkX() << 4) + 15;
+        int maxZ = (this.rCoord.getMaxChunkZ() << 4) + 15;
+        BlockPos sw = new BlockPos(x, y, maxZ);
+        BlockPos se = new BlockPos(maxX, y, maxZ);
+        BlockPos ne = new BlockPos(maxX, y, z);
+        BlockPos nw = new BlockPos(x, y, z);
+        MapPolygon polygon = new MapPolygon(sw, se, ne, nw);
+
+        // Create the overlay
+        PolygonOverlay regionOverlay = new PolygonOverlay(Journeymap.MOD_ID, displayId, rCoord.dimension, shapeProps, polygon);
+
+        // Set the text
+        regionOverlay.setOverlayGroupName(groupName)
+                .setLabel(label)
+                .setTextProperties(textProps)
+                .setActiveUIs(EnumSet.of(Context.UI.Fullscreen, Context.UI.Webmap))
+                .setActiveMapTypes(EnumSet.of(Context.MapType.Any));
+
+        return regionOverlay;
     }
 
     @Override
@@ -148,7 +209,28 @@ public class MapRegionTask extends BaseMapTask
         else
         {
             logger.info(String.format("Actual chunks mapped in %s: %s ", rCoord, mappedChunks));
+            regionOverlay.setTitle(Constants.getString("jm.common.automap_region_chunks", mappedChunks));
         }
+
+        long usedPct = getMemoryUsage();
+        if (usedPct >= 85)
+        {
+            logger.warn(String.format("Memory usage at %2d%%, forcing garbage collection", usedPct));
+            System.gc();
+            usedPct = getMemoryUsage();
+        }
+        logger.info(String.format("Memory usage at %2d%%", usedPct));
+    }
+
+    /**
+     * Get percent of memory used.  Calculated the same way MC does it in GuiOverlayDebug.
+     */
+    private long getMemoryUsage()
+    {
+        long max = Runtime.getRuntime().maxMemory();
+        long total = Runtime.getRuntime().totalMemory();
+        long free = Runtime.getRuntime().freeMemory();
+        return (total - free) * 100L / max;
     }
 
     @Override
@@ -274,6 +356,8 @@ public class MapRegionTask extends BaseMapTask
                 regionLoader.getRegions().clear();
                 regionLoader = null;
             }
+
+            ClientAPI.INSTANCE.removeAll(Journeymap.MOD_ID, DisplayType.Polygon);
 
         }
 

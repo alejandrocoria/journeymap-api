@@ -1,4 +1,4 @@
-### JourneyMap 5.1.1 Resource Bundle - fr_FR
+### JourneyMap 5.2.0 Resource Bundle - fr_FR
 jm.advanced.announcemod=Annoncer le mod
 jm.advanced.announcemod.tooltip=Annoncer dans le chat que JourneyMap est disponible.
 jm.advanced.automappoll=Fréquence de rafraîchissement de cartographie
@@ -67,7 +67,7 @@ jm.common.dimension=Dimension %1$s
 jm.common.disabled_feature=Fonction non disponible
 jm.common.enable=Activé
 jm.common.enable_mapping_false=Désactiver la cartographie
-# jm.common.enable_mapping_false_text=Mapping disabled.
+jm.common.enable_mapping_false_text=Mapping désactivé.
 jm.common.enable_mapping_true=Activer la cartographie
 jm.common.enable_mapping_true_text=Cartographie activée.
 jm.common.file_updates=Les fichiers sont mis-à-jour (%1$s). Cartographie suspendue.
@@ -436,7 +436,7 @@ jm.webmap.follow_twitter_title=Suivre JourneyMapMod sur Twitter
 jm.webmap.forum_link_text=minecraftforum.net
 jm.webmap.forum_link_title=Forum JourneyMap sur minecraftforum.net
 jm.webmap.google_domain=Domaine Google Maps API
-# jm.webmap.google_domain.tooltip=If your country blocks maps.google.com, select a different domain for the Google Maps API.
+jm.webmap.google_domain.tooltip=Si votre pays bloque le site : maps.google.com, sélectionnez un domaine différent pour l'API Google Maps.
 jm.webmap.grid_menu_item_text=Grille
 jm.webmap.grid_menu_item_title=Affiche la Grille des Tranches (Chunks)
 jm.webmap.location_text=Position:

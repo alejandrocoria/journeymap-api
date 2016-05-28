@@ -20,14 +20,20 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base class for methods reusable across renderers.
@@ -36,6 +42,9 @@ import java.util.HashMap;
  */
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkPos, ChunkMD>
 {
+    public static final int COLOR_BLACK = Color.black.getRGB();
+    public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
+    public static volatile AtomicLong badBlockCount = new AtomicLong(0);
     public static final String PROP_WATER_HEIGHT = "waterHeight";
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
     protected final DataCache dataCache = DataCache.instance();
@@ -50,7 +59,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapPlants;
     protected boolean mapPlantShadows;
     protected float[] ambientColor;
-
 
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
@@ -159,10 +167,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         else
         {
             ChunkMD chunkMD = stratum.getChunkMd();
-            basicColor = stratum.getBlockMD().getColor(chunkMD, chunkMD.toWorldX(stratum.getX()), stratum.getY(), chunkMD.toWorldZ(stratum.getZ()));
+            basicColor = stratum.getBlockMD().getColor(chunkMD, stratum.getBlockPos());
         }
 
-        if (stratum.getBlockMD().getBlock() == Blocks.GLOWSTONE || stratum.getBlockMD().getBlock() == Blocks.LIT_REDSTONE_LAMP)
+        Block block = stratum.getBlockMD().getBlockState().getBlock();
+        if (block == Blocks.GLOWSTONE || block == Blocks.LIT_REDSTONE_LAMP)
         {
             basicColor = RGB.adjustBrightness(basicColor, tweakBrightenLightsourceBlock); // magic #
         }
@@ -195,9 +204,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Initialize surface slopes in chunk.  This is the black magic
      * that serves as the stand-in for true bump-mapping.
      */
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice,
-                                       final HeightsCache chunkHeights,
-                                       final SlopesCache chunkSlopes)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
 
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
@@ -269,6 +276,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return slopes;
 
     }
+
+    public abstract int getBlockHeight(final ChunkMD chunkMd, BlockPos blockPos);
 
     /**
      * Get block height within slice.  Should lazy-populate sliceHeights. Can return null.
@@ -365,9 +374,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return new int[]{sliceMinY, sliceMaxY};
     }
 
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z,
-                             final HeightsCache chunkHeights,
-                             final SlopesCache chunkSlopes)
+    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
     {
         Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.getCoord());
 
@@ -409,7 +416,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
      * blocks that shouldn't be used as the top block.
      */
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
+    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int localX, int localZ, final HeightsCache chunkHeights)
     {
         Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if (heights == null)
@@ -419,7 +426,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         Integer y;
 
-        y = heights[x][z];
+        y = heights[localX][localZ];
 
         if (y != null)
         {
@@ -428,16 +435,28 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         // Find the height.
-        y = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
+        y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
+
+        if (y == 0)
+        {
+            return 0;
+        }
+
+        BlockMD blockMD;
+        boolean propUnsetWaterHeight = true;
 
         try
         {
-            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-            boolean propUnsetWaterHeight = true;
-
             while (y > 0)
             {
-                if (blockMD.isWater())
+                blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
+
+                if (blockMD.isAir())
+                {
+                    y--;
+                    continue;
+                }
+                else if (blockMD.isWater())
                 {
                     if (!mapBathymetry)
                     {
@@ -445,45 +464,61 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     }
                     else if (propUnsetWaterHeight)
                     {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, localX, localZ);
                         propUnsetWaterHeight = false;
                     }
+                    y--;
+                    continue;
                 }
-                else if (!blockMD.isAir())// && !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                else if (blockMD.hasFlag(BlockMD.Flag.Plant))
                 {
-                    if (mapPlants && blockMD.hasFlag(BlockMD.Flag.Plant))
+                    if (!mapPlants)
                     {
-                        if (!mapPlantShadows)
-                        {
-                            y--;
-                        }
+                        y--;
+                        continue;
                     }
-                    else if (mapCrops && blockMD.hasFlag(BlockMD.Flag.Crop))
-                    {
-                        if (!mapPlantShadows)
-                        {
-                            y--;
-                        }
-                    }
-                    else if (!blockMD.isLava() && blockMD.hasNoShadow())
+
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
                     {
                         y--;
                     }
+
                     break;
                 }
-                y--;
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                else if (blockMD.hasFlag(BlockMD.Flag.Crop))
+                {
+                    if (!mapCrops)
+                    {
+                        y--;
+                        continue;
+                    }
+
+                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    {
+                        y--;
+                    }
+
+                    break;
+
+                }
+                else if (!blockMD.isLava() && blockMD.hasNoShadow())
+                {
+                    y--;
+                }
+
+                break;
             }
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn(String.format("Couldn't get safe surface block height for %s coords %s,%s: %s",
+                    chunkMd, localX, localZ, LogFormatter.toString(e)));
         }
 
         //why is height 4 set on a chunk to the left?
         y = Math.max(0, y);
 
-        heights[x][z] = y;
+        heights[localX][localZ] = y;
 
         return y;
     }
@@ -618,6 +653,54 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             Journeymap.getLogger().warn("Error in getColumnProperties(): " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Darken the existing color.
+     */
+    public void paintDimOverlay(BufferedImage image, int x, int z, float alpha)
+    {
+        Integer color = image.getRGB(x, z);
+        paintBlock(image, x, z, RGB.adjustBrightness(color, alpha));
+    }
+
+    /**
+     * Paint the block.
+     */
+    public void paintBlock(BufferedImage image, final int x, final int z, final int color)
+    {
+        // Use alpha mask since color is rgb, but bufferedimage is argb
+        image.setRGB(x, z, 0xFF000000 | color);
+    }
+
+    /**
+     * Paint the void.
+     */
+    public void paintVoidBlock(BufferedImage image, final int x, final int z)
+    {
+        paintBlock(image, x, z, COLOR_VOID);
+    }
+
+    /**
+     * Paint the void.
+     */
+    public void paintBlackBlock(BufferedImage image, final int x, final int z)
+    {
+        paintBlock(image, x, z, COLOR_BLACK);
+    }
+
+    /**
+     * It's a problem
+     */
+    public void paintBadBlock(BufferedImage image, final int x, final int y, final int z)
+    {
+        long count = badBlockCount.incrementAndGet();
+        if (count == 1 || count % 10240 == 0)
+        {
+            Journeymap.getLogger().warn(
+                    "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count
+            );
         }
     }
 

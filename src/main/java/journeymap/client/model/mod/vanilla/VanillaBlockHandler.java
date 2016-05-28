@@ -6,11 +6,10 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
-import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +73,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         setTextureSide(BlockDoublePlant.class, 2);
         setFlags(BlockLeaves.class, OpenToSky, Foliage, NoTopo);
         setFlags(BlockVine.class, .2F, OpenToSky, CustomBiomeColor, Foliage, NoTopo, NoShadow);
-        setFlags(BlockLilyPad.class, CustomBiomeColor, NoTopo);
+        setFlags(BlockLilyPad.class, NoTopo, Plant, CustomBiomeColor);
         setFlags(BlockCrops.class, Crop, NoTopo);
         setTextureSide(BlockCrops.class, 2);
         setFlags(BlockFlower.class, Plant, NoTopo);
@@ -95,15 +94,9 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         // Set vanilla color handler
         blockMD.setBlockColorHandler(VanillaColorHandler.INSTANCE);
 
-        if (blockMD.isWater())
-        {
-            Journeymap.getLogger().info("Water! " + blockMD);
-        }
-
         // Set flags based on material
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        Material material = block.getMaterial(blockState);
+        Block block = blockMD.getBlockState().getBlock();
+        Material material = block.getMaterial(blockMD.getBlockState());
         blockMD.addFlags(materialFlags.get(material));
 
         // Set alpha based on material
@@ -159,22 +152,17 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         // 1.8
         if (block instanceof BlockHugeMushroom)
         {
-            // 1.8 : 14 gets "all_outside" texture
-            int overrideMeta = block.getMetaFromState(block.getDefaultState());
-            if (blockMD.getMeta() != overrideMeta)
-            {
-                blockMD.setOverrideMeta(overrideMeta);
-            }
+            blockMD.setUseDefaultState(true);
         }
 
         // Double-tall grass should be treated like BlockTallGrass:  ignored
-        if (block == Blocks.DOUBLE_PLANT && blockMD.getMeta() == 2)
+        if (block == Blocks.DOUBLE_PLANT && block.getMetaFromState(blockMD.getBlockState()) == 2)
         {
             blockMD.addFlags(HasAir, NoTopo);
         }
 
         // Ferns unlike other BlockTallGrass will be treated like plants
-        if (block == Blocks.TALLGRASS && blockMD.getMeta() == 2)
+        if (block == Blocks.TALLGRASS && block.getMetaFromState(blockMD.getBlockState()) == 2)
         {
             blockMD.addFlags(Plant, CustomBiomeColor);
         }
@@ -189,7 +177,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     }
 
     @Override
-    public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ)
+    public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         // Should never be called
         return blockMD;

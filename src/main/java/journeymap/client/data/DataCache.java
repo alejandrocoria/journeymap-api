@@ -17,6 +17,7 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.*;
@@ -300,7 +301,7 @@ public class DataCache
             if (WaypointsData.isManagerEnabled())
             {
                 // The store is the cache
-                return WaypointStore.instance().getAll();
+                return WaypointStore.INSTANCE.getAll();
             }
             else
             {
@@ -398,9 +399,14 @@ public class DataCache
 //        }
 //    }
 
+    public ChunkMD getChunkMD(BlockPos blockPos)
+    {
+        return getChunkMD(new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4));
+    }
+
     public ChunkMD getChunkMD(ChunkPos coord)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             ChunkMD chunkMD = null;
 
@@ -428,7 +434,7 @@ public class DataCache
 
     public void addChunkMD(ChunkMD chunkMD)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
@@ -436,7 +442,7 @@ public class DataCache
 
     public Set<ChunkPos> getCachedChunkCoordinates()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             return chunkMetadata.asMap().keySet();
         }
@@ -444,7 +450,7 @@ public class DataCache
 
     public void invalidateChunkMD(ChunkPos coord)
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.invalidate(coord);
         }
@@ -452,7 +458,7 @@ public class DataCache
 
     public void invalidateChunkMDCache()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             chunkMetadata.invalidateAll();
         }
@@ -460,7 +466,7 @@ public class DataCache
 
     public void stopChunkMDRetention()
     {
-        synchronized (chunkMetadata)
+        //synchronized (chunkMetadata)
         {
             for (ChunkMD chunkMD : chunkMetadata.asMap().values())
             {

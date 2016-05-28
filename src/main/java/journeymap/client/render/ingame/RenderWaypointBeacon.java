@@ -59,7 +59,7 @@ public class RenderWaypointBeacon
         {
             waypointProperties = JourneymapClient.getWaypointProperties();
 
-            Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
+            Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
             //allTimer.start();
             final int playerDim = mc.thePlayer.dimension;
             for (Waypoint wp : waypoints)
