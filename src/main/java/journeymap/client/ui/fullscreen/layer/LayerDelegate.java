@@ -9,6 +9,7 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.render.BaseRenderer;
 import journeymap.client.data.DataCache;
 import journeymap.client.io.FileHandler;
@@ -93,16 +94,17 @@ public class LayerDelegate
         ChunkMD chunkMD = DataCache.instance().getChunkMD(seaLevel);
         if (chunkMD != null)
         {
-            ChunkCoordIntPair chunkCoord = chunkMD.getCoord();
-            RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.chunkXPos, chunkCoord.chunkZPos);
-            BaseRenderer chunkRenderer = JourneymapClient.getInstance().getChunkRenderController().getRenderer(rCoord, gridRenderer.getMapType(), chunkMD);
-            int blockY = chunkRenderer.getBlockHeight(chunkMD, seaLevel);
-            return new BlockPos(seaLevel.getX(), blockY, seaLevel.getZ());
+            ChunkRenderController crc = JourneymapClient.getInstance().getChunkRenderController();
+            if (crc != null)
+            {
+                ChunkCoordIntPair chunkCoord = chunkMD.getCoord();
+                RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.chunkXPos, chunkCoord.chunkZPos);
+                BaseRenderer chunkRenderer = crc.getRenderer(rCoord, gridRenderer.getMapType(), chunkMD);
+                int blockY = chunkRenderer.getBlockHeight(chunkMD, seaLevel);
+                return new BlockPos(seaLevel.getX(), blockY, seaLevel.getZ());
+            }
         }
-        else
-        {
-            return seaLevel;
-        }
+        return seaLevel;
     }
 
     public List<DrawStep> getDrawSteps()
