@@ -21,7 +21,7 @@ import journeymap.client.properties.TopoProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
@@ -440,11 +440,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
+    public void onRemoval(RemovalNotification<ChunkPos, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {
-            ChunkCoordIntPair coord = notification.getKey();
+            ChunkPos coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
             columnPropertiesCache.invalidate(coord);

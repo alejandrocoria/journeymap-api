@@ -41,9 +41,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.*;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -377,9 +381,9 @@ public class ForgeHelper_1_9 implements IForgeHelper
     }
 
     @Override
-    public BiomeGenBase getBiome(BlockPos blockPos)
+    public Biome getBiome(BlockPos blockPos)
     {
-        return getWorld().getBiomeGenForCoords(blockPos);
+        return getWorld().getBiome(blockPos);
     }
 
     @Override
@@ -415,7 +419,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
 
     private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
     {
-        return DataCache.instance().getChunkMD(new ChunkCoordIntPair(pos.getX() >> 4, pos.getZ() >> 4));
+        return DataCache.instance().getChunkMD(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     class JmBlockAccess implements IBlockAccess
@@ -458,7 +462,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         }
 
         @Override
-        public BiomeGenBase getBiomeGenForCoords(BlockPos pos)
+        public Biome getBiome(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
             if (chunkMD != null && chunkMD.hasChunk())
@@ -466,7 +470,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 try
                 {
                     Chunk chunk = chunkMD.getChunk();
-                    BiomeGenBase biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getBiomeProvider());
+                    Biome biome = chunk.getBiome(pos, ForgeHelper.INSTANCE.getWorld().getBiomeProvider());
                     if (biome == null)
                     {
                         return null;
@@ -475,17 +479,17 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 }
                 catch (Throwable throwable)
                 {
-                    Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
-                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
+                    Journeymap.getLogger().error("Error in getBiome(): " + throwable);
+                    return ForgeHelper.INSTANCE.getWorld().getBiome(pos);
                 }
             }
             else
             {
                 // 1.8
-                // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, BiomeGenBase.plains);
+                // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, Biome.plains);
 
                 // 1.8.8
-                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiomeGenerator(pos, Biomes.PLAINS);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
             }
         }
 

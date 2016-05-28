@@ -16,7 +16,7 @@ import journeymap.client.model.RegionImageCache;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.datafix.DataFixesManager;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
@@ -124,8 +124,8 @@ public class RegionLoader
                     {
                         if (!RegionImageHandler.getRegionImageFile(rc, mapType, false).exists())
                         {
-                            List<ChunkCoordIntPair> chunkCoords = rc.getChunkCoordsInRegion();
-                            for (ChunkCoordIntPair coord : chunkCoords)
+                            List<ChunkPos> chunkCoords = rc.getChunkCoordsInRegion();
+                            for (ChunkPos coord : chunkCoords)
                             {
                                 if (anvilChunkLoader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
                                 {

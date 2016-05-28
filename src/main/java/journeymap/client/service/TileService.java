@@ -16,7 +16,7 @@ import journeymap.client.model.MapType;
 import journeymap.client.render.map.Tile;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
@@ -128,8 +128,8 @@ public class TileService extends FileService
 
                 //System.out.println("zoom " + zoom + ", scale=" + scale + ", distance=" + distance + ": " + minChunkX + "," + minChunkZ + " - " + maxChunkX + "," + maxChunkZ);
 
-                final ChunkCoordIntPair startCoord = new ChunkCoordIntPair(minChunkX, minChunkZ);
-                final ChunkCoordIntPair endCoord = new ChunkCoordIntPair(maxChunkX, maxChunkZ);
+                final ChunkPos startCoord = new ChunkPos(minChunkX, minChunkZ);
+                final ChunkPos endCoord = new ChunkPos(maxChunkX, maxChunkZ);
 
                 boolean showGrid = JourneymapClient.getFullMapProperties().showGrid.get();
                 MapType mapType = new MapType(mapTypeName, vSlice, dimension);

@@ -23,9 +23,9 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.core.helpers.Strings;
 
@@ -239,9 +239,9 @@ public class Waypoint implements Serializable
         return isDeathPoint() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
     }
 
-    public ChunkCoordIntPair getChunkCoordIntPair()
+    public ChunkPos getChunkCoordIntPair()
     {
-        return new ChunkCoordIntPair(x >> 4, z >> 4);
+        return new ChunkPos(x >> 4, z >> 4);
     }
 
     public Waypoint setGroup(WaypointGroup group)

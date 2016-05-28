@@ -18,7 +18,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -46,8 +46,8 @@ public class DataCache
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
-    final LoadingCache<ChunkCoordIntPair, ChunkMD> chunkMetadata;
-    final ProxyRemovalListener<ChunkCoordIntPair, ChunkMD> chunkMetadataRemovalListener;
+    final LoadingCache<ChunkPos, ChunkMD> chunkMetadata;
+    final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
@@ -105,7 +105,7 @@ public class DataCache
         regionImageSets = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, ChunkMD>();
+        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkPos, ChunkMD>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
@@ -401,10 +401,10 @@ public class DataCache
 
     public ChunkMD getChunkMD(BlockPos blockPos)
     {
-        return getChunkMD(new ChunkCoordIntPair(blockPos.getX() >> 4, blockPos.getZ() >> 4));
+        return getChunkMD(new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4));
     }
 
-    public ChunkMD getChunkMD(ChunkCoordIntPair coord)
+    public ChunkMD getChunkMD(ChunkPos coord)
     {
         //synchronized (chunkMetadata)
         {
@@ -440,7 +440,7 @@ public class DataCache
         }
     }
 
-    public Set<ChunkCoordIntPair> getCachedChunkCoordinates()
+    public Set<ChunkPos> getCachedChunkCoordinates()
     {
         //synchronized (chunkMetadata)
         {
@@ -448,7 +448,7 @@ public class DataCache
         }
     }
 
-    public void invalidateChunkMD(ChunkCoordIntPair coord)
+    public void invalidateChunkMD(ChunkPos coord)
     {
         //synchronized (chunkMetadata)
         {
@@ -478,7 +478,7 @@ public class DataCache
         }
     }
 
-    public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, ChunkMD> listener)
+    public void addChunkMDListener(RemovalListener<ChunkPos, ChunkMD> listener)
     {
         synchronized (chunkMetadataRemovalListener)
         {

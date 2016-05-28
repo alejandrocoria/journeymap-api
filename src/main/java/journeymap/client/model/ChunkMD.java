@@ -16,7 +16,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
@@ -38,7 +38,7 @@ public class ChunkMD
     public static final String PROP_LAST_RENDERED = "lastRendered";
     final static DataCache dataCache = DataCache.instance(); // TODO REMOVE
     private final WeakReference<Chunk> chunkReference;
-    private final ChunkCoordIntPair coord;
+    private final ChunkPos coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
     private Chunk retainedChunk;
 
@@ -53,7 +53,7 @@ public class ChunkMD
         {
             throw new IllegalArgumentException("Chunk can't be null");
         }
-        this.coord = new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition); // avoid GC issue holding onto chunk's coord ref
+        this.coord = new ChunkPos(chunk.xPosition, chunk.zPosition); // avoid GC issue holding onto chunk's coord ref
 
         // Set load time
         setProperty(PROP_LOADED, System.currentTimeMillis());
@@ -279,7 +279,7 @@ public class ChunkMD
         return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), getBlockPos(localX, y, localZ));
     }
 
-    public ChunkCoordIntPair getCoord()
+    public ChunkPos getCoord()
     {
         return coord;
     }
@@ -351,18 +351,18 @@ public class ChunkMD
 
     public static class ChunkMissingException extends RuntimeException
     {
-        ChunkMissingException(ChunkCoordIntPair coord)
+        ChunkMissingException(ChunkPos coord)
         {
             super("Chunk missing: " + coord);
         }
     }
 
-    public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, ChunkMD>
+    public static class SimpleCacheLoader extends CacheLoader<ChunkPos, ChunkMD>
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
 
         @Override
-        public ChunkMD load(ChunkCoordIntPair coord) throws Exception
+        public ChunkMD load(ChunkPos coord) throws Exception
         {
             synchronized (this)
             {

@@ -13,7 +13,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
@@ -29,7 +29,7 @@ public class ChunkLoader
      * Gets the chunk from the region file on disk.  Only works in SinglePlayer, and assumes the current dimension
      * is the intended dimension.
      */
-    public static ChunkMD getChunkMD(AnvilChunkLoader loader, Minecraft mc, ChunkCoordIntPair coord, boolean forceRetain)
+    public static ChunkMD getChunkMD(AnvilChunkLoader loader, Minecraft mc, ChunkPos coord, boolean forceRetain)
     {
         try
         {

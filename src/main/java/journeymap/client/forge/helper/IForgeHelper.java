@@ -25,7 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 
 import java.net.SocketAddress;
@@ -92,7 +92,7 @@ public interface IForgeHelper
 
     public TileEntity getTileEntity(BlockPos blockPos);
 
-    public BiomeGenBase getBiome(BlockPos blockPos);
+    public Biome getBiome(BlockPos blockPos);
 
     public boolean hasNoSky(Entity entity);
 

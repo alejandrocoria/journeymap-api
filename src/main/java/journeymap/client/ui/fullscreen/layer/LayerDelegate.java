@@ -21,7 +21,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class LayerDelegate
             ChunkRenderController crc = JourneymapClient.getInstance().getChunkRenderController();
             if (crc != null)
             {
-                ChunkCoordIntPair chunkCoord = chunkMD.getCoord();
+                ChunkPos chunkCoord = chunkMD.getCoord();
                 RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.chunkXPos, chunkCoord.chunkZPos);
                 BaseRenderer chunkRenderer = crc.getRenderer(rCoord, gridRenderer.getMapType(), chunkMD);
                 int blockY = chunkRenderer.getBlockHeight(chunkMD, seaLevel);

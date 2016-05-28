@@ -9,7 +9,7 @@
 package journeymap.client.forge.event;
 
 import journeymap.client.data.DataCache;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,7 +36,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onChunkEvent(ChunkEvent.Unload event)
     {
-        ChunkCoordIntPair coord = event.getChunk().getChunkCoordIntPair();
+        ChunkPos coord = event.getChunk().getChunkCoordIntPair();
         DataCache.instance().invalidateChunkMD(coord);
     }
 }

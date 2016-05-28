@@ -17,9 +17,9 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
@@ -61,7 +61,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 {
                     y = posY + 1;
 
-                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkPos(x >> 4, z >> 4));
                     if (chunkMD != null)
                     {
                         if (chunkMD.ceiling(x & 15, z & 15) <= y)
@@ -99,7 +99,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         {
             try
             {
-                BiomeGenBase biome = ForgeHelper.INSTANCE.getBiome(player.getPosition());
+                Biome biome = ForgeHelper.INSTANCE.getBiome(player.getPosition());
                 // Can be null right after spawn/teleport before chunks loaded
                 if (biome != null)
                 {
