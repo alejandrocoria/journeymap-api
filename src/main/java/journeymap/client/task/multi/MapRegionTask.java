@@ -134,7 +134,7 @@ public class MapRegionTask extends BaseMapTask
             }
             finally
             {
-                regionOverlay.getShapeProperties().setFillColor(0xffffff).setFillOpacity(.1f).setStrokeColor(0xffffff);
+                regionOverlay.getShapeProperties().setFillColor(0xffffff).setFillOpacity(.15f).setStrokeColor(0xffffff);
                 String label = String.format("%s\nRegion [%s,%s]", Constants.getString("jm.common.automap_region_complete"), rCoord.regionX, rCoord.regionZ);
                 regionOverlay.setLabel(label);
                 regionOverlay.flagForRerender();
