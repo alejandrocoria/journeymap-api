@@ -10,19 +10,10 @@ package journeymap.server;
 
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.migrate.Migration;
 import journeymap.common.network.PacketHandler;
+import journeymap.server.events.ForgeEvents;
+import journeymap.server.legacyserver.config.ConfigHandler;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
-import journeymap.server.oldservercode.chat.ChatHandler;
-import journeymap.server.oldservercode.config.ConfigHandler;
-import journeymap.server.oldservercode.events.ForgeEvents;
-import journeymap.server.oldservercode.network.ForgePacketHandler;
-import journeymap.server.oldservercode.network.PacketManager;
-import journeymap.server.oldservercode.reference.Controller;
-import journeymap.server.oldservercode.util.ForgeChat;
-import journeymap.server.oldservercode.util.ForgePlayerUtil;
-import journeymap.server.oldservercode.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -31,7 +22,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -45,7 +35,6 @@ import java.util.Map;
 public class JourneymapServer implements CommonProxy
 {
     public static String WORLD_NAME;
-
     private Logger logger;
 
     /**
@@ -76,22 +65,7 @@ public class JourneymapServer implements CommonProxy
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event)
     {
-        try
-        {
-            // Migrate tasks
-            boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
-
-            // TODO: Move the dir name to a constant
-            ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
-        }
-        catch (Throwable t)
-        {
-            if (logger == null)
-            {
-                logger = LogManager.getLogger(Journeymap.MOD_ID);
-            }
-            logger.error(LogFormatter.toString(t));
-        }
+        ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
     }
 
     /**
@@ -103,14 +77,15 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event)
     {
+        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
+
 //        PacketHandler packetHandler = new PacketHandler();
 //        packetHandler.init(Side.SERVER);
-        Controller.setController(Controller.FORGE);
-        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
-        //FMLCommonHandler.instance().bus().register(new FMLEvents());
-        PacketManager.init(new ForgePacketHandler());
-        PlayerUtil.init(new ForgePlayerUtil());
-        ChatHandler.init(new ForgeChat());
+//        Controller.setController(Controller.FORGE);
+//        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
+//        PacketManager.init(new ForgePacketHandler());
+//        PlayerUtil.init(new ForgePlayerUtil());
+//        ChatHandler.init(new ForgeChat());
     }
 
     /**

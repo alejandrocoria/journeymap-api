@@ -86,7 +86,10 @@ public class WorldNbtIDSaveHandler
 
     private void saveWorldID(String worldID)
     {
-        data.getData().setString(WORLD_ID_KEY, worldID);
-        data.markDirty();
+        if (data != null)
+        {
+            data.getData().setString(WORLD_ID_KEY, worldID);
+            data.markDirty();
+        }
     }
 }

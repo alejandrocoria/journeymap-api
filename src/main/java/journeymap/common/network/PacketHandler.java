@@ -13,6 +13,7 @@ package journeymap.common.network;
  */
 
 import journeymap.common.Journeymap;
+import journeymap.server.properties.DimensionProperties;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -23,7 +24,28 @@ public class PacketHandler
 {
 
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
+    public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
     //public static final SimpleNetworkWrapper JM_PERMS = NetworkRegistry.INSTANCE.newSimpleChannel("jm_perms");
+
+    public static void init(Side side)
+    {
+        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
+
+        if (Side.SERVER == side)
+        {
+
+        }
+
+        if (Side.CLIENT == side)
+        {
+            DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
+        }
+    }
+
+    public static void sendDimensionPacketToPlayer(EntityPlayerMP player, DimensionProperties property)
+    {
+        DIMENSION_PERMISSIONS_CHANNEL.sendTo(new DimensionPermissionPacket(property), player);
+    }
 
     public static void sendAllPlayersWorldID(String worldID)
     {
@@ -32,7 +54,6 @@ public class PacketHandler
 
     public static void sendPlayerWorldID(String worldID, EntityPlayerMP player)
     {
-
         if ((player instanceof EntityPlayerMP) && (player != null))
         {
             String playerName = player.getName();
@@ -52,37 +73,5 @@ public class PacketHandler
         }
 
 
-    }
-
-    private static int toInt(boolean val)
-    {
-        int intVal;
-        if (val)
-        {
-            intVal = 1;
-        }
-        else
-        {
-            intVal = 0;
-        }
-        return intVal;
-    }
-
-//    public static void sendPerms(String worldName, EntityPlayerMP player) {
-//        MappingOptionsHandler options = new MappingOptionsHandler(worldName);
-//        JM_PERMS.sendTo(
-//                new PermissionsPacket(
-//                        toInt(options.disableRadar(player.getCommandSenderName())),
-//                        toInt(options.disableRadar(player.getCommandSenderName())),
-//                        toInt(options.disableRadar(player.getCommandSenderName())),
-//                        toInt(options.disableRadar(player.getCommandSenderName())),
-//                        toInt(options.disableCaveMapping(player.getCommandSenderName()))
-//                ), player);
-//    }
-
-    public void init(Side side)
-    {
-        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
-        //JM_PERMS.registerMessage(PermissionsPacket.PermissionsListener.class, PermissionsPacket.class, 0, Side.SERVER);
     }
 }

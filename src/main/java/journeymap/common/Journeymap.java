@@ -8,10 +8,11 @@
 
 package journeymap.common;
 
+import journeymap.common.log.LogFormatter;
+import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
-import journeymap.server.oldservercode.command.CommandJMServerForge;
-import journeymap.server.oldservercode.config.ConfigHandler;
+import journeymap.server.properties.PropertiesManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -114,7 +115,21 @@ public class Journeymap
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new CommandJMServerForge());
+        // Server migration needs to be here because of NBT loading/saving is not available until after postInit.
+        try
+        {
+            // TODO: Move the dir name to a constant
+
+            boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
+
+        }
+        catch (Throwable t)
+        {
+            getLogger().error(LogFormatter.toString(t));
+        }
+        PropertiesManager.getInstance();
+
+        //event.registerServerCommand(new CommandJMServerForge());
     }
 
     @SideOnly(Side.SERVER)
@@ -123,6 +138,7 @@ public class Journeymap
     {
         MinecraftServer server = FMLServerHandler.instance().getServer();
         JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
-        getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
+        //getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
     }
+
 }

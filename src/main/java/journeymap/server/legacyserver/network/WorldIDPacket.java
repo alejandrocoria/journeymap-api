@@ -1,18 +1,9 @@
-/*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
- */
-
-package journeymap.common.network;
+package journeymap.server.legacyserver.network;
 
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
 import journeymap.server.legacyserver.config.ConfigHandler;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -24,8 +15,6 @@ import net.minecraftforge.fml.relauncher.Side;
  */
 public class WorldIDPacket implements IMessage
 {
-    // Channel name
-    public static final String CHANNEL_NAME = "world_info";
 
     private String worldID;
 
@@ -46,14 +35,6 @@ public class WorldIDPacket implements IMessage
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        try
-        {
-            worldID = ByteBufUtils.readUTF8String(buf);
-        }
-        catch (Throwable t)
-        {
-            Journeymap.getLogger().error(String.format("Failed to read message: %s", t));
-        }
     }
 
     @Override
@@ -77,16 +58,16 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
-
-            EntityPlayerMP player = null;
             if (ctx.side == Side.SERVER)
             {
-                player = ctx.getServerHandler().playerEntity;
-                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
+                if (ConfigHandler.getConfigByWorldName(ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
                 {
-                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
+                    String worldName = ctx.getServerHandler().playerEntity.getEntityWorld().getWorldInfo().getWorldName();
+                    String worldID = ConfigHandler.getConfigByWorldName(worldName).getWorldID();
+                    PacketManager.instance.sendPlayerWorldID(worldID, ctx.getServerHandler().playerEntity.getName());
                 }
             }
+
             return null;
         }
     }

@@ -12,6 +12,10 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.MigrationTask;
 import journeymap.common.version.Version;
+import journeymap.server.legacyserver.config.ConfigHandler;
+import journeymap.server.legacyserver.config.Configuration;
+import journeymap.server.properties.GlobalProperties;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,10 +35,11 @@ public class Migrate5_2 implements MigrationTask
     {
         if (currentVersion.toMajorMinorString().equals("5.2"))
         {
-
             // Do whatever to determine what needs to be done, return true if the task should be called.
-            return true;
-
+            if (ConfigHandler.getConfigByWorldName("world") != null)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -50,8 +55,21 @@ public class Migrate5_2 implements MigrationTask
     {
         try
         {
-            // Do the thing
-            logger.error(String.format("Did the thing."));
+
+            String worldName = FMLServerHandler.instance().getServer().getEntityWorld().getWorldInfo().getWorldName();
+
+            GlobalProperties properties = new GlobalProperties();
+            Configuration oldConfig = ConfigHandler.getConfigByWorldName(worldName);
+
+            properties.setWorldID(oldConfig.getWorldID());
+            properties.radarEnabled.set(oldConfig.getRadar().isPlayerRadar());
+            properties.opRadarEnabled.set(oldConfig.getRadar().isOpRadar());
+            properties.caveMappingEnabled.set(oldConfig.getCaveMapping().isPlayerCaveMapping());
+            properties.opCaveMappingEnabled.set(oldConfig.getCaveMapping().isOpCaveMapping());
+
+            properties.save();
+            ConfigHandler.delete(worldName);
+            logger.error(String.format("Server config migration to 5.2 complete."));
 
             return true;
         }

@@ -3,6 +3,10 @@ package journeymap.server.properties;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.StringField;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.UUID;
 
 import static journeymap.server.properties.ServerCategory.General;
 
@@ -11,16 +15,15 @@ import static journeymap.server.properties.ServerCategory.General;
  */
 public class GlobalProperties extends PermissionProperties
 {
-    public final BooleanField useWorldID = new BooleanField(General, "Use World ID", false);
-    public final StringField worldID = new StringField(General, "World ID");
-    public final BooleanField saveInWorldFolder = new BooleanField(General, "Save configs in world folder", false);
+    public final StringField worldID = new StringField(General, "World ID ");
+    public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
 
     /**
      * Constructor.
      */
     public GlobalProperties()
     {
-        super("Global Server Configuration", "Applies to all dimensions unless overridden.");
+        super("Global Server Configuration", "Applies to all dimensions unless overridden. 'WorldID is Read Only'");
     }
 
 
@@ -29,26 +32,42 @@ public class GlobalProperties extends PermissionProperties
         return "global";
     }
 
+    /**
+     * @param worldId
+     */
+    @SideOnly(Side.SERVER)
+    public void setWorldID(String worldId)
+    {
+        this.worldID.set(worldId);
+        this.preSave();
+    }
+
+    @SideOnly(Side.SERVER)
+    public String getWorldID()
+    {
+        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
+        return worldSaveHandler.getWorldID();
+    }
+
     @Override
     protected void postLoad(boolean isNew)
     {
         super.postLoad(isNew);
+        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
+        this.worldID.set(worldSaveHandler.getWorldID());
 
-        if (this.saveInWorldFolder.get())
-        {
-            WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-            this.worldID.set(worldSaveHandler.getWorldID());
-        }
     }
 
     @Override
     protected void preSave()
     {
         super.preSave();
-        if (this.saveInWorldFolder.get())
+        if (worldID.get() == null || worldID.get().isEmpty() || worldID.get().equals(""))
         {
-            WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-            worldSaveHandler.setWorldID(worldID.get());
+            worldID.set(UUID.randomUUID().toString());
         }
+        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
+        worldSaveHandler.setWorldID(worldID.get());
+
     }
 }

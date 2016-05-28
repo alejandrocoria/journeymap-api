@@ -4,7 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
-import journeymap.server.oldservercode.config.ConfigHandler;
+import journeymap.server.legacyserver.config.ConfigHandler;
 
 import java.io.File;
 import java.util.List;
@@ -52,6 +52,40 @@ public abstract class ServerPropertiesBase extends PropertiesBase
     public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
         super.updateFrom(otherInstance);
+    }
+
+    /**
+     * Returns an instance with values loaded from string, or null if failed
+     *
+     * @param jsonString json to load config from
+     * @param verbose    whether to deserialize all field attributes.
+     * @param <T>        properties type
+     * @return loaded instance or null
+     */
+    public <T extends PropertiesBase> T load(String jsonString, boolean verbose)
+    {
+        ensureInit();
+
+        try
+        {
+            T jsonInstance = fromJsonString(jsonString, (Class<T>) this.getClass(), verbose);
+            this.updateFrom(jsonInstance);
+            this.postLoad(false);
+            this.currentState = State.FileLoaded;
+            if (!this.isValid(true))
+            {
+                return null;
+            }
+            else
+            {
+                return (T) this;
+            }
+        }
+        catch (Exception e)
+        {
+            error(String.format("Can't load JSON string: %s", jsonString), e);
+            return null;
+        }
     }
 
     /**
