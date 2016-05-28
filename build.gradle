@@ -56,7 +56,7 @@ dependencies {
 }
 
 minecraft {
-    version = "${project.minecraft_version}-${project.forge_version}"
+    version = "${project.minecraft_version}-${project.forge_version}-${project.minecraft_version}"
     mappings = project.mappings
     runDir = "run"
     makeObfSourceJar = false
