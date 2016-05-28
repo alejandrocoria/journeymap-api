@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.theme;
 
-import net.minecraft.util.text.TextFormatting;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -53,9 +53,9 @@ public class ThemePresets
             button.useThemeImages = true;
             button.width = 24;
             button.height = 24;
-            button.tooltipOnStyle = TextFormatting.WHITE.toString();
-            button.tooltipOffStyle = TextFormatting.WHITE.toString();
-            button.tooltipDisabledStyle = TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC.toString();
+            button.tooltipOnStyle = ChatFormatting.WHITE.toString();
+            button.tooltipOffStyle = ChatFormatting.WHITE.toString();
+            button.tooltipDisabledStyle = ChatFormatting.DARK_GRAY.toString() + ChatFormatting.ITALIC.toString();
             button.iconOnColor = controlColor;
             button.iconOffColor = controlColor;
             button.iconHoverColor = Theme.toHexColor(Color.white);
@@ -67,9 +67,9 @@ public class ThemePresets
             toggle.useThemeImages = true;
             toggle.width = 24;
             toggle.height = 24;
-            toggle.tooltipOnStyle = TextFormatting.WHITE.toString();
-            toggle.tooltipOffStyle = TextFormatting.WHITE.toString();
-            toggle.tooltipDisabledStyle = TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC.toString();
+            toggle.tooltipOnStyle = ChatFormatting.WHITE.toString();
+            toggle.tooltipOffStyle = ChatFormatting.WHITE.toString();
+            toggle.tooltipDisabledStyle = ChatFormatting.DARK_GRAY.toString() + ChatFormatting.ITALIC.toString();
             toggle.iconOnColor = Theme.toHexColor(Color.darkGray);
             toggle.iconOffColor = controlColor;
             toggle.iconHoverColor = Theme.toHexColor(Color.white);
@@ -205,9 +205,9 @@ public class ThemePresets
             button.useThemeImages = false;
             button.width = 20;
             button.height = 20;
-            button.tooltipOnStyle = TextFormatting.WHITE.toString();
-            button.tooltipOffStyle = TextFormatting.WHITE.toString();
-            button.tooltipDisabledStyle = TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC.toString();
+            button.tooltipOnStyle = ChatFormatting.WHITE.toString();
+            button.tooltipOffStyle = ChatFormatting.WHITE.toString();
+            button.tooltipDisabledStyle = ChatFormatting.DARK_GRAY.toString() + ChatFormatting.ITALIC.toString();
             button.iconOnColor = Theme.toHexColor(new Color(16777120));
             button.iconOffColor = Theme.toHexColor(new Color(14737632));
             button.iconHoverColor = Theme.toHexColor(new Color(16777120));
@@ -219,9 +219,9 @@ public class ThemePresets
             toggle.useThemeImages = false;
             toggle.width = 20;
             toggle.height = 20;
-            toggle.tooltipOnStyle = TextFormatting.WHITE.toString();
-            toggle.tooltipOffStyle = TextFormatting.WHITE.toString();
-            toggle.tooltipDisabledStyle = TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC.toString();
+            toggle.tooltipOnStyle = ChatFormatting.WHITE.toString();
+            toggle.tooltipOffStyle = ChatFormatting.WHITE.toString();
+            toggle.tooltipDisabledStyle = ChatFormatting.DARK_GRAY.toString() + ChatFormatting.ITALIC.toString();
             toggle.iconOnColor = Theme.toHexColor(Color.white);
             toggle.iconOffColor = Theme.toHexColor(Color.gray);
             toggle.iconHoverColor = Theme.toHexColor(new Color(16777120));

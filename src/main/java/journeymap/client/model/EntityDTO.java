@@ -113,15 +113,13 @@ public class EntityDTO implements Serializable
         else if (entity instanceof EntityHorse)
         {
             // TODO: Test this with and without owners
-            // 1.8
-            // String ownerUuidString = ((EntityHorse) entity).func_152119_ch();
-            // 1.8.8
+            // 1.9
             UUID ownerUuid = ((EntityHorse) entity).getOwnerUniqueId();
             if (currentPlayer != null && ownerUuid != null)
             {
                 try
                 {
-                    UUID playerUuid = currentPlayer.getUniqueID();
+                    String playerUuid = currentPlayer.getUniqueID().toString();
                     if (playerUuid.equals(ownerUuid))
                     {
                         owner = ForgeHelper.INSTANCE.getEntityName(currentPlayer);

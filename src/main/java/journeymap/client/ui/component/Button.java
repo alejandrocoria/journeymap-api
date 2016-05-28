@@ -107,7 +107,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void drawPartialScrollable(Minecraft minecraft, int x, int y, int width, int height)
     {
-        minecraft.getTextureManager().bindTexture(buttonTextures);
+        minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
         int k = 0;// this.getHoverState(this.field_82253_i);
         this.drawTexturedModalRect(x, y, 0, 46 + k * 20, width / 2, height);
         this.drawTexturedModalRect(x + width / 2, y, 200 - width / 2, 46 + k * 20, width / 2, height);
@@ -173,7 +173,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         else
         {
             // Use small button colors
-            minecraft.getTextureManager().bindTexture(buttonTextures);
+            minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
             GlStateManager.color(1, 1, 1, 1);
 
             this.setHovered(mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height);

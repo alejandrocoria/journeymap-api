@@ -85,7 +85,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
             if (controlDown && Constants.KB_MAP.isKeyDown())
             {
-                UIManager.getInstance().toggleMinimap();
+                UIManager.INSTANCE.toggleMinimap();
                 return true;
             }
             else if (controlDown && Constants.KB_MAP_ZOOMIN.isKeyDown())
@@ -115,12 +115,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             else if (Constants.KB_MINIMAP_PRESET.isKeyDown())
             {
-                UIManager.getInstance().switchMiniMapPreset();
+                UIManager.INSTANCE.switchMiniMapPreset();
                 return true;
             }
             else if (controlDown && Constants.KB_WAYPOINT.isKeyDown())
             {
-                UIManager.getInstance().openWaypointManager(null, null);
+                UIManager.INSTANCE.openWaypointManager(null, null);
                 return true;
             }
 
@@ -130,13 +130,13 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 {
                     if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
-                        UIManager.getInstance().openFullscreenMap();
+                        UIManager.INSTANCE.openFullscreenMap();
                     }
                     else
                     {
                         if (FMLClientHandler.instance().getClient().currentScreen instanceof Fullscreen)
                         {
-                            UIManager.getInstance().closeAll();
+                            UIManager.INSTANCE.closeAll();
                         }
                     }
                     return true;
@@ -149,7 +149,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                         {
                             Minecraft mc = FMLClientHandler.instance().getClient();
                             Waypoint waypoint = Waypoint.of(mc.thePlayer);
-                            UIManager.getInstance().openWaypointEditor(waypoint, true, null);
+                            UIManager.INSTANCE.openWaypointEditor(waypoint, true, null);
                         }
                         return true;
                     }

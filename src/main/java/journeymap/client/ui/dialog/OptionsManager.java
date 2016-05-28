@@ -39,6 +39,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -117,6 +118,10 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap1PreviewButton = new CheckBox(name, false);
                 minimap1PreviewButton.setTooltip(tooltip);
+                if (FMLClientHandler.instance().getClient().theWorld == null)
+                {
+                    minimap1PreviewButton.setEnabled(false);
+                }
             }
 
             if (minimap2PreviewButton == null)
@@ -125,6 +130,10 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap2PreviewButton = new CheckBox(name, false);
                 minimap2PreviewButton.setTooltip(tooltip);
+                if (FMLClientHandler.instance().getClient().theWorld == null)
+                {
+                    minimap2PreviewButton.setEnabled(false);
+                }
             }
 
             if (minimap1KeysButton == null)
@@ -200,7 +209,10 @@ public class OptionsManager extends JmUI
 
                         if (category == ClientCategory.MiniMap1)
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
+                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                {
+                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
+                                }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
@@ -208,7 +220,10 @@ public class OptionsManager extends JmUI
                             }
                         else if (category == ClientCategory.MiniMap2)
                             {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
+                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                {
+                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
+                                }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
                                 categorySlot.getAllChildMetadata().add(resetSlotMetadata);
@@ -290,11 +305,11 @@ public class OptionsManager extends JmUI
                 // Minimap buttons:  Force minimap toggles
                 if (minimap1PreviewButton.isActive())
                 {
-                    UIManager.getInstance().switchMiniMapPreset(1);
+                    UIManager.INSTANCE.switchMiniMapPreset(1);
                 }
                 else if (minimap2PreviewButton.isActive())
                 {
-                    UIManager.getInstance().switchMiniMapPreset(2);
+                    UIManager.INSTANCE.switchMiniMapPreset(2);
                 }
             }
 
@@ -313,7 +328,7 @@ public class OptionsManager extends JmUI
 
             if (previewMiniMap())
             {
-                UIManager.getInstance().getMiniMap().drawMap(true);
+                UIManager.INSTANCE.getMiniMap().drawMap(true);
                 RenderHelper.disableStandardItemLighting();
             }
 
@@ -348,6 +363,7 @@ public class OptionsManager extends JmUI
     private void updateRenderStats()
     {
         RenderSpec.getSurfaceSpec();
+        RenderSpec.getTopoSpec();
         RenderSpec.getUndergroundSpec();
 
         // Show validation on render distances
@@ -486,14 +502,14 @@ public class OptionsManager extends JmUI
                 ThemeFileHandler.getCurrentTheme(true);
                 if (previewMiniMap())
                 {
-                    UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                    UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
                 }
             }
 
             // Grid edit buttons
             if (editGridButtons.contains(slotMetadata.getButton()))
             {
-                UIManager.getInstance().openGridEditor(this);
+                UIManager.INSTANCE.openGridEditor(this);
                 return;
             }
 
@@ -501,28 +517,28 @@ public class OptionsManager extends JmUI
             if (slotMetadata.getButton() == minimap1PreviewButton)
             {
                 minimap2PreviewButton.setToggled(false);
-                UIManager.getInstance().switchMiniMapPreset(1);
-                UIManager.getInstance().getMiniMap().resetInitTime();
+                UIManager.INSTANCE.switchMiniMapPreset(1);
+                UIManager.INSTANCE.getMiniMap().resetInitTime();
             }
 
             if (slotMetadata.getButton() == minimap2PreviewButton)
             {
                 minimap1PreviewButton.setToggled(false);
-                UIManager.getInstance().switchMiniMapPreset(2);
-                UIManager.getInstance().getMiniMap().resetInitTime();
+                UIManager.INSTANCE.switchMiniMapPreset(2);
+                UIManager.INSTANCE.getMiniMap().resetInitTime();
             }
 
             if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
             {
                 optionsListPane.resetLastPressed();
-                UIManager.getInstance().openMiniMapHotkeyHelp(this);
+                UIManager.INSTANCE.openMiniMapHotkeyHelp(this);
                 return;
             }
 
             if (slotMetadata.getButton() == fullscreenKeysButton)
             {
                 optionsListPane.resetLastPressed();
-                UIManager.getInstance().openMapHotkeyHelp(this);
+                UIManager.INSTANCE.openMapHotkeyHelp(this);
                 return;
             }
         }
@@ -539,7 +555,7 @@ public class OptionsManager extends JmUI
             {
                 refreshMinimapOptions();
                 DataCache.instance().resetRadarCaches();
-                UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+                UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
             }
 
             // If the button is Cartography-related, ensure valid
@@ -562,20 +578,20 @@ public class OptionsManager extends JmUI
 
         if (button == buttonAbout)
         {
-            UIManager.getInstance().openSplash(this);
+            UIManager.INSTANCE.openSplash(this);
             return;
         }
 
         if (button == minimap1PreviewButton)
         {
             minimap2PreviewButton.setToggled(false);
-            UIManager.getInstance().switchMiniMapPreset(1);
+            UIManager.INSTANCE.switchMiniMapPreset(1);
         }
 
         if (button == minimap2PreviewButton)
         {
             minimap1PreviewButton.setToggled(false);
-            UIManager.getInstance().switchMiniMapPreset(2);
+            UIManager.INSTANCE.switchMiniMapPreset(2);
         }
     }
 
@@ -602,7 +618,7 @@ public class OptionsManager extends JmUI
         boolean optionUpdated = optionsListPane.keyTyped(c, i);
         if (optionUpdated && previewMiniMap())
         {
-            UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+            UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
         }
 
         // Check for any minimap-related keypresses
@@ -682,7 +698,7 @@ public class OptionsManager extends JmUI
         if (mc.theWorld != null)
         {
             // Ensure minimap is back to the one used before this opened
-            UIManager.getInstance().getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
+            UIManager.INSTANCE.getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
 
             for (Category category : changedCategories)
             {
@@ -690,7 +706,7 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.MiniMap1)
                     {
                         DataCache.instance().resetRadarCaches();
-                        UIManager.getInstance().getMiniMap().reset();
+                        UIManager.INSTANCE.getMiniMap().reset();
                         continue;
                     }
                 if (category == ClientCategory.MiniMap2)
@@ -712,7 +728,7 @@ public class OptionsManager extends JmUI
                     }
                 if (category == ClientCategory.Waypoint)
                     {
-                        WaypointStore.instance().reset();
+                        WaypointStore.INSTANCE.reset();
                         continue;
                     }
                 if (category == ClientCategory.WaypointBeacon)
@@ -737,8 +753,8 @@ public class OptionsManager extends JmUI
 
             }
 
-            UIManager.getInstance().getMiniMap().reset();
-            UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+            UIManager.INSTANCE.getMiniMap().reset();
+            UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
         }
 
         if (this.returnDisplay != null && this.returnDisplay instanceof Fullscreen)

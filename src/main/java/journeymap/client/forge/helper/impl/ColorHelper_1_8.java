@@ -9,6 +9,7 @@
 package journeymap.client.forge.helper.impl;
 
 import journeymap.client.cartography.RGB;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
@@ -40,7 +41,7 @@ import java.util.HashSet;
 /**
  * IColorHelper implementation for 1.8.   Formerly IconLoader.
  */
-public class ColorHelper_1_9 implements IColorHelper
+public class ColorHelper_1_8 implements IColorHelper
 {
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
@@ -50,7 +51,7 @@ public class ColorHelper_1_9 implements IColorHelper
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.
      */
-    public ColorHelper_1_9()
+    public ColorHelper_1_8()
     {
     }
 
@@ -78,25 +79,22 @@ public class ColorHelper_1_9 implements IColorHelper
     }
 
     @Override
-    public int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z)
+    public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        BlockPos blockPos = new BlockPos(x, y, z);
         if (chunkMD == null || !chunkMD.hasChunk())
         {
-            return RGB.WHITE_RGB;
-            //return block.colorMultiplier(ForgeHelper.INSTANCE.getIBlockAccess(), blockPos);
+            return blockColors.colorMultiplier(blockMD.getBlockState(), ForgeHelper.INSTANCE.getIBlockAccess(), blockPos, 2);
         }
         else
         {
             IBlockState blockState = chunkMD.getChunk().getBlockState(blockPos);
-            if (Blocks.air.getDefaultState().equals(blockState))
+            if (Blocks.AIR.getDefaultState().equals(blockState))
             {
                 return RGB.WHITE_RGB;
             }
             else
             {
-                // 1.9 TODO: determine if tint index should be other than 0
-                return blockColors.colorMultiplier(blockState, chunkMD.getWorld(), blockPos, 0);
+                return blockColors.colorMultiplier(blockMD.getBlockState(), ForgeHelper.INSTANCE.getIBlockAccess(), blockPos, 2);
             }
         }
     }
@@ -108,27 +106,15 @@ public class ColorHelper_1_9 implements IColorHelper
     @Override
     public int getRenderColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getRenderColor(blockMD.meta);
-
-        // 1.8
-        // return blockMD.getBlock().getRenderColor(blockState);
-
-        // 1.9 TODO  I have no idea if this will work
-        IBlockState blockState = blockMD.getBlock().getStateFromMeta(blockMD.getMeta());
-        return blockState.getMapColor().colorValue;
+        // TODO?
+        //return blockMD.getBlockState().getBlock().getRenderColor(blockMD.getBlockState());
+        return RGB.WHITE_RGB;
     }
 
     @Override
     public int getMapColor(BlockMD blockMD)
     {
-        // 1.7
-        // return blockMD.getBlock().getMapColor(blockMD.meta);
-
-        // 1.8
-        Block block = blockMD.getBlock();
-        IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
-        MapColor mapColor = block.getMapColor(blockState);
+        MapColor mapColor = blockMD.getBlockState().getBlock().getMapColor(blockMD.getBlockState());
         if (mapColor != null)
         {
             return mapColor.colorValue;
@@ -141,9 +127,6 @@ public class ColorHelper_1_9 implements IColorHelper
 
     /**
      * Derive block color from the corresponding texture.
-     *
-     * @param blockMD
-     * @return
      */
     @Override
     public Integer getTextureColor(BlockMD blockMD)
@@ -170,7 +153,7 @@ public class ColorHelper_1_9 implements IColorHelper
 
             if (blockIcon == null)
             {
-                if (blockMD.getBlock() instanceof ITileEntityProvider)
+                if (blockMD.getBlockState().getBlock() instanceof ITileEntityProvider)
                 {
                     logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
                     blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
@@ -199,11 +182,7 @@ public class ColorHelper_1_9 implements IColorHelper
             failed.add(blockMD);
             if (blockMD.getUid().startsWith("minecraft"))
             {
-                logger.warn("Error getting block color. Please report this exception to the JourneyMap mod author regarding " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
-            }
-            else
-            {
-                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of " + blockMD.getUid() + ": " + LogFormatter.toPartialString(t));
+                logger.warn(String.format("Error getting block color for %s. Cause: %s", blockMD, LogFormatter.toPartialString(t)));
             }
             return null;
         }
@@ -218,27 +197,20 @@ public class ColorHelper_1_9 implements IColorHelper
             return null;
         }
 
-        Block block = blockMD.getBlock();
-        Integer overrideMeta = null;
-        if (blockMD.hasOverrideMeta())
-        {
-            overrideMeta = blockMD.getOverrideMeta();
-        }
-        int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
-
-        IBlockState state = blockMD.getBlock().getStateFromMeta(meta);
+        IBlockState blockState = blockMD.getBlockState();
+        Block block = blockState.getBlock();
 
         // Always get the upper portion of a double plant for rendering
         if (block instanceof BlockDoublePlant)
         {
-            if (state.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
+            if (blockState.getValue(BlockDoublePlant.HALF).toString().equals("lower"))
             {
                 // cycle to upper
-                state = state.cycleProperty(BlockDoublePlant.HALF);
+                blockState = blockState.cycleProperty(BlockDoublePlant.HALF);
             }
         }
 
-        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
+        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
         return icon;
         //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
     }
@@ -253,6 +225,7 @@ public class ColorHelper_1_9 implements IColorHelper
         }
 
         Integer color = null;
+        IBlockState blockState = blockMD.getBlockState();
 
         try
         {
@@ -330,36 +303,22 @@ public class ColorHelper_1_9 implements IColorHelper
             }
             else
             {
-                logger.warn("Couldn't get texture for " + icon.getIconName() + " using blockid ");
+                logger.warn("Texture was completely transparent in " + icon.getIconName() + " for " + blockMD);
             }
 
-            if (unusable)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-                String pattern = "Unusable texture for %s, icon=%s,texture coords %s,%s - %s,%s";
-                logger.debug(String.format(pattern, blockMD, icon.getIconName(), xStart, yStart, xStop, yStop));
-                r = g = b = 0;
-            }
+            Block block = blockMD.getBlockState().getBlock();
+            float blockAlpha = 0f;
 
-
-            // Set color
-            color = RGB.toInteger(r, g, b);
-
-            // Determine alpha
-            Block block = blockMD.getBlock();
-            float blockAlpha = 1f;
-            if (unusable)
+            if (!unusable)
             {
-                blockAlpha = 0f;
-            }
-            else
-            {
-                IBlockState blockState = block.getStateFromMeta(blockMD.getMeta());
+                // Set color
+                color = RGB.toInteger(r, g, b);
+
                 if (blockMD.hasFlag(BlockMD.Flag.Transparency))
                 {
                     blockAlpha = blockMD.getAlpha();
                 }
-                else if (block.getRenderType(blockState) != EnumBlockRenderType.INVISIBLE)
+                else if (block.getRenderType(blockState) == EnumBlockRenderType.MODEL)
                 {
                     // 1.8 check translucent because lava's opacity = 0;
                     if (block.isTranslucent(blockState))
@@ -374,7 +333,37 @@ public class ColorHelper_1_9 implements IColorHelper
                     }
                 }
             }
-            //dataCache.getBlockMetadata().setAllAlpha(block, blockAlpha);
+
+            if (unusable)
+            {
+                if (!block.getMaterial(blockState).isOpaque())
+                {
+                    unusable = false;
+                }
+                else
+                {
+                    logger.warn(String.format("Block is opaque, but texture was completely transparent: %s . Using MaterialMapColor instead for: %s", icon.getIconName(), blockMD));
+                    try
+                    {
+                        color = block.getMaterial(blockState).getMaterialMapColor().colorValue;
+                        unusable = false;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.warn(String.format("Failed to use MaterialMapColor, marking block transparent: %s", blockMD));
+                        blockAlpha = 0F;
+                        color = RGB.WHITE_RGB;
+                    }
+                }
+            }
+
+            if (unusable)
+            {
+                blockMD.addFlags(BlockMD.Flag.Error);
+            }
+
+            // Set alpha and color
+            //blockMD.setColor(color);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
         }

@@ -11,6 +11,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Default color determination for mod blocks.
@@ -32,12 +33,12 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      * Get the color of the block at global coordinates
      */
     @Override
-    public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
+        Integer color = getBaseColor(chunkMD, blockMD, blockPos);
         if (blockMD.isBiomeColored())
         {
-            color = getBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
+            color = getBiomeColor(chunkMD, blockMD, blockPos);
         }
 
         // Fallback to Minecraft's own map color
@@ -52,31 +53,31 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the biome-based block color at the world coordinates
      */
-    protected Integer getBiomeColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getBiomeColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         if (blockMD.isGrass())
         {
-            return getGrassColor(chunkMD, blockMD, globalX, y, globalZ);
+            return getGrassColor(chunkMD, blockMD, blockPos);
         }
 
         if (blockMD.isFoliage())
         {
-            return getFoliageColor(chunkMD, blockMD, globalX, y, globalZ);
+            return getFoliageColor(chunkMD, blockMD, blockPos);
         }
 
         if (blockMD.isWater())
         {
-            return getWaterColor(chunkMD, blockMD, globalX, y, globalZ);
+            return getWaterColor(chunkMD, blockMD, blockPos);
         }
 
         // Anything else, including those with CustomBiomeColor
-        return getCustomBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
+        return getCustomBiomeColor(chunkMD, blockMD, blockPos);
     }
 
     /**
      * Gets the color for the block.  If one isn't set yet, it is loaded from the block texture.
      */
-    protected int getBaseColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected int getBaseColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         Integer color = blockMD.getColor();
         if (color == null)
@@ -90,7 +91,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             else
             {
                 // May update flags based on tint (CustomBiomeColor)
-                color = loadTextureColor(blockMD, globalX, y, globalZ);
+                color = loadTextureColor(blockMD, blockPos);
             }
             blockMD.setColor(color);
         }
@@ -100,10 +101,10 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the block's tint based on the biome position it's in.
      */
-    protected Integer getCustomBiomeColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getCustomBiomeColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
-        int tint = getTint(chunkMD, blockMD, globalX, y, globalZ);
+        Integer color = getBaseColor(chunkMD, blockMD, blockPos);
+        int tint = getTint(chunkMD, blockMD, blockPos);
 
         if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
         {
@@ -125,63 +126,63 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Get the foliage color for the block.
      */
-    protected Integer getFoliageColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getFoliageColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, globalX, y, globalZ),
-                getTint(chunkMD, blockMD, globalX, y, globalZ)), .8f);
+        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
+                getTint(chunkMD, blockMD, blockPos)), .8f);
     }
 
     /**
      * Get the grass color for the block.
      */
-    protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
-        return RGB.multiply(0x929292, getTint(chunkMD, blockMD, globalX, y, globalZ));
+        return RGB.multiply(0x929292, getTint(chunkMD, blockMD, blockPos));
     }
 
     /**
      * Get the water color for the block.
      */
-    protected Integer getWaterColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getWaterColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-        return RGB.multiply(getBaseColor(chunkMD, blockMD, globalX, y, globalZ), getTint(chunkMD, blockMD, globalX, y, globalZ));
+        return RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos), getTint(chunkMD, blockMD, blockPos));
     }
 
     /**
      * Get the tint (color multiplier) for the block.
      */
-    protected Integer getTint(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer getTint(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         int tint = RGB.WHITE_RGB;
 
         if (!blockMD.hasFlag(BlockMD.Flag.TintError))
         {
+            if (!blockMD.isUseDefaultState())
+            {
+                try
+                {
+                    return colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
+                }
+                catch (Exception e)
+                {
+                    blockMD.setUseDefaultState(true);
+                }
+            }
+
+            // Use default blockstate if needed
             try
             {
-                return colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
+                tint = colorHelper.getColorMultiplier(chunkMD, BlockMD.get(blockMD.getBlockState().getBlock().getDefaultState()), blockPos);
             }
             catch (Exception e)
             {
                 Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
                                 "Please report this exception to the mod author of '%s' blockstate '%s': %s",
-                        blockMD.getUid(), blockMD.getMeta(), LogFormatter.toPartialString(e)));
+                        blockMD.getUid(), blockMD.getBlockState(), LogFormatter.toPartialString(e)));
 
-                blockMD.addFlags(BlockMD.Flag.TintError);
+                blockMD.addFlags(BlockMD.Flag.TintError, BlockMD.Flag.Error);
             }
-        }
-
-        try
-        {
-            tint = colorHelper.getColorMultiplier(chunkMD, blockMD.getBlock(), globalX, y, globalZ);
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().warn(String.format("Error getting block color multiplier. " +
-                            "Please report this exception to the mod author of '%s' blockstate '%s': %s",
-                    blockMD.getUid(), blockMD.getMeta(), LogFormatter.toPartialString(e)));
-
-            blockMD.addFlags(BlockMD.Flag.TintError, BlockMD.Flag.Error);
         }
 
         return tint;
@@ -190,10 +191,8 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Provides a color using the icon loader.
      * For non-biome blocks, the base color is multiplied against the block's render color.
-     *
-     * @return
      */
-    protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected Integer loadTextureColor(BlockMD blockMD, BlockPos blockPos)
     {
         Integer baseColor = null;
 
@@ -207,7 +206,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             if (!blockMD.isBiomeColored())
             {
                 // Check for custom biome-based color multiplier
-                int tint = getTint(null, blockMD, globalX, y, globalZ);
+                int tint = getTint(null, blockMD, blockPos);
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
@@ -255,15 +254,15 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
         // Flower colors look bad because the stem color is averaged in, overriding them is easier.
         // 1.8
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta()).setColor(0x1E7EB6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta()).setColor(0x8549B6);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta()).setColor(0x9DA1A7);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta()).setColor(0x980406);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta()).setColor(0xA3581A);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta()).setColor(0xB0B0B0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta()).setColor(0xB09AB0);
-        BlockMD.get(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta()).setColor(0xB3B3B3);
-        BlockMD.get(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta()).setColor(0xAFB401);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.POPPY.getMeta())).setColor(0x980406);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta())).setColor(0x1E7EB6);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.ALLIUM.getMeta())).setColor(0x8549B6);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.HOUSTONIA.getMeta())).setColor(0x9DA1A7);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.RED_TULIP.getMeta())).setColor(0x980406);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta())).setColor(0xA3581A);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta())).setColor(0xB0B0B0);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.PINK_TULIP.getMeta())).setColor(0xB09AB0);
+        BlockMD.get(Blocks.RED_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta())).setColor(0xB3B3B3);
+        BlockMD.get(Blocks.YELLOW_FLOWER.getStateFromMeta(BlockFlower.EnumFlowerType.DANDELION.getMeta())).setColor(0xAFB401);
     }
 }

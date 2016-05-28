@@ -81,6 +81,10 @@ public class RunnableTask implements Runnable
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
 
             }
+            catch (InterruptedException e)
+            {
+                logger.debug("Task interrupted: " + LogFormatter.toPartialString(e));
+            }
             catch (Throwable t)
             {
                 String error = "Unexpected error during RunnableTask: " + LogFormatter.toString(t);

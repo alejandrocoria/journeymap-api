@@ -504,7 +504,7 @@ public class JourneymapClient implements CommonProxy
                     memory));
 
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
-            UIManager.getInstance().getMiniMap().reset();
+            UIManager.INSTANCE.getMiniMap().reset();
         }
     }
 
@@ -551,9 +551,9 @@ public class JourneymapClient implements CommonProxy
         Fullscreen.state().follow.set(true);
         StatTimer.resetAll();
         TileDrawStepCache.clear();
-        UIManager.getInstance().getMiniMap().reset();
-        UIManager.getInstance().reset();
-        WaypointStore.instance().reset();
+        UIManager.INSTANCE.getMiniMap().reset();
+        UIManager.INSTANCE.reset();
+        WaypointStore.INSTANCE.reset();
     }
 
     /**
@@ -590,9 +590,12 @@ public class JourneymapClient implements CommonProxy
     {
         try
         {
-            if (isMapping())
+            synchronized (this)
             {
-                multithreadTaskController.performTasks();
+                if (isMapping())
+                {
+                    multithreadTaskController.performTasks();
+                }
             }
         }
         catch (Throwable t)

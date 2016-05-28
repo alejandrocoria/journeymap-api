@@ -9,7 +9,6 @@
 package journeymap.client.model;
 
 import com.google.common.base.Objects;
-import journeymap.client.cartography.ChunkPainter;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
@@ -34,6 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ImageHolder implements IThreadedFileIO
 {
+    public static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
+
     final static Logger logger = Journeymap.getLogger();
     final MapType mapType;
     final Path imagePath;
@@ -92,7 +93,7 @@ public class ImageHolder implements IThreadedFileIO
             {
                 BufferedImage textureImage = texture.getImage();
                 Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
-                g2D.setComposite(ChunkPainter.ALPHA_OPAQUE);
+                g2D.setComposite(ALPHA_OPAQUE);
                 g2D.drawImage(imagePart, x, y, null);
                 g2D.dispose();
                 partialUpdate = true;

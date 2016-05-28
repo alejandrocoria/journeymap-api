@@ -59,7 +59,7 @@ public class RenderWaypointBeacon
         {
             waypointProperties = JourneymapClient.getWaypointProperties();
 
-            Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
+            Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
             //allTimer.start();
             final int playerDim = mc.thePlayer.dimension;
             for (Waypoint wp : waypoints)
@@ -90,7 +90,7 @@ public class RenderWaypointBeacon
 
     static void doRender(Waypoint waypoint)
     {
-        if (renderManager.livingPlayer == null)
+        if (renderManager.renderViewEntity == null)
         {
             return;
         }
@@ -102,7 +102,7 @@ public class RenderWaypointBeacon
         try
         {
             // Player coords
-            Vec3d playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
+            Vec3d playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.renderViewEntity);
 
             // Move y up to put icon at eye height
             Vec3d waypointVec = waypoint.getPosition().addVector(0, .118, 0);
@@ -160,7 +160,7 @@ public class RenderWaypointBeacon
                 {
                     degrees = 360 + degrees;
                 }
-                double playerYaw = renderManager.livingPlayer.getRotationYawHead() % 360;
+                double playerYaw = renderManager.renderViewEntity.getRotationYawHead() % 360;
                 if (playerYaw < 0)
                 {
                     playerYaw += 360;

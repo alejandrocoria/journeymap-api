@@ -137,7 +137,7 @@ public class GridEditor extends JmUI
         catch (Throwable t)
         {
             Journeymap.getLogger().error(LogFormatter.toString(t));
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
     }
 
@@ -457,11 +457,11 @@ public class GridEditor extends JmUI
     {
         if (returnDisplay == null)
         {
-            UIManager.getInstance().closeAll();
+            UIManager.INSTANCE.closeAll();
         }
         else
         {
-            UIManager.getInstance().open(returnDisplay);
+            UIManager.INSTANCE.open(returnDisplay);
         }
     }
 }

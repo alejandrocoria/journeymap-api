@@ -10,6 +10,7 @@ package journeymap.client.cartography;
 
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,9 +27,9 @@ public class Stratum
 
     private ChunkMD chunkMd;
     private BlockMD blockMD;
-    private int x;
+    private int localX;
     private int y;
-    private int z;
+    private int localZ;
     private int lightLevel;
     private int lightOpacity;
     private boolean isWater;
@@ -42,7 +43,7 @@ public class Stratum
         this.id = IDGEN.incrementAndGet();
     }
 
-    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
+    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel)
     {
         if (chunkMd == null || blockMD == null)
         {
@@ -52,9 +53,9 @@ public class Stratum
         {
             this.setChunkMd(chunkMd);
             this.setBlockMD(blockMD);
-            this.setX(x);
+            this.setX(localX);
             this.setY(y);
-            this.setZ(z);
+            this.setZ(localZ);
             this.setWater(blockMD.isWater());
             if (blockMD.isLava())
             {
@@ -62,9 +63,9 @@ public class Stratum
             }
             else
             {
-                this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(x, y + 1, z));
+                this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(localX, y + 1, localZ));
             }
-            this.setLightOpacity(chunkMd.getLightOpacity(blockMD, x, y, z));
+            this.setLightOpacity(chunkMd.getLightOpacity(blockMD, localX, y, localZ));
             setDayColor(null);
             setNightColor(null);
             setCaveColor(null);
@@ -121,9 +122,9 @@ public class Stratum
         if (!uninitialized)
         {
             return String.format(common,
-                    ", x=" + getX() +
+                    ", localX=" + getX() +
                             ", y=" + getY() +
-                            ", z=" + getZ() +
+                            ", localZ=" + getZ() +
                             ", lightLevel=" + getLightLevel() +
                             ", lightOpacity=" + getLightOpacity() +
                             ", isWater=" + isWater() +
@@ -159,12 +160,12 @@ public class Stratum
 
     public int getX()
     {
-        return x;
+        return localX;
     }
 
     public void setX(int x)
     {
-        this.x = x;
+        this.localX = x;
     }
 
     public int getY()
@@ -179,12 +180,12 @@ public class Stratum
 
     public int getZ()
     {
-        return z;
+        return localZ;
     }
 
     public void setZ(int z)
     {
-        this.z = z;
+        this.localZ = z;
     }
 
     public int getLightLevel()
@@ -245,6 +246,11 @@ public class Stratum
     public void setCaveColor(Integer caveColor)
     {
         this.caveColor = caveColor;
+    }
+
+    public BlockPos getBlockPos()
+    {
+        return new BlockPos(chunkMd.getBlockPos(this.localX, y, this.localZ));
     }
 
     public boolean isUninitialized()

@@ -13,6 +13,7 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
@@ -34,6 +35,7 @@ public class ModBlockDelegate
     {
         handlers = Arrays.asList(
                 new VanillaBlockHandler(),
+                new BiomesOPlenty.BopBlockHandler(),
                 new CarpentersBlocks.CommonHandler(),
                 new TerraFirmaCraft.TfcBlockHandler(),
                 new Miscellaneous.CommonHandler());
@@ -43,7 +45,7 @@ public class ModBlockDelegate
      * Provide special handling of a block in-situ when encountered during a mapping task.
      * The block returned will be used to color that spot on the map.
      */
-    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, int localX, int y, int localZ)
+    public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, BlockPos blockPos)
     {
         BlockMD delegatedBlockMD = null;
         try
@@ -51,7 +53,7 @@ public class ModBlockDelegate
             IModBlockHandler handler = blockMD.getModBlockHandler();
             if (handler != null)
             {
-                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, localX, y, localZ);
+                delegatedBlockMD = handler.handleBlock(chunkMD, blockMD, blockPos);
             }
             else
             {
@@ -124,7 +126,7 @@ public class ModBlockDelegate
          * Provide special handling of a block in-situ when encountered during a mapping task.
          * The block returned will be used to color that spot on the map.
          */
-        BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, int localX, int y, int localZ);
+        BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos);
     }
 
     /**
@@ -132,7 +134,7 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
-        public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ);
+        public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos);
 
         public Integer getTextureColor(BlockMD blockMD);
     }

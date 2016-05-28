@@ -89,6 +89,8 @@ public abstract class BaseMapTask implements ITask
                 return;
             }
 
+            final long now = System.currentTimeMillis();
+
             // Map the chunks
             while (chunkIter.hasNext())
             {
@@ -115,8 +117,11 @@ public abstract class BaseMapTask implements ITask
                     try
                     {
                         RegionCoord rCoord = RegionCoord.fromChunkPos(jmWorldDir, mapType, chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos);
-                        renderController.renderChunk(rCoord, mapType, chunkMd);
-                        count++;
+                        boolean rendered = renderController.renderChunk(rCoord, mapType, chunkMd);
+                        if (rendered)
+                        {
+                            count++;
+                        }
                     }
                     catch (Throwable t)
                     {

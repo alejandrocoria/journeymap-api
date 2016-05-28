@@ -14,6 +14,7 @@ import com.google.common.collect.ListMultimap;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
+import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.option.KeyedEnum;
 import net.minecraft.client.Minecraft;
@@ -34,10 +35,11 @@ public class RenderSpec
 {
     private static DecimalFormat decFormat = new DecimalFormat("##.#");
     private static volatile RenderSpec lastSurfaceRenderSpec;
+    private static volatile RenderSpec lastTopoRenderSpec;
     private static volatile RenderSpec lastUndergroundRenderSpec;
     private static Minecraft minecraft = Minecraft.getMinecraft();
     private final EntityPlayer player;
-    private final Boolean underground;
+    private final MapType mapType;
     private final int primaryRenderDistance;
     private final int maxSecondaryRenderDistance;
     private final RevealShape revealShape;
@@ -50,15 +52,15 @@ public class RenderSpec
     private int lastTaskChunks;
     private double lastTaskAvgChunkTime;
 
-    private RenderSpec(Minecraft minecraft, boolean underground)
+    private RenderSpec(Minecraft minecraft, MapType mapType)
     {
         this.player = minecraft.thePlayer;
         final CoreProperties props = JourneymapClient.getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
-        final int mapRenderDistanceMin = underground ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
-        final int mapRenderDistanceMax = underground ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
+        int mapRenderDistanceMin = mapType.isUnderground() ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
+        final int mapRenderDistanceMax = mapType.isUnderground() ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
 
-        this.underground = underground;
+        this.mapType = mapType;
         int rdMin = Math.min(gameRenderDistance, mapRenderDistanceMin);
         int rdMax = Math.min(gameRenderDistance, Math.max(rdMin, mapRenderDistanceMax));
         if (rdMin + 1 == rdMax)
@@ -144,11 +146,24 @@ public class RenderSpec
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            RenderSpec newSpec = new RenderSpec(minecraft, false);
+            RenderSpec newSpec = new RenderSpec(minecraft, MapType.day(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastSurfaceRenderSpec);
             lastSurfaceRenderSpec = newSpec;
         }
         return lastSurfaceRenderSpec;
+    }
+
+    public static RenderSpec getTopoSpec()
+    {
+        if (lastTopoRenderSpec == null
+                || lastTopoRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
+                || lastTopoRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+        {
+            RenderSpec newSpec = new RenderSpec(minecraft, MapType.topo(DataCache.getPlayer()));
+            newSpec.copyLastStatsFrom(lastTopoRenderSpec);
+            lastTopoRenderSpec = newSpec;
+        }
+        return lastTopoRenderSpec;
     }
 
     public static RenderSpec getUndergroundSpec()
@@ -157,7 +172,7 @@ public class RenderSpec
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            RenderSpec newSpec = new RenderSpec(minecraft, true);
+            RenderSpec newSpec = new RenderSpec(minecraft, MapType.underground(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastUndergroundRenderSpec);
             lastUndergroundRenderSpec = newSpec;
         }
@@ -168,6 +183,7 @@ public class RenderSpec
     {
         lastUndergroundRenderSpec = null;
         lastSurfaceRenderSpec = null;
+        lastTopoRenderSpec = null;
     }
 
     protected Collection<ChunkCoordIntPair> getRenderAreaCoords()
@@ -230,9 +246,19 @@ public class RenderSpec
         }
     }
 
-    public Boolean getUnderground()
+    public Boolean isUnderground()
     {
-        return underground;
+        return mapType.isUnderground();
+    }
+
+    public Boolean isTopo()
+    {
+        return mapType.isTopo();
+    }
+
+    public Boolean getSurface()
+    {
+        return mapType.isSurface();
     }
 
     public int getPrimaryRenderDistance()
@@ -295,11 +321,22 @@ public class RenderSpec
     {
         String debugString;
 
+        if (isUnderground())
+        {
+            debugString = "jm.common.renderstats_debug_cave";
+        }
+        else if (isTopo())
+        {
+            debugString = "jm.common.renderstats_debug_topo";
+        }
+        else
+        {
+            debugString = "jm.common.renderstats_debug_surface";
+        }
+
         if (primaryRenderDistance != maxSecondaryRenderDistance)
         {
             // Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
-            debugString = underground ? "jm.common.renderstats_debug_cave" : "jm.common.renderstats_debug_surface";
-
             String avg = decFormat.format(lastTaskAvgChunkTime);
             if (lastTaskAvgChunkTime >= 10)
             {
@@ -316,7 +353,7 @@ public class RenderSpec
         else
         {
             // Caves: %1$s = %2$s chunks in %3$sms (avg %4$sms)
-            debugString = underground ? "jm.common.renderstats_debug_cave_simple" : "jm.common.renderstats_debug_surface_simple";
+            debugString += "_simple";
             return Constants.getString(debugString,
                     primaryRenderDistance,
                     lastTaskChunks,
@@ -351,7 +388,7 @@ public class RenderSpec
         {
             return false;
         }
-        if (!underground.equals(that.underground))
+        if (!mapType.equals(that.mapType))
         {
             return false;
         }
@@ -362,7 +399,7 @@ public class RenderSpec
     @Override
     public int hashCode()
     {
-        int result = underground.hashCode();
+        int result = mapType.hashCode();
         result = 31 * result + primaryRenderDistance;
         result = 31 * result + maxSecondaryRenderDistance;
         result = 31 * result + revealShape.hashCode();

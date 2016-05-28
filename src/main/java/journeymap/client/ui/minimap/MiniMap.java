@@ -26,6 +26,8 @@ import journeymap.client.render.draw.*;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -92,7 +94,10 @@ public class MiniMap
 
     public static void updateUIState(boolean isActive)
     {
-        gridRenderer.updateUIState(isActive);
+        if (FMLClientHandler.instance().getClient().theWorld != null)
+        {
+            gridRenderer.updateUIState(isActive);
+        }
     }
 
     private void initGridRenderer()
@@ -666,29 +671,39 @@ public class MiniMap
 
     private void updateLabels()
     {
-        // FPS
-        if (dv.showFps)
+        try
         {
-            fpsLabelText = forgeHelper.getFPS();
-        }
+            if (mc.thePlayer != null)
+            {
+                // FPS
+                if (dv.showFps)
+                {
+                    fpsLabelText = forgeHelper.getFPS();
+                }
 
-        // Location key
-        if (dv.showLocation)
+                // Location key
+                if (dv.showLocation)
+                {
+                    final int playerX = MathHelper.floor_double(player.posX);
+                    final int playerZ = MathHelper.floor_double(player.posZ);
+                    final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(player).minY);
+                    locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+                }
+
+                // Biome key
+                if (dv.showBiome)
+                {
+                    biomeLabelText = state.getPlayerBiome();
+                }
+            }
+
+            // Update timestamp
+            lastLabelRefresh = System.currentTimeMillis();
+        }
+        catch (Exception e)
         {
-            final int playerX = MathHelper.floor_double(player.posX);
-            final int playerZ = MathHelper.floor_double(player.posZ);
-            final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(player).minY);
-            locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+            Journeymap.getLogger().error("Unexpected error updating minimap labels: " + LogFormatter.toString(e));
         }
-
-        // Biome key
-        if (dv.showBiome)
-        {
-            biomeLabelText = state.getPlayerBiome();
-        }
-
-        // Update timestamp
-        lastLabelRefresh = System.currentTimeMillis();
     }
 }
 

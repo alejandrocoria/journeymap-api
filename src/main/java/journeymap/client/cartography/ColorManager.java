@@ -20,8 +20,6 @@ import journeymap.common.log.LogFormatter;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
-import java.util.Map;
-
 /**
  * Manages of block colors derived from the current texture pack.
  *
@@ -152,10 +150,7 @@ public class ColorManager
                     try
                     {
                         long start = System.currentTimeMillis();
-                        for (Map.Entry<BlockMD, Integer> entry : palette.getBasicColorMap().entrySet())
-                        {
-                            entry.getKey().setColor(entry.getValue());
-                        }
+                        palette.updateColors();
                         long elapsed = System.currentTimeMillis() - start;
                         Journeymap.getLogger().info(String.format("Loaded %d block colors from color palette file in %dms: %s", palette.size(), elapsed, palette.getOrigin()));
                     }
@@ -172,7 +167,7 @@ public class ColorManager
             int count = 0;
             for (BlockMD blockMD : BlockMD.getAll())
             {
-                if (blockMD.ensureColor())
+                if (!blockMD.isAir() && blockMD.ensureColor())
                 {
                     count++;
                 }

@@ -111,13 +111,13 @@ public class Strata
         return push(chunkMd, blockMD, x, y, z, null);
     }
 
-    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z, Integer lightLevel)
+    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel)
     {
         try
         {
             // Alocate to stack, and set vars on stratum
             Stratum stratum = allocate();
-            stratum.set(chunkMd, blockMD, x, y, z, lightLevel);
+            stratum.set(chunkMd, blockMD, localX, y, localZ, lightLevel);
 
             // Update Strata's basic data
             setTopY((getTopY() == null) ? y : Math.max(getTopY(), y));
@@ -133,7 +133,7 @@ public class Strata
                 setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
                 if (getWaterColor() == null)
                 {
-                    setWaterColor(blockMD.getColor(chunkMd, chunkMd.toWorldX(x), y, chunkMd.toWorldZ(z)));
+                    setWaterColor(blockMD.getColor(chunkMd, chunkMd.getBlockPos(localX, y, localZ)));
                 }
             }
 

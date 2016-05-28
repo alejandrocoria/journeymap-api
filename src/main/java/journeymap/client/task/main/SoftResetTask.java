@@ -46,13 +46,13 @@ public class SoftResetTask implements IMainThreadTask
         JMLogger.setLevelFromProperties();
         DataCache.instance().purge();
         TileDrawStepCache.instance().invalidateAll();
-        UIManager.getInstance().reset();
-        WaypointStore.instance().reset();
+        UIManager.INSTANCE.reset();
+        WaypointStore.INSTANCE.reset();
         MiniMapOverlayHandler.checkEventConfig();
         ThemeFileHandler.getCurrentTheme(true);
         MiniMap.state().requireRefresh();
         Fullscreen.state().requireRefresh();
-        UIManager.getInstance().getMiniMap().updateDisplayVars(true);
+        UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
         return null;
     }
 
