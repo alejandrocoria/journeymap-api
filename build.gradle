@@ -55,6 +55,10 @@ dependencies {
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
 }
 
+manifest {
+    attributes 'FMLAT': 'journeymap_at.cfg'
+}
+
 minecraft {
     version = "${project.minecraft_version}-${project.forge_version}-${project.minecraft_version}"
     mappings = project.mappings
