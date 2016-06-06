@@ -2,6 +2,7 @@ package journeymap.common.network;
 
 
 import io.netty.buffer.ByteBuf;
+import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
 import journeymap.server.properties.DimensionProperties;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -68,7 +69,10 @@ public class DimensionPermissionPacket implements IMessage
         public IMessage onMessage(DimensionPermissionPacket message, MessageContext ctx)
         {
             DimensionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
-            System.out.println(prop);
+            if (prop.enabled.get())
+            {
+                FeatureManager.instance().disableDimensionFeature(prop);
+            }
             return null;
         }
     }
