@@ -30,6 +30,7 @@ public class WaypointProperties extends ClientPropertiesBase implements Comparab
     public final IntegerField fontScale = new IntegerField(WaypointBeacon, "jm.waypoint.font_scale", 1, 3, 2);
     public final BooleanField textureSmall = new BooleanField(WaypointBeacon, "jm.waypoint.texture_size", true);
     public final IntegerField maxDistance = new IntegerField(Waypoint, "jm.waypoint.max_distance", 0, 10000, 0);
+    public final IntegerField minDistance = new IntegerField(WaypointBeacon, "jm.waypoint.min_distance", 0, 64, 4);
     public final BooleanField createDeathpoints = new BooleanField(Waypoint, "jm.waypoint.create_deathpoints", true);
 
     @Override
