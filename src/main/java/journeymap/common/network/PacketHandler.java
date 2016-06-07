@@ -13,7 +13,7 @@ package journeymap.common.network;
  */
 
 import journeymap.common.Journeymap;
-import journeymap.server.properties.DimensionProperties;
+import journeymap.server.properties.PermissionProperties;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -42,7 +42,7 @@ public class PacketHandler
         }
     }
 
-    public static void sendDimensionPacketToPlayer(EntityPlayerMP player, DimensionProperties property)
+    public static void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)
     {
         DIMENSION_PERMISSIONS_CHANNEL.sendTo(new DimensionPermissionPacket(property), player);
     }

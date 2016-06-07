@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
 import journeymap.server.properties.DimensionProperties;
+import journeymap.server.properties.PermissionProperties;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -24,7 +25,7 @@ public class DimensionPermissionPacket implements IMessage
     {
     }
 
-    public DimensionPermissionPacket(DimensionProperties prop)
+    public DimensionPermissionPacket(PermissionProperties prop)
     {
         this.prop = prop.toJsonString(false);
     }
@@ -68,11 +69,9 @@ public class DimensionPermissionPacket implements IMessage
         @Override
         public IMessage onMessage(DimensionPermissionPacket message, MessageContext ctx)
         {
-            DimensionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
-            if (prop.enabled.get())
-            {
-                FeatureManager.instance().disableDimensionFeature(prop);
-            }
+            PermissionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
+            FeatureManager.instance().disableDimensionFeature(prop);
+
             return null;
         }
     }

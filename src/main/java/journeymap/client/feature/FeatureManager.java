@@ -10,7 +10,7 @@ package journeymap.client.feature;
 
 import com.google.common.reflect.ClassPath;
 import journeymap.common.Journeymap;
-import journeymap.server.properties.DimensionProperties;
+import journeymap.server.properties.PermissionProperties;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -128,9 +128,15 @@ public class FeatureManager
         }
     }
 
-    public void disableDimensionFeature(DimensionProperties properties)
+    public void disableDimensionFeature(PermissionProperties properties)
     {
         FeatureManager.instance().reset();
+
+        Holder.INSTANCE.policyMap.put(Feature.RadarAnimals, new Policy(Feature.RadarAnimals, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarMobs, new Policy(Feature.RadarMobs, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarVillagers, new Policy(Feature.RadarVillagers, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarPlayers, new Policy(Feature.RadarPlayers, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, true, true));
 
         if (!properties.caveMappingEnabled.get())
         {

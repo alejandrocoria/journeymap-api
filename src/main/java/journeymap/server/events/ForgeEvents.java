@@ -29,7 +29,16 @@ public class ForgeEvents
             Journeymap.getLogger().info(((EntityPlayerMP) event.getEntity()).getDisplayNameString() + " joining dimension " + event.getEntity().dimension);
             DimensionProperties prop = PropertiesManager.getInstance().getDimProperties(player.dimension);
             System.out.println(prop.toString());
-            PacketHandler.sendDimensionPacketToPlayer(player, prop);
+            if (prop.enabled.get())
+            {
+                PacketHandler.sendDimensionPacketToPlayer(player, prop);
+            }
+            else
+            {
+                PacketHandler.sendDimensionPacketToPlayer(player, PropertiesManager.getInstance().getGlobalProperties());
+            }
+
+
 
         }
     }
