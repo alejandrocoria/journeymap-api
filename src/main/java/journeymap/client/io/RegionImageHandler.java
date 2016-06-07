@@ -142,7 +142,6 @@ public class RegionImageHandler
         }
         final Graphics2D g2D = initRenderingHints(image.createGraphics());
         g2D.clearRect(0, 0, imageWidth, imageHeight);
-        g2D.dispose();
 
         final RegionImageCache cache = RegionImageCache.instance();
 
@@ -239,6 +238,9 @@ public class RegionImageHandler
         if (imageHeight != null && imageWidth != null && (initialHeight != imageHeight || initialWidth != imageWidth))
         {
             final BufferedImage scaledImage = createBlankImage(imageWidth, imageHeight);
+            final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
+            g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
+            g.dispose();
             return scaledImage;
         }
         else

@@ -73,7 +73,6 @@ public class FileService extends BaseService
         }
         else
         {
-
             // Format reusable resourcePath
             testPath = resourceDir.getPath();
             if (testPath.endsWith("/"))
@@ -83,6 +82,19 @@ public class FileService extends BaseService
 
             // Check whether operating out of a zip/jar
             useZipEntry = (resourceDir.getProtocol().equals("file") || resourceDir.getProtocol().equals("jar")) && testPath.contains("!/"); //$NON-NLS-1$	//$NON-NLS-2$
+        }
+
+        if (!useZipEntry && Journeymap.FORGE_VERSION.contains("@"))
+        {
+            try
+            {
+                testPath = new File("../src/main/resources/assets/journeymap/web").getCanonicalPath();
+                Journeymap.getLogger().info("Dev environment detected, serving source files from " + testPath);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         resourcePath = testPath;
