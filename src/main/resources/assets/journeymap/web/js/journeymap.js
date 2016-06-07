@@ -8,7 +8,7 @@ var JourneyMap = (function() {
 	var map;
 	var mapOverlay;
 
-	var isNightMap = false;
+    var mapType;
 	var centerOnPlayer = true;
 	var showCaves = true;	
 	var showAnimals = true;
@@ -111,7 +111,6 @@ var JourneyMap = (function() {
 			url : "/properties",
 			dataType : "jsonp",
 			contentType : "application/javascript; charset=utf-8",
-			async : false
 			
 		}).fail(handleError).done(function(data, textStatus, jqXHR) {
 			JM.properties = data;
@@ -131,7 +130,6 @@ var JourneyMap = (function() {
 				url : "/data/messages",
 				dataType : "jsonp",
 				contentType : "application/javascript; charset=utf-8",
-				async : false
 			}).fail(handleError).done(function(data, textStatus, jqXHR) {
 				JM.messages = data;
 				initGame();
@@ -155,7 +153,6 @@ var JourneyMap = (function() {
 			url : "/data/world",
 			dataType : "jsonp",
 			contentType : "application/javascript; charset=utf-8",
-			async : false
 		}).fail(handleError).done(
 			function(data, textStatus, jqXHR) {
 
@@ -249,11 +246,7 @@ var JourneyMap = (function() {
 			.attr("title", getMessage('day_button_title'))
 			.click(function() {
 				playerOverrideMap = true;
-				if(isNightMap===true) {
-					setMapType('day');
-				} else {								
-					setMapType('night');
-				}
+				toggleMapType();
 			});
 
 		$("#dayNightButton").parent().buttonset();
@@ -644,28 +637,47 @@ var JourneyMap = (function() {
 		$(message).parent().delay(2000).fadeOut(1500, closeFn);
 	}
 
-	function setMapType(mapType) {
+	function toggleMapType() {
 
-		var typeChanged = false;
+        var toggleNext = true;
+	    if(!mapType) {
+	        toggleNext = false;
+	        mapType = 'day';
+	        if (JM.world.dimension === 0 && playerUnderground === false) {
+                if (JM.world.time >= 13800) {
+                    mapType = 'night';
+                }
+            }
+	    }
+
+	    var typeChanged = false;
+	    if(toggleNext) {
+	        if (mapType === "day") {
+	            mapType = "night";
+	        } else if (mapType === "night") {
+                mapType = "topo";
+            } else {
+                mapType = "day";
+            }
+            typeChanged = true;
+	    }
+
 		if (mapType === "day") {
-			if (isNightMap === false) return;
-			isNightMap = false;
-			typeChanged = true;
-
 			$("#dayNightText").html(getMessage('day_button_text'));
 			$("#dayNightButton").attr("title", getMessage('day_button_title'));
 			$("#dayNightButtonImg").attr('src', '/theme/icon/day.png')
 
 		} else if (mapType === "night") {
-			if (isNightMap === true) return;
-			isNightMap = true;
-			typeChanged = true;
-
 			$("#dayNightText").html(getMessage('night_button_text'));
 			$("#dayNightButton").attr("title", getMessage('night_button_title'));
 			$("#dayNightButtonImg").attr('src', '/theme/icon/night.png');
 	
-		} else {
+		} else if (mapType === "topo") {
+            $("#dayNightText").html(getMessage('topo_button_text'));
+            $("#dayNightButton").attr("title", getMessage('topo_button_title'));
+            $("#dayNightButtonImg").attr('src', '/theme/icon/topo.png');
+
+        } else {
 			if (debug)
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
 		}
@@ -771,11 +783,8 @@ var JourneyMap = (function() {
 			// Set map type based on time
 			if (playerOverrideMap != true) {
 				if (JM.world.dimension === 0 && playerUnderground === false) {
-					if (JM.world.time < 13800) {
-						setMapType('day');
-					} else {
-						setMapType('night');
-					}
+					mapType = null;
+                    toggleMapType();
 				}
 			}
 
@@ -1400,10 +1409,10 @@ var JourneyMap = (function() {
     };
 	
 	var getMapStateUrl = function() {
-		var mapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : (isNightMap === true ? "night" : "day");
+		var actualMapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : mapType;
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
-		return "&mapType=" + mapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
+		return "&mapType=" + actualMapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
 	};
 	
 	var rgbToHex = function(r, g, b) {
