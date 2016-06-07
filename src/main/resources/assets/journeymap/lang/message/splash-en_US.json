@@ -13,6 +13,10 @@
     {
       "label": "Customize Topographic map colors. Click here for the wiki page.",
       "action": "dialog.FullscreenActions#launchWebsite#Topographic"
+    },
+    {
+      "label": "New 'Minimum Distance' for waypoint beacons. Click here to configure.",
+      "action": "dialog.OptionsManager#WaypointBeacon"
     }
   ]
 }
