@@ -34,7 +34,6 @@ import java.util.Map;
 @SideOnly(Side.SERVER)
 public class JourneymapServer implements CommonProxy
 {
-    public static String WORLD_NAME;
     private Logger logger;
 
     /**
@@ -43,16 +42,6 @@ public class JourneymapServer implements CommonProxy
     public JourneymapServer()
     {
         logger = Journeymap.getLogger();
-    }
-
-    public static String getWorldName()
-    {
-        return WORLD_NAME;
-    }
-
-    public static void setWorldName(String worldName)
-    {
-        WORLD_NAME = worldName;
     }
 
     /**
@@ -78,14 +67,6 @@ public class JourneymapServer implements CommonProxy
     public void initialize(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new ForgeEvents());
-
-//        PacketHandler packetHandler = new PacketHandler();
-//        packetHandler.init(Side.SERVER);
-//        Controller.setController(Controller.FORGE);
-//        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
-//        PacketManager.init(new ForgePacketHandler());
-//        PlayerUtil.init(new ForgePlayerUtil());
-//        ChatHandler.init(new ForgeChat());
     }
 
     /**

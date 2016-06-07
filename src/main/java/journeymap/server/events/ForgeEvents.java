@@ -23,7 +23,7 @@ public class ForgeEvents
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if (event.getEntity() instanceof EntityPlayerMP)
+        if ((event.getEntity() instanceof EntityPlayerMP) && (event.getEntity() != null))
         {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
 
@@ -71,8 +71,10 @@ public class ForgeEvents
     @SubscribeEvent
     public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event)
     {
-        if (event.player instanceof EntityPlayerMP)
+        if ((event.player instanceof EntityPlayerMP) && (event.player != null))
         {
+
+            PacketHandler.sendPlayerWorldID(PropertiesManager.getInstance().getGlobalProperties().getWorldID(), (EntityPlayerMP) event.player);
             if (isOp((EntityPlayerMP) event.player))
             {
                 //TODO: send op ui packet

@@ -24,7 +24,6 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.RegionImageCache;
-import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.*;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.client.service.WebServer;
@@ -541,10 +540,6 @@ public class JourneymapClient implements CommonProxy
      */
     private void reset()
     {
-        if (!mc.isSingleplayer() && currentWorldId == null)
-        {
-            WorldInfoHandler.requestWorldID();
-        }
 
         loadConfigProperties();
         DataCache.instance().purge();

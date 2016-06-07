@@ -11,13 +11,10 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
-import journeymap.server.legacyserver.config.ConfigHandler;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Created by Mysticdrew on 10/8/2014.
@@ -78,16 +75,20 @@ public class WorldIDPacket implements IMessage
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
 
-            EntityPlayerMP player = null;
-            if (ctx.side == Side.SERVER)
-            {
-                player = ctx.getServerHandler().playerEntity;
-                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
-                {
-                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
-                }
-            }
+            Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
+            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
             return null;
+
+//            EntityPlayerMP player = null;
+//            if (ctx.side == Side.SERVER)
+//            {
+//                player = ctx.getServerHandler().playerEntity;
+//                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
+//                {
+//                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
+//                }
+//            }
+//            return null;
         }
     }
 }

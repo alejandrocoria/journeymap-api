@@ -11,16 +11,14 @@ package journeymap.common;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
-import journeymap.server.JourneymapServer;
+import journeymap.server.legacyserver.command.CommandJMServerForge;
 import journeymap.server.properties.PropertiesManager;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.server.FMLServerHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -129,16 +127,14 @@ public class Journeymap
         }
         PropertiesManager.getInstance();
 
-        //event.registerServerCommand(new CommandJMServerForge());
+        event.registerServerCommand(new CommandJMServerForge());
     }
 
     @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
-        MinecraftServer server = FMLServerHandler.instance().getServer();
-        JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
-        //getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
+
     }
 
 }
