@@ -3,6 +3,8 @@ package journeymap.server.events;
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
 import journeymap.server.properties.DimensionProperties;
+import journeymap.server.properties.GlobalProperties;
+import journeymap.server.properties.PermissionProperties;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -25,20 +27,42 @@ public class ForgeEvents
         {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
 
-            //TODO: sendplayer permission packets
             Journeymap.getLogger().info(((EntityPlayerMP) event.getEntity()).getDisplayNameString() + " joining dimension " + event.getEntity().dimension);
-            DimensionProperties prop = PropertiesManager.getInstance().getDimProperties(player.dimension);
-            System.out.println(prop.toString());
-            if (prop.enabled.get())
+            PermissionProperties prop;
+            DimensionProperties dimensionProperties = PropertiesManager.getInstance().getDimProperties(player.dimension);
+
+
+            try
             {
+                /**
+                 * Cloning since we do not want to modify the permission properties,
+                 * We want a brand new copy to send to the client
+                 */
+                if (dimensionProperties.enabled.get())
+                {
+                    prop = (DimensionProperties) dimensionProperties.clone();
+                }
+                else
+                {
+                    prop = (GlobalProperties) PropertiesManager.getInstance().getGlobalProperties().clone();
+                }
+
+                /**
+                 * If player is op, set the cave and radar options on the packet to send.
+                 * The client only reads radarEnabled and caveMappingEnabled, it ignores the
+                 */
+                if (isOp(player))
+                {
+                    prop.radarEnabled.set(prop.opRadarEnabled.get());
+                    prop.caveMappingEnabled.set(prop.opCaveMappingEnabled.get());
+                }
+
                 PacketHandler.sendDimensionPacketToPlayer(player, prop);
             }
-            else
+            catch (CloneNotSupportedException e)
             {
-                PacketHandler.sendDimensionPacketToPlayer(player, PropertiesManager.getInstance().getGlobalProperties());
+                Journeymap.getLogger().error("CloneNotSupportedException: ", e);
             }
-
-
 
         }
     }
@@ -49,25 +73,25 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-            if (isOp(event.player.getName()))
+            if (isOp((EntityPlayerMP) event.player))
             {
                 //TODO: send op ui packet
-                System.out.println("PLAYER IS OPS");
+//                System.out.println("PLAYER IS OPS");
             }
             else
             {
                 //TODO: sendplayer logged in packet(worldid)
-                System.out.println("NOT OP");
+//                System.out.println("NOT OP");
             }
         }
     }
 
-    private boolean isOp(String playerName)
+    private boolean isOp(EntityPlayerMP player)
     {
         String[] ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayerNames();
         for (String opName : ops)
         {
-            if (playerName.equalsIgnoreCase(opName))
+            if (player.getDisplayNameString().equalsIgnoreCase(opName))
             {
                 return true;
             }

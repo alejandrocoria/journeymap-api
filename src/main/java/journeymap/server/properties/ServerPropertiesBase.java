@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Base class for server-side properties POJO.
  */
-public abstract class ServerPropertiesBase extends PropertiesBase
+public abstract class ServerPropertiesBase extends PropertiesBase implements Cloneable
 {
     protected final String displayName;
     protected final String description;
@@ -184,4 +184,9 @@ public abstract class ServerPropertiesBase extends PropertiesBase
         return sourceFile;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        return super.clone();
+    }
 }

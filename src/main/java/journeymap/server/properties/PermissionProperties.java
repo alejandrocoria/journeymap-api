@@ -15,8 +15,6 @@ public abstract class PermissionProperties extends ServerPropertiesBase
     public final BooleanField villagerRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable villager radar", true);
     public final BooleanField animalRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable animal radar", true);
     public final BooleanField mobRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable mob radar", true);
-    public final BooleanField creeperRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable creeper radar", true);
-
 
     /**
      * Constructor.
