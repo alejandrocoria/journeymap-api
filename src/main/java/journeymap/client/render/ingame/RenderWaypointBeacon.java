@@ -20,7 +20,6 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -110,9 +109,24 @@ public class RenderWaypointBeacon
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
             final int maxDistance = waypointProperties.maxDistance.get();
+
             if (maxDistance > 0 && actualDistance > maxDistance)
             {
                 return;
+            }
+
+            float fadeAlpha = 1f;
+            final int minDistance = waypointProperties.minDistance.get();
+            if (minDistance > 0)
+            {
+                if ((int) actualDistance <= minDistance)
+                {
+                    return;
+                }
+                if ((int) actualDistance <= minDistance + 4)
+                {
+                    fadeAlpha = (float) (actualDistance - minDistance) / 3f;
+                }
             }
 
             // Adjust waypoint render position if needed
@@ -133,7 +147,7 @@ public class RenderWaypointBeacon
             boolean showRotatingBeam = waypointProperties.showRotatingBeam.get();
             if (showStaticBeam || showRotatingBeam)
             {
-                renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), showStaticBeam, showRotatingBeam);
+                renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), fadeAlpha, showStaticBeam, showRotatingBeam);
             }
 
             String label = waypoint.getName();
@@ -142,15 +156,6 @@ public class RenderWaypointBeacon
             boolean labelHidden = false;
             if (viewDistance > .5 && waypointProperties.autoHideLabel.get())
             {
-                // 3D algorithm
-//                Vec3 playerLookVec = renderManager.livingPlayer.getLook(1.0F).normalize();
-//                Vec3 delta = mc.theWorld.getWorldVec3Pool().getVecFromPool(waypointVec.xCoord - renderManager.viewerPosX, waypointVec.yCoord - renderManager.viewerPosY, waypointVec.zCoord - renderManager.viewerPosZ);
-//                delta.yCoord = 0;
-//                double distance = delta.lengthVector();
-//                delta = delta.normalize();
-//                double dp = playerLookVec.dotProduct(delta);
-//                labelHidden = dp < (1.0D - (.5D / distance));
-
                 // 2D algorithm (ignore pitch)
                 int angle = 5;
 
@@ -172,14 +177,10 @@ public class RenderWaypointBeacon
                 playerDegrees += angle;
 
                 labelHidden = Math.abs((degrees + angle) - (playerDegrees + angle)) > angle;
-//
-//                label = String.format("degrees %1.2f & playerDegrees %1.2f = %s", degrees, playerDegrees, labelHidden);
-//                labelHidden = false;
             }
 
             // Set render scale (1/64)
             double scale = 0.00390625 * ((viewDistance + 4) / 3);
-            FontRenderer fr = renderManager.getFontRenderer();
 
             final TextureImpl texture = waypoint.getTexture();
             double halfTexHeight = texture.getHeight() / 2;
@@ -236,13 +237,13 @@ public class RenderWaypointBeacon
                     double labelY = (0 - halfTexHeight) - 8;
 
                     // Depth label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .6f, waypoint.getSafeColor(), 1f, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .6f * fadeAlpha, waypoint.getSafeColor(), fadeAlpha, fontScale, false);
 
                     GlStateManager.disableDepth();
                     GlStateManager.depthMask(false);
 
                     // Front label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .4f, waypoint.getSafeColor(), 1f, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, .4f * fadeAlpha, waypoint.getSafeColor(), fadeAlpha, fontScale, false);
 
                     GlStateManager.popMatrix();
                 }
@@ -270,7 +271,7 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, waypoint.getColor(), 1f, 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
+                DrawUtil.drawColoredImage(texture, waypoint.getColor(), fadeAlpha, 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
 
                 GlStateManager.popMatrix();
             }
@@ -293,9 +294,9 @@ public class RenderWaypointBeacon
     /**
      * Render beam
      */
-    static void renderBeam(double x, double y, double z, Integer color, boolean staticBeam, boolean rotatingBeam)
+    static void renderBeam(double x, double y, double z, Integer color, float alpha, boolean staticBeam, boolean rotatingBeam)
     {
-        float f1 = 1f;
+        float f1 = alpha;
 
         mc.renderEngine.bindTexture(beam);
 
@@ -321,7 +322,7 @@ public class RenderWaypointBeacon
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             //double d3 = (double) time * 0.025D * -1.5D;
 
-            int[] rgba = RGB.ints(color, 115);
+            int[] rgba = RGB.ints(color, alpha * .45f);
             DrawUtil.startDrawingQuads(true);
             GlStateManager.enableBlend();
 
@@ -373,7 +374,7 @@ public class RenderWaypointBeacon
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
             GlStateManager.depthMask(false);
 
-            int[] rgba = RGB.ints(color, 40);
+            int[] rgba = RGB.ints(color, alpha * .4f);
             DrawUtil.startDrawingQuads(true);
 
             DrawUtil.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
