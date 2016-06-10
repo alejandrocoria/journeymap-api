@@ -239,10 +239,13 @@ def getDate() {
 build.dependsOn makePretty
 
 // Automated upload to CurseForge for the win!
+if (!project.hasProperty("curseForgeApiKey")) {
+    ext.curseForgeApiKey = "notset"
+}
 curseforge {
     project {
         id = '32274'
-        apiKey = "${forgeApiKey}"
+        apiKey = "${curseForgeApiKey}"
         changelogType = 'html'
         releaseType = curse_release_type
         relations {
