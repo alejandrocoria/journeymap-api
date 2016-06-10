@@ -77,7 +77,7 @@ minecraft {
     replace "@PATCH@", project.jm_patch
 }
 
-processResources(dependsOn: processDocs) {
+processResources() {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -171,7 +171,7 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar']) {
+task unlimitedJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar']) {
     version = "${version}-${project.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
@@ -213,7 +213,7 @@ task fairPlaySolder(type: Zip, dependsOn: 'fairPlayJar') {
     }
 }
 
-task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
+task fairPlayJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
     version = "${version}-${project.fairplay}".toLowerCase()
 
     from(sourceSets.main.output) {
