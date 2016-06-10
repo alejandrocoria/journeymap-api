@@ -219,7 +219,19 @@ public class BlockMD implements Comparable<BlockMD>
             BlockMD blockMD = cache.get(blockState);
             if (blockMD == null)
             {
-                blockMD = new BlockMD(blockState);
+                if (blockState.getBlock().getRegistryName() == null)
+                {
+                    Journeymap.getLogger().debug("Unregistered block will be treated like air: " + blockState);
+                    blockMD = AIRBLOCK;
+                }
+                else if (blockState.getBlock() instanceof BlockAir)
+                {
+                    blockMD = AIRBLOCK;
+                }
+                else
+                {
+                    blockMD = new BlockMD(blockState);
+                }
                 cache.put(blockState, blockMD);
             }
 
@@ -228,6 +240,7 @@ public class BlockMD implements Comparable<BlockMD>
         catch (Exception e)
         {
             Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
+            cache.put(blockState, AIRBLOCK);
             return AIRBLOCK;
         }
     }
