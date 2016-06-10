@@ -5,13 +5,19 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.7'
     }
 }
 
+apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle'
 
 ext {
     srcWebDir = "src/main/resources/assets/journeymap/web/"
@@ -53,6 +59,10 @@ dependencies {
     runtime group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
     testCompile 'junit:junit:4.12'
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
+}
+
+manifest {
+    attributes 'FMLAT': 'journeymap_at.cfg'
 }
 
 minecraft {
@@ -230,3 +240,35 @@ def getDate() {
 }
 
 build.dependsOn makePretty
+
+// Automated upload to CurseForge for the win!
+curseforge {
+    project {
+        id = '32274'
+        apiKey = "${forgeApiKey}"
+        changelogType = 'markdown'
+        addGameVersion '1.7'
+        addGameVersion '1.8'
+        releaseType = curse_release_type
+        relations {
+            embeddedLibrary 'journeymap-api'
+            tool 'journeymap-tools'
+        }
+
+        mainArtifact(unlimitedJar) {
+            displayName = "${archivesBaseName}-${version}"
+            changelog = file('/doc/changelog.md')
+        }
+
+        addArtifact(fairPlayJar) {
+        }
+
+        addArtifact(fairPlaySolder) {
+            changelog = file('/doc/solder.md')
+        }
+
+        addArtifact(unlimitedSolder) {
+            changelog = file('/doc/solder.md')
+        }
+    }
+}
