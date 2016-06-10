@@ -77,7 +77,7 @@ minecraft {
     replace "@PATCH@", project.jm_patch
 }
 
-processResources {
+processResources(dependsOn: processDocs) {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -96,6 +96,20 @@ processResources {
         exclude 'mcmod.info'
         exclude 'license.txt'
     }
+}
+
+task processDocs(type: Copy) {
+    // update docs
+    from(file("/doc/")) {
+        include '*.html'
+        expand 'version': project.version,
+                'date': getDate(),
+                'mcversion': project.minecraft.version,
+                'forgeversion': project.forge_version,
+                'jmedition': project.unlimited,
+                'apiversion': project.journeymap_api_version
+    }
+    into 'build/doc'
 }
 
 task copyJs(type: Copy) {
@@ -218,7 +232,12 @@ task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar
     }
 }
 
-artifacts.archives unlimitedJar, unlimitedSolder, fairPlayJar, fairPlaySolder
+artifacts {
+    archives unlimitedJar
+    archives unlimitedSolder
+    archives fairPlayJar
+    archives fairPlaySolder
+}
 
 reobf {
     unlimitedJar {}
@@ -255,18 +274,26 @@ curseforge {
 
         mainArtifact(unlimitedJar) {
             displayName = "${archivesBaseName}-${version}"
-            changelog = file('/doc/changelog.html')
+            changelog = file('/build/doc/changelog.html')
         }
 
         addArtifact(fairPlayJar) {
         }
 
         addArtifact(fairPlaySolder) {
-            changelog = file('/doc/solder.html')
+            changelog = file('/build/doc/solder.html')
         }
 
         addArtifact(unlimitedSolder) {
-            changelog = file('/doc/solder.html')
+            changelog = file('/build/doc/solder.html')
         }
     }
 }
+
+// Ensure build is done prior to cursegradle tasks
+project.afterEvaluate {
+    project.tasks.findAll { task -> task.name.startsWith('curseforge') && task.name != 'curseforge' }.each { projectTask ->
+        projectTask.dependsOn build
+    }
+}
+
