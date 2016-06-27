@@ -33,7 +33,13 @@ public class NBTWorldSaveDataHandler extends WorldSavedData
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound)
+    public void deserializeNBT(NBTTagCompound compound)
+    {
+        compound.setTag(tagName, data);
+    }
+
+    @Override
+    public void func_76187_b(NBTTagCompound compound)
     {
         compound.setTag(tagName, data);
     }

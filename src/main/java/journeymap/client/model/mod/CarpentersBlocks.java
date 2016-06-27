@@ -72,7 +72,7 @@ public class CarpentersBlocks
             if (tileEntity != null)
             {
                 final NBTTagCompound tag = new NBTTagCompound();
-                tileEntity.writeToNBT(tag);
+                tileEntity.deserializeNBT(tag);
 
                 if (!tag.hasNoTags())
                 {
