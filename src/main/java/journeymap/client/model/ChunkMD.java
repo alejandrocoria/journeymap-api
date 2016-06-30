@@ -241,19 +241,6 @@ public class ChunkMD
         return getCoord().equals(other.getCoord());
     }
 
-    public boolean needsToBeMapped()
-    {
-        if (hasChunk())
-        {
-            if (getLastRendered() < System.currentTimeMillis() - 5000)
-            {
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
-
     public Chunk getChunk()
     {
         Chunk chunk = chunkReference.get();
