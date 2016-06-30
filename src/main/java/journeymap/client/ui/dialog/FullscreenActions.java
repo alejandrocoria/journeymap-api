@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 
 public class FullscreenActions extends JmUI
@@ -95,6 +96,24 @@ public class FullscreenActions extends JmUI
         {
             Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * Suggest a tweet message
+     */
+    public static void tweet(String message)
+    {
+        String path = null;
+        try
+        {
+            path = "http://twitter.com/home/?status=@JourneyMapMod+" + URLEncoder.encode(message, "UTF-8");
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(path));
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     /**
