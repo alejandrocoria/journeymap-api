@@ -255,12 +255,6 @@ public class Constants
             return getString("jm.common.birthday", "mysticdrew");
         }
 
-        // TODO REMOVE
-        if (month == Calendar.JUNE && date == 29)
-        {
-            return getString("jm.common.birthday", "techbrew");
-        }
-
         return null;
     }
 
