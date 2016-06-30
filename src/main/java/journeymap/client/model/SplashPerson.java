@@ -36,7 +36,14 @@ public class SplashPerson
     {
         this.ign = ign;
         this.name = name;
-        this.title = Constants.getString(titleKey);
+        if (titleKey != null)
+        {
+            this.title = Constants.getString(titleKey);
+        }
+        else
+        {
+            this.title = "";
+        }
     }
 
     public Button getButton()
@@ -129,6 +136,22 @@ public class SplashPerson
                 }
                 break;
             }
+        }
+    }
+
+    public static class Fake extends SplashPerson
+    {
+        private TextureImpl texture;
+
+        public Fake(String name, String title, TextureImpl texture)
+        {
+            super(name, title, null);
+            this.texture = texture;
+        }
+
+        public TextureImpl getSkin()
+        {
+            return texture;
         }
     }
 }

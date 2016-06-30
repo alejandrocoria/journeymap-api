@@ -39,6 +39,12 @@ public class SplashInfo
         {
         }
 
+        public Line(String label, String action)
+        {
+            this.label = label;
+            this.action = action;
+        }
+
         public boolean hasAction()
         {
             return action != null && action.trim().length() > 0;

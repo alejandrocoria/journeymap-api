@@ -30,6 +30,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +64,14 @@ public class Splash extends JmUI
 
         // Get splash strings
         info = FileHandler.getMessageModel(SplashInfo.class, "splash");
+
+        String bday = Constants.birthdayMessage();
+        if (bday != null)
+        {
+            info.lines.add(0, new SplashInfo.Line(bday, "dialog.FullscreenActions#tweet#" + bday));
+            devs = new ArrayList<SplashPerson>(devs);
+            devs.add(new SplashPerson.Fake("", "", TextureCache.instance().getColorPicker2()));
+        }
 
         // Get brick texture
         brickTex = TextureCache.instance().getBrick();
@@ -264,8 +273,19 @@ public class Splash extends JmUI
         int imgY = button.getY() - 2;
         int imgX = button.getCenterX() - (imgSize / 2);
 
-        DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, RGB.BLACK_RGB, .4f, RGB.BLACK_RGB, .8f);
-        DrawUtil.drawImage(person.getSkin(), imgX, imgY, false, scale, 0);
+        GlStateManager.enableAlpha();
+
+        if (!(person instanceof SplashPerson.Fake))
+        {
+            DrawUtil.drawGradientRect(imgX - 1, imgY - 1, imgSize + 2, imgSize + 2, RGB.BLACK_RGB, .4f, RGB.BLACK_RGB, .8f);
+            DrawUtil.drawImage(person.getSkin(), 1f, imgX, imgY, false, scale, 0);
+        }
+        else
+        {
+            float size = Math.min(person.getSkin().getWidth() * scale, 24 * scale);
+            DrawUtil.drawQuad(person.getSkin(), 0xffffff, 1f, imgX, imgY, size, size, false, 0);
+        }
+
         by = imgY + imgSize + 4;
 
         String name = person.name.trim();

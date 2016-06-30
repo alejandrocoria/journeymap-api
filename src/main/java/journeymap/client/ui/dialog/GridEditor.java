@@ -66,7 +66,7 @@ public class GridEditor extends JmUI
     public GridEditor(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.grid_editor"), returnDisplay);
-        this.colorPickTexture = TextureCache.instance().getColorPicker();
+        this.colorPickTexture = Constants.birthdayMessage() == null ? TextureCache.instance().getColorPicker() : TextureCache.instance().getColorPicker2();
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
 
