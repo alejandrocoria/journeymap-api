@@ -112,7 +112,7 @@ public abstract class BaseMapTask implements ITask
                 }
 
                 ChunkPos coord = chunkIter.next();
-                ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
+                ChunkMD chunkMd = DataCache.INSTANCE.getChunkMD(coord);
                 if (chunkMd != null)
                 {
                     try
@@ -149,7 +149,7 @@ public abstract class BaseMapTask implements ITask
             }
 
             // Push chunk cache to region cache
-            RegionImageCache.instance().updateTextures(flushCacheWhenDone, asyncFileWrites);
+            RegionImageCache.INSTANCE.updateTextures(flushCacheWhenDone, asyncFileWrites);
             chunkCoords.clear();
             this.complete(count, false, false);
             timer.stop();

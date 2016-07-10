@@ -9,7 +9,6 @@
 package journeymap.client.render.map;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.GridSpec;
@@ -91,7 +90,7 @@ public class Tile
     public static void switchTileRenderType()
     {
         // Switch Tile Render Type
-        CoreProperties coreProperties = JourneymapClient.getCoreProperties();
+        CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
         int type = coreProperties.tileRenderType.incrementAndGet();
         if (type > 4)
         {
@@ -106,7 +105,7 @@ public class Tile
 
     public static void switchTileDisplayQuality()
     {
-        CoreProperties coreProperties = JourneymapClient.getCoreProperties();
+        CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
         boolean high = !coreProperties.tileHighDisplayQuality.get();
         coreProperties.tileHighDisplayQuality.set(high);
         coreProperties.save();
@@ -117,7 +116,7 @@ public class Tile
     private static void resetTileDisplay()
     {
         TileDrawStepCache.instance().invalidateAll();
-        RegionImageCache.instance().clear();
+        RegionImageCache.INSTANCE.clear();
         MiniMap.state().requireRefresh();
         Fullscreen.state().requireRefresh();
     }
@@ -153,7 +152,7 @@ public class Tile
 
     private void updateRenderType()
     {
-        this.renderType = JourneymapClient.getCoreProperties().tileRenderType.get();
+        this.renderType = Journeymap.getClient().getCoreProperties().tileRenderType.get();
         switch (renderType)
         {
             case (4):

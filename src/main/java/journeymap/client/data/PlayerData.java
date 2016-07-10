@@ -10,11 +10,11 @@ package journeymap.client.data;
 
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.ChunkPos;
@@ -61,7 +61,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 {
                     y = posY + 1;
 
-                    ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkPos(x >> 4, z >> 4));
+                    ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(new ChunkPos(x >> 4, z >> 4));
                     if (chunkMD != null)
                     {
                         if (chunkMD.ceiling(x & 15, z & 15) <= y)
@@ -83,7 +83,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
 
-        EntityDTO dto = DataCache.instance().getEntityDTO(player);
+        EntityDTO dto = DataCache.INSTANCE.getEntityDTO(player);
         dto.update(player, false);
         dto.biome = getPlayerBiome(player);
         dto.underground = playerIsUnderground(mc, player);
@@ -117,6 +117,6 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
 
     public long getTTL()
     {
-        return JourneymapClient.getCoreProperties().cachePlayerData.get();
+        return Journeymap.getClient().getCoreProperties().cachePlayerData.get();
     }
 }

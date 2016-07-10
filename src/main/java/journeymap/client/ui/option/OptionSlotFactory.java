@@ -11,7 +11,6 @@ package journeymap.client.ui.option;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.ui.component.CheckBox;
 import journeymap.client.ui.component.IntSliderButton;
@@ -44,12 +43,12 @@ public class OptionSlotFactory
     {
         HashMap<Category, List<SlotMetadata>> mergedMap = new HashMap<Category, List<SlotMetadata>>();
 
-        addSlots(mergedMap, MiniMap1, JourneymapClient.getMiniMapProperties1());
-        addSlots(mergedMap, MiniMap2, JourneymapClient.getMiniMapProperties2());
-        addSlots(mergedMap, FullMap, JourneymapClient.getFullMapProperties());
-        addSlots(mergedMap, WebMap, JourneymapClient.getWebMapProperties());
-        addSlots(mergedMap, Waypoint, JourneymapClient.getWaypointProperties());
-        addSlots(mergedMap, Advanced, JourneymapClient.getCoreProperties());
+        addSlots(mergedMap, MiniMap1, Journeymap.getClient().getMiniMapProperties1());
+        addSlots(mergedMap, MiniMap2, Journeymap.getClient().getMiniMapProperties2());
+        addSlots(mergedMap, FullMap, Journeymap.getClient().getFullMapProperties());
+        addSlots(mergedMap, WebMap, Journeymap.getClient().getWebMapProperties());
+        addSlots(mergedMap, Waypoint, Journeymap.getClient().getWaypointProperties());
+        addSlots(mergedMap, Advanced, Journeymap.getClient().getCoreProperties());
 
         List<CategorySlot> categories = new ArrayList<CategorySlot>();
         for (Map.Entry<Category, List<SlotMetadata>> entry : mergedMap.entrySet())

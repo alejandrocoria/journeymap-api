@@ -419,7 +419,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
 
     private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
     {
-        return DataCache.instance().getChunkMD(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
+        return DataCache.INSTANCE.getChunkMD(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     class JmBlockAccess implements IBlockAccess

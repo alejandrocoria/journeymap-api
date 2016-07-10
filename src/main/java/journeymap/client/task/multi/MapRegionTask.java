@@ -108,7 +108,7 @@ public class MapRegionTask extends BaseMapTask
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null && !chunkMD.getChunk().isEmpty())
             {
-                DataCache.instance().addChunkMD(chunkMD);
+                DataCache.INSTANCE.addChunkMD(chunkMD);
             }
         }
 
@@ -117,7 +117,7 @@ public class MapRegionTask extends BaseMapTask
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
             if (chunkMD != null && chunkMD.hasChunk())
             {
-                DataCache.instance().addChunkMD(chunkMD);
+                DataCache.INSTANCE.addChunkMD(chunkMD);
             }
             else
             {
@@ -197,10 +197,10 @@ public class MapRegionTask extends BaseMapTask
         lastTaskCompleted = System.currentTimeMillis();
 
         // Flush images to disk
-        RegionImageCache.instance().flushToDiskAsync(true);
+        RegionImageCache.INSTANCE.flushToDiskAsync(true);
 
         // Ensure no chunks are forcefully retained.
-        DataCache.instance().stopChunkMDRetention();
+        DataCache.INSTANCE.stopChunkMDRetention();
 
         if (hadError || cancelled)
         {
@@ -284,7 +284,7 @@ public class MapRegionTask extends BaseMapTask
                 return false;
             }
 
-            if ((System.currentTimeMillis() - lastTaskCompleted) < JourneymapClient.getCoreProperties().autoMapPoll.get())
+            if ((System.currentTimeMillis() - lastTaskCompleted) < Journeymap.getClient().getCoreProperties().autoMapPoll.get())
             {
                 return false;
             }
@@ -351,8 +351,8 @@ public class MapRegionTask extends BaseMapTask
             if (regionLoader != null)
             {
                 // Write files synchronously before clearing
-                RegionImageCache.instance().flushToDisk(true);
-                RegionImageCache.instance().clear();
+                RegionImageCache.INSTANCE.flushToDisk(true);
+                RegionImageCache.INSTANCE.clear();
                 regionLoader.getRegions().clear();
                 regionLoader = null;
             }
@@ -377,7 +377,7 @@ public class MapRegionTask extends BaseMapTask
             }
 
             RegionCoord rCoord = regionLoader.getRegions().peek();
-            ChunkRenderController chunkRenderController = JourneymapClient.getInstance().getChunkRenderController();
+            ChunkRenderController chunkRenderController = Journeymap.getClient().getChunkRenderController();
             BaseMapTask baseMapTask = MapRegionTask.create(chunkRenderController, rCoord, regionLoader.getMapType(), minecraft);
             return baseMapTask;
         }

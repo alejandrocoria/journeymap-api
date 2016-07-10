@@ -8,7 +8,6 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.render.BaseRenderer;
 import journeymap.client.data.DataCache;
@@ -91,10 +90,10 @@ public class LayerDelegate
     private BlockPos getBlockPos(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition)
     {
         BlockPos seaLevel = gridRenderer.getBlockAtPixel(mousePosition);
-        ChunkMD chunkMD = DataCache.instance().getChunkMD(seaLevel);
+        ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(seaLevel);
         if (chunkMD != null)
         {
-            ChunkRenderController crc = JourneymapClient.getInstance().getChunkRenderController();
+            ChunkRenderController crc = Journeymap.getClient().getChunkRenderController();
             if (crc != null)
             {
                 ChunkPos chunkCoord = chunkMD.getCoord();

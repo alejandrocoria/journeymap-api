@@ -1,6 +1,5 @@
 package journeymap.client.forge.event;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.common.Journeymap;
@@ -34,7 +33,7 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
             // 0==blocks, 1==items
             // if(event.map.getTextureType()==0) // 1.7.10 only
             {
-                JourneymapClient.getInstance().queueMainThreadTask(task);
+                Journeymap.getClient().queueMainThreadTask(task);
             }
         }
         catch (Exception e)

@@ -36,7 +36,7 @@ public class ChunkMD
     public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
     public static final String PROP_LOADED = "loaded";
     public static final String PROP_LAST_RENDERED = "lastRendered";
-    final static DataCache dataCache = DataCache.instance(); // TODO REMOVE
+    final static DataCache dataCache = DataCache.INSTANCE; // TODO REMOVE
     private final WeakReference<Chunk> chunkReference;
     private final ChunkPos coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
@@ -89,7 +89,12 @@ public class ChunkMD
 
     public BlockMD getBlockMD(BlockPos blockPos)
     {
-        return BlockMD.get(getBlockState(blockPos));
+        BlockMD blockMD = BlockMD.get(getBlockState(blockPos));
+        if(blockMD==null)
+        {
+            return BlockMD.AIRBLOCK;
+        }
+        return blockMD;
     }
 
     /**
@@ -147,7 +152,11 @@ public class ChunkMD
                 blockPos = getBlockPos(localX, y, localZ);
                 blockMD = getBlockMD(blockPos);
 
-                if (blockMD.isAir() || blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMD == null)
+                {
+                    y--;
+                }
+                else if (blockMD.isAir() || blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                 {
                     y--;
                 }
@@ -163,7 +172,7 @@ public class ChunkMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(e + " at " + blockPos);
+            Journeymap.getLogger().warn(e + " at " + blockPos, e);
         }
 
         return Math.max(0, y);

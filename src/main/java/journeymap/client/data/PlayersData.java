@@ -9,11 +9,11 @@
 package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.EntityHelper;
+import journeymap.common.Journeymap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +40,6 @@ public class PlayersData extends CacheLoader<Class, Map<String, EntityDTO>>
 
     public long getTTL()
     {
-        return JourneymapClient.getCoreProperties().cachePlayersData.get();
+        return Journeymap.getClient().getCoreProperties().cachePlayersData.get();
     }
 }

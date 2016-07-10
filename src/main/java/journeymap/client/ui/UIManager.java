@@ -8,7 +8,6 @@
 
 package journeymap.client.ui;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
@@ -48,8 +47,8 @@ public enum UIManager
         MiniMap tmp;
         try
         {
-            int preset = JourneymapClient.getMiniMapProperties1().isActive() ? 1 : 2;
-            tmp = new MiniMap(JourneymapClient.getMiniMapProperties(preset));
+            int preset = Journeymap.getClient().getMiniMapProperties1().isActive() ? 1 : 2;
+            tmp = new MiniMap(Journeymap.getClient().getMiniMapProperties(preset));
         }
         catch (Throwable e)
         {
@@ -258,6 +257,7 @@ public enum UIManager
 
     public void drawMiniMap()
     {
+        minecraft.mcProfiler.startSection("journeymap");
         try
         {
             boolean doDraw = false;
@@ -282,6 +282,10 @@ public enum UIManager
         catch (Throwable e)
         {
             Journeymap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
+        }
+        finally
+        {
+            minecraft.mcProfiler.endSection(); // journeymap
         }
     }
 
@@ -453,7 +457,7 @@ public enum UIManager
     {
         try
         {
-            miniMap.setMiniMapProperties(JourneymapClient.getMiniMapProperties(which));
+            miniMap.setMiniMapProperties(Journeymap.getClient().getMiniMapProperties(which));
         }
         catch (LinkageError e)
         {

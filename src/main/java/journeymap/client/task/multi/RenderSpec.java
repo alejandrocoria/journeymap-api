@@ -12,11 +12,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.ui.option.KeyedEnum;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.ChunkPos;
@@ -55,7 +55,7 @@ public class RenderSpec
     private RenderSpec(Minecraft minecraft, MapType mapType)
     {
         this.player = minecraft.thePlayer;
-        final CoreProperties props = JourneymapClient.getCoreProperties();
+        final CoreProperties props = Journeymap.getClient().getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
         int mapRenderDistanceMin = mapType.isUnderground() ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
         final int mapRenderDistanceMax = mapType.isUnderground() ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
@@ -70,7 +70,7 @@ public class RenderSpec
 
         this.primaryRenderDistance = rdMin;
         this.maxSecondaryRenderDistance = rdMax;
-        this.revealShape = JourneymapClient.getCoreProperties().revealShape.get();
+        this.revealShape = Journeymap.getClient().getCoreProperties().revealShape.get();
 
         lastPlayerCoord = new ChunkPos(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
         lastSecondaryRenderDistance = this.primaryRenderDistance;
@@ -194,7 +194,7 @@ public class RenderSpec
             offsets = calculateOffsets(primaryRenderDistance, maxSecondaryRenderDistance, revealShape);
         }
 
-        DataCache dataCache = DataCache.instance();
+        DataCache dataCache = DataCache.INSTANCE;
 
         // Reset coords if player moved
         if (lastPlayerCoord == null || lastPlayerCoord.chunkXPos != player.chunkCoordX || lastPlayerCoord.chunkZPos != player.chunkCoordZ)

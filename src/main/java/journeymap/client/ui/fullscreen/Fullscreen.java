@@ -9,7 +9,6 @@
 package journeymap.client.ui.fullscreen;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
 import journeymap.client.api.display.PolygonOverlay;
@@ -85,8 +84,8 @@ public class Fullscreen extends JmUI
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
-    FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
-    CoreProperties coreProperties = JourneymapClient.getCoreProperties();
+    FullMapProperties fullMapProperties = Journeymap.getClient().getFullMapProperties();
+    CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
     boolean firstLayoutPass = true;
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
@@ -117,7 +116,7 @@ public class Fullscreen extends JmUI
     {
         super(null);
         mc = FMLClientHandler.instance().getClient();
-        fullMapProperties = JourneymapClient.getFullMapProperties();
+        fullMapProperties = Journeymap.getClient().getFullMapProperties();
         state.refresh(mc, mc.thePlayer, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
         gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
@@ -144,7 +143,7 @@ public class Fullscreen extends JmUI
     @Override
     public void initGui()
     {
-        fullMapProperties = JourneymapClient.getFullMapProperties();
+        fullMapProperties = Journeymap.getClient().getFullMapProperties();
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
@@ -157,7 +156,7 @@ public class Fullscreen extends JmUI
 
         // Check for first-time use
         String thisVersion = Journeymap.JM_VERSION.toString();
-        String splashViewed = JourneymapClient.getCoreProperties().splashViewed.get();
+        String splashViewed = Journeymap.getClient().getCoreProperties().splashViewed.get();
 
         if (splashViewed == null || !thisVersion.equals(splashViewed))
         {
@@ -1073,7 +1072,7 @@ public class Fullscreen extends JmUI
         timer.start();
 
         // Update the state first
-        fullMapProperties = JourneymapClient.getFullMapProperties();
+        fullMapProperties = Journeymap.getClient().getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
 
         if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)
@@ -1199,7 +1198,7 @@ public class Fullscreen extends JmUI
     {
         try
         {
-            MiniMapProperties mmp = JourneymapClient.getMiniMapProperties(JourneymapClient.getActiveMinimapId());
+            MiniMapProperties mmp = Journeymap.getClient().getMiniMapProperties(Journeymap.getClient().getActiveMinimapId());
             mmp.shape.set(Shape.Rectangle);
             mmp.showBiome.set(false);
             mmp.sizePercent.set(20);

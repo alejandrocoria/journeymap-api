@@ -10,15 +10,16 @@ package journeymap.client.io;
 
 
 import journeymap.client.Constants;
+import journeymap.client.model.GridSpec;
 import journeymap.client.model.MapType;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.model.RegionImageCache;
+import journeymap.client.render.map.Tile;
 import journeymap.client.render.map.TileDrawStep;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.ChunkPos;
-import org.apache.logging.log4j.Level;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,15 +31,6 @@ import java.util.List;
 
 public class RegionImageHandler
 {
-    private RegionImageHandler()
-    {
-    }
-
-    // Get singleton instance.  Concurrency-safe.
-    public static RegionImageHandler getInstance()
-    {
-        return Holder.INSTANCE;
-    }
 
     public static File getImageDir(RegionCoord rCoord, MapType mapType)
     {
@@ -127,26 +119,19 @@ public class RegionImageHandler
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
     public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
-                                                             final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight,
-                                                             final boolean allowNullImage, boolean showGrid)
+                                                             int scale, boolean showGrid)
     {
-        long start = 0, stop = 0;
-        start = System.currentTimeMillis();
+        scale = Math.max(scale, 1);
+        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16) / scale);
+        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16) / scale);
 
-        final int initialWidth = (endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16;
-        final int initialHeight = (endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16;
+        BufferedImage blank = null;
 
-        if (image == null || image.getWidth() != initialWidth || imageHeight != initialHeight)
-        {
-            image = createBlankImage(initialWidth, initialHeight);
-        }
-        final Graphics2D g2D = initRenderingHints(image.createGraphics());
-        g2D.clearRect(0, 0, imageWidth, imageHeight);
+        BufferedImage image = createBlankImage(initialWidth, initialHeight);
+        final Graphics2D g2D = image.createGraphics();
 
-        final RegionImageCache cache = RegionImageCache.instance();
-
-        RegionCoord rc = null;
-        BufferedImage regionImage = null;
+        RegionCoord rc;
+        BufferedImage regionImage;
 
         final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
         final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
@@ -155,17 +140,20 @@ public class RegionImageHandler
 
         int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 
-        boolean imageDrawn = false;
         for (int rx = rx1; rx <= rx2; rx++)
         {
             for (int rz = rz1; rz <= rz2; rz++)
             {
                 rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
-                regionImage = cache.getRegionImageSet(rc).getImage(mapType);
+                regionImage = RegionImageCache.INSTANCE.getRegionImageSet(rc).getImage(mapType);
 
                 if (regionImage == null)
                 {
-                    continue;
+                    if (blank == null)
+                    {
+                        blank = createBlankImage(Tile.TILESIZE, Tile.TILESIZE);
+                    }
+                    regionImage = blank;
                 }
 
                 rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
@@ -173,73 +161,45 @@ public class RegionImageHandler
                 rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
                 rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
 
-                int xoffset = rc.getMinChunkX() * 16;
-                int yoffset = rc.getMinChunkZ() * 16;
-                sx1 = (rminCx * 16) - xoffset;
-                sy1 = (rminCz * 16) - yoffset;
+                // Get pixel coords of source image
+                sx1 = (rminCx - rc.getMinChunkX()) * 16;
+                sy1 = (rminCz - rc.getMinChunkZ()) * 16;
                 sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
                 sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
 
-                xoffset = startCoord.chunkXPos * 16;
-                yoffset = startCoord.chunkZPos * 16;
-                dx1 = (startCoord.chunkXPos * 16) - xoffset;
-                dy1 = (startCoord.chunkZPos * 16) - yoffset;
-                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
-                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
+                // Get pixel coords of destination image
+                dx1 = (rminCx - startCoord.chunkXPos) * 16;
+                dy1 = (rminCz - startCoord.chunkZPos) * 16;
+                dx2 = dx1 + (sx2 - sx1);
+                dy2 = dy1 + (sy2 - sy1);
 
                 g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-                imageDrawn = true;
             }
         }
 
         // Show chunk grid
-        if (imageDrawn)
+        if (showGrid)
         {
-            if (showGrid)
+            GridSpec gridSpec = Journeymap.getClient().getCoreProperties().gridSpecs.getSpec(mapType);
+            if (gridSpec != null)
             {
-
-                if (mapType.isDay())
-                {
-                    g2D.setColor(Color.black);
-                    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25F));
-                }
-                else
-                {
-                    g2D.setColor(Color.gray);
-                    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
-                }
-
-                for (int x = 0; x <= initialWidth; x += 16)
-                {
-                    g2D.drawLine(x, 0, x, initialHeight);
-                }
-
-                for (int z = 0; z <= initialHeight; z += 16)
-                {
-                    g2D.drawLine(0, z, initialWidth, z);
-                }
+                BufferedImage gridImage = gridSpec.getTexture().getImage();
+                g2D.setXORMode(new Color(gridSpec.getColor()));
+                g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, gridSpec.alpha));
+                g2D.drawImage(gridImage, 0, 0, initialWidth, initialHeight, null);
             }
         }
 
         g2D.dispose();
 
-        if (Journeymap.getLogger().isEnabled(Level.DEBUG))
-        {
-            stop = System.currentTimeMillis();
-            Journeymap.getLogger().debug("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        if (allowNullImage && !imageDrawn)
-        {
-            return null;
-        }
-
         // Scale if needed
-        if (imageHeight != null && imageWidth != null && (initialHeight != imageHeight || initialWidth != imageWidth))
+        if (scale > 1)
         {
-            final BufferedImage scaledImage = createBlankImage(imageWidth, imageHeight);
+            int scaledWidth = Math.min(Tile.TILESIZE, initialWidth * scale);
+            int scaledHeight = Math.min(Tile.TILESIZE, initialHeight * scale);
+            final BufferedImage scaledImage = createBlankImage(scaledWidth, scaledHeight);
             final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
-            g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
+            g.drawImage(image, 0, 0, scaledWidth, scaledHeight, null);
             g.dispose();
             return scaledImage;
         }
@@ -322,11 +282,4 @@ public class RegionImageHandler
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         return g;
     }
-
-    // On-demand-holder for instance
-    private static class Holder
-    {
-        private static final RegionImageHandler INSTANCE = new RegionImageHandler();
-    }
-
 }

@@ -8,7 +8,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.*;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
@@ -90,7 +89,7 @@ public class DataService extends BaseService
             if (!path.equals("/data/messages"))
             {
                 // Ensure JourneyMap and World is loaded
-                if (!JourneymapClient.getInstance().isMapping())
+                if (!Journeymap.getClient().isMapping())
                 {
                     throwEventException(503, "JourneyMap not mapping", event, false);
                 }
@@ -127,15 +126,15 @@ public class DataService extends BaseService
 
             if (dpClass == AllData.class)
             {
-                data = DataCache.instance().getAll(since);
+                data = DataCache.INSTANCE.getAll(since);
             }
             else if (dpClass == AnimalsData.class)
             {
-                data = DataCache.instance().getAnimals(false);
+                data = DataCache.INSTANCE.getAnimals(false);
             }
             else if (dpClass == MobsData.class)
             {
-                data = DataCache.instance().getMobs(false);
+                data = DataCache.INSTANCE.getMobs(false);
             }
             else if (dpClass == ImagesData.class)
             {
@@ -143,27 +142,27 @@ public class DataService extends BaseService
             }
             else if (dpClass == MessagesData.class)
             {
-                data = DataCache.instance().getMessages(false);
+                data = DataCache.INSTANCE.getMessages(false);
             }
             else if (dpClass == PlayerData.class)
             {
-                data = DataCache.instance().getPlayer(false);
+                data = DataCache.INSTANCE.getPlayer(false);
             }
             else if (dpClass == PlayersData.class)
             {
-                data = DataCache.instance().getPlayers(false);
+                data = DataCache.INSTANCE.getPlayers(false);
             }
             else if (dpClass == WorldData.class)
             {
-                data = DataCache.instance().getWorld(false);
+                data = DataCache.INSTANCE.getWorld(false);
             }
             else if (dpClass == VillagersData.class)
             {
-                data = DataCache.instance().getVillagers(false);
+                data = DataCache.INSTANCE.getVillagers(false);
             }
             else if (dpClass == WaypointsData.class)
             {
-                Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
+                Collection<Waypoint> waypoints = DataCache.INSTANCE.getWaypoints(false);
                 Map<String, Waypoint> wpMap = new HashMap<String, Waypoint>();
                 for (Waypoint waypoint : waypoints)
                 {

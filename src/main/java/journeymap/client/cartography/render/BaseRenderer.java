@@ -10,7 +10,6 @@ package journeymap.client.cartography.render;
 
 
 import com.google.common.cache.*;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
@@ -47,7 +46,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public static volatile AtomicLong badBlockCount = new AtomicLong(0);
     public static final String PROP_WATER_HEIGHT = "waterHeight";
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
-    protected final DataCache dataCache = DataCache.instance();
+    protected final DataCache dataCache = DataCache.INSTANCE;
     protected CoreProperties coreProperties;
     protected BlockColumnPropertiesCache columnPropertiesCache = null;
     // Updated in updateOptions()
@@ -125,7 +124,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     protected void updateOptions()
     {
-        coreProperties = JourneymapClient.getCoreProperties();
+        coreProperties = Journeymap.getClient().getCoreProperties();
         mapBathymetry = coreProperties.mapBathymetry.get();
         mapTransparency = coreProperties.mapTransparency.get();
         mapAntialiasing = coreProperties.mapAntialiasing.get();
@@ -608,7 +607,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     private CacheBuilder<Object, Object> getCacheBuilder()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
-        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
+        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }
@@ -722,7 +721,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     return new Integer[16][16];
                 }
             });
-            DataCache.instance().addPrivateCache(name, this);
+            DataCache.INSTANCE.addPrivateCache(name, this);
         }
 
         @Override
@@ -750,7 +749,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     return new Float[16][16];
                 }
             });
-            DataCache.instance().addPrivateCache(name, this);
+            DataCache.INSTANCE.addPrivateCache(name, this);
         }
 
         @Override
@@ -778,7 +777,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                     return new HashMap[16][16];
                 }
             });
-            DataCache.instance().addPrivateCache(name, this);
+            DataCache.INSTANCE.addPrivateCache(name, this);
         }
 
         @Override

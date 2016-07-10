@@ -24,12 +24,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RegionImageCache
+public enum RegionImageCache
 {
-    public static final long flushInterval = TimeUnit.SECONDS.toMillis(30);
-    public static final long regionCacheAge = flushInterval / 2;
+    INSTANCE;
+
+    public final long firstFlushInterval = TimeUnit.SECONDS.toMillis(5);
+    public final long flushInterval = TimeUnit.SECONDS.toMillis(30);
+    public final long regionCacheAge = flushInterval / 2;
     static final Logger logger = Journeymap.getLogger();
-    final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSetsCache;
     private volatile long lastFlush;
 
     /**
@@ -37,19 +39,10 @@ public class RegionImageCache
      */
     private RegionImageCache()
     {
-        this.regionImageSetsCache = DataCache.instance().getRegionImageSets();
-        lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
+        lastFlush = System.currentTimeMillis() + firstFlushInterval;
     }
 
-    /**
-     * Singleton
-     */
-    public static RegionImageCache instance()
-    {
-        return Holder.INSTANCE;
-    }
-
-    public static LoadingCache<RegionImageSet.Key, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
+    public LoadingCache<RegionImageSet.Key, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
     {
         return builder
                 .expireAfterAccess(regionCacheAge, TimeUnit.SECONDS)
@@ -84,18 +77,18 @@ public class RegionImageCache
 
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
-        return regionImageSetsCache.getUnchecked(RegionImageSet.Key.from(rCoord));
+        return DataCache.INSTANCE.getRegionImageSets().getUnchecked(RegionImageSet.Key.from(rCoord));
     }
 
     public RegionImageSet getRegionImageSet(RegionImageSet.Key rCoordKey)
     {
-        return regionImageSetsCache.getUnchecked(rCoordKey);
+        return DataCache.INSTANCE.getRegionImageSets().getUnchecked(rCoordKey);
     }
 
     // Doesn't trigger access on cache
     private Collection<RegionImageSet> getRegionImageSets()
     {
-        return regionImageSetsCache.asMap().values();
+        return DataCache.INSTANCE.getRegionImageSets().asMap().values();
     }
 
     /**
@@ -191,7 +184,7 @@ public class RegionImageCache
         }
         if (logger.isEnabled(Level.DEBUG))
         {
-            logger.debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
+            logger.debug("Dirty regions: " + list.size() + " of " + DataCache.INSTANCE.getRegionImageSets().size());
         }
         return list;
     }
@@ -222,8 +215,8 @@ public class RegionImageCache
             // Ensures textures are properly disposed of
             regionImageSet.clear();
         }
-        regionImageSetsCache.invalidateAll();
-        regionImageSetsCache.cleanUp();
+        DataCache.INSTANCE.getRegionImageSets().invalidateAll();
+        DataCache.INSTANCE.getRegionImageSets().cleanUp();
     }
 
     public boolean deleteMap(MapState state, boolean allDims)
@@ -281,10 +274,5 @@ public class RegionImageCache
             logger.info("Found no DIM directories in " + imageDir);
             return true;
         }
-    }
-
-    private static class Holder
-    {
-        private static final RegionImageCache INSTANCE = new RegionImageCache();
     }
 }

@@ -83,7 +83,7 @@ public class Splash extends JmUI
     @Override
     public void initGui()
     {
-        JourneymapClient.getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+        Journeymap.getClient().getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
 
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();

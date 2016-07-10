@@ -124,7 +124,7 @@ public class JMLogger
         try
         {
             final Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
-            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(JourneymapClient.getCoreProperties().logLevel.get(), Level.INFO));
+            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.toLevel(Journeymap.getClient().getCoreProperties().logLevel.get(), Level.INFO));
         }
         catch (Throwable t)
         {
@@ -181,14 +181,14 @@ public class JMLogger
         sb.append(LogFormatter.LINEBREAK).append(FeatureManager.getPolicyDetails());
 
         // Add config files
-        JourneymapClient jm = JourneymapClient.getInstance();
+        JourneymapClient jm = Journeymap.getClient();
         List<? extends PropertiesBase> configs = Arrays.asList(
-                JourneymapClient.getMiniMapProperties1(),
-                JourneymapClient.getMiniMapProperties2(),
-                JourneymapClient.getFullMapProperties(),
-                JourneymapClient.getWaypointProperties(),
-                JourneymapClient.getWebMapProperties(),
-                JourneymapClient.getCoreProperties()
+                Journeymap.getClient().getMiniMapProperties1(),
+                Journeymap.getClient().getMiniMapProperties2(),
+                Journeymap.getClient().getFullMapProperties(),
+                Journeymap.getClient().getWaypointProperties(),
+                Journeymap.getClient().getWebMapProperties(),
+                Journeymap.getClient().getCoreProperties()
         );
 
         for (PropertiesBase config : configs)

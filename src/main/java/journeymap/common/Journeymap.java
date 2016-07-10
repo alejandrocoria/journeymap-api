@@ -8,6 +8,7 @@
 
 package journeymap.common;
 
+import journeymap.client.JourneymapClient;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
 import journeymap.server.oldservercode.command.CommandJMServerForge;
@@ -124,5 +125,17 @@ public class Journeymap
         MinecraftServer server = FMLServerHandler.instance().getServer();
         JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
         getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static JourneymapClient getClient()
+    {
+        return (JourneymapClient) proxy;
+    }
+
+    @SideOnly(Side.SERVER)
+    public static JourneymapServer getServer()
+    {
+        return (JourneymapServer) proxy;
     }
 }

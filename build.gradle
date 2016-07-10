@@ -30,8 +30,8 @@ ext {
     }
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 version = "${project.minecraft_version}-${project.jm_major}.${project.jm_minor}.${project.jm_micro}${project.jm_patch}"
 group = project.group_id
 archivesBaseName = project.mod_id
@@ -44,14 +44,14 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public/' }
 }
 
-configurations.all {
-    // Check for snapshots more frequently than Gradle's default of 1 day. 0 = every build.
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 configurations {
     // custom config of jars that will be included in the journeymap jar
     includeInJar
+}
+
+configurations.all {
+    // Check for snapshots more frequently than Gradle's default of 1 day. 0 = every build.
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {

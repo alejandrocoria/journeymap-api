@@ -10,7 +10,6 @@ package journeymap.client.io;
 
 import ar.com.hjg.pngj.*;
 import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
-import journeymap.client.JourneymapClient;
 import journeymap.common.Journeymap;
 
 import java.io.File;
@@ -44,7 +43,7 @@ public class PngjHelper
         final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
         final int lineLen = tileSize * 4; // 4=bytesPixel
         final int gridColor = 135;
-        final boolean showGrid = JourneymapClient.getFullMapProperties().showGrid.get();
+        final boolean showGrid = Journeymap.getClient().getFullMapProperties().showGrid.get();
 
         int destRow = 0;
 

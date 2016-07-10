@@ -8,7 +8,6 @@
 
 package journeymap.client.render.draw;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
@@ -38,7 +37,7 @@ public class WaypointDrawStepFactory
         Minecraft mc = FMLClientHandler.instance().getClient();
         EntityPlayer player = mc.thePlayer;
         int dimension = player.dimension;
-        int maxDistance = JourneymapClient.getWaypointProperties().maxDistance.get();
+        int maxDistance = Journeymap.getClient().getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
         Vec3d playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
         drawStepList.clear();
@@ -59,7 +58,7 @@ public class WaypointDrawStepFactory
                         }
                     }
 
-                    DrawWayPointStep wayPointStep = DataCache.instance().getDrawWayPointStep(waypoint);
+                    DrawWayPointStep wayPointStep = DataCache.INSTANCE.getDrawWayPointStep(waypoint);
                     if (wayPointStep != null)
                     {
                         drawStepList.add(wayPointStep);

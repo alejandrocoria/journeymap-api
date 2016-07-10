@@ -8,7 +8,6 @@
 
 package journeymap.client.cartography;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.render.*;
 import journeymap.client.model.*;
 import journeymap.common.Journeymap;
@@ -47,7 +46,7 @@ public class ChunkRenderController
     {
         try
         {
-            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            RegionImageSet regionImageSet = RegionImageCache.INSTANCE.getRegionImageSet(rCoord);
             if (mapType.isUnderground())
             {
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
@@ -85,7 +84,7 @@ public class ChunkRenderController
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
-        if (!JourneymapClient.getInstance().isMapping())
+        if (!Journeymap.getClient().isMapping())
         {
             return false;
         }
@@ -94,7 +93,7 @@ public class ChunkRenderController
 
         try
         {
-            RegionImageSet regionImageSet = RegionImageCache.instance().getRegionImageSet(rCoord);
+            RegionImageSet regionImageSet = RegionImageCache.INSTANCE.getRegionImageSet(rCoord);
             if (mapType.isUnderground())
             {
                 BufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);

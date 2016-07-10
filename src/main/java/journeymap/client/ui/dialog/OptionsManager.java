@@ -9,7 +9,6 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
@@ -86,7 +85,7 @@ public class OptionsManager extends JmUI
     {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
-        this.inGameMinimapId = JourneymapClient.getActiveMinimapId();
+        this.inGameMinimapId = Journeymap.getClient().getActiveMinimapId();
     }
 
     @Override
@@ -375,7 +374,7 @@ public class OptionsManager extends JmUI
                 CategorySlot categorySlot = (CategorySlot) rootSlot;
                 if (categorySlot.getCategory() == ClientCategory.Cartography)
                 {
-                    CoreProperties coreProperties = JourneymapClient.getCoreProperties();
+                    CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
                     for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
                     {
                         if (slotMetadata.getButton() instanceof IConfigFieldHolder)
@@ -384,7 +383,7 @@ public class OptionsManager extends JmUI
                             boolean limitButtonRange = false;
                             if (property == coreProperties.renderDistanceCaveMax)
                             {
-                                boolean valid = JourneymapClient.getCoreProperties().hasValidCaveRenderDistances();
+                                boolean valid = Journeymap.getClient().getCoreProperties().hasValidCaveRenderDistances();
                                 limitButtonRange = true;
                                 if (valid)
                                 {
@@ -397,7 +396,7 @@ public class OptionsManager extends JmUI
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
-                                boolean valid = JourneymapClient.getCoreProperties().hasValidSurfaceRenderDistances();
+                                boolean valid = Journeymap.getClient().getCoreProperties().hasValidSurfaceRenderDistances();
                                 limitButtonRange = true;
                                 if (valid)
                                 {
@@ -432,7 +431,7 @@ public class OptionsManager extends JmUI
             }
         }
 
-        renderStatsButton.displayString = JourneymapClient.getCoreProperties().mappingEnabled.get()
+        renderStatsButton.displayString = Journeymap.getClient().getCoreProperties().mappingEnabled.get()
                 ? MapPlayerTask.getSimpleStats()
                 : Constants.getString("jm.common.enable_mapping_false_text");
 
@@ -554,14 +553,14 @@ public class OptionsManager extends JmUI
             if (category == ClientCategory.MiniMap1 || category == ClientCategory.MiniMap2)
             {
                 refreshMinimapOptions();
-                DataCache.instance().resetRadarCaches();
+                DataCache.INSTANCE.resetRadarCaches();
                 UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
             }
 
             // If the button is Cartography-related, ensure valid
             if (category == ClientCategory.Cartography)
             {
-                JourneymapClient.getCoreProperties().save();
+                Journeymap.getClient().getCoreProperties().save();
                 RenderSpec.resetRenderSpecs();
             }
         }
@@ -689,41 +688,41 @@ public class OptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
-        JourneymapClient.getCoreProperties().optionsManagerViewed.set(Journeymap.JM_VERSION.toString());
+        Journeymap.getClient().getCoreProperties().optionsManagerViewed.set(Journeymap.JM_VERSION.toString());
 
         // Just in case a property changed but wasn't saved.
-        JourneymapClient.getInstance().saveConfigProperties();
+        Journeymap.getClient().saveConfigProperties();
 
         // No world if Forge has opened this class directly as a config UI
         if (mc.theWorld != null)
         {
             // Ensure minimap is back to the one used before this opened
-            UIManager.INSTANCE.getMiniMap().setMiniMapProperties(JourneymapClient.getMiniMapProperties(this.inGameMinimapId));
+            UIManager.INSTANCE.getMiniMap().setMiniMapProperties(Journeymap.getClient().getMiniMapProperties(this.inGameMinimapId));
 
             for (Category category : changedCategories)
             {
 
                 if (category == ClientCategory.MiniMap1)
                     {
-                        DataCache.instance().resetRadarCaches();
+                        DataCache.INSTANCE.resetRadarCaches();
                         UIManager.INSTANCE.getMiniMap().reset();
                         continue;
                     }
                 if (category == ClientCategory.MiniMap2)
                     {
-                        DataCache.instance().resetRadarCaches();
+                        DataCache.INSTANCE.resetRadarCaches();
                         continue;
                     }
                 if (category == ClientCategory.FullMap)
                     {
-                        DataCache.instance().resetRadarCaches();
+                        DataCache.INSTANCE.resetRadarCaches();
                         ThemeFileHandler.getCurrentTheme(true);
                         continue;
                     }
                 if (category == ClientCategory.WebMap)
                     {
-                        DataCache.instance().resetRadarCaches();
-                        WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
+                        DataCache.INSTANCE.resetRadarCaches();
+                        WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), true);
                         continue;
                     }
                 if (category == ClientCategory.Waypoint)
@@ -747,7 +746,7 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.Advanced)
                     {
                         SoftResetTask.queue();
-                        WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
+                        WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), false);
                         continue;
                     }
 

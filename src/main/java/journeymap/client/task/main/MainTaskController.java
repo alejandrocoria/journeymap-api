@@ -14,6 +14,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -27,15 +28,8 @@ public class MainTaskController
     private final ConcurrentLinkedQueue<IMainThreadTask> currentQueue = Queues.newConcurrentLinkedQueue();
     private final ConcurrentLinkedQueue<IMainThreadTask> deferredQueue = Queues.newConcurrentLinkedQueue();
 
-    private Minecraft minecraft;
-    private JourneymapClient journeyMap;
-    private Logger logger;
-
-    public MainTaskController(Minecraft mc, JourneymapClient jm)
+    public MainTaskController()
     {
-        this.minecraft = mc;
-        this.journeyMap = jm;
-        this.logger = Journeymap.getLogger();
     }
 
     public void addTask(IMainThreadTask task)
@@ -57,6 +51,9 @@ public class MainTaskController
                     currentQueue.add(new MappingMonitorTask());
                 }
 
+                Minecraft minecraft = FMLClientHandler.instance().getClient();
+                JourneymapClient journeymapClient = Journeymap.getClient();
+
                 while (!currentQueue.isEmpty())
                 {
                     IMainThreadTask task = currentQueue.poll();
@@ -64,7 +61,7 @@ public class MainTaskController
                     {
                         StatTimer timer = StatTimer.get(task.getName());
                         timer.start();
-                        IMainThreadTask deferred = task.perform(minecraft, journeyMap);
+                        IMainThreadTask deferred = task.perform(minecraft, journeymapClient);
                         timer.stop();
                         if (deferred != null)
                         {
@@ -80,8 +77,8 @@ public class MainTaskController
         catch (Throwable t)
         {
             String error = "Error in TickTaskController.performMainThreadTasks(): " + t.getMessage();
-            logger.error(error);
-            logger.error(LogFormatter.toString(t));
+            Journeymap.getLogger().error(error);
+            Journeymap.getLogger().error(LogFormatter.toString(t));
         }
     }
 

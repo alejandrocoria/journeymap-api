@@ -36,7 +36,7 @@ public class SoftResetTask implements IMainThreadTask
 
     public static void queue()
     {
-        JourneymapClient.getInstance().queueMainThreadTask(new SoftResetTask());
+        Journeymap.getClient().queueMainThreadTask(new SoftResetTask());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SoftResetTask implements IMainThreadTask
     {
         jm.loadConfigProperties();
         JMLogger.setLevelFromProperties();
-        DataCache.instance().purge();
+        DataCache.INSTANCE.purge();
         TileDrawStepCache.instance().invalidateAll();
         UIManager.INSTANCE.reset();
         WaypointStore.INSTANCE.reset();

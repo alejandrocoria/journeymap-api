@@ -9,7 +9,6 @@
 package journeymap.client.cartography;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
@@ -88,10 +87,10 @@ public class ColorManager
         {
             Journeymap.getLogger().info("Loading blocks and textures...");
 
-            boolean isMapping = JourneymapClient.getInstance().isMapping();
+            boolean isMapping = Journeymap.getClient().isMapping();
             if (isMapping)
             {
-                JourneymapClient.getInstance().stopMapping();
+                Journeymap.getClient().stopMapping();
             }
 
             // Reload all BlockMDs
@@ -105,7 +104,7 @@ public class ColorManager
 
             if (isMapping)
             {
-                JourneymapClient.getInstance().startMapping();
+                Journeymap.getClient().startMapping();
             }
         }
         else

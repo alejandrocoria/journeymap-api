@@ -9,7 +9,6 @@
 package journeymap.client.log;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.service.WebServer;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -121,7 +120,7 @@ public class ChatLog
         if (!initialized)
         {
             // Announce mod?
-            enableAnnounceMod = JourneymapClient.getCoreProperties().announceMod.get();
+            enableAnnounceMod = Journeymap.getClient().getCoreProperties().announceMod.get();
             announceMod(false);
 
             // Check for newer version online
@@ -156,11 +155,11 @@ public class ChatLog
         if (enableAnnounceMod)
         {
             //ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
-            if (JourneymapClient.getWebMapProperties().enabled.get())
+            if (Journeymap.getClient().getWebMapProperties().enabled.get())
             {
                 try
                 {
-                    WebServer webServer = JourneymapClient.getInstance().getJmServer();
+                    WebServer webServer = Journeymap.getClient().getJmServer();
                     String keyName = Constants.getKeyName(Constants.KB_MAP);
                     String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
@@ -177,7 +176,7 @@ public class ChatLog
                 ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
             }
 
-            if (!JourneymapClient.getCoreProperties().mappingEnabled.get())
+            if (!Journeymap.getClient().getCoreProperties().mappingEnabled.get())
             {
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
             }

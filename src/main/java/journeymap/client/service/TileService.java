@@ -8,12 +8,10 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.MapType;
-import journeymap.client.render.map.Tile;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
@@ -71,7 +69,7 @@ public class TileService extends FileService
         }
 
         // Ensure world is loaded
-        if (!JourneymapClient.getInstance().isMapping())
+        if (!Journeymap.getClient().isMapping())
         {
             throwEventException(503, "JourneyMap not started", event, false);
         }
@@ -131,9 +129,9 @@ public class TileService extends FileService
                 final ChunkPos startCoord = new ChunkPos(minChunkX, minChunkZ);
                 final ChunkPos endCoord = new ChunkPos(maxChunkX, maxChunkZ);
 
-                boolean showGrid = JourneymapClient.getFullMapProperties().showGrid.get();
+                boolean showGrid = Journeymap.getClient().getFullMapProperties().showGrid.get();
                 MapType mapType = new MapType(mapTypeName, vSlice, dimension);
-                final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
+                final BufferedImage img = RegionImageHandler.getMergedChunks(worldDir, startCoord, endCoord, mapType, scale, showGrid);
 
                 ResponseHeader.on(event).contentType(ContentType.png).noCache();
                 serveImage(event, img);

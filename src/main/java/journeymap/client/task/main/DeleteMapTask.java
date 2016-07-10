@@ -32,7 +32,7 @@ public class DeleteMapTask implements IMainThreadTask
 
     public static void queue(boolean allDims)
     {
-        JourneymapClient.getInstance().queueMainThreadTask(new DeleteMapTask(allDims));
+        Journeymap.getClient().queueMainThreadTask(new DeleteMapTask(allDims));
     }
 
     @Override
@@ -44,13 +44,13 @@ public class DeleteMapTask implements IMainThreadTask
             jm.toggleTask(MapRegionTask.Manager.class, false, false);
             GridRenderer.setEnabled(false);
 
-            boolean wasMapping = JourneymapClient.getInstance().isMapping();
+            boolean wasMapping = Journeymap.getClient().isMapping();
             if (wasMapping)
             {
-                JourneymapClient.getInstance().stopMapping();
+                Journeymap.getClient().stopMapping();
             }
 
-            boolean ok = RegionImageCache.instance().deleteMap(Fullscreen.state(), allDims);
+            boolean ok = RegionImageCache.INSTANCE.deleteMap(Fullscreen.state(), allDims);
             if (ok)
             {
                 ChatLog.announceI18N("jm.common.deletemap_status_done");
@@ -62,7 +62,7 @@ public class DeleteMapTask implements IMainThreadTask
 
             if (wasMapping)
             {
-                JourneymapClient.getInstance().startMapping();
+                Journeymap.getClient().startMapping();
                 MapPlayerTask.forceNearbyRemap();
             }
 

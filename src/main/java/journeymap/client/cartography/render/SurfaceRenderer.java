@@ -47,7 +47,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
         chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
         chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
-        DataCache.instance().addChunkMDListener(this);
+        DataCache.INSTANCE.addChunkMDListener(this);
     }
 
     @Override

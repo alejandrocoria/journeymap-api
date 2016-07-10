@@ -55,7 +55,7 @@ public class RegionCoord implements Comparable<RegionCoord>
     {
         // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
         // unfortunately, so there's no reliable key.  If there's a collision, we put in a new one.
-        Cache<String, RegionCoord> cache = DataCache.instance().getRegionCoords();
+        Cache<String, RegionCoord> cache = DataCache.INSTANCE.getRegionCoords();
         RegionCoord regionCoord = cache.getIfPresent(toCacheKey(getDimPath(worldDir, dimension), regionX, regionZ));
         if (regionCoord == null || regionX != regionCoord.regionX || regionZ != regionCoord.regionZ || dimension != regionCoord.dimension)
         {

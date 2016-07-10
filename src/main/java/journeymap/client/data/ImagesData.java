@@ -44,7 +44,7 @@ public class ImagesData
         this.queryTime = now;
         this.since = (since == null) ? now : since;
 
-        List<RegionCoord> dirtyRegions = RegionImageCache.instance().getChangedSince(null, this.since);
+        List<RegionCoord> dirtyRegions = RegionImageCache.INSTANCE.getChangedSince(null, this.since);
         if (dirtyRegions.isEmpty())
         {
             this.regions = Collections.EMPTY_LIST;

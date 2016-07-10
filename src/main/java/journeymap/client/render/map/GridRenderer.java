@@ -8,7 +8,6 @@
 
 package journeymap.client.render.map;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.DisplayUpdateEvent;
@@ -91,7 +90,7 @@ public class GridRenderer
     public GridRenderer(Context.UI contextUi, int gridSize)
     {
         this.contextUi = contextUi;
-        this.uiState = UIState.newInactive(contextUi);
+        this.uiState = UIState.newInactive(contextUi, FMLClientHandler.instance().getClient());
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
@@ -436,7 +435,7 @@ public class GridRenderer
         {
             double centerX = offsetX + centerPixelOffset.x;
             double centerZ = offsetZ + centerPixelOffset.y;
-            GridSpec gridSpec = showGrid ? JourneymapClient.getCoreProperties().gridSpecs.getSpec(mapType) : null;
+            GridSpec gridSpec = showGrid ? Journeymap.getClient().getCoreProperties().gridSpecs.getSpec(mapType) : null;
 
             boolean somethingDrew = false;
             for (Map.Entry<TilePos, Tile> entry : grid.entrySet())
@@ -459,7 +458,7 @@ public class GridRenderer
 
             if (!somethingDrew)
             {
-                RegionImageCache.instance().clear();
+                RegionImageCache.INSTANCE.clear();
             }
         }
 
@@ -674,13 +673,13 @@ public class GridRenderer
             blockBounds = new AxisAlignedBB(upperLeft.add(-pad, 0, -pad), lowerRight.add(pad, worldHeight, pad));
 
             newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType,
-                    new BlockPos(centerBlockX, 0, centerBlockZ),
+                    new BlockPos(centerBlockX, 0, centerBlockZ), mapType.vSlice,
                     blockBounds,
                     screenBounds);
         }
         else
         {
-            newState = UIState.newInactive(contextUi);
+            newState = UIState.newInactive(uiState);
         }
 
         if (!newState.equals(this.uiState))
@@ -705,7 +704,7 @@ public class GridRenderer
 
     private Tile findTile(final int tileX, final int tileZ, final int zoom)
     {
-        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, JourneymapClient.getCoreProperties().tileHighDisplayQuality.get());
+        return Tile.create(tileX, tileZ, zoom, worldDir, mapType, Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get());
     }
 
     public void setContext(File worldDir, MapType mapType)

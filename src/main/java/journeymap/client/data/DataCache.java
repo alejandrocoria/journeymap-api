@@ -9,7 +9,6 @@
 package journeymap.client.data;
 
 import com.google.common.cache.*;
-import journeymap.client.JourneymapClient;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
@@ -29,8 +28,10 @@ import java.util.concurrent.TimeUnit;
  *
  * @author mwoodman
  */
-public class DataCache
+public enum DataCache
 {
+    INSTANCE;
+
     final LoadingCache<Long, Map> all;
     final LoadingCache<Class, Map<String, EntityDTO>> animals;
     final LoadingCache<Class, Map<String, EntityDTO>> mobs;
@@ -102,7 +103,7 @@ public class DataCache
         entityDTOs = getCacheBuilder().weakKeys().build(new EntityDTO.SimpleCacheLoader());
         managedCaches.put(entityDTOs, "EntityDTO");
 
-        regionImageSets = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
+        regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkPos, ChunkMD>();
@@ -116,15 +117,9 @@ public class DataCache
         managedCaches.put(mapTypes, "MapType");
     }
 
-    // Get singleton instance.  Concurrency-safe.
-    public static DataCache instance()
-    {
-        return Holder.INSTANCE;
-    }
-
     public static EntityDTO getPlayer()
     {
-        return instance().getPlayer(false);
+        return INSTANCE.getPlayer(false);
     }
 
     /**
@@ -136,7 +131,7 @@ public class DataCache
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
         builder.concurrencyLevel(defaultConcurrencyLevel);
-        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
+        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }
@@ -507,7 +502,7 @@ public class DataCache
     public void purge()
     {
         // Flush images, do syncronously to ensure it's done before cache invalidates
-        RegionImageCache.instance().flushToDisk(false);
+        RegionImageCache.INSTANCE.flushToDisk(false);
 
         synchronized (managedCaches)
         {
@@ -545,7 +540,7 @@ public class DataCache
     public String getDebugHtml()
     {
         StringBuffer sb = new StringBuffer();
-        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
+        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
         {
             appendDebugHtml(sb, "Managed Caches", managedCaches);
             appendDebugHtml(sb, "Private Caches", privateCaches);
@@ -588,12 +583,6 @@ public class DataCache
         }
 
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
-    }
-
-    // On-demand-holder for instance
-    private static class Holder
-    {
-        private static final DataCache INSTANCE = new DataCache();
     }
 
     class ProxyRemovalListener<K, V> implements RemovalListener<K, V>

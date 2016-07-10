@@ -99,7 +99,7 @@ public class TileDrawStepCache
         if (!regionCoord.worldDir.equals(this.worldDir))
         {
             drawStepCache.invalidateAll();
-            RegionImageCache.instance().clear();
+            RegionImageCache.INSTANCE.clear();
         }
     }
 

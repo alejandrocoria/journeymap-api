@@ -9,7 +9,6 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -56,19 +55,19 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     {
         if (!blockPos.equals(lastCoord))
         {
-            FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
+            FullMapProperties fullMapProperties = Journeymap.getClient().getFullMapProperties();
 
             locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
 
             lastCoord = blockPos;
 
             // Get block under mouse
-            ChunkMD chunkMD = DataCache.instance().getChunkMD(blockPos);
+            ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(blockPos);
             String info = "";
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 BlockMD blockMD = chunkMD.getBlockMD(blockPos.up());
-                if (blockMD.isAir())
+                if (blockMD == null || blockMD.isAir())
                 {
                     blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
@@ -109,7 +108,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
     private double getMapFontScale()
     {
-        return JourneymapClient.getFullMapProperties().fontScale.get();
+        return Journeymap.getClient().getFullMapProperties().fontScale.get();
     }
 
     @Override

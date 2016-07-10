@@ -8,7 +8,6 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.event.DeathWaypointEvent;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -84,16 +83,16 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             if (counter == 20)
             {
                 mc.mcProfiler.startSection("mainTasks");
-                JourneymapClient.getInstance().performMainThreadTasks();
+                Journeymap.getClient().performMainThreadTasks();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
             else if (counter == 10)
             {
                 mc.mcProfiler.startSection("multithreadTasks");
-                if (JourneymapClient.getInstance().isMapping() && mc.theWorld != null)
+                if (Journeymap.getClient().isMapping() && mc.theWorld != null)
                 {
-                    JourneymapClient.getInstance().performMultithreadTasks();
+                    Journeymap.getClient().performMultithreadTasks();
                 }
                 counter++;
                 mc.mcProfiler.endSection();
@@ -110,9 +109,9 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 counter++;
             }
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Error during performMainThreadTasks: " + e);
+            Journeymap.getLogger().warn("Error during onClientTick: " + LogFormatter.toPartialString(t));
         }
         finally
         {
@@ -131,7 +130,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 return;
             }
 
-            WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
+            WaypointProperties waypointProperties = Journeymap.getClient().getWaypointProperties();
             boolean enabled = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
             boolean cancelled = false;
 
@@ -187,7 +186,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 e2.printStackTrace();
             }
-            JourneymapClient.disable();
+            Journeymap.getClient().disable();
         }
     }
 }

@@ -67,7 +67,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
     public static boolean isHardcoreAndMultiplayer()
     {
-        WorldData world = DataCache.instance().getWorld(false);
+        WorldData world = DataCache.INSTANCE.getWorld(false);
         return world.hardcore && !world.singlePlayer;
     }
 
@@ -315,9 +315,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
         jm_version = Journeymap.JM_VERSION.toString();
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
-        browser_poll = Math.max(1000, JourneymapClient.getCoreProperties().browserPoll.get());
+        browser_poll = Math.max(1000, Journeymap.getClient().getCoreProperties().browserPoll.get());
 
-        iconSetName = JourneymapClient.getFullMapProperties().entityIconSetName.get();
+        iconSetName = Journeymap.getClient().getFullMapProperties().entityIconSetName.get();
         iconSetNames = IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
 
         return this;

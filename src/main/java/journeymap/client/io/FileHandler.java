@@ -40,14 +40,28 @@ import java.util.zip.ZipInputStream;
 
 public class FileHandler
 {
+    public static final String DEV_MINECRAFT_DIR = "run/";
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
 
-    public static final File MinecraftDirectory = FMLClientHandler.instance().getClient().mcDataDir;
+    public static final File MinecraftDirectory = getMinecraftDirectory();
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
 
     private static WorldClient theLastWorld;
+
+    public static File getMinecraftDirectory()
+    {
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        if(minecraft!=null)
+        {
+            return minecraft.mcDataDir;
+        }
+        else
+        {
+            return new File(DEV_MINECRAFT_DIR);
+        }
+    }
 
     public static File getMCWorldDir(Minecraft minecraft)
     {
@@ -160,7 +174,7 @@ public class FileHandler
 
         if (!minecraft.isSingleplayer())
         {
-            return getJMWorldDir(minecraft, JourneymapClient.getInstance().getCurrentWorldId());
+            return getJMWorldDir(minecraft, Journeymap.getClient().getCurrentWorldId());
         }
         else
         {
@@ -184,7 +198,7 @@ public class FileHandler
 
             worldDirectory = getJMWorldDirForWorldId(minecraft, worldId);
 
-            if (worldDirectory.exists())
+            if (worldDirectory!=null && worldDirectory.exists())
             {
                 return worldDirectory;
             }
@@ -274,7 +288,7 @@ public class FileHandler
 
     public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
     {
-        if (minecraft.theWorld == null)
+        if (minecraft==null || minecraft.theWorld == null)
         {
             return null;
         }

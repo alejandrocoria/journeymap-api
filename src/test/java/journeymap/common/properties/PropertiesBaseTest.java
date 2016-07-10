@@ -9,9 +9,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Generic test code to ensure serialization/deserialization work correctly
@@ -133,8 +133,8 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
     @SuppressWarnings("unchecked")
     protected void randomize(EnumField field)
     {
-        EnumSet enumSet = field.getValidValues();
-        ArrayList<? extends Enum> list = new ArrayList<Enum>(enumSet);
+        Set enumSet = field.getValidValues();
+        ArrayList<? extends Enum> list = new ArrayList<>(enumSet);
         field.set(list.get(rand.nextInt(list.size())));
     }
 

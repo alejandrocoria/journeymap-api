@@ -8,7 +8,6 @@
 
 package journeymap.client.cartography;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -25,7 +24,7 @@ public class Strata
     final int initialPoolSize;
     final int poolGrowthIncrement;
     private final boolean underground;
-    private boolean mapCaveLighting = JourneymapClient.getCoreProperties().mapCaveLighting.get();
+    private boolean mapCaveLighting = Journeymap.getClient().getCoreProperties().mapCaveLighting.get();
     private Integer topY = null;
     private Integer bottomY = null;
     private Integer topWaterY = null;
@@ -84,7 +83,7 @@ public class Strata
         setLightAttenuation(0);
         setBlocksFound(false);
 
-        mapCaveLighting = JourneymapClient.getCoreProperties().mapCaveLighting.get();
+        mapCaveLighting = Journeymap.getClient().getCoreProperties().mapCaveLighting.get();
 
         while (!stack.isEmpty())
         {

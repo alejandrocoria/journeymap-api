@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import journeymap.client.JourneymapClient;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.client.ui.waypoint.WaypointChat;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -56,7 +57,7 @@ public class CmdChatPosition implements ICommand
 
         final String pos = text;
 
-        JourneymapClient.getInstance().queueMainThreadTask(new IMainThreadTask()
+        Journeymap.getClient().queueMainThreadTask(new IMainThreadTask()
         {
             @Override
             public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)

@@ -8,7 +8,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.MapSaver;
 import journeymap.client.model.MapType;
@@ -67,7 +66,7 @@ public class ActionService extends BaseService
         }
 
         // Ensure world is loaded
-        if (!JourneymapClient.getInstance().isMapping())
+        if (!Journeymap.getClient().isMapping())
         {
             throwEventException(503, "JourneyMap not mapping", event, false);
         }
@@ -150,7 +149,7 @@ public class ActionService extends BaseService
             {
                 throwEventException(403, "No image files to save.", event, true);
             }
-            JourneymapClient.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+            Journeymap.getClient().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
 
             Properties response = new Properties();
             response.put("filename", mapSaver.getSaveFileName());
@@ -182,7 +181,7 @@ public class ActionService extends BaseService
     private void autoMap(Event event) throws Event, Exception
     {
 
-        boolean enabled = JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        boolean enabled = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
         String scope = getParameter(event.query(), "scope", "stop");
 
         HashMap responseObj = new HashMap();
@@ -191,14 +190,14 @@ public class ActionService extends BaseService
         {
             if (enabled)
             {
-                JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);
+                Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, false, Boolean.FALSE);
                 responseObj.put("message", "automap_complete");
             }
         }
         else if (!enabled)
         {
             boolean doAll = "all".equals(scope);
-            JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, true, doAll);
+            Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, true, doAll);
             responseObj.put("message", "automap_started");
         }
         else

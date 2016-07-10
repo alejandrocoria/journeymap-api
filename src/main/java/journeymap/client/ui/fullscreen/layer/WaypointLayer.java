@@ -108,7 +108,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         int dimension = mc.thePlayer.dimension;
 
         // check for existing
-        Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
+        Collection<Waypoint> waypoints = DataCache.INSTANCE.getWaypoints(false);
         ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
         for (Waypoint waypoint : waypoints)
         {

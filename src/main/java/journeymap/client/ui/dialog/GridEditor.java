@@ -9,7 +9,6 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
@@ -70,7 +69,7 @@ public class GridEditor extends JmUI
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
 
-        this.gridSpecs = JourneymapClient.getCoreProperties().gridSpecs.clone();
+        this.gridSpecs = Journeymap.getClient().getCoreProperties().gridSpecs.clone();
 
         MapType mapType = MapType.day(0);
         activeMapType = mapType;
@@ -429,8 +428,8 @@ public class GridEditor extends JmUI
     protected void saveAndClose()
     {
         updateGridSpecs();
-        JourneymapClient.getCoreProperties().gridSpecs.updateFrom(this.gridSpecs);
-        JourneymapClient.getCoreProperties().save();
+        Journeymap.getClient().getCoreProperties().gridSpecs.updateFrom(this.gridSpecs);
+        Journeymap.getClient().getCoreProperties().save();
         closeAndReturn();
     }
 

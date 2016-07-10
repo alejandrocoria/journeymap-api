@@ -8,7 +8,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
@@ -54,8 +53,8 @@ public class PropertyService extends BaseService
     {
         if (propMap.isEmpty())
         {
-            fullMapProperties = JourneymapClient.getFullMapProperties();
-            webMapProperties = JourneymapClient.getWebMapProperties();
+            fullMapProperties = Journeymap.getClient().getFullMapProperties();
+            webMapProperties = Journeymap.getClient().getWebMapProperties();
             propMap.put("showCaves", fullMapProperties.showCaves);
             propMap.put("showGrid", fullMapProperties.showGrid);
             propMap.put("showAnimals", webMapProperties.showAnimals);

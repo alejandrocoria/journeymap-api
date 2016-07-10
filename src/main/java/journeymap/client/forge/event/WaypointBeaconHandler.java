@@ -8,8 +8,8 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.render.ingame.RenderWaypointBeacon;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -40,7 +40,7 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)
     {
-        if (mc.thePlayer != null && JourneymapClient.getWaypointProperties().beaconEnabled.get())
+        if (mc.thePlayer != null && Journeymap.getClient().getWaypointProperties().beaconEnabled.get())
         {
             if (!this.mc.gameSettings.hideGUI)
             {

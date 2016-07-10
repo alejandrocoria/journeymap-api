@@ -9,7 +9,6 @@
 package journeymap.client.render.ingame;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
@@ -56,7 +55,7 @@ public class RenderWaypointBeacon
     {
         try
         {
-            waypointProperties = JourneymapClient.getWaypointProperties();
+            waypointProperties = Journeymap.getClient().getWaypointProperties();
 
             Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
             //allTimer.start();

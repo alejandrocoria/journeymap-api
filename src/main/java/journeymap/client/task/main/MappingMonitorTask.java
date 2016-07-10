@@ -70,7 +70,7 @@ public class MappingMonitorTask implements IMainThreadTask
             }
             else
             {
-                if (!jm.isMapping() && !isDead && JourneymapClient.getCoreProperties().mappingEnabled.get())
+                if (!jm.isMapping() && !isDead && Journeymap.getClient().getCoreProperties().mappingEnabled.get())
                 {
                     jm.startMapping();
                 }
@@ -92,7 +92,7 @@ public class MappingMonitorTask implements IMainThreadTask
             }
 
             // Start Mapping
-            if (!jm.isMapping() && JourneymapClient.getCoreProperties().mappingEnabled.get())
+            if (!jm.isMapping() && Journeymap.getClient().getCoreProperties().mappingEnabled.get())
             {
                 jm.startMapping();
             }

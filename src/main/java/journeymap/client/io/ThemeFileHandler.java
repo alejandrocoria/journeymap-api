@@ -12,7 +12,6 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.ui.UIManager;
@@ -175,7 +174,7 @@ public class ThemeFileHandler
         {
             return;
         }
-        JourneymapClient.getCoreProperties().themeName.set(theme.name);
+        Journeymap.getClient().getCoreProperties().themeName.set(theme.name);
         getCurrentTheme(true);
         UIManager.INSTANCE.getMiniMap().reset();
     }
@@ -187,7 +186,7 @@ public class ThemeFileHandler
             TextureCache.instance().purgeThemeImages();
         }
 
-        String themeName = JourneymapClient.getCoreProperties().themeName.get();
+        String themeName = Journeymap.getClient().getCoreProperties().themeName.get();
         if (forceReload || currentTheme == null || !themeName.equals(currentTheme.name))
         {
             currentTheme = getThemeByName(themeName);

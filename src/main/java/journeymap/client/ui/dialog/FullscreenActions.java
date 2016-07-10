@@ -9,7 +9,6 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.BlockMD;
@@ -58,7 +57,7 @@ public class FullscreenActions extends JmUI
 
     public static void launchLocalhost()
     {
-        String url = "http://localhost:" + JourneymapClient.getWebMapProperties().port.get();
+        String url = "http://localhost:" + Journeymap.getClient().getWebMapProperties().port.get();
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -144,11 +143,11 @@ public class FullscreenActions extends JmUI
         buttonSave = new Button(Constants.getString("jm.common.save_map"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonBrowser = new Button(Constants.getString("jm.common.use_browser"));
-        buttonBrowser.setEnabled(JourneymapClient.getWebMapProperties().enabled.get());
+        buttonBrowser.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
 
         buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
         buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
-        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && JourneymapClient.getCoreProperties().mappingEnabled.get());
+        buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && Journeymap.getClient().getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));
@@ -162,7 +161,7 @@ public class FullscreenActions extends JmUI
 
         buttonEnableMapping = new BooleanPropertyButton(Constants.getString("jm.common.enable_mapping_false"),
                 Constants.getString("jm.common.enable_mapping_true"),
-                JourneymapClient.getCoreProperties().mappingEnabled);
+                Journeymap.getClient().getCoreProperties().mappingEnabled);
 
         buttonList.add(buttonAbout);
         buttonList.add(buttonAutomap);
@@ -192,7 +191,7 @@ public class FullscreenActions extends JmUI
             initGui();
         }
 
-        buttonSave.setEnabled(!JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class));
+        buttonSave.setEnabled(!Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class));
 
         final int hgap = 4;
         final int vgap = 3;
@@ -269,7 +268,7 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonEnableMapping)
         {
             buttonEnableMapping.toggle();
-            if (JourneymapClient.getCoreProperties().mappingEnabled.get())
+            if (Journeymap.getClient().getCoreProperties().mappingEnabled.get())
             {
                 UIManager.INSTANCE.openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
@@ -277,7 +276,7 @@ public class FullscreenActions extends JmUI
             }
             else
             {
-                JourneymapClient.getInstance().stopMapping();
+                Journeymap.getClient().stopMapping();
                 BlockMD.reset();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
                 UIManager.INSTANCE.openFullscreenMap();
@@ -290,12 +289,12 @@ public class FullscreenActions extends JmUI
     void save()
     {
         final MapState state = Fullscreen.state();
-        boolean showCaves = JourneymapClient.getFullMapProperties().showCaves.get();
+        boolean showCaves = Journeymap.getClient().getFullMapProperties().showCaves.get();
         final MapType mapType = state.getMapType(showCaves);
         final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType);
         if (mapSaver.isValid())
         {
-            JourneymapClient.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+            Journeymap.getClient().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
             ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
         }
         closeAndReturn();

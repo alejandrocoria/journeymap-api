@@ -12,7 +12,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.mod.ModBlockDelegate;
@@ -211,7 +210,7 @@ public class BlockMD implements Comparable<BlockMD>
     {
         try
         {
-            if (blockState == null)
+            if (blockState == null || blockState.getBlock()==Blocks.AIR)
             {
                 return AIRBLOCK;
             }
@@ -486,7 +485,7 @@ public class BlockMD implements Comparable<BlockMD>
             return true;
         }
 
-        return (hasAnyFlag(FlagsPlantAndCrop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get());
+        return (hasAnyFlag(FlagsPlantAndCrop) && !Journeymap.getClient().getCoreProperties().mapPlantShadows.get());
     }
 
     /**

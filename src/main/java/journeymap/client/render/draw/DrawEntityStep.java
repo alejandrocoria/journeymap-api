@@ -9,7 +9,6 @@
 package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -35,7 +34,7 @@ public class DrawEntityStep implements DrawStep
     static final Integer labelFg = RGB.WHITE_RGB;
     static final int labelFgAlpha = 225;
 
-    boolean hideSneaks = JourneymapClient.getCoreProperties().hideSneakingEntities.get();
+    boolean hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
     TextureImpl texture;
@@ -60,7 +59,7 @@ public class DrawEntityStep implements DrawStep
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving != null)
         {
-            customName = DataCache.instance().getEntityDTO(entityLiving).customName;
+            customName = DataCache.INSTANCE.getEntityDTO(entityLiving).customName;
         }
     }
 

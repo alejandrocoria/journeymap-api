@@ -9,7 +9,6 @@
 package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.WorldData;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -32,8 +31,8 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -111,7 +110,7 @@ public class WaypointEditor extends JmUI
     {
         try
         {
-            FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
+            FullMapProperties fullMapProperties = Journeymap.getClient().getFullMapProperties();
             LocationFormat locationFormat = new LocationFormat();
             locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
 
@@ -686,7 +685,7 @@ public class WaypointEditor extends JmUI
             return;
         }
 
-        //DataCache.instance().forceRefresh(WaypointsData.class);
+        //DataCache.INSTANCE.forceRefresh(WaypointsData.class);
         Fullscreen.state().requireRefresh();
         closeAndReturn();
     }

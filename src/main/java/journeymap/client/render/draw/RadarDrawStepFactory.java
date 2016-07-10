@@ -107,7 +107,7 @@ public class RadarDrawStepFactory
                         if (isPlayer)
                         {
                             entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(entityLiving));
-                            DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
+                            DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);
                         }
@@ -116,7 +116,7 @@ public class RadarDrawStepFactory
                             entityIcon = tc.getEntityIconTexture(iconSetName, dto.filename);
                             if (entityIcon != null)
                             {
-                                DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
+                                DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
                                 drawStep.update(false, locatorImg, entityIcon, showMobHeading);
                                 drawStepList.add(drawStep);
                             }

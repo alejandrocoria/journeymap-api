@@ -9,11 +9,11 @@
 package journeymap.client.data;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.EntityHelper;
+import journeymap.common.Journeymap;
 import net.minecraft.entity.EntityLivingBase;
 
 import java.util.ArrayList;
@@ -59,6 +59,6 @@ public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
 
     public long getTTL()
     {
-        return Math.max(1000, JourneymapClient.getCoreProperties().cacheAnimalsData.get());
+        return Math.max(1000, Journeymap.getClient().getCoreProperties().cacheAnimalsData.get());
     }
 }

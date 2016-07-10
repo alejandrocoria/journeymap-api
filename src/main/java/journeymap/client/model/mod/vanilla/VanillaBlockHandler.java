@@ -2,10 +2,10 @@ package journeymap.client.model.mod.vanilla;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
-import journeymap.client.JourneymapClient;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
+import journeymap.common.Journeymap;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -42,7 +42,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         setFlags(Material.BARRIER, HasAir, OpenToSky, NoShadow);
         setFlags(Material.AIR, HasAir, OpenToSky, NoShadow);
         setFlags(Material.GLASS, .4F, TransparentRoof);
-        if (JourneymapClient.getCoreProperties().caveIgnoreGlass.get())
+        if (Journeymap.getClient().getCoreProperties().caveIgnoreGlass.get())
         {
             setFlags(Material.GLASS, OpenToSky);
         }
@@ -168,7 +168,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         }
 
         // Toggle plant shadows
-        if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop) && !JourneymapClient.getCoreProperties().mapPlantShadows.get())
+        if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop) && !Journeymap.getClient().getCoreProperties().mapPlantShadows.get())
         {
             blockMD.addFlags(NoShadow);
         }

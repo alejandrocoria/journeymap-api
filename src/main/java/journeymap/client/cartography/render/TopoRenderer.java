@@ -9,7 +9,6 @@
 package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
@@ -63,7 +62,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
         chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
         chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
-        DataCache.instance().addChunkMDListener(this);
+        DataCache.INSTANCE.addChunkMDListener(this);
 
         primarySlopeOffsets.clear();
         secondarySlopeOffsets.clear();
@@ -85,7 +84,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         World world = FMLClientHandler.instance().getClient().theWorld;
         double worldHeight = world.getHeight();
 
-        topoProperties = JourneymapClient.getTopoProperties();
+        topoProperties = Journeymap.getClient().getTopoProperties();
         if (System.currentTimeMillis() - lastPropFileUpdate > 5000 && lastPropFileUpdate < topoProperties.lastModified())
         {
             Journeymap.getLogger().info("Loading " + topoProperties.getFileName());

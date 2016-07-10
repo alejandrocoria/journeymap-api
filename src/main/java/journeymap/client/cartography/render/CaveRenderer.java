@@ -9,7 +9,6 @@
 package journeymap.client.cartography.render;
 
 import com.google.common.cache.RemovalNotification;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
@@ -65,7 +64,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     {
         super.updateOptions();
 
-        mapSurfaceAboveCaves = JourneymapClient.getCoreProperties().mapSurfaceAboveCaves.get();
+        mapSurfaceAboveCaves = Journeymap.getClient().getCoreProperties().mapSurfaceAboveCaves.get();
     }
 
     @Override

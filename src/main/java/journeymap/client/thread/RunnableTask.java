@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 
 public class RunnableTask implements Runnable
 {
-    static final JourneymapClient jm = JourneymapClient.getInstance();
+    static final JourneymapClient jm = Journeymap.getClient();
     static final Logger logger = Journeymap.getLogger();
     static final Minecraft mc = FMLClientHandler.instance().getClient();
     static final boolean threadLogging = jm.isThreadLogging();

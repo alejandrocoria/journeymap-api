@@ -37,6 +37,6 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
     public void onChunkEvent(ChunkEvent.Unload event)
     {
         ChunkPos coord = event.getChunk().getChunkCoordIntPair();
-        DataCache.instance().invalidateChunkMD(coord);
+        DataCache.INSTANCE.invalidateChunkMD(coord);
     }
 }

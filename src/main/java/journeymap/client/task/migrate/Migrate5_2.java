@@ -13,7 +13,6 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -53,13 +52,13 @@ public class Migrate5_2 implements MigrationTask
         if (currentVersion.toMajorMinorString().equals("5.2"))
         {
 
-            if (JourneymapClient.getCoreProperties() == null)
+            if (Journeymap.getClient().getCoreProperties() == null)
             {
-                JourneymapClient.getInstance().loadConfigProperties();
+                Journeymap.getClient().loadConfigProperties();
             }
 
             // Check current configs to see if they've already been updated
-            String optionsManagerViewed = JourneymapClient.getCoreProperties().optionsManagerViewed.get();
+            String optionsManagerViewed = Journeymap.getClient().getCoreProperties().optionsManagerViewed.get();
             if (Strings.isNullOrEmpty(optionsManagerViewed))
             {
                 return true;
@@ -93,12 +92,12 @@ public class Migrate5_2 implements MigrationTask
             logger.info("Migrating configs from 5.1 to 5.2");
 
             List<? extends PropertiesBase> propertiesList = Arrays.asList(
-                    JourneymapClient.getCoreProperties(),
-                    JourneymapClient.getFullMapProperties(),
-                    JourneymapClient.getMiniMapProperties(1),
-                    JourneymapClient.getMiniMapProperties(2),
-                    JourneymapClient.getWaypointProperties(),
-                    JourneymapClient.getWebMapProperties()
+                    Journeymap.getClient().getCoreProperties(),
+                    Journeymap.getClient().getFullMapProperties(),
+                    Journeymap.getClient().getMiniMapProperties(1),
+                    Journeymap.getClient().getMiniMapProperties(2),
+                    Journeymap.getClient().getWaypointProperties(),
+                    Journeymap.getClient().getWebMapProperties()
             );
 
             for (PropertiesBase properties : propertiesList)
@@ -118,7 +117,7 @@ public class Migrate5_2 implements MigrationTask
                 }
             }
 
-            JourneymapClient.getCoreProperties().optionsManagerViewed.set("5.1");
+            Journeymap.getClient().getCoreProperties().optionsManagerViewed.set("5.1");
 
             return true;
         }

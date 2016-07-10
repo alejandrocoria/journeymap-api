@@ -94,8 +94,8 @@ public class RegionLoader
         }
 
         // Flush synchronously so it's done before clearing
-        RegionImageCache.instance().flushToDisk(false);
-        RegionImageCache.instance().clear();
+        RegionImageCache.INSTANCE.flushToDisk(false);
+        RegionImageCache.INSTANCE.clear();
 
         final File jmImageWorldDir = FileHandler.getJMWorldDir(mc);
         final Stack<RegionCoord> stack = new Stack<RegionCoord>();

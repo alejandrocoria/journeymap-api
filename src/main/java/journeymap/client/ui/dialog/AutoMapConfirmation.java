@@ -15,6 +15,7 @@ import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
@@ -42,7 +43,7 @@ public class AutoMapConfirmation extends JmUI
         buttonNone = new Button(Constants.getString("jm.common.automap_dialog_none"));
         buttonClose = new Button(Constants.getString("jm.common.close"));
 
-        boolean enable = !JourneymapClient.getInstance().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        boolean enable = !Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
         buttonAll.setEnabled(enable);
         buttonMissing.setEnabled(enable);
         buttonNone.setEnabled(!enable);
@@ -97,12 +98,12 @@ public class AutoMapConfirmation extends JmUI
                 arg = null;
             }
 
-            JourneymapClient.getInstance().queueMainThreadTask(new IMainThreadTask()
+            Journeymap.getClient().queueMainThreadTask(new IMainThreadTask()
             {
                 @Override
                 public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
                 {
-                    JourneymapClient.getInstance().toggleTask(MapRegionTask.Manager.class, enable, arg);
+                    Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, enable, arg);
                     return null;
                 }
 

@@ -10,7 +10,6 @@ package journeymap.client.model;
 
 
 import com.google.common.base.Objects;
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
@@ -26,6 +25,7 @@ import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.task.multi.MapPlayerTask;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -92,7 +92,7 @@ public class MapState
 
         lastPlayerChunkX = player.chunkCoordX;
         lastPlayerChunkZ = player.chunkCoordZ;
-        highQuality = JourneymapClient.getCoreProperties().tileHighDisplayQuality.get();
+        highQuality = Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get();
 
         if (player.dimension != this.getCurrentMapType().dimension)
         {
@@ -136,7 +136,7 @@ public class MapState
         }
 
         boolean hasSky = !ForgeHelper.INSTANCE.hasNoSky(playerEntity);
-        boolean mapTopo = JourneymapClient.getCoreProperties().mapTopography.get();
+        boolean mapTopo = Journeymap.getClient().getCoreProperties().mapTopography.get();
 
         if (currentMapType.isUnderground())
         {
@@ -282,21 +282,21 @@ public class MapState
         {
             if (mapProperties.showAnimals.get() || mapProperties.showPets.get())
             {
-                entityList.addAll(DataCache.instance().getAnimals(false).values());
+                entityList.addAll(DataCache.INSTANCE.getAnimals(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarVillagers))
         {
             if (mapProperties.showVillagers.get())
             {
-                entityList.addAll(DataCache.instance().getVillagers(false).values());
+                entityList.addAll(DataCache.INSTANCE.getVillagers(false).values());
             }
         }
         if (FeatureManager.isAllowed(Feature.RadarMobs))
         {
             if (mapProperties.showMobs.get())
             {
-                entityList.addAll(DataCache.instance().getMobs(false).values());
+                entityList.addAll(DataCache.INSTANCE.getMobs(false).values());
             }
         }
 
@@ -304,7 +304,7 @@ public class MapState
         {
             if (mapProperties.showPlayers.get())
             {
-                entityList.addAll(DataCache.instance().getPlayers(false).values());
+                entityList.addAll(DataCache.INSTANCE.getPlayers(false).values());
             }
         }
 
@@ -319,7 +319,7 @@ public class MapState
         if (mapProperties.showWaypoints.get())
         {
             boolean showLabel = mapProperties.showWaypointLabels.get();
-            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.instance().getWaypoints(false), gridRenderer, checkWaypointDistance, showLabel));
+            drawWaypointStepList.addAll(waypointRenderer.prepareSteps(DataCache.INSTANCE.getWaypoints(false), gridRenderer, checkWaypointDistance, showLabel));
         }
 
         generateDrawStepsTimer.stop();

@@ -65,7 +65,6 @@ public class JourneymapClient implements CommonProxy
 {
     public static final String EDITION = getEdition();
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + EDITION;
-    private static JourneymapClient instance;
 
     // Properties & preferences
     private volatile CoreProperties coreProperties;
@@ -77,37 +76,23 @@ public class JourneymapClient implements CommonProxy
     private volatile WaypointProperties waypointProperties;
     private volatile Boolean initialized = false;
     private volatile String currentWorldId = null;
-    private volatile Minecraft mc;
+    //private final Minecraft mc;
     private Logger logger;
     private boolean threadLogging = false;
 
-    // Task controller for issuing tasks in executor
-    private TaskController multithreadTaskController;
-    private ChunkRenderController chunkRenderController;
+    // Main thread tasks
+    private final MainTaskController mainThreadTaskController = new MainTaskController();
 
-    // Controller for tasks that have to be done on the main thread
-    private volatile MainTaskController mainThreadTaskController;
+    // Multithreaded tasks
+    private TaskController multithreadTaskController;
+
+    private ChunkRenderController chunkRenderController;
 
     /**
      * Constructor.
      */
     public JourneymapClient()
     {
-        if (instance != null)
-        {
-            throw new IllegalArgumentException("Use instance() after initialization is complete");
-        }
-        instance = this;
-    }
-
-    /**
-     * Get the instance
-     *
-     * @return
-     */
-    public static JourneymapClient getInstance()
-    {
-        return instance;
     }
 
     /**
@@ -117,7 +102,7 @@ public class JourneymapClient implements CommonProxy
      */
     private static String getEdition()
     {
-        String ed = null;
+        String ed;
         try
         {
             ed = Journeymap.JM_VERSION + " " + FeatureManager.getPolicySetName();
@@ -133,56 +118,56 @@ public class JourneymapClient implements CommonProxy
     /**
      * Get the core properties.
      */
-    public static CoreProperties getCoreProperties()
+    public CoreProperties getCoreProperties()
     {
-        return instance.coreProperties;
+        return coreProperties;
     }
 
     /**
      * Get the fullmap properties.
      */
-    public static FullMapProperties getFullMapProperties()
+    public FullMapProperties getFullMapProperties()
     {
-        return instance.fullMapProperties;
+        return fullMapProperties;
     }
 
     /**
      * Get the core properties.
      */
-    public static TopoProperties getTopoProperties()
+    public TopoProperties getTopoProperties()
     {
-        return instance.topoProperties;
+        return topoProperties;
     }
 
     /**
      * Disable the mod.
      */
-    public static void disable()
+    public void disable()
     {
-        instance.initialized = false;
+        initialized = false;
         EventHandlerManager.unregisterAll();
-        instance.stopMapping();
+        stopMapping();
         ClientAPI.INSTANCE.purge();
-        DataCache.instance().purge();
+        DataCache.INSTANCE.purge();
     }
 
     /**
      * Get the minimap properties for the active minimap.
      */
-    public static MiniMapProperties getMiniMapProperties(int which)
+    public MiniMapProperties getMiniMapProperties(int which)
     {
         switch (which)
         {
             case 2:
             {
-                instance.miniMapProperties2.setActive(true);
-                instance.miniMapProperties1.setActive(false);
+                miniMapProperties2.setActive(true);
+                miniMapProperties1.setActive(false);
                 return getMiniMapProperties2();
             }
             default:
             {
-                instance.miniMapProperties1.setActive(true);
-                instance.miniMapProperties2.setActive(false);
+                miniMapProperties1.setActive(true);
+                miniMapProperties2.setActive(false);
                 return getMiniMapProperties1();
             }
         }
@@ -191,9 +176,9 @@ public class JourneymapClient implements CommonProxy
     /**
      * Get the active minimap id.
      */
-    public static int getActiveMinimapId()
+    public int getActiveMinimapId()
     {
-        if (instance.miniMapProperties1.isActive())
+        if (miniMapProperties1.isActive())
         {
             return 1;
         }
@@ -206,33 +191,33 @@ public class JourneymapClient implements CommonProxy
     /**
      * Get properties for minimap 1.
      */
-    public static MiniMapProperties getMiniMapProperties1()
+    public MiniMapProperties getMiniMapProperties1()
     {
-        return instance.miniMapProperties1;
+        return miniMapProperties1;
     }
 
     /**
      * Get properties for minimap 2.
      */
-    public static MiniMapProperties getMiniMapProperties2()
+    public MiniMapProperties getMiniMapProperties2()
     {
-        return instance.miniMapProperties2;
+        return miniMapProperties2;
     }
 
     /**
      * Get the webmap properties.
      */
-    public static WebMapProperties getWebMapProperties()
+    public WebMapProperties getWebMapProperties()
     {
-        return instance.webMapProperties;
+        return webMapProperties;
     }
 
     /**
      * Get the waypoint properties.
      */
-    public static WaypointProperties getWaypointProperties()
+    public WaypointProperties getWaypointProperties()
     {
-        return instance.waypointProperties;
+        return waypointProperties;
     }
 
     /**
@@ -241,7 +226,6 @@ public class JourneymapClient implements CommonProxy
      * @param event
      * @throws Throwable
      */
-    @SideOnly(Side.CLIENT)
     @Override
     public void preInitialize(FMLPreInitializationEvent event) throws Throwable
     {
@@ -261,7 +245,6 @@ public class JourneymapClient implements CommonProxy
      * @param event
      * @throws Throwable
      */
-    @SideOnly(Side.CLIENT)
     @Override
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
@@ -316,22 +299,17 @@ public class JourneymapClient implements CommonProxy
      *
      * @param event
      */
-    @SideOnly(Side.CLIENT)
     @Override
     public void postInitialize(FMLPostInitializationEvent event)
     {
         StatTimer timer = null;
         try
         {
-            logger.info("postInitialize ENTER");
+            logger.debug("postInitialize ENTER");
             timer = StatTimer.getDisposable("elapsed").start();
 
-            // Get ref to Minecraft
-            mc = FMLClientHandler.instance().getClient();
-
             // Main thread task controller
-            mainThreadTaskController = new MainTaskController(mc, this);
-            mainThreadTaskController.addTask(new MappingMonitorTask());
+            queueMainThreadTask(new MappingMonitorTask());
 
             // Register general event handlers
             EventHandlerManager.registerGeneralHandlers();
@@ -368,7 +346,7 @@ public class JourneymapClient implements CommonProxy
         }
         finally
         {
-            logger.info("postInitialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
+            logger.debug("postInitialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
         }
 
         JMLogger.setLevelFromProperties();
@@ -411,7 +389,7 @@ public class JourneymapClient implements CommonProxy
      */
     public Boolean isMapping()
     {
-        return initialized && multithreadTaskController != null && multithreadTaskController.isMapping();
+        return initialized && multithreadTaskController != null && multithreadTaskController.isActive();
     }
 
     /**
@@ -435,7 +413,20 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Toggles automapping
+     * Queue a Runnable on the multithreaded task controller.
+     *
+     * @param runnable
+     */
+    public void queueOneOff(Runnable runnable) throws Exception
+    {
+        if (multithreadTaskController != null)
+        {
+            multithreadTaskController.queueOneOff(runnable);
+        }
+    }
+
+    /**
+     * Toggles a recurring task
      *
      * @param enable
      */
@@ -472,12 +463,19 @@ public class JourneymapClient implements CommonProxy
     {
         synchronized (this)
         {
+            Minecraft mc = FMLClientHandler.instance().getClient();
+
             if (mc == null || mc.theWorld == null || !initialized || !coreProperties.mappingEnabled.get())
             {
                 return;
             }
 
             File worldDir = FileHandler.getJMWorldDir(mc, currentWorldId);
+            if (worldDir == null)
+            {
+                return;
+            }
+
             if (!worldDir.exists())
             {
                 boolean created = worldDir.mkdirs();
@@ -515,10 +513,12 @@ public class JourneymapClient implements CommonProxy
     {
         synchronized (this)
         {
+            Minecraft mc = FMLClientHandler.instance().getClient();
             if ((isMapping()) && mc != null)
             {
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension()));
-                RegionImageCache.instance().flushToDiskAsync(true);
+                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId),
+                        File.separator, ForgeHelper.INSTANCE.getDimension()));
+                RegionImageCache.INSTANCE.flushToDiskAsync(true);
             }
 
             if (multithreadTaskController != null)
@@ -528,9 +528,11 @@ public class JourneymapClient implements CommonProxy
                 multithreadTaskController = null;
             }
 
-            int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension() : 0;
-
-            ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
+            if (mc != null)
+            {
+                int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension() : 0;
+                ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
+            }
         }
     }
 
@@ -539,13 +541,13 @@ public class JourneymapClient implements CommonProxy
      */
     private void reset()
     {
-        if (!mc.isSingleplayer() && currentWorldId == null)
+        if (!FMLClientHandler.instance().getClient().isSingleplayer() && currentWorldId == null)
         {
             WorldInfoHandler.requestWorldID();
         }
 
         loadConfigProperties();
-        DataCache.instance().purge();
+        DataCache.INSTANCE.purge();
         chunkRenderController = new ChunkRenderController();
         Fullscreen.state().requireRefresh();
         Fullscreen.state().follow.set(true);
@@ -571,16 +573,7 @@ public class JourneymapClient implements CommonProxy
      */
     public void performMainThreadTasks()
     {
-        try
-        {
-            mainThreadTaskController.performTasks();
-        }
-        catch (Throwable t)
-        {
-            String error = "Error in JourneyMap.performMainThreadTasks(): " + t.getMessage();
-            ChatLog.announceError(error);
-            logger.error(LogFormatter.toString(t));
-        }
+        mainThreadTaskController.performTasks();
     }
 
     /**
@@ -607,7 +600,7 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Get the chunk render controller instance.  May be null.
+     * Get the chunk render controller   May be null.
      *
      * @return
      */
@@ -701,6 +694,7 @@ public class JourneymapClient implements CommonProxy
     {
         synchronized (this)
         {
+            Minecraft mc = FMLClientHandler.instance().getClient();
             File currentWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, currentWorldId);
             File newWorldDirectory = FileHandler.getJMWorldDir(mc, worldId);
 

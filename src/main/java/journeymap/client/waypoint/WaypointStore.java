@@ -15,7 +15,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.Waypoint;
 import journeymap.client.model.WaypointGroup;
@@ -142,7 +141,7 @@ public enum WaypointStore
         cache.invalidateAll();
         dimensions.clear();
         loaded = false;
-        if (JourneymapClient.getWaypointProperties().managerEnabled.get())
+        if (Journeymap.getClient().getWaypointProperties().managerEnabled.get())
         {
             load();
         }

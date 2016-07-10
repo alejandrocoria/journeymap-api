@@ -8,7 +8,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.log.ChatLog;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
@@ -45,13 +44,13 @@ public class WebServer
 
     private WebServer()
     {
-        port = JourneymapClient.getWebMapProperties().port.get();
+        port = Journeymap.getClient().getWebMapProperties().port.get();
         validatePort();
     }
 
     public static void setEnabled(Boolean enable, boolean forceAnnounce)
     {
-        WebMapProperties webMapProperties = JourneymapClient.getWebMapProperties();
+        WebMapProperties webMapProperties = Journeymap.getClient().getWebMapProperties();
         webMapProperties.enabled.set(enable);
         webMapProperties.save();
 
@@ -198,7 +197,7 @@ public class WebServer
         props.put("threads", Integer.toString(5)); //$NON-NLS-1$
 
         // Rupy logging is spammy.  Only enable it if you really need to.
-        Level logLevel = Level.toLevel(JourneymapClient.getCoreProperties().logLevel.get(), Level.INFO);
+        Level logLevel = Level.toLevel(Journeymap.getClient().getCoreProperties().logLevel.get(), Level.INFO);
         if (logLevel.intLevel() >= (Level.TRACE.intLevel()))
         {
             props.put("debug", Boolean.TRUE.toString()); //$NON-NLS-1$

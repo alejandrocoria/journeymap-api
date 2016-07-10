@@ -7,6 +7,7 @@ import journeymap.client.model.Waypoint;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.waypoint.WaypointParser;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -50,7 +51,7 @@ public class CmdEditWaypoint implements ICommand
         if (waypoint != null)
         {
             final boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-            JourneymapClient.getInstance().queueMainThreadTask(new IMainThreadTask()
+            Journeymap.getClient().queueMainThreadTask(new IMainThreadTask()
             {
                 @Override
                 public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)

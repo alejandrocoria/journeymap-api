@@ -8,7 +8,6 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.client.JourneymapClient;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
@@ -119,7 +118,7 @@ public class MiniMap
         gridRenderer.setContext(state.getWorldDir(), mapType);
         gridRenderer.center(state.getWorldDir(), mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
 
-        boolean highQuality = JourneymapClient.getCoreProperties().tileHighDisplayQuality.get();
+        boolean highQuality = Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get();
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
     }
 
@@ -203,7 +202,7 @@ public class MiniMap
             // Refresh state
             if (doStateRefresh)
             {
-                boolean checkWaypointDistance = JourneymapClient.getWaypointProperties().maxDistance.get() > 0;
+                boolean checkWaypointDistance = Journeymap.getClient().getWaypointProperties().maxDistance.get() > 0;
                 state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
                 state.updateLastRefresh();
             }

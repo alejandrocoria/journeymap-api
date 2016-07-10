@@ -34,7 +34,7 @@ public class TileDrawStep
 {
     private static final Integer bgColor = 0x222222;
     private static final Logger logger = Journeymap.getLogger();
-    private static final RegionImageCache regionImageCache = RegionImageCache.instance();
+    private static final RegionImageCache regionImageCache = RegionImageCache.INSTANCE;
 
     private final boolean debug = logger.isDebugEnabled();
     private final RegionCoord regionCoord;

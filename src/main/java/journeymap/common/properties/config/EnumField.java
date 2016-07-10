@@ -4,6 +4,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Enum property field.
@@ -68,9 +69,10 @@ public class EnumField<E extends Enum> extends ConfigField<E>
         return null;
     }
 
-    public EnumSet<?> getValidValues()
+    public Set<E> getValidValues()
     {
-        return EnumSet.allOf(getEnumClass());
+        Class<? extends Enum> enumClass = getEnumClass();
+        return (Set<E>) EnumSet.allOf(enumClass);
     }
 
     @Override

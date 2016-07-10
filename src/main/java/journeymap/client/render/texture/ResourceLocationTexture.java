@@ -1,7 +1,6 @@
 package journeymap.client.render.texture;
 
 import com.google.common.cache.*;
-import journeymap.client.JourneymapClient;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -101,7 +100,7 @@ public class ResourceLocationTexture extends TextureImpl
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
         builder.concurrencyLevel(1);
-        if (JourneymapClient.getCoreProperties().recordCacheStats.get())
+        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
         {
             builder.recordStats();
         }

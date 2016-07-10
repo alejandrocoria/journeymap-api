@@ -8,15 +8,25 @@ import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.PluginHelper;
 import journeymap.client.api.util.UIState;
+import journeymap.client.io.FileHandler;
+import journeymap.client.io.RegionImageHandler;
+import journeymap.client.model.MapType;
 import journeymap.client.render.draw.OverlayDrawStep;
+import journeymap.client.render.map.Tile;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.helpers.Strings;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 /**
  * Implementation of the journeymap-api IClientAPI.
@@ -182,6 +192,80 @@ public enum ClientAPI implements IClientAPI
     {
         // TODO
         return true;
+    }
+
+    /**
+     * Note:  This is not currently supported for all mods.  Talk to Techbrew if you need to use this
+     * function.
+     * <p>
+     * Asynchonrously request a BufferedImage map tile (512x512px) from JourneyMap. Abusing this can have
+     * severe performance implications.  Requests may be throttled, so use sparingly.
+     *
+     * @param modId      Mod ID
+     * @param dimension  The dimension
+     * @param apiMapType The map type
+     * @param coord      The NW coordinates of the tile.  Y is ignored.
+     * @param vSlice     The vertical chunk (slice) if the maptype isn't day/night/topo
+     * @param zoom       The zoom level
+     * @param showGrid   Whether to include to include the chunk grid overlay
+     * @return a Future which will provide a BufferedImage when/if available.  If it returns null, then no image available.
+     */
+    public FutureTask<BufferedImage> requestMapTile(final String modId, final int dimension, final Context.MapType apiMapType,
+                                                    final ChunkPos coord, Integer vSlice, final int zoom, final boolean showGrid)
+    {
+        boolean honorRequest = true;
+        final File worldDir = FileHandler.getJMWorldDir(Minecraft.getMinecraft());
+        if (!Objects.equals("jmitems", modId))
+        {
+            honorRequest = false;
+            logError("requestMapTile not supported");
+        }
+        else if (worldDir == null || !worldDir.exists() || !worldDir.isDirectory())
+        {
+            honorRequest = false;
+            logError("world directory not found: " + worldDir);
+        }
+
+        final MapType mapType;
+        final boolean returnImage = honorRequest;
+        if (returnImage)
+        {
+            mapType = MapType.fromApiContextMapType(apiMapType, vSlice, dimension);
+        }
+        else
+        {
+            mapType = null;
+        }
+
+        return new FutureTask<BufferedImage>(new Callable<BufferedImage>()
+        {
+            @Override
+            public BufferedImage call() throws Exception
+            {
+                try
+                {
+                    if (returnImage)
+                    {
+                        // Determine chunks for coordinates at zoom level
+                        final int scale = (int) Math.pow(2, zoom);
+                        final int distance = 32 / scale;
+                        final int maxChunkX = coord.chunkXPos + distance - 1;
+                        final int maxChunkZ = coord.chunkZPos + distance - 1;
+                        final ChunkPos endCoord = new ChunkPos(maxChunkX, maxChunkZ);
+                        return RegionImageHandler.getMergedChunks(worldDir, coord, endCoord, mapType, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
+                    }
+                    else
+                    {
+                        log("Requesting map tile: Not supported / possible");
+                    }
+                }
+                catch (Exception e)
+                {
+                    logError("Couldn't request map tile", e);
+                }
+                return null;
+            }
+        });
     }
 
     public boolean playerAccepts(Displayable displayable)

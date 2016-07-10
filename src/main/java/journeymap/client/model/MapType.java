@@ -38,7 +38,7 @@ public class MapType
 
     public static MapType from(Name name, Integer vSlice, int dimension)
     {
-        return DataCache.instance().getMapType(name, vSlice, dimension);
+        return DataCache.INSTANCE.getMapType(name, vSlice, dimension);
     }
 
     public static MapType from(Integer vSlice, int dimension)
@@ -110,6 +110,33 @@ public class MapType
                 return Context.MapType.Underground;
             default:
                 return Context.MapType.Any;
+        }
+    }
+
+    public static MapType fromApiContextMapType(final Context.MapType apiMapType, Integer vSlice, int dimension)
+    {
+        switch (apiMapType)
+        {
+            case Day:
+            {
+                return new MapType(Name.day, vSlice, dimension);
+            }
+            case Night:
+            {
+                return new MapType(Name.night, vSlice, dimension);
+            }
+            case Underground:
+            {
+                return new MapType(Name.underground, vSlice, dimension);
+            }
+            case Topo:
+            {
+                return new MapType(Name.topo, vSlice, dimension);
+            }
+            default:
+            {
+                return new MapType(Name.day, vSlice, dimension);
+            }
         }
     }
 

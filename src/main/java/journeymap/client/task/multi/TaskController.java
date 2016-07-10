@@ -11,6 +11,7 @@ package journeymap.client.task.multi;
 import journeymap.client.log.StatTimer;
 import journeymap.client.thread.RunnableTask;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.profiler.Profiler;
@@ -50,7 +51,7 @@ public class TaskController
         }
     }
 
-    public Boolean isMapping()
+    public Boolean isActive()
     {
         return taskExecutor != null && !taskExecutor.isShutdown();
     }
@@ -146,7 +147,7 @@ public class TaskController
         }
     }
 
-    private void toggleTask(ITaskManager manager, boolean enable, Object params)
+    public void toggleTask(ITaskManager manager, boolean enable, Object params)
     {
         Minecraft minecraft = FMLClientHandler.instance().getClient();
         if (manager.isEnabled(minecraft))
@@ -190,6 +191,27 @@ public class TaskController
     public boolean hasRunningTask()
     {
         return !queue.isEmpty();
+    }
+
+    public void queueOneOff(Runnable runnable) throws Exception
+    {
+        try
+        {
+            ensureExecutor();
+            if (taskExecutor != null && !taskExecutor.isShutdown())
+            {
+                taskExecutor.submit(runnable);
+            }
+            else
+            {
+                throw new IllegalStateException("TaskExecutor isn't running");
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("TaskController couldn't queueOneOff(): " + LogFormatter.toString(e));
+            throw e;
+        }
     }
 
     public void performTasks()

@@ -36,7 +36,7 @@ public class MapPlayerTask extends BaseMapTask
     private static volatile long lastTaskCompleted;
     private static long lastTaskTime;
     private static double lastTaskAvgChunkTime;
-    private final int maxRuntime = JourneymapClient.getCoreProperties().renderDelay.get() * 3000;
+    private final int maxRuntime = Journeymap.getClient().getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
     private long startNs;
     private long elapsedNs;
@@ -50,7 +50,7 @@ public class MapPlayerTask extends BaseMapTask
     {
         synchronized (MapPlayerTask.class)
         {
-            DataCache.instance().invalidateChunkMDCache();
+            DataCache.INSTANCE.invalidateChunkMDCache();
         }
     }
 
@@ -93,20 +93,20 @@ public class MapPlayerTask extends BaseMapTask
 
         if (underground)
         {
-            if (worldHasSky && JourneymapClient.getCoreProperties().alwaysMapSurface.get())
+            if (worldHasSky && Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkPos>()));
             }
         }
         else
         {
-            if (cavesAllowed && JourneymapClient.getCoreProperties().alwaysMapCaves.get())
+            if (cavesAllowed && Journeymap.getClient().getCoreProperties().alwaysMapCaves.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.underground(player), new ArrayList<ChunkPos>()));
             }
         }
 
-        if (worldHasSky && !underground && JourneymapClient.getCoreProperties().mapTopography.get())
+        if (worldHasSky && !underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
         {
             tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.topo(player), new ArrayList<ChunkPos>()));
         }
@@ -120,17 +120,17 @@ public class MapPlayerTask extends BaseMapTask
         {
             ArrayList<String> lines = new ArrayList<String>(3);
 
-            if (DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapCaves.get())
+            if (DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapCaves.get())
             {
                 lines.add(RenderSpec.getUndergroundSpec().getDebugStats());
             }
 
-            if (!DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapSurface.get())
+            if (!DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
             {
                 lines.add(RenderSpec.getSurfaceSpec().getDebugStats());
             }
 
-            if (!DataCache.getPlayer().underground && JourneymapClient.getCoreProperties().mapTopography.get())
+            if (!DataCache.getPlayer().underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
             {
                 lines.add(RenderSpec.getTopoSpec().getDebugStats());
             }
@@ -150,7 +150,7 @@ public class MapPlayerTask extends BaseMapTask
         int secondaryRenderSize = 0;
         int totalChunks = 0;
 
-        if (DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapCaves.get())
+        if (DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapCaves.get())
         {
             RenderSpec spec = RenderSpec.getUndergroundSpec();
             if (spec != null)
@@ -161,7 +161,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        if (!DataCache.getPlayer().underground || JourneymapClient.getCoreProperties().alwaysMapSurface.get())
+        if (!DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
         {
             RenderSpec spec = RenderSpec.getSurfaceSpec();
             if (spec != null)
@@ -228,7 +228,7 @@ public class MapPlayerTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
-        final int mapTaskDelay = JourneymapClient.getCoreProperties().renderDelay.get() * 1000;
+        final int mapTaskDelay = Journeymap.getClient().getCoreProperties().renderDelay.get() * 1000;
 
         boolean enabled;
 
@@ -265,7 +265,7 @@ public class MapPlayerTask extends BaseMapTask
             {
                 if ((System.currentTimeMillis() - lastTaskCompleted) >= mapTaskDelay)
                 {
-                    ChunkRenderController chunkRenderController = JourneymapClient.getInstance().getChunkRenderController();
+                    ChunkRenderController chunkRenderController = Journeymap.getClient().getChunkRenderController();
                     return MapPlayerTask.create(chunkRenderController, DataCache.getPlayer());
                 }
             }
@@ -298,7 +298,7 @@ public class MapPlayerTask extends BaseMapTask
 
             startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
-            DataCache.instance().invalidateChunkMDCache();
+            DataCache.INSTANCE.invalidateChunkMDCache();
 
             super.performTask(mc, jm, jmWorldDir, threadLogging);
 

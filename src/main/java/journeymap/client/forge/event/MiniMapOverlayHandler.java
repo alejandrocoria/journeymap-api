@@ -14,6 +14,7 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.ui.UIManager;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -44,8 +45,8 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
 
     public static void checkEventConfig()
     {
-        EVENT_TYPE = JourneymapClient.getCoreProperties().renderOverlayEventTypeName.get();
-        EVENT_PRE = JourneymapClient.getCoreProperties().renderOverlayPreEvent.get();
+        EVENT_TYPE = Journeymap.getClient().getCoreProperties().renderOverlayEventTypeName.get();
+        EVENT_PRE = Journeymap.getClient().getCoreProperties().renderOverlayPreEvent.get();
     }
 
     @Override
@@ -62,7 +63,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
             if (mc.gameSettings.showDebugInfo)
             {
                 event.getLeft().add(null);
-                if (JourneymapClient.getCoreProperties().mappingEnabled.get())
+                if (Journeymap.getClient().getCoreProperties().mappingEnabled.get())
                 {
                     for (String line : MapPlayerTask.getDebugStats())
                     {
@@ -104,18 +105,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         {
             if (event.getType() == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
             {
-                if (jm == null)
-                {
-                    jm = JourneymapClient.getInstance();
-                }
-                if (jm.isMapping() || !JourneymapClient.getCoreProperties().mappingEnabled.get())
-                {
-                    mc.mcProfiler.startSection("journeymap");
-
-                    UIManager.getInstance().drawMiniMap();
-
-                    mc.mcProfiler.endSection(); // journeymap
-                }
+                UIManager.INSTANCE.drawMiniMap();
             }
         }
         catch (Throwable t)
