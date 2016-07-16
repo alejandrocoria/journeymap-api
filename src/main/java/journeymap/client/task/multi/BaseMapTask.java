@@ -113,7 +113,7 @@ public abstract class BaseMapTask implements ITask
 
                 ChunkPos coord = chunkIter.next();
                 ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
-                if (chunkMd != null && (chunkMd.needsToBeMapped() || playerChunk.equals(coord)))
+                if (chunkMd != null)
                 {
                     try
                     {

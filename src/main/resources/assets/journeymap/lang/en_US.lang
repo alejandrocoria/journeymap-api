@@ -58,6 +58,7 @@ jm.common.automap_title=Auto-Map...
 jm.common.automap_region_start=Auto-Mapping
 jm.common.automap_region_complete=Auto-Mapped
 jm.common.automap_region_chunks=Chunks mapped: %1$s
+jm.common.birthday=Happy birthday %1$s!
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Close
 jm.common.day=Day
