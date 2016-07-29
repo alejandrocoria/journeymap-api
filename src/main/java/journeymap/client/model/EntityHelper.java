@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.entity.RenderHorse;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -65,7 +66,7 @@ public class EntityHelper
                         if (entityClass.isAssignableFrom(entity.getClass()))
                         {
                             EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                            EntityDTO dto = DataCache.instance().getEntityDTO(entityLivingBase);
+                            EntityDTO dto = DataCache.INSTANCE.getEntityDTO(entityLivingBase);
                             dto.update(entityLivingBase, hostile);
                             list.add(dto);
                             break;
@@ -118,9 +119,13 @@ public class EntityHelper
             return false;
         }
 
-        if (entityLiving.getAttackTarget() != null)
+        EntityLivingBase attackTarget = entityLiving.getAttackTarget();
+        if (attackTarget != null)
         {
-            return false;
+            if (attackTarget instanceof EntityPlayer || attackTarget instanceof IEntityOwnable)
+            {
+                return false;
+            }
         }
 
         return true;
@@ -151,7 +156,7 @@ public class EntityHelper
         List<EntityDTO> playerDTOs = new ArrayList<EntityDTO>(allPlayers.size());
         for (EntityPlayer player : allPlayers)
         {
-            EntityDTO dto = DataCache.instance().getEntityDTO(player);
+            EntityDTO dto = DataCache.INSTANCE.getEntityDTO(player);
             dto.update(player, false);
             playerDTOs.add(dto);
         }
