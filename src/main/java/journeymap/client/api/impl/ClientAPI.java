@@ -9,10 +9,8 @@ import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.PluginHelper;
 import journeymap.client.api.util.UIState;
 import journeymap.client.io.FileHandler;
-import journeymap.client.io.RegionImageHandler;
-import journeymap.client.model.MapType;
 import journeymap.client.render.draw.OverlayDrawStep;
-import journeymap.client.render.map.Tile;
+import journeymap.client.task.multi.ApiImageTask;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
@@ -21,12 +19,12 @@ import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.helpers.Strings;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.function.Consumer;
 
 /**
  * Implementation of the journeymap-api IClientAPI.
@@ -195,24 +193,27 @@ public enum ClientAPI implements IClientAPI
     }
 
     /**
-     * Note:  This is not currently supported for all mods.  Talk to Techbrew if you need to use this
-     * function.
+     * Note:  This method IS NOT SUPPORTED for most mods. Misuse will lead to severe performance issues.
+     * Talk to Techbrew if you need to use this function.
      * <p>
-     * Asynchonrously request a BufferedImage map tile (512x512px) from JourneyMap. Abusing this can have
-     * severe performance implications.  Requests may be throttled, so use sparingly.
+     * Asynchonrously request a BufferedImage map tile from JourneyMap. Requests may be throttled, so use sparingly.
+     * The largest image size that will be returned is 512x512 px.
      *
-     * @param modId      Mod ID
+     * @param modId      Mod id
      * @param dimension  The dimension
      * @param apiMapType The map type
-     * @param coord      The NW coordinates of the tile.  Y is ignored.
-     * @param vSlice     The vertical chunk (slice) if the maptype isn't day/night/topo
-     * @param zoom       The zoom level
+     * @param startChunk The NW chunk of the tile.
+     * @param endChunk   The SW chunk of the tile.
+     * @param chunkY     The vertical chunk (slice) if the maptype isn't day/night/topo
+     * @param zoom       The zoom level (0-8)
      * @param showGrid   Whether to include to include the chunk grid overlay
-     * @return a Future which will provide a BufferedImage when/if available.  If it returns null, then no image available.
+     * @param callback   A callback function which will provide a BufferedImage when/if available.  If it returns null, then no image available.
      */
-    public FutureTask<BufferedImage> requestMapTile(final String modId, final int dimension, final Context.MapType apiMapType,
-                                                    final ChunkPos coord, Integer vSlice, final int zoom, final boolean showGrid)
+    public void requestMapTile(String modId, int dimension, Context.MapType apiMapType, ChunkPos startChunk, ChunkPos endChunk,
+                        @Nullable Integer chunkY, int zoom, boolean showGrid, final Consumer<BufferedImage> callback)
     {
+        log("requestMapTile");
+
         boolean honorRequest = true;
         final File worldDir = FileHandler.getJMWorldDir(Minecraft.getMinecraft());
         if (!Objects.equals("jmitems", modId))
@@ -226,46 +227,21 @@ public enum ClientAPI implements IClientAPI
             logError("world directory not found: " + worldDir);
         }
 
-        final MapType mapType;
-        final boolean returnImage = honorRequest;
-        if (returnImage)
+        if(honorRequest)
         {
-            mapType = MapType.fromApiContextMapType(apiMapType, vSlice, dimension);
+            try
+            {
+                Journeymap.getClient().queueOneOff(new ApiImageTask(modId, dimension, apiMapType, startChunk, endChunk, chunkY, zoom, showGrid, callback));
+            }
+            catch (Exception e)
+            {
+                callback.accept(null);
+            }
         }
         else
         {
-            mapType = null;
+            callback.accept(null);
         }
-
-        return new FutureTask<BufferedImage>(new Callable<BufferedImage>()
-        {
-            @Override
-            public BufferedImage call() throws Exception
-            {
-                try
-                {
-                    if (returnImage)
-                    {
-                        // Determine chunks for coordinates at zoom level
-                        final int scale = (int) Math.pow(2, zoom);
-                        final int distance = 32 / scale;
-                        final int maxChunkX = coord.chunkXPos + distance - 1;
-                        final int maxChunkZ = coord.chunkZPos + distance - 1;
-                        final ChunkPos endCoord = new ChunkPos(maxChunkX, maxChunkZ);
-                        return RegionImageHandler.getMergedChunks(worldDir, coord, endCoord, mapType, true, null, Tile.TILESIZE, Tile.TILESIZE, false, showGrid);
-                    }
-                    else
-                    {
-                        log("Requesting map tile: Not supported / possible");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logError("Couldn't request map tile", e);
-                }
-                return null;
-            }
-        });
     }
 
     public boolean playerAccepts(Displayable displayable)
