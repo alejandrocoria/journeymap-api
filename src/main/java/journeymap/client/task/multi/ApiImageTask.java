@@ -6,6 +6,7 @@ import journeymap.client.io.RegionImageHandler;
 import journeymap.client.model.MapType;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
@@ -59,10 +60,10 @@ public class ApiImageTask implements Runnable
         {
             Journeymap.getLogger().error("Error in ApiImageTask: " + t, LogFormatter.toString(t));
         }
-        finally
-        {
-            this.callback.accept(image);
-        }
+
+        // Callback on main thread
+        final BufferedImage finalImage = image;
+        Minecraft.getMinecraft().addScheduledTask(() -> callback.accept(finalImage));
     }
 
 }
