@@ -283,27 +283,27 @@ public class ColorPalette
 
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
-                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + blockMD);
+                Journeymap.getLogger().debug("Block with Error flag won't be saved to color palette: " + blockMD);
                 continue;
             }
 
             if (Strings.isEmpty(blockMD.getUid()))
             {
-                Journeymap.getLogger().warn("Block without uid won't be saved to color palette: " + blockMD);
+                Journeymap.getLogger().debug("Block without uid won't be saved to color palette: " + blockMD);
                 continue;
             }
 
             Integer color = blockMD.getColor();
             if (color == null)
             {
-                Journeymap.getLogger().warn("Block without color won't be saved to color palette: " + blockMD);
+                Journeymap.getLogger().debug("Block without color won't be saved to color palette: " + blockMD);
                 continue;
             }
 
             Block block = blockMD.getBlock();
             if (block == null)
             {
-                Journeymap.getLogger().warn("Bad block won't be saved to color palette: " + blockMD);
+                Journeymap.getLogger().debug("Bad block won't be saved to color palette: " + blockMD);
                 continue;
             }
 

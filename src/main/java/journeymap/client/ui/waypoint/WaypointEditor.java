@@ -33,6 +33,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -41,6 +42,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class WaypointEditor extends JmUI
 {
@@ -81,6 +84,7 @@ public class WaypointEditor extends JmUI
     private Integer currentColor;
     private Rectangle2D.Double colorPickRect;
     private BufferedImage colorPickImg;
+    private List<String> colorPickTooltip;
     private Waypoint editedWaypoint;
     private ButtonList bottomButtons;
 
@@ -91,7 +95,9 @@ public class WaypointEditor extends JmUI
         this.editedWaypoint = new Waypoint(originalWaypoint);
         this.isNew = isNew;
         this.wpTexture = waypoint.getTexture();
-        this.colorPickTexture = TextureCache.instance().getColorPicker();
+        String tooltip = Constants.birthdayMessage();
+        this.colorPickTooltip = tooltip == null ? null : Collections.singletonList(tooltip);
+        this.colorPickTexture = tooltip == null ? TextureCache.instance().getColorPicker() : TextureCache.instance().getColorPicker2();
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
         Keyboard.enableRepeatEvents(true);
@@ -350,6 +356,12 @@ public class WaypointEditor extends JmUI
             guibutton.drawButton(this.mc, x, y);
         }
 
+        if (colorPickTooltip != null && colorPickRect.contains(x, y))
+        {
+            drawHoveringText(colorPickTooltip, x, y, getFontRenderer());
+            RenderHelper.disableStandardItemLighting();
+        }
+
         drawTitle();
         drawLogo();
     }
@@ -426,6 +438,12 @@ public class WaypointEditor extends JmUI
 
         updateWaypointFromForm();
         validate();
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException
+    {
+        super.handleMouseInput();
     }
 
     @Override

@@ -5,13 +5,18 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.7'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle'
 
 ext {
     srcWebDir = "src/main/resources/assets/journeymap/web/"
@@ -25,6 +30,8 @@ ext {
     }
 }
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 version = "${project.minecraft_version}-${project.jm_major}.${project.jm_minor}.${project.jm_micro}${project.jm_patch}"
 group = project.group_id
 archivesBaseName = project.mod_id
@@ -55,6 +62,10 @@ dependencies {
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
 }
 
+manifest {
+    attributes 'FMLAT': 'journeymap_at.cfg'
+}
+
 minecraft {
     version = "${project.minecraft_version}-${project.forge_version}"
     mappings = project.mappings
@@ -70,7 +81,7 @@ minecraft {
     replace "@PATCH@", project.jm_patch
 }
 
-processResources {
+processResources() {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -89,6 +100,20 @@ processResources {
         exclude 'mcmod.info'
         exclude 'license.txt'
     }
+}
+
+task processDocs(type: Copy) {
+    // update docs
+    from(file("/doc/")) {
+        include '*.html'
+        expand 'version': project.version,
+                'date': getDate(),
+                'mcversion': project.minecraft.version,
+                'forgeversion': project.forge_version,
+                'jmedition': project.unlimited,
+                'apiversion': project.journeymap_api_version
+    }
+    into 'build/doc'
 }
 
 task copyJs(type: Copy) {
@@ -150,7 +175,7 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task unlimitedJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar']) {
+task unlimitedJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar']) {
     version = "${version}-${project.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
@@ -192,7 +217,7 @@ task fairPlaySolder(type: Zip, dependsOn: 'fairPlayJar') {
     }
 }
 
-task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
+task fairPlayJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
     version = "${version}-${project.fairplay}".toLowerCase()
 
     from(sourceSets.main.output) {
@@ -211,7 +236,12 @@ task fairPlayJar(type: Jar, dependsOn: ['includeJars', 'copyCss', 'deleteNoRadar
     }
 }
 
-artifacts.archives unlimitedJar, unlimitedSolder, fairPlayJar, fairPlaySolder
+artifacts {
+    archives unlimitedJar
+    archives unlimitedSolder
+    archives fairPlayJar
+    archives fairPlaySolder
+}
 
 reobf {
     unlimitedJar {}
@@ -230,3 +260,44 @@ def getDate() {
 }
 
 build.dependsOn makePretty
+
+// Automated upload to CurseForge for the win!
+if (!project.hasProperty("curseForgeApiKey")) {
+    ext.curseForgeApiKey = "notset"
+}
+curseforge {
+    project {
+        id = '32274'
+        apiKey = "${curseForgeApiKey}"
+        changelogType = 'html'
+        releaseType = curse_release_type
+        relations {
+            embeddedLibrary 'journeymap-api'
+            tool 'journeymap-tools'
+        }
+
+        mainArtifact(unlimitedJar) {
+            displayName = "${archivesBaseName}-${version}"
+            changelog = file('/build/doc/changelog.html')
+        }
+
+        addArtifact(fairPlayJar) {
+        }
+
+        addArtifact(fairPlaySolder) {
+            changelog = file('/build/doc/solder.html')
+        }
+
+        addArtifact(unlimitedSolder) {
+            changelog = file('/build/doc/solder.html')
+        }
+    }
+}
+
+// Ensure build is done prior to cursegradle tasks
+project.afterEvaluate {
+    project.tasks.findAll { task -> task.name.startsWith('curseforge') && task.name != 'curseforge' }.each { projectTask ->
+        projectTask.dependsOn build
+    }
+}
+

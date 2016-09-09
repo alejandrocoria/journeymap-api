@@ -241,6 +241,23 @@ public class Constants
         return Joiner.on(", ").join(list);
     }
 
+    public static String birthdayMessage()
+    {
+        Calendar today = Calendar.getInstance();
+        int month = today.get(Calendar.MONTH);
+        int date = today.get(Calendar.DATE);
+        if (month == Calendar.JULY && date == 2)
+        {
+            return getString("jm.common.birthday", "techbrew");
+        }
+        if (month == Calendar.SEPTEMBER && date == 21)
+        {
+            return getString("jm.common.birthday", "mysticdrew");
+        }
+
+        return null;
+    }
+
     public enum WorldType
     {
         mp, sp

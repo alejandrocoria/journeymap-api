@@ -43,7 +43,7 @@ public class MapApiService extends FileService
     public void filter(Event event) throws Event, Exception
     {
         String domain = JourneymapClient.getWebMapProperties().googleMapApiDomain.get();
-        String apiUrl = String.format("http://maps.google%s/maps/api/js?libraries=geometry&sensor=false", domain);
+        String apiUrl = String.format("http://maps.google%s/maps/api/js?libraries=geometry&sensor=false&key=AIzaSyDeq8K0022T9N1y-7Q7GBYhwoDS2hruB3c", domain);
 
         ResponseHeader.on(event).setHeader("Location", apiUrl).noCache();
         event.reply().code("303 See Other");

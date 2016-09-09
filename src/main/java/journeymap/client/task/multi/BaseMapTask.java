@@ -22,6 +22,7 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public abstract class BaseMapTask implements ITask
                 return;
             }
 
-            final long now = System.currentTimeMillis();
+            ChunkPos playerChunk = new ChunkPos(FMLClientHandler.instance().getClient().thePlayer.getPosition());
 
             // Map the chunks
             while (chunkIter.hasNext())
@@ -112,7 +113,7 @@ public abstract class BaseMapTask implements ITask
 
                 ChunkPos coord = chunkIter.next();
                 ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
-                if (chunkMd != null && chunkMd.hasChunk())
+                if (chunkMd != null)
                 {
                     try
                     {
@@ -127,10 +128,6 @@ public abstract class BaseMapTask implements ITask
                     {
                         logger.warn("Error rendering chunk " + chunkMd + ": " + t.getMessage());
                     }
-                }
-                else
-                {
-                    //System.out.println("Lost: " + coord);
                 }
             }
 

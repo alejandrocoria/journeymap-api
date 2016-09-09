@@ -383,7 +383,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
-        return getWorld().getBiome(blockPos);
+        return getWorld().getBiomeForCoordsBody(blockPos);
     }
 
     @Override
@@ -462,7 +462,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         }
 
         @Override
-        public Biome getBiome(BlockPos pos)
+        public Biome getBiomeGenForCoords(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
             if (chunkMD != null && chunkMD.hasChunk())
@@ -480,7 +480,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 catch (Throwable throwable)
                 {
                     Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-                    return ForgeHelper.INSTANCE.getWorld().getBiome(pos);
+                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
                 }
             }
             else
@@ -489,7 +489,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, Biome.plains);
 
                 // 1.8.8
-                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiomeGenerator(pos, Biomes.PLAINS);
             }
         }
 
