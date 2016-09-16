@@ -16,7 +16,7 @@ import static journeymap.server.properties.ServerCategory.General;
 public class GlobalProperties extends PermissionProperties
 {
     public final StringField worldID = new StringField(General, "World ID ");
-    public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
+    public static final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
 
     /**
      * Constructor.

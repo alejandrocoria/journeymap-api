@@ -462,7 +462,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
         }
 
         @Override
-        public Biome getBiomeGenForCoords(BlockPos pos)
+        public Biome getBiome(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
             if (chunkMD != null && chunkMD.hasChunk())
@@ -480,7 +480,7 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 catch (Throwable throwable)
                 {
                     Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
+                    return ForgeHelper.INSTANCE.getWorld().getBiome(pos);
                 }
             }
             else
@@ -489,15 +489,15 @@ public class ForgeHelper_1_9 implements IForgeHelper
                 // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, Biome.plains);
 
                 // 1.8.8
-                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiomeGenerator(pos, Biomes.PLAINS);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
             }
         }
 
-        @Override
-        public boolean extendedLevelsInChunkCache()
-        {
-            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-        }
+//        @Override
+//        public boolean extendedLevelsInChunkCache()
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+//        }
 
         @Override
         public int getStrongPower(BlockPos pos, EnumFacing direction)

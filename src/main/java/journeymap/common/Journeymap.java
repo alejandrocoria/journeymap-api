@@ -11,6 +11,7 @@ package journeymap.common;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
+import journeymap.server.command.DebugCommandTeleport;
 import journeymap.server.legacyserver.command.CommandJMServerForge;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraftforge.fml.common.Mod;
@@ -128,6 +129,7 @@ public class Journeymap
         PropertiesManager.getInstance();
 
         event.registerServerCommand(new CommandJMServerForge());
+        event.registerServerCommand(new DebugCommandTeleport());
     }
 
     @SideOnly(Side.SERVER)
