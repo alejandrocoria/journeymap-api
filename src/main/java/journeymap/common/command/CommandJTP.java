@@ -1,16 +1,17 @@
-package journeymap.server.command;
+package journeymap.common.command;
 
-import journeymap.server.feature.JourneyMapTeleport;
+import journeymap.common.feature.JourneyMapTeleport;
+import journeymap.common.network.model.Location;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 
 /**
  * Created by Mysticdrew on 9/15/2016.
  */
-public class DebugCommandTeleport extends CommandBase
+public class CommandJTP extends CommandBase
 {
 
     @Override
@@ -38,13 +39,27 @@ public class DebugCommandTeleport extends CommandBase
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
-
+        if (args.length < 4)
+        {
+            throw new CommandException(this.getCommandUsage(sender));
+        }
         String x = args[0];
         String y = args[1];
         String z = args[2];
         String dim = args[3];
-
-        EntityPlayerMP player = server.getPlayerList().getPlayerByUsername(sender.getName());
-        JourneyMapTeleport.attemptTeleport(player, x, y, z, dim, true);
+        Entity player = getCommandSenderAsPlayer(sender);
+        try
+        {
+            Location location = new Location(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), Integer.parseInt(dim));
+            JourneyMapTeleport.attemptTeleport(player, location, true);
+        }
+        catch (NumberFormatException nfe)
+        {
+            throw new CommandException("Numbers only! Usage: " + this.getCommandUsage(sender));
+        }
+        catch (Exception e)
+        {
+            throw new CommandException("/jtp failed Usage: " + this.getCommandUsage(sender));
+        }
     }
 }

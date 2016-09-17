@@ -8,10 +8,10 @@
 
 package journeymap.common;
 
+import journeymap.common.command.CommandJTP;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
-import journeymap.server.command.DebugCommandTeleport;
 import journeymap.server.legacyserver.command.CommandJMServerForge;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraftforge.fml.common.Mod;
@@ -108,28 +108,31 @@ public class Journeymap
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
     {
         proxy.postInitialize(event);
+
     }
 
-    @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
-        // Server migration needs to be here because of NBT loading/saving is not available until after postInit.
-        try
+        if (event.getServer().getEntityWorld().isRemote)
         {
-            // TODO: Move the dir name to a constant
+            // Server migration needs to be here because of NBT loading/saving is not available until after postInit.
+            try
+            {
+                // TODO: Move the dir name to a constant
 
-            boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
+                boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
 
+            }
+            catch (Throwable t)
+            {
+                getLogger().error(LogFormatter.toString(t));
+            }
+            PropertiesManager.getInstance();
         }
-        catch (Throwable t)
-        {
-            getLogger().error(LogFormatter.toString(t));
-        }
-        PropertiesManager.getInstance();
 
         event.registerServerCommand(new CommandJMServerForge());
-        event.registerServerCommand(new DebugCommandTeleport());
+        event.registerServerCommand(new CommandJTP());
     }
 
     @SideOnly(Side.SERVER)

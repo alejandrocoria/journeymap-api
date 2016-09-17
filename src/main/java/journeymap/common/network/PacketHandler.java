@@ -13,6 +13,7 @@ package journeymap.common.network;
  */
 
 import journeymap.common.Journeymap;
+import journeymap.common.network.model.Location;
 import journeymap.server.properties.PermissionProperties;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -25,11 +26,13 @@ public class PacketHandler
 
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
-    //public static final SimpleNetworkWrapper JM_PERMS = NetworkRegistry.INSTANCE.newSimpleChannel("jm_perms");
+    public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
 
     public static void init(Side side)
     {
+
         WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
+        TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
 
         if (Side.SERVER == side)
         {
@@ -40,6 +43,11 @@ public class PacketHandler
         {
             DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
         }
+    }
+
+    public static void teleportPlayer(Location location)
+    {
+        TELEPORT_CHANNEL.sendToServer(new TeleportPacket(location));
     }
 
     public static void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)

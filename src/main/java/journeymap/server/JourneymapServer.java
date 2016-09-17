@@ -62,11 +62,11 @@ public class JourneymapServer implements CommonProxy
      *
      * @param event
      */
-    @SideOnly(Side.SERVER)
     @Override
     public void initialize(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new ForgeEvents());
+        PacketHandler.init(Side.SERVER);
     }
 
     /**

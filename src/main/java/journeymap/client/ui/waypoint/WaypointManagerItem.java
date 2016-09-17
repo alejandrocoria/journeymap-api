@@ -75,11 +75,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         String on = Constants.getString("jm.common.on");
         String off = Constants.getString("jm.common.off");
 
-        buttonEnable = new OnOffButton(on, off, true); 
+        buttonEnable = new OnOffButton(on, off, true);
         buttonEnable.setToggled(waypoint.isEnable());
         buttonFind = new Button(Constants.getString("jm.waypoint.find"));
 
-        buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport")); 
+        buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport"));
         buttonTeleport.setDrawButton(manager.canUserTeleport);
         buttonTeleport.setEnabled(manager.canUserTeleport);
 
