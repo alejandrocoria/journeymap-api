@@ -7,12 +7,10 @@
  */
 package journeymap.client.properties;
 
-import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
-import journeymap.common.properties.config.StringField;
 
 import static journeymap.common.properties.Category.Hidden;
 import static journeymap.common.properties.Category.Inherit;
@@ -30,7 +28,6 @@ public abstract class MapProperties extends ClientPropertiesBase implements Comp
     public final BooleanField showWaypoints = new BooleanField(Inherit, "jm.common.show_waypoints", true);
     public final BooleanField showSelf = new BooleanField(Inherit, "jm.common.show_self", true);
     public final BooleanField showGrid = new BooleanField(Inherit, "jm.common.show_grid", true);
-    public final StringField entityIconSetName = new StringField(Inherit, "jm.common.mob_icon_set", IconSetFileHandler.IconSetValuesProvider.class);
     public final EnumField<MapType.Name> preferredMapType = new EnumField<MapType.Name>(Hidden, "", MapType.Name.day);
     public final IntegerField zoomLevel = new IntegerField(Hidden, "", 0, 8, 0);
 

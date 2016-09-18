@@ -17,8 +17,14 @@ import journeymap.client.model.MapType;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 
@@ -26,6 +32,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
@@ -45,13 +52,16 @@ public class TextureCache
     //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
     private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
 
-    private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    //private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
     private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
 
     private final LoadingCache<ResourceLocation, TextureImpl> resourceIcons = ResourceLocationTexture.createCache();
 
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<Runnable>(8), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
+
+    //private String currentEntityIconSetName;
+    private TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
 
     private TextureCache()
     {
@@ -285,32 +295,54 @@ public class TextureCache
     }
 
     /**
+     * Gets a buffered image from the resource location
+     *
+     * @param location location
+     * @return image
+     */
+    public static BufferedImage resolveImage(ResourceLocation location)
+    {
+        if (location.getResourceDomain().equals("fake"))
+        {
+            return null;
+        }
+
+        IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+        try
+        {
+            IResource resource = resourceManager.getResource(location);
+            InputStream is = resource.getInputStream();
+            return TextureUtil.readBufferedImage(is);
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
+            return null;
+        }
+    }
+
+    /**
      * *************************************************
      */
 
-    public TextureImpl getEntityIconTexture(String setName, String iconPath)
+    public TextureImpl getEntityIconTexture(ResourceLocation location)
     {
-        String texName = String.format("%s/%s", setName, iconPath);
-        synchronized (entityIcons)
+        ITextureObject tex = textureManager.getTexture(location);
+        if (tex != null && !(tex instanceof ResourceLocationTexture))
         {
-            TextureImpl tex = entityIcons.get(texName);
-            if (tex == null || (!tex.hasImage() && tex.retainImage))
-            {
-                File parentDir = IconSetFileHandler.getEntityIconDir();
-                String assetPath = IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY;
-                BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, setName, iconPath, getUnknownEntity().getImage()); //$NON-NLS-1$
-                if (img != null)
-                {
-                    if (tex != null)
-                    {
-                        tex.queueForDeletion();
-                    }
-                    tex = new TextureImpl(img);
-                    entityIcons.put(texName, tex);
-                }
-            }
-            return tex;
+            // Another mod stomped on the resource.  Considering it's a JM-only resource,
+            // we're going to replace it.
+            ExpireTextureTask.queue(tex.getGlTextureId());
+            tex = null;
         }
+
+        if (tex == null)
+        {
+            tex = new ResourceLocationTexture(location, true, false);
+            textureManager.loadTexture(location, tex);
+        }
+
+        return (TextureImpl) tex;
     }
 
     public TextureImpl getResourceTexture(ResourceLocation resourceLocation)
@@ -335,8 +367,13 @@ public class TextureCache
             if (tex == null || (!tex.hasImage() && tex.retainImage) || (resize && (width != tex.width || height != tex.height)) || tex.alpha != alpha)
             {
                 File parentDir = ThemeFileHandler.getThemeIconDir();
-                String assetPath = ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME;
-                BufferedImage img = FileHandler.getIconFromFile(parentDir, assetPath, theme.directory, iconPath, null); //$NON-NLS-1$
+                BufferedImage img = FileHandler.getIconFromFile(parentDir, theme.directory, iconPath);
+                if (img == null)
+                {
+                    String resourcePath = String.format("theme/%s/%s", theme.directory, iconPath);
+                    img = resolveImage(new ResourceLocation(Journeymap.MOD_ID, resourcePath));
+                }
+
                 if (img != null)
                 {
                     if (resize || alpha < 1f)
@@ -365,6 +402,7 @@ public class TextureCache
                 else
                 {
                     Journeymap.getLogger().error("Unknown theme image: " + texName);
+                    IconSetFileHandler.ensureEntityIconSet("Default");
                     return getUnknownEntity();
                 }
             }
@@ -529,11 +567,11 @@ public class TextureCache
             namedTextures.clear();
         }
 
-        synchronized (entityIcons)
-        {
-            ExpireTextureTask.queue(entityIcons.values());
-            entityIcons.clear();
-        }
+//        synchronized (entityIcons)
+//        {
+//            ExpireTextureTask.queue(entityIcons.values());
+//            entityIcons.clear();
+//        }
 
         synchronized (resourceIcons)
         {

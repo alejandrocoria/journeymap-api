@@ -22,14 +22,18 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -486,8 +490,31 @@ public class FileHandler
 
     public static boolean isInJar()
     {
-        URL location = JourneymapClient.class.getProtectionDomain().getCodeSource().getLocation();
-        return "jar".equals(location.getProtocol());
+        return isInJar(JourneymapClient.class.getProtectionDomain().getCodeSource().getLocation());
+    }
+
+    public static boolean isInJar(URL location)
+    {
+        if ("jar".equals(location.getProtocol()))
+        {
+            return true;
+        }
+        ;
+
+        if ("file".equals(location.getProtocol()))
+        {
+            File file = new File(location.getFile());
+            if (file.exists())
+            {
+                if (file.getName().endsWith(".jar") || file.getName().endsWith(".jar"))
+                {
+                    return true;
+                }
+            }
+        }
+        ;
+
+        return false;
     }
 
     public static File copyColorPaletteHtmlFile(File toDir, String fileName)
@@ -566,32 +593,109 @@ public class FileHandler
         }
     }
 
-    public static void copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
+    public static boolean copyResources(File targetDirectory, ResourceLocation location, String setName, boolean overwrite)
     {
         String fromPath = null;
         File toDir = null;
         try
         {
-            URL resourceDir = JourneymapClient.class.getResource(assetsPath);
-            String toPath = String.format("%s/%s", assetsPath, setName);
-            toDir = new File(targetDirectory, setName);
-            boolean inJar = FileHandler.isInJar();
-            if (inJar)
+            String domain = location.getResourceDomain();
+            URL fileLocation = null;
+
+            if (domain.equals("minecraft"))
             {
-                fromPath = URLDecoder.decode(resourceDir.getPath(), "utf-8").split("file:")[1].split("!/")[0];
-                FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
+                fileLocation = Minecraft.class.getProtectionDomain().getCodeSource().getLocation();
             }
             else
             {
-                File fromDir = new File(JourneymapClient.class.getResource(toPath).getFile());
-                fromPath = fromDir.getPath();
-                FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
+                for (Map.Entry<String, ModContainer> modEntry : Loader.instance().getIndexedModList().entrySet())
+                {
+                    if (modEntry.getValue().getModId().toLowerCase().equals(domain))
+                    {
+                        fileLocation = modEntry.getValue().getSource().toURI().toURL();
+                        break;
+                    }
+                }
+            }
+
+            if (fileLocation != null)
+            {
+                String assetsPath;
+                if (location.getResourcePath().startsWith("/assets/"))
+                {
+                    assetsPath = location.getResourcePath();
+                }
+                else
+                {
+                    assetsPath = String.format("/assets/%s/%s", domain, location.getResourcePath());
+                }
+                return copyResources(targetDirectory, fileLocation, assetsPath, setName, overwrite);
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(String.format("Couldn't get resource set from %s to %s: %s", fromPath, toDir, t));
+        }
+        return false;
+    }
+
+    public static boolean copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
+    {
+        ModContainer modContainer = Loader.instance().getIndexedModList().get(Journeymap.MOD_ID);
+        if (modContainer != null)
+        {
+            try
+            {
+                URL resourceDir = modContainer.getSource().toURI().toURL();
+                return copyResources(targetDirectory, resourceDir, assetsPath, setName, overwrite);
+            }
+            catch (MalformedURLException e)
+            {
+                Journeymap.getLogger().error(String.format("Couldn't find resource directory %s ", targetDirectory));
+            }
+        }
+        return false;
+    }
+
+    public static boolean copyResources(File targetDirectory, URL resourceDir, String assetsPath, String setName, boolean overwrite)
+    {
+        String fromPath = null;
+        File toDir = null;
+        try
+        {
+            toDir = new File(targetDirectory, setName);
+            boolean inJar = FileHandler.isInJar(resourceDir);
+            if (inJar)
+            {
+                if ("jar".equals(resourceDir.getProtocol()))
+                {
+                    fromPath = URLDecoder.decode(resourceDir.getPath(), "utf-8").split("file:")[1].split("!/")[0];
+                }
+                else
+                {
+                    fromPath = new File(resourceDir.getPath()).getPath();
+                }
+                return FileHandler.copyFromZip(fromPath, assetsPath, toDir, overwrite);
+            }
+            else
+            {
+                File fromDir = new File(resourceDir.getFile(), assetsPath);
+                if (fromDir.exists())
+                {
+                    fromPath = fromDir.getPath();
+                    return FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
+                }
+                else
+                {
+                    Journeymap.getLogger().error(String.format("Couldn't locate icons for %s: %s", setName, fromDir));
+                }
             }
         }
         catch (Throwable t)
         {
             Journeymap.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
         }
+        return false;
     }
 
     /**
@@ -600,9 +704,8 @@ public class FileHandler
      *
      * @throws IOException
      */
-    static void copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
+    static boolean copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
     {
-
         if (zipEntryName.startsWith("/"))
         {
             zipEntryName = zipEntryName.substring(1);
@@ -610,6 +713,8 @@ public class FileHandler
         final ZipFile zipFile = new ZipFile(zipFilePath);
         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
         ZipEntry entry = zipIn.getNextEntry();
+
+        boolean success = false;
 
         try
         {
@@ -624,6 +729,7 @@ public class FileHandler
                         {
                             Files.createParentDirs(toFile);
                             new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
+                            success = true;
                         }
                     }
                 }
@@ -636,14 +742,22 @@ public class FileHandler
         {
             zipIn.close();
         }
+
+        return success;
     }
 
     /**
      * Copies contents of one directory to another
      */
-    static void copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
+    static boolean copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
     {
-        toDir.mkdir();
+        if (!toDir.exists())
+        {
+            if (!toDir.mkdirs())
+            {
+                throw new IOException("Couldn't create directory: " + toDir);
+            }
+        }
         File[] files = fromDir.listFiles();
 
         if (files == null)
@@ -651,18 +765,27 @@ public class FileHandler
             throw new IOException(fromDir + " nas no files");
         }
 
+        boolean success = true;
         for (File from : files)
         {
             File to = new File(toDir, from.getName());
             if (from.isDirectory())
             {
-                copyFromDirectory(from, to, overWrite);
+                if (!copyFromDirectory(from, to, overWrite))
+                {
+                    success = false;
+                }
             }
             else if (overWrite || !to.exists())
             {
                 Files.copy(from, to);
+                if (!to.exists())
+                {
+                    success = false;
+                }
             }
         }
+        return success;
     }
 
     public static boolean delete(File file)
@@ -715,7 +838,7 @@ public class FileHandler
         return file.exists();
     }
 
-    public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
+    public static BufferedImage getIconFromFile(File parentdir, String setName, String iconPath)
     {
         BufferedImage img = null;
         if (iconPath == null)
@@ -737,31 +860,7 @@ public class FileHandler
                 img = FileHandler.getImage(iconFile);
             }
 
-            if (img == null)
-            {
-                img = FileHandler.getIconFromResource(assetsPath, setName, iconPath);
-                if (img == null && defaultImg != null)
-                {
-                    img = defaultImg;
-                    try
-                    {
-                        iconFile.getParentFile().mkdirs();
-                        ImageIO.write(img, "png", iconFile);
-                    }
-                    catch (Exception e)
-                    {
-                        String error = "FileHandler can't write image: " + iconFile + ": " + e;
-                        Journeymap.getLogger().error(error);
-                    }
 
-                    Journeymap.getLogger().debug("Created image: " + iconFile);
-                }
-                else
-                {
-                    String pngPath = Joiner.on('/').join(assetsPath, setName, iconPath);
-                    Journeymap.getLogger().error(String.format("Can't get image from file (%s) nor resource (%s) ", iconFile, pngPath));
-                }
-            }
         }
         catch (Exception e)
         {
@@ -770,6 +869,34 @@ public class FileHandler
 
         return img;
     }
+
+//    public void TODO(ResourceLocation assetsPath, String setName, String iconPath, BufferedImage defaultImg) {
+//        if (img == null)
+//        {
+//            img = FileHandler.getIconFromResource(assetsPath, setName, iconPath);
+//            if (img == null && defaultImg != null)
+//            {
+//                img = defaultImg;
+//                try
+//                {
+//                    iconFile.getParentFile().mkdirs();
+//                    ImageIO.write(img, "png", iconFile);
+//                }
+//                catch (Exception e)
+//                {
+//                    String error = "FileHandler can't write image: " + iconFile + ": " + e;
+//                    Journeymap.getLogger().error(error);
+//                }
+//
+//                Journeymap.getLogger().debug("Created image: " + iconFile);
+//            }
+//            else
+//            {
+//                String pngPath = Joiner.on('/').join(assetsPath, setName, iconPath);
+//                Journeymap.getLogger().error(String.format("Can't get image from file (%s) nor resource (%s) ", iconFile, pngPath));
+//            }
+//        }
+//    }
 
     public static BufferedImage getIconFromResource(String assetsPath, String setName, String iconPath)
     {

@@ -69,6 +69,7 @@ public class TextureImpl extends AbstractTexture
             this.glTextureId = glId;
         }
 
+        this.retainImage = retainImage;
         if (image != null)
         {
             setImage(image, retainImage);

@@ -48,7 +48,6 @@ public class RadarDrawStepFactory
 
             String playername = ForgeHelper.INSTANCE.getEntityName(FMLClientHandler.instance().getClient().thePlayer);
             TextureCache tc = TextureCache.instance();
-            String iconSetName = mapProperties.entityIconSetName.get();
 
             for (EntityDTO dto : entityDTOs)
             {
@@ -111,9 +110,9 @@ public class RadarDrawStepFactory
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
                             drawStepList.add(drawStep);
                         }
-                        else
+                        else if (dto.entityIconLocation != null)
                         {
-                            entityIcon = tc.getEntityIconTexture(iconSetName, dto.filename);
+                            entityIcon = tc.getEntityIconTexture(dto.entityIconLocation);
                             if (entityIcon != null)
                             {
                                 DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);

@@ -20,6 +20,7 @@ import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.config.StringField;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
@@ -33,7 +34,7 @@ import java.util.*;
  */
 public class ThemeFileHandler
 {
-    public static final String ASSETS_JOURNEYMAP_ICON_THEME = "/assets/journeymap/icon/theme";
+    public static final ResourceLocation THEME_ASSETS = new ResourceLocation(Journeymap.MOD_ID, "theme");
     public static final String THEME_FILE_SUFFIX = ".theme.json";
     public static final String DEFAULT_THEME_FILE = "default.theme.config";
 
@@ -55,7 +56,8 @@ public class ThemeFileHandler
         // Copy theme dirs from assets
         for (String dirName : themeDirNames)
         {
-            FileHandler.copyResources(getThemeIconDir(), ASSETS_JOURNEYMAP_ICON_THEME, dirName, true);
+            // TODO:  Use ResourceLocation
+            FileHandler.copyResources(getThemeIconDir(), THEME_ASSETS, dirName, true);
         }
 
         // Save theme files

@@ -184,7 +184,6 @@ public enum ClientAPI implements IClientAPI
         return false;
     }
 
-
     @Override
     public boolean playerAccepts(String modId, DisplayType displayType)
     {
@@ -227,24 +226,27 @@ public enum ClientAPI implements IClientAPI
             logError("world directory not found: " + worldDir);
         }
 
-        if(honorRequest)
+
         {
             try
             {
-                Journeymap.getClient().queueOneOff(new ApiImageTask(modId, dimension, apiMapType, startChunk, endChunk, chunkY, zoom, showGrid, callback));
+                if (honorRequest)
+                {
+                    Journeymap.getClient().queueOneOff(new ApiImageTask(modId, dimension, apiMapType, startChunk, endChunk, chunkY, zoom, showGrid, callback));
+                }
+                else
+                {
+                    Minecraft.getMinecraft().addScheduledTask(() -> callback.accept(null));
+                }
             }
             catch (Exception e)
             {
                 callback.accept(null);
             }
         }
-        else
-        {
-            callback.accept(null);
-        }
     }
 
-    public boolean playerAccepts(Displayable displayable)
+    private boolean playerAccepts(Displayable displayable)
     {
         return playerAccepts(displayable.getModId(), displayable.getDisplayType());
     }

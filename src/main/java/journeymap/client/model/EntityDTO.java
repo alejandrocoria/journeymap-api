@@ -10,6 +10,12 @@ package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -18,6 +24,7 @@ import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
@@ -32,7 +39,8 @@ public class EntityDTO implements Serializable
 {
     public final String entityId;
     public transient WeakReference<EntityLivingBase> entityLivingRef;
-    public String filename;
+    public transient ResourceLocation entityIconLocation;
+    public String iconLocation;
     public Boolean hostile;
     public double posX;
     public double posY;
@@ -79,17 +87,40 @@ public class EntityDTO implements Serializable
         }
         this.sneaking = entity.isSneaking();
 
+        ResourceLocation entityIcon = null;
+
         // Player check
         if (entity instanceof EntityPlayer)
         {
             String name = StringUtils.stripControlCodes(ForgeHelper.INSTANCE.getEntityName(entity));
-            this.filename = "/skin/" + name;
             this.username = name;
+
+            entityIcon = DefaultPlayerSkin.getDefaultSkinLegacy();
+            try
+            {
+
+                NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
+                NetworkPlayerInfo info = client.getPlayerInfo(entity.getUniqueID());
+                if (info != null)
+                {
+                    entityIcon = info.getLocationSkin();
+                }
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error("Error looking up player skin: " + LogFormatter.toPartialString(t));
+            }
         }
         else
         {
-            this.filename = EntityHelper.getFileName(entity);
             this.username = null;
+            entityIcon = EntityHelper.getIconTextureLocation(entity);
+        }
+
+        if (entityIcon != null)
+        {
+            this.entityIconLocation = entityIcon;
+            this.iconLocation = entityIcon.toString();
         }
 
         // Owner

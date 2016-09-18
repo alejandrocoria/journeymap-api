@@ -113,7 +113,7 @@ public class ColorPalette
      */
     public static ColorPalette getActiveColorPalette()
     {
-        String resourcePacks = Constants.getResourcePackNames();
+        String resourcePacks = ColorManager.getResourcePackNames();
         String modNames = Constants.getModNames();
 
         File worldPaletteFile = ColorPalette.getWorldPaletteFile();
@@ -186,7 +186,7 @@ public class ColorPalette
         ColorPalette palette = null;
         try
         {
-            String resourcePackNames = Constants.getResourcePackNames();
+            String resourcePackNames = ColorManager.getResourcePackNames();
             String modPackNames = Constants.getModNames();
 
             palette = new ColorPalette(resourcePackNames, modPackNames);

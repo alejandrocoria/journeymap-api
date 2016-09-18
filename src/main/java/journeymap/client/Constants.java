@@ -185,11 +185,10 @@ public class Constants
 
     /**
      * Get a list of all resource pack names.
-     * TODO:  Why did this end up here?
      *
      * @return
      */
-    public static String getResourcePackNames()
+    public static List<ResourcePackRepository.Entry> getResourcePacks()
     {
         ArrayList<ResourcePackRepository.Entry> entries = new ArrayList<ResourcePackRepository.Entry>();
 
@@ -202,23 +201,7 @@ public class Constants
         {
             Journeymap.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
         }
-
-        String packs;
-        if (entries.isEmpty())
-        {
-            packs = RESOURCE_PACKS_DEFAULT;
-        }
-        else
-        {
-            ArrayList<String> entryStrings = new ArrayList<String>(entries.size());
-            for (ResourcePackRepository.Entry entry : entries)
-            {
-                entryStrings.add(entry.toString());
-            }
-            Collections.sort(entryStrings);
-            packs = Joiner.on(", ").join(entryStrings);
-        }
-        return packs;
+        return entries;
     }
 
     /**
@@ -230,7 +213,7 @@ public class Constants
     public static String getModNames()
     {
         ArrayList<String> list = new ArrayList<String>();
-        for (ModContainer mod : Loader.instance().getModList())
+        for (ModContainer mod : Loader.instance().getActiveModList())
         {
             if (Loader.isModLoaded(mod.getModId()))
             {

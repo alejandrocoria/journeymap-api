@@ -18,7 +18,6 @@ public abstract class ClientPropertiesBaseTest<P extends PropertiesBase> extends
         randomize(p.showWaypoints);
         randomize(p.showSelf);
         randomize(p.showGrid);
-        randomize(p.entityIconSetName);
         randomize(p.preferredMapType);
         randomize(p.zoomLevel);
     }

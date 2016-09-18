@@ -15,7 +15,6 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -316,9 +315,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
         latest_journeymap_version = VersionCheck.getVersionAvailable();
         mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
         browser_poll = Math.max(1000, Journeymap.getClient().getCoreProperties().browserPoll.get());
-
-        iconSetName = Journeymap.getClient().getFullMapProperties().entityIconSetName.get();
-        iconSetNames = IconSetFileHandler.getEntityIconSetNames().toArray(new String[0]);
 
         return this;
     }

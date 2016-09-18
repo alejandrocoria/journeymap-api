@@ -20,6 +20,10 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.theme.ThemePresets;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import se.rupy.http.Event;
 
 import java.awt.image.BufferedImage;
@@ -170,7 +174,7 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = FileHandler.getIconStream(IconSetFileHandler.ASSETS_JOURNEYMAP_ICON_ENTITY, setName, iconPath);
+                    fileStream = FileHandler.getIconStream(ICON_ENTITY_PATH_PREFIX, setName, iconPath);
                     JMLogger.logOnce("Couldn't get file for " + path, null);
                 }
                 else
@@ -198,8 +202,18 @@ public class FileService extends BaseService
                     {
                         ResponseHeader.on(event).contentType(ContentType.png);
                     }
-                    fileStream = FileHandler.getIconStream(ThemeFileHandler.ASSETS_JOURNEYMAP_ICON_THEME, setName, iconPath);
-                    Journeymap.getLogger().warn("Couldn't get theme file for " + path);
+
+                    String resourcePath = String.format("theme/%s/%s", setName, iconPath);
+                    try
+                    {
+                        IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+                        IResource resource = resourceManager.getResource(new ResourceLocation(Journeymap.MOD_ID, resourcePath));
+                        fileStream = resource.getInputStream();
+                    }
+                    catch (Exception e)
+                    {
+                        Journeymap.getLogger().error("Resource not usable as image: " + resourcePath, LogFormatter.toPartialString(e));
+                    }
                 }
                 else
                 {

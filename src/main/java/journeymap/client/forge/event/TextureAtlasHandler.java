@@ -30,11 +30,7 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            // 0==blocks, 1==items
-            // if(event.map.getTextureType()==0) // 1.7.10 only
-            {
-                Journeymap.getClient().queueMainThreadTask(task);
-            }
+            Journeymap.getClient().queueMainThreadTask(task);
         }
         catch (Exception e)
         {

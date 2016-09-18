@@ -42,7 +42,7 @@ public class EntityHelper
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
-    //private static String[] horseVariantTextures = new String[] {"horse/horse_white.png", "horse/horse_creamy.png", "horse/horse_chestnut.png", "horse/horse_brown.png", "horse/horse_black.png", "horse/horse_gray.png", "/horse/horse_darkbrown.png"};
+    private static final String[] HORSE_TEXTURES = new String[]{"textures/entity/horse/horse_white.png", "textures/entity/horse/horse_creamy.png", "textures/entity/horse/horse_chestnut.png", "textures/entity/horse/horse_brown.png", "textures/entity/horse/horse_black.png", "textures/entity/horse/horse_gray.png", "textures/entity/horse/horse_darkbrown.png"};
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
@@ -213,66 +213,32 @@ public class EntityHelper
      * @param entity
      * @return
      */
-    public static String getFileName(Entity entity)
+    public static ResourceLocation getIconTextureLocation(Entity entity)
     {
-
         try
         {
             Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
 
+            ResourceLocation original = null;
             // Manually handle horses
             if (entityRender instanceof RenderHorse)
             {
                 EntityHorse horse = ((EntityHorse) entity);
-                final int type = ((EntityHorse) entity).getHorseVariant();
-                switch (type)
-                {
-                    case 1:
-                        return "horse/donkey.png";
-
-                    case 2:
-                        return "horse/mule.png";
-
-                    case 3:
-                        return "horse/horse_zombie.png";
-
-                    case 4:
-                        return "horse/horse_skeleton.png";
-                    case 0:
-                    {
-                        String variantTexture = horse.getVariantTexturePaths()[0];
-                        if (variantTexture.startsWith("textures/entity/"))
-                        {
-                            return variantTexture.split("textures/entity/")[1];
-                        }
-                    }
-                    default:
-                        return "horse/horse_brown.png";
-                }
+                original = new ResourceLocation("minecraft", horse.getVariantTexturePaths()[0]);
+            }
+            else
+            {
+                original = RenderFacade.getEntityTexture(entityRender, entity);
             }
 
-            // Non-horse mobs
-            ResourceLocation loc = RenderFacade.getEntityTexture(entityRender, entity);
-            if (loc == null)
+            if (original == null)
             {
                 JMLogger.logOnce("Can't get entityTexture for " + entity.getClass() + " via " + entityRender.getClass(), null);
                 return null;
             }
-            if (loc.getResourceDomain().equals("minecraft"))
-            {
-                String tex = loc.getResourcePath();
-                String search = "/entity/";
-                int i = tex.lastIndexOf(search);
-                if (i >= 0)
-                {
-                    tex = tex.substring(i + search.length());
-                }
-                return tex;
-            }
-            else
-            {
-                return loc.getResourceDomain() + "/" + loc.getResourcePath();
-            }
+
+            ResourceLocation entityIconLoc = new ResourceLocation(original.getResourceDomain(), original.getResourcePath().replace("/entity/", "/entity_icon/"));
+            return entityIconLoc;
         }
         catch (Throwable t)
         {

@@ -12,33 +12,98 @@ import journeymap.client.Constants;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.config.StringField;
+import net.minecraft.client.resources.IResourcePack;
+import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * IconSet file management.
  */
 public class IconSetFileHandler
 {
-    public static final String ASSETS_JOURNEYMAP_ICON_ENTITY = "/assets/journeymap/icon/entity";
-    public final static String MOB_ICON_SET_2D = "2D";
-    public final static String MOB_ICON_SET_3D = "3D";
-    public final static List<String> MOB_ICON_SETS = Arrays.asList(MOB_ICON_SET_2D, MOB_ICON_SET_3D);
+    public static final ResourceLocation ASSETS_JOURNEYMAP_ICON_ENTITY = new ResourceLocation(Journeymap.MOD_ID, "icon/entity");
+    public final static String MOB_ICON_SET_DEFAULT = "Default";
+
+    private static final Set<String> modUpdatedSetNames = new HashSet<>();
+    private static final Set<ResourceLocation> entityIconLocations = new HashSet<>();
+
+    static
+    {
+        registerEntityIconDirectory(ASSETS_JOURNEYMAP_ICON_ENTITY);
+    }
 
     public static void initialize()
     {
-        Journeymap.getLogger().info("Initializing icon sets...");
+        // Assume all entityIconLocations registered by now
+        modUpdatedSetNames.add(MOB_ICON_SET_DEFAULT);
+    }
 
-        // Mob icons
-        for (String setName : MOB_ICON_SETS)
+    public static boolean registerEntityIconDirectory(ResourceLocation resourceLocation)
+    {
+        boolean valid = addEntityIcons(resourceLocation, MOB_ICON_SET_DEFAULT, false);
+        if (valid)
         {
-            FileHandler.copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, setName, false);
+            entityIconLocations.add(resourceLocation);
         }
+        return valid;
+    }
+
+    public static void ensureEntityIconSet(String setName)
+    {
+        ensureEntityIconSet(setName, false);
+    }
+
+    public static void ensureEntityIconSet(String setName, boolean overwrite)
+    {
+        if (!modUpdatedSetNames.contains(setName))
+        {
+            // No need to repeat. Just once per runtime.
+            for (ResourceLocation resourceLocation : entityIconLocations)
+            {
+                addEntityIcons(resourceLocation, setName, overwrite);
+            }
+            modUpdatedSetNames.add(setName);
+        }
+
+        try
+        {
+            ResourcePackRepository rpr = FMLClientHandler.instance().getClient().getResourcePackRepository();
+            for (ResourcePackRepository.Entry entry : rpr.getRepositoryEntries())
+            {
+                IResourcePack pack = entry.getResourcePack();
+                for (String domain : pack.getResourceDomains())
+                {
+                    ResourceLocation domainEntityIcons = new ResourceLocation(domain, "textures/entity_icons");
+                    if (pack.resourceExists(domainEntityIcons))
+                    {
+                        addEntityIcons(domainEntityIcons, setName, true);
+                    }
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(String.format("Can't get entity icon from resource packs: %s", LogFormatter.toString(t)));
+        }
+    }
+
+    private static boolean addEntityIcons(ResourceLocation resourceLocation, String setName, boolean overwrite)
+    {
+        boolean result = false;
+        try
+        {
+            result = FileHandler.copyResources(getEntityIconDir(), resourceLocation, setName, overwrite);
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error adding entity icons: " + t.getMessage(), t);
+        }
+        Journeymap.getLogger().info(String.format("Added entity icons from %s. Success: %s", resourceLocation, result));
+        return result;
     }
 
     public static File getEntityIconDir()
@@ -53,7 +118,7 @@ public class IconSetFileHandler
 
     public static ArrayList<String> getEntityIconSetNames()
     {
-        return getIconSetNames(getEntityIconDir(), MOB_ICON_SETS);
+        return getIconSetNames(getEntityIconDir(), Collections.singletonList(MOB_ICON_SET_DEFAULT));
     }
 
     public static ArrayList<String> getIconSetNames(File parentDir, List<String> defaultIconSets)
@@ -101,14 +166,14 @@ public class IconSetFileHandler
             }
             else
             {
-                return MOB_ICON_SETS;
+                return Collections.singletonList(MOB_ICON_SET_DEFAULT);
             }
         }
 
         @Override
         public String getDefaultString()
         {
-            return MOB_ICON_SET_2D;
+            return MOB_ICON_SET_DEFAULT;
         }
     }
 

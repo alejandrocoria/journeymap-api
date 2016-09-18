@@ -8,6 +8,7 @@
 
 package journeymap.client.cartography;
 
+import com.google.common.base.Joiner;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
@@ -16,8 +17,13 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.client.resources.ResourcePackRepository;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Manages of block colors derived from the current texture pack.
@@ -35,6 +41,33 @@ public class ColorManager
     public static ColorManager instance()
     {
         return Holder.INSTANCE;
+    }
+
+    /**
+     * Get a list of all resource pack names.
+     *
+     * @return
+     */
+    public static String getResourcePackNames()
+    {
+        List<ResourcePackRepository.Entry> entries = Constants.getResourcePacks();
+
+        String packs;
+        if (entries.isEmpty())
+        {
+            packs = Constants.RESOURCE_PACKS_DEFAULT;
+        }
+        else
+        {
+            ArrayList<String> entryStrings = new ArrayList<String>(entries.size());
+            for (ResourcePackRepository.Entry entry : entries)
+            {
+                entryStrings.add(entry.toString());
+            }
+            Collections.sort(entryStrings);
+            packs = Joiner.on(", ").join(entryStrings);
+        }
+        return packs;
     }
 
     /**
@@ -57,7 +90,7 @@ public class ColorManager
             return;
         }
 
-        String currentResourcePackNames = Constants.getResourcePackNames();
+        String currentResourcePackNames = getResourcePackNames();
         String currentModNames = Constants.getModNames();
 
         boolean resourcePackSame = false;

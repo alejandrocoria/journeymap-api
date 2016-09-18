@@ -9,6 +9,7 @@
 package journeymap.client;
 
 import journeymap.client.api.impl.ClientAPI;
+import journeymap.client.api.impl.IMCHandler;
 import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorManager;
@@ -44,8 +45,11 @@ import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -318,10 +322,13 @@ public class JourneymapClient implements CommonProxy
             // Resets detection results of Voxel/Rei's
             WaypointsData.enableRecheck();
 
+            // TODO: TEMP DO NOT CHECKIN
+            IconSetFileHandler.registerEntityIconDirectory(new ResourceLocation("Waila", "textures/entity_icons"));
+
             // Ensure all icons are ready for use.
             IconSetFileHandler.initialize();
 
-            // Ensure all themese are ready for use
+            // Ensure all themes are ready for use
             ThemeFileHandler.initialize();
 
             // Webserver
@@ -370,6 +377,12 @@ public class JourneymapClient implements CommonProxy
     public boolean isUpdateCheckEnabled()
     {
         return getCoreProperties().checkUpdates.get();
+    }
+
+    @Mod.EventHandler
+    public void handleIMC(FMLInterModComms.IMCEvent event)
+    {
+        IMCHandler.handle(event);
     }
 
     /**
