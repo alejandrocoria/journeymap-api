@@ -113,36 +113,26 @@ public class ColorManager
         {
             lastResourcePackNames = currentResourcePackNames;
             lastModNames = currentModNames;
-            blocksTextureChanged = colorHelper.clearBlocksTexture();
+            blocksTextureChanged = true;
         }
 
-        if (!colorHelper.hasBlocksTexture())
+        Journeymap.getLogger().info("Loading blocks and textures...");
+
+        boolean isMapping = Journeymap.getClient().isMapping();
+        if (isMapping)
         {
-            Journeymap.getLogger().info("Loading blocks and textures...");
-
-            boolean isMapping = Journeymap.getClient().isMapping();
-            if (isMapping)
-            {
-                Journeymap.getClient().stopMapping();
-            }
-
-            // Reload all BlockMDs
-            BlockMD.reset();
-
-            // Ensure blocks texture initialized
-            colorHelper.initBlocksTexture();
-
-            // Init colors
-            initBlockColors(blocksTextureChanged);
-
-            if (isMapping)
-            {
-                Journeymap.getClient().startMapping();
-            }
+            Journeymap.getClient().stopMapping();
         }
-        else
+
+        // Reload all BlockMDs
+        BlockMD.reset();
+
+        // Init colors
+        initBlockColors(blocksTextureChanged);
+
+        if (isMapping)
         {
-            Journeymap.getLogger().info("Blocks and textures are current");
+            Journeymap.getClient().startMapping();
         }
     }
 

@@ -17,7 +17,6 @@ import journeymap.client.model.MapType;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
-import journeymap.common.log.LogFormatter;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.ITextureObject;
@@ -316,7 +315,8 @@ public class TextureCache
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
+            //Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
+            Journeymap.getLogger().error("Resource not usable as image: " + location);
             return null;
         }
     }

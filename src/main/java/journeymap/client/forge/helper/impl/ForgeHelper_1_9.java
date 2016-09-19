@@ -64,7 +64,7 @@ import java.util.List;
 public class ForgeHelper_1_9 implements IForgeHelper
 {
     private IBlockAccess blockAccess = new JmBlockAccess();
-    private IColorHelper colorHelper = new ColorHelper_1_8();
+    private IColorHelper colorHelper = new ColorHelper_1_9();
 
     @Override
     public IColorHelper getColorHelper()

@@ -18,19 +18,11 @@ import net.minecraft.util.math.BlockPos;
  */
 public interface IColorHelper
 {
-    boolean clearBlocksTexture();
-
-    boolean hasBlocksTexture();
-
-    boolean initBlocksTexture();
-
     boolean failedFor(BlockMD blockMD);
 
     Integer getTextureColor(BlockMD blockMD);
 
     int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos);
-
-    int getRenderColor(BlockMD blockMD);
 
     int getMapColor(BlockMD blockMD);
 }

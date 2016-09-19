@@ -11,9 +11,9 @@ package journeymap.client.forge.helper.impl;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
-import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.render.texture.TextureCache;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
@@ -21,55 +21,32 @@ import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.awt.image.BufferedImage;
-import java.nio.IntBuffer;
 import java.util.HashSet;
 
 /**
  * IColorHelper implementation for 1.8.   Formerly IconLoader.
  */
-public class ColorHelper_1_8 implements IColorHelper
+public class ColorHelper_1_9 implements IColorHelper
 {
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
     BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
-    private volatile BufferedImage blocksTexture;
 
     /**
      * Must be instantiated on main minecraft thread where GL context is viable.
      */
-    public ColorHelper_1_8()
+    public ColorHelper_1_9()
     {
-    }
-
-    @Override
-    public boolean hasBlocksTexture()
-    {
-        return blocksTexture != null;
-    }
-
-    @Override
-    public boolean clearBlocksTexture()
-    {
-        if (blocksTexture == null)
-        {
-            return false;
-        }
-        blocksTexture = null;
-        return true;
     }
 
     @Override
@@ -99,18 +76,6 @@ public class ColorHelper_1_8 implements IColorHelper
         }
     }
 
-    /**
-     * @deprecated use getColorMultiplier() instead
-     */
-    @Deprecated
-    @Override
-    public int getRenderColor(BlockMD blockMD)
-    {
-        // TODO?
-        //return blockMD.getBlockState().getBlock().getRenderColor(blockMD.getBlockState());
-        return RGB.WHITE_RGB;
-    }
-
     @Override
     public int getMapColor(BlockMD blockMD)
     {
@@ -134,12 +99,12 @@ public class ColorHelper_1_8 implements IColorHelper
 
         Integer color = null;
 
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
+//        boolean ok = blocksTexture != null || initBlocksTexture();
+//        if (!ok)
+//        {
+//            logger.warn("BlocksTexture not yet loaded");
+//            return null;
+//        }
 
 //        if (failed.contains(blockMD))
 //        {
@@ -190,12 +155,12 @@ public class ColorHelper_1_8 implements IColorHelper
 
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
+//        boolean ok = blocksTexture != null || initBlocksTexture();
+//        if (!ok)
+//        {
+//            logger.warn("BlocksTexture not yet loaded");
+//            return null;
+//        }
 
         IBlockState blockState = blockMD.getBlockState();
         Block block = blockState.getBlock();
@@ -217,102 +182,39 @@ public class ColorHelper_1_8 implements IColorHelper
 
     Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
-
         Integer color = null;
         IBlockState blockState = blockMD.getBlockState();
 
         try
         {
-            int count = 0;
-            int argb, alpha;
-            int a = 0, r = 0, g = 0, b = 0;
-            int x = 0, y = 0;
+            Block block = blockMD.getBlockState().getBlock();
+            float[] rgba = new float[0];
+            float blockAlpha = 0f;
 
-            int xStart, yStart, xStop, yStop;
-            if (icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
+            // Plan A: Get image from texture data
+            BufferedImage textureImg = getImageFromFrameTextureData(icon);
+            if (textureImg == null)
             {
-                logger.warn("Couldn't get texture for " + icon.getIconName() + " because of an error matching it within the stitched blocks atlas.");
-                return null;
+                // Plan B: Get image from texture's source PNG
+                textureImg = getImageFromResourceLocation(icon);
             }
-            BufferedImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
-            xStart = yStart = 0;
-            xStop = textureImg.getWidth();
-            yStop = textureImg.getHeight();
+            boolean unusable = (textureImg == null || textureImg.getWidth() == 0);
 
-            boolean unusable = true;
-            if (textureImg != null && textureImg.getWidth() > 0)
+            // Get average rgba values from texture
+            if (!unusable)
             {
-                outer:
-                for (x = xStart; x < xStop; x++)
-                {
-                    inner:
-                    for (y = yStart; y < yStop; y++)
-                    {
-                        try
-                        {
-                            argb = textureImg.getRGB(x, y);
-                        }
-                        catch (ArrayIndexOutOfBoundsException e)
-                        {
-                            logger.warn("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
-                            continue; // Bugfix for some texturepacks that may not be reporting correct size?
-                        }
-                        catch (Throwable e)
-                        {
-                            logger.warn("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
-                            break outer;
-                        }
-                        alpha = (argb >> 24) & 0xFF;
-                        if (alpha > 0)
-                        {
-                            count++;
-                            a += alpha;
-                            r += (argb >> 16) & 0xFF;
-                            g += (argb >> 8) & 0xFF;
-                            b += (argb) & 0xFF;
-                        }
-                    }
-                }
-
-                if (count > 0)
-                {
-                    unusable = false;
-                    if (a > 0)
-                    {
-                        a = a / count;
-                    }
-                    if (r > 0)
-                    {
-                        r = r / count;
-                    }
-                    if (g > 0)
-                    {
-                        g = g / count;
-                    }
-                    if (b > 0)
-                    {
-                        b = b / count;
-                    }
-                }
+                rgba = getAverageColor(blockMD, textureImg);
+                unusable = rgba.length < 4;
             }
             else
             {
-                logger.warn("Texture was completely transparent in " + icon.getIconName() + " for " + blockMD);
+                Journeymap.getLogger().warn(String.format("ColorHelper.getColorForIcon(): No usable texture for %s", blockMD));
             }
-
-            Block block = blockMD.getBlockState().getBlock();
-            float blockAlpha = 0f;
 
             if (!unusable)
             {
                 // Set color
-                color = RGB.toInteger(r, g, b);
+                color = RGB.toInteger(rgba);
 
                 if (blockMD.hasFlag(BlockMD.Flag.Transparency))
                 {
@@ -322,14 +224,15 @@ public class ColorHelper_1_8 implements IColorHelper
                 {
                     // 1.8 check translucent because lava's opacity = 0;
                     if (block.isTranslucent(blockState))
-                    { // try to use light opacity
+                    {
+                        // try to use light opacity
                         blockAlpha = block.getLightOpacity(blockState) / 255f;
                     }
 
                     // try to use texture alpha
                     if (blockAlpha == 0 || blockAlpha == 1)
                     {
-                        blockAlpha = a * 1.0f / 255;
+                        blockAlpha = rgba[3] * 1.0f / 255;
                     }
                 }
             }
@@ -366,63 +269,146 @@ public class ColorHelper_1_8 implements IColorHelper
             //blockMD.setColor(color);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
+
+            if (color != null)
+            {
+                if (logger.isTraceEnabled())
+                {
+                    logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color));
+                }
+            }
         }
         catch (Throwable e1)
         {
             logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
         }
 
-        if (color != null)
-        {
-            if (logger.isTraceEnabled())
-            {
-                logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color));
-            }
-        }
-
         return color;
     }
 
-    @Override
-    public boolean initBlocksTexture()
+    /**
+     * Primary means of getting block texture:  FrameTextureData
+     */
+    private BufferedImage getImageFromFrameTextureData(TextureAtlasSprite tas)
     {
-        StatTimer timer = StatTimer.get("ColorHelper.initBlocksTexture", 0);
-
         try
         {
-            if (!Display.isCurrent())
+            final int[] rgb = tas.getFrameTextureData(0)[0];
+            if (rgb.length > 0)
             {
-                return false;
+                int width = tas.getIconWidth();
+                int height = tas.getIconHeight();
+                BufferedImage textureImg = new BufferedImage(width, height, 2);
+                textureImg.setRGB(0, 0, width, height, rgb, 0, width);
+                return textureImg;
             }
-            blocksTexture = null;
-            timer.start();
-
-            int blocksTexId = FMLClientHandler.instance().getClient().getTextureMapBlocks().getGlTextureId();
-            GlStateManager.bindTexture(blocksTexId);
-            GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
-            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-
-            int miplevel = 0;
-            int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
-            int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
-            IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
-            int[] aint = new int[width * height];
-            GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
-            intbuffer.get(aint);
-            BufferedImage bufferedimage = new BufferedImage(width, height, 2);
-            bufferedimage.setRGB(0, 0, width, height, aint, 0, width);
-            blocksTexture = bufferedimage;
-
-            double time = timer.stop();
-            Journeymap.getLogger().info(String.format("initBlocksTexture: %sx%s loaded in %sms", width, height, time));
-
-            return true;
         }
         catch (Throwable t)
         {
-            logger.error("Could not load blocksTexture :" + t);
-            timer.cancel();
-            return false;
+            Journeymap.getLogger().error(String.format("ColorHelper.getColorForIcon(): Unable to use frame data for %s: %s", tas.getIconName(), t.getMessage()));
         }
+        return null;
+    }
+
+    /**
+     * Secondary means of getting block texture:  derived ResourceLocation
+     */
+    private BufferedImage getImageFromResourceLocation(TextureAtlasSprite tas)
+    {
+        try
+        {
+            ResourceLocation iconNameLoc = new ResourceLocation(tas.getIconName());
+            ResourceLocation fileLoc = new ResourceLocation(iconNameLoc.getResourceDomain(), "textures/" + iconNameLoc.getResourcePath() + ".png");
+            return TextureCache.resolveImage(fileLoc);
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(String.format("ColorHelper.getColorForIcon(): Unable to use texture file for %s: %s", tas.getIconName(), t.getMessage()));
+        }
+        return null;
+    }
+
+    /**
+     * Average r/g/b/a values from BufferedImage
+     */
+    private float[] getAverageColor(BlockMD blockMD, BufferedImage textureImg)
+    {
+        int count = 0;
+        int argb, alpha;
+        int a = 0, r = 0, g = 0, b = 0;
+        int x = 0, y = 0;
+        int xStart, yStart, xStop, yStop;
+
+        xStart = yStart = 0;
+        xStop = textureImg.getWidth();
+        yStop = textureImg.getHeight();
+
+        // Average r/g/b/a
+        try
+        {
+            boolean unusable = true;
+
+            outer:
+            for (x = xStart; x < xStop; x++)
+            {
+                for (y = yStart; y < yStop; y++)
+                {
+                    try
+                    {
+                        argb = textureImg.getRGB(x, y);
+                    }
+                    catch (ArrayIndexOutOfBoundsException e)
+                    {
+                        logger.warn("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                        continue; // Bugfix for some texturepacks that may not be reporting correct size?
+                    }
+                    catch (Throwable e)
+                    {
+                        logger.warn("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                        break outer;
+                    }
+                    alpha = (argb >> 24) & 0xFF;
+                    if (alpha > 0)
+                    {
+                        count++;
+                        a += alpha;
+                        r += (argb >> 16) & 0xFF;
+                        g += (argb >> 8) & 0xFF;
+                        b += (argb) & 0xFF;
+                    }
+                }
+            }
+
+            if (count > 0)
+            {
+                if (a > 0)
+                {
+                    a = a / count;
+                }
+                if (r > 0)
+                {
+                    r = r / count;
+                }
+                if (g > 0)
+                {
+                    g = g / count;
+                }
+                if (b > 0)
+                {
+                    b = b / count;
+                }
+                return RGB.floats(RGB.toInteger(r, g, b), a);
+            }
+            else
+            {
+                logger.warn("Texture was completely transparent for " + blockMD);
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(String.format("ColorHelper.getAverageColor(): Error getting average color: %s", t.getMessage()));
+        }
+
+        return new float[0];
     }
 }
