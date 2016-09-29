@@ -19,10 +19,11 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
@@ -79,15 +80,7 @@ public class ColorHelper_1_9 implements IColorHelper
     @Override
     public int getMapColor(BlockMD blockMD)
     {
-        MapColor mapColor = blockMD.getBlockState().getBlock().getMapColor(blockMD.getBlockState());
-        if (mapColor != null)
-        {
-            return mapColor.colorValue;
-        }
-        else
-        {
-            return RGB.BLACK_RGB;
-        }
+        return blockMD.getBlockState().getMaterial().getMaterialMapColor().colorValue;
     }
 
     /**
@@ -96,51 +89,10 @@ public class ColorHelper_1_9 implements IColorHelper
     @Override
     public Integer getTextureColor(BlockMD blockMD)
     {
-
-        Integer color = null;
-
-//        boolean ok = blocksTexture != null || initBlocksTexture();
-//        if (!ok)
-//        {
-//            logger.warn("BlocksTexture not yet loaded");
-//            return null;
-//        }
-
-//        if (failed.contains(blockMD))
-//        {
-//            return null;
-//        }
-
         try
         {
-
-            TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
-
-            if (blockIcon == null)
-            {
-                if (blockMD.getBlockState().getBlock() instanceof ITileEntityProvider)
-                {
-                    logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
-                    blockMD.addFlags(BlockMD.Flag.TileEntity, BlockMD.Flag.HasAir);
-                    return null;
-                }
-            }
-
-            if (blockIcon == null)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-                failed.add(blockMD);
-                return null;
-            }
-
-            color = getColorForIcon(blockMD, blockIcon);
-            if (color == null)
-            {
-                failed.add(blockMD);
-                return null;
-            }
-
-            return color;
+            setBlockColor(blockMD, getDirectIcon(blockMD));
+            return blockMD.getColor();
         }
         catch (Throwable t)
         {
@@ -155,13 +107,6 @@ public class ColorHelper_1_9 implements IColorHelper
 
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-//        boolean ok = blocksTexture != null || initBlocksTexture();
-//        if (!ok)
-//        {
-//            logger.warn("BlocksTexture not yet loaded");
-//            return null;
-//        }
-
         IBlockState blockState = blockMD.getBlockState();
         Block block = blockState.getBlock();
 
@@ -175,115 +120,150 @@ public class ColorHelper_1_9 implements IColorHelper
             }
         }
 
-        TextureAtlasSprite icon = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
-        return icon;
-        //return getClient().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state).getFaceQuads(EnumFacing.UP)
+        return FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
     }
 
-    Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    void setBlockColorToError(BlockMD blockMD)
     {
-        Integer color = null;
-        IBlockState blockState = blockMD.getBlockState();
+        blockMD.setAlpha(0);
+        blockMD.addFlags(BlockMD.Flag.HasAir, BlockMD.Flag.Error);
+        blockMD.setColor(null);
+        failed.add(blockMD);
+    }
 
+    void setBlockColorToAir(BlockMD blockMD)
+    {
+        blockMD.setAlpha(0);
+        blockMD.addFlags(BlockMD.Flag.HasAir);
+        blockMD.setColor(RGB.WHITE_RGB);
+    }
+
+    void setBlockColorToMaterial(BlockMD blockMD)
+    {
         try
         {
-            Block block = blockMD.getBlockState().getBlock();
-            float[] rgba = new float[0];
-            float blockAlpha = 0f;
+            blockMD.setAlpha(1);
+            blockMD.addFlags(BlockMD.Flag.HasAir);
+            blockMD.setColor(getMapColor(blockMD));
+        }
+        catch (Exception e)
+        {
+            logger.warn(String.format("Failed to use MaterialMapColor, marking as error: %s", blockMD));
+            setBlockColorToError(blockMD);
+        }
+    }
 
-            // Plan A: Get image from texture data
-            BufferedImage textureImg = getImageFromFrameTextureData(icon);
-            if (textureImg == null)
+    boolean setBlockColor(BlockMD blockMD, TextureAtlasSprite icon, BufferedImage textureImg, String pass)
+    {
+        try
+        {
+            // Bail if the texture's not usable
+            if (textureImg == null || textureImg.getWidth() == 0)
             {
-                // Plan B: Get image from texture's source PNG
-                textureImg = getImageFromResourceLocation(icon);
+                Journeymap.getLogger().warn(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Null/empty texture for %s", blockMD));
+                return false;
             }
-            boolean unusable = (textureImg == null || textureImg.getWidth() == 0);
 
             // Get average rgba values from texture
-            if (!unusable)
+            float[] rgba = getAverageColor(blockMD, textureImg);
+            if (rgba.length < 4)
             {
-                rgba = getAverageColor(blockMD, textureImg);
-                unusable = rgba.length < 4;
+                Journeymap.getLogger().warn(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Couldn't derive RGBA from %s", blockMD));
+                return false;
+            }
+
+            // Set color
+            int color = RGB.toInteger(rgba);
+            float blockAlpha;
+
+            if (blockMD.hasFlag(BlockMD.Flag.Transparency))
+            {
+                // Use preset alpha
+                blockAlpha = blockMD.getAlpha();
             }
             else
             {
-                Journeymap.getLogger().warn(String.format("ColorHelper.getColorForIcon(): No usable texture for %s", blockMD));
+                blockAlpha = rgba[3];
             }
 
-            if (!unusable)
+            blockMD.setColor(color);
+            blockMD.setAlpha(blockAlpha);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.error(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Error for %s", blockMD));
+            logger.error(LogFormatter.toPartialString(e));
+            return false;
+        }
+    }
+
+    void setBlockColor(BlockMD blockMD, TextureAtlasSprite icon)
+    {
+        try
+        {
+            // No icon?
+            if (icon == null)
             {
-                // Set color
-                color = RGB.toInteger(rgba);
-
-                if (blockMD.hasFlag(BlockMD.Flag.Transparency))
+                if (blockMD.getBlockState().getBlock() instanceof ITileEntityProvider)
                 {
-                    blockAlpha = blockMD.getAlpha();
-                }
-                else if (block.getRenderType(blockState) == EnumBlockRenderType.MODEL)
-                {
-                    // 1.8 check translucent because lava's opacity = 0;
-                    if (block.isTranslucent(blockState))
-                    {
-                        // try to use light opacity
-                        blockAlpha = block.getLightOpacity(blockState) / 255f;
-                    }
-
-                    // try to use texture alpha
-                    if (blockAlpha == 0 || blockAlpha == 1)
-                    {
-                        blockAlpha = rgba[3] * 1.0f / 255;
-                    }
-                }
-            }
-
-            if (unusable)
-            {
-                if (!block.getMaterial(blockState).isOpaque())
-                {
-                    unusable = false;
+                    logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
+                    blockMD.addFlags(BlockMD.Flag.TileEntity);
+                    setBlockColorToAir(blockMD);
                 }
                 else
                 {
-                    logger.warn(String.format("Block is opaque, but texture was completely transparent: %s . Using MaterialMapColor instead for: %s", icon.getIconName(), blockMD));
-                    try
-                    {
-                        color = block.getMaterial(blockState).getMaterialMapColor().colorValue;
-                        unusable = false;
-                    }
-                    catch (Exception e)
-                    {
-                        logger.warn(String.format("Failed to use MaterialMapColor, marking block transparent: %s", blockMD));
-                        blockAlpha = 0F;
-                        color = RGB.WHITE_RGB;
-                    }
+                    setBlockColorToError(blockMD);
                 }
+                return;
             }
 
-            if (unusable)
-            {
-                blockMD.addFlags(BlockMD.Flag.Error);
-            }
-
-            // Set alpha and color
-            //blockMD.setColor(color);
-            blockMD.setAlpha(blockAlpha);
+            // Set icon name
             blockMD.setIconName(icon.getIconName());
 
-            if (color != null)
+            // Invisible?
+            if (blockMD.getBlockState().getRenderType() == EnumBlockRenderType.INVISIBLE)
             {
-                if (logger.isTraceEnabled())
-                {
-                    logger.debug("Derived color for " + blockMD + ": " + Integer.toHexString(color));
-                }
+                setBlockColorToAir(blockMD);
+                return;
             }
+
+            // Air?
+            if (Material.AIR.equals(blockMD.getBlockState().getMaterial()))
+            {
+                setBlockColorToAir(blockMD);
+                return;
+            }
+
+            // Missing texture?
+            if (new ResourceLocation(icon.getIconName()).equals(TextureMap.LOCATION_MISSING_TEXTURE))
+            {
+                setBlockColorToAir(blockMD);
+                return;
+            }
+
+            // Plan A: Get image from texture data
+            if (setBlockColor(blockMD, icon, getImageFromFrameTextureData(icon), "frameTextureData"))
+            {
+                return;
+            }
+
+            // Plan B: Get image from texture's source PNG
+            if (setBlockColor(blockMD, icon, getImageFromResourceLocation(icon), "resourceLocation"))
+            {
+                return;
+            }
+
+            // Plan C: Use Material's map color
+            logger.warn(String.format("ColorHelper.setBlockColor(): Texture unusable. Using MaterialMapColor instead for: %s", blockMD));
+            setBlockColorToMaterial(blockMD);
         }
         catch (Throwable e1)
         {
             logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
+            setBlockColorToMaterial(blockMD);
         }
-
-        return color;
     }
 
     /**
