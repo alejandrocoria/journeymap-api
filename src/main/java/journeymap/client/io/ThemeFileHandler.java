@@ -27,14 +27,18 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Mark on 8/29/2014.
  */
 public class ThemeFileHandler
 {
-    public static final ResourceLocation THEME_ASSETS = new ResourceLocation(Journeymap.MOD_ID, "theme");
     public static final String THEME_FILE_SUFFIX = ".theme.json";
     public static final String DEFAULT_THEME_FILE = "default.theme.config";
 
@@ -47,27 +51,22 @@ public class ThemeFileHandler
         Journeymap.getLogger().trace("Initializing themes ...");
 
         // Theme dirs
-        Set<String> themeDirNames = new HashSet<String>();
-        for (String dir : ThemePresets.getPresetDirs())
-        {
-            themeDirNames.add(dir);
-        }
+        Set<String> themeDirNames = ThemePresets.getPresetDirs().stream().collect(Collectors.toSet());
 
         // Copy theme dirs from assets
         for (String dirName : themeDirNames)
         {
-            // TODO:  Use ResourceLocation
-            FileHandler.copyResources(getThemeIconDir(), THEME_ASSETS, dirName, true);
+            FileHandler.copyResources(getThemeIconDir(), new ResourceLocation(Journeymap.MOD_ID, "theme/" + dirName), dirName, true);
         }
 
         // Save theme files
-        for (Theme theme : ThemePresets.getPresets())
-        {
-            save(theme);
-        }
+        ThemePresets.getPresets().forEach(ThemeFileHandler::save);
 
         // Create a default.theme.json file only if it doesn't already exist
         ensureDefaultThemeFile();
+
+        // Preload the current theme
+        preloadCurrentTheme();
     }
 
     public static File getThemeIconDir()
@@ -353,6 +352,35 @@ public class ThemeFileHandler
             Journeymap.getLogger().error("Could not load Theme.DefaultTheme json file: " + LogFormatter.toString(t));
         }
         return null;
+    }
+
+    /**
+     * Load the theme textures ahead of time to avoid the initial
+     * lag when opening the Fullscreen map.
+     */
+    public static void preloadCurrentTheme()
+    {
+        int count = 0;
+        try
+        {
+            Theme theme = getCurrentTheme();
+            File themeDir = new File(getThemeIconDir(), theme.directory).getCanonicalFile();
+            Path themePath = themeDir.toPath();
+            for (File file : Files.fileTreeTraverser().breadthFirstTraversal(themeDir))
+            {
+                if (file.isFile() && file.getName().toLowerCase().endsWith(".png"))
+                {
+                    String relativePath = themePath.relativize(file.toPath()).toString().replaceAll("\\\\", "/");
+                    TextureCache.instance().getThemeTexture(theme, relativePath);
+                    count++;
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error preloading theme textures: " + LogFormatter.toString(t));
+        }
+        Journeymap.getLogger().info("Preloaded theme textures: " + count);
     }
 
     public static class ThemeValuesProvider implements StringField.ValuesProvider

@@ -229,7 +229,7 @@ public class ThemeMinimapFrame
 
     private TextureImpl getTexture(String suffix, int width, int height, boolean resize, boolean retain)
     {
-        return TextureCache.instance().getThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
+        return TextureCache.instance().getSizedThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
     }
 
     public Rectangle.Double getFrameBounds()

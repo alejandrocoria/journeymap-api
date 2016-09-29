@@ -355,16 +355,16 @@ public class TextureCache
 
     public TextureImpl getThemeTexture(Theme theme, String iconPath)
     {
-        return getThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
+        return getSizedThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
     }
 
-    public TextureImpl getThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
+    public TextureImpl getSizedThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
     {
         String texName = String.format("%s/%s", theme.directory, iconPath);
         synchronized (themeImages)
         {
             TextureImpl tex = themeImages.get(texName);
-            if (tex == null || (!tex.hasImage() && tex.retainImage) || (resize && (width != tex.width || height != tex.height)) || tex.alpha != alpha)
+            if (tex == null || (tex.retainImage != retainImage) || (!tex.hasImage() && tex.retainImage) || (resize && (width != tex.width || height != tex.height)) || tex.alpha != alpha)
             {
                 File parentDir = ThemeFileHandler.getThemeIconDir();
                 BufferedImage img = FileHandler.getIconFromFile(parentDir, theme.directory, iconPath);

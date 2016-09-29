@@ -45,7 +45,6 @@ import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -321,9 +320,6 @@ public class JourneymapClient implements CommonProxy
 
             // Resets detection results of Voxel/Rei's
             WaypointsData.enableRecheck();
-
-            // TODO: TEMP DO NOT CHECKIN
-            IconSetFileHandler.registerEntityIconDirectory(new ResourceLocation("Waila", "textures/entity_icons"));
 
             // Ensure all icons are ready for use.
             IconSetFileHandler.initialize();

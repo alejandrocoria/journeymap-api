@@ -608,13 +608,21 @@ public class FileHandler
             }
             else
             {
-                for (Map.Entry<String, ModContainer> modEntry : Loader.instance().getIndexedModList().entrySet())
+                ModContainer mod = Loader.instance().getIndexedModList().get(domain);
+                if (mod == null)
                 {
-                    if (modEntry.getValue().getModId().toLowerCase().equals(domain))
+                    for (Map.Entry<String, ModContainer> modEntry : Loader.instance().getIndexedModList().entrySet())
                     {
-                        fileLocation = modEntry.getValue().getSource().toURI().toURL();
-                        break;
+                        if (modEntry.getValue().getModId().toLowerCase().equals(domain))
+                        {
+                            mod = modEntry.getValue();
+                            break;
+                        }
                     }
+                }
+                if (mod != null)
+                {
+                    fileLocation = mod.getSource().toURI().toURL();
                 }
             }
 
