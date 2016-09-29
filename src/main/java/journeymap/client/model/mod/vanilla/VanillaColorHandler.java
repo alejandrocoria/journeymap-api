@@ -212,16 +212,6 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
                     Journeymap.getLogger().debug("Custom biome color will be used with " + blockMD);
                 }
-                else
-                {
-                    // Check for render color
-                    int renderColor = colorHelper.getRenderColor(blockMD);
-                    if (!RGB.isWhite(renderColor))
-                    {
-                        baseColor = RGB.multiply(baseColor, RGB.ALPHA_OPAQUE | renderColor); // Force opaque render color
-                        Journeymap.getLogger().debug("Applied render color for " + blockMD);
-                    }
-                }
             }
         }
 
