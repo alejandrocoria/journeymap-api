@@ -15,9 +15,11 @@ import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -47,6 +49,7 @@ public enum DataCache
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
+    final LoadingCache<IBlockState, BlockMD> blockMetadata;
     final LoadingCache<ChunkPos, ChunkMD> chunkMetadata;
     final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
@@ -106,7 +109,10 @@ public enum DataCache
         regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkPos, ChunkMD>();
+        blockMetadata = getCacheBuilder().weakKeys().build(new BlockMD.SimpleCacheLoader());
+        managedCaches.put(blockMetadata, "BlockMD");
+
+        chunkMetadataRemovalListener = new ProxyRemovalListener<>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
@@ -393,6 +399,33 @@ public enum DataCache
 //            return colors.getUnchecked(rgbInt);
 //        }
 //    }
+
+    public BlockMD getBlockMD(IBlockState blockState)
+    {
+        try
+        {
+            // Normalize IExtendedBlockState if possible
+            if (blockState instanceof IExtendedBlockState)
+            {
+                blockState = blockState.getBlock().getDefaultState();
+                if (blockState instanceof IExtendedBlockState)
+                {
+                    return BlockMD.AIRBLOCK;
+                }
+            }
+
+            return blockMetadata.getUnchecked(blockState);
+        }
+        catch (CacheLoader.InvalidCacheLoadException e)
+        {
+            return BlockMD.AIRBLOCK;
+        }
+    }
+
+    public void resetBlockMetadata()
+    {
+        blockMetadata.invalidateAll();
+    }
 
     public ChunkMD getChunkMD(BlockPos blockPos)
     {

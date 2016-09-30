@@ -10,10 +10,11 @@ package journeymap.client.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
+import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.log.StatTimer;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.model.mod.vanilla.VanillaColorHandler;
 import journeymap.common.Journeymap;
@@ -21,12 +22,15 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
@@ -39,7 +43,6 @@ public class BlockMD implements Comparable<BlockMD>
 {
     public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
     public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
-    private static final Map<IBlockState, BlockMD> cache = new HashMap<IBlockState, BlockMD>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
@@ -107,9 +110,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public static void reset()
     {
-        StatTimer timer = StatTimer.get("BlockMD.reset", 0, 2000);
-        timer.start();
-        cache.clear();
+        DataCache.INSTANCE.resetBlockMetadata();
 
         // Create new delegate
         modBlockDelegate = new ModBlockDelegate();
@@ -123,9 +124,6 @@ public class BlockMD implements Comparable<BlockMD>
 
         // Final color updates
         VanillaColorHandler.INSTANCE.setExplicitColors();
-
-        timer.stop();
-        Journeymap.getLogger().info(String.format("Built BlockMD cache (%s) : %s", all.size(), timer.getLogReportString()));
     }
 
     /**
@@ -208,40 +206,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public static BlockMD get(IBlockState blockState)
     {
-        try
-        {
-            if (blockState == null || blockState.getBlock()==Blocks.AIR)
-            {
-                return AIRBLOCK;
-            }
-
-            BlockMD blockMD = cache.get(blockState);
-            if (blockMD == null)
-            {
-                if (blockState.getBlock().getRegistryName() == null)
-                {
-                    Journeymap.getLogger().debug("Unregistered block will be treated like air: " + blockState);
-                    blockMD = AIRBLOCK;
-                }
-                else if (blockState.getBlock() instanceof BlockAir)
-                {
-                    blockMD = AIRBLOCK;
-                }
-                else
-                {
-                    blockMD = new BlockMD(blockState);
-                }
-                cache.put(blockState, blockMD);
-            }
-
-            return blockMD;
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
-            cache.put(blockState, AIRBLOCK);
-            return AIRBLOCK;
-        }
+        return DataCache.INSTANCE.getBlockMD(blockState);
     }
 
     public static void debug()
@@ -790,5 +755,49 @@ public class BlockMD implements Comparable<BlockMD>
          * Block produces error when calling getColorMultiplier();
          */
         TintError;
+    }
+
+    public static class SimpleCacheLoader extends CacheLoader<IBlockState, BlockMD>
+    {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+
+        @Override
+        public BlockMD load(IBlockState blockState)
+        {
+            synchronized (this)
+            {
+                try
+                {
+                    if (blockState == null)
+                    {
+                        return AIRBLOCK;
+                    }
+
+                    if (blockState instanceof IExtendedBlockState)
+                    {
+                        Journeymap.getLogger().error(String.format("Won't cache BlockMD for IExtendedBlockState %s", blockState));
+                        return AIRBLOCK;
+                    }
+
+                    if (blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir)
+                    {
+                        return AIRBLOCK;
+                    }
+
+                    if (blockState.getBlock().getRegistryName() == null)
+                    {
+                        Journeymap.getLogger().debug("Unregistered block will be treated like air: " + blockState);
+                        return AIRBLOCK;
+                    }
+
+                    return new BlockMD(blockState);
+                }
+                catch (Exception e)
+                {
+                    Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
+                    return AIRBLOCK;
+                }
+            }
+        }
     }
 }
