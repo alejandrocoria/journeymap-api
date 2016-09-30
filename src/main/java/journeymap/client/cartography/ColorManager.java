@@ -10,9 +10,7 @@ package journeymap.client.cartography;
 
 import com.google.common.base.Joiner;
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IColorHelper;
-import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.ColorHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
@@ -32,8 +30,6 @@ import java.util.List;
  */
 public class ColorManager
 {
-    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private volatile IColorHelper colorHelper = forgeHelper.getColorHelper();
     private volatile ColorPalette currentPalette;
     private String lastResourcePackNames;
     private String lastModNames;
@@ -97,7 +93,7 @@ public class ColorManager
         boolean modPackSame = false;
         boolean blocksTextureChanged = false;
 
-        if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
+        if (currentResourcePackNames.equals(lastResourcePackNames) && ColorHelper.INSTANCE.hasCachedIconColors())
         {
             Journeymap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
             resourcePackSame = true;
@@ -185,6 +181,7 @@ public class ColorManager
             }
 
             // Load textures for the others
+            ColorHelper.INSTANCE.resetIconColorCache();
             long start = System.currentTimeMillis();
             int count = 0;
             for (BlockMD blockMD : BlockMD.getAll())
@@ -195,6 +192,8 @@ public class ColorManager
                 }
             }
             long elapsed = System.currentTimeMillis() - start;
+
+            Journeymap.getLogger().info("Cached colors from TextureAtlasSprites: " + ColorHelper.INSTANCE.cachedIconColors());
 
             if (count > 0 || palette == null)
             {

@@ -1,9 +1,7 @@
 package journeymap.client.model.mod.vanilla;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IColorHelper;
-import journeymap.client.forge.helper.IForgeHelper;
+import journeymap.client.forge.helper.ColorHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
@@ -20,13 +18,10 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 {
     public static final VanillaColorHandler INSTANCE = new VanillaColorHandler();
 
-    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private final IColorHelper colorHelper = forgeHelper.getColorHelper();
-
     @Override
     public Integer getTextureColor(BlockMD blockMD)
     {
-        return colorHelper.getTextureColor(blockMD);
+        return ColorHelper.INSTANCE.getTextureColor(blockMD);
     }
 
     /**
@@ -44,7 +39,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
         // Fallback to Minecraft's own map color
         if (color == null)
         {
-            color = colorHelper.getMapColor(blockMD);
+            color = ColorHelper.INSTANCE.getMapColor(blockMD);
         }
 
         return color;
@@ -162,7 +157,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             {
                 try
                 {
-                    return colorHelper.getColorMultiplier(chunkMD, blockMD, blockPos);
+                    return ColorHelper.INSTANCE.getColorMultiplier(chunkMD, blockMD, blockPos);
                 }
                 catch (Exception e)
                 {
@@ -173,7 +168,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             // Use default blockstate if needed
             try
             {
-                tint = colorHelper.getColorMultiplier(chunkMD, BlockMD.get(blockMD.getBlockState().getBlock().getDefaultState()), blockPos);
+                tint = ColorHelper.INSTANCE.getColorMultiplier(chunkMD, BlockMD.get(blockMD.getBlockState().getBlock().getDefaultState()), blockPos);
             }
             catch (Exception e)
             {
@@ -223,7 +218,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                 // TODO: What to do about this?
                 Journeymap.getLogger().debug("Iconloader ignoring tile entity: " + blockMD);
             }
-            else if (colorHelper.failedFor(blockMD))
+            else if (ColorHelper.INSTANCE.failedFor(blockMD))
             {
                 Journeymap.getLogger().warn("Iconloader failed to get base color for " + blockMD);
             }

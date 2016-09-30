@@ -6,11 +6,9 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.forge.helper.impl;
+package journeymap.client.forge.helper;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.render.texture.TextureCache;
@@ -32,31 +30,42 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * IColorHelper implementation for 1.8.   Formerly IconLoader.
+ * Singleton that encapsulates color-related functions that have changed frequently since 1.7.10.
  */
-public class ColorHelper_1_9 implements IColorHelper
+public enum ColorHelper
 {
+    INSTANCE;
+
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
     BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
+    HashMap<String, float[]> iconColorCache = new HashMap<>();
 
-    /**
-     * Must be instantiated on main minecraft thread where GL context is viable.
-     */
-    public ColorHelper_1_9()
+    public void resetIconColorCache()
     {
+        iconColorCache.clear();
+        failed.clear();
     }
 
-    @Override
+    public boolean hasCachedIconColors()
+    {
+        return !iconColorCache.isEmpty();
+    }
+
+    public int cachedIconColors()
+    {
+        return iconColorCache.size();
+    }
+
     public boolean failedFor(BlockMD blockMD)
     {
         return failed.contains(blockMD);
     }
 
-    @Override
     public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         if (chunkMD == null || !chunkMD.hasChunk())
@@ -77,7 +86,7 @@ public class ColorHelper_1_9 implements IColorHelper
         }
     }
 
-    @Override
+
     public int getMapColor(BlockMD blockMD)
     {
         return blockMD.getBlockState().getMaterial().getMaterialMapColor().colorValue;
@@ -86,7 +95,7 @@ public class ColorHelper_1_9 implements IColorHelper
     /**
      * Derive block color from the corresponding texture.
      */
-    @Override
+
     public Integer getTextureColor(BlockMD blockMD)
     {
         try
@@ -123,7 +132,7 @@ public class ColorHelper_1_9 implements IColorHelper
         return FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
     }
 
-    void setBlockColorToError(BlockMD blockMD)
+    private void setBlockColorToError(BlockMD blockMD)
     {
         blockMD.setAlpha(0);
         blockMD.addFlags(BlockMD.Flag.HasAir, BlockMD.Flag.Error);
@@ -131,14 +140,14 @@ public class ColorHelper_1_9 implements IColorHelper
         failed.add(blockMD);
     }
 
-    void setBlockColorToAir(BlockMD blockMD)
+    private void setBlockColorToAir(BlockMD blockMD)
     {
         blockMD.setAlpha(0);
         blockMD.addFlags(BlockMD.Flag.HasAir);
         blockMD.setColor(RGB.WHITE_RGB);
     }
 
-    void setBlockColorToMaterial(BlockMD blockMD)
+    private void setBlockColorToMaterial(BlockMD blockMD)
     {
         try
         {
@@ -153,7 +162,7 @@ public class ColorHelper_1_9 implements IColorHelper
         }
     }
 
-    boolean setBlockColor(BlockMD blockMD, TextureAtlasSprite icon, BufferedImage textureImg, String pass)
+    private boolean setBlockColor(BlockMD blockMD, BufferedImage textureImg, String pass)
     {
         try
         {
@@ -166,6 +175,28 @@ public class ColorHelper_1_9 implements IColorHelper
 
             // Get average rgba values from texture
             float[] rgba = getAverageColor(blockMD, textureImg);
+            if (setBlockColor(blockMD, rgba, pass))
+            {
+                iconColorCache.put(blockMD.getIconName(), rgba);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Error for %s", blockMD));
+            logger.error(LogFormatter.toPartialString(e));
+            return false;
+        }
+    }
+
+    private boolean setBlockColor(BlockMD blockMD, float[] rgba, String pass)
+    {
+        try
+        {
             if (rgba.length < 4)
             {
                 Journeymap.getLogger().warn(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Couldn't derive RGBA from %s", blockMD));
@@ -199,7 +230,7 @@ public class ColorHelper_1_9 implements IColorHelper
         }
     }
 
-    void setBlockColor(BlockMD blockMD, TextureAtlasSprite icon)
+    private void setBlockColor(BlockMD blockMD, TextureAtlasSprite icon)
     {
         try
         {
@@ -220,7 +251,22 @@ public class ColorHelper_1_9 implements IColorHelper
             }
 
             // Set icon name
-            blockMD.setIconName(icon.getIconName());
+            final String iconName = icon.getIconName();
+            blockMD.setIconName(iconName);
+
+            // Check for cached color
+            if (iconColorCache.containsKey(iconName))
+            {
+                float[] rgba = iconColorCache.get(iconName);
+                if (setBlockColor(blockMD, rgba, "cache"))
+                {
+                    return;
+                }
+                else
+                {
+                    iconColorCache.remove(iconName);
+                }
+            }
 
             // Invisible?
             if (blockMD.getBlockState().getRenderType() == EnumBlockRenderType.INVISIBLE)
@@ -237,20 +283,20 @@ public class ColorHelper_1_9 implements IColorHelper
             }
 
             // Missing texture?
-            if (new ResourceLocation(icon.getIconName()).equals(TextureMap.LOCATION_MISSING_TEXTURE))
+            if (new ResourceLocation(iconName).equals(TextureMap.LOCATION_MISSING_TEXTURE))
             {
                 setBlockColorToAir(blockMD);
                 return;
             }
 
             // Plan A: Get image from texture data
-            if (setBlockColor(blockMD, icon, getImageFromFrameTextureData(icon), "frameTextureData"))
+            if (setBlockColor(blockMD, getImageFromFrameTextureData(icon), "frameTextureData"))
             {
                 return;
             }
 
             // Plan B: Get image from texture's source PNG
-            if (setBlockColor(blockMD, icon, getImageFromResourceLocation(icon), "resourceLocation"))
+            if (setBlockColor(blockMD, getImageFromResourceLocation(icon), "resourceLocation"))
             {
                 return;
             }

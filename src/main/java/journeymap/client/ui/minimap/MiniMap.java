@@ -15,7 +15,6 @@ import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -51,7 +50,6 @@ public class MiniMap
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
     private final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Minimap, 3);
-    private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final Minecraft mc = FMLClientHandler.instance().getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
@@ -148,7 +146,7 @@ public class MiniMap
 
     private boolean shouldShowCaves()
     {
-        return FeatureManager.isAllowed(Feature.MapCaves) && (forgeHelper.hasNoSky(player) || miniMapProperties.showCaves.get());
+        return FeatureManager.isAllowed(Feature.MapCaves) && (ForgeHelper.INSTANCE.hasNoSky(player) || miniMapProperties.showCaves.get());
     }
 
     /**
@@ -677,7 +675,7 @@ public class MiniMap
                 // FPS
                 if (dv.showFps)
                 {
-                    fpsLabelText = forgeHelper.getFPS();
+                    fpsLabelText = ForgeHelper.INSTANCE.getFPS();
                 }
 
                 // Location key
@@ -685,7 +683,7 @@ public class MiniMap
                 {
                     final int playerX = MathHelper.floor_double(player.posX);
                     final int playerZ = MathHelper.floor_double(player.posZ);
-                    final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(player).minY);
+                    final int playerY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(player).minY);
                     locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
                 }
 

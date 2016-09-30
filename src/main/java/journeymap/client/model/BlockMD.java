@@ -14,6 +14,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import journeymap.client.data.DataCache;
+import journeymap.client.forge.helper.ColorHelper;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.model.mod.vanilla.VanillaColorHandler;
@@ -111,6 +112,7 @@ public class BlockMD implements Comparable<BlockMD>
     public static void reset()
     {
         DataCache.INSTANCE.resetBlockMetadata();
+        ColorHelper.INSTANCE.resetIconColorCache();
 
         // Create new delegate
         modBlockDelegate = new ModBlockDelegate();
