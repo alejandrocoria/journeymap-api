@@ -13,10 +13,14 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.network.PacketHandler;
+import journeymap.common.network.model.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraftforge.fml.client.FMLClientHandler;
+
+import java.util.TreeSet;
 
 /**
  * Created by mwoodman on 4/8/2014.
@@ -77,6 +81,20 @@ public class CmdTeleportWaypoint
 
     public void run()
     {
-        mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.thePlayer), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+        double x = waypoint.getBlockCenteredX();
+        double z = waypoint.getBlockCenteredZ();
+        TreeSet<Integer> dim = (TreeSet<Integer>) waypoint.getDimensions();
+
+        if (dim.first() == -1 && mc.thePlayer.dimension != -1)
+        {
+            x = x / 8;
+            z = z / 8;
+        }
+        else if (dim.first() != -1 && mc.thePlayer.dimension == -1)
+        {
+            x = (x * 8);
+            z = (z * 8);
+        }
+        PacketHandler.teleportPlayer(new Location((int) x, waypoint.getY(), (int) z, dim.first()));
     }
 }

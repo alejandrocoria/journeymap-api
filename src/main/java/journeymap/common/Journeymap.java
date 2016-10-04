@@ -9,6 +9,9 @@
 package journeymap.common;
 
 import journeymap.client.JourneymapClient;
+import journeymap.common.command.CommandJTP;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
 import journeymap.server.oldservercode.command.CommandJMServerForge;
@@ -20,7 +23,6 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.server.FMLServerHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -109,22 +111,38 @@ public class Journeymap
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
     {
         proxy.postInitialize(event);
+
     }
 
-    @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
+        if (event.getServer().getEntityWorld().isRemote)
+        {
+            // Server migration needs to be here because of NBT loading/saving is not available until after postInit.
+            try
+            {
+                // TODO: Move the dir name to a constant
+
+                boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
+
+            }
+            catch (Throwable t)
+            {
+                getLogger().error(LogFormatter.toString(t));
+            }
+            PropertiesManager.getInstance();
+        }
+
         event.registerServerCommand(new CommandJMServerForge());
+        event.registerServerCommand(new CommandJTP());
     }
 
     @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
-        MinecraftServer server = FMLServerHandler.instance().getServer();
-        JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
-        getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
+
     }
 
     @SideOnly(Side.CLIENT)

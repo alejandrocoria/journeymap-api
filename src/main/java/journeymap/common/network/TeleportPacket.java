@@ -11,6 +11,9 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
+import journeymap.common.feature.JourneyMapTeleport;
+import journeymap.common.network.model.Location;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -19,33 +22,34 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by Mysticdrew on 10/8/2014.
  */
-public class WorldIDPacket implements IMessage
+public class TeleportPacket implements IMessage
 {
     // Channel name
-    public static final String CHANNEL_NAME = "world_info";
+    public static final String CHANNEL_NAME = "jtp";
 
-    private String worldID;
+    private String location;
 
-    public WorldIDPacket()
+    public TeleportPacket()
     {
     }
 
-    public WorldIDPacket(String worldID)
+    public TeleportPacket(Location location)
     {
-        this.worldID = worldID;
+        this.location = Location.GSON.toJson(location);
     }
 
-    public String getWorldID()
+    public String getLocation()
     {
-        return worldID;
+        return location;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
+
         try
         {
-            worldID = ByteBufUtils.readUTF8String(buf);
+            location = ByteBufUtils.readUTF8String(buf);
         }
         catch (Throwable t)
         {
@@ -58,9 +62,9 @@ public class WorldIDPacket implements IMessage
     {
         try
         {
-            if (worldID != null)
+            if (location != null)
             {
-                ByteBufUtils.writeUTF8String(buf, worldID);
+                ByteBufUtils.writeUTF8String(buf, location);
             }
         }
         catch (Throwable t)
@@ -69,26 +73,16 @@ public class WorldIDPacket implements IMessage
         }
     }
 
-    public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage>
+    public static class Listener implements IMessageHandler<TeleportPacket, IMessage>
     {
         @Override
-        public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
+        public IMessage onMessage(TeleportPacket message, MessageContext ctx)
         {
-
-            Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
-            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
+            Entity player = null;
+            player = ctx.getServerHandler().playerEntity;
+            Location location = Location.GSON.fromJson(message.getLocation(), Location.class);
+            JourneyMapTeleport.attemptTeleport(player, location, false);
             return null;
-
-//            EntityPlayerMP player = null;
-//            if (ctx.side == Side.SERVER)
-//            {
-//                player = ctx.getServerHandler().playerEntity;
-//                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
-//                {
-//                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
-//                }
-//            }
-//            return null;
         }
     }
 }

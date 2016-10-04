@@ -10,6 +10,7 @@ package journeymap.client.feature;
 
 import com.google.common.reflect.ClassPath;
 import journeymap.common.Journeymap;
+import journeymap.server.properties.PermissionProperties;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -124,6 +125,55 @@ public class FeatureManager
                 Holder.INSTANCE.policyMap.put(feature, new Policy(feature, true, false));
             }
 
+        }
+    }
+
+    public void disableDimensionFeature(PermissionProperties properties)
+    {
+        FeatureManager.instance().reset();
+
+        Holder.INSTANCE.policyMap.put(Feature.RadarAnimals, new Policy(Feature.RadarAnimals, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarMobs, new Policy(Feature.RadarMobs, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarVillagers, new Policy(Feature.RadarVillagers, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.RadarPlayers, new Policy(Feature.RadarPlayers, true, true));
+        Holder.INSTANCE.policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, true, true));
+
+        if (!properties.caveMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.MapCaves);
+            Holder.INSTANCE.policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, true, false));
+        }
+
+        if (properties.radarEnabled.get())
+        {
+            if (!properties.animalRadarEnabled.get())
+            {
+                Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.RadarAnimals);
+                Holder.INSTANCE.policyMap.put(Feature.RadarAnimals, new Policy(Feature.RadarAnimals, true, false));
+            }
+            if (!properties.mobRadarEnabled.get())
+            {
+                Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.RadarMobs);
+                Holder.INSTANCE.policyMap.put(Feature.RadarMobs, new Policy(Feature.RadarMobs, true, false));
+            }
+            if (!properties.playerRadarEnabled.get())
+            {
+                Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.RadarPlayers);
+                Holder.INSTANCE.policyMap.put(Feature.RadarPlayers, new Policy(Feature.RadarPlayers, true, false));
+            }
+            if (!properties.villagerRadarEnabled.get())
+            {
+                Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.RadarVillagers);
+                Holder.INSTANCE.policyMap.put(Feature.RadarVillagers, new Policy(Feature.RadarVillagers, true, false));
+            }
+        }
+        else
+        {
+            Journeymap.getLogger().info("Feature disabled in multiplayer via control code: AllRadar");
+            Holder.INSTANCE.policyMap.put(Feature.RadarAnimals, new Policy(Feature.RadarAnimals, true, false));
+            Holder.INSTANCE.policyMap.put(Feature.RadarMobs, new Policy(Feature.RadarMobs, true, false));
+            Holder.INSTANCE.policyMap.put(Feature.RadarVillagers, new Policy(Feature.RadarVillagers, true, false));
+            Holder.INSTANCE.policyMap.put(Feature.RadarPlayers, new Policy(Feature.RadarPlayers, true, false));
         }
     }
 

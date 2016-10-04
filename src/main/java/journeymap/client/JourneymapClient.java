@@ -41,6 +41,7 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
+import journeymap.common.network.PacketHandler;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -251,6 +252,7 @@ public class JourneymapClient implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
+        PacketHandler.init(Side.CLIENT);
         StatTimer timer = null;
         try
         {

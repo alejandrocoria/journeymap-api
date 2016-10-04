@@ -28,4 +28,9 @@ public class DimensionProperties extends PermissionProperties
     {
         return "dim" + dimension;
     }
+
+    public Integer getDimension()
+    {
+        return dimension;
+    }
 }
