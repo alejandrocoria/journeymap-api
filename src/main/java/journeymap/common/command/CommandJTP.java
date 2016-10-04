@@ -8,6 +8,9 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * Created by Mysticdrew on 9/15/2016.
  */
@@ -17,11 +20,7 @@ public class CommandJTP extends CommandBase
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender)
     {
-        if ("mysticdrew".equalsIgnoreCase(sender.getDisplayName().toString()) || "techbrew".equalsIgnoreCase(sender.getDisplayName().toString()))
-        {
-            return true;
-        }
-        return super.checkPermission(server, sender);
+        return true;
     }
 
     @Override
@@ -39,23 +38,24 @@ public class CommandJTP extends CommandBase
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
+
         if (args.length < 4)
         {
             throw new CommandException(this.getCommandUsage(sender));
         }
-        String x = args[0];
-        String y = args[1];
-        String z = args[2];
-        String dim = args[3];
         Entity player = getCommandSenderAsPlayer(sender);
         try
         {
-            Location location = new Location(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), Integer.parseInt(dim));
-            JourneyMapTeleport.attemptTeleport(player, location, true);
+            double x = Double.parseDouble(args[0]);
+            double y = Double.parseDouble(args[1]);
+            double z = Double.parseDouble(args[2]);
+            int dim = Integer.parseInt(args[3]);
+            Location location = new Location(x, y, z, dim);
+            JourneyMapTeleport.attemptTeleport(player, location);
         }
         catch (NumberFormatException nfe)
         {
-            throw new CommandException("Numbers only! Usage: " + this.getCommandUsage(sender));
+            throw new CommandException("Numbers only! Usage: " + this.getCommandUsage(sender) + nfe);
         }
         catch (Exception e)
         {

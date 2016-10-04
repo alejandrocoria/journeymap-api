@@ -74,7 +74,11 @@ public class ForgeEvents
         if ((event.player instanceof EntityPlayerMP) && (event.player != null))
         {
 
-            PacketHandler.sendPlayerWorldID(PropertiesManager.getInstance().getGlobalProperties().getWorldID(), (EntityPlayerMP) event.player);
+            if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
+            {
+                PacketHandler.sendPlayerWorldID(PropertiesManager.getInstance().getGlobalProperties().getWorldID(), (EntityPlayerMP) event.player);
+            }
+
             if (isOp((EntityPlayerMP) event.player))
             {
                 //TODO: send op ui packet

@@ -69,6 +69,7 @@ public class JourneymapClient implements CommonProxy
 {
     public static final String EDITION = getEdition();
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + EDITION;
+    private boolean serverEnabled = false;
 
     // Properties & preferences
     private volatile CoreProperties coreProperties;
@@ -727,5 +728,15 @@ public class JourneymapClient implements CommonProxy
             this.currentWorldId = worldId;
             Journeymap.getLogger().info("World UID is set to: " + worldId);
         }
+    }
+
+    public boolean isServerEnabled()
+    {
+        return serverEnabled;
+    }
+
+    public void setServerEnabled(boolean serverEnabled)
+    {
+        this.serverEnabled = serverEnabled;
     }
 }

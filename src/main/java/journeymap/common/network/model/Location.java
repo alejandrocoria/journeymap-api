@@ -15,11 +15,11 @@ public class Location implements Serializable
     public static final Gson GSON = new GsonBuilder().create();
 
 
-    private int x;
+    private double x;
 
-    private int y;
+    private double y;
 
-    private int z;
+    private double z;
 
     private int dim;
 
@@ -27,7 +27,7 @@ public class Location implements Serializable
     {
     }
 
-    public Location(int x, int y, int z, int dim)
+    public Location(double x, double y, double z, int dim)
     {
         this.x = x;
         this.y = y;
@@ -35,17 +35,17 @@ public class Location implements Serializable
         this.dim = dim;
     }
 
-    public int getX()
+    public double getX()
     {
         return x;
     }
 
-    public int getY()
+    public double getY()
     {
         return y;
     }
 
-    public int getZ()
+    public double getZ()
     {
         return z;
     }

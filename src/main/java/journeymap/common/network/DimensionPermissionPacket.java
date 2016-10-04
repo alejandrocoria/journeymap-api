@@ -71,7 +71,7 @@ public class DimensionPermissionPacket implements IMessage
         {
             PermissionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
             FeatureManager.instance().disableDimensionFeature(prop);
-
+            Journeymap.getClient().setServerEnabled(true);
             return null;
         }
     }

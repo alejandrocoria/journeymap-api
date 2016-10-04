@@ -12,8 +12,8 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
 import journeymap.server.events.ForgeEvents;
-import journeymap.server.legacyserver.config.ConfigHandler;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
+import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -24,7 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 
 
@@ -54,7 +54,7 @@ public class JourneymapServer implements CommonProxy
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event)
     {
-        ConfigHandler.init(new File(event.getModConfigurationDirectory() + "/JourneyMapServer/"));
+        event.getModConfigurationDirectory();
     }
 
     /**
@@ -97,8 +97,26 @@ public class JourneymapServer implements CommonProxy
         for (String s : modList.keySet())
         {
             //logger.info("MOD Key: " + s + " MOD Value: " + modList.get(s));
+            if ("journeymap".equalsIgnoreCase(s))
+            {
+                if ("@JMVERSION@".equals(modList.get(s)))
+                {
+                    // Dev Env
+                    logger.info("Mod check = dev environment");
+                    return true;
+                }
+                String[] version = modList.get(s).split("-")[1].split("\\.");
+                int major = Integer.parseInt(version[0]);
+                int minor = Integer.parseInt(version[1]);
+
+                if (major >= 5 && minor >= 4)
+                {
+                    return true;
+                }
+                logger.info("Version Mismatch need 5.4.0 or higher. Current version attempt -> " + modList.get(s));
+                return false;
+            }
         }
-        // TODO: Check for JM client and enable/disable worldid checking, etc.
         return true;
     }
 
@@ -117,7 +135,10 @@ public class JourneymapServer implements CommonProxy
     @Override
     public void handleWorldIdMessage(String message, EntityPlayerMP playerEntity)
     {
-        WorldNbtIDSaveHandler nbt = new WorldNbtIDSaveHandler();
-        PacketHandler.sendPlayerWorldID(nbt.getWorldID(), playerEntity);
+        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
+        {
+            WorldNbtIDSaveHandler nbt = new WorldNbtIDSaveHandler();
+            PacketHandler.sendPlayerWorldID(nbt.getWorldID(), playerEntity);
+        }
     }
 }

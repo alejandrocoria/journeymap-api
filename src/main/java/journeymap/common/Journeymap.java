@@ -10,13 +10,9 @@ package journeymap.common;
 
 import journeymap.client.JourneymapClient;
 import journeymap.common.command.CommandJTP;
-import journeymap.common.log.LogFormatter;
-import journeymap.common.migrate.Migration;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
-import journeymap.server.oldservercode.command.CommandJMServerForge;
-import journeymap.server.oldservercode.config.ConfigHandler;
-import net.minecraft.server.MinecraftServer;
+import journeymap.server.properties.PropertiesManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
@@ -41,7 +37,7 @@ public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
-    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 2, 0, "dev"));
+    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 4, 0, "dev"));
     public static final String FORGE_VERSION = "@FORGEVERSION@";
     public static final String WEBSITE_URL = "http://journeymap.info/";
     public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";
@@ -119,22 +115,8 @@ public class Journeymap
     {
         if (event.getServer().getEntityWorld().isRemote)
         {
-            // Server migration needs to be here because of NBT loading/saving is not available until after postInit.
-            try
-            {
-                // TODO: Move the dir name to a constant
-
-                boolean migrationOk = new Migration("journeymap.server.task.migrate").performTasks();
-
-            }
-            catch (Throwable t)
-            {
-                getLogger().error(LogFormatter.toString(t));
-            }
             PropertiesManager.getInstance();
         }
-
-        event.registerServerCommand(new CommandJMServerForge());
         event.registerServerCommand(new CommandJTP());
     }
 

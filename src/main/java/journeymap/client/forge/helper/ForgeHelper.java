@@ -484,11 +484,11 @@ public enum ForgeHelper
             }
         }
 
-
-        public boolean extendedLevelsInChunkCache()
-        {
-            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-        }
+        // Not needed in 1.10.2
+//        public boolean extendedLevelsInChunkCache()
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+//        }
 
 
         public int getStrongPower(BlockPos pos, EnumFacing direction)

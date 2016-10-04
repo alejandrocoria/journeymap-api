@@ -19,7 +19,7 @@ public class DimensionProperties extends PermissionProperties
     public DimensionProperties(Integer dimension)
     {
         super(String.format("Dimension %s Configuration", dimension),
-                "Overrides the Global Server Configuration for this dimension");
+                "Overrides the Global Server Configuration for this dimension - sent enable true to override global settings for this dim");
         this.dimension = dimension;
     }
 

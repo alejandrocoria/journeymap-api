@@ -81,7 +81,7 @@ public class TeleportPacket implements IMessage
             Entity player = null;
             player = ctx.getServerHandler().playerEntity;
             Location location = Location.GSON.fromJson(message.getLocation(), Location.class);
-            JourneyMapTeleport.attemptTeleport(player, location, false);
+//            JourneyMapTeleport.attemptTeleport(player, location, false);
             return null;
         }
     }

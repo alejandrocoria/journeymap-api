@@ -16,7 +16,8 @@ import static journeymap.server.properties.ServerCategory.General;
 public class GlobalProperties extends PermissionProperties
 {
     public final StringField worldID = new StringField(General, "World ID ");
-    public static final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
+    public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
+    public final BooleanField useWorldId = new BooleanField(ServerCategory.General, "Use world id", false);
 
     /**
      * Constructor.
@@ -35,14 +36,12 @@ public class GlobalProperties extends PermissionProperties
     /**
      * @param worldId
      */
-    @SideOnly(Side.SERVER)
     public void setWorldID(String worldId)
     {
         this.worldID.set(worldId);
         this.preSave();
     }
 
-    @SideOnly(Side.SERVER)
     public String getWorldID()
     {
         WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();

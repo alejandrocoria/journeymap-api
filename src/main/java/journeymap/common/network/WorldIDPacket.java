@@ -74,21 +74,10 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
-
             Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
             Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
+            Journeymap.getClient().setServerEnabled(true);
             return null;
-
-//            EntityPlayerMP player = null;
-//            if (ctx.side == Side.SERVER)
-//            {
-//                player = ctx.getServerHandler().playerEntity;
-//                if (ConfigHandler.getConfigByWorldName(player.getEntityWorld().getWorldInfo().getWorldName()).isUsingWorldID())
-//                {
-//                    Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), player);
-//                }
-//            }
-//            return null;
         }
     }
 }

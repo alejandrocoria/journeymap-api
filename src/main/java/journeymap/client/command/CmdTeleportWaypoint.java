@@ -95,6 +95,10 @@ public class CmdTeleportWaypoint
             x = (x * 8);
             z = (z * 8);
         }
-        PacketHandler.teleportPlayer(new Location((int) x, waypoint.getY(), (int) z, dim.first()));
+        if (Journeymap.getClient().isServerEnabled() || FMLClientHandler.instance().getClient().isSingleplayer()) {
+            mc.thePlayer.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
+        } else {
+            mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.thePlayer), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+        }
     }
 }

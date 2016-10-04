@@ -24,18 +24,18 @@ public class GlobalPropertiesTest extends PropertiesBaseTest<GlobalProperties>
     {
         GlobalProperties p = new GlobalProperties();
 
-        p.useWorldID.set(rand.nextBoolean());
-        p.worldID.set(worldId);
-
-        // Don't randomize; setting to true requires a running server
-        p.saveInWorldFolder.set(false);
-
-        p.opCaveMapping.set(rand.nextBoolean());
-        p.playerCaveMapping.set(rand.nextBoolean());
-        p.whiteListCaveMapping.set(String.format("user%s, user%s", rand.nextInt(1000), rand.nextInt(1000)));
-        p.opRadar.set(rand.nextBoolean());
-        p.playerRadar.set(rand.nextBoolean());
-        p.whiteListRadar.set(String.format("user%s, user%s", rand.nextInt(1000), rand.nextInt(1000)));
+//        p.useWorldID.set(rand.nextBoolean());
+//        p.worldID.set(worldId);
+//
+//        // Don't randomize; setting to true requires a running server
+//        p.saveInWorldFolder.set(false);
+//
+//        p.opCaveMapping.set(rand.nextBoolean());
+//        p.playerCaveMapping.set(rand.nextBoolean());
+//        p.whiteListCaveMapping.set(String.format("user%s, user%s", rand.nextInt(1000), rand.nextInt(1000)));
+//        p.opRadar.set(rand.nextBoolean());
+//        p.playerRadar.set(rand.nextBoolean());
+//        p.whiteListRadar.set(String.format("user%s, user%s", rand.nextInt(1000), rand.nextInt(1000)));
 
         return p;
     }

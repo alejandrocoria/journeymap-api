@@ -4,7 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
-import journeymap.server.legacyserver.config.ConfigHandler;
+import journeymap.server.Constants;
 
 import java.io.File;
 import java.util.List;
@@ -179,7 +179,7 @@ public abstract class ServerPropertiesBase extends PropertiesBase implements Clo
     {
         if (sourceFile == null)
         {
-            sourceFile = new File(ConfigHandler.getConfigPath(), getFileName());
+            sourceFile = new File(Constants.CONFIG_DIR, getFileName());
         }
         return sourceFile;
     }

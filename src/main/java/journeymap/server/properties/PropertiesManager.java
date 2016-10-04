@@ -26,9 +26,9 @@ public class PropertiesManager
 
     private void loadConfigs()
     {
-        dimensionProperties = new HashMap<Integer, DimensionProperties>();
+        dimensionProperties = new HashMap<>();
         globalProperties = new GlobalProperties();
-        globalProperties.load().save();
+        globalProperties.load();
 
         for (Integer dim : DimensionManager.getIDs())
         {
