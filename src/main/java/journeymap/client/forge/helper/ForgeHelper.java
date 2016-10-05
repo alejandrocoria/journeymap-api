@@ -478,7 +478,7 @@ public enum ForgeHelper
             }
         }
 
-        // Not needed in 1.10.2
+        // Does not exist in 1.10.2
 //        @Override
 //        public boolean extendedLevelsInChunkCache()
 //        {

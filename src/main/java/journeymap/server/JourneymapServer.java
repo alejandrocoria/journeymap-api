@@ -24,17 +24,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.Map;
 
 
 /**
  * Coming soon to a codebase near you.
  */
-@SideOnly(Side.SERVER)
 public class JourneymapServer implements CommonProxy
 {
     private Logger logger;
+    public static boolean DEV_MODE = false;
 
     /**
      * Constructor.
@@ -54,7 +53,6 @@ public class JourneymapServer implements CommonProxy
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event)
     {
-        event.getModConfigurationDirectory();
     }
 
     /**
@@ -99,10 +97,11 @@ public class JourneymapServer implements CommonProxy
             //logger.info("MOD Key: " + s + " MOD Value: " + modList.get(s));
             if ("journeymap".equalsIgnoreCase(s))
             {
-                if ("@JMVERSION@".equals(modList.get(s)))
+                if (modList.get(s).contains("@"))
                 {
                     // Dev Env
                     logger.info("Mod check = dev environment");
+                    DEV_MODE = true;
                     return true;
                 }
                 String[] version = modList.get(s).split("-")[1].split("\\.");

@@ -113,10 +113,10 @@ public class Journeymap
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
-        if (event.getServer().getEntityWorld().isRemote)
-        {
+//        if (event.getServer().getEntityWorld().isRemote)
+//        {
             PropertiesManager.getInstance();
-        }
+//        }
         event.registerServerCommand(new CommandJTP());
     }
 

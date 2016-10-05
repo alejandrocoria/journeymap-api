@@ -2,7 +2,7 @@ package journeymap.common.feature;
 
 import journeymap.common.Journeymap;
 import journeymap.common.network.model.Location;
-import journeymap.server.properties.GlobalProperties;
+import journeymap.server.JourneymapServer;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -107,7 +107,7 @@ public class JourneyMapTeleport
             else
             {
                 player.connection.setPlayerLocation(location.getX() + 0.5D, location.getY(), location.getZ() + 0.5D, yaw, entity.rotationPitch);
-                ((WorldServer) destinationWorld).getChunkProvider().loadChunk((int)location.getX() >> 4, (int)location.getZ() >> 4);
+                ((WorldServer) destinationWorld).getChunkProvider().loadChunk((int) location.getX() >> 4, (int) location.getZ() >> 4);
                 return true;
             }
         }
@@ -123,8 +123,10 @@ public class JourneyMapTeleport
         entity.setWorld(toWorldIn);
     }
 
-    private static boolean debugOverride(Entity sender) {
-        if ("mysticdrew".equalsIgnoreCase(sender.getDisplayName().toString()) || "techbrew".equalsIgnoreCase(sender.getDisplayName().toString()))
+    private static boolean debugOverride(Entity sender)
+    {
+        if ((JourneymapServer.DEV_MODE)
+                && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
         {
             return true;
         }

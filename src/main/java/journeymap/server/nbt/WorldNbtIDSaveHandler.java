@@ -8,6 +8,7 @@
 
 package journeymap.server.nbt;
 
+import journeymap.server.Constants;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
@@ -28,7 +29,7 @@ public class WorldNbtIDSaveHandler
 
     public WorldNbtIDSaveHandler()
     {
-        world = FMLServerHandler.instance().getServer().getEntityWorld();
+        world = Constants.SERVER.getEntityWorld();
         legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
         data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, DAT_FILE);
     }
