@@ -7,8 +7,10 @@
  */
 package journeymap.client.properties;
 
+import journeymap.client.ui.minimap.MobDisplay;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
 
@@ -27,6 +29,7 @@ public abstract class InGameMapProperties extends MapProperties
     public final StringField locationFormat = new StringField(Inherit, "jm.common.location_format", LocationFormat.IdProvider.class);
     public final BooleanField showMobHeading = new BooleanField(Inherit, "jm.minimap.mob_heading", true);
     public final BooleanField showPlayerHeading = new BooleanField(Inherit, "jm.minimap.player_heading", true);
+    public final EnumField<MobDisplay> mobDisplay = new EnumField<>(Inherit, "jm.minimap.mob_display", MobDisplay.Dots);
 
     protected InGameMapProperties()
     {

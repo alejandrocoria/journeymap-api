@@ -13,6 +13,7 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
@@ -34,10 +35,15 @@ public class DrawEntityStep implements DrawStep
     static final Integer labelFg = RGB.WHITE_RGB;
     static final int labelFgAlpha = 225;
 
-    boolean hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
+    boolean minimal;
+    int elevationOffset;
+    int color;
+    boolean hideSneaks;
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
     TextureImpl texture;
+    TextureImpl minimalTexture;
+    TextureImpl minimalElevatedTexture;
     TextureImpl locatorTexture;
     WeakReference<EntityLivingBase> entityLivingRef;
     String customName;
@@ -47,20 +53,32 @@ public class DrawEntityStep implements DrawStep
     private DrawEntityStep(EntityLivingBase entityLiving)
     {
         super();
-        this.entityLivingRef = new WeakReference<EntityLivingBase>(entityLiving);
+        this.entityLivingRef = new WeakReference<>(entityLiving);
+        hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
     }
 
     public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading)
     {
-        this.locatorTexture = locatorTexture;
-        this.texture = texture;
-        this.flip = flip;
-        this.showHeading = showHeading;
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving != null)
         {
             customName = DataCache.INSTANCE.getEntityDTO(entityLiving).customName;
         }
+
+        minimal = false;
+        this.color = 0xffffff;
+        this.locatorTexture = locatorTexture;
+        this.texture = texture;
+        this.flip = flip;
+        this.showHeading = showHeading;
+    }
+
+    public void updateMinimal(int color)
+    {
+        minimal = true;
+        this.color = color;
+        this.minimalTexture = TextureCache.instance().getLocatorMinimal();
+        this.minimalElevatedTexture = TextureCache.instance().getLocatorMinimalElevated();
     }
 
     @Override
@@ -74,8 +92,11 @@ public class DrawEntityStep implements DrawStep
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (pass == Pass.Object)
         {
-            if (entityLiving == null || entityLiving.isDead || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
-                    || !entityLiving.addedToChunk || (hideSneaks && entityLiving.isSneaking()))
+            if (entityLiving == null
+                    || entityLiving.isDead
+                    || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
+                    || !entityLiving.addedToChunk
+                    || (hideSneaks && entityLiving.isSneaking()))
             {
                 screenPosition = null;
                 return;
@@ -103,7 +124,6 @@ public class DrawEntityStep implements DrawStep
                 //int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
                 //float labelOffset = texture != null ? texture.getHeight() / blockSize : 0;
                 drawPlayer(pass, drawX, drawY, gridRenderer, alpha, heading, drawScale, fontScale, rotation);
-
             }
             else
             {
@@ -159,13 +179,12 @@ public class DrawEntityStep implements DrawStep
             return;
         }
 
-        //Math.min(1f, Math.max(0f, (float) (16 - (entityLiving.posY - minecraft.thePlayer.posY))));
-
         if (pass == Pass.Object)
         {
             if (locatorTexture != null && showHeading)
             {
-                DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+                float minimalScale = minimal ? .75f : 1f;
+                DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, minimalScale * drawScale, rotation);
             }
         }
 
@@ -184,7 +203,26 @@ public class DrawEntityStep implements DrawStep
         {
             if (texture != null)
             {
-                DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
+                if (minimal)
+                {
+                    TextureImpl minTex = null;
+                    elevationOffset = (int) (DataCache.getPlayer().posY - entityLiving.posY);
+                    if (elevationOffset < -1 || elevationOffset > 1)
+                    {
+                        this.flip = (elevationOffset < -1);
+                        minTex = this.minimalElevatedTexture;
+                    }
+                    else
+                    {
+                        this.flip = false;
+                        minTex = this.minimalTexture;
+                    }
+                    DrawUtil.drawColoredEntity(drawX, drawY, minTex, color, alpha, drawScale * .5f, flip ? -rotation + 180 : -rotation);
+                }
+                else
+                {
+                    DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
+                }
             }
         }
     }

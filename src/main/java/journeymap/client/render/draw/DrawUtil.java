@@ -646,6 +646,22 @@ public class DrawUtil
         }
     }
 
+    /**
+     * Draw the entity's location and heading on the overlay image
+     * using the provided icon.
+     */
+    public static void drawColoredEntity(double x, double y, TextureImpl texture, int color, float alpha, float scale, double rotation)
+    {
+        // Adjust to scale
+        double width = (texture.getWidth() * scale);
+        double height = (texture.getHeight() * scale);
+        double drawX = x - (width / 2);
+        double drawY = y - (height / 2);
+
+        // Draw texture in rotated position
+        drawColoredImage(texture, color, alpha, drawX, drawY, scale, rotation);
+    }
+
     public static void sizeDisplay(double width, double height)
     {
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
