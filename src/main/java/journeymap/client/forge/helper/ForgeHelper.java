@@ -415,19 +415,15 @@ public enum ForgeHelper
 
     class JmBlockAccess implements IBlockAccess
     {
-
-
         public TileEntity getTileEntity(BlockPos pos)
         {
             return ForgeHelper.INSTANCE.getWorld().getTileEntity(pos);
         }
 
-
         public int getCombinedLight(BlockPos pos, int min)
         {
             return ForgeHelper.INSTANCE.getWorld().getCombinedLight(pos, min);
         }
-
 
         public IBlockState getBlockState(BlockPos pos)
         {
@@ -446,12 +442,10 @@ public enum ForgeHelper
             }
         }
 
-
         public boolean isAirBlock(BlockPos pos)
         {
             return ForgeHelper.INSTANCE.getWorld().isAirBlock(pos);
         }
-
 
         public Biome getBiomeGenForCoords(BlockPos pos)
         {
@@ -485,10 +479,11 @@ public enum ForgeHelper
         }
 
         // Not needed in 1.10.2
-//        public boolean extendedLevelsInChunkCache()
-//        {
-//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-//        }
+        @Override
+        public boolean extendedLevelsInChunkCache()
+        {
+            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+        }
 
 
         public int getStrongPower(BlockPos pos, EnumFacing direction)
