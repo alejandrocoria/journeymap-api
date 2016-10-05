@@ -169,6 +169,16 @@ public class TextureCache
         return tex;
     }
 
+    public TextureImpl getLocatorMinimal()
+    {
+        return getNamedTexture(Name.LocatorMinimal, "marker.png", false); //$NON-NLS-1$
+    }
+
+    public TextureImpl getLocatorMinimalElevated()
+    {
+        return getNamedTexture(Name.LocatorMinimalElevated, "marker_elevated.png", false); //$NON-NLS-1$
+    }
+
     public TextureImpl getWaypoint()
     {
         return getNamedTexture(Name.Waypoint, "waypoint.png", false); //$NON-NLS-1$
@@ -327,6 +337,10 @@ public class TextureCache
 
     public TextureImpl getEntityIconTexture(ResourceLocation location)
     {
+        if (location == null)
+        {
+            return null;
+        }
         ITextureObject tex = textureManager.getTexture(location);
         if (tex != null && !(tex instanceof ResourceLocationTexture))
         {
@@ -594,9 +608,9 @@ public class TextureCache
     {
         MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle,
         MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile,
-        LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, ColorPicker, ColorPicker2, UnknownEntity,
-        GridSquares, GridDots, GridCheckers, Brick,
-        TileSampleDay, TileSampleNight, TileSampleUnderground
+        LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, LocatorMinimal, LocatorMinimalElevated,
+        ColorPicker, ColorPicker2, UnknownEntity, GridSquares, GridDots, GridCheckers, Brick, TileSampleDay, TileSampleNight,
+        TileSampleUnderground
     }
 
     private static class Holder

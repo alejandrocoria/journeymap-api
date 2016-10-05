@@ -16,6 +16,7 @@ import journeymap.client.properties.InGameMapProperties;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.ui.minimap.MobDisplay;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,9 +33,10 @@ import java.util.List;
  */
 public class RadarDrawStepFactory
 {
-
     public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, float drawScale, InGameMapProperties mapProperties)
     {
+        int color = 0xcccccc;
+        final boolean minimal = (mapProperties.mobDisplay.get() == MobDisplay.Dots);
         final boolean showAnimals = mapProperties.showAnimals.get();
         final boolean showPets = mapProperties.showPets.get();
         final boolean showMobHeading = mapProperties.showMobHeading.get();
@@ -43,7 +45,8 @@ public class RadarDrawStepFactory
 
         try
         {
-            TextureImpl entityIcon, locatorImg;
+            TextureImpl entityIcon = null;
+            TextureImpl locatorImg = null;
             boolean isPlayer, isPet;
 
             String playername = ForgeHelper.INSTANCE.getEntityName(FMLClientHandler.instance().getClient().thePlayer);
@@ -81,12 +84,14 @@ public class RadarDrawStepFactory
                         // Determine and draw locator
                         if (dto.hostile)
                         {
+                            color = 0xff0000;
                             locatorImg = tc.getHostileLocator();
                         }
                         else
                         {
                             if (!Strings.isNullOrEmpty(dto.owner) && playername.equals(dto.owner))
                             {
+                                color = 0x0077ff;
                                 locatorImg = tc.getPetLocator();
                             }
                             else
@@ -97,29 +102,29 @@ public class RadarDrawStepFactory
                                 }
                                 else
                                 {
+                                    color = 0xcccccc;
                                     locatorImg = tc.getNeutralLocator();
                                 }
                             }
                         }
 
                         // Draw entity icon and label
+                        DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
                         if (isPlayer)
                         {
                             entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(entityLiving));
-                            DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
                             drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
-                            drawStepList.add(drawStep);
                         }
-                        else if (dto.entityIconLocation != null)
+                        else
                         {
                             entityIcon = tc.getEntityIconTexture(dto.entityIconLocation);
-                            if (entityIcon != null)
+                            drawStep.update(false, locatorImg, entityIcon, showMobHeading);
+                            if (minimal || entityIcon == null)
                             {
-                                DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
-                                drawStep.update(false, locatorImg, entityIcon, showMobHeading);
-                                drawStepList.add(drawStep);
+                                drawStep.updateMinimal(color);
                             }
                         }
+                        drawStepList.add(drawStep);
                     }
                 }
                 catch (Exception e)
