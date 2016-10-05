@@ -479,11 +479,11 @@ public enum ForgeHelper
         }
 
         // Does not exist in 1.10.2
-//        @Override
-//        public boolean extendedLevelsInChunkCache()
-//        {
-//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-//        }
+        @Override
+        public boolean extendedLevelsInChunkCache()
+        {
+            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+        }
 
 
         public int getStrongPower(BlockPos pos, EnumFacing direction)
