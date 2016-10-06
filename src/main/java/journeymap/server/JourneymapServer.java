@@ -108,11 +108,11 @@ public class JourneymapServer implements CommonProxy
                 int major = Integer.parseInt(version[0]);
                 int minor = Integer.parseInt(version[1]);
 
-                if (major >= 5 && minor >= 4)
+                if (major >= 5 && minor >= 3)
                 {
                     return true;
                 }
-                logger.info("Version Mismatch need 5.4.0 or higher. Current version attempt -> " + modList.get(s));
+                logger.info("Version Mismatch need 5.3.0 or higher. Current version attempt -> " + modList.get(s));
                 return false;
             }
         }
