@@ -33,4 +33,19 @@ public class DimensionProperties extends PermissionProperties
     {
         return dimension;
     }
+
+    public DimensionProperties build()
+    {
+        GlobalProperties gProp = PropertiesManager.getInstance().getGlobalProperties();
+        this.opCaveMappingEnabled.set(gProp.opCaveMappingEnabled.get());
+        this.caveMappingEnabled.set(gProp.caveMappingEnabled.get());
+        this.opRadarEnabled.set(gProp.opRadarEnabled.get());
+        this.radarEnabled.set(gProp.radarEnabled.get());
+        this.playerRadarEnabled.set(gProp.playerRadarEnabled.get());
+        this.villagerRadarEnabled.set(gProp.villagerRadarEnabled.get());
+        this.animalRadarEnabled.set(gProp.animalRadarEnabled.get());
+        this.mobRadarEnabled.set(gProp.mobRadarEnabled.get());
+        this.save();
+        return this;
+    }
 }
