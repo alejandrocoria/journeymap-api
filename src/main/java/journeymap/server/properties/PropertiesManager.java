@@ -32,19 +32,32 @@ public class PropertiesManager
 
         for (Integer dim : DimensionManager.getIDs())
         {
-            DimensionProperties prop = new DimensionProperties(dim);
-            dimensionProperties.put(dim, prop);
-            prop.load();
+            genConfig(dim);
         }
     }
 
     public DimensionProperties getDimProperties(int dim)
     {
+        if (dimensionProperties.get(dim) == null)
+        {
+            genConfig(dim);
+        }
         return dimensionProperties.get(dim);
     }
 
     public GlobalProperties getGlobalProperties()
     {
         return globalProperties;
+    }
+
+    private void genConfig(int dim)
+    {
+        DimensionProperties prop = new DimensionProperties(dim);
+        dimensionProperties.put(dim, prop);
+        if (!prop.getFile().exists())
+        {
+            prop.build();
+        }
+        prop.load();
     }
 }
