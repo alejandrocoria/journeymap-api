@@ -1,5 +1,7 @@
 package journeymap.common.feature;
 
+import com.mojang.authlib.GameProfile;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.model.Location;
 import journeymap.server.JourneymapServer;
@@ -26,6 +28,7 @@ public class JourneyMapTeleport
     {
         MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
         boolean creative = false;
+        boolean cheatMode = false;
         World destinationWorld;
 
         if (entity == null)
@@ -36,6 +39,8 @@ public class JourneyMapTeleport
         if (entity instanceof EntityPlayerMP)
         {
             creative = ((EntityPlayerMP) entity).capabilities.isCreativeMode;
+            cheatMode = mcServer.getPlayerList().canSendCommands(new GameProfile(entity.getUniqueID(), entity.getName()));
+
         }
 
         if (mcServer == null)
@@ -57,7 +62,7 @@ public class JourneyMapTeleport
             return false;
         }
 
-        if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get() || debugOverride(entity) || creative)
+        if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get() || debugOverride(entity) || creative || cheatMode)
         {
             teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
             return true;
