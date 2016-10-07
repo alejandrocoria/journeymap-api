@@ -447,7 +447,8 @@ public enum ForgeHelper
             return ForgeHelper.INSTANCE.getWorld().isAirBlock(pos);
         }
 
-        public Biome getBiomeGenForCoords(BlockPos pos)
+        // 1.10.2
+        public Biome getBiome(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
             if (chunkMD != null && chunkMD.hasChunk())
@@ -465,25 +466,23 @@ public enum ForgeHelper
                 catch (Throwable throwable)
                 {
                     Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
+                    // 1.10.2
+                    return ForgeHelper.INSTANCE.getWorld().getBiome(pos);
                 }
             }
             else
             {
-                // 1.8
-                // return ForgeHelper.INSTANCE.getWorld().getWorldChunkManager().func_180300_a(pos, Biome.plains);
-
-                // 1.8.8
-                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiomeGenerator(pos, Biomes.PLAINS);
+                // 1.10.2
+                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
             }
         }
 
         // Does not exist in 1.10.2
-        @Override
-        public boolean extendedLevelsInChunkCache()
-        {
-            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-        }
+//        @Override
+//        public boolean extendedLevelsInChunkCache()
+//        {
+//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+//        }
 
 
         public int getStrongPower(BlockPos pos, EnumFacing direction)
