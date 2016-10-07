@@ -1,22 +1,26 @@
-/* JourneyMap 5.2.0 Splash/About Dialog - en_US */
+/* JourneyMap 5.3.0 Splash/About Dialog - en_US */
 /* Only translate label values. Do not translate action values. */
 {
   "lines": [
     {
-      "label": "Waypoint sharing! Click here for the wiki page.",
-      "action": "dialog.FullscreenActions#launchWebsite#Waypoint_Sharing"
+      "label": "Performance enhancements! Less memory, faster loading.",
+      "action": ""
     },
     {
-      "label": "Topographic maps. Click here to try it!",
-      "action": "fullscreen.Fullscreen#setMapType#topo"
+      "label": "Minimap: Display Mobs as Dots or Icons.Click to Configure.",
+      "action": "dialog.OptionsManager#MiniMap1"
     },
     {
-      "label": "Customize Topographic map colors. Click here for the wiki page.",
-      "action": "dialog.FullscreenActions#launchWebsite#Topographic"
+      "label": "Fullscreen: Display Mobs as Dots or Icons. Click to Configure.",
+      "action": "dialog.OptionsManager#FullMap"
     },
     {
-      "label": "New 'Minimum Distance' for waypoint beacons. Click here to configure.",
-      "action": "dialog.OptionsManager#WaypointBeacon"
+      "label": "New features for Server Admins! Click to read more.",
+      "action": "dialog.FullscreenActions#launchWebsite#JourneyMapServer"
+    },
+    {
+      "label": "Mods/Packs can add mob icons! Click to read more.",
+      "action": "dialog.FullscreenActions#launchWebsite#Custom_Mob_Icon_Sets"
     }
   ]
 }
