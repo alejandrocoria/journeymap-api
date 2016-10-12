@@ -41,38 +41,42 @@ public class JourneyMapTeleport
             creative = ((EntityPlayerMP) entity).capabilities.isCreativeMode;
             cheatMode = mcServer.getPlayerList().canSendCommands(new GameProfile(entity.getUniqueID(), entity.getName()));
 
-        }
 
-        if (mcServer == null)
-        {
-            entity.addChatMessage(new TextComponentString("Cannot Find World"));
-            return false;
-        }
+            if (mcServer == null)
+            {
+                entity.addChatMessage(new TextComponentString("Cannot Find World"));
+                return false;
+            }
 
-        destinationWorld = mcServer.worldServerForDimension(location.getDim());
-        if (!entity.isEntityAlive())
-        {
-            entity.addChatMessage(new TextComponentString("Cannot teleport when dead."));
-            return false;
-        }
+            destinationWorld = mcServer.worldServerForDimension(location.getDim());
+            if (!entity.isEntityAlive())
+            {
+                entity.addChatMessage(new TextComponentString("Cannot teleport when dead."));
+                return false;
+            }
 
-        if (destinationWorld == null)
-        {
-            entity.addChatMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
-            return false;
-        }
+            if (destinationWorld == null)
+            {
+                entity.addChatMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
+                return false;
+            }
 
-        if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get() || debugOverride(entity) || creative || cheatMode)
-        {
-            teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
-            return true;
+            if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get()
+                    || debugOverride(entity)
+                    || creative
+                    || cheatMode
+                    || isOp((EntityPlayerMP) entity))
+            {
+                teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
+                return true;
+            }
+            else
+            {
+                entity.addChatMessage(new TextComponentString("Server has disabled JourneyMap teleporting."));
+                return false;
+            }
         }
-        else
-        {
-            entity.addChatMessage(new TextComponentString("Server has disabled JourneyMap teleporting."));
-            return false;
-        }
-
+        return false;
     }
 
     private static boolean teleportEntity(MinecraftServer server, World destinationWorld, Entity entity, Location location, float yaw)
@@ -133,7 +137,20 @@ public class JourneyMapTeleport
         if ((JourneymapServer.DEV_MODE)
                 && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
         {
-            return true;
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isOp(EntityPlayerMP player)
+    {
+        String[] ops = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOppedPlayerNames();
+        for (String opName : ops)
+        {
+            if (player.getDisplayNameString().equalsIgnoreCase(opName))
+            {
+                return true;
+            }
         }
         return false;
     }
