@@ -15,6 +15,7 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.multi.MapRegionTask;
@@ -39,7 +40,7 @@ import java.net.URLEncoder;
 
 public class FullscreenActions extends JmUI
 {
-    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
+    protected TextureImpl patreonLogo = ResourceLocationTexture.get(TextureCache.Patreon);
 
     Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
     BooleanPropertyButton buttonEnableMapping;

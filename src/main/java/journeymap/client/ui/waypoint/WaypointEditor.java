@@ -16,6 +16,7 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -96,7 +97,7 @@ public class WaypointEditor extends JmUI
         this.wpTexture = waypoint.getTexture();
         String tooltip = Constants.birthdayMessage();
         this.colorPickTooltip = tooltip == null ? null : Collections.singletonList(tooltip);
-        this.colorPickTexture = tooltip == null ? TextureCache.instance().getColorPicker() : TextureCache.instance().getColorPicker2();
+        this.colorPickTexture = tooltip == null ? ResourceLocationTexture.get(TextureCache.ColorPicker) : ResourceLocationTexture.get(TextureCache.ColorPicker2);
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
         Keyboard.enableRepeatEvents(true);

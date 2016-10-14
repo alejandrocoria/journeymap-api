@@ -12,6 +12,7 @@ import journeymap.client.api.display.ImageOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -44,7 +45,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
     }
 
     @Override
-    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
         if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
@@ -74,17 +75,17 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
                         icon.getOpacity(),
                         northWestPosition.x + xOffset,
                         northWestPosition.y + yOffset,
-                        drawScale, icon.getRotation());
+                        1f, icon.getRotation());
             }
         }
         else
         {
-            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+            super.drawText(pass, xOffset, yOffset, gridRenderer, fontScale, rotation);
         }
     }
 
     /**
-     * Fetch and bind the marker icon texture as needed.
+     * Fetch and bind the marker icon upperTexture as needed.
      */
     protected void ensureTexture()
     {
@@ -97,7 +98,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
         {
             if (iconFuture == null || iconFuture.isCancelled())
             {
-                iconFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+                iconFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
                 {
                     @Override
                     public TextureImpl call() throws Exception
@@ -107,13 +108,13 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
                         if (resourceLocation == null)
                         {
                             resourceLocation = new ResourceLocation("fake:" + overlay.getGuid());
-                            TextureImpl texture = TextureCache.instance().getResourceTexture(resourceLocation);
+                            TextureImpl texture = ResourceLocationTexture.get(resourceLocation);
                             texture.setImage(image.getImage(), true);
                             return texture;
                         }
                         else
                         {
-                            return TextureCache.instance().getResourceTexture(resourceLocation);
+                            return ResourceLocationTexture.get(resourceLocation);
                         }
                     }
                 });
@@ -133,7 +134,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Error getting ImageOverlay marimage texture: " + e, e);
+            Journeymap.getLogger().error("Error getting ImageOverlay marimage upperTexture: " + e, e);
             hasError = true;
         }
 

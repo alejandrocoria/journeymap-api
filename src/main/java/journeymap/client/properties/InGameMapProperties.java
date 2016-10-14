@@ -7,7 +7,7 @@
  */
 package journeymap.client.properties;
 
-import journeymap.client.ui.minimap.MobDisplay;
+import journeymap.client.ui.minimap.EntityDisplay;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
@@ -21,15 +21,15 @@ import static journeymap.common.properties.Category.Inherit;
  */
 public abstract class InGameMapProperties extends MapProperties
 {
+    public final EnumField<EntityDisplay> playerDisplay = new EnumField<>(Inherit, "jm.minimap.player_display", EntityDisplay.SmallDots);
+    public final BooleanField showPlayerHeading = new BooleanField(Inherit, "jm.minimap.player_heading", true);
+    public final EnumField<EntityDisplay> mobDisplay = new EnumField<>(Inherit, "jm.minimap.mob_display", EntityDisplay.SmallDots);
+    public final BooleanField showMobHeading = new BooleanField(Inherit, "jm.minimap.mob_heading", true);
     public final BooleanField showCaves = new BooleanField(Inherit, "jm.common.show_caves", true);
     public final IntegerField fontScale = new IntegerField(Inherit, "jm.common.font_scale", 1, 4, 1);
-    public final BooleanField textureSmall = new BooleanField(Inherit, "jm.minimap.texture_size", true);
     public final BooleanField showWaypointLabels = new BooleanField(Inherit, "jm.minimap.show_waypointlabels", true);
     public final BooleanField locationFormatVerbose = new BooleanField(Inherit, "jm.common.location_format_verbose", true);
     public final StringField locationFormat = new StringField(Inherit, "jm.common.location_format", LocationFormat.IdProvider.class);
-    public final BooleanField showMobHeading = new BooleanField(Inherit, "jm.minimap.mob_heading", true);
-    public final BooleanField showPlayerHeading = new BooleanField(Inherit, "jm.minimap.player_heading", true);
-    public final EnumField<MobDisplay> mobDisplay = new EnumField<>(Inherit, "jm.minimap.mob_display", MobDisplay.Dots);
 
     protected InGameMapProperties()
     {

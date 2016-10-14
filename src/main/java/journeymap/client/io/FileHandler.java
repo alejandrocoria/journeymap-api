@@ -46,7 +46,7 @@ public class FileHandler
 {
     public static final String DEV_MINECRAFT_DIR = "run/";
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
-    public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
+    public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/ui";
 
     public static final File MinecraftDirectory = getMinecraftDirectory();
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
@@ -378,29 +378,6 @@ public class FileHandler
         return waypointDir;
     }
 
-    public static BufferedImage getWebImage(String fileName)
-    {
-        try
-        {
-            String png = FileHandler.ASSETS_JOURNEYMAP_WEB + "/img/" + fileName;//$NON-NLS-1$
-            InputStream is = JourneymapClient.class.getResourceAsStream(png);
-            if (is == null)
-            {
-                Journeymap.getLogger().warn("Image not found: " + png);
-                return null;
-            }
-            BufferedImage img = ImageIO.read(is);
-            is.close();
-            return img;
-        }
-        catch (IOException e)
-        {
-            String error = "Could not get web image " + fileName + ": " + e.getMessage();
-            Journeymap.getLogger().error(error);
-            return null;
-        }
-    }
-
     public static Properties getLangFile(String fileName)
     {
         try
@@ -522,7 +499,7 @@ public class FileHandler
         try
         {
             final File outFile = new File(toDir, fileName);
-            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
+            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_UI + "/" + fileName;
             InputStream inputStream = JourneymapClient.class.getResource(htmlPath).openStream();
 
             ByteSink out = new ByteSink()

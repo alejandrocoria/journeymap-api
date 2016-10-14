@@ -1,7 +1,11 @@
 package journeymap.client.forge.event;
 
+import journeymap.client.render.texture.TextureCache;
 import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.main.IMainThreadTask;
+import journeymap.client.ui.UIManager;
+import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -30,6 +34,10 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
     {
         try
         {
+            TextureCache.INSTANCE.reset();
+            UIManager.INSTANCE.getMiniMap().reset();
+            Fullscreen.state().requireRefresh();
+            MiniMap.state().requireRefresh();
             Journeymap.getClient().queueMainThreadTask(task);
         }
         catch (Exception e)

@@ -12,6 +12,7 @@ import com.google.common.cache.CacheLoader;
 import journeymap.client.cartography.RGB;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 
@@ -63,7 +64,7 @@ public class DrawWayPointStep implements DrawStep
     }
 
     @Override
-    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
         if (!waypoint.isInPlayerDimension())
         {
@@ -80,7 +81,7 @@ public class DrawWayPointStep implements DrawStep
             }
             else if (isEdit && pass == Pass.Object)
             {
-                TextureImpl editTex = TextureCache.instance().getWaypointEdit();
+                TextureImpl editTex = ResourceLocationTexture.get(TextureCache.WaypointEdit);
                 DrawUtil.drawColoredImage(editTex, color, 1f, pixel.getX() - (editTex.getWidth() / 2), pixel.getY() - editTex.getHeight() / 2, -rotation);
             }
 

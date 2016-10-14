@@ -12,6 +12,7 @@ import journeymap.client.api.display.MarkerOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -42,7 +43,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     }
 
     @Override
-    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
         if (!isOnScreen(xOffset, yOffset, gridRenderer, rotation))
         {
@@ -68,17 +69,17 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                         icon.getOpacity(),
                         markerPosition.x + xOffset - icon.getAnchorX(),
                         markerPosition.y + yOffset - icon.getAnchorY(),
-                        drawScale, icon.getRotation() - rotation);
+                        1f, icon.getRotation() - rotation);
             }
         }
         else
         {
-            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+            super.drawText(pass, xOffset, yOffset, gridRenderer, fontScale, rotation);
         }
     }
 
     /**
-     * Fetch and bind the marker icon texture as needed.
+     * Fetch and bind the marker icon upperTexture as needed.
      */
     protected void ensureTexture()
     {
@@ -91,7 +92,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         {
             if (iconFuture == null || iconFuture.isCancelled())
             {
-                iconFuture = TextureCache.instance().scheduleTextureTask(new Callable<TextureImpl>()
+                iconFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
                 {
                     @Override
                     public TextureImpl call() throws Exception
@@ -99,7 +100,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                         MapImage icon = overlay.getIcon();
                         if (icon.getImageLocation() != null)
                         {
-                            return TextureCache.instance().getResourceTexture(icon.getImageLocation());
+                            return ResourceLocationTexture.get(icon.getImageLocation());
                         }
                         else if (icon.getImage() != null)
                         {
@@ -127,7 +128,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Error getting MarkerOverlay image texture: " + e, e);
+            Journeymap.getLogger().error("Error getting MarkerOverlay image upperTexture: " + e, e);
             hasError = true;
         }
 

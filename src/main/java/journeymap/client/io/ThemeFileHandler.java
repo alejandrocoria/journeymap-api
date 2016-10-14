@@ -184,7 +184,7 @@ public class ThemeFileHandler
     {
         if (forceReload)
         {
-            TextureCache.instance().purgeThemeImages();
+            TextureCache.INSTANCE.purgeThemeImages();
         }
 
         String themeName = Journeymap.getClient().getCoreProperties().themeName.get();
@@ -371,7 +371,7 @@ public class ThemeFileHandler
                 if (file.isFile() && file.getName().toLowerCase().endsWith(".png"))
                 {
                     String relativePath = themePath.relativize(file.toPath()).toString().replaceAll("\\\\", "/");
-                    TextureCache.instance().getThemeTexture(theme, relativePath);
+                    TextureCache.INSTANCE.getThemeTexture(theme, relativePath);
                     count++;
                 }
             }

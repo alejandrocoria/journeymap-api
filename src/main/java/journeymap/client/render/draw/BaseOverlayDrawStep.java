@@ -52,7 +52,7 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
      * @param fontScale
      * @param rotation
      */
-    protected void drawText(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    protected void drawText(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
         TextProperties textProperties = overlay.getTextProperties();
 

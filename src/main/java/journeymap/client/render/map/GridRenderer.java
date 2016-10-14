@@ -403,19 +403,19 @@ public class GridRenderer
      * @param xOffset
      * @param yOffset
      */
-    public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, float drawScale, double fontScale, double rotation)
+    public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, double fontScale, double rotation)
     {
         if (!enabled || drawStepList == null || drawStepList.isEmpty())
         {
             return;
         }
-        draw(xOffset, yOffset, drawScale, fontScale, rotation, drawStepList.toArray(new DrawStep[drawStepList.size()]));
+        draw(xOffset, yOffset, fontScale, rotation, drawStepList.toArray(new DrawStep[drawStepList.size()]));
     }
 
     /**
      * Draw an array of steps
      */
-    public void draw(double xOffset, double yOffset, float drawScale, double fontScale, double rotation, DrawStep... drawSteps)
+    public void draw(double xOffset, double yOffset, double fontScale, double rotation, DrawStep... drawSteps)
     {
         if (enabled)
         {
@@ -423,7 +423,7 @@ public class GridRenderer
             {
                 for (DrawStep drawStep : drawSteps)
                 {
-                    drawStep.draw(pass, xOffset, yOffset, this, drawScale, fontScale, rotation);
+                    drawStep.draw(pass, xOffset, yOffset, this, fontScale, rotation);
                 }
             }
         }

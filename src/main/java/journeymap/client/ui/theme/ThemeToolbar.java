@@ -75,7 +75,7 @@ public class ThemeToolbar extends Button
             if (toolbarSpec.useThemeImages)
             {
                 String pathPattern = "container/" + toolbarSpec.prefix + "toolbar_%s.png";
-                TextureCache tc = TextureCache.instance();
+                TextureCache tc = TextureCache.INSTANCE;
                 textureBegin = tc.getThemeTexture(theme, String.format(pathPattern, "begin"));
                 textureInner = tc.getThemeTexture(theme, String.format(pathPattern, "inner"));
                 textureEnd = tc.getThemeTexture(theme, String.format(pathPattern, "end"));

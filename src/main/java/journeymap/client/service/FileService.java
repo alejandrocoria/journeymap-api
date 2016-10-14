@@ -67,7 +67,7 @@ public class FileService extends BaseService
     public FileService()
     {
 
-        URL resourceDir = JourneymapClient.class.getResource(FileHandler.ASSETS_JOURNEYMAP_WEB); //$NON-NLS-1$
+        URL resourceDir = JourneymapClient.class.getResource(FileHandler.ASSETS_JOURNEYMAP_UI); //$NON-NLS-1$
 
         String testPath = null;
 
@@ -92,7 +92,7 @@ public class FileService extends BaseService
         {
             try
             {
-                testPath = new File("../src/main/resources/assets/journeymap/web").getCanonicalPath();
+                testPath = new File("../src/main/resources" + FileHandler.ASSETS_JOURNEYMAP_UI).getCanonicalPath();
                 Journeymap.getLogger().info("Dev environment detected, serving source files from " + testPath);
             }
             catch (IOException e)
@@ -347,7 +347,7 @@ public class FileService extends BaseService
 
         ResponseHeader.on(event).contentType(ContentType.png);
 
-        TextureImpl tex = TextureCache.instance().getPlayerSkin(username);
+        TextureImpl tex = TextureCache.INSTANCE.getPlayerSkin(username);
         BufferedImage img = tex.getImage();
         if (img != null)
         {

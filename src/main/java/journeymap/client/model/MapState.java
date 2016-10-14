@@ -262,7 +262,7 @@ public class MapState
         return drawWaypointStepList;
     }
 
-    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, InGameMapProperties mapProperties, float drawScale, boolean checkWaypointDistance)
+    public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, InGameMapProperties mapProperties, boolean checkWaypointDistance)
     {
         generateDrawStepsTimer.start();
         lastMapProperties = mapProperties;
@@ -270,11 +270,6 @@ public class MapState
         drawStepList.clear();
         drawWaypointStepList.clear();
         entityList.clear();
-
-        if (mapProperties.zoomLevel.get() == 0)
-        {
-            drawScale = drawScale * .5f;
-        }
 
         ClientAPI.INSTANCE.getDrawSteps(drawStepList, gridRenderer.getUIState());
 
@@ -312,7 +307,7 @@ public class MapState
         if (!entityList.isEmpty())
         {
             Collections.sort(entityList, EntityHelper.entityMapComparator);
-            drawStepList.addAll(radarRenderer.prepareSteps(entityList, gridRenderer, drawScale, mapProperties));
+            drawStepList.addAll(radarRenderer.prepareSteps(entityList, gridRenderer, mapProperties));
         }
 
         // Draw waypoints

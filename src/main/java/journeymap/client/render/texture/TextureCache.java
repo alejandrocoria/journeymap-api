@@ -8,19 +8,18 @@
 
 package journeymap.client.render.texture;
 
-import com.google.common.cache.LoadingCache;
+import com.google.common.base.Strings;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.task.main.ExpireTextureTask;
+import journeymap.client.ui.minimap.EntityDisplay;
 import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -34,273 +33,237 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
- * TODO:  Make this actually act like a cache.
- * For now it's just a dumping ground for all textures that need to be retained
- *
+ * Texture management with functionality for reloading them as needed.
  * @author mwoodman
  */
-public class TextureCache
+public enum TextureCache
 {
-    private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length / 2) + 1));
-    //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
-    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    INSTANCE;
 
-    //private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    // BufferedImages should be retained
+    public static final ResourceLocation GridCheckers = uiImage("grid-checkers.png");
+    public static final ResourceLocation GridDots = uiImage("grid-dots.png");
+    public static final ResourceLocation GridSquares = uiImage("grid.png");
+    public static final ResourceLocation ColorPicker = uiImage("colorpick.png");
+    public static final ResourceLocation ColorPicker2 = uiImage("colorpick2.png");
+    public static final ResourceLocation TileSampleDay = uiImage("tile-sample-day.png");
+    public static final ResourceLocation TileSampleNight = uiImage("tile-sample-night.png");
+    public static final ResourceLocation TileSampleUnderground = uiImage("tile-sample-underground.png");
+    public static final ResourceLocation UnknownEntity = uiImage("unknown.png");
 
-    private final LoadingCache<ResourceLocation, TextureImpl> resourceIcons = ResourceLocationTexture.createCache();
+    // BufferedImages don't need be retained
+    public static final ResourceLocation Brick = uiImage("brick.png");
+    public static final ResourceLocation Deathpoint = uiImage("waypoint-death.png");
+    public static final ResourceLocation MobDot = uiImage("marker-dot-16.png");
+    public static final ResourceLocation MobDot_Large = uiImage("marker-dot-32.png");
+    public static final ResourceLocation MobDotArrow = uiImage("marker-dot-arrow-16.png");
+    public static final ResourceLocation MobDotArrow_Large = uiImage("marker-dot-arrow-32.png");
+    public static final ResourceLocation MobDotChevron = uiImage("marker-chevron-16.png");
+    public static final ResourceLocation MobDotChevron_Large = uiImage("marker-chevron-32.png");
+    public static final ResourceLocation MobIconArrow = uiImage("marker-icon-arrow-16.png");
+    public static final ResourceLocation MobIconArrow_Large = uiImage("marker-icon-arrow-32.png");
+    public static final ResourceLocation PlayerArrow = uiImage("marker-player-16.png");
+    public static final ResourceLocation PlayerArrowBG = uiImage("marker-player-bg-16.png");
+    public static final ResourceLocation PlayerArrow_Large = uiImage("marker-player-32.png");
+    public static final ResourceLocation PlayerArrowBG_Large = uiImage("marker-player-bg-32.png");
+    public static final ResourceLocation Logo = uiImage("ico/journeymap60.png");
+    public static final ResourceLocation MinimapSquare128 = uiImage("minimap/minimap-square-128.png");
+    public static final ResourceLocation MinimapSquare256 = uiImage("minimap/minimap-square-256.png");
+    public static final ResourceLocation MinimapSquare512 = uiImage("minimap/minimap-square-512.png");
+    public static final ResourceLocation Patreon = uiImage("patreon.png");
+    public static final ResourceLocation Waypoint = uiImage("waypoint.png");
+    public static final ResourceLocation WaypointEdit = uiImage("waypoint-edit.png");
+    public static final ResourceLocation WaypointOffscreen = uiImage("waypoint-offscreen.png");
+
+    private static ResourceLocation uiImage(String fileName)
+    {
+        return new ResourceLocation(Journeymap.MOD_ID, "ui/img/" + fileName);
+    }
+
+    // Keeps the textures referenced here from being garbage collected, since ResourceLocationTexture's cache uses weak values.
+    private final ArrayList<TextureImpl> preloaded = new ArrayList<>(32);
+    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<>());
 
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
-            new ArrayBlockingQueue<Runnable>(8), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
-
-    //private String currentEntityIconSetName;
-    private TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-
-    private TextureCache()
-    {
-    }
-
-    public static TextureCache instance()
-    {
-        return Holder.INSTANCE;
-    }
+            new ArrayBlockingQueue<>(8), new JMThreadFactory("texture"),
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
 
     public Future<TextureImpl> scheduleTextureTask(Callable<TextureImpl> textureTask)
     {
-        //JourneyMap.getLogger().info("TextureCache.scheduleTextureTask()");
         return texExec.submit(textureTask);
+    }
+
+    private void preloadRetained()
+    {
+        preloaded.addAll(Arrays.asList(ColorPicker, ColorPicker2, GridCheckers, GridDots, GridSquares, TileSampleDay,
+                TileSampleNight, TileSampleUnderground, UnknownEntity).stream().map(ResourceLocationTexture::get)
+                .collect(Collectors.toList()));
+    }
+
+    private void preloadNonRetained()
+    {
+        preloaded.addAll(Arrays.asList(Brick, Deathpoint, Logo, MinimapSquare128, MinimapSquare256, MinimapSquare512,
+                MobDot, MobDot_Large, MobDotArrow, MobDotArrow_Large, MobDotChevron, MobDotChevron_Large,
+                MobIconArrow_Large, PlayerArrow, PlayerArrowBG, PlayerArrow_Large, PlayerArrowBG, Patreon, Waypoint,
+                WaypointEdit, WaypointOffscreen).stream().map(ResourceLocationTexture::get).collect(Collectors.toList()));
+    }
+
+    public void reset()
+    {
+        preloaded.clear();
+        ResourceLocationTexture.purge();
+        preloadRetained();
+        preloadNonRetained();
+    }
+
+    public void purgeThemeImages()
+    {
+        synchronized (themeImages)
+        {
+            ExpireTextureTask.queue(themeImages.values());
+            themeImages.clear();
+        }
     }
 
     /**
      * *********************************************
      */
 
-//    public TextureImpl getCustomTexture(String filename, boolean retain) {
-//        synchronized(customTextures)
-//        {
-//            TextureImpl tex = customTextures.get(filename);
-//            if(tex==null || (!tex.hasImage() && retain)) {
-//                BufferedImage img = FileHandler.getImage(filename);
-//                if(img==null){
-//                    img = getUnknownEntity().getImage();
-//                }
-//                if(img!=null){
-//                    if(tex!=null){
-//                        tex.queueForDeletion();
-//                    }
-//                    tex = new TextureImpl(img, retain);
-//                    customTextures.put(filename, tex);
-//                }
-//            }
-//            return tex;
-//        }
-//    }
-    private TextureImpl getNamedTexture(Name name, String filename, boolean retain)
-    {
-        synchronized (namedTextures)
-        {
-            TextureImpl tex = namedTextures.get(name);
-            if (tex == null || (!tex.hasImage() && retain))
-            {
-                BufferedImage img = FileHandler.getWebImage(filename);
-                if (img == null)
-                {
-                    img = getUnknownEntity().getImage();
-                }
-                if (img != null)
-                {
-                    if (tex != null)
-                    {
-                        tex.queueForDeletion();
-                    }
-                    tex = new TextureImpl(img, retain);
-                    tex.setDescription(String.format("%s (%s)", name, filename));
-                    namedTextures.put(name, tex);
-                }
-            }
-            return tex;
-        }
-    }
-
     public TextureImpl getMinimapCustomSquare(int size, float alpha)
     {
         size = Math.max(64, Math.min(size, 1024));
         alpha = Math.max(0, Math.min(alpha, 1));
 
-        final String frameImg;
+        final BufferedImage frameImg;
         if (size <= 128)
         {
-            frameImg = "minimap/minimap-square-128.png";
+            frameImg = resolveImage(MinimapSquare128);
         }
         else if (size <= 256)
         {
-            frameImg = "minimap/minimap-square-256.png";
+            frameImg = resolveImage(MinimapSquare256);
         }
         else if (size <= 512)
         {
-            frameImg = "minimap/minimap-square-512.png";
+            frameImg = resolveImage(MinimapSquare512);
         }
         else
         {
-            frameImg = "minimap/minimap-square-128.png";
+            frameImg = resolveImage(MinimapSquare128);
         }
 
-        BufferedImage img = FileHandler.getWebImage(frameImg);
         BufferedImage resizedImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) resizedImg.getGraphics();
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g.drawImage(img, 0, 0, size, size, null);
+        g.drawImage(frameImg, 0, 0, size, size, null);
         g.dispose();
 
-        TextureImpl tex = namedTextures.get(Name.MinimapCustomSquare);
-        if (tex != null)
-        {
-            tex.queueForDeletion();
-        }
-
-        tex = new TextureImpl(resizedImg, false);
-        namedTextures.put(Name.MinimapCustomSquare, tex);
+        // Just use 128 as the key
+        ResourceLocationTexture.CACHE.invalidate(MinimapSquare128);
+        ResourceLocationTexture tex = new ResourceLocationTexture(MinimapSquare128);
+        tex.setImage(resizedImg, false);
         return tex;
     }
 
-    public TextureImpl getLocatorMinimal()
+    public static TextureImpl getLowerEntityTexture(EntityDisplay entityDisplay, boolean showHeading)
     {
-        return getNamedTexture(Name.LocatorMinimal, "marker.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getLocatorMinimalElevated()
-    {
-        return getNamedTexture(Name.LocatorMinimalElevated, "marker_elevated.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getWaypoint()
-    {
-        return getNamedTexture(Name.Waypoint, "waypoint.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getWaypointEdit()
-    {
-        return getNamedTexture(Name.WaypointEdit, "waypoint-edit.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getWaypointOffscreen()
-    {
-        return getNamedTexture(Name.WaypointOffscreen, "waypoint-offscreen.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getDeathpoint()
-    {
-        return getNamedTexture(Name.Deathpoint, "waypoint-death.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getLogo()
-    {
-        return getNamedTexture(Name.Logo, "ico/journeymap60.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getPatreonLogo()
-    {
-        return getNamedTexture(Name.Patreon, "patreon.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getHostileLocator()
-    {
-        return getNamedTexture(Name.LocatorHostile, "locator-hostile.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getNeutralLocator()
-    {
-        return getNamedTexture(Name.LocatorNeutral, "locator-neutral.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getOtherLocator()
-    {
-        return getNamedTexture(Name.LocatorOther, "locator-other.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getPetLocator()
-    {
-        return getNamedTexture(Name.LocatorPet, "locator-pet.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getPlayerLocator()
-    {
-        return getNamedTexture(Name.LocatorPlayer, "locator-player.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getPlayerLocatorSmall()
-    {
-        return getNamedTexture(Name.LocatorPlayerSmall, "locator-player-sm.png", false); //$NON-NLS-1$
-    }
-
-    public TextureImpl getColorPicker()
-    {
-        return getNamedTexture(Name.ColorPicker, "colorpick.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getColorPicker2()
-    {
-        return getNamedTexture(Name.ColorPicker2, "colorpick2.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getUnknownEntity()
-    {
-        return getNamedTexture(Name.UnknownEntity, "unknown.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getBrick()
-    {
-        return getNamedTexture(Name.Brick, "brick.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getGrid(Name name)
-    {
-        switch (name)
+        ResourceLocation texLocation = null;
+        switch (entityDisplay)
         {
-            case GridCheckers:
-                return getNamedTexture(Name.GridCheckers, "grid-checkers.png", true);
-            case GridDots:
-                return getNamedTexture(Name.GridDots, "grid-dots.png", true);
-            default:
-                return getNamedTexture(Name.GridSquares, "grid.png", true);
+            case LargeDots:
+            {
+                texLocation = showHeading ? MobDotArrow_Large : MobDot_Large;
+                break;
+            }
+            case SmallDots:
+            {
+                texLocation = showHeading ? MobDotArrow : MobDot;
+                break;
+            }
+            case LargeIcons:
+            {
+                texLocation = showHeading ? MobIconArrow_Large : null;
+                break;
+            }
+            case SmallIcons:
+            {
+                texLocation = showHeading ? MobIconArrow : null;
+                break;
+            }
         }
+        return ResourceLocationTexture.get(texLocation);
     }
+
+    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay)
+    {
+        return getUpperEntityTexture(entityDisplay, (String) null);
+    }
+
+    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay, String playerName)
+    {
+        switch (entityDisplay)
+        {
+            case LargeDots:
+            {
+                return ResourceLocationTexture.get(MobDotChevron_Large);
+            }
+            case SmallDots:
+            {
+                return ResourceLocationTexture.get(MobDotChevron);
+            }
+        }
+
+        if (!Strings.isNullOrEmpty(playerName))
+        {
+            return INSTANCE.getPlayerSkin(playerName);
+        }
+
+        return null;
+    }
+
+    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay, ResourceLocation iconLocation)
+    {
+        switch (entityDisplay)
+        {
+            case LargeDots:
+            {
+                return ResourceLocationTexture.get(MobDotChevron_Large);
+            }
+            case SmallDots:
+            {
+                return ResourceLocationTexture.get(MobDotChevron);
+            }
+        }
+
+        if (iconLocation == null)
+        {
+            return null;
+        }
+        return ResourceLocationTexture.getRetained(iconLocation);
+    }
+
 
     public TextureImpl getTileSample(MapType mapType)
     {
         if (mapType.isNight())
         {
-            return getTileSampleNight();
+            return ResourceLocationTexture.getRetained(TileSampleNight);
         }
         else if (mapType.isUnderground())
         {
-            return getTileSampleUnderground();
+            return ResourceLocationTexture.getRetained(TileSampleUnderground);
         }
         else
         {
-            return getTileSampleDay();
+            return ResourceLocationTexture.getRetained(TileSampleDay);
         }
-    }
-
-    public TextureImpl getTileSampleDay()
-    {
-        return getNamedTexture(Name.TileSampleDay, "tile-sample-day.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getTileSampleNight()
-    {
-        return getNamedTexture(Name.TileSampleNight, "tile-sample-night.png", true); //$NON-NLS-1$
-    }
-
-    public TextureImpl getTileSampleUnderground()
-    {
-        return getNamedTexture(Name.TileSampleUnderground, "tile-sample-underground.png", true); //$NON-NLS-1$
     }
 
     /**
@@ -328,42 +291,6 @@ public class TextureCache
             //Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
             Journeymap.getLogger().error("Resource not usable as image: " + location);
             return null;
-        }
-    }
-
-    /**
-     * *************************************************
-     */
-
-    public TextureImpl getEntityIconTexture(ResourceLocation location)
-    {
-        if (location == null)
-        {
-            return null;
-        }
-        ITextureObject tex = textureManager.getTexture(location);
-        if (tex != null && !(tex instanceof ResourceLocationTexture))
-        {
-            // Another mod stomped on the resource.  Considering it's a JM-only resource,
-            // we're going to replace it.
-            ExpireTextureTask.queue(tex.getGlTextureId());
-            tex = null;
-        }
-
-        if (tex == null)
-        {
-            tex = new ResourceLocationTexture(location, true, false);
-            textureManager.loadTexture(location, tex);
-        }
-
-        return (TextureImpl) tex;
-    }
-
-    public TextureImpl getResourceTexture(ResourceLocation resourceLocation)
-    {
-        synchronized (resourceIcons)
-        {
-            return resourceIcons.getUnchecked(resourceLocation);
         }
     }
 
@@ -417,7 +344,7 @@ public class TextureCache
                 {
                     Journeymap.getLogger().error("Unknown theme image: " + texName);
                     IconSetFileHandler.ensureEntityIconSet("Default");
-                    return getUnknownEntity();
+                    return ResourceLocationTexture.getRetained(UnknownEntity);
                 }
             }
             return tex;
@@ -457,7 +384,7 @@ public class TextureCache
                 else
                 {
                     Journeymap.getLogger().error("Unable to get scaled image: " + texName);
-                    return getUnknownEntity();
+                    return ResourceLocationTexture.getRetained(UnknownEntity);
                 }
             }
             return tex;
@@ -466,6 +393,7 @@ public class TextureCache
 
     /**
      * Get the head portion of a player's skin, scaled to 24x24 pixels.
+     * TODO use skinmanager
      */
     public TextureImpl getPlayerSkin(final String username)
     {
@@ -571,50 +499,5 @@ public class TextureCache
         }
 
         return img;
-    }
-
-    public void purge()
-    {
-        synchronized (namedTextures)
-        {
-            ExpireTextureTask.queue(namedTextures.values());
-            namedTextures.clear();
-        }
-
-//        synchronized (entityIcons)
-//        {
-//            ExpireTextureTask.queue(entityIcons.values());
-//            entityIcons.clear();
-//        }
-
-        synchronized (resourceIcons)
-        {
-            resourceIcons.invalidateAll();
-        }
-
-        purgeThemeImages();
-    }
-
-    public void purgeThemeImages()
-    {
-        synchronized (themeImages)
-        {
-            ExpireTextureTask.queue(themeImages.values());
-            themeImages.clear();
-        }
-    }
-
-    public static enum Name
-    {
-        MinimapSmallSquare, MinimapMediumSquare, MinimapLargeSquare, MinimapCustomSquare, MinimapSmallCircle,
-        MinimapLargeCircle, Waypoint, Deathpoint, WaypointOffscreen, WaypointEdit, Logo, Patreon, LocatorHostile,
-        LocatorNeutral, LocatorOther, LocatorPet, LocatorPlayer, LocatorPlayerSmall, LocatorMinimal, LocatorMinimalElevated,
-        ColorPicker, ColorPicker2, UnknownEntity, GridSquares, GridDots, GridCheckers, Brick, TileSampleDay, TileSampleNight,
-        TileSampleUnderground
-    }
-
-    private static class Holder
-    {
-        private static final TextureCache INSTANCE = new TextureCache();
     }
 }

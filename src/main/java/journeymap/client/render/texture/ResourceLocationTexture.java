@@ -4,7 +4,6 @@ import com.google.common.cache.*;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
@@ -16,46 +15,82 @@ import javax.annotation.Nonnull;
  */
 public class ResourceLocationTexture extends TextureImpl
 {
-    private final boolean isExternallyBound;
+    protected static final LoadingCache<ResourceLocation, ResourceLocationTexture> CACHE = createCache();
 
-    /**
-     * Create a texture using an image found at location.
-     *
-     * @param location        Location where image resides
-     * @param retainImage     Whether to keep the buffered image in memory
-     * @param bindImmediately Whether to bind immediately. If true, this must be called on the main GL thread.
-     */
-    public ResourceLocationTexture(ResourceLocation location, boolean retainImage, boolean bindImmediately)
+    private boolean isExternallyBound;
+    private final ResourceLocation location;
+
+    public static void purge()
     {
-        super(null, TextureCache.resolveImage(location), retainImage, false);
-        this.description = location.toString();
+        CACHE.invalidateAll();
+    }
 
-        // Check to see if TextureManager already has this - avoid binding it twice
-        TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-        ITextureObject existingTexture = null;
+    public static ResourceLocationTexture get(ResourceLocation location)
+    {
+        return get(location, false, false);
+    }
 
-        try
-        {
-            existingTexture = textureManager.getTexture(location);
-        }
-        catch (Exception e)
-        {
-            // Oh well
-        }
+    public static ResourceLocationTexture getRetained(ResourceLocation location)
+    {
+        return get(location, true, false);
+    }
 
-        if (existingTexture != null)
+    public static ResourceLocationTexture get(ResourceLocation location, boolean retainImage, boolean bindImmediately)
+    {
+        ResourceLocationTexture tex = CACHE.getUnchecked(location);
+        if (tex.isBound())
         {
-            this.glTextureId = existingTexture.getGlTextureId();
-            this.isExternallyBound = true;
+            if (retainImage && !tex.hasImage())
+            {
+                tex.setImage(TextureCache.resolveImage(location), true);
+            }
         }
         else
         {
-            this.isExternallyBound = false;
+            if (!tex.hasImage())
+            {
+                tex.setImage(TextureCache.resolveImage(location), retainImage);
+            }
+
+            try
+            {
+                // Check for existing
+                ITextureObject existing = Minecraft.getMinecraft().getTextureManager().getTexture(location);
+                if (existing != null)
+                {
+                    bindImmediately = false;
+                    tex.glTextureId = existing.getGlTextureId();
+                    tex.isExternallyBound = true;
+                }
+                else
+                {
+                    tex.isExternallyBound = false;
+                }
+            }
+            catch (Exception e)
+            {
+                tex.isExternallyBound = false;
+            }
+
             if (bindImmediately)
             {
-                bindTexture();
+                tex.bindTexture();
             }
         }
+
+        return tex;
+    }
+
+    public ResourceLocationTexture(ResourceLocation location)
+    {
+        super(null, null, false, false);
+        this.location = location;
+        this.description = location.getResourcePath();
+    }
+
+    public ResourceLocation getLocation()
+    {
+        return this.location;
     }
 
     /**
@@ -64,7 +99,7 @@ public class ResourceLocationTexture extends TextureImpl
      *
      * @return
      */
-    public static LoadingCache<ResourceLocation, TextureImpl> createCache()
+    public static LoadingCache<ResourceLocation, ResourceLocationTexture> createCache()
     {
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
         builder.concurrencyLevel(1);
@@ -100,11 +135,11 @@ public class ResourceLocationTexture extends TextureImpl
         });
 
         return builder.build(
-                new CacheLoader<ResourceLocation, TextureImpl>()
+                new CacheLoader<ResourceLocation, ResourceLocationTexture>()
                 {
-                    public TextureImpl load(ResourceLocation key) throws Exception
+                    public ResourceLocationTexture load(@Nonnull ResourceLocation key) throws Exception
                     {
-                        return new ResourceLocationTexture(key, true, false);
+                        return new ResourceLocationTexture(key);
                     }
                 });
     }

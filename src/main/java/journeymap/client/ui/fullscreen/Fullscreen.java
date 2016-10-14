@@ -34,7 +34,9 @@ import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.map.Tile;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
+import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
@@ -263,6 +265,7 @@ public class Fullscreen extends JmUI
 
         initGui();
 
+        refreshState();
         drawMap();
     }
 
@@ -964,7 +967,6 @@ public class Fullscreen extends JmUI
             gridRenderer.clearGlErrors(false);
 
             gridRenderer.updateRotation(0);
-            float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 
             if (state.follow.get())
             {
@@ -972,19 +974,25 @@ public class Fullscreen extends JmUI
             }
             gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
             gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
-            gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, getMapFontScale(), 0);
+            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, getMapFontScale(), 0);
 
             if (fullMapProperties.showSelf.get())
             {
                 Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
                 if (playerPixel != null)
                 {
-                    DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, TextureCache.instance().getPlayerLocatorSmall(), drawScale, 0);
+                    boolean large = fullMapProperties.playerDisplay.get().isLarge();
+                    TextureImpl bgTex = large ? ResourceLocationTexture.get(TextureCache.PlayerArrowBG_Large) : ResourceLocationTexture.get(TextureCache.PlayerArrowBG);
+                    TextureImpl fgTex = large ? ResourceLocationTexture.get(TextureCache.PlayerArrow_Large) : ResourceLocationTexture.get(TextureCache.PlayerArrow);
+                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, bgTex, 0xffffff, 1f, 1f, mc.thePlayer.rotationYawHead);
+
+                    int playerColor = coreProperties.getColor(coreProperties.colorSelf);
+                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, fgTex, playerColor, 1f, 1f, mc.thePlayer.rotationYawHead);
                 }
             }
 
-            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, getMapFontScale(), 0);
 
             DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
                     statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
@@ -1096,7 +1104,7 @@ public class Fullscreen extends JmUI
         gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
 
         // Build list of drawSteps
-        state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, 1f, false);
+        state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, false);
 
         // Update player pos
         LocationFormat.LocationFormatKeys locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
@@ -1178,7 +1186,7 @@ public class Fullscreen extends JmUI
     {
         if (logo.isDefunct())
         {
-            logo = TextureCache.instance().getLogo();
+            logo = ResourceLocationTexture.get(TextureCache.Logo);
         }
         DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
         DrawUtil.drawImage(logo, 8, 8, false, 1, 0);

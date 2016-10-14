@@ -16,6 +16,7 @@ import journeymap.client.Constants;
 import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointGroupStore;
@@ -236,7 +237,7 @@ public class Waypoint implements Serializable
 
     public TextureImpl getTexture()
     {
-        return isDeathPoint() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
+        return isDeathPoint() ? ResourceLocationTexture.get(TextureCache.Deathpoint) : ResourceLocationTexture.get(TextureCache.Waypoint);
     }
 
     public ChunkPos getChunkCoordIntPair()

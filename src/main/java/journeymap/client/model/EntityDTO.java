@@ -8,8 +8,10 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -24,6 +26,7 @@ import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -59,6 +62,7 @@ public class EntityDTO implements Serializable
     public boolean invisible;
     public boolean sneaking;
     public boolean passiveAnimal;
+    public int color;
 
     private EntityDTO(EntityLivingBase entity)
     {
@@ -68,6 +72,7 @@ public class EntityDTO implements Serializable
 
     public void update(EntityLivingBase entity, boolean hostile)
     {
+        Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
         this.dimension = entity.dimension;
         this.posX = entity.posX;
@@ -87,13 +92,26 @@ public class EntityDTO implements Serializable
         }
         this.sneaking = entity.isSneaking();
 
+        CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
         ResourceLocation entityIcon = null;
+        int playerColor = coreProperties.getColor(coreProperties.colorPlayer);
 
         // Player check
         if (entity instanceof EntityPlayer)
         {
             String name = StringUtils.stripControlCodes(ForgeHelper.INSTANCE.getEntityName(entity));
             this.username = name;
+            try
+            {
+                ScorePlayerTeam team = mc.theWorld.getScoreboard().getPlayersTeam(this.username);
+                if (team != null)
+                {
+                    playerColor = team.getChatFormat().getColorIndex();
+                }
+            }
+            catch (Throwable t)
+            {
+            }
 
             entityIcon = DefaultPlayerSkin.getDefaultSkinLegacy();
             try
@@ -164,7 +182,6 @@ public class EntityDTO implements Serializable
         }
 
         this.owner = owner;
-
         String customName = null;
 
         // TODO: Recompare to branch to ensure it matches bugfixes
@@ -208,6 +225,33 @@ public class EntityDTO implements Serializable
         else
         {
             this.profession = null;
+        }
+
+        // Color
+        if (entity instanceof EntityPlayer)
+        {
+            // Player
+            this.color = playerColor;
+        }
+        else if (!Strings.isNullOrEmpty(owner))
+        {
+            // Pet
+            color = coreProperties.getColor(coreProperties.colorPet);
+        }
+        else if (profession != null)
+        {
+            // Villager
+            color = coreProperties.getColor(coreProperties.colorVillager);
+        }
+        else if (hostile)
+        {
+            // Mob
+            color = coreProperties.getColor(coreProperties.colorHostile);
+        }
+        else
+        {
+            // Passive
+            color = coreProperties.getColor(coreProperties.colorPassive);
         }
     }
 

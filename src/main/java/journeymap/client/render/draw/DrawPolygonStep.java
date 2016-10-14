@@ -37,7 +37,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
     }
 
     @Override
-    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation)
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
         if (pass == Pass.Object)
         {
@@ -56,7 +56,7 @@ public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
         }
         else if (onScreen)
         {
-            super.drawText(pass, xOffset, yOffset, gridRenderer, drawScale, fontScale, rotation);
+            super.drawText(pass, xOffset, yOffset, gridRenderer, fontScale, rotation);
         }
     }
 

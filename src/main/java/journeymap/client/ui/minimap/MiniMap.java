@@ -19,9 +19,11 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
+import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.*;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -53,7 +55,10 @@ public class MiniMap
     private final Minecraft mc = FMLClientHandler.instance().getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
-    private TextureImpl playerLocatorTex;
+    private TextureImpl playerArrowFg;
+    private TextureImpl playerArrowBg;
+    private int playerArrowColor;
+    private float arrowScale = 1f;
     private MiniMapProperties miniMapProperties;
     private EntityPlayer player;
     private StatTimer drawTimer;
@@ -128,6 +133,7 @@ public class MiniMap
     public void setMiniMapProperties(MiniMapProperties miniMapProperties)
     {
         this.miniMapProperties = miniMapProperties;
+        state().requireRefresh();
         reset();
     }
 
@@ -201,7 +207,7 @@ public class MiniMap
             if (doStateRefresh)
             {
                 boolean checkWaypointDistance = Journeymap.getClient().getWaypointProperties().maxDistance.get() > 0;
-                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, dv.drawScale, checkWaypointDistance);
+                state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, miniMapProperties, checkWaypointDistance);
                 state.updateLastRefresh();
             }
 
@@ -267,7 +273,7 @@ public class MiniMap
 
                 // Draw entities, etc
 
-                gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, dv.fontScale, rotation);
+                gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.fontScale, rotation);
 
                 // Get center of minimap and rect of minimap
                 centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
@@ -277,11 +283,12 @@ public class MiniMap
                 drawOnMapWaypoints(rotation);
 
                 // Draw player
-                if (miniMapProperties.showSelf.get() && playerLocatorTex != null)
+                if (miniMapProperties.showSelf.get() && playerArrowFg != null)
                 {
                     if (centerPoint != null)
                     {
-                        DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
+                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowBg, 0xffffff, 1f, 1f, mc.thePlayer.rotationYawHead);
+                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowFg, playerArrowColor, 1f, 1f, mc.thePlayer.rotationYawHead);
                     }
                 }
 
@@ -437,7 +444,7 @@ public class MiniMap
                 if (onScreen)
                 {
                     drawWayPointStep.setShowLabel(showLabel);
-                    drawWayPointStep.draw(pass, 0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
+                    drawWayPointStep.draw(pass, 0, 0, gridRenderer, dv.fontScale, rotation);
                 }
             }
         }
@@ -604,7 +611,20 @@ public class MiniMap
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();
         GridRenderer.clearDebugMessages();
-        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
+
+        CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
+        playerArrowColor = coreProperties.getColor(coreProperties.colorSelf);
+        arrowScale = miniMapProperties.playerDisplay.get().isLarge() ? 1.11f : 1f;
+        if (miniMapProperties.playerDisplay.get().isLarge())
+        {
+            playerArrowBg = ResourceLocationTexture.get(TextureCache.PlayerArrowBG_Large);
+            playerArrowFg = ResourceLocationTexture.get(TextureCache.PlayerArrow_Large);
+        }
+        else
+        {
+            playerArrowBg = ResourceLocationTexture.get(TextureCache.PlayerArrowBG);
+            playerArrowFg = ResourceLocationTexture.get(TextureCache.PlayerArrow);
+        }
     }
 
 

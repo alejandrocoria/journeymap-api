@@ -65,7 +65,7 @@ public class ThemeButton extends BooleanPropertyButton
     {
         this.theme = theme;
         this.buttonSpec = getButtonSpec(theme);
-        TextureCache tc = TextureCache.instance();
+        TextureCache tc = TextureCache.INSTANCE;
 
         if (buttonSpec.useThemeImages)
         {

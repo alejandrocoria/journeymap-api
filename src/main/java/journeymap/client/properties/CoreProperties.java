@@ -7,6 +7,7 @@
  */
 package journeymap.client.properties;
 
+import journeymap.client.cartography.RGB;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
@@ -21,6 +22,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static journeymap.client.properties.ClientCategory.*;
 
@@ -29,6 +31,8 @@ import static journeymap.client.properties.ClientCategory.*;
  */
 public class CoreProperties extends ClientPropertiesBase implements Comparable<CoreProperties>
 {
+    public final String PATTERN_COLOR = "^#[a-f0-9]{6}$";
+
     public final StringField logLevel = new StringField(Advanced, "jm.advanced.loglevel", JMLogger.LogLevelStringProvider.class);
     public final IntegerField autoMapPoll = new IntegerField(Advanced, "jm.advanced.automappoll", 500, 10000, 2000);
     public final IntegerField cacheAnimalsData = new IntegerField(Advanced, "jm.advanced.cache_animals", 1000, 10000, 3100);
@@ -76,6 +80,14 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final StringField optionsManagerViewed = new StringField(Category.Hidden, "", null);
     public final StringField splashViewed = new StringField(Category.Hidden, "", null);
     public final GridSpecs gridSpecs = new GridSpecs();
+    public final StringField colorPassive = new StringField(Category.Hidden, null, null, "#bbbbbb").pattern(PATTERN_COLOR);
+    public final StringField colorHostile = new StringField(Category.Hidden, null, null, "#ff0000").pattern(PATTERN_COLOR);
+    public final StringField colorPet = new StringField(Category.Hidden, null, null, "#0077ff").pattern(PATTERN_COLOR);
+    public final StringField colorVillager = new StringField(Category.Hidden, null, null, "#88e188").pattern(PATTERN_COLOR);
+    public final StringField colorPlayer = new StringField(Category.Hidden, null, null, "#ffffff").pattern(PATTERN_COLOR);
+    public final StringField colorSelf = new StringField(Category.Hidden, null, null, "#0000ff").pattern(PATTERN_COLOR);
+
+    private transient HashMap<StringField, Integer> mobColors = new HashMap<>(6);
 
     public CoreProperties()
     {
@@ -101,6 +113,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
         {
             this.gridSpecs.updateFrom(((CoreProperties) otherInstance).gridSpecs);
         }
+        mobColors.clear();
     }
 
     @Override
@@ -138,5 +151,16 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public boolean hasValidSurfaceRenderDistances()
     {
         return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
+    }
+
+    public int getColor(StringField colorField)
+    {
+        Integer color = mobColors.get(colorField);
+        if (color == null)
+        {
+            color = RGB.hexToInt(colorField.get());
+            mobColors.put(colorField, color);
+        }
+        return color;
     }
 }

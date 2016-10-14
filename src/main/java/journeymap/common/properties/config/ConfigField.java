@@ -342,7 +342,9 @@ public abstract class ConfigField<T>
                         LogFormatter.toString(e)));
             }
         }
-        return null;
+        // Resort to the default
+        setToDefault();
+        return (E) getDefaultValue();
     }
 
     /**

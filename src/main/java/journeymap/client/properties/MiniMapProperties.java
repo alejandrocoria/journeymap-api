@@ -34,11 +34,12 @@ public class MiniMapProperties extends InGameMapProperties
     public final IntegerField sizePercent = new IntegerField(Inherit, "jm.minimap.size", 1, 100, 30);
     public final IntegerField frameAlpha = new IntegerField(Inherit, "jm.minimap.frame_alpha", 0, 100, 100);
     public final IntegerField terrainAlpha = new IntegerField(Inherit, "jm.minimap.terrain_alpha", 0, 100, 100);
-    public final EnumField<Orientation> orientation = new EnumField<Orientation>(Inherit, "jm.minimap.orientation.button", Orientation.PlayerHeading);
+    public final EnumField<Orientation> orientation = new EnumField<Orientation>(Inherit, "jm.minimap.orientation.button", Orientation.North);
     public final IntegerField compassFontScale = new IntegerField(Inherit, "jm.minimap.compass_font_scale", 1, 4, 1);
     public final BooleanField showCompass = new BooleanField(Inherit, "jm.minimap.show_compass", true);
     public final BooleanField showReticle = new BooleanField(Inherit, "jm.minimap.show_reticle", true);
     public final EnumField<ReticleOrientation> reticleOrientation = new EnumField<ReticleOrientation>(Inherit, "jm.minimap.reticle_orientation", ReticleOrientation.Compass);
+
     protected final transient int id;
     protected boolean active = false;
 

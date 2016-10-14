@@ -17,7 +17,7 @@ import journeymap.client.render.map.GridRenderer;
  */
 public interface DrawStep
 {
-    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, float drawScale, double fontScale, double rotation);
+    public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation);
 
     public int getDisplayOrder();
 

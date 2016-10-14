@@ -14,6 +14,7 @@ import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -65,7 +66,8 @@ public class GridEditor extends JmUI
     public GridEditor(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.grid_editor"), returnDisplay);
-        this.colorPickTexture = Constants.birthdayMessage() == null ? TextureCache.instance().getColorPicker() : TextureCache.instance().getColorPicker2();
+        this.colorPickTexture = Constants.birthdayMessage() == null ?
+                ResourceLocationTexture.get(TextureCache.ColorPicker) : ResourceLocationTexture.get(TextureCache.ColorPicker2);
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
 
@@ -253,7 +255,7 @@ public class GridEditor extends JmUI
 
         drawRect(x - 1, y - 1, x + tileSize + 1, y + tileSize + 1, -6250336);
 
-        TextureImpl tileTex = TextureCache.instance().getTileSample(activeMapType);
+        TextureImpl tileTex = TextureCache.INSTANCE.getTileSample(activeMapType);
         DrawUtil.drawImage(tileTex, x, y, false, 1, 0);
         if (scale == 2)
         {

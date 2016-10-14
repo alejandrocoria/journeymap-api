@@ -10,9 +10,11 @@ package journeymap.client.model;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
+import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -29,7 +31,7 @@ public class GridSpec
     public final float alpha;
     private int colorX = -1;
     private int colorY = -1;
-    //private transient TextureImpl texture = null;
+    private transient ResourceLocationTexture texture = null;
 
     public GridSpec(Style style, Color color, float alpha)
     {
@@ -86,7 +88,11 @@ public class GridSpec
 
     public TextureImpl getTexture()
     {
-        return TextureCache.instance().getGrid(style.textureName);
+        if (texture == null || texture.isDefunct())
+        {
+            texture = ResourceLocationTexture.get(style.textureLocation);
+        }
+        return texture;
     }
 
     public GridSpec clone()
@@ -117,17 +123,17 @@ public class GridSpec
 
     public enum Style
     {
-        Squares("jm.common.grid_style_squares", TextureCache.Name.GridSquares),
-        Dots("jm.common.grid_style_dots", TextureCache.Name.GridDots),
-        Checkers("jm.common.grid_style_checkers", TextureCache.Name.GridCheckers);
+        Squares("jm.common.grid_style_squares", TextureCache.GridSquares),
+        Dots("jm.common.grid_style_dots", TextureCache.GridDots),
+        Checkers("jm.common.grid_style_checkers", TextureCache.GridCheckers);
 
         private final String key;
-        private final TextureCache.Name textureName;
+        private final ResourceLocation textureLocation;
 
-        private Style(String key, TextureCache.Name textureName)
+        private Style(String key, ResourceLocation textureLocation)
         {
             this.key = key;
-            this.textureName = textureName;
+            this.textureLocation = textureLocation;
         }
 
         public String displayName()

@@ -40,7 +40,6 @@ public class DisplayVars
     final Shape shape;
     final Orientation orientation;
     final double fontScale;
-    final float drawScale;
     final int displayWidth;
     final int displayHeight;
     final float terrainAlpha;
@@ -144,8 +143,6 @@ public class DisplayVars
         {
             compassLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.compassLabel.shadow) * compassFontScale);
         }
-
-        drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, miniMapProperties, minimapWidth, minimapHeight);
         marginX = marginY = minimapSpec.margin;
@@ -400,7 +397,7 @@ public class DisplayVars
         {
             this.mapType = mapType;
             name = mapType.isUnderground() ? "caves" : mapType.name();
-            tex = TextureCache.instance().getThemeTexture(theme, String.format("icon/%s.png", name));
+            tex = TextureCache.INSTANCE.getThemeTexture(theme, String.format("icon/%s.png", name));
             color = RGB.WHITE_RGB;
             opposite = RGB.DARK_GRAY_RGB;
             bgScale = 1.15f;

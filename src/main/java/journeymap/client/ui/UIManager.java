@@ -62,15 +62,6 @@ public enum UIManager
         this.miniMap = tmp;
     }
 
-    /**
-     * @deprecated use enum INSTANCE directly
-     */
-    @Deprecated
-    public static UIManager getInstance()
-    {
-        return INSTANCE;
-    }
-
     public static void handleLinkageError(LinkageError error)
     {
         Journeymap.getLogger().error(LogFormatter.toString(error));
@@ -267,6 +258,10 @@ public enum UIManager
                 doDraw = currentScreen == null || currentScreen instanceof GuiChat;
                 if (doDraw)
                 {
+                    if (!MiniMap.uiState().active)
+                    {
+                        MiniMap.state().requireRefresh();
+                    }
                     miniMap.drawMap();
                 }
             }
@@ -458,6 +453,7 @@ public enum UIManager
         try
         {
             miniMap.setMiniMapProperties(Journeymap.getClient().getMiniMapProperties(which));
+            MiniMap.state().requireRefresh();
         }
         catch (LinkageError e)
         {

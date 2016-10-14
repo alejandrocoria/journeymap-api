@@ -14,14 +14,16 @@ import journeymap.client.ui.option.KeyedEnum;
 /**
  * Enum for showing mobs as icons or dots
  */
-public enum MobDisplay implements KeyedEnum
+public enum EntityDisplay implements KeyedEnum
 {
-    Dots("jm.minimap.mob_display.dots"),
-    Icons("jm.minimap.mob_display.icons");
+    LargeDots("jm.common.entity_display.large_dots"),
+    SmallDots("jm.common.entity_display.small_dots"),
+    LargeIcons("jm.common.entity_display.large_icons"),
+    SmallIcons("jm.common.entity_display.small_icons");
 
     public final String key;
 
-    MobDisplay(String key)
+    EntityDisplay(String key)
     {
         this.key = key;
     }
@@ -36,5 +38,15 @@ public enum MobDisplay implements KeyedEnum
     public String toString()
     {
         return Constants.getString(this.key);
+    }
+
+    public boolean isDots()
+    {
+        return this == LargeDots || this == SmallDots;
+    }
+
+    public boolean isLarge()
+    {
+        return this == LargeDots || this == LargeIcons;
     }
 }

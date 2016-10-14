@@ -79,18 +79,6 @@ public class DrawUtil
     /**
      * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
-     *
-     * @param text
-     * @param x
-     * @param y
-     * @param hAlign
-     * @param vAlign
-     * @param bgColor
-     * @param bgAlpha
-     * @param color
-     * @param alpha
-     * @param fontScale
-     * @param fontShadow
      */
     public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, int color, float alpha, double fontScale, boolean fontShadow)
     {
@@ -421,7 +409,7 @@ public class DrawUtil
                 double transX = x + (width / 2);
                 double transY = y + (height / 2);
 
-                // Move origin to center of texture
+                // Move origin to center of upperTexture
                 GlStateManager.translate(transX, transY, 0);
 
                 // Rotatate around origin
@@ -604,29 +592,17 @@ public class DrawUtil
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
-     *
-     * @param x
-     * @param y
-     * @param heading
-     * @param flipInsteadOfRotate
-     * @param texture
      */
-    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float scale, double rotation)
+    public static void drawEntity(double x, double y, double heading, TextureImpl texture, float scale, double rotation)
     {
-        drawEntity(x, y, heading, flipInsteadOfRotate, texture, 1f, scale, rotation);
+        drawEntity(x, y, heading, texture, 1f, scale, rotation);
     }
 
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
-     *
-     * @param x
-     * @param y
-     * @param heading
-     * @param flipInsteadOfRotate
-     * @param texture
      */
-    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float alpha, float scale, double rotation)
+    public static void drawEntity(double x, double y, double heading, TextureImpl texture, float alpha, float scale, double rotation)
     {
         // Adjust to scale
         double width = (texture.getWidth() * scale);
@@ -634,16 +610,8 @@ public class DrawUtil
         double drawX = x - (width / 2);
         double drawY = y - (height / 2);
 
-        if (flipInsteadOfRotate)
-        {
-            boolean flip = (heading % 180) < 90;
-            drawImage(texture, alpha, drawX, drawY, flip, scale, -rotation);
-        }
-        else
-        {
-            // Draw texture in rotated position
-            drawImage(texture, alpha, drawX, drawY, false, scale, heading);
-        }
+        // Draw upperTexture in rotated position
+        drawImage(texture, alpha, drawX, drawY, false, scale, heading);
     }
 
     /**
@@ -658,7 +626,7 @@ public class DrawUtil
         double drawX = x - (width / 2);
         double drawY = y - (height / 2);
 
-        // Draw texture in rotated position
+        // Draw upperTexture in rotated position
         drawColoredImage(texture, color, alpha, drawX, drawY, scale, rotation);
     }
 

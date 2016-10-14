@@ -27,7 +27,8 @@ public abstract class ClientPropertiesBaseTest<P extends PropertiesBase> extends
         randomizeMapProperties(p);
         randomize(p.showCaves);
         randomize(p.fontScale);
-        randomize(p.textureSmall);
+        randomize(p.mobDisplay);
+        randomize(p.playerDisplay);
         randomize(p.showWaypointLabels);
         randomize(p.locationFormatVerbose);
         randomize(p.locationFormat);
