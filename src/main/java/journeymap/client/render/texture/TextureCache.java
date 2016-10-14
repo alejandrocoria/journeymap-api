@@ -8,18 +8,17 @@
 
 package journeymap.client.render.texture;
 
-import com.google.common.base.Strings;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.io.ThemeFileHandler;
-import journeymap.client.model.MapType;
 import journeymap.client.task.main.ExpireTextureTask;
-import journeymap.client.ui.minimap.EntityDisplay;
 import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -33,18 +32,18 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
- * Texture management with functionality for reloading them as needed.
+ * Texture management
  * @author mwoodman
  */
-public enum TextureCache
+public class TextureCache
 {
-    INSTANCE;
-
     // BufferedImages should be retained
     public static final ResourceLocation GridCheckers = uiImage("grid-checkers.png");
     public static final ResourceLocation GridDots = uiImage("grid-dots.png");
@@ -86,183 +85,60 @@ public enum TextureCache
     }
 
     // Keeps the textures referenced here from being garbage collected, since ResourceLocationTexture's cache uses weak values.
-    private final ArrayList<TextureImpl> preloaded = new ArrayList<>(32);
-    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<>());
 
-    private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
+    private static ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(8), new JMThreadFactory("texture"),
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
 
-    public Future<TextureImpl> scheduleTextureTask(Callable<TextureImpl> textureTask)
+    public static TextureImpl getTexture(ResourceLocation location)
+    {
+        if (location == null)
+        {
+            return null;
+        }
+        TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
+        ITextureObject textureObject = textureManager.getTexture(location);
+        if (textureObject == null || (!(textureObject instanceof TextureImpl)))
+        {
+            textureObject = new TextureImpl(location);
+            boolean loaded = textureManager.loadTexture(location, textureObject);
+            if (!loaded)
+            {
+                textureObject = null;
+            }
+
+        }
+        return (TextureImpl) textureObject;
+    }
+
+    public static Future<TextureImpl> scheduleTextureTask(Callable<TextureImpl> textureTask)
     {
         return texExec.submit(textureTask);
     }
 
-    private void preloadRetained()
+    public static void reset()
     {
-        preloaded.addAll(Arrays.asList(ColorPicker, ColorPicker2, GridCheckers, GridDots, GridSquares, TileSampleDay,
-                TileSampleNight, TileSampleUnderground, UnknownEntity).stream().map(ResourceLocationTexture::get)
-                .collect(Collectors.toList()));
+        playerSkins.clear();
+
+        Arrays.asList(Brick, ColorPicker, ColorPicker2, Deathpoint, GridCheckers, GridDots, GridSquares, Logo,
+                MinimapSquare128, MinimapSquare256, MinimapSquare512, MobDot, MobDot_Large, MobDotArrow,
+                MobDotArrow_Large, MobDotChevron, MobDotChevron_Large, MobIconArrow_Large, Patreon, PlayerArrow,
+                PlayerArrow_Large, PlayerArrowBG, PlayerArrowBG, TileSampleDay, TileSampleNight, TileSampleUnderground,
+                UnknownEntity, Waypoint, WaypointEdit, WaypointOffscreen).stream().map(TextureCache::getTexture);
+
+        Arrays.asList(ColorPicker, ColorPicker2, GridCheckers, GridDots, GridSquares, TileSampleDay,
+                TileSampleNight, TileSampleUnderground, UnknownEntity).stream().map(TextureCache::getTexture);
     }
 
-    private void preloadNonRetained()
-    {
-        preloaded.addAll(Arrays.asList(Brick, Deathpoint, Logo, MinimapSquare128, MinimapSquare256, MinimapSquare512,
-                MobDot, MobDot_Large, MobDotArrow, MobDotArrow_Large, MobDotChevron, MobDotChevron_Large,
-                MobIconArrow_Large, PlayerArrow, PlayerArrowBG, PlayerArrow_Large, PlayerArrowBG, Patreon, Waypoint,
-                WaypointEdit, WaypointOffscreen).stream().map(ResourceLocationTexture::get).collect(Collectors.toList()));
-    }
-
-    public void reset()
-    {
-        preloaded.clear();
-        ResourceLocationTexture.purge();
-        preloadRetained();
-        preloadNonRetained();
-    }
-
-    public void purgeThemeImages()
+    public static void purgeThemeImages(Map<String, TextureImpl> themeImages)
     {
         synchronized (themeImages)
         {
             ExpireTextureTask.queue(themeImages.values());
             themeImages.clear();
-        }
-    }
-
-    /**
-     * *********************************************
-     */
-
-    public TextureImpl getMinimapCustomSquare(int size, float alpha)
-    {
-        size = Math.max(64, Math.min(size, 1024));
-        alpha = Math.max(0, Math.min(alpha, 1));
-
-        final BufferedImage frameImg;
-        if (size <= 128)
-        {
-            frameImg = resolveImage(MinimapSquare128);
-        }
-        else if (size <= 256)
-        {
-            frameImg = resolveImage(MinimapSquare256);
-        }
-        else if (size <= 512)
-        {
-            frameImg = resolveImage(MinimapSquare512);
-        }
-        else
-        {
-            frameImg = resolveImage(MinimapSquare128);
-        }
-
-        BufferedImage resizedImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D) resizedImg.getGraphics();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g.drawImage(frameImg, 0, 0, size, size, null);
-        g.dispose();
-
-        // Just use 128 as the key
-        ResourceLocationTexture.CACHE.invalidate(MinimapSquare128);
-        ResourceLocationTexture tex = new ResourceLocationTexture(MinimapSquare128);
-        tex.setImage(resizedImg, false);
-        return tex;
-    }
-
-    public static TextureImpl getLowerEntityTexture(EntityDisplay entityDisplay, boolean showHeading)
-    {
-        ResourceLocation texLocation = null;
-        switch (entityDisplay)
-        {
-            case LargeDots:
-            {
-                texLocation = showHeading ? MobDotArrow_Large : MobDot_Large;
-                break;
-            }
-            case SmallDots:
-            {
-                texLocation = showHeading ? MobDotArrow : MobDot;
-                break;
-            }
-            case LargeIcons:
-            {
-                texLocation = showHeading ? MobIconArrow_Large : null;
-                break;
-            }
-            case SmallIcons:
-            {
-                texLocation = showHeading ? MobIconArrow : null;
-                break;
-            }
-        }
-        return ResourceLocationTexture.get(texLocation);
-    }
-
-    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay)
-    {
-        return getUpperEntityTexture(entityDisplay, (String) null);
-    }
-
-    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay, String playerName)
-    {
-        switch (entityDisplay)
-        {
-            case LargeDots:
-            {
-                return ResourceLocationTexture.get(MobDotChevron_Large);
-            }
-            case SmallDots:
-            {
-                return ResourceLocationTexture.get(MobDotChevron);
-            }
-        }
-
-        if (!Strings.isNullOrEmpty(playerName))
-        {
-            return INSTANCE.getPlayerSkin(playerName);
-        }
-
-        return null;
-    }
-
-    public static TextureImpl getUpperEntityTexture(EntityDisplay entityDisplay, ResourceLocation iconLocation)
-    {
-        switch (entityDisplay)
-        {
-            case LargeDots:
-            {
-                return ResourceLocationTexture.get(MobDotChevron_Large);
-            }
-            case SmallDots:
-            {
-                return ResourceLocationTexture.get(MobDotChevron);
-            }
-        }
-
-        if (iconLocation == null)
-        {
-            return null;
-        }
-        return ResourceLocationTexture.getRetained(iconLocation);
-    }
-
-
-    public TextureImpl getTileSample(MapType mapType)
-    {
-        if (mapType.isNight())
-        {
-            return ResourceLocationTexture.getRetained(TileSampleNight);
-        }
-        else if (mapType.isUnderground())
-        {
-            return ResourceLocationTexture.getRetained(TileSampleUnderground);
-        }
-        else
-        {
-            return ResourceLocationTexture.getRetained(TileSampleDay);
         }
     }
 
@@ -294,12 +170,12 @@ public enum TextureCache
         }
     }
 
-    public TextureImpl getThemeTexture(Theme theme, String iconPath)
+    public static TextureImpl getThemeTexture(Theme theme, String iconPath)
     {
         return getSizedThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
     }
 
-    public TextureImpl getSizedThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
+    public static TextureImpl getSizedThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
     {
         String texName = String.format("%s/%s", theme.directory, iconPath);
         synchronized (themeImages)
@@ -344,14 +220,14 @@ public enum TextureCache
                 {
                     Journeymap.getLogger().error("Unknown theme image: " + texName);
                     IconSetFileHandler.ensureEntityIconSet("Default");
-                    return ResourceLocationTexture.getRetained(UnknownEntity);
+                    return getTexture(UnknownEntity);
                 }
             }
             return tex;
         }
     }
 
-    public TextureImpl getScaledCopy(String texName, TextureImpl original, int width, int height, float alpha)
+    public static TextureImpl getScaledCopy(String texName, TextureImpl original, int width, int height, float alpha)
     {
         synchronized (themeImages)
         {
@@ -384,7 +260,7 @@ public enum TextureCache
                 else
                 {
                     Journeymap.getLogger().error("Unable to get scaled image: " + texName);
-                    return ResourceLocationTexture.getRetained(UnknownEntity);
+                    return getTexture(UnknownEntity);
                 }
             }
             return tex;
@@ -395,7 +271,7 @@ public enum TextureCache
      * Get the head portion of a player's skin, scaled to 24x24 pixels.
      * TODO use skinmanager
      */
-    public TextureImpl getPlayerSkin(final String username)
+    public static TextureImpl getPlayerSkin(final String username)
     {
         TextureImpl tex = null;
         synchronized (playerSkins)
@@ -445,7 +321,7 @@ public enum TextureCache
     /**
      * Blocks.  Use this in a thread.
      */
-    protected BufferedImage downloadSkin(String username)
+    public static BufferedImage downloadSkin(String username)
     {
         BufferedImage img = null;
         HttpURLConnection conn = null;
@@ -465,7 +341,7 @@ public enum TextureCache
         return img;
     }
 
-    private BufferedImage downloadImage(URL imageURL)
+    private static BufferedImage downloadImage(URL imageURL)
     {
         BufferedImage img = null;
         HttpURLConnection conn = null;
@@ -477,7 +353,7 @@ public enum TextureCache
             conn.setDoInput(true);
             conn.setDoOutput(false);
             conn.connect();
-            if (conn.getResponseCode() / 100 == 2) // can't get input stream before response code available
+            if (conn.getResponseCode() / 100 == 2) // can't getTexture input stream before response code available
             {
                 img = ImageIO.read(conn.getInputStream()).getSubimage(8, 8, 8, 8);
             }

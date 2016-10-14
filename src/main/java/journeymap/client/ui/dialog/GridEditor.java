@@ -14,7 +14,6 @@ import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -28,6 +27,7 @@ import journeymap.common.properties.Category;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL12;
 
@@ -63,18 +63,20 @@ public class GridEditor extends JmUI
     private ButtonList leftChecks;
     private ButtonList bottomButtons;
 
+    private ResourceLocation colorPicResource;
+
     public GridEditor(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.grid_editor"), returnDisplay);
-        this.colorPickTexture = Constants.birthdayMessage() == null ?
-                ResourceLocationTexture.get(TextureCache.ColorPicker) : ResourceLocationTexture.get(TextureCache.ColorPicker2);
-        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
-        this.colorPickImg = colorPickTexture.getImage();
+        colorPicResource = Constants.birthdayMessage() == null ? TextureCache.ColorPicker : TextureCache.ColorPicker2;
+
+        this.colorPickImg = TextureCache.resolveImage(colorPicResource);
+        this.colorPickTexture = TextureCache.getTexture(colorPicResource);
+        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickImg.getWidth(), colorPickImg.getHeight());
 
         this.gridSpecs = Journeymap.getClient().getCoreProperties().gridSpecs.clone();
 
-        MapType mapType = MapType.day(0);
-        activeMapType = mapType;
+        activeMapType = MapType.day(0);
         this.activeColor = this.gridSpecs.getSpec(activeMapType).getColor();
 
         Keyboard.enableRepeatEvents(true);
@@ -225,7 +227,7 @@ public class GridEditor extends JmUI
         if (colorPickRect.width != size)
         {
             // Updated scaled image only when necessary
-            Image image = colorPickTexture.getImage().getScaledInstance(sizeI, sizeI, Image.SCALE_FAST);
+            Image image = TextureCache.resolveImage(colorPicResource).getScaledInstance(sizeI, sizeI, Image.SCALE_FAST);
             colorPickImg = new BufferedImage(sizeI, sizeI, BufferedImage.TYPE_INT_RGB);
 
             Graphics g = colorPickImg.createGraphics();
@@ -233,7 +235,7 @@ public class GridEditor extends JmUI
             g.dispose();
         }
         colorPickRect.setRect(x, y, size, size);
-        float scale = size / colorPickTexture.getWidth();
+        float scale = size / colorPickImg.getWidth();
         DrawUtil.drawImage(colorPickTexture, x, y, false, scale, 0);
 
         GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
@@ -255,7 +257,7 @@ public class GridEditor extends JmUI
 
         drawRect(x - 1, y - 1, x + tileSize + 1, y + tileSize + 1, -6250336);
 
-        TextureImpl tileTex = TextureCache.INSTANCE.getTileSample(activeMapType);
+        TextureImpl tileTex = getTileSample(activeMapType);
         DrawUtil.drawImage(tileTex, x, y, false, 1, 0);
         if (scale == 2)
         {
@@ -463,6 +465,22 @@ public class GridEditor extends JmUI
         else
         {
             UIManager.INSTANCE.open(returnDisplay);
+        }
+    }
+
+    public TextureImpl getTileSample(MapType mapType)
+    {
+        if (mapType.isNight())
+        {
+            return TextureCache.getTexture(TextureCache.TileSampleNight);
+        }
+        else if (mapType.isUnderground())
+        {
+            return TextureCache.getTexture(TextureCache.TileSampleUnderground);
+        }
+        else
+        {
+            return TextureCache.getTexture(TextureCache.TileSampleDay);
         }
     }
 }

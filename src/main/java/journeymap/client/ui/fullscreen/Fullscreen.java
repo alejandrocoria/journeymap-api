@@ -34,7 +34,6 @@ import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.map.Tile;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -983,8 +982,8 @@ public class Fullscreen extends JmUI
                 if (playerPixel != null)
                 {
                     boolean large = fullMapProperties.playerDisplay.get().isLarge();
-                    TextureImpl bgTex = large ? ResourceLocationTexture.get(TextureCache.PlayerArrowBG_Large) : ResourceLocationTexture.get(TextureCache.PlayerArrowBG);
-                    TextureImpl fgTex = large ? ResourceLocationTexture.get(TextureCache.PlayerArrow_Large) : ResourceLocationTexture.get(TextureCache.PlayerArrow);
+                    TextureImpl bgTex = large ? TextureCache.getTexture(TextureCache.PlayerArrowBG_Large) : TextureCache.getTexture(TextureCache.PlayerArrowBG);
+                    TextureImpl fgTex = large ? TextureCache.getTexture(TextureCache.PlayerArrow_Large) : TextureCache.getTexture(TextureCache.PlayerArrow);
                     DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, bgTex, 0xffffff, 1f, 1f, mc.thePlayer.rotationYawHead);
 
                     int playerColor = coreProperties.getColor(coreProperties.colorSelf);
@@ -1011,7 +1010,7 @@ public class Fullscreen extends JmUI
 
 
         //GridRenderer.addDebugMessage(timer.getName(), timer.getSimpleReportString());
-        //GridRenderer.addDebugMessage(StatTimer.get("GridRenderer.center").getName(), StatTimer.get("GridRenderer.center").getSimpleReportString());
+        //GridRenderer.addDebugMessage(StatTimer.getTexture("GridRenderer.center").getName(), StatTimer.getTexture("GridRenderer.center").getSimpleReportString());
 
     }
 
@@ -1186,7 +1185,7 @@ public class Fullscreen extends JmUI
     {
         if (logo.isDefunct())
         {
-            logo = ResourceLocationTexture.get(TextureCache.Logo);
+            logo = TextureCache.getTexture(TextureCache.Logo);
         }
         DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
         DrawUtil.drawImage(logo, 8, 8, false, 1, 0);

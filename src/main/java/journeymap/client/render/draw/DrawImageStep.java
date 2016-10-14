@@ -12,7 +12,6 @@ import journeymap.client.api.display.ImageOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -98,7 +97,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
         {
             if (iconFuture == null || iconFuture.isCancelled())
             {
-                iconFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
+                iconFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
                 {
                     @Override
                     public TextureImpl call() throws Exception
@@ -108,13 +107,13 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
                         if (resourceLocation == null)
                         {
                             resourceLocation = new ResourceLocation("fake:" + overlay.getGuid());
-                            TextureImpl texture = ResourceLocationTexture.get(resourceLocation);
+                            TextureImpl texture = TextureCache.getTexture(resourceLocation);
                             texture.setImage(image.getImage(), true);
                             return texture;
                         }
                         else
                         {
-                            return ResourceLocationTexture.get(resourceLocation);
+                            return TextureCache.getTexture(resourceLocation);
                         }
                     }
                 });

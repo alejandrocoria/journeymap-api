@@ -13,7 +13,6 @@ import journeymap.client.data.DataCache;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.properties.InGameMapProperties;
 import journeymap.client.render.map.GridRenderer;
-import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.minimap.EntityDisplay;
 import journeymap.common.Journeymap;
@@ -82,22 +81,22 @@ public class RadarDrawStepFactory
                     isPlayer = entityLiving instanceof EntityPlayer;
                     if (isPlayer)
                     {
-                        locatorImg = TextureCache.getLowerEntityTexture(playerDisplay, showPlayerHeading);
-                        entityIcon = TextureCache.getUpperEntityTexture(playerDisplay, entityLiving.getName());
+                        locatorImg = EntityDisplay.getLocatorTexture(playerDisplay, showPlayerHeading);
+                        entityIcon = EntityDisplay.getEntityTexture(playerDisplay, entityLiving.getName());
                         drawStep.update(playerDisplay, locatorImg, entityIcon, dto.color, showPlayerHeading);
                         drawStepList.add(drawStep);
                     }
                     else
                     {
-                        locatorImg = TextureCache.getLowerEntityTexture(mobDisplay, showMobHeading);
-                        entityIcon = TextureCache.getUpperEntityTexture(mobDisplay, dto.entityIconLocation);
+                        locatorImg = EntityDisplay.getLocatorTexture(mobDisplay, showMobHeading);
+                        entityIcon = EntityDisplay.getEntityTexture(mobDisplay, dto.entityIconLocation);
 
                         EntityDisplay actualDisplay = mobDisplay;
                         if (!mobDisplay.isDots() && entityIcon == null)
                         {
                             // Missing icon?  Use dot.
                             actualDisplay = mobDisplay.isLarge() ? EntityDisplay.LargeDots : EntityDisplay.SmallDots;
-                            entityIcon = TextureCache.getUpperEntityTexture(actualDisplay, dto.entityIconLocation);
+                            entityIcon = EntityDisplay.getEntityTexture(actualDisplay, dto.entityIconLocation);
                         }
                         drawStep.update(actualDisplay, locatorImg, entityIcon, dto.color, showMobHeading);
                         drawStepList.add(drawStep);

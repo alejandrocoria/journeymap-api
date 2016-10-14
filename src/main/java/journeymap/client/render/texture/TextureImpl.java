@@ -14,6 +14,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
@@ -34,6 +35,15 @@ public class TextureImpl extends AbstractTexture
 
     protected ByteBuffer buffer;
     protected boolean bindNeeded;
+
+    /**
+     * Must be called on thread with OpenGL Context.  Texture is immediately bound.
+     */
+    public TextureImpl(ResourceLocation resourceLocation)
+    {
+        this(null, TextureCache.resolveImage(resourceLocation), false, false);
+        setDescription(resourceLocation.getResourcePath());
+    }
 
     /**
      * Must be called on thread with OpenGL Context.  Texture is immediately bound.
@@ -153,7 +163,12 @@ public class TextureImpl extends AbstractTexture
         {
             try
             {
+//                int oldGlid = glTextureId;
                 GlStateManager.bindTexture(super.getGlTextureId());
+//                if(oldGlid!=glTextureId)
+//                {
+//                    Journeymap.getLogger().info(String.format("%s GLID %s -> %s", this, oldGlid, glTextureId));
+//                }
 
                 //Send texel data to OpenGL
 

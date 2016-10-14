@@ -463,7 +463,7 @@ public class ButtonList extends ArrayList<Button>
 
         if (totalWidth < maxTotalWidth)
         {
-            // Pad the buttons to get up to maxTotalWidth
+            // Pad the buttons to getTexture up to maxTotalWidth
             int pad = (maxTotalWidth - totalWidth) / this.size();
             if (pad > 0)
             {

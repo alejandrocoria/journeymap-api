@@ -347,7 +347,7 @@ public class FileService extends BaseService
 
         ResponseHeader.on(event).contentType(ContentType.png);
 
-        TextureImpl tex = TextureCache.INSTANCE.getPlayerSkin(username);
+        TextureImpl tex = TextureCache.getPlayerSkin(username);
         BufferedImage img = tex.getImage();
         if (img != null)
         {

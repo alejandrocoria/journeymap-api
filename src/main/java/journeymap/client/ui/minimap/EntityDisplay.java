@@ -8,24 +8,100 @@
 
 package journeymap.client.ui.minimap;
 
+import com.google.common.base.Strings;
 import journeymap.client.Constants;
+import journeymap.client.render.texture.TextureCache;
+import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.option.KeyedEnum;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * Enum for showing mobs as icons or dots
  */
 public enum EntityDisplay implements KeyedEnum
 {
-    LargeDots("jm.common.entity_display.large_dots"),
     SmallDots("jm.common.entity_display.small_dots"),
-    LargeIcons("jm.common.entity_display.large_icons"),
-    SmallIcons("jm.common.entity_display.small_icons");
+    LargeDots("jm.common.entity_display.large_dots"),
+    SmallIcons("jm.common.entity_display.small_icons"),
+    LargeIcons("jm.common.entity_display.large_icons");
 
     public final String key;
 
     EntityDisplay(String key)
     {
         this.key = key;
+    }
+
+    public static TextureImpl getLocatorTexture(EntityDisplay entityDisplay, boolean showHeading)
+    {
+        ResourceLocation texLocation = null;
+        switch (entityDisplay)
+        {
+            case LargeDots:
+            {
+                texLocation = showHeading ? TextureCache.MobDotArrow_Large : TextureCache.MobDot_Large;
+                break;
+            }
+            case SmallDots:
+            {
+                texLocation = showHeading ? TextureCache.MobDotArrow : TextureCache.MobDot;
+                break;
+            }
+            case LargeIcons:
+            {
+                texLocation = showHeading ? TextureCache.MobIconArrow_Large : null;
+                break;
+            }
+            case SmallIcons:
+            {
+                texLocation = showHeading ? TextureCache.MobIconArrow : null;
+                break;
+            }
+        }
+        return TextureCache.getTexture(texLocation);
+    }
+
+    public static TextureImpl getEntityTexture(EntityDisplay entityDisplay)
+    {
+        return getEntityTexture(entityDisplay, (String) null);
+    }
+
+    public static TextureImpl getEntityTexture(EntityDisplay entityDisplay, String playerName)
+    {
+        switch (entityDisplay)
+        {
+            case LargeDots:
+            {
+                return TextureCache.getTexture(TextureCache.MobDotChevron_Large);
+            }
+            case SmallDots:
+            {
+                return TextureCache.getTexture(TextureCache.MobDotChevron);
+            }
+        }
+
+        if (!Strings.isNullOrEmpty(playerName))
+        {
+            return TextureCache.getPlayerSkin(playerName);
+        }
+
+        return null;
+    }
+
+    public static TextureImpl getEntityTexture(EntityDisplay entityDisplay, ResourceLocation iconLocation)
+    {
+        switch (entityDisplay)
+        {
+            case LargeDots:
+            {
+                return TextureCache.getTexture(TextureCache.MobDotChevron_Large);
+            }
+            case SmallDots:
+            {
+                return TextureCache.getTexture(TextureCache.MobDotChevron);
+            }
+        }
+        return TextureCache.getTexture(iconLocation);
     }
 
     @Override

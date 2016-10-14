@@ -10,7 +10,6 @@ package journeymap.client.model;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.renderer.GlStateManager;
@@ -31,7 +30,7 @@ public class GridSpec
     public final float alpha;
     private int colorX = -1;
     private int colorY = -1;
-    private transient ResourceLocationTexture texture = null;
+    private transient TextureImpl texture = null;
 
     public GridSpec(Style style, Color color, float alpha)
     {
@@ -90,7 +89,7 @@ public class GridSpec
     {
         if (texture == null || texture.isDefunct())
         {
-            texture = ResourceLocationTexture.get(style.textureLocation);
+            texture = TextureCache.getTexture(style.textureLocation);
         }
         return texture;
     }

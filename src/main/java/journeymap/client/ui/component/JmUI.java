@@ -13,7 +13,6 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -44,7 +43,7 @@ public abstract class JmUI extends GuiScreen
     protected final Logger logger = Journeymap.getLogger();
     protected GuiScreen returnDisplay;
     protected int scaleFactor = 1;
-    protected TextureImpl logo = ResourceLocationTexture.get(TextureCache.Logo);
+    protected TextureImpl logo = TextureCache.getTexture(TextureCache.Logo);
 
     public JmUI(String title)
     {
@@ -130,7 +129,7 @@ public abstract class JmUI extends GuiScreen
 //    {
 //        for (int k = 0; k < this.buttonList.size(); ++k)
 //        {
-//            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+//            GuiButton guibutton = (GuiButton) this.buttonList.getTexture(k);
 //            if (guibutton instanceof Button)
 //            {
 //                Button button = (Button) guibutton;
@@ -147,7 +146,7 @@ public abstract class JmUI extends GuiScreen
     {
         if (logo.isDefunct())
         {
-            logo = ResourceLocationTexture.get(TextureCache.Logo);
+            logo = TextureCache.getTexture(TextureCache.Logo);
         }
         DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
         DrawUtil.drawImage(logo, 8, 8, false, 1, 0);

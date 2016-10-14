@@ -91,10 +91,10 @@ public class ThemeMinimapFrame
             resourcePattern = "minimap/circle/" + minimapCircle.prefix + "%s.png";
 
             TextureImpl tempMask = getTexture("mask_" + imgSize, imgSize, imgSize, false, true);
-            textureCircleMask = TextureCache.INSTANCE.getScaledCopy("scaledCircleMask", tempMask, width, height, 1f);
+            textureCircleMask = TextureCache.getScaledCopy("scaledCircleMask", tempMask, width, height, 1f);
 
             TextureImpl tempCircle = getTexture("rim_" + imgSize, imgSize, imgSize, false, true);
-            textureCircle = TextureCache.INSTANCE.getScaledCopy("scaledCircleRim", tempCircle, width, height, frameAlpha);
+            textureCircle = TextureCache.getScaledCopy("scaledCircleRim", tempCircle, width, height, frameAlpha);
         }
 
         if (minimapSpec.compassPoint != null && minimapSpec.compassPoint.width > 0 && minimapSpec.compassPoint.height > 0)
@@ -229,7 +229,7 @@ public class ThemeMinimapFrame
 
     private TextureImpl getTexture(String suffix, int width, int height, boolean resize, boolean retain)
     {
-        return TextureCache.INSTANCE.getSizedThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
+        return TextureCache.getSizedThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
     }
 
     public Rectangle.Double getFrameBounds()

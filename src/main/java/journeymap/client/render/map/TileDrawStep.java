@@ -287,7 +287,7 @@ public class TileDrawStep
             return false;
         }
 
-        regionFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
+        regionFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
         {
             @Override
             public TextureImpl call() throws Exception
@@ -328,7 +328,7 @@ public class TileDrawStep
 
         if (scaledTexture == null)
         {
-            scaledFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
+            scaledFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
             {
                 @Override
                 public TextureImpl call() throws Exception
@@ -342,7 +342,7 @@ public class TileDrawStep
         else if (scaledTexture.getLastImageUpdate() < getRegionTextureHolder().getImageTimestamp())
         {
             final TextureImpl temp = scaledTexture;
-            scaledFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
+            scaledFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
             {
                 @Override
                 public TextureImpl call() throws Exception

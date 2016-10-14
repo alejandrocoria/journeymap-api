@@ -31,7 +31,7 @@ import static journeymap.client.properties.ClientCategory.*;
  */
 public class CoreProperties extends ClientPropertiesBase implements Comparable<CoreProperties>
 {
-    public final String PATTERN_COLOR = "^#[a-f0-9]{6}$";
+    public final static String PATTERN_COLOR = "^#[a-f0-9]{6}$";
 
     public final StringField logLevel = new StringField(Advanced, "jm.advanced.loglevel", JMLogger.LogLevelStringProvider.class);
     public final IntegerField autoMapPoll = new IntegerField(Advanced, "jm.advanced.automappoll", 500, 10000, 2000);
@@ -80,12 +80,12 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final StringField optionsManagerViewed = new StringField(Category.Hidden, "", null);
     public final StringField splashViewed = new StringField(Category.Hidden, "", null);
     public final GridSpecs gridSpecs = new GridSpecs();
-    public final StringField colorPassive = new StringField(Category.Hidden, null, null, "#bbbbbb").pattern(PATTERN_COLOR);
-    public final StringField colorHostile = new StringField(Category.Hidden, null, null, "#ff0000").pattern(PATTERN_COLOR);
-    public final StringField colorPet = new StringField(Category.Hidden, null, null, "#0077ff").pattern(PATTERN_COLOR);
-    public final StringField colorVillager = new StringField(Category.Hidden, null, null, "#88e188").pattern(PATTERN_COLOR);
-    public final StringField colorPlayer = new StringField(Category.Hidden, null, null, "#ffffff").pattern(PATTERN_COLOR);
-    public final StringField colorSelf = new StringField(Category.Hidden, null, null, "#0000ff").pattern(PATTERN_COLOR);
+    public final StringField colorPassive = new StringField(Category.Hidden, "jm.common.radar_color_passive", null, "#bbbbbb").pattern(PATTERN_COLOR);
+    public final StringField colorHostile = new StringField(Category.Hidden, "jm.common.radar_color_hostile", null, "#ff0000").pattern(PATTERN_COLOR);
+    public final StringField colorPet = new StringField(Category.Hidden, "jm.common.radar_color_pet", null, "#0077ff").pattern(PATTERN_COLOR);
+    public final StringField colorVillager = new StringField(Category.Hidden, "jm.common.radar_color_villager", null, "#88e188").pattern(PATTERN_COLOR);
+    public final StringField colorPlayer = new StringField(Category.Hidden, "jm.common.radar_color_player", null, "#ffffff").pattern(PATTERN_COLOR);
+    public final StringField colorSelf = new StringField(Category.Hidden, "jm.common.radar_color_self", null, "#0000ff").pattern(PATTERN_COLOR);
 
     private transient HashMap<StringField, Integer> mobColors = new HashMap<>(6);
 

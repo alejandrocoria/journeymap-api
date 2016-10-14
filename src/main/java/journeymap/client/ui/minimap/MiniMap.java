@@ -23,7 +23,6 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.*;
 import journeymap.client.render.map.GridRenderer;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -617,13 +616,13 @@ public class MiniMap
         arrowScale = miniMapProperties.playerDisplay.get().isLarge() ? 1.11f : 1f;
         if (miniMapProperties.playerDisplay.get().isLarge())
         {
-            playerArrowBg = ResourceLocationTexture.get(TextureCache.PlayerArrowBG_Large);
-            playerArrowFg = ResourceLocationTexture.get(TextureCache.PlayerArrow_Large);
+            playerArrowBg = TextureCache.getTexture(TextureCache.PlayerArrowBG_Large);
+            playerArrowFg = TextureCache.getTexture(TextureCache.PlayerArrow_Large);
         }
         else
         {
-            playerArrowBg = ResourceLocationTexture.get(TextureCache.PlayerArrowBG);
-            playerArrowFg = ResourceLocationTexture.get(TextureCache.PlayerArrow);
+            playerArrowBg = TextureCache.getTexture(TextureCache.PlayerArrowBG);
+            playerArrowFg = TextureCache.getTexture(TextureCache.PlayerArrow);
         }
     }
 

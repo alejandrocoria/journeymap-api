@@ -397,7 +397,7 @@ public class DisplayVars
         {
             this.mapType = mapType;
             name = mapType.isUnderground() ? "caves" : mapType.name();
-            tex = TextureCache.INSTANCE.getThemeTexture(theme, String.format("icon/%s.png", name));
+            tex = TextureCache.getThemeTexture(theme, String.format("icon/%s.png", name));
             color = RGB.WHITE_RGB;
             opposite = RGB.DARK_GRAY_RGB;
             bgScale = 1.15f;

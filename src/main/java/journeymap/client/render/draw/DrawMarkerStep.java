@@ -12,7 +12,6 @@ import journeymap.client.api.display.MarkerOverlay;
 import journeymap.client.api.model.MapImage;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.render.map.GridRenderer;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
@@ -92,7 +91,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
         {
             if (iconFuture == null || iconFuture.isCancelled())
             {
-                iconFuture = TextureCache.INSTANCE.scheduleTextureTask(new Callable<TextureImpl>()
+                iconFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
                 {
                     @Override
                     public TextureImpl call() throws Exception
@@ -100,7 +99,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
                         MapImage icon = overlay.getIcon();
                         if (icon.getImageLocation() != null)
                         {
-                            return ResourceLocationTexture.get(icon.getImageLocation());
+                            return TextureCache.getTexture(icon.getImageLocation());
                         }
                         else if (icon.getImage() != null)
                         {

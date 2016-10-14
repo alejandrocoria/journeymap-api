@@ -65,16 +65,15 @@ public class ThemeButton extends BooleanPropertyButton
     {
         this.theme = theme;
         this.buttonSpec = getButtonSpec(theme);
-        TextureCache tc = TextureCache.INSTANCE;
 
         if (buttonSpec.useThemeImages)
         {
             String pattern = getPathPattern();
             String prefix = buttonSpec.prefix;
-            textureOn = tc.getThemeTexture(theme, String.format(pattern, prefix, "on"));
-            textureOff = tc.getThemeTexture(theme, String.format(pattern, prefix, "off"));
-            textureHover = tc.getThemeTexture(theme, String.format(pattern, prefix, "hover"));
-            textureDisabled = tc.getThemeTexture(theme, String.format(pattern, prefix, "disabled"));
+            textureOn = TextureCache.getThemeTexture(theme, String.format(pattern, prefix, "on"));
+            textureOff = TextureCache.getThemeTexture(theme, String.format(pattern, prefix, "off"));
+            textureHover = TextureCache.getThemeTexture(theme, String.format(pattern, prefix, "hover"));
+            textureDisabled = TextureCache.getThemeTexture(theme, String.format(pattern, prefix, "disabled"));
         }
         else
         {
@@ -89,7 +88,7 @@ public class ThemeButton extends BooleanPropertyButton
         iconHoverColor = Theme.getColor(buttonSpec.iconHoverColor);
         iconDisabledColor = Theme.getColor(buttonSpec.iconDisabledColor);
 
-        textureIcon = tc.getThemeTexture(theme, String.format("icon/%s.png", iconName));
+        textureIcon = TextureCache.getThemeTexture(theme, String.format("icon/%s.png", iconName));
 
         setWidth(buttonSpec.width);
         setHeight(buttonSpec.height);

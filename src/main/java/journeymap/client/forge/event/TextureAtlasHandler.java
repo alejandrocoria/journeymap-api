@@ -34,7 +34,7 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            TextureCache.INSTANCE.reset();
+            TextureCache.reset();
             UIManager.INSTANCE.getMiniMap().reset();
             Fullscreen.state().requireRefresh();
             MiniMap.state().requireRefresh();

@@ -15,7 +15,6 @@ import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;
 import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.ResourceLocationTexture;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -37,7 +36,7 @@ import java.util.List;
 
 public class Splash extends JmUI
 {
-    protected TextureImpl patreonLogo = ResourceLocationTexture.get(TextureCache.Patreon);
+    protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
     Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
     ButtonList devButtons;
@@ -71,11 +70,11 @@ public class Splash extends JmUI
         {
             info.lines.add(0, new SplashInfo.Line(bday, "dialog.FullscreenActions#tweet#" + bday));
             devs = new ArrayList<SplashPerson>(devs);
-            devs.add(new SplashPerson.Fake("", "", ResourceLocationTexture.get(TextureCache.ColorPicker2)));
+            devs.add(new SplashPerson.Fake("", "", TextureCache.getTexture(TextureCache.ColorPicker2)));
         }
 
         // Get brick texture
-        brickTex = ResourceLocationTexture.get(TextureCache.Brick);
+        brickTex = TextureCache.getTexture(TextureCache.Brick);
     }
 
     /**
@@ -249,8 +248,8 @@ public class Splash extends JmUI
             }
 //            int rowWidth = peopleButtons.getWidth(hgap);
 //
-//            Button topLeft = people.get(0).getButton();
-//            Button bottomRight = people.get(people.size() - 1).getButton();
+//            Button topLeft = people.getTexture(0).getButton();
+//            Button bottomRight = people.getTexture(people.size() - 1).getButton();
 
             for (SplashPerson person : people)
             {

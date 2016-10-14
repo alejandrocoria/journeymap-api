@@ -59,7 +59,7 @@ public class SplashPerson
 
     public TextureImpl getSkin()
     {
-        return TextureCache.INSTANCE.getPlayerSkin(ign);
+        return TextureCache.getPlayerSkin(ign);
     }
 
     public int getWidth(FontRenderer fr)

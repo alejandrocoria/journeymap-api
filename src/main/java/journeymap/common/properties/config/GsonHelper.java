@@ -65,7 +65,14 @@ public abstract class GsonHelper<T extends ConfigField>
             Set<Map.Entry<String, JsonElement>> set = json.getAsJsonObject().entrySet();
             for (Map.Entry<String, JsonElement> entry : set)
             {
-                result.put(entry.getKey(), entry.getValue().getAsString());
+                try
+                {
+                    result.put(entry.getKey(), entry.getValue().getAsString());
+                }
+                catch (Throwable t)
+                {
+                    Journeymap.getLogger().warn("Error deserializing %s in %s: %s", entry, json, t);
+                }
             }
         }
         return result;
