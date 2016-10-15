@@ -108,7 +108,7 @@ public class IconSetFileHandler
 
     public static File getEntityIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.ENTITY_ICON_DIR);
+        File dir = new File(FileHandler.getMinecraftDirectory(), Constants.ENTITY_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();

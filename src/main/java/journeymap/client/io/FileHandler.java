@@ -72,7 +72,7 @@ public class FileHandler
         if (minecraft.isIntegratedServerRunning())
         {
             String lastMCFolderName = minecraft.getIntegratedServer().getFolderName();
-            File lastMCWorldDir = new File(minecraft.mcDataDir, "saves" + File.separator + lastMCFolderName);
+            File lastMCWorldDir = new File(getMinecraftDirectory(), "saves" + File.separator + lastMCFolderName);
             return lastMCWorldDir;
         }
         return null;
@@ -84,7 +84,7 @@ public class FileHandler
         {
             try
             {
-                File savesDir = new File(minecraft.mcDataDir, "saves");
+                File savesDir = new File(getMinecraftDirectory(), "saves");
                 File worldSaveDir = new File(savesDir, minecraft.getIntegratedServer().getFolderName());
                 if (minecraft.theWorld.provider.getSaveFolder() != null)
                 {

@@ -672,10 +672,17 @@ public class GridRenderer
 
             blockBounds = new AxisAlignedBB(upperLeft.add(-pad, 0, -pad), lowerRight.add(pad, worldHeight, pad));
 
-            newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType,
-                    new BlockPos(centerBlockX, 0, centerBlockZ), mapType.vSlice,
-                    blockBounds,
-                    screenBounds);
+            try
+            {
+                newState = new UIState(contextUi, true, mapType.dimension, zoom, mapType.apiMapType,
+                        new BlockPos(centerBlockX, 0, centerBlockZ), mapType.vSlice,
+                        blockBounds,
+                        screenBounds);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else
         {

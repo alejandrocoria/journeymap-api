@@ -148,7 +148,7 @@ public class MapSaver
             sb.append(".png");
 
             // Ensure screenshots directory
-            File screenshotsDir = new File(FMLClientHandler.instance().getClient().mcDataDir, "screenshots");
+            File screenshotsDir = new File(FileHandler.getMinecraftDirectory(), "screenshots");
             if (!screenshotsDir.exists())
             {
                 screenshotsDir.mkdir();

@@ -10,7 +10,7 @@ package modinfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.client.Minecraft;
+import journeymap.client.io.FileHandler;
 import org.apache.logging.log4j.Level;
 
 import java.io.*;
@@ -92,8 +92,7 @@ public class Config implements Serializable
 
     private static File getFile(String modId)
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        File dir = new File(minecraft.mcDataDir, PARENT_DIR);
+        File dir = new File(FileHandler.getMinecraftDirectory(), PARENT_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();

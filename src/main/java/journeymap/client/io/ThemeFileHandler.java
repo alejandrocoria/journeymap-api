@@ -71,7 +71,7 @@ public class ThemeFileHandler
 
     public static File getThemeIconDir()
     {
-        File dir = new File(FMLClientHandler.instance().getClient().mcDataDir, Constants.THEME_ICON_DIR);
+        File dir = new File(FileHandler.getMinecraftDirectory(), Constants.THEME_ICON_DIR);
         if (!dir.exists())
         {
             dir.mkdirs();
