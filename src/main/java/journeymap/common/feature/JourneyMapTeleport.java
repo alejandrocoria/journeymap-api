@@ -1,7 +1,6 @@
 package journeymap.common.feature;
 
 import com.mojang.authlib.GameProfile;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.model.Location;
 import journeymap.server.JourneymapServer;
@@ -137,7 +136,7 @@ public class JourneyMapTeleport
         if ((JourneymapServer.DEV_MODE)
                 && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
         {
-            return false;
+            return true;
         }
         return false;
     }
