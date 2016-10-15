@@ -137,7 +137,7 @@ public class JourneyMapTeleport
         if ((JourneymapServer.DEV_MODE)
                 && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
         {
-            return false;
+            return true;
         }
         return false;
     }

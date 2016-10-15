@@ -76,7 +76,7 @@ public class ForgeEvents
 
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
             {
-                PacketHandler.sendPlayerWorldID(PropertiesManager.getInstance().getGlobalProperties().getWorldID(), (EntityPlayerMP) event.player);
+                PacketHandler.sendPlayerWorldID((EntityPlayerMP) event.player);
             }
 
             if (isOp((EntityPlayerMP) event.player))

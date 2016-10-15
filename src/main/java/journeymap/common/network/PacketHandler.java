@@ -14,6 +14,7 @@ package journeymap.common.network;
 
 import journeymap.common.Journeymap;
 import journeymap.common.network.model.Location;
+import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PermissionProperties;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -60,10 +61,12 @@ public class PacketHandler
         WORLD_INFO_CHANNEL.sendToAll(new WorldIDPacket(worldID));
     }
 
-    public static void sendPlayerWorldID(String worldID, EntityPlayerMP player)
+    public static void sendPlayerWorldID(EntityPlayerMP player)
     {
         if ((player instanceof EntityPlayerMP) && (player != null))
         {
+            WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
+            String worldID =  worldSaveHandler.getWorldID();
             String playerName = player.getName();
 
             try

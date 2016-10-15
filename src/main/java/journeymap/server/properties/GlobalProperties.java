@@ -1,21 +1,12 @@
 package journeymap.server.properties;
 
 import journeymap.common.properties.config.BooleanField;
-import journeymap.common.properties.config.StringField;
-import journeymap.server.nbt.WorldNbtIDSaveHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.UUID;
-
-import static journeymap.server.properties.ServerCategory.General;
 
 /**
  * Properties which can be applied globally (unless overridden by a specific DimensionProperties.)
  */
 public class GlobalProperties extends PermissionProperties
 {
-    public final StringField worldID = new StringField(General, "World ID ");
     public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
     public final BooleanField useWorldId = new BooleanField(ServerCategory.General, "Use world id", false);
 
@@ -33,40 +24,15 @@ public class GlobalProperties extends PermissionProperties
         return "global";
     }
 
-    /**
-     * @param worldId
-     */
-    public void setWorldID(String worldId)
-    {
-        this.worldID.set(worldId);
-        this.preSave();
-    }
-
-    public String getWorldID()
-    {
-        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-        return worldSaveHandler.getWorldID();
-    }
-
     @Override
     protected void postLoad(boolean isNew)
     {
         super.postLoad(isNew);
-        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-        this.worldID.set(worldSaveHandler.getWorldID());
-
     }
 
     @Override
     protected void preSave()
     {
         super.preSave();
-        if (worldID.get() == null || worldID.get().isEmpty() || worldID.get().equals(""))
-        {
-            worldID.set(UUID.randomUUID().toString());
-        }
-        WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-        worldSaveHandler.setWorldID(worldID.get());
-
     }
 }
