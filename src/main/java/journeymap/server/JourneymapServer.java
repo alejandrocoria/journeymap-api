@@ -136,8 +136,7 @@ public class JourneymapServer implements CommonProxy
     {
         if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
         {
-            WorldNbtIDSaveHandler nbt = new WorldNbtIDSaveHandler();
-            PacketHandler.sendPlayerWorldID(nbt.getWorldID(), playerEntity);
+            PacketHandler.sendPlayerWorldID(playerEntity);
         }
     }
 }
