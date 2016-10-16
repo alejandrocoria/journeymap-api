@@ -97,9 +97,17 @@ public class WaypointEditor extends JmUI
         String tooltip = Constants.birthdayMessage();
         this.colorPickTooltip = tooltip == null ? null : Collections.singletonList(tooltip);
         this.colorPickTexture = tooltip == null ? TextureCache.getTexture(TextureCache.ColorPicker) : TextureCache.getTexture(TextureCache.ColorPicker2);
-        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
-        this.colorPickImg = colorPickTexture.getImage();
-        Keyboard.enableRepeatEvents(true);
+        try
+        {
+            this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
+            this.colorPickImg = colorPickTexture.getImage();
+            Keyboard.enableRepeatEvents(true);
+        }
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error during WaypointEditor ctor: " + LogFormatter.toPartialString(t));
+            UIManager.INSTANCE.closeAll();
+        }
     }
 
     /**
@@ -241,128 +249,144 @@ public class WaypointEditor extends JmUI
     @Override
     protected void layoutButtons()
     {
-        // Buttons
-        initGui();
-
-        final FontRenderer fr = getFontRenderer();
-
-        // Margins
-        final int vpad = 5;
-        final int hgap = fr.getStringWidth("X") * 3;
-        final int vgap = fieldX.getHeight() + vpad;
-        final int startY = Math.max(30, (this.height - 200) / 2);
-
-        // Determine dimension button spacing requirement
-        int dcw = fr.getStringWidth(dimensionsTitle);
-        dcw = 8 + Math.max(dcw, dimScrollPane.getFitWidth(fr));
-
-        // Set column dimensions
-        final int leftWidth = hgap * 2 + fieldX.getWidth() + fieldY.getWidth() + fieldZ.getWidth();
-        final int rightWidth = dcw;
-        final int totalWidth = leftWidth + 10 + rightWidth;
-        final int leftX = ((this.width - totalWidth) / 2);
-        final int leftXEnd = leftX + leftWidth;
-        final int rightX = leftXEnd + 10;
-        final int rightXEnd = rightX + rightWidth;
-
-        // Left column starting Y
-        int leftRowY = startY;
-        drawLabel(labelName, leftX, leftRowY);
-        leftRowY += 12;
-        fieldName.setWidth(leftWidth);
-        fieldName.setX(leftX);
-        fieldName.setY(leftRowY);
-        if (!fieldName.isFocused())
+        try
         {
-            fieldName.setSelectionPos(fieldName.getText().length());
+            // Buttons
+            initGui();
+
+            final FontRenderer fr = getFontRenderer();
+
+            // Margins
+            final int vpad = 5;
+            final int hgap = fr.getStringWidth("X") * 3;
+            final int vgap = fieldX.getHeight() + vpad;
+            final int startY = Math.max(30, (this.height - 200) / 2);
+
+            // Determine dimension button spacing requirement
+            int dcw = fr.getStringWidth(dimensionsTitle);
+            dcw = 8 + Math.max(dcw, dimScrollPane.getFitWidth(fr));
+
+            // Set column dimensions
+            final int leftWidth = hgap * 2 + fieldX.getWidth() + fieldY.getWidth() + fieldZ.getWidth();
+            final int rightWidth = dcw;
+            final int totalWidth = leftWidth + 10 + rightWidth;
+            final int leftX = ((this.width - totalWidth) / 2);
+            final int leftXEnd = leftX + leftWidth;
+            final int rightX = leftXEnd + 10;
+            final int rightXEnd = rightX + rightWidth;
+
+            // Left column starting Y
+            int leftRowY = startY;
+            drawLabel(labelName, leftX, leftRowY);
+            leftRowY += 12;
+            fieldName.setWidth(leftWidth);
+            fieldName.setX(leftX);
+            fieldName.setY(leftRowY);
+            if (!fieldName.isFocused())
+            {
+                fieldName.setSelectionPos(fieldName.getText().length());
+            }
+            fieldName.drawTextBox();
+
+            // Coordinates
+            leftRowY += vgap + vpad;
+            drawLabel(locationTitle, leftX, leftRowY);
+            leftRowY += 12;
+            drawLabelAndField(labelX, fieldX, leftX, leftRowY);
+            drawLabelAndField(labelZ, fieldZ, fieldX.getX() + fieldX.getWidth() + hgap, leftRowY);
+            drawLabelAndField(labelY, fieldY, fieldZ.getX() + fieldZ.getWidth() + hgap, leftRowY);
+
+            // Color
+            leftRowY += vgap + vpad;
+            drawLabel(colorTitle, leftX, leftRowY);
+            leftRowY += 12;
+            drawLabelAndField(labelR, fieldR, leftX, leftRowY);
+            drawLabelAndField(labelG, fieldG, fieldR.getX() + fieldR.getWidth() + hgap, leftRowY);
+            drawLabelAndField(labelB, fieldB, fieldG.getX() + fieldG.getWidth() + hgap, leftRowY);
+            buttonRandomize.setWidth(4 + Math.max(fieldB.getX() + fieldB.getWidth() - fieldR.getX(), 10 + fr.getStringWidth(buttonRandomize.displayString)));
+            buttonRandomize.setPosition(fieldR.getX() - 2, leftRowY += vgap);
+
+            // Color picker
+            int cpY = fieldB.getY();
+            int cpSize = buttonRandomize.getY() + buttonRandomize.getHeight() - cpY - 2;
+            int cpHAreaX = fieldB.getX() + fieldB.getWidth();
+            int cpHArea = (fieldName.getX() + fieldName.getWidth()) - (cpHAreaX);
+            int cpX = cpHAreaX + (cpHArea - cpSize);
+            drawColorPicker(cpX, cpY, cpSize);
+
+            // WP icon
+            int iconX = cpHAreaX + ((cpX - cpHAreaX) / 2) - (wpTexture.getWidth() / 2) + 1;
+            int iconY = buttonRandomize.getY() - vpad / 2;
+            drawWaypoint(iconX, iconY);
+
+            // Enable
+            leftRowY += (vgap);
+            buttonEnable.fitWidth(fr);
+            buttonEnable.setWidth(Math.max(leftWidth / 2, buttonEnable.getWidth()));
+            buttonEnable.setPosition(leftX - 2, leftRowY);
+
+            // Reset
+            buttonReset.setWidth(leftWidth - buttonEnable.getWidth() - 2);
+            buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRowY);
+
+            // Dimensions column
+            int rightRow = startY;
+
+            // Dimensions label
+            drawLabel(dimensionsTitle, rightX, rightRow);
+            rightRow += (12);
+
+            // Dimension buttons in the scroll pane
+            int scrollHeight = (buttonReset.getY() + buttonReset.getHeight() - 2) - rightRow;
+            dimScrollPane.setDimensions(dcw, scrollHeight, 0, 0, rightX, rightRow);
+
+            // Remove(Cancel) / Save
+            int totalRow = Math.max(leftRowY + vgap, rightRow + vgap);
+
+            bottomButtons.layoutFilledHorizontal(fr, leftX - 2, totalRow, rightXEnd + 2, 4, true);
         }
-        fieldName.drawTextBox();
-
-        // Coordinates
-        leftRowY += vgap + vpad;
-        drawLabel(locationTitle, leftX, leftRowY);
-        leftRowY += 12;
-        drawLabelAndField(labelX, fieldX, leftX, leftRowY);
-        drawLabelAndField(labelZ, fieldZ, fieldX.getX() + fieldX.getWidth() + hgap, leftRowY);
-        drawLabelAndField(labelY, fieldY, fieldZ.getX() + fieldZ.getWidth() + hgap, leftRowY);
-
-        // Color
-        leftRowY += vgap + vpad;
-        drawLabel(colorTitle, leftX, leftRowY);
-        leftRowY += 12;
-        drawLabelAndField(labelR, fieldR, leftX, leftRowY);
-        drawLabelAndField(labelG, fieldG, fieldR.getX() + fieldR.getWidth() + hgap, leftRowY);
-        drawLabelAndField(labelB, fieldB, fieldG.getX() + fieldG.getWidth() + hgap, leftRowY);
-        buttonRandomize.setWidth(4 + Math.max(fieldB.getX() + fieldB.getWidth() - fieldR.getX(), 10 + fr.getStringWidth(buttonRandomize.displayString)));
-        buttonRandomize.setPosition(fieldR.getX() - 2, leftRowY += vgap);
-
-        // Color picker
-        int cpY = fieldB.getY();
-        int cpSize = buttonRandomize.getY() + buttonRandomize.getHeight() - cpY - 2;
-        int cpHAreaX = fieldB.getX() + fieldB.getWidth();
-        int cpHArea = (fieldName.getX() + fieldName.getWidth()) - (cpHAreaX);
-        int cpX = cpHAreaX + (cpHArea - cpSize);
-        drawColorPicker(cpX, cpY, cpSize);
-
-        // WP icon
-        int iconX = cpHAreaX + ((cpX - cpHAreaX) / 2) - (wpTexture.getWidth() / 2) + 1;
-        int iconY = buttonRandomize.getY() - vpad / 2;
-        drawWaypoint(iconX, iconY);
-
-        // Enable
-        leftRowY += (vgap);
-        buttonEnable.fitWidth(fr);
-        buttonEnable.setWidth(Math.max(leftWidth / 2, buttonEnable.getWidth()));
-        buttonEnable.setPosition(leftX - 2, leftRowY);
-
-        // Reset
-        buttonReset.setWidth(leftWidth - buttonEnable.getWidth() - 2);
-        buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRowY);
-
-        // Dimensions column
-        int rightRow = startY;
-
-        // Dimensions label
-        drawLabel(dimensionsTitle, rightX, rightRow);
-        rightRow += (12);
-
-        // Dimension buttons in the scroll pane
-        int scrollHeight = (buttonReset.getY() + buttonReset.getHeight() - 2) - rightRow;
-        dimScrollPane.setDimensions(dcw, scrollHeight, 0, 0, rightX, rightRow);
-
-        // Remove(Cancel) / Save
-        int totalRow = Math.max(leftRowY + vgap, rightRow + vgap);
-
-        bottomButtons.layoutFilledHorizontal(fr, leftX - 2, totalRow, rightXEnd + 2, 4, true);
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error("Error during WaypointEditor layout: " + LogFormatter.toPartialString(t));
+            UIManager.INSTANCE.closeAll();
+        }
     }
 
     @Override
     public void drawScreen(int x, int y, float par3)
     {
-        drawBackground(0);
-
-        validate();
-
-        layoutButtons();
-
-        dimScrollPane.drawScreen(x, y, par3);
-
-        DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 1f, RGB.LIGHT_GRAY_RGB, 1f, 1, true);
-
-        for (int k = 0; k < this.buttonList.size(); ++k)
+        try
         {
-            GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-            guibutton.drawButton(this.mc, x, y);
-        }
+            drawBackground(0);
 
-        if (colorPickTooltip != null && colorPickRect.contains(x, y))
+            validate();
+
+            layoutButtons();
+
+            dimScrollPane.drawScreen(x, y, par3);
+
+            DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 1f, RGB.LIGHT_GRAY_RGB, 1f, 1, true);
+
+            for (int k = 0; k < this.buttonList.size(); ++k)
+            {
+                GuiButton guibutton = (GuiButton) this.buttonList.get(k);
+                guibutton.drawButton(this.mc, x, y);
+            }
+
+            if (colorPickTooltip != null && colorPickRect.contains(x, y))
+            {
+                drawHoveringText(colorPickTooltip, x, y, getFontRenderer());
+                RenderHelper.disableStandardItemLighting();
+            }
+
+            drawTitle();
+            drawLogo();
+        }
+        catch (Throwable t)
         {
-            drawHoveringText(colorPickTooltip, x, y, getFontRenderer());
-            RenderHelper.disableStandardItemLighting();
+            Journeymap.getLogger().error("Error during WaypointEditor layout: " + LogFormatter.toPartialString(t));
+            UIManager.INSTANCE.closeAll();
         }
-
-        drawTitle();
-        drawLogo();
     }
 
     protected void drawWaypoint(int x, int y)

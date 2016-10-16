@@ -210,7 +210,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
         try
         {
-            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
+            BlockMD blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
             while (y > 0)
             {
                 if (blockMD.isWater() || blockMD.isIce())
@@ -229,7 +229,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     break;
                 }
                 y--;
-                blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
             }
         }
         catch (Exception e)
@@ -263,7 +263,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             {
                 h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
 
-                BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, (int) h, z);
+                BlockMD blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, (int) h, z);
 
                 boolean isWater = false;
 

@@ -285,12 +285,12 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             while (y > 0)
             {
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
 
                 if (!blockMD.isAir())
                 {
                     strata.setBlocksFound(true);
-                    blockAboveMD = BlockMD.getBlockMD(chunkMd, x, y + 1, z);
+                    blockAboveMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
                     if (blockMD.isLava() && blockAboveMD.isLava())
                     {
@@ -425,8 +425,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         {
             y = sliceMaxY - 1;
 
-            BlockMD blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-            BlockMD blockMDAbove = BlockMD.getBlockMD(chunkMd, x, y + 1, z);
+            BlockMD blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
+            BlockMD blockMDAbove = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
             boolean inAirPocket = false;
 
@@ -450,8 +450,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 y--;
 
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
-                blockMDAbove = BlockMD.getBlockMD(chunkMd, x, y + 1, z);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
+                blockMDAbove = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
                 if (y < sliceMinY && !inAirPocket)
                 {

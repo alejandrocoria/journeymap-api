@@ -260,7 +260,14 @@ public enum UIManager
                 {
                     if (!MiniMap.uiState().active)
                     {
-                        MiniMap.state().requireRefresh();
+                        if (MiniMap.state().getLastMapTypeChange() == 0)
+                        {
+                            miniMap.reset();
+                        }
+                        else
+                        {
+                            MiniMap.state().requireRefresh();
+                        }
                     }
                     miniMap.drawMap();
                 }

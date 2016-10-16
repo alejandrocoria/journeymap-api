@@ -59,6 +59,40 @@ public class BlockMD implements Comparable<BlockMD>
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
     private boolean useDefaultState;
 
+    public static BlockMD create(IBlockState blockState)
+    {
+        try
+        {
+            // Normalize IExtendedBlockState if possible
+            if (blockState instanceof IExtendedBlockState)
+            {
+                blockState = blockState.getBlock().getDefaultState();
+                if (blockState instanceof IExtendedBlockState)
+                {
+                    return BlockMD.AIRBLOCK;
+                }
+            }
+
+            if (blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir)
+            {
+                return BlockMD.AIRBLOCK;
+            }
+
+            if (blockState.getBlock().getRegistryName() == null)
+            {
+                Journeymap.getLogger().debug("Unregistered block will be treated like air: " + blockState);
+                return BlockMD.AIRBLOCK;
+            }
+
+            return new BlockMD(blockState);
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
+            return BlockMD.AIRBLOCK;
+        }
+    }
+
     /**
      * Private constructor.
      */
@@ -147,7 +181,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Retrieves a BlockMD instance corresponding to chunk-local coords.
      */
-    public static BlockMD getBlockMD(ChunkMD chunkMd, int localX, int y, int localZ)
+    public static BlockMD getBlockMDFromChunkLocal(ChunkMD chunkMd, int localX, int y, int localZ)
     {
         return getBlockMD(chunkMd, chunkMd.getBlockPos(localX, y, localZ));
     }
@@ -161,21 +195,17 @@ public class BlockMD implements Comparable<BlockMD>
         {
             if (blockPos.getY() >= 0)
             {
-                IBlockState blockState = ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
-                BlockMD blockMD = get(blockState);
-                if (blockMD.isAir())
+                IBlockState blockState;
+                if (chunkMd != null && chunkMd.hasChunk())
                 {
-                    return blockMD;
+                    blockState = chunkMd.getChunk().getBlockState(blockPos);
                 }
-                else if (blockMD.hasFlag(Flag.SpecialHandling))
+                else
                 {
-                    BlockMD delegated = ModBlockDelegate.handleBlock(chunkMd, blockMD, blockPos);
-                    if (delegated != null)
-                    {
-                        blockMD = delegated;
-                    }
+                    blockState = ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
                 }
-                return blockMD;
+
+                return get(blockState);
             }
             else
             {
@@ -201,7 +231,6 @@ public class BlockMD implements Comparable<BlockMD>
         }
         return BlockMD.get(block.getStateFromMeta(meta));
     }
-
 
     /**
      * Retrieves/lazy-creates the corresponding BlockMD instance.
@@ -775,10 +804,14 @@ public class BlockMD implements Comparable<BlockMD>
                         return AIRBLOCK;
                     }
 
+                    // Normalize IExtendedBlockState if possible
                     if (blockState instanceof IExtendedBlockState)
                     {
-                        Journeymap.getLogger().error(String.format("Won't cache BlockMD for IExtendedBlockState %s", blockState));
-                        return AIRBLOCK;
+                        blockState = blockState.getBlock().getDefaultState();
+                        if (blockState instanceof IExtendedBlockState)
+                        {
+                            return BlockMD.AIRBLOCK;
+                        }
                     }
 
                     if (blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir)

@@ -82,19 +82,9 @@ public class ChunkMD
         return ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
     }
 
-    public BlockMD getBlockMD(int localX, int y, int localZ)
-    {
-        return BlockMD.get(getBlockState(localX, y, localZ));
-    }
-
     public BlockMD getBlockMD(BlockPos blockPos)
     {
-        BlockMD blockMD = BlockMD.get(getBlockState(blockPos));
-        if(blockMD==null)
-        {
-            return BlockMD.AIRBLOCK;
-        }
-        return blockMD;
+        return BlockMD.getBlockMD(this, blockPos);
     }
 
     /**
