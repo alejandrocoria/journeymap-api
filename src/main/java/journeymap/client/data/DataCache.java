@@ -9,6 +9,7 @@
 package journeymap.client.data;
 
 import com.google.common.cache.*;
+import com.google.common.collect.MapMaker;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
@@ -19,7 +20,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -49,7 +49,7 @@ public enum DataCache
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
-    final LoadingCache<IBlockState, BlockMD> blockMetadata;
+    final Map<IBlockState, BlockMD> blockMetadata;
     final LoadingCache<ChunkPos, ChunkMD> chunkMetadata;
     final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
@@ -109,8 +109,7 @@ public enum DataCache
         regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        blockMetadata = getCacheBuilder().weakKeys().build(new BlockMD.SimpleCacheLoader());
-        managedCaches.put(blockMetadata, "BlockMD");
+        blockMetadata = new MapMaker().weakKeys().initialCapacity(5000).concurrencyLevel(2).makeMap();
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<>();
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
@@ -387,36 +386,14 @@ public enum DataCache
             return waypointDrawSteps.getUnchecked(waypoint);
         }
     }
-//    public RGB getColor(Color color)
-//    {
-//        return getColor(color.getRGB());
-//    }
-//
-//    public RGB getColor(int rgbInt)
-//    {
-//        synchronized (colors)
-//        {
-//            return colors.getUnchecked(rgbInt);
-//        }
-//    }
 
-    public BlockMD getBlockMD(IBlockState blockState)
+    public BlockMD getBlockMD(final IBlockState aBlockState)
     {
         try
         {
-            // Normalize IExtendedBlockState if possible
-            if (blockState instanceof IExtendedBlockState)
-            {
-                blockState = blockState.getBlock().getDefaultState();
-                if (blockState instanceof IExtendedBlockState)
-                {
-                    return BlockMD.AIRBLOCK;
-                }
-            }
-
-            return blockMetadata.getUnchecked(blockState);
+            return blockMetadata.computeIfAbsent(aBlockState, BlockMD::create);
         }
-        catch (CacheLoader.InvalidCacheLoadException e)
+        catch (Exception e)
         {
             return BlockMD.AIRBLOCK;
         }
@@ -424,7 +401,7 @@ public enum DataCache
 
     public void resetBlockMetadata()
     {
-        blockMetadata.invalidateAll();
+        blockMetadata.clear();
     }
 
     public ChunkMD getChunkMD(BlockPos blockPos)
@@ -536,6 +513,8 @@ public enum DataCache
     {
         // Flush images, do syncronously to ensure it's done before cache invalidates
         RegionImageCache.INSTANCE.flushToDisk(false);
+
+        resetBlockMetadata();
 
         synchronized (managedCaches)
         {

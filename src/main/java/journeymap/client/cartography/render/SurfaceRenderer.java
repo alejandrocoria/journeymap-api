@@ -173,7 +173,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         int checkY = roofY;
                         while (checkY > standardY)
                         {
-                            topBlockMd = BlockMD.getBlockMD(chunkMd, x, checkY, z);
+                            topBlockMd = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, checkY, z);
                             if (topBlockMd.isTransparentRoof())
                             {
                                 y = Math.max(standardY, checkY);
@@ -252,7 +252,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         {
             while (roofY > y)
             {
-                blockMD = BlockMD.getBlockMD(chunkMd, x, roofY, z);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, roofY, z);
                 if (!blockMD.isAir())
                 {
                     if (blockMD.isTransparentRoof())
@@ -272,7 +272,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         {
             while (y >= 0)
             {
-                blockMD = BlockMD.getBlockMD(chunkMd, x, y, z);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
 
                 if (!blockMD.isAir())
                 {

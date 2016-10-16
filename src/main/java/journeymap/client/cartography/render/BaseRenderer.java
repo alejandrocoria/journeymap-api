@@ -448,7 +448,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             while (y > 0)
             {
-                blockMD = BlockMD.getBlockMD(chunkMd, localX, y, localZ);
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
 
                 if (blockMD.isAir())
                 {

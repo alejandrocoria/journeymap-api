@@ -436,7 +436,7 @@ public enum ForgeHelper
                 ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
                 if (chunkMD != null && chunkMD.hasChunk())
                 {
-                    return chunkMD.getChunk().getBlockState(new BlockPos(pos.getX() & 15, pos.getY(), pos.getZ() & 15));
+                    return chunkMD.getChunk().getBlockState(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 }
                 return Blocks.AIR.getDefaultState();
             }
