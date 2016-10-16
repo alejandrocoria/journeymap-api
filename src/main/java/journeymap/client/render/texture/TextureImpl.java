@@ -32,6 +32,7 @@ public class TextureImpl extends AbstractTexture
     protected long lastImageUpdate;
     protected long lastBound;
     protected String description;
+    protected ResourceLocation resourceLocation;
 
     protected ByteBuffer buffer;
     protected boolean bindNeeded;
@@ -42,6 +43,7 @@ public class TextureImpl extends AbstractTexture
     public TextureImpl(ResourceLocation resourceLocation)
     {
         this(null, TextureCache.resolveImage(resourceLocation), false, false);
+        this.resourceLocation = resourceLocation;
         setDescription(resourceLocation.getResourcePath());
     }
 
@@ -247,17 +249,6 @@ public class TextureImpl extends AbstractTexture
 
     }
 
-//    @Override
-//    public int getGlTextureId()
-//    {
-//        int glId = super.getGlTextureId();
-//        if (bindNeeded)
-//        {
-//            bindTexture();
-//        }
-//        return glId;
-//    }
-
     public boolean hasImage()
     {
         return image != null;
@@ -265,7 +256,15 @@ public class TextureImpl extends AbstractTexture
 
     public BufferedImage getImage()
     {
-        return image;
+        if (image != null)
+        {
+            return image;
+        }
+        if (resourceLocation != null)
+        {
+            return TextureCache.resolveImage(resourceLocation);
+        }
+        return null;
     }
 
     public boolean isDefunct()
@@ -334,6 +333,9 @@ public class TextureImpl extends AbstractTexture
     @Override
     public void loadTexture(IResourceManager par1ResourceManager)
     {
+        if (resourceLocation != null)
+        {
+        }
     }
 
     @Override
