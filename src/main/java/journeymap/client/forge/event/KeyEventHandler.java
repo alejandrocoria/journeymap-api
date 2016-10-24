@@ -17,6 +17,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -156,9 +157,9 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
             }
         }
-        finally
+        catch (Throwable e)
         {
-
+            Journeymap.getLogger().error("Error during keypress: " + LogFormatter.toPartialString(e));
         }
         return false;
     }

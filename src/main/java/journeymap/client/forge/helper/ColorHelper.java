@@ -18,20 +18,25 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Singleton that encapsulates color-related functions that have changed frequently since 1.7.10.
@@ -39,6 +44,8 @@ import java.util.HashSet;
 public enum ColorHelper
 {
     INSTANCE;
+
+    static List<EnumFacing> spriteFacings = Arrays.asList(EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST);
 
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
@@ -129,8 +136,57 @@ public enum ColorHelper
             }
         }
 
-        return FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes().getTexture(blockState);
+        if (block instanceof IFluidBlock)
+        {
+            ResourceLocation loc = ((IFluidBlock) block).getFluid().getStill();
+            TextureAtlasSprite tas = FMLClientHandler.instance().getClient().getTextureMapBlocks().getAtlasSprite(loc.toString());
+            return tas;
+        }
+
+        ArrayList<EnumFacing> facings = new ArrayList<>(2);
+        // If the block is directional, try to grab the sprite for EnumFacing.UP, NORTH, etc.
+        for (Map.Entry<IProperty<?>, Comparable<?>> entry : blockState.getProperties().entrySet())
+        {
+            if (entry.getKey() instanceof PropertyDirection)
+            {
+                facings.addAll(spriteFacings);
+                facings.retainAll(entry.getKey().getAllowedValues());
+                break;
+            }
+        }
+        return getFirstFoundSprite(blockState, facings);
     }
+
+    private TextureAtlasSprite getFirstFoundSprite(IBlockState blockState, ArrayList<EnumFacing> facing)
+    {
+        BlockModelShapes bms = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes();
+        for(EnumFacing face : facing)
+        {
+            try
+            {
+                List<BakedQuad> quads = bms.getModelForState(blockState).getQuads(blockState, face, 0);
+                if (!quads.isEmpty())
+                {
+                    if(Journeymap.getLogger().isDebugEnabled())
+                    {
+                        Journeymap.getLogger().info("Using face %s for block color in %s", face, blockState);
+                    }
+                    return quads.get(0).getSprite();
+                }
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().warn(String.format("Error getting EnumFacing.%s for %s", face, blockState));
+            }
+        }
+
+        if(Journeymap.getLogger().isDebugEnabled())
+        {
+            Journeymap.getLogger().debug("Using particle texture for block color in %s", blockState);
+        }
+        return bms.getTexture(blockState);
+    }
+
 
     private void setBlockColorToError(BlockMD blockMD)
     {
@@ -282,10 +338,10 @@ public enum ColorHelper
                 return;
             }
 
-            // Missing texture?
+            // Missing texture? Use material map color.
             if (new ResourceLocation(iconName).equals(TextureMap.LOCATION_MISSING_TEXTURE))
             {
-                setBlockColorToAir(blockMD);
+                setBlockColorToMaterial(blockMD);
                 return;
             }
 
@@ -302,12 +358,12 @@ public enum ColorHelper
             }
 
             // Plan C: Use Material's map color
-            logger.warn(String.format("ColorHelper.setBlockColor(): Texture unusable. Using MaterialMapColor instead for: %s", blockMD));
+            logger.debug(String.format("ColorHelper.setBlockColor(): Texture unusable. Using MaterialMapColor instead for: %s", blockMD));
             setBlockColorToMaterial(blockMD);
         }
         catch (Throwable e1)
         {
-            logger.warn("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
+            logger.debug("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
             setBlockColorToMaterial(blockMD);
         }
     }
@@ -349,7 +405,7 @@ public enum ColorHelper
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error(String.format("ColorHelper.getColorForIcon(): Unable to use texture file for %s: %s", tas.getIconName(), t.getMessage()));
+            Journeymap.getLogger().debug(String.format("ColorHelper.getColorForIcon(): Unable to use texture file for %s: %s", tas.getIconName(), t.getMessage()));
         }
         return null;
     }
@@ -390,7 +446,7 @@ public enum ColorHelper
                     }
                     catch (Throwable e)
                     {
-                        logger.warn("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
+                        logger.debug("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
                         break outer;
                     }
                     alpha = (argb >> 24) & 0xFF;

@@ -136,7 +136,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
                     Integer textureSide = blockClassTextureSides.get(parentClass);
                     if (textureSide != null)
                     {
-                        blockMD.setTextureSide(textureSide);
+                        //blockMD.setTextureSide(textureSide);
                     }
 
                     break;

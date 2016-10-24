@@ -42,7 +42,7 @@ public class BiomesOPlenty
                 {
                     if (name.contains(plant))
                     {
-                        blockMD.setTextureSide(2);
+                        //blockMD.setTextureSide(2);
                         blockMD.addFlags(Plant);
                         break;
                     }
@@ -52,7 +52,7 @@ public class BiomesOPlenty
                 {
                     if (name.contains(crop))
                     {
-                        blockMD.setTextureSide(2);
+                        //blockMD.setTextureSide(2);
                         blockMD.addFlags(Crop);
                         break;
                     }
@@ -62,7 +62,7 @@ public class BiomesOPlenty
                 {
                     if (name.contains(biomeColoredPlant))
                     {
-                        blockMD.setTextureSide(2);
+                        //blockMD.setTextureSide(2);
                         blockMD.addFlags(Plant, CustomBiomeColor);
                         break;
                     }

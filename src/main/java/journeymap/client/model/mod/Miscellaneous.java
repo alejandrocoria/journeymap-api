@@ -54,7 +54,7 @@ public class Miscellaneous
             else if (uid.equals(maricultureKelpId))
             {
                 blockMD.addFlags(Plant);
-                blockMD.setTextureSide(2);
+                //blockMD.setTextureSide(2);
             }
             else if (uid.equals(thaumcraftLeavesId))
             {

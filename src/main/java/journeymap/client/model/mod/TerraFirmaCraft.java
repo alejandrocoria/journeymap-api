@@ -40,7 +40,7 @@ public class TerraFirmaCraft
                 }
                 else if (name.contains("seagrass"))
                 {
-                    blockMD.setTextureSide(2);
+                    //blockMD.setTextureSide(2);
                     blockMD.addFlags(Plant);
                     //preloadColor(blockMD);
                 }

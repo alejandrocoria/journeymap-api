@@ -124,7 +124,7 @@ public class FileHandler
             // Normal dimensions handled this way
             if (dimension == -1 || dimension == 1)
             {
-                dimDir = new File(worldDir, "DIM" + dimString); //$NON-NLS-1$
+                dimDir = new File(worldDir, "DIM" + dimString); 
             }
 
             // Custom dimensions handled this way
@@ -141,6 +141,10 @@ public class FileHandler
                 });
 
                 if (dims.length == 0)
+                {
+                    return new File(worldDir, "DIM" + dimString); 
+                }
+                else if (dims.length == 1)
                 {
                     dimDir = dims[0];
                 }
@@ -307,7 +311,7 @@ public class FileHandler
                     worldId = worldId.replaceAll("\\W+", "~");
                 }
                 String suffix = (worldId != null) ? ("_" + worldId) : "";
-                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); //$NON-NLS-1$
+                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); 
             }
             else
             {

@@ -112,23 +112,26 @@ public class ColorManager
             blocksTextureChanged = true;
         }
 
-        Journeymap.getLogger().info("Loading blocks and textures...");
-
-        boolean isMapping = Journeymap.getClient().isMapping();
-        if (isMapping)
+        if (blocksTextureChanged || !ColorHelper.INSTANCE.hasCachedIconColors())
         {
-            Journeymap.getClient().stopMapping();
-        }
+            Journeymap.getLogger().info("Loading blocks and textures...");
 
-        // Reload all BlockMDs
-        BlockMD.reset();
+            boolean isMapping = Journeymap.getClient().isMapping();
+            if (isMapping)
+            {
+                Journeymap.getClient().stopMapping();
+            }
 
-        // Init colors
-        initBlockColors(blocksTextureChanged);
+            // Reload all BlockMDs
+            BlockMD.reset();
 
-        if (isMapping)
-        {
-            Journeymap.getClient().startMapping();
+            // Init colors
+            initBlockColors(blocksTextureChanged);
+
+            if (isMapping)
+            {
+                Journeymap.getClient().startMapping();
+            }
         }
     }
 

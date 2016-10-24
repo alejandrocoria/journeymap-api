@@ -87,10 +87,10 @@ public class RegionLoader
 
         final File mcWorldDir = FileHandler.getMCWorldDir(mc, mapType.dimension);
         final File regionDir = new File(mcWorldDir, "region");
-        if (!regionDir.exists() || regionDir.isFile())
+        if (!regionDir.exists() && !regionDir.mkdirs())
         {
-            logger.warn("MC world region directory doesn't exist: " + regionDir);
-            return null;
+            logger.warn("MC world region directory isn't usable: " + regionDir);
+            return new Stack<RegionCoord>();
         }
 
         // Flush synchronously so it's done before clearing

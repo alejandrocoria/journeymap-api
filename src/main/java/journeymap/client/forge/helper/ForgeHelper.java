@@ -118,7 +118,9 @@ public enum ForgeHelper
         //return world.provider.hasNoSky;
 
         // 1.8
-        return world.provider.getHasNoSky();
+        // TODO
+        return false;
+        //return world.provider.getHasNoSky();
     }
 
 
