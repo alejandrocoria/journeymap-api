@@ -114,13 +114,7 @@ public enum ForgeHelper
 
     public boolean hasNoSky(World world)
     {
-        // 1.7
-        //return world.provider.hasNoSky;
-
-        // 1.8
-        // TODO
-        return false;
-        //return world.provider.getHasNoSky();
+        return world.provider.getHasNoSky();
     }
 
 

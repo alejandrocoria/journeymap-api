@@ -148,7 +148,7 @@ public class MiniMap
 
     private boolean shouldShowCaves()
     {
-        return FeatureManager.isAllowed(Feature.MapCaves) && (ForgeHelper.INSTANCE.hasNoSky(mc.thePlayer) || miniMapProperties.showCaves.get());
+        return FeatureManager.isAllowed(Feature.MapCaves) && miniMapProperties.showCaves.get();
     }
 
     /**

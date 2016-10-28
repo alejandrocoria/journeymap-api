@@ -135,20 +135,11 @@ public class MapState
             return;
         }
 
-        boolean hasSky = !ForgeHelper.INSTANCE.hasNoSky(playerEntity);
         boolean mapTopo = Journeymap.getClient().getCoreProperties().mapTopography.get();
 
         if (currentMapType.isUnderground())
         {
-            if (hasSky)
-            {
-                lastMapProperties.showCaves.set(false);
-                setMapType(MapType.day(player));
-            }
-            else
-            {
-                setMapType(MapType.underground(player));
-            }
+            setMapType(MapType.day(player));
         }
         else if (currentMapType.isDay())
         {
@@ -198,11 +189,8 @@ public class MapState
         MapType mapType = null;
 
         EntityDTO player = DataCache.getPlayer();
-        if (ForgeHelper.INSTANCE.hasNoSky(player.entityLivingRef.get()))
-        {
-            mapType = MapType.underground(player);
-        }
-        else if (underground && caveMappingAllowed && showCaves)
+
+        if (underground && caveMappingAllowed && showCaves)
         {
             mapType = MapType.underground(DataCache.getPlayer());
         }

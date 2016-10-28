@@ -262,20 +262,12 @@ public class MapRegionTask extends BaseMapTask
         {
             EntityDTO player = DataCache.getPlayer();
             final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
-            final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(player.entityLivingRef.get());
-            boolean underground = ForgeHelper.INSTANCE.hasNoSky(player.entityLivingRef.get()) || player.underground;
+            boolean underground = player.underground;
 
             if (underground && !cavesAllowed)
             {
-                if (worldHasSky)
-                {
-                    underground = false;
-                }
-                else
-                {
-                    logger.info("Cave mapping not permitted.");
-                    return false;
-                }
+                logger.info("Cave mapping not permitted.");
+                return false;
             }
 
             enabled = (params != null);

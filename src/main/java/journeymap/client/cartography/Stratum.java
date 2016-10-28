@@ -36,6 +36,8 @@ public class Stratum
     private Integer dayColor;
     private Integer nightColor;
     private Integer caveColor;
+    private float worldAmbientLight;
+    private boolean worldHasNoSky;
     private boolean uninitialized = true;
 
     Stratum()
@@ -126,6 +128,7 @@ public class Stratum
                             ", y=" + getY() +
                             ", localZ=" + getZ() +
                             ", lightLevel=" + getLightLevel() +
+                            ", worldAmbientLight=" + getWorldAmbientLight() +
                             ", lightOpacity=" + getLightOpacity() +
                             ", isWater=" + isWater() +
                             ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
@@ -146,6 +149,16 @@ public class Stratum
     public void setChunkMd(ChunkMD chunkMd)
     {
         this.chunkMd = chunkMd;
+        if (chunkMd != null)
+        {
+            this.worldAmbientLight = chunkMd.getWorld().getSunBrightness(1f) * 15;
+            this.worldHasNoSky = chunkMd.getHasNoSky();
+        }
+        else
+        {
+            this.worldAmbientLight = 15;
+            this.worldHasNoSky = false;
+        }
     }
 
     public BlockMD getBlockMD()
@@ -156,6 +169,16 @@ public class Stratum
     public void setBlockMD(BlockMD blockMD)
     {
         this.blockMD = blockMD;
+    }
+
+    public float getWorldAmbientLight()
+    {
+        return this.worldAmbientLight;
+    }
+
+    public boolean getWorldHasNoSky()
+    {
+        return worldHasNoSky;
     }
 
     public int getX()
@@ -261,6 +284,8 @@ public class Stratum
     public void clear()
     {
         this.uninitialized = true;
+        this.worldAmbientLight = 15f;
+        this.worldHasNoSky = false;
         this.setChunkMd(null);
         this.setBlockMD(null);
         this.setX(0);

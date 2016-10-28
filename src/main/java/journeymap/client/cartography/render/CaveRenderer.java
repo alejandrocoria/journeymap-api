@@ -21,6 +21,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.WorldProviderHell;
 
 import java.awt.image.BufferedImage;
 
@@ -174,7 +175,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 try
                 {
-                    final int ceiling = chunkMd.getHasNoSky() ? sliceMaxY : getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
+                    final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
                     //final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
 
                     // Oh look, a hole in the world.
@@ -192,15 +193,17 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                         {
                             // Should be painted by surface renderer already.
                             paintDimOverlay(chunkSliceImage, x, z, defaultDim);
+                            chunkOk = true;
+                            continue;
                         }
-                        else
-                        {
-                            paintBlackBlock(chunkSliceImage, x, z);
-                        }
-                        chunkOk = true;
-                        continue;
+//                        else
+//                        {
+//                            paintBlackBlock(chunkSliceImage, x, z);
+//                        }
+
                     }
-                    else if (ceiling > sliceMaxY)
+
+                    if (ceiling > sliceMaxY)
                     {
                         // Solid stuff above the slice. Shouldn't be painted by surface renderer.
                         y = sliceMaxY;
@@ -292,7 +295,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     strata.setBlocksFound(true);
                     blockAboveMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
-                    if (blockMD.isLava() && blockAboveMD.isLava())
+                    if (blockMD.isLava() && (blockAboveMD.isLava() || y < minY))
                     {
                         // Ignores the myriad tiny one-block pockets of lava in the Nether
                         lavaBlockMD = blockMD;
@@ -300,7 +303,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
-                        if (chunkMd.getHasNoSky() || !chunkMd.canBlockSeeTheSky(x, y + 1, z))
+                        if (!chunkMd.canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 
@@ -330,7 +333,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         {
             // Corner case where the column has lava but no air in it.
             // This is a nether thing
-            if (chunkMd.getHasNoSky() && strata.isEmpty() && lavaBlockMD != null)
+            if (strata.isEmpty() && lavaBlockMD != null && chunkMd.getWorld().provider instanceof WorldProviderHell)
             {
                 strata.push(chunkMd, lavaBlockMD, x, topY, z, 14);
             }

@@ -21,6 +21,7 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -152,11 +153,23 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         // Daylight is the greater of sun light (15) attenuated through the stack and the stratum's inherent light level
-        float daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), 15 - lightAttenuation)) / 15f;
-        daylightDiff += tweakBrightenDaylightDiff;
-
-        // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherent light level
-        float nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
+        float dayAmbient = 15;
+        float daylightDiff;
+        float nightLightDiff;
+        boolean noSky = stratum.getWorldHasNoSky();
+        if (noSky)
+        {
+            dayAmbient = stratum.getWorldAmbientLight();
+            daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), dayAmbient - lightAttenuation)) / 15f;
+            nightLightDiff = daylightDiff;
+        }
+        else
+        {
+            daylightDiff = Math.max(1, Math.max(stratum.getLightLevel(), dayAmbient - lightAttenuation)) / 15f;
+            daylightDiff += tweakBrightenDaylightDiff;
+            // Nightlight is the greater of moon light (4) attenuated through the stack and the stratum's inherent light level
+            nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
+        }
 
         int basicColor;
         if (stratum.isWater())
@@ -182,14 +195,28 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             int adjustedBasicColor = RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff));
             stratum.setDayColor(RGB.blendWith(adjustedBasicColor, adjustedWaterColor, tweakWaterColorBlend));
 
-            // Darken for night light and blend with watercolor above
-            stratum.setNightColor(RGB.adjustBrightness(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
+            if (noSky)
+            {
+                stratum.setNightColor(stratum.getDayColor());
+            }
+            else
+            {
+                // Darken for night light and blend with watercolor above
+                stratum.setNightColor(RGB.adjustBrightness(stratum.getDayColor(), Math.max(nightLightDiff, tweakMinimumDarkenNightWater)));
+            }
         }
         else
         {
-            // Just adjustBrightness based on light levels
             stratum.setDayColor(RGB.adjustBrightness(basicColor, daylightDiff));
-            stratum.setNightColor(RGB.darkenAmbient(basicColor, nightLightDiff, getAmbientColor()));
+            if (noSky)
+            {
+                stratum.setNightColor(stratum.getDayColor());
+            }
+            else
+            {
+                // Just adjustBrightness based on light levels
+                stratum.setNightColor(RGB.darkenAmbient(basicColor, nightLightDiff, getAmbientColor()));
+            }
         }
 
         if (underground)

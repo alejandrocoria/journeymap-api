@@ -62,19 +62,11 @@ public class MapPlayerTask extends BaseMapTask
         {
             return null;
         }
-        final boolean worldHasSky = !ForgeHelper.INSTANCE.hasNoSky(playerEntity);
-        boolean underground = ForgeHelper.INSTANCE.hasNoSky(playerEntity) || player.underground;
+        boolean underground = player.underground;
 
         if (underground && !cavesAllowed)
         {
-            if (worldHasSky)
-            {
-                underground = false;
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         MapType mapType;
@@ -93,7 +85,7 @@ public class MapPlayerTask extends BaseMapTask
 
         if (underground)
         {
-            if (worldHasSky && Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
+            if (Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkPos>()));
             }
@@ -106,7 +98,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        if (worldHasSky && !underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
+        if (!underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
         {
             tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.topo(player), new ArrayList<ChunkPos>()));
         }

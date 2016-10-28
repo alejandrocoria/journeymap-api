@@ -365,18 +365,10 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                 }
             }
 
-            if (chunkMd.getHasNoSky())
+            paintBlock(dayChunkImage, x, z, strata.getRenderDayColor());
+            if (nightChunkImage != null)
             {
-                // End: Only use night color
-                paintBlock(dayChunkImage, x, z, strata.getRenderNightColor());
-            }
-            else
-            {
-                paintBlock(dayChunkImage, x, z, strata.getRenderDayColor());
-                if (nightChunkImage != null)
-                {
-                    paintBlock(nightChunkImage, x, z, strata.getRenderNightColor());
-                }
+                paintBlock(nightChunkImage, x, z, strata.getRenderNightColor());
             }
         }
         catch (RuntimeException e)

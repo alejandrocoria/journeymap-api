@@ -60,6 +60,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.WorldProviderHell;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -552,11 +553,11 @@ public class Fullscreen extends JmUI
         }
 
         // Update toggles
-        boolean isSky = !ForgeHelper.INSTANCE.hasNoSky(mc.theWorld);
-        buttonDay.setEnabled(isSky);
-        buttonNight.setEnabled(isSky);
-        buttonTopo.setEnabled(isSky);
-        buttonCaves.setEnabled(isSky && state.isUnderground() && state.isCaveMappingAllowed());
+        boolean notNether = !(mc.theWorld.provider instanceof WorldProviderHell);
+        buttonDay.setEnabled(notNether);
+        buttonNight.setEnabled(notNether);
+        buttonTopo.setEnabled(notNether);
+        buttonCaves.setEnabled(notNether && state.isUnderground() && state.isCaveMappingAllowed());
         buttonFollow.setEnabled(!state.follow.get());
 
         int padding = mapTypeToolbar.getToolbarSpec().padding;

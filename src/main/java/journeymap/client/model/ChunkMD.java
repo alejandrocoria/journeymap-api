@@ -257,15 +257,8 @@ public class ChunkMD
 
     public int getWorldActualHeight()
     {
-        if (getHasNoSky())
-        {
-            return getWorld().getActualHeight();
-        }
-        else
-        {
-            // add one to get above the top block for some worlds that paste in to 256
-            return getWorld().getActualHeight() + 1;
-        }
+        // add one to get above the top block for some worlds that paste in to 256
+        return getWorld().getActualHeight() + 1;
     }
 
     public Boolean getHasNoSky()

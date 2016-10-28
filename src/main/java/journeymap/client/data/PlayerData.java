@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
@@ -35,7 +36,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
      */
     public static boolean playerIsUnderground(Minecraft mc, EntityPlayer player)
     {
-        if (ForgeHelper.INSTANCE.hasNoSky(player.getEntityWorld()))
+        if(player.getEntityWorld().provider instanceof WorldProviderHell)
         {
             return true;
         }
