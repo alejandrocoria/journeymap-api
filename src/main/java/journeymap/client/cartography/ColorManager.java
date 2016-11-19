@@ -110,6 +110,7 @@ public class ColorManager
             lastResourcePackNames = currentResourcePackNames;
             lastModNames = currentModNames;
             blocksTextureChanged = true;
+            ColorHelper.INSTANCE.resetIconColorCache();
         }
 
         if (blocksTextureChanged || !ColorHelper.INSTANCE.hasCachedIconColors())

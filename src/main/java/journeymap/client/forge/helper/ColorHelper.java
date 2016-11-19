@@ -143,6 +143,11 @@ public enum ColorHelper
             return tas;
         }
 
+        if (blockState.getMaterial() == Material.GRASS)
+        {
+            blockMD.addFlags(BlockMD.Flag.Grass);
+        }
+
         ArrayList<EnumFacing> facings = new ArrayList<>(2);
         // If the block is directional, try to grab the sprite for EnumFacing.UP, NORTH, etc.
         for (Map.Entry<IProperty<?>, Comparable<?>> entry : blockState.getProperties().entrySet())
@@ -153,6 +158,10 @@ public enum ColorHelper
                 facings.retainAll(entry.getKey().getAllowedValues());
                 break;
             }
+        }
+        if (facings.isEmpty())
+        {
+            facings.add(EnumFacing.UP);
         }
         return getFirstFoundSprite(blockState, facings);
     }

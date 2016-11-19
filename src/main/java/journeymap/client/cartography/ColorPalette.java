@@ -48,7 +48,7 @@ public class ColorPalette
     public static final String VARIABLE = "var colorpalette=";
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
-    public static final double VERSION = 5.2;
+    public static final double VERSION = 5.3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
 
     @Since(3)
