@@ -2,6 +2,7 @@ package journeymap.server.events;
 
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
+import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
@@ -77,6 +78,12 @@ public class ForgeEvents
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
             {
                 PacketHandler.sendPlayerWorldID((EntityPlayerMP) event.player);
+            }
+
+            if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get()) {
+                InitLogin init = new InitLogin();
+                init.setTeleportEnabled(PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get());
+                PacketHandler.sendLoginPacket((EntityPlayerMP) event.player, init);
             }
 
             if (isOp((EntityPlayerMP) event.player))

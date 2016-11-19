@@ -9,6 +9,7 @@
 package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
+import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -23,6 +24,7 @@ import journeymap.client.ui.component.ScrollListPane;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -80,8 +82,18 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonFind = new Button(Constants.getString("jm.waypoint.find"));
 
         buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport"));
-        buttonTeleport.setDrawButton(manager.canUserTeleport);
-        buttonTeleport.setEnabled(manager.canUserTeleport);
+        JourneymapClient jm = Journeymap.getClient();
+
+        if (jm.isServerEnabled())
+        {
+            buttonTeleport.setDrawButton(jm.isServerTeleportEnabled());
+            buttonTeleport.setEnabled(jm.isServerTeleportEnabled());
+        }
+        else
+        {
+            buttonTeleport.setDrawButton(manager.canUserTeleport);
+            buttonTeleport.setEnabled(manager.canUserTeleport);
+        }
 
         buttonListLeft = new ButtonList(buttonEnable, buttonFind, buttonTeleport);
         buttonListLeft.setHeights(manager.rowHeight);
