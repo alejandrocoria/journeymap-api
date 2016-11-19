@@ -123,11 +123,8 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      */
     protected Integer getFoliageColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
-//        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
-//                getTint(chunkMD, blockMD, blockPos)), .8f);
-
         return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
-                chunkMD.getChunk().getWorld().getBiome(blockPos).getFoliageColorAtPos(blockPos)), .8f);
+                getTint(chunkMD, blockMD, blockPos)), .8f);
     }
 
     /**
@@ -136,12 +133,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
-
-        // Current approach:
-        //return RGB.multiply(0x929292, getTint(chunkMD, blockMD, blockPos));
-
-        // TODO: See if this calls into different results than current approach
-        return RGB.multiply(0x929292, chunkMD.getChunk().getWorld().getBiome(blockPos).getGrassColorAtPos(blockPos));
+        return RGB.multiply(0x929292, getTint(chunkMD, blockMD, blockPos));
     }
 
     /**
