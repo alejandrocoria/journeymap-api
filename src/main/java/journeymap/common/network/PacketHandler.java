@@ -13,6 +13,7 @@ package journeymap.common.network;
  */
 
 import journeymap.common.Journeymap;
+import journeymap.common.network.model.InitLogin;
 import journeymap.common.network.model.Location;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PermissionProperties;
@@ -28,11 +29,13 @@ public class PacketHandler
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
+    public static final SimpleNetworkWrapper INIT_LOGIN_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(LoginPacket.CHANNEL_NAME);
 
     public static void init(Side side)
     {
 
         WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
+        INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
 
         if (Side.SERVER == side)
@@ -66,7 +69,7 @@ public class PacketHandler
         if ((player instanceof EntityPlayerMP) && (player != null))
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
-            String worldID =  worldSaveHandler.getWorldID();
+            String worldID = worldSaveHandler.getWorldID();
             String playerName = player.getName();
 
             try
@@ -82,7 +85,27 @@ public class PacketHandler
                 Journeymap.getLogger().error("Unknown Exception - PlayerName:" + playerName + " WorldID:" + worldID + " Exception " + e);
             }
         }
+    }
 
+    public static void sendLoginPacket(EntityPlayerMP player, InitLogin packetData)
+    {
+        if ((player instanceof EntityPlayerMP) && (player != null))
+        {
+            Journeymap.getLogger().info("Sending log in packet.");
+            String playerName = player.getName();
 
+            try
+            {
+                INIT_LOGIN_CHANNEL.sendTo(new LoginPacket(packetData), player);
+            }
+            catch (RuntimeException rte)
+            {
+                Journeymap.getLogger().error(playerName + " is not a real player. Error: " + rte);
+            }
+            catch (Exception e)
+            {
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + playerName + " Exception " + e);
+            }
+        }
     }
 }

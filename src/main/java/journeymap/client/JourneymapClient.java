@@ -70,6 +70,7 @@ public class JourneymapClient implements CommonProxy
     public static final String EDITION = getEdition();
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + EDITION;
     private boolean serverEnabled = false;
+    private boolean serverTeleportEnabled = false;
 
     // Properties & preferences
     private volatile CoreProperties coreProperties;
@@ -738,5 +739,17 @@ public class JourneymapClient implements CommonProxy
     public void setServerEnabled(boolean serverEnabled)
     {
         this.serverEnabled = serverEnabled;
+    }
+
+    public boolean isServerTeleportEnabled()
+    {
+        logger.info("uhh hi " + this.serverTeleportEnabled);
+        return serverTeleportEnabled;
+    }
+
+    public void setServerTeleportEnabled(boolean serverTeleportEnabled)
+    {
+        logger.info("setting it to " + serverTeleportEnabled);
+        this.serverTeleportEnabled = serverTeleportEnabled;
     }
 }
