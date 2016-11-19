@@ -39,15 +39,15 @@ public class DataService extends BaseService
     {
         providerMap = new HashMap<String, Class>(14);
         providerMap.put("/data/all", AllData.class);  //$NON-NLS-1$
-        providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
-        providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
+//        providerMap.put("/data/animals", AnimalsData.class);  //$NON-NLS-1$
+//        providerMap.put("/data/mobs", MobsData.class);  //$NON-NLS-1$
         providerMap.put("/data/game", GameData.class);  //$NON-NLS-1$
         providerMap.put("/data/image", ImagesData.class);  //$NON-NLS-1$
         providerMap.put("/data/messages", MessagesData.class);  //$NON-NLS-1$
         providerMap.put("/data/player", PlayerData.class);  //$NON-NLS-1$
-        providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
+//        providerMap.put("/data/players", PlayersData.class);  //$NON-NLS-1$
         providerMap.put("/data/world", WorldData.class);  //$NON-NLS-1$
-        providerMap.put("/data/villagers", VillagersData.class);  //$NON-NLS-1$
+//        providerMap.put("/data/villagers", VillagersData.class);  //$NON-NLS-1$
         providerMap.put("/data/waypoints", WaypointsData.class);  //$NON-NLS-1$
 
         // Compose path string used by RupyService

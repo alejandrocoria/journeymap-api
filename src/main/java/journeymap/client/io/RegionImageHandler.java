@@ -119,6 +119,123 @@ public class RegionImageHandler
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
      */
     public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
+                                                             final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight,
+                                                             final boolean allowNullImage, boolean showGrid)
+    {
+        int scale = 1;
+        scale = Math.max(scale, 1);
+        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16) / scale);
+        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16) / scale);
+
+        BufferedImage blank = null;
+
+        image = createBlankImage(initialWidth, initialHeight);
+        final Graphics2D g2D = image.createGraphics();
+
+        final RegionImageCache cache = RegionImageCache.INSTANCE;
+
+        RegionCoord rc = null;
+        BufferedImage regionImage = null;
+
+        final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
+        final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
+        final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
+        final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
+
+        int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
+
+        boolean imageDrawn = false;
+        for (int rx = rx1; rx <= rx2; rx++)
+        {
+            for (int rz = rz1; rz <= rz2; rz++)
+            {
+                rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
+                regionImage = cache.getRegionImageSet(rc).getImage(mapType);
+
+                if (regionImage == null)
+                {
+                    continue;
+                }
+
+                rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
+                rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
+                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
+                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+
+                int xoffset = rc.getMinChunkX() * 16;
+                int yoffset = rc.getMinChunkZ() * 16;
+                sx1 = (rminCx * 16) - xoffset;
+                sy1 = (rminCz * 16) - yoffset;
+                sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
+                sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
+
+                xoffset = startCoord.chunkXPos * 16;
+                yoffset = startCoord.chunkZPos * 16;
+                dx1 = (startCoord.chunkXPos * 16) - xoffset;
+                dy1 = (startCoord.chunkZPos * 16) - yoffset;
+                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
+                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
+
+                g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+                imageDrawn = true;
+            }
+        }
+
+        // Show chunk grid
+        if (imageDrawn)
+        {
+            if (showGrid)
+            {
+
+                if (mapType.isDay())
+                {
+                    g2D.setColor(Color.black);
+                    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25F));
+                }
+                else
+                {
+                    g2D.setColor(Color.gray);
+                    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1F));
+                }
+
+                for (int x = 0; x <= initialWidth; x += 16)
+                {
+                    g2D.drawLine(x, 0, x, initialHeight);
+                }
+
+                for (int z = 0; z <= initialHeight; z += 16)
+                {
+                    g2D.drawLine(0, z, initialWidth, z);
+                }
+            }
+        }
+
+        g2D.dispose();
+
+        if (allowNullImage && !imageDrawn)
+        {
+            return null;
+        }
+
+        // Scale if needed
+        if (imageHeight != null && imageWidth != null && (initialHeight != imageHeight || initialWidth != imageWidth))
+        {
+            final BufferedImage scaledImage = createBlankImage(imageWidth, imageHeight);
+            final Graphics2D g = initRenderingHints(scaledImage.createGraphics());
+            g.drawImage(image, 0, 0, imageWidth, imageHeight, null);
+            g.dispose();
+            return scaledImage;
+        }
+        else
+        {
+            return image;
+        }
+    }
+
+    /**
+     * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
+     */
+    public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
                                                              int scale, boolean showGrid)
     {
         scale = Math.max(scale, 1);

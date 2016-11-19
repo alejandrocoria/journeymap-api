@@ -105,6 +105,12 @@ label span {
 
 }
 
+.playerMarker {
+	height:32px;
+	width:32px;
+	border: none;
+}
+
 .entityMarker, .mpMarker {
 	height:64px;
 	width:64px;
@@ -175,10 +181,9 @@ label span {
 	background-color:rgba(255,0,0,0.7);
 }
 
-.entityImages, .mpImages {
+.playerImages, .entityImages, .mpImages {
     position:relative;	
 }
-
 
 .entityIcon {
     position:absolute;
@@ -200,6 +205,12 @@ label span {
 	position:absolute;
 	width: 64px;
     height: 64px;
+}
+
+.playerLocator {
+	position:absolute;
+	width: 32px;
+    height: 32px;
 }
 
 .mpIcon {

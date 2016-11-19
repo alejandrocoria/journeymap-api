@@ -8,7 +8,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -18,6 +17,7 @@ import se.rupy.http.Query;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provide player data
@@ -26,10 +26,7 @@ import java.util.HashMap;
  */
 public class PropertyService extends BaseService
 {
-
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
-    private static final long serialVersionUID = 4412225358529161454L;
-    FullMapProperties fullMapProperties;
     WebMapProperties webMapProperties;
     HashMap<String, BooleanField> propMap = new HashMap<String, BooleanField>();
 
@@ -53,15 +50,14 @@ public class PropertyService extends BaseService
     {
         if (propMap.isEmpty())
         {
-            fullMapProperties = Journeymap.getClient().getFullMapProperties();
             webMapProperties = Journeymap.getClient().getWebMapProperties();
-            propMap.put("showCaves", fullMapProperties.showCaves);
-            propMap.put("showGrid", fullMapProperties.showGrid);
-            propMap.put("showAnimals", webMapProperties.showAnimals);
-            propMap.put("showMobs", webMapProperties.showMobs);
-            propMap.put("showPets", webMapProperties.showPets);
-            propMap.put("showPlayers", webMapProperties.showPlayers);
-            propMap.put("showVillagers", webMapProperties.showVillagers);
+            propMap.put("showCaves", webMapProperties.showCaves);
+            propMap.put("showGrid", webMapProperties.showGrid);
+//            propMap.put("showAnimals", webMapProperties.showAnimals);
+//            propMap.put("showMobs", webMapProperties.showMobs);
+//            propMap.put("showPets", webMapProperties.showPets);
+//            propMap.put("showPlayers", webMapProperties.showPlayers);
+//            propMap.put("showVillagers", webMapProperties.showVillagers);
             propMap.put("showWaypoints", webMapProperties.showWaypoints);
         }
     }
@@ -105,7 +101,12 @@ public class PropertyService extends BaseService
             }
 
             // Put map into json form
-            jsonData.append(GSON.toJson(propMap));
+            Map<String, Boolean> valMap = new HashMap<>();
+            for (Map.Entry<String, BooleanField> entry : propMap.entrySet())
+            {
+                valMap.put(entry.getKey(), entry.getValue().get());
+            }
+            jsonData.append(GSON.toJson(valMap));
 
             // Finish function call for JsonP if needed
             if (useJsonP)
@@ -145,14 +146,7 @@ public class PropertyService extends BaseService
             {
                 Boolean boolValue = Boolean.parseBoolean(value);
                 propMap.get(key).set(boolValue);
-                if (key.equals("showCaves") || key.equals("showGrid"))
-                {
-                    fullMapProperties.save();
-                }
-                else
-                {
-                    webMapProperties.save();
-                }
+                webMapProperties.save();
             }
         }
         catch (Throwable t)

@@ -108,6 +108,14 @@ public class EntityDTO implements Serializable
                 {
                     playerColor = team.getChatFormat().getColorIndex();
                 }
+                else if (currentPlayer.equals(entity))
+                {
+                    playerColor = coreProperties.getColor(coreProperties.colorSelf);
+                }
+                else
+                {
+                    playerColor = coreProperties.getColor(coreProperties.colorPlayer);
+                }
             }
             catch (Throwable t)
             {

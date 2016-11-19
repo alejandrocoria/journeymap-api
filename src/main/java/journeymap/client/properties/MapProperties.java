@@ -20,14 +20,10 @@ import static journeymap.common.properties.Category.Inherit;
  */
 public abstract class MapProperties extends ClientPropertiesBase implements Comparable<MapProperties>
 {
-    public final BooleanField showMobs = new BooleanField(Inherit, "jm.common.show_mobs", true);
-    public final BooleanField showAnimals = new BooleanField(Inherit, "jm.common.show_animals", true);
-    public final BooleanField showVillagers = new BooleanField(Inherit, "jm.common.show_villagers", true);
-    public final BooleanField showPets = new BooleanField(Inherit, "jm.common.show_pets", true);
-    public final BooleanField showPlayers = new BooleanField(Inherit, "jm.common.show_players", true);
     public final BooleanField showWaypoints = new BooleanField(Inherit, "jm.common.show_waypoints", true);
     public final BooleanField showSelf = new BooleanField(Inherit, "jm.common.show_self", true);
     public final BooleanField showGrid = new BooleanField(Inherit, "jm.common.show_grid", true);
+    public final BooleanField showCaves = new BooleanField(Inherit, "jm.common.show_caves", true);
     public final EnumField<MapType.Name> preferredMapType = new EnumField<MapType.Name>(Hidden, "", MapType.Name.day);
     public final IntegerField zoomLevel = new IntegerField(Hidden, "", 0, 8, 0);
 

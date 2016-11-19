@@ -11,11 +11,11 @@ var JourneyMap = (function() {
     var mapType;
 	var centerOnPlayer = true;
 	var showCaves = true;	
-	var showAnimals = true;
-	var showPets = true;
-	var showMobs = true;
-	var showVillagers = true;
-	var showPlayers = true;
+	var showAnimals = false;
+	var showPets = false;
+	var showMobs = false;
+	var showVillagers = false;
+	var showPlayers = false;
 	var showWaypoints = true;
 	var showGrid = true;
 
@@ -47,23 +47,32 @@ var JourneyMap = (function() {
 		images : null
 	};
 	var markers = {};
-	
-	var entityTemplate = [
-	    '<div class="entityMarker" id="">',
-	    '<div class="entityName"/>',
-	    '<div class="entityImages">',			    
-	    '<img class="entityLocator" src="/img/pixel.png">',
-	    '<img class="entityIcon" src="/img/pixel.png" >',
-	    '</div>',
-	    '</div>'
-	].join('');
+
+    var playerTemplate = [
+        '<div class="playerMarker" id="">',
+        '<div class="playerImages">',
+        '<img class="playerLocator" src="/img/marker-player-bg-32.png">',
+        '<img class="playerLocator filter-tint" src="/img/marker-player-32.png">',
+        '</div>',
+        '</div>'
+    ].join('');
+
+    var entityTemplate = [
+        '<div class="entityMarker" id="">',
+        '<div class="entityName"/>',
+        '<div class="entityImages">',
+        '<img class="entityLocator filter-tint" src="/img/pixel.png">',
+        '<img class="entityIcon filter-tint" src="/img/pixel.png" >',
+        '</div>',
+        '</div>'
+    ].join('');
 	
 	var mpTemplate = [
 	    '<div class="mpMarker" id="">',
 	    '<div class="mpName"/>',
 	    '<div class="mpImages">',			    
-	    '<img class="mpLocator" src="/img/locator-other.png">',
-	    '<img class="mpIcon" src="/img/pixel.png" >',
+	    '<img class="mpLocator filter-tint" src="/img/marker-player-bg-32.png">',
+	    '<img class="mpIcon filter-tint" src="/img/pixel.png" >',
 	    '</div>',
 	    '</div>'
 	].join('');	          
@@ -76,8 +85,7 @@ var JourneyMap = (function() {
 	].join('');	
 	
 	var messageTemplate = '<div class="message"></div>';
-	
-	
+
 	var errorDialog = null;
 	var splashDialog = null;
 	var debug = false;
@@ -116,14 +124,14 @@ var JourneyMap = (function() {
 			JM.properties = data;
 			
 			// Set global vars of prefs
-			showCaves = JM.properties.showCaves.value==1;
-            showGrid = JM.properties.showGrid.value==1;
-            showMobs = JM.properties.showMobs.value==1;
-			showAnimals = JM.properties.showAnimals.value==1;
-			showVillagers = JM.properties.showVillagers.value==1;
-			showPets = JM.properties.showPets.value==1;
-			showPlayers = JM.properties.showPlayers.value==1;
-			showWaypoints = JM.properties.showWaypoints.value==1;
+			showCaves = JM.properties.showCaves;
+            showGrid = JM.properties.showGrid;
+//            showMobs = JM.properties.showMobs;
+//			showAnimals = JM.properties.showAnimals;
+//			showVillagers = JM.properties.showVillagers;
+//			showPets = JM.properties.showPets;
+//			showPlayers = JM.properties.showPlayers;
+			showWaypoints = JM.properties.showWaypoints;
 			
 			// Get L10N messages
 			$.ajax({
@@ -274,11 +282,12 @@ var JourneyMap = (function() {
 			} else {		
 
 				enforceFeature("#checkShowCaves", JM.world.features.MapCaves);
-				enforceFeature("#checkShowAnimals", JM.world.features.RadarAnimals);
-				enforceFeature("#checkShowPets", JM.world.features.RadarAnimals);
-				enforceFeature("#checkShowMobs", JM.world.features.RadarMobs);
-				enforceFeature("#checkShowVillagers", JM.world.features.RadarVillagers);
-				enforceFeature("#checkShowPlayers", JM.world.features.RadarPlayers);
+//				enforceFeature("#checkShowGrid", JM.world.features.MapGrid);
+//				enforceFeature("#checkShowAnimals", JM.world.features.RadarAnimals);
+//				enforceFeature("#checkShowPets", JM.world.features.RadarAnimals);
+//				enforceFeature("#checkShowMobs", JM.world.features.RadarMobs);
+//				enforceFeature("#checkShowVillagers", JM.world.features.RadarVillagers);
+//				enforceFeature("#checkShowPlayers", JM.world.features.RadarPlayers);
 				
 				menu.show();
 				$( document ).one( "click", function() { menu.hide(); });
@@ -293,76 +302,76 @@ var JourneyMap = (function() {
 		
 		// Options Menu items
 		setTextAndTitle("#cavesMenuItem", "caves_menu_item_text", "caves_menu_item_title");
-		setTextAndTitle("#animalsMenuItem", "animals_menu_item_text", "animals_menu_item_title");
-		setTextAndTitle("#petsMenuItem", "pets_menu_item_text", "pets_menu_item_title");
-		setTextAndTitle("#mobsMenuItem", "mobs_menu_item_text", "mobs_menu_item_title");
-		setTextAndTitle("#villagersMenuItem", "villagers_menu_item_text", "villagers_menu_item_title");
-		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
+//		setTextAndTitle("#animalsMenuItem", "animals_menu_item_text", "animals_menu_item_title");
+//		setTextAndTitle("#petsMenuItem", "pets_menu_item_text", "pets_menu_item_title");
+//		setTextAndTitle("#mobsMenuItem", "mobs_menu_item_text", "mobs_menu_item_title");
+//		setTextAndTitle("#villagersMenuItem", "villagers_menu_item_text", "villagers_menu_item_title");
+//		setTextAndTitle("#playersMenuItem", "players_menu_item_text", "players_menu_item_title");
 		setTextAndTitle("#waypointsMenuItem", "waypoints_menu_item_text", "waypoints_menu_item_title");
 		setTextAndTitle("#gridMenuItem", "grid_menu_item_text", "grid_menu_item_title");
-		
+
 		// Options Menu checkboxes
-		$("#checkShowCaves").prop('checked', showCaves)		
+		$("#checkShowCaves")[0].checked = showCaves;
 		$("#checkShowCaves").click(function(event) {
-			showCaves = (this.checked === true);
+			showCaves = (event.target.checked === true);
 			postPreference("showCaves", showCaves);
 			if(playerUnderground) {
 				refreshMap();			
 			}
 		});
 		
-		$("#checkShowGrid").prop('checked', showGrid)		
+		$("#checkShowGrid")[0].checked = showGrid;
 		$("#checkShowGrid").click(function(event) {
-			showGrid = (this.checked === true);
+			showGrid = (event.target.checked === true);
 			postPreference("showGrid", showGrid);
 			setTimeout(function() {
                 window.location = window.location;
             }, 1500);
 		});
 		
-		$("#checkShowWaypoints").prop('checked', showWaypoints)		
+		$("#checkShowWaypoints")[0].checked = showWaypoints;
 		$("#checkShowWaypoints").click(function(event) {
-			showWaypoints = (this.checked === true);
+			showWaypoints = (event.target.checked === true);
 			postPreference("showWaypoints", showWaypoints);
 			if(!showWaypoints) {
 				JM.waypoints = null;				
 			}
 		});
 		
-		$("#checkShowAnimals").prop('checked', showAnimals)
-		$("#checkShowAnimals").click(function(event) {
-			showAnimals = (this.checked === true);
-			postPreference("showAnimals", showAnimals);
-			drawMobs();
-		});
-
-		$("#checkShowPets").prop('checked', showPets)
-		$("#checkShowPets").click(function(event) {
-			showPets = (this.checked === true);
-			postPreference("showPets", showPets);
-			drawMobs();
-		});
-
-		$("#checkShowMobs").prop('checked', showMobs)
-		$("#checkShowMobs").click(function() {
-			showMobs = (this.checked === true);
-			postPreference("showMobs", showMobs);
-			drawMobs();
-		});
-
-		$("#checkShowVillagers").prop('checked', showVillagers)
-		$("#checkShowVillagers").click(function() {
-			showVillagers = (this.checked === true);
-			postPreference("showVillagers", showVillagers);
-			drawMobs();
-		});
-
-		$("#checkShowPlayers").prop('checked', showPlayers)
-		$("#checkShowPlayers").click(function() {
-			showPlayers = (this.checked === true);
-			postPreference("showPlayers", showPlayers);
-			drawMultiplayers();
-		});
+//		$("#checkShowAnimals").prop('checked', showAnimals)
+//		$("#checkShowAnimals").click(function(event) {
+//			showAnimals = (event.target.checked === true);
+//			postPreference("showAnimals", showAnimals);
+//			drawMobs();
+//		});
+//
+//		$("#checkShowPets").prop('checked', showPets)
+//		$("#checkShowPets").click(function(event) {
+//			showPets = (event.target.checked === true);
+//			postPreference("showPets", showPets);
+//			drawMobs();
+//		});
+//
+//		$("#checkShowMobs").prop('checked', showMobs)
+//		$("#checkShowMobs").click(function() {
+//			showMobs = (event.target.checked === true);
+//			postPreference("showMobs", showMobs);
+//			drawMobs();
+//		});
+//
+//		$("#checkShowVillagers").prop('checked', showVillagers)
+//		$("#checkShowVillagers").click(function() {
+//			showVillagers = (event.target.checked === true);
+//			postPreference("showVillagers", showVillagers);
+//			drawMobs();
+//		});
+//
+//		$("#checkShowPlayers").prop('checked', showPlayers)
+//		$("#checkShowPlayers").click(function() {
+//			showPlayers = (event.target.checked === true);
+//			postPreference("showPlayers", showPlayers);
+//			drawMultiplayers();
+//		});
 		
 		// Actions Menu Button
 		$("#jm-actions-menu").menu().hide();
@@ -420,6 +429,8 @@ var JourneyMap = (function() {
 
 		// Continue
 		initWorld();
+
+
 
 	}
 	
@@ -491,8 +502,11 @@ var JourneyMap = (function() {
 			player: {}
 		}
 
-		queryServer(setupMap);
+		// Prepare observer for markers
+		// The node to be monitored
+        var target = $( "#map-canvas" )[0];
 
+		queryServer(setupMap);
 	}
 
 	var setupMap = function() {
@@ -850,6 +864,7 @@ var JourneyMap = (function() {
 			map.panTo(center);
 			map.setZoom(zoom);
 			map.panTo(center);
+
 		}, 500 );
 
 	}
@@ -991,25 +1006,20 @@ var JourneyMap = (function() {
 		// Get current player position
 		var pos = blockPosToLatLng(JM.player.posX, JM.player.posZ);
 		var heading = JM.player.heading;
-		var imgId = 'player'+JM.player.entityId;
+		var imgId = 'player'+JM.player.username;
 		
 		// Ensure marker
 		if(!markers.playerMarker) {
 
-			var img = new Image();
-			$(img).attr('id', imgId)
-			      .attr('src','/img/locator-player.png')
-			      .css('width','64px')
-			      .css('height','64px')
-			      .rotate(heading);
-			
+        	var marker = $(playerTemplate).attr('id', imgId);
+
 			markers.playerMarker = new RichMarker({
 				position: pos,
 			    map: map,
 			    draggable: false,
 			    flat: true,
 			    anchor: RichMarkerPosition.MIDDLE,
-			    content: img,
+			    content: marker[0],
 			    zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 			    tooltip : new RichMarker({
 					position: null,
@@ -1020,6 +1030,10 @@ var JourneyMap = (function() {
 				    content: '<div class="playerInfo">' + JM.player.username + '</div>',
 		        })
 	        });
+
+            $(marker).find(".filter-tint").one("load", function(e) {
+               tintWhenVisible(e.target);
+            });
 			
 			google.maps.event.addListener(markers.playerMarker, 'mouseover', function(args) {
 				var tooltip = markers.playerMarker.tooltip;
@@ -1053,6 +1067,10 @@ var JourneyMap = (function() {
 			});
 			
 			google.maps.event.addListener(map, 'zoom_changed', function() {
+
+			    // Prevent icon selection on doubleclick
+			    document.getSelection().removeAllRanges();
+
 				if(centerOnPlayer===true) {
 					if(markers.playerMarker) {
 						map.panTo(markers.playerMarker.getPosition());
@@ -1081,8 +1099,12 @@ var JourneyMap = (function() {
 		
 		// Update marker position and heading
 		markers.playerMarker.setPosition(pos);
-		$('#'+imgId).rotate(heading);
-		
+
+		$(markers.playerMarker.content).find("img").rotate(heading);
+
+        // Update color
+        updateTint(markers.playerMarker.content, JM.player.color);
+
 		// Keep on top
 		if(markers.playerMarker.getZIndex()<google.maps.Marker.MAX_ZINDEX){
 			markers.playerMarker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
@@ -1153,7 +1175,7 @@ var JourneyMap = (function() {
 
 		var locatorUrl = null;
 		var iconSize = 32;
-		var iconColor = "#cccccc";
+		var iconColor = intToHex(entity.color);
 		var iconLabel = null;
 		var marker = markerMap[id];
 
@@ -1161,10 +1183,8 @@ var JourneyMap = (function() {
 
         if(entity.owner === JM.player.username) {
             locatorUrl = "/img/locator-pet.png";
-            iconColor = "#0000ff";
         } else if(entity.hostile==true) {
             locatorUrl = "/img/locator-hostile.png";
-            iconColor = "#ff0000";
         } else {
             locatorUrl = "/img/locator-neutral.png";
         }
@@ -1206,6 +1226,10 @@ var JourneyMap = (function() {
 			    content: contentDiv[0]
 	        });
 			markerMap[id] = marker;
+
+            $(marker).find(".filter-tint").one("load", function(e) {
+               tintWhenVisible(e.target);
+            });
 			
 			if(debug) console.log("Marker added for " + id);
 		}
@@ -1220,11 +1244,14 @@ var JourneyMap = (function() {
 		}
 		
 		// Entity icon
-		$(contentDiv).find('.entityIcon').addClass('entity_' + JM.world.iconSetName).attr('src','/icon/entity/' + JM.world.iconSetName + '/' + entity.filename);
+		$(contentDiv).find('.entityIcon').addClass('entity_' + JM.world.iconSetName).attr('src','/entity_icon?location=' + entity.iconLocation);
 
 		// Entity locator		
-		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading);		
-	
+		$(contentDiv).find('.entityLocator').attr('src', locatorUrl).rotate(heading);
+
+        // Update color
+        updateTint(contentDiv, entity.color);
+
 		// Update marker position
 		marker.setPosition(pos);
 	};
@@ -1276,6 +1303,10 @@ var JourneyMap = (function() {
 			    content: contentDiv[0]
 	        });
 			markerMap[id] = marker;
+
+            $(marker).find(".filter-tint").one("load", function(e) {
+               tintWhenVisible(e.target);
+            });
 			
 			if(debug) console.log("Marker added for " + id);
 		}
@@ -1389,6 +1420,26 @@ var JourneyMap = (function() {
 		}
 	};
 
+	var updateTint = function(element, intColor) {
+	    var hexColor = intToHex(intColor);
+        $.each($(element).find(".filter-tint"), function( i, v ) {
+            var el = $(v);
+            if(el.attr("data-pb-tint-colour") !== hexColor) {
+                el.attr("data-pb-tint-colour", hexColor);
+                el.attr("data-pb-tint-opacity", "1.0");
+                tintWhenVisible(el);
+            }
+        });
+	}
+
+    var tintWhenVisible = function(element) {
+        if($(element).is(":visible")) {
+            processFilters()
+        } else {
+            setTimeout(function() { tintWhenVisible(element); }, 50);
+        }
+   }
+
     var dimensionalValue = function(original, primaryDimension, dimension) {
         if(primaryDimension==dimension)
         {
@@ -1414,6 +1465,11 @@ var JourneyMap = (function() {
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;
 		return "&mapType=" + actualMapType + "&dim=" + dimension + "&depth=" + depth + "&ts=" + lastImageCheck;
 	};
+
+	var intToHex = function(rgb) {
+	    var ints = [(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF];
+	    return rgbToHex(ints[0], ints[1], ints[2])
+	}
 	
 	var rgbToHex = function(r, g, b) {
 	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
@@ -1438,10 +1494,9 @@ var JourneyMap = (function() {
 	MapConfig.perPixel = 1.0 / MapConfig.tileSize;
 	
 	var blockPosToLatLng = function (x, y) {
-		var me = this;		
-		var center = .5 * MapConfig.perPixel;		
-		var lat = (y * MapConfig.perPixel) + center;
-		var lng = (x * MapConfig.perPixel) + center;		
+		var me = this;
+		var lat = (y * MapConfig.perPixel);
+		var lng = (x * MapConfig.perPixel);
 		return new google.maps.LatLng(lat, lng);
 	}
 	
@@ -1545,7 +1600,7 @@ var JourneyMap = (function() {
 	MCMapType.prototype.refreshTiles = function (force) {
 		var me = this;
 		
-		if(!force) force==false;
+		force = force || false;
 		if (debug) console.log(">>> " + "refreshTiles: " + force);
 		
 		if(force) {			
@@ -1567,10 +1622,7 @@ var JourneyMap = (function() {
 		lastImageCheck = JM.images.queryTime || new Date().getTime();
 		
 		if (debug) {
-			console.log("Regions changed since ", JM.images.since);
-			JM.images.regions.forEach(function(region) {
-				console.log("\t", region);
-			});
+			console.log("Regions changed since " + JM.images.since + ": " + JM.images.regions.join(", "));
 		}
 
 		for (var tileId in me.loadedTiles) {
@@ -1591,7 +1643,7 @@ var JourneyMap = (function() {
 					me.refreshTile(tile);
 					return false;
 				} else {
-					if (debug) console.log("    tile " + coord + " zoom " + zoom + " not in region: ", tileRegion);
+					//if (debug) console.log("    tile " + coord + " zoom " + zoom + " not in region: ", tileRegion);
 					return true;
 				}
 			});				

@@ -21,11 +21,9 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -311,7 +309,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                           final HeightsCache chunkHeights)
     {
-        throw new NotImplementedException();
+        throw new RuntimeException("Not implemented");
     }
 
     /**

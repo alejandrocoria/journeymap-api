@@ -12,7 +12,6 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.cartography.ColorPalette;
 import journeymap.client.io.FileHandler;
-import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
@@ -55,7 +54,7 @@ public class FileService extends BaseService
     protected final String resourcePath;
     final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
     final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
-    final String ICON_ENTITY_PATH_PREFIX = "/icon/entity/";
+    final String ENTITY_ICON_PREFIX = "/entity_icon";
     final String ICON_THEME_PATH_PREFIX = "/theme/";
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
@@ -160,30 +159,19 @@ public class FileService extends BaseService
                 }
             }
             // Handle entity icon request
-            else if (path.startsWith(ICON_ENTITY_PATH_PREFIX))
+            else if (path.startsWith(ENTITY_ICON_PREFIX))
             {
-                String entityIconPath = path.split(ICON_ENTITY_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File iconFile = new File(IconSetFileHandler.getEntityIconDir(), entityIconPath);
-                if (!iconFile.exists())
+                String location = event.query().parameters().split("location=")[1];
+                BufferedImage image = TextureCache.resolveImage(new ResourceLocation(location));
+                if (image == null)
                 {
-                    // Fallback to jar asset
-                    String setName = entityIconPath.split(File.separator)[0];
-                    String iconPath = entityIconPath.substring(entityIconPath.indexOf(File.separatorChar) + 1);
-
-                    if (event != null)
-                    {
-                        ResponseHeader.on(event).contentType(ContentType.png);
-                    }
-                    fileStream = FileHandler.getIconStream(ICON_ENTITY_PATH_PREFIX, setName, iconPath);
-                    JMLogger.logOnce("Couldn't get file for " + path, null);
+                    JMLogger.logOnce("Path not found: " + path, null);
+                    throwEventException(404, "Unknown: " + path, event, true);
                 }
                 else
                 {
-                    if (event != null)
-                    {
-                        ResponseHeader.on(event).content(iconFile);
-                    }
-                    fileStream = new FileInputStream(iconFile);
+                    ResponseHeader.on(event).contentType(ContentType.png).noCache();
+                    serveImage(event, image);
                 }
             }
             // Handle skin icon request

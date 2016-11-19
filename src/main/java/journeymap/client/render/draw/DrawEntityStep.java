@@ -40,8 +40,8 @@ public class DrawEntityStep implements DrawStep
     boolean hideSneaks;
     boolean showHeading = true;
     Minecraft minecraft = Minecraft.getMinecraft();
-    TextureImpl upperTexture;
-    TextureImpl lowerTexture;
+    TextureImpl entityTexture;
+    TextureImpl locatorTexture;
     WeakReference<EntityLivingBase> entityLivingRef;
     String customName;
     Point2D screenPosition;
@@ -54,7 +54,7 @@ public class DrawEntityStep implements DrawStep
         hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
     }
 
-    public void update(EntityDisplay entityDisplay, TextureImpl locatorTexture, TextureImpl texture, int color, boolean showHeading)
+    public void update(EntityDisplay entityDisplay, TextureImpl locatorTexture, TextureImpl entityTexture, int color, boolean showHeading)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving != null)
@@ -64,8 +64,8 @@ public class DrawEntityStep implements DrawStep
 
         this.useDots = entityDisplay.isDots();
         this.color = color;
-        this.lowerTexture = locatorTexture;
-        this.upperTexture = texture;
+        this.locatorTexture = locatorTexture;
+        this.entityTexture = entityTexture;
         this.drawScale = (entityDisplay == EntityDisplay.SmallIcons) ? .66666666f : 1f;
         this.showHeading = showHeading;
     }
@@ -112,7 +112,7 @@ public class DrawEntityStep implements DrawStep
             if (entityLiving instanceof EntityPlayer)
             {
                 //int blockSize = (int) Math.pow(2, gridRenderer.getZoom());
-                //float labelOffset = upperTexture != null ? upperTexture.getHeight() / blockSize : 0;
+                //float labelOffset = upperTexture != null ? entityTexture.getHeight() / blockSize : 0;
                 drawPlayer(pass, drawX, drawY, gridRenderer, alpha, heading, fontScale, rotation);
             }
             else
@@ -132,20 +132,20 @@ public class DrawEntityStep implements DrawStep
 
         if (pass == Pass.Object)
         {
-            if (lowerTexture != null)
+            if (locatorTexture != null)
             {
-                DrawUtil.drawColoredEntity(drawX, drawY, lowerTexture, color, alpha, drawScale, showHeading ? heading : -rotation);
+                DrawUtil.drawColoredEntity(drawX, drawY, locatorTexture, color, alpha, drawScale, showHeading ? heading : -rotation);
             }
 
-            if (upperTexture != null)
+            if (entityTexture != null)
             {
-                DrawUtil.drawColoredEntity(drawX, drawY, upperTexture, color, alpha, drawScale, heading);
+                DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, heading);
             }
         }
 
         if (pass == Pass.Text)
         {
-            int labelOffset = upperTexture == null ? 0 : rotation == 0 ? -upperTexture.getHeight() / 2 : upperTexture.getHeight() / 2;
+            int labelOffset = entityTexture == null ? 0 : rotation == 0 ? -entityTexture.getHeight() / 2 : entityTexture.getHeight() / 2;
             Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
 
             Team team = entityLiving.getTeam();
@@ -171,13 +171,13 @@ public class DrawEntityStep implements DrawStep
 
         if (pass == Pass.Object)
         {
-            if (lowerTexture != null)
+            if (locatorTexture != null)
             {
-                DrawUtil.drawColoredEntity(drawX, drawY, lowerTexture, color, alpha, drawScale, showHeading ? heading : -rotation);
+                DrawUtil.drawColoredEntity(drawX, drawY, locatorTexture, color, alpha, drawScale, showHeading ? heading : -rotation);
             }
         }
 
-        int labelOffset = upperTexture == null ? 8 : rotation == 0 ? upperTexture.getHeight() : -upperTexture.getHeight();
+        int labelOffset = entityTexture == null ? 8 : rotation == 0 ? entityTexture.getHeight() : -entityTexture.getHeight();
 
         if (pass == Pass.Text)
         {
@@ -190,7 +190,7 @@ public class DrawEntityStep implements DrawStep
 
         if (pass == Pass.Object)
         {
-            if (upperTexture != null)
+            if (entityTexture != null)
             {
                 if (useDots)
                 {
@@ -201,12 +201,12 @@ public class DrawEntityStep implements DrawStep
                         flip = (elevationOffset < -1);
                     }
                     // marker-chevron
-                    DrawUtil.drawColoredEntity(drawX, drawY, upperTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
+                    DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
                 }
                 else
                 {
                     // mob icon
-                    DrawUtil.drawEntity(drawX, drawY, -rotation, upperTexture, alpha, drawScale, 0);
+                    DrawUtil.drawEntity(drawX, drawY, -rotation, entityTexture, alpha, drawScale, 0);
                 }
             }
         }

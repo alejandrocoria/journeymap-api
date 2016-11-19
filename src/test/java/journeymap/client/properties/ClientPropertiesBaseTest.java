@@ -10,11 +10,11 @@ public abstract class ClientPropertiesBaseTest<P extends PropertiesBase> extends
 {
     protected void randomizeMapProperties(MapProperties p)
     {
-        randomize(p.showMobs);
-        randomize(p.showAnimals);
-        randomize(p.showVillagers);
-        randomize(p.showPets);
-        randomize(p.showPlayers);
+//        randomize(p.showMobs);
+//        randomize(p.showAnimals);
+//        randomize(p.showVillagers);
+//        randomize(p.showPets);
+//        randomize(p.showPlayers);
         randomize(p.showWaypoints);
         randomize(p.showSelf);
         randomize(p.showGrid);

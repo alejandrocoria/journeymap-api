@@ -60,38 +60,38 @@ public class AllData extends CacheLoader<Long, Map>
 
         if (!WorldData.isHardcoreAndMultiplayer())
         {
-            if (Journeymap.getClient().getWebMapProperties().showAnimals.get() || Journeymap.getClient().getWebMapProperties().showPets.get())
-            {
-                props.put(Key.animals, cache.getAnimals(false));
-            }
-            else
+//            if (Journeymap.getClient().getWebMapProperties().showAnimals.get() || Journeymap.getClient().getWebMapProperties().showPets.get())
+//            {
+//                props.put(Key.animals, cache.getAnimals(false));
+//            }
+//            else
             {
                 props.put(Key.animals, Collections.emptyMap());
             }
 
-            if (Journeymap.getClient().getWebMapProperties().showMobs.get())
-            {
-                props.put(Key.mobs, cache.getMobs(false));
-            }
-            else
+//            if (Journeymap.getClient().getWebMapProperties().showMobs.get())
+//            {
+//                props.put(Key.mobs, cache.getMobs(false));
+//            }
+//            else
             {
                 props.put(Key.mobs, Collections.emptyMap());
             }
 
-            if (Journeymap.getClient().getWebMapProperties().showPlayers.get())
-            {
-                props.put(Key.players, cache.getPlayers(false));
-            }
-            else
+//            if (Journeymap.getClient().getWebMapProperties().showPlayers.get())
+//            {
+//                props.put(Key.players, cache.getPlayers(false));
+//            }
+//            else
             {
                 props.put(Key.players, Collections.emptyMap());
             }
 
-            if (Journeymap.getClient().getWebMapProperties().showVillagers.get())
-            {
-                props.put(Key.villagers, cache.getVillagers(false));
-            }
-            else
+//            if (Journeymap.getClient().getWebMapProperties().showVillagers.get())
+//            {
+//                props.put(Key.villagers, cache.getVillagers(false));
+//            }
+//            else
             {
                 props.put(Key.villagers, Collections.emptyMap());
             }
