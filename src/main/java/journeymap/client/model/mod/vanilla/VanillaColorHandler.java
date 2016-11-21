@@ -127,7 +127,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 //                getTint(chunkMD, blockMD, blockPos)), .8f);
 
         return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
-                chunkMD.getChunk().getWorld().getBiome(blockPos).getFoliageColorAtPos(blockPos)), .8f);
+                chunkMD.getChunk().getWorld().getBiomeGenForCoords(blockPos).getFoliageColorAtPos(blockPos)), .8f);
     }
 
     /**
@@ -141,7 +141,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
         //return RGB.multiply(0x929292, getTint(chunkMD, blockMD, blockPos));
 
         // TODO: See if this calls into different results than current approach
-        return RGB.multiply(0x929292, chunkMD.getChunk().getWorld().getBiome(blockPos).getGrassColorAtPos(blockPos));
+        return RGB.multiply(0x929292, chunkMD.getChunk().getWorld().getBiomeGenForCoords(blockPos).getGrassColorAtPos(blockPos));
     }
 
     /**

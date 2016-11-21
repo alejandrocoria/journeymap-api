@@ -444,7 +444,7 @@ public enum ForgeHelper
         }
 
         // 1.10.2
-        public Biome getBiome(BlockPos pos)
+        public Biome getBiomeGenForCoords(BlockPos pos)
         {
             ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
             if (chunkMD != null && chunkMD.hasChunk())
@@ -463,35 +463,32 @@ public enum ForgeHelper
                 {
                     Journeymap.getLogger().error("Error in getBiome(): " + throwable);
                     // 1.10.2
-                    return ForgeHelper.INSTANCE.getWorld().getBiome(pos);
+                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(pos);
                 }
             }
             else
             {
                 // 1.10.2
-                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeProvider().getBiomeGenerator(pos, Biomes.PLAINS);
             }
         }
 
         // Does not exist in 1.10.2
-//        @Override
-//        public boolean extendedLevelsInChunkCache()
-//        {
-//            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
-//        }
-
+        @Override
+        public boolean extendedLevelsInChunkCache()
+        {
+            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+        }
 
         public int getStrongPower(BlockPos pos, EnumFacing direction)
         {
             return ForgeHelper.INSTANCE.getWorld().getStrongPower(pos, direction);
         }
 
-
         public WorldType getWorldType()
         {
             return ForgeHelper.INSTANCE.getWorld().getWorldType();
         }
-
 
         public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default)
         {
