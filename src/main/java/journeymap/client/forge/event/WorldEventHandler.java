@@ -8,6 +8,7 @@
 
 package journeymap.client.forge.event;
 
+import journeymap.client.data.DataCache;
 import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
 import net.minecraftforge.event.world.WorldEvent;
@@ -36,7 +37,17 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void invoke(WorldEvent.Unload event)
     {
-        Journeymap.getClient().stopMapping();
-        FeatureManager.instance().reset();
+        try
+        {
+            if (DataCache.getPlayer().dimension == event.getWorld().provider.getDimension())
+            {
+                Journeymap.getClient().stopMapping();
+                FeatureManager.instance().reset();
+            }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Error handling WorldEvent.Unload", e);
+        }
     }
 }
