@@ -127,7 +127,7 @@ public class RegionLoader
                             List<ChunkPos> chunkCoords = rc.getChunkCoordsInRegion();
                             for (ChunkPos coord : chunkCoords)
                             {
-                                if (anvilChunkLoader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
+                                if (anvilChunkLoader.chunkExists(mc.world, coord.chunkXPos, coord.chunkZPos))
                                 {
                                     stack.add(rc);
                                     break;
@@ -148,7 +148,7 @@ public class RegionLoader
         }
 
         // Add player's current region
-        final RegionCoord playerRc = RegionCoord.fromChunkPos(jmImageWorldDir, mapType, mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ);
+        final RegionCoord playerRc = RegionCoord.fromChunkPos(jmImageWorldDir, mapType, mc.player.chunkCoordX, mc.player.chunkCoordZ);
         if (stack.contains(playerRc))
         {
             stack.remove(playerRc);

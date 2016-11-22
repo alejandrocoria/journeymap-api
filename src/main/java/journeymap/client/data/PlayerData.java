@@ -41,9 +41,9 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
             return true;
         }
 
-        final int posX = MathHelper.floor_double(player.posX);
-        final int posY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(player).minY);
-        final int posZ = MathHelper.floor_double(player.posZ);
+        final int posX = MathHelper.floor(player.posX);
+        final int posY = MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(player).minY);
+        final int posZ = MathHelper.floor(player.posZ);
         final int offset = 1;
 
         boolean isUnderground = true;
@@ -82,7 +82,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
     public EntityDTO load(Class aClass) throws Exception
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        EntityPlayer player = mc.thePlayer;
+        EntityPlayer player = mc.player;
 
         EntityDTO dto = DataCache.INSTANCE.getEntityDTO(player);
         dto.update(player, false);
@@ -106,7 +106,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                 {
                     return biome.getBiomeName();
                 }
-                //return playerChunk.getBiome(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ)).biomeName;
+                //return playerChunk.getBiome(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ)).biomeName;
             }
             catch (Exception e)
             {

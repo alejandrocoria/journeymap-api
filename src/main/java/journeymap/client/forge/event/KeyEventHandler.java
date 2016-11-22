@@ -149,7 +149,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                         if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {
                             Minecraft mc = FMLClientHandler.instance().getClient();
-                            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                            Waypoint waypoint = Waypoint.of(mc.player);
                             UIManager.INSTANCE.openWaypointEditor(waypoint, true, null);
                         }
                         return true;

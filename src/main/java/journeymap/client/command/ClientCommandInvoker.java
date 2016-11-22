@@ -24,23 +24,23 @@ public class ClientCommandInvoker implements ICommand
 
     public ClientCommandInvoker register(ICommand command)
     {
-        commandMap.put(command.getCommandName().toLowerCase(), command);
+        commandMap.put(command.getName().toLowerCase(), command);
         return this;
     }
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "jm";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         StringBuffer sb = new StringBuffer();
         for (ICommand command : commandMap.values())
         {
-            String usage = command.getCommandUsage(sender);
+            String usage = command.getUsage(sender);
             if (!Strings.isEmpty(usage))
             {
                 if (sb.length() > 0)
@@ -54,7 +54,7 @@ public class ClientCommandInvoker implements ICommand
     }
 
     @Override
-    public List<String> getCommandAliases()
+    public List<String> getAliases()
     {
         return Arrays.asList("journeymap");
     }
@@ -75,7 +75,7 @@ public class ClientCommandInvoker implements ICommand
             }
             else
             {
-                sender.addChatMessage(new TextComponentString(getCommandUsage(sender)));
+                sender.sendMessage(new TextComponentString(getUsage(sender)));
             }
         }
         catch (Throwable t)
@@ -93,7 +93,7 @@ public class ClientCommandInvoker implements ICommand
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         try
         {
@@ -101,7 +101,7 @@ public class ClientCommandInvoker implements ICommand
             if (command != null)
             {
                 String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                return command.getTabCompletionOptions(server, sender, subArgs, pos);
+                return command.getTabCompletions(server, sender, subArgs, pos);
             }
         }
         catch (Throwable t)

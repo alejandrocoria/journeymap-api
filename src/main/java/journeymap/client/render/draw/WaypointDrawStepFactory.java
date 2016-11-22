@@ -35,7 +35,7 @@ public class WaypointDrawStepFactory
     public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance, boolean showLabel)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        EntityPlayer player = mc.thePlayer;
+        EntityPlayer player = mc.player;
         int dimension = player.dimension;
         int maxDistance = Journeymap.getClient().getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;

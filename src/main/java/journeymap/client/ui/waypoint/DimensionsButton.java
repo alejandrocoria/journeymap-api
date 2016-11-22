@@ -33,7 +33,7 @@ class DimensionsButton extends Button
 
         if (needInit || currentWorldProvider != null)
         {
-            currentWorldProvider = new WorldData.WrappedProvider(FMLClientHandler.instance().getClient().thePlayer.worldObj.provider);
+            currentWorldProvider = new WorldData.WrappedProvider(FMLClientHandler.instance().getClient().player.world.provider);
             needInit = false;
         }
         updateLabel();

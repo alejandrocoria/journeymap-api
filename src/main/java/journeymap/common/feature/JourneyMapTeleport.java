@@ -43,20 +43,20 @@ public class JourneyMapTeleport
 
             if (mcServer == null)
             {
-                entity.addChatMessage(new TextComponentString("Cannot Find World"));
+                entity.sendMessage(new TextComponentString("Cannot Find World"));
                 return false;
             }
 
             destinationWorld = mcServer.worldServerForDimension(location.getDim());
             if (!entity.isEntityAlive())
             {
-                entity.addChatMessage(new TextComponentString("Cannot teleport when dead."));
+                entity.sendMessage(new TextComponentString("Cannot teleport when dead."));
                 return false;
             }
 
             if (destinationWorld == null)
             {
-                entity.addChatMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
+                entity.sendMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
                 return false;
             }
 
@@ -71,7 +71,7 @@ public class JourneyMapTeleport
             }
             else
             {
-                entity.addChatMessage(new TextComponentString("Server has disabled JourneyMap teleporting."));
+                entity.sendMessage(new TextComponentString("Server has disabled JourneyMap teleporting."));
                 return false;
             }
         }
@@ -80,7 +80,7 @@ public class JourneyMapTeleport
 
     private static boolean teleportEntity(MinecraftServer server, World destinationWorld, Entity entity, Location location, float yaw)
     {
-        World startWorld = entity.worldObj;
+        World startWorld = entity.world;
         boolean changedWorld = startWorld != destinationWorld;
         PlayerList playerList = server.getPlayerList();
 
@@ -92,7 +92,7 @@ public class JourneyMapTeleport
             if (changedWorld)
             {
                 player.dimension = location.getDim();
-                player.connection.sendPacket(new SPacketRespawn(player.dimension, player.worldObj.getDifficulty(), destinationWorld.getWorldInfo().getTerrainType(), player.interactionManager.getGameType()));
+                player.connection.sendPacket(new SPacketRespawn(player.dimension, player.world.getDifficulty(), destinationWorld.getWorldInfo().getTerrainType(), player.interactionManager.getGameType()));
                 playerList.updatePermissionLevel(player);
                 startWorld.removeEntityDangerously(player);
                 player.isDead = false;
@@ -126,7 +126,7 @@ public class JourneyMapTeleport
     private static void transferPlayerToWorld(Entity entity, WorldServer toWorldIn)
     {
         entity.setLocationAndAngles(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D, entity.rotationYaw, entity.rotationPitch);
-        toWorldIn.spawnEntityInWorld(entity);
+        toWorldIn.spawnEntity(entity);
         toWorldIn.updateEntityWithOptionalForce(entity, false);
         entity.setWorld(toWorldIn);
     }

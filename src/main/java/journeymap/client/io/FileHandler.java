@@ -86,9 +86,9 @@ public class FileHandler
             {
                 File savesDir = new File(getMinecraftDirectory(), "saves");
                 File worldSaveDir = new File(savesDir, minecraft.getIntegratedServer().getFolderName());
-                if (minecraft.theWorld.provider.getSaveFolder() != null)
+                if (minecraft.world.provider.getSaveFolder() != null)
                 {
-                    File dir = new File(worldSaveDir, minecraft.theWorld.provider.getSaveFolder());
+                    File dir = new File(worldSaveDir, minecraft.world.provider.getSaveFolder());
                     dir.mkdirs();
                     return dir;
                 }
@@ -175,7 +175,7 @@ public class FileHandler
 
     public static File getJMWorldDir(Minecraft minecraft)
     {
-        if (minecraft.theWorld == null)
+        if (minecraft.world == null)
         {
             return null;
         }
@@ -192,7 +192,7 @@ public class FileHandler
 
     public static synchronized File getJMWorldDir(Minecraft minecraft, String worldId)
     {
-        if (minecraft.theWorld == null)
+        if (minecraft.world == null)
         {
             theLastWorld = null;
 
@@ -290,13 +290,13 @@ public class FileHandler
             throw new RuntimeException(e);
         }
 
-        theLastWorld = minecraft.theWorld;
+        theLastWorld = minecraft.world;
         return worldDirectory;
     }
 
     public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
     {
-        if (minecraft==null || minecraft.theWorld == null)
+        if (minecraft == null || minecraft.world == null)
         {
             return null;
         }

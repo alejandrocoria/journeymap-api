@@ -124,10 +124,10 @@ public class WaypointEditor extends JmUI
 
             // Update player pos
             String pos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
-                    MathHelper.floor_double(mc.thePlayer.posX),
-                    MathHelper.floor_double(mc.thePlayer.posZ),
-                    MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY),
-                    MathHelper.floor_double(mc.thePlayer.chunkCoordY));
+                    MathHelper.floor(mc.player.posX),
+                    MathHelper.floor(mc.player.posZ),
+                    MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.player).minY),
+                    MathHelper.floor(mc.player.chunkCoordY));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())
@@ -158,7 +158,7 @@ public class WaypointEditor extends JmUI
 
                 int y = originalWaypoint.getY();
                 fieldY = new TextField(y < 0 ? "" : y, fr, width3chars, h, true, true);
-                fieldY.setClamp(0, mc.theWorld.getHeight() - 1);
+                fieldY.setClamp(0, mc.world.getHeight() - 1);
                 fieldY.setMinLength(1);
                 fieldList.add(fieldY);
 
@@ -658,7 +658,7 @@ public class WaypointEditor extends JmUI
         editedWaypoint.setEnable(buttonEnable.getToggled());
         editedWaypoint.setName(fieldName.getText());
 
-        editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.thePlayer.dimension);
+        editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.player.dimension);
     }
 
     protected int getSafeColorInt(TextField field)

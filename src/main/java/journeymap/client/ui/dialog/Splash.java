@@ -129,7 +129,7 @@ public class Splash extends JmUI
         bottomButtons = new ButtonList(buttonOptions, buttonDonate);
 
         // Show the close button if not in Forge mod Config mode with no game running
-        if (mc.theWorld != null)
+        if (mc.world != null)
         {
             bottomButtons.add(buttonClose);
         }

@@ -69,7 +69,7 @@ public abstract class BaseMapTask implements ITask
 
         try
         {
-            if (mc.theWorld == null)
+            if (mc.world == null)
             {
                 this.complete(count, true, false);
                 return;
@@ -90,7 +90,7 @@ public abstract class BaseMapTask implements ITask
                 return;
             }
 
-            ChunkPos playerChunk = new ChunkPos(FMLClientHandler.instance().getClient().thePlayer.getPosition());
+            ChunkPos playerChunk = new ChunkPos(FMLClientHandler.instance().getClient().player.getPosition());
 
             // Map the chunks
             while (chunkIter.hasNext())

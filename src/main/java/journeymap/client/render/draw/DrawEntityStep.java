@@ -84,7 +84,7 @@ public class DrawEntityStep implements DrawStep
         {
             if (entityLiving == null
                     || entityLiving.isDead
-                    || entityLiving.isInvisibleToPlayer(minecraft.thePlayer)
+                    || entityLiving.isInvisibleToPlayer(minecraft.player)
                     || !entityLiving.addedToChunk
                     || (hideSneaks && entityLiving.isSneaking()))
             {
@@ -104,9 +104,9 @@ public class DrawEntityStep implements DrawStep
             double drawY = screenPosition.getY() + yOffset;
 
             float alpha = 1f;
-            if (entityLiving.posY > minecraft.thePlayer.posY)
+            if (entityLiving.posY > minecraft.player.posY)
             {
-                alpha = 1f - Math.max(.1f, (float) ((entityLiving.posY - minecraft.thePlayer.posY) / 32f));
+                alpha = 1f - Math.max(.1f, (float) ((entityLiving.posY - minecraft.player.posY) / 32f));
             }
 
             if (entityLiving instanceof EntityPlayer)

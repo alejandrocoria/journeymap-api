@@ -21,7 +21,6 @@ import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.io.nbt.RegionLoader;
@@ -65,7 +64,7 @@ public class MapRegionTask extends BaseMapTask
 
     public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, MapType mapType, Minecraft minecraft)
     {
-        final World world = minecraft.theWorld;
+        final World world = minecraft.world;
 
         final List<ChunkPos> renderCoords = rCoord.getChunkCoordsInRegion();
         final List<ChunkPos> retainedCoords = new ArrayList<ChunkPos>(renderCoords.size());

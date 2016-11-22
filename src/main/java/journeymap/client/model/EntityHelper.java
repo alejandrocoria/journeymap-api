@@ -52,8 +52,8 @@ public class EntityHelper
         Minecraft mc = FMLClientHandler.instance().getClient();
         List<EntityDTO> list = new ArrayList();
 
-        List<Entity> allEntities = new ArrayList<Entity>(mc.theWorld.loadedEntityList);
-        AxisAlignedBB bb = getBB(mc.thePlayer);
+        List<Entity> allEntities = new ArrayList<Entity>(mc.world.loadedEntityList);
+        AxisAlignedBB bb = getBB(mc.player);
 
         try
         {
@@ -78,7 +78,7 @@ public class EntityHelper
             if (list.size() > maxEntities)
             {
                 int before = list.size();
-                entityDTODistanceComparator.player = mc.thePlayer;
+                entityDTODistanceComparator.player = mc.player;
                 Collections.sort(list, entityDTODistanceComparator);
                 list = list.subList(0, maxEntities);
             }
@@ -142,13 +142,13 @@ public class EntityHelper
         timer.start();
 
         Minecraft mc = FMLClientHandler.instance().getClient();
-        List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.theWorld.playerEntities);
-        allPlayers.remove(mc.thePlayer);
+        List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.world.playerEntities);
+        allPlayers.remove(mc.player);
 
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();
         if (allPlayers.size() > max)
         {
-            entityDistanceComparator.player = mc.thePlayer;
+            entityDistanceComparator.player = mc.player;
             Collections.sort(allPlayers, entityDistanceComparator);
             allPlayers = allPlayers.subList(0, max);
         }

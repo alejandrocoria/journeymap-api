@@ -117,7 +117,7 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap1PreviewButton = new CheckBox(name, false);
                 minimap1PreviewButton.setTooltip(tooltip);
-                if (FMLClientHandler.instance().getClient().theWorld == null)
+                if (FMLClientHandler.instance().getClient().world == null)
                 {
                     minimap1PreviewButton.setEnabled(false);
                 }
@@ -129,7 +129,7 @@ public class OptionsManager extends JmUI
                 String tooltip = Constants.getString("jm.minimap.preview.tooltip");
                 minimap2PreviewButton = new CheckBox(name, false);
                 minimap2PreviewButton.setTooltip(tooltip);
-                if (FMLClientHandler.instance().getClient().theWorld == null)
+                if (FMLClientHandler.instance().getClient().world == null)
                 {
                     minimap2PreviewButton.setEnabled(false);
                 }
@@ -208,7 +208,7 @@ public class OptionsManager extends JmUI
 
                         if (category == ClientCategory.MiniMap1)
                             {
-                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                if (FMLClientHandler.instance().getClient().world != null)
                                 {
                                     categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
                                 }
@@ -219,7 +219,7 @@ public class OptionsManager extends JmUI
                             }
                         else if (category == ClientCategory.MiniMap2)
                             {
-                                if (FMLClientHandler.instance().getClient().theWorld != null)
+                                if (FMLClientHandler.instance().getClient().world != null)
                                 {
                                     categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
                                 }
@@ -313,7 +313,7 @@ public class OptionsManager extends JmUI
             }
 
             // No world if Forge has opened this class directly as a config UI
-            if (mc.theWorld != null)
+            if (mc.world != null)
             {
                 updateRenderStats();
             }
@@ -694,7 +694,7 @@ public class OptionsManager extends JmUI
         Journeymap.getClient().saveConfigProperties();
 
         // No world if Forge has opened this class directly as a config UI
-        if (mc.theWorld != null)
+        if (mc.world != null)
         {
             // Ensure minimap is back to the one used before this opened
             UIManager.INSTANCE.getMiniMap().setMiniMapProperties(Journeymap.getClient().getMiniMapProperties(this.inGameMinimapId));

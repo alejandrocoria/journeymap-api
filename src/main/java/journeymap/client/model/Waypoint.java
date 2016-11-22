@@ -180,7 +180,7 @@ public class Waypoint implements Serializable
 
     public static Waypoint of(EntityPlayer player)
     {
-        BlockPos blockPos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+        BlockPos blockPos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
         return at(blockPos, Type.Normal, ForgeHelper.INSTANCE.getPlayerDimension());
     }
 
@@ -359,7 +359,7 @@ public class Waypoint implements Serializable
 
     public int getX()
     {
-        if (mc != null && mc.thePlayer != null && mc.thePlayer.dimension == -1)
+        if (mc != null && mc.player != null && mc.player.dimension == -1)
         {
             return x / 8;
         }
@@ -383,7 +383,7 @@ public class Waypoint implements Serializable
 
     public int getZ()
     {
-        if (mc != null && mc.thePlayer != null && mc.thePlayer.dimension == -1)
+        if (mc != null && mc.player != null && mc.player.dimension == -1)
         {
             return z / 8;
         }

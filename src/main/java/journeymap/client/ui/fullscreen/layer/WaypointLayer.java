@@ -79,7 +79,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         }
 
         AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
-                blockCoord.getX() + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.getZ() + proximity);
+                blockCoord.getX() + proximity, mc.world.getActualHeight() + 1, blockCoord.getZ() + proximity);
 
         if (!lastCoord.equals(blockCoord))
         {
@@ -105,7 +105,7 @@ public class WaypointLayer implements LayerDelegate.Layer
             return drawStepList;
         }
 
-        int dimension = mc.thePlayer.dimension;
+        int dimension = mc.player.dimension;
 
         // check for existing
         Collection<Waypoint> waypoints = DataCache.INSTANCE.getWaypoints(false);
@@ -161,7 +161,7 @@ public class WaypointLayer implements LayerDelegate.Layer
             else
             {
                 // Create waypoint
-                Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.thePlayer.dimension);
+                Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.player.dimension);
                 UIManager.INSTANCE.openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
             }
         }

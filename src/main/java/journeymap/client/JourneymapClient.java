@@ -457,7 +457,7 @@ public class JourneymapClient implements CommonProxy
         {
             Minecraft mc = FMLClientHandler.instance().getClient();
 
-            if (mc == null || mc.theWorld == null || !initialized || !coreProperties.mappingEnabled.get())
+            if (mc == null || mc.world == null || !initialized || !coreProperties.mappingEnabled.get())
             {
                 return;
             }
@@ -522,7 +522,7 @@ public class JourneymapClient implements CommonProxy
 
             if (mc != null)
             {
-                int dimension = mc.theWorld != null ? ForgeHelper.INSTANCE.getDimension() : 0;
+                int dimension = mc.world != null ? ForgeHelper.INSTANCE.getDimension() : 0;
                 ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
             }
         }

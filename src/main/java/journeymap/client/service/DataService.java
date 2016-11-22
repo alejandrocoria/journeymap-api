@@ -95,7 +95,7 @@ public class DataService extends BaseService
                 }
                 else
                 {
-                    if (FMLClientHandler.instance().getClient().theWorld == null)
+                    if (FMLClientHandler.instance().getClient().world == null)
                     {
                         throwEventException(503, "World not connected", event, false);
                     }

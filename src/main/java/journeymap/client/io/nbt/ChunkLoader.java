@@ -36,9 +36,9 @@ public class ChunkLoader
             // Check for the region file on disk first so the loader doesn't create empty region files
             if (RegionLoader.getRegionFile(mc, coord.chunkXPos, coord.chunkZPos).exists())
             {
-                if (loader.chunkExists(mc.theWorld, coord.chunkXPos, coord.chunkZPos))
+                if (loader.chunkExists(mc.world, coord.chunkXPos, coord.chunkZPos))
                 {
-                    Chunk chunk = loader.loadChunk(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+                    Chunk chunk = loader.loadChunk(mc.world, coord.chunkXPos, coord.chunkZPos);
                     if (chunk != null)
                     {
                         if (!chunk.isLoaded())

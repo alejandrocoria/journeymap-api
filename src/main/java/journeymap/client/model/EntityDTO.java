@@ -73,7 +73,7 @@ public class EntityDTO implements Serializable
     public void update(EntityLivingBase entity, boolean hostile)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().thePlayer;
+        EntityPlayer currentPlayer = FMLClientHandler.instance().getClient().player;
         this.dimension = entity.dimension;
         this.posX = entity.posX;
         this.posY = entity.posY;
@@ -103,7 +103,7 @@ public class EntityDTO implements Serializable
             this.username = name;
             try
             {
-                ScorePlayerTeam team = mc.theWorld.getScoreboard().getPlayersTeam(this.username);
+                ScorePlayerTeam team = mc.world.getScoreboard().getPlayersTeam(this.username);
                 if (team != null)
                 {
                     playerColor = team.getChatFormat().getColorIndex();

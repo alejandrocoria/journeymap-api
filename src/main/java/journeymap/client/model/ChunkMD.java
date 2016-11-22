@@ -358,7 +358,7 @@ public class ChunkMD
         {
             synchronized (this)
             {
-                return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+                return ChunkLoader.getChunkMdFromMemory(mc.world, coord.chunkXPos, coord.chunkZPos);
             }
         }
     }

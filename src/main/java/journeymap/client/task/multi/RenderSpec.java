@@ -54,7 +54,7 @@ public class RenderSpec
 
     private RenderSpec(Minecraft minecraft, MapType mapType)
     {
-        this.player = minecraft.thePlayer;
+        this.player = minecraft.player;
         final CoreProperties props = Journeymap.getClient().getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
         int mapRenderDistanceMin = mapType.isUnderground() ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
@@ -72,14 +72,15 @@ public class RenderSpec
         this.maxSecondaryRenderDistance = rdMax;
         this.revealShape = Journeymap.getClient().getCoreProperties().revealShape.get();
 
-        lastPlayerCoord = new ChunkPos(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkPos(minecraft.player.chunkCoordX, minecraft.player.chunkCoordZ);
         lastSecondaryRenderDistance = this.primaryRenderDistance;
     }
 
     private static Double blockDistance(ChunkPos playerCoord, ChunkPos coord)
     {
-        int x = playerCoord.getCenterXPos() - coord.getCenterXPos();
-        int z = playerCoord.getCenterZPosition() - coord.getCenterZPosition();
+        //(this.chunkXPos << 4) + 8
+        int x = ((playerCoord.chunkXPos << 4) + 8) - ((coord.chunkXPos << 4) + 8);
+        int z = ((playerCoord.chunkZPos << 4) + 8) - ((coord.chunkZPos << 4) + 8);
         return Math.sqrt(x * x + z * z);
     }
 
@@ -143,8 +144,8 @@ public class RenderSpec
     public static RenderSpec getSurfaceSpec()
     {
         if (lastSurfaceRenderSpec == null
-                || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
-                || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+                || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
+                || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.day(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastSurfaceRenderSpec);
@@ -156,8 +157,8 @@ public class RenderSpec
     public static RenderSpec getTopoSpec()
     {
         if (lastTopoRenderSpec == null
-                || lastTopoRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
-                || lastTopoRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+                || lastTopoRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
+                || lastTopoRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.topo(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastTopoRenderSpec);
@@ -169,8 +170,8 @@ public class RenderSpec
     public static RenderSpec getUndergroundSpec()
     {
         if (lastUndergroundRenderSpec == null
-                || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
-                || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
+                || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
+                || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.underground(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastUndergroundRenderSpec);
@@ -202,7 +203,7 @@ public class RenderSpec
             primaryRenderCoords = null;
             lastSecondaryRenderDistance = primaryRenderDistance;
         }
-        lastPlayerCoord = new ChunkPos(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkPos(minecraft.player.chunkCoordX, minecraft.player.chunkCoordZ);
 
         // Add min distance coords around player
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())

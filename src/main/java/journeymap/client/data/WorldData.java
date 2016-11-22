@@ -129,7 +129,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         else
         {
-            worldName = mc.theWorld.getWorldInfo().getWorldName();
+            worldName = mc.world.getWorldInfo().getWorldName();
             String serverName = getServerName();
 
             if (serverName == null)
@@ -197,7 +197,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
-            WorldProvider playerProvider = FMLClientHandler.instance().getClient().thePlayer.worldObj.provider;
+            WorldProvider playerProvider = FMLClientHandler.instance().getClient().player.world.provider;
             int dimId = ForgeHelper.INSTANCE.getDimension();
             DimensionProvider playerDimProvider = new WrappedProvider(playerProvider);
             dimProviders.put(dimId, playerDimProvider);
@@ -298,7 +298,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     public WorldData load(Class aClass) throws Exception
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        WorldInfo worldInfo = mc.theWorld.getWorldInfo();
+        WorldInfo worldInfo = mc.world.getWorldInfo();
 
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
@@ -307,7 +307,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         dimension = ForgeHelper.INSTANCE.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
-        time = mc.theWorld.getWorldTime() % 24000L;
+        time = mc.world.getWorldTime() % 24000L;
         features = FeatureManager.getAllowedFeatures();
 
         mod_name = JourneymapClient.MOD_NAME;

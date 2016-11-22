@@ -8,9 +8,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
 /**
  * Created by Mysticdrew on 9/15/2016.
  */
@@ -24,13 +21,13 @@ public class CommandJTP extends CommandBase
     }
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "jtp";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         return "/jtp <x y z dim>";
     }
@@ -41,7 +38,7 @@ public class CommandJTP extends CommandBase
 
         if (args.length < 4)
         {
-            throw new CommandException(this.getCommandUsage(sender));
+            throw new CommandException(this.getUsage(sender));
         }
         Entity player = getCommandSenderAsPlayer(sender);
         try
@@ -55,11 +52,11 @@ public class CommandJTP extends CommandBase
         }
         catch (NumberFormatException nfe)
         {
-            throw new CommandException("Numbers only! Usage: " + this.getCommandUsage(sender) + nfe);
+            throw new CommandException("Numbers only! Usage: " + this.getUsage(sender) + nfe);
         }
         catch (Exception e)
         {
-            throw new CommandException("/jtp failed Usage: " + this.getCommandUsage(sender));
+            throw new CommandException("/jtp failed Usage: " + this.getUsage(sender));
         }
     }
 }

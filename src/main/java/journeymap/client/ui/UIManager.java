@@ -118,7 +118,7 @@ public enum UIManager
     {
         logger.debug("Opening inventory");
         closeAll();
-        minecraft.displayGuiScreen(new GuiInventory(minecraft.thePlayer)); // displayGuiScreen
+        minecraft.displayGuiScreen(new GuiInventory(minecraft.player)); // displayGuiScreen
     }
 
     public <T extends JmUI> T open(Class<T> uiClass, JmUI returnDisplay)

@@ -298,7 +298,7 @@ public class ModInfo
         map.put(Payload.Parameter.ScreenResolution, displayMode.getWidth() + "x" + displayMode.getHeight());
 
         StringBuilder desc = new StringBuilder(Loader.MC_VERSION);
-        if (minecraft.theWorld != null)
+        if (minecraft.world != null)
         {
             IntegratedServer server = minecraft.getIntegratedServer();
             boolean multiplayer = server == null || server.getPublic();

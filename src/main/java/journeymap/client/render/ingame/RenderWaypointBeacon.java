@@ -59,7 +59,7 @@ public class RenderWaypointBeacon
 
             Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
             //allTimer.start();
-            final int playerDim = mc.thePlayer.dimension;
+            final int playerDim = mc.player.dimension;
             for (Waypoint wp : waypoints)
             {
                 if (wp.isEnable() && wp.getDimensions().contains(playerDim))
@@ -306,14 +306,14 @@ public class RenderWaypointBeacon
         GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0);
         //GlStateManager.depthMask(false);
 
-        float time = (float) mc.theWorld.getTotalWorldTime();
+        float time = (float) mc.world.getTotalWorldTime();
         if (mc.isGamePaused())
         {
             // Show rotation for Waypoint Options UI
             time = Minecraft.getSystemTime() / 50;
         }
 
-        float texOffset = -(-time * 0.2F - (float) MathHelper.floor_float(-time * 0.1F)) * .6f;
+        float texOffset = -(-time * 0.2F - (float) MathHelper.floor(-time * 0.1F)) * .6f;
 
         if (rotatingBeam)
         {

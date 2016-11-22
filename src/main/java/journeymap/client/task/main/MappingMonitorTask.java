@@ -39,7 +39,7 @@ public class MappingMonitorTask implements IMainThreadTask
 
             final boolean isDead = mc.currentScreen != null && mc.currentScreen instanceof GuiGameOver;
 
-            if (mc.theWorld == null)
+            if (mc.world == null)
             {
                 if (jm.isMapping())
                 {
@@ -60,9 +60,9 @@ public class MappingMonitorTask implements IMainThreadTask
 
                 return this;
             }
-            else if (lastDimension != mc.thePlayer.dimension)
+            else if (lastDimension != mc.player.dimension)
             {
-                lastDimension = mc.thePlayer.dimension;
+                lastDimension = mc.player.dimension;
                 if (jm.isMapping())
                 {
                     jm.stopMapping();

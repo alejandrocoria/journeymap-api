@@ -362,17 +362,17 @@ public class GridRenderer
         double deltaX = ((centerPixelX - pixel.x) / uiState.blockSize);
         double deltaZ = ((centerPixelZ - (lastHeight - pixel.y)) / uiState.blockSize);
 
-        int x = MathHelper.floor_double(centerBlockX - deltaX);
-        int z = MathHelper.floor_double(centerBlockZ + deltaZ);
+        int x = MathHelper.floor(centerBlockX - deltaX);
+        int z = MathHelper.floor(centerBlockZ + deltaZ);
 
         int y = 0;
         if (DataCache.getPlayer().underground)
         {
-            y = MathHelper.floor_double(DataCache.getPlayer().posY);
+            y = MathHelper.floor(DataCache.getPlayer().posY);
         }
         else
         {
-            y = FMLClientHandler.instance().getClient().theWorld.getSeaLevel();
+            y = FMLClientHandler.instance().getClient().world.getSeaLevel();
         }
 
         return new BlockPos(x, y, z);
@@ -664,7 +664,7 @@ public class GridRenderer
         if (isActive)
         {
             // Pad the BB by two chunks
-            int worldHeight = FMLClientHandler.instance().getClient().theWorld.getActualHeight();
+            int worldHeight = FMLClientHandler.instance().getClient().world.getActualHeight();
             int pad = 32;
 
             BlockPos upperLeft = getBlockAtPixel(new Point2D.Double(screenBounds.getMinX(), screenBounds.getMinY()));

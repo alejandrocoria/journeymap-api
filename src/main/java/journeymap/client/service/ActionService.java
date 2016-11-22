@@ -59,7 +59,7 @@ public class ActionService extends BaseService
 
         // Check world
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        World theWorld = minecraft.theWorld;
+        World theWorld = minecraft.world;
         if (theWorld == null)
         {
             throwEventException(503, "World not connected", event, false);
@@ -102,7 +102,7 @@ public class ActionService extends BaseService
         Query query = event.query();
 
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        World theWorld = minecraft.theWorld;
+        World theWorld = minecraft.world;
 
 
         try

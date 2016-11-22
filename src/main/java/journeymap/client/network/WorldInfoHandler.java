@@ -105,9 +105,9 @@ public class WorldInfoHandler
     {
         if (event.getEntity() instanceof EntityPlayerMP)
         {
-            if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
+            if (!mc.isSingleplayer() && mc.player != null && !mc.player.isDead)
             {
-                if (ForgeHelper.INSTANCE.getEntityName(event.getEntity()).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
+                if (ForgeHelper.INSTANCE.getEntityName(event.getEntity()).equals(ForgeHelper.INSTANCE.getEntityName(mc.player)))
                 {
                     requestWorldID();
                 }

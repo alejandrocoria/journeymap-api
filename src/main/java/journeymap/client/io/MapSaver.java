@@ -136,7 +136,7 @@ public class MapSaver
             final boolean isUnderground = mapType.isUnderground();
             final StringBuilder sb = new StringBuilder(date).append("_");
             sb.append(WorldData.getWorldName(mc, false)).append("_");
-            sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.theWorld.provider))).append("_");
+            sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.world.provider))).append("_");
             if (isUnderground)
             {
                 sb.append("slice").append(mapType.dimension);

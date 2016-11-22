@@ -85,7 +85,7 @@ public class WaypointManager extends JmUI
 
             if (buttonSortDistance == null)
             {
-                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().thePlayer, true);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(FMLClientHandler.instance().getClient().player, true);
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);
@@ -379,7 +379,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonAdd)
         {
-            Waypoint waypoint = Waypoint.of(mc.thePlayer);
+            Waypoint waypoint = Waypoint.of(mc.player);
             UIManager.INSTANCE.openWaypointEditor(waypoint, true, this);
             return;
         }
@@ -481,7 +481,7 @@ public class WaypointManager extends JmUI
         for (Waypoint waypoint : waypoints)
         {
             WaypointManagerItem item = new WaypointManagerItem(waypoint, fr, this);
-            item.getDistanceTo(mc.thePlayer);
+            item.getDistanceTo(mc.player);
             if (currentDim == null || item.waypoint.getDimensions().contains(currentDim))
             {
                 items.add(item);

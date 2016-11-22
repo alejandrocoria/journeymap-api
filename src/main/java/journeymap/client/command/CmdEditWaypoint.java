@@ -25,20 +25,20 @@ public class CmdEditWaypoint implements ICommand
 {
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "wpedit";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         // Users don't need this, it only exists for ClickEvents to work.
         return null;
     }
 
     @Override
-    public List<String> getCommandAliases()
+    public List<String> getAliases()
     {
         return null;
     }
@@ -98,7 +98,7 @@ public class CmdEditWaypoint implements ICommand
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }

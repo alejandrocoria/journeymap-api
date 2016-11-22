@@ -174,7 +174,7 @@ public abstract class JmUI extends GuiScreen
     @Override
     public void drawBackground(int tint)
     {
-        if (this.mc.theWorld == null)
+        if (this.mc.world == null)
         {
             this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         }
@@ -250,7 +250,7 @@ public abstract class JmUI extends GuiScreen
     {
         if (returnDisplay == null)
         {
-            if (mc.theWorld != null)
+            if (mc.world != null)
             {
                 UIManager.INSTANCE.openFullscreenMap();
             }

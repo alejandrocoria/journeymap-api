@@ -31,7 +31,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
@@ -92,7 +91,7 @@ public class MiniMap
 
     public static void updateUIState(boolean isActive)
     {
-        if (FMLClientHandler.instance().getClient().theWorld != null)
+        if (FMLClientHandler.instance().getClient().world != null)
         {
             gridRenderer.updateUIState(isActive);
         }
@@ -102,20 +101,20 @@ public class MiniMap
     {
         gridRenderer.clear();
         state.requireRefresh();
-        if (mc.thePlayer == null || mc.thePlayer.isDead)
+        if (mc.player == null || mc.player.isDead)
         {
             return;
         }
 
         boolean showCaves = shouldShowCaves();
-        state.refresh(mc, mc.thePlayer, miniMapProperties);
+        state.refresh(mc, mc.player, miniMapProperties);
 
         MapType mapType = state.getMapType(showCaves);
 
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), mapType);
-        gridRenderer.center(state.getWorldDir(), mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+        gridRenderer.center(state.getWorldDir(), mapType, mc.player.posX, mc.player.posZ, miniMapProperties.zoomLevel.get());
 
         boolean highQuality = Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get();
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
@@ -163,7 +162,7 @@ public class MiniMap
         try
         {
             // Check player status
-            if (mc.thePlayer == null || mc.thePlayer.isDead)
+            if (mc.player == null || mc.player.isDead)
             {
                 return;
             }
@@ -181,7 +180,7 @@ public class MiniMap
                 gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
                 if (!preview)
                 {
-                    state.refresh(mc, mc.thePlayer, miniMapProperties);
+                    state.refresh(mc, mc.player, miniMapProperties);
                 }
                 ClientAPI.INSTANCE.flagOverlaysForRerender();
             }
@@ -191,7 +190,7 @@ public class MiniMap
             }
 
             // Update the grid
-            boolean moved = gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+            boolean moved = gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.player.posX, mc.player.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
                 boolean showCaves = shouldShowCaves();
@@ -249,7 +248,7 @@ public class MiniMap
                 {
                     if (dv.shape == Shape.Circle)
                     {
-                        rotation = (180 - mc.thePlayer.rotationYawHead);
+                        rotation = (180 - mc.player.rotationYawHead);
                     }
                     break;
                 }
@@ -271,7 +270,7 @@ public class MiniMap
                 gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.fontScale, rotation);
 
                 // Get center of minimap and rect of minimap
-                centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                centerPoint = gridRenderer.getPixel(mc.player.posX, mc.player.posZ);
                 centerRect = new Rectangle2D.Double(centerPoint.x - dv.minimapWidth / 2, centerPoint.y - dv.minimapHeight / 2, dv.minimapWidth, dv.minimapHeight);
 
                 // Draw waypoints
@@ -282,8 +281,8 @@ public class MiniMap
                 {
                     if (centerPoint != null)
                     {
-                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowBg, 0xffffff, 1f, 1f, mc.thePlayer.rotationYawHead);
-                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowFg, playerArrowColor, 1f, 1f, mc.thePlayer.rotationYawHead);
+                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowBg, 0xffffff, 1f, 1f, mc.player.rotationYawHead);
+                        DrawUtil.drawColoredEntity(centerPoint.getX(), centerPoint.getY(), playerArrowFg, playerArrowColor, 1f, 1f, mc.player.rotationYawHead);
                     }
                 }
 
@@ -302,10 +301,10 @@ public class MiniMap
                     else
                     {
                         /***** BEGIN MATRIX: ROTATION *****/
-                        startMapRotation(mc.thePlayer.rotationYawHead);
+                        startMapRotation(mc.player.rotationYawHead);
                         dv.minimapFrame.drawReticle();
                         /***** END MATRIX: ROTATION *****/
-                        stopMapRotation(mc.thePlayer.rotationYawHead);
+                        stopMapRotation(mc.player.rotationYawHead);
                     }
                 }
 
@@ -684,7 +683,7 @@ public class MiniMap
     {
         try
         {
-            if (mc.thePlayer != null && !mc.thePlayer.isDead)
+            if (mc.player != null && !mc.player.isDead)
             {
                 // FPS
                 if (dv.showFps)
@@ -695,10 +694,10 @@ public class MiniMap
                 // Location key
                 if (dv.showLocation)
                 {
-                    final int playerX = MathHelper.floor_double(mc.thePlayer.posX);
-                    final int playerZ = MathHelper.floor_double(mc.thePlayer.posZ);
-                    final int playerY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY);
-                    locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
+                    final int playerX = MathHelper.floor(mc.player.posX);
+                    final int playerZ = MathHelper.floor(mc.player.posZ);
+                    final int playerY = MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.player).minY);
+                    locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY);
                 }
 
                 // Biome key

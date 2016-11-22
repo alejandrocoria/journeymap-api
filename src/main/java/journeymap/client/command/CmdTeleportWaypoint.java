@@ -13,8 +13,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.PacketHandler;
-import journeymap.common.network.model.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerList;
@@ -44,7 +42,7 @@ public class CmdTeleportWaypoint
             GameProfile profile = null;
             try
             {
-                profile = new GameProfile(mc.thePlayer.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.thePlayer));
+                profile = new GameProfile(mc.player.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.player));
                 configurationManager = mcServer.getPlayerList();
 
                 // 1.7
@@ -61,7 +59,7 @@ public class CmdTeleportWaypoint
                     if (profile != null && configurationManager != null)
                     {
                         return mcServer.isSinglePlayer()
-                                && mcServer.worldServers[0].getWorldInfo().areCommandsAllowed()
+                                && mcServer.worlds[0].getWorldInfo().areCommandsAllowed()
                                 && mcServer.getServerOwner().equalsIgnoreCase(profile.getName());
                     }
                     else
@@ -85,20 +83,20 @@ public class CmdTeleportWaypoint
         double z = waypoint.getBlockCenteredZ();
         TreeSet<Integer> dim = (TreeSet<Integer>) waypoint.getDimensions();
 
-        if (dim.first() == -1 && mc.thePlayer.dimension != -1)
+        if (dim.first() == -1 && mc.player.dimension != -1)
         {
             x = x / 8;
             z = z / 8;
         }
-        else if (dim.first() != -1 && mc.thePlayer.dimension == -1)
+        else if (dim.first() != -1 && mc.player.dimension == -1)
         {
             x = (x * 8);
             z = (z * 8);
         }
         if (Journeymap.getClient().isServerEnabled() || FMLClientHandler.instance().getClient().isSingleplayer()) {
-            mc.thePlayer.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
+            mc.player.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
         } else {
-            mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.thePlayer), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+            mc.player.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.player), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
         }
     }
 }

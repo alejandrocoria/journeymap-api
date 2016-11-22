@@ -14,7 +14,6 @@ import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
 import journeymap.common.Journeymap;
@@ -76,31 +75,31 @@ public class MapPlayerTask extends BaseMapTask
         }
         else
         {
-            final long time = playerEntity.worldObj.getWorldInfo().getWorldTime() % 24000L;
+            final long time = playerEntity.world.getWorldInfo().getWorldTime() % 24000L;
             mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
         }
 
         List<ITask> tasks = new ArrayList<ITask>(2);
-        tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, mapType, new ArrayList<ChunkPos>()));
+        tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, mapType, new ArrayList<ChunkPos>()));
 
         if (underground)
         {
             if (Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.day(player), new ArrayList<ChunkPos>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, MapType.day(player), new ArrayList<ChunkPos>()));
             }
         }
         else
         {
             if (cavesAllowed && Journeymap.getClient().getCoreProperties().alwaysMapCaves.get())
             {
-                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.underground(player), new ArrayList<ChunkPos>()));
+                tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, MapType.underground(player), new ArrayList<ChunkPos>()));
             }
         }
 
         if (!underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
         {
-            tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.worldObj, MapType.topo(player), new ArrayList<ChunkPos>()));
+            tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, MapType.topo(player), new ArrayList<ChunkPos>()));
         }
 
         return new MapPlayerTaskBatch(tasks);
@@ -253,7 +252,7 @@ public class MapPlayerTask extends BaseMapTask
         public ITask getTask(Minecraft minecraft)
         {
             // Ensure player chunk is loaded
-            if (enabled && minecraft.thePlayer.addedToChunk)
+            if (enabled && minecraft.player.addedToChunk)
             {
                 if ((System.currentTimeMillis() - lastTaskCompleted) >= mapTaskDelay)
                 {
@@ -283,7 +282,7 @@ public class MapPlayerTask extends BaseMapTask
         @Override
         public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
         {
-            if (mc.thePlayer == null)
+            if (mc.player == null)
             {
                 return;
             }

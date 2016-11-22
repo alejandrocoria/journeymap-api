@@ -23,20 +23,20 @@ public class CmdChatPosition implements ICommand
 {
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "~";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         // todo i18n
         return TextFormatting.AQUA + "~" + TextFormatting.RESET + " : Copy your location into Text";
     }
 
     @Override
-    public List<String> getCommandAliases()
+    public List<String> getAliases()
     {
         return null;
     }
@@ -82,7 +82,7 @@ public class CmdChatPosition implements ICommand
 
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }

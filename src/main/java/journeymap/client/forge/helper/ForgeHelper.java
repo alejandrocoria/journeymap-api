@@ -105,29 +105,29 @@ public enum ForgeHelper
     public int getPlayerDimension()
     {
         // 1.7
-        //return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.dimension;
+        //return FMLClientHandler.instance().getClient().player.world.provider.dimension;
 
         // 1.8
-        return FMLClientHandler.instance().getClient().thePlayer.worldObj.provider.getDimension();
+        return FMLClientHandler.instance().getClient().player.world.provider.getDimension();
     }
 
 
     public boolean hasNoSky(World world)
     {
-        return world.provider.getHasNoSky();
+        return world.provider.hasNoSky();
     }
 
 
     public World getWorld()
     {
-        return FMLClientHandler.instance().getClient().theWorld;
+        return FMLClientHandler.instance().getClient().world;
     }
 //
 //    
 //    public World getWorld(Chunk chunk)
 //    {
 //        // 1.7
-//        // return getChunk().worldObj;
+//        // return getChunk().world;
 //
 //        // 1.8
 //        return chunk.getWorld();

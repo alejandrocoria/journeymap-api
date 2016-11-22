@@ -60,7 +60,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
         mc.mcProfiler.startSection("journeymap");
 
-        if (mc.thePlayer != null && mc.thePlayer.isDead)
+        if (mc.player != null && mc.player.isDead)
         {
             if (!deathpointCreated)
             {
@@ -73,7 +73,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             deathpointCreated = false;
         }
 
-        if (!javaChecked && mc.thePlayer != null && !mc.thePlayer.isDead)
+        if (!javaChecked && mc.player != null && !mc.player.isDead)
         {
             checkJava();
         }
@@ -90,7 +90,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             else if (counter == 10)
             {
                 mc.mcProfiler.startSection("multithreadTasks");
-                if (Journeymap.getClient().isMapping() && mc.theWorld != null)
+                if (Journeymap.getClient().isMapping() && mc.world != null)
                 {
                     Journeymap.getClient().performMultithreadTasks();
                 }
@@ -123,7 +123,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            EntityPlayer player = mc.thePlayer;
+            EntityPlayer player = mc.player;
             if (player == null)
             {
                 Journeymap.getLogger().error("Lost reference to player before Deathpoint could be created");
@@ -134,7 +134,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             boolean enabled = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
             boolean cancelled = false;
 
-            BlockPos pos = new BlockPos(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ));
+            BlockPos pos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
             if (enabled)
             {
                 int dim = ForgeHelper.INSTANCE.getPlayerDimension();

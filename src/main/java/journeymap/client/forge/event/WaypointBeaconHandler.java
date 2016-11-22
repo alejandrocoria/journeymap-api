@@ -40,7 +40,7 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)
     {
-        if (mc.thePlayer != null && Journeymap.getClient().getWaypointProperties().beaconEnabled.get())
+        if (mc.player != null && Journeymap.getClient().getWaypointProperties().beaconEnabled.get())
         {
             if (!this.mc.gameSettings.hideGUI)
             {

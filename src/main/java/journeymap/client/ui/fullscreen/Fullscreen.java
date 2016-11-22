@@ -119,7 +119,7 @@ public class Fullscreen extends JmUI
         super(null);
         mc = FMLClientHandler.instance().getClient();
         fullMapProperties = Journeymap.getClient().getFullMapProperties();
-        state.refresh(mc, mc.thePlayer, fullMapProperties);
+        state.refresh(mc, mc.player, fullMapProperties);
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
         gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
@@ -149,7 +149,7 @@ public class Fullscreen extends JmUI
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
-        if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)
+        if (state.getCurrentMapType().dimension != mc.player.dimension)
         {
             gridRenderer.clear();
         }
@@ -553,7 +553,7 @@ public class Fullscreen extends JmUI
         }
 
         // Update toggles
-        boolean notNether = !(mc.theWorld.provider instanceof WorldProviderHell);
+        boolean notNether = !(mc.world.provider instanceof WorldProviderHell);
         buttonDay.setEnabled(notNether);
         buttonNight.setEnabled(notNether);
         buttonTopo.setEnabled(notNether);
@@ -853,7 +853,7 @@ public class Fullscreen extends JmUI
             }
             else
             {
-                Waypoint waypoint = Waypoint.of(mc.thePlayer);
+                Waypoint waypoint = Waypoint.of(mc.player);
                 UIManager.INSTANCE.openWaypointEditor(waypoint, true, null);
             }
             return;
@@ -970,7 +970,7 @@ public class Fullscreen extends JmUI
 
             if (state.follow.get())
             {
-                gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+                gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.player.posX, mc.player.posZ, fullMapProperties.zoomLevel.get());
             }
             gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
             gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
@@ -979,16 +979,16 @@ public class Fullscreen extends JmUI
 
             if (fullMapProperties.showSelf.get())
             {
-                Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                Point2D playerPixel = gridRenderer.getPixel(mc.player.posX, mc.player.posZ);
                 if (playerPixel != null)
                 {
                     boolean large = fullMapProperties.playerDisplay.get().isLarge();
                     TextureImpl bgTex = large ? TextureCache.getTexture(TextureCache.PlayerArrowBG_Large) : TextureCache.getTexture(TextureCache.PlayerArrowBG);
                     TextureImpl fgTex = large ? TextureCache.getTexture(TextureCache.PlayerArrow_Large) : TextureCache.getTexture(TextureCache.PlayerArrow);
-                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, bgTex, 0xffffff, 1f, 1f, mc.thePlayer.rotationYawHead);
+                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, bgTex, 0xffffff, 1f, 1f, mc.player.rotationYawHead);
 
                     int playerColor = coreProperties.getColor(coreProperties.colorSelf);
-                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, fgTex, playerColor, 1f, 1f, mc.thePlayer.rotationYawHead);
+                    DrawUtil.drawColoredEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, fgTex, playerColor, 1f, 1f, mc.player.rotationYawHead);
                 }
             }
 
@@ -1022,7 +1022,7 @@ public class Fullscreen extends JmUI
 
     public void centerOn(Waypoint waypoint)
     {
-        if (waypoint.getDimensions().contains(mc.thePlayer.dimension))
+        if (waypoint.getDimensions().contains(mc.player.dimension))
         {
             state.follow.set(false);
             state.requireRefresh();
@@ -1047,7 +1047,7 @@ public class Fullscreen extends JmUI
         {
             BlockPos pos = waypoint.getBlockPos();
 
-            PolygonOverlay polygonOverlay = new PolygonOverlay(Journeymap.MOD_ID, waypoint.getName(), mc.thePlayer.dimension,
+            PolygonOverlay polygonOverlay = new PolygonOverlay(Journeymap.MOD_ID, waypoint.getName(), mc.player.dimension,
                     new ShapeProperties().setStrokeColor(0x0000ff).setStrokeOpacity(1f).setStrokeWidth(1.5f),
                     new MapPolygon(pos.add(-1, 0, 2), pos.add(2, 0, 2), pos.add(2, 0, -1), pos.add(-1, 0, -1)));
 
@@ -1069,7 +1069,7 @@ public class Fullscreen extends JmUI
     void refreshState()
     {
         // Check player status
-        EntityPlayer player = mc.thePlayer;
+        EntityPlayer player = mc.player;
         if (player == null)
         {
             logger.warn("Could not get player");
@@ -1083,7 +1083,7 @@ public class Fullscreen extends JmUI
         fullMapProperties = Journeymap.getClient().getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
 
-        if (state.getCurrentMapType().dimension != mc.thePlayer.dimension)
+        if (state.getCurrentMapType().dimension != mc.player.dimension)
         {
             setFollow(true);
         }
@@ -1093,7 +1093,7 @@ public class Fullscreen extends JmUI
         // Center core renderer
         if (state.follow.get())
         {
-            gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+            gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.player.posX, mc.player.posZ, fullMapProperties.zoomLevel.get());
         }
         else
         {
@@ -1109,10 +1109,10 @@ public class Fullscreen extends JmUI
         // Update player pos
         LocationFormat.LocationFormatKeys locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
         state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
-                MathHelper.floor_double(mc.thePlayer.posX),
-                MathHelper.floor_double(mc.thePlayer.posZ),
-                MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY),
-                mc.thePlayer.chunkCoordY) + " " + state.getPlayerBiome();
+                MathHelper.floor(mc.player.posX),
+                MathHelper.floor(mc.player.posZ),
+                MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.player).minY),
+                mc.player.chunkCoordY) + " " + state.getPlayerBiome();
 
         // Reset timer
         state.updateLastRefresh();
