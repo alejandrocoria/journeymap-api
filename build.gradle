@@ -21,13 +21,6 @@ apply plugin: 'com.matthewprenger.cursegradle'
 ext {
     srcWebDir = "src/main/resources/assets/journeymap/web/"
     implSrc = "build/resources/java/journeymap/feature/impl/"
-    sharedManifest = manifest {
-        attributes = [
-                "Implementation-Title": "JourneyMap",
-                "Implementation-Version": project.version,
-                "Implementation-URL"  : "http://journeymap.info"
-        ]
-    }
 }
 
 sourceCompatibility = 1.8
@@ -92,7 +85,6 @@ processResources() {
                 'date': getDate(),
                 'mcversion': project.minecraft.version,
                 'forgeversion': project.forge_version,
-                'jmedition': project.unlimited,
                 'apiversion': project.journeymap_api_version
     }
     // copy everything else, thats not the mcmod.info
@@ -110,7 +102,6 @@ task processDocs(type: Copy) {
                 'date': getDate(),
                 'mcversion': project.minecraft.version,
                 'forgeversion': project.forge_version,
-                'jmedition': project.unlimited,
                 'apiversion': project.journeymap_api_version
     }
     into 'build/doc'
@@ -154,7 +145,7 @@ task minifyJs(type: JavaExec, dependsOn: filter) {
     {
         arg(value: "${srcWebDir}js/journeymap.js")
         arg(value: "-o")
-        arg(value: "tmp/journeymap.js")
+        arg(value: "build/tmp/journeymap.js")
     }
 }
 
@@ -163,94 +154,39 @@ task minifyCss(type: JavaExec, dependsOn: filter) {
     {
         arg(value: "${srcWebDir}css/journeymap.css")
         arg(value: "-o")
-        arg(value: "tmp/journeymap.css")
+        arg(value: "build/tmp/journeymap.css")
     }
 }
 
-task deleteNoRadar(type: Delete) {
-    delete '${implSrc}NoRadar.java'
-}
-
-task deleteUnlimited(type: Delete) {
-    delete '${implSrc}Unlimited.java'
-}
-
-task unlimitedJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar']) {
-    version = "${version}-${project.unlimited}".toLowerCase()
-
-    from(sourceSets.main.output) {
-        duplicatesStrategy = 'exclude'
-        exclude("journeymap/client/feature/impl/NoRadar.class")
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'license.txt','mcmod.info'
-        expand 'version': project.version,
-                'date': getDate(),
-                'mcversion': project.minecraft.version,
-                'forgeversion': project.forge_version,
-                'jmedition': project.unlimited,
-                'apiversion': project.journeymap_api_version
-    }
-
-    manifest = project.manifest {
-        from sharedManifest
+/* Jar manifest */
+jar {
+    dependsOn 'processDocs', 'includeJars', 'copyCss'
+    manifest {
+        attributes = [
+                "Manifest-Version"      : "1.0",
+                "Implementation-Title"  : "JourneyMap",
+                "Implementation-Version": project.version,
+                "Implementation-URL"    : "http://journeymap.info"
+        ]
     }
 }
 
-task unlimitedSolder(type: Zip, dependsOn: 'unlimitedJar') {
+task solderZip(type: Zip, dependsOn: 'jar') {
     baseName = "[solder]${archivesBaseName}"
-    version = "${version}-${project.unlimited}".toLowerCase()
     from("build/libs") {
         into("mods")
-        include("*unlimited.jar")
+        include("*.jar")
     }
 
-}
-
-task fairPlaySolder(type: Zip, dependsOn: 'fairPlayJar') {
-    baseName = "[solder]${archivesBaseName}"
-    version = "${version}-${project.fairplay}".toLowerCase()
-    from("build/libs") {
-        into("mods")
-        include("*fairplay.jar")
-    }
-}
-
-task fairPlayJar(type: Jar, dependsOn: ['processDocs', 'includeJars', 'copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
-    version = "${version}-${project.fairplay}".toLowerCase()
-
-    from(sourceSets.main.output) {
-        exclude("journeymap/client/feature/impl/Unlimited.class")
-        exclude("journeymap/client/feature/impl/NoRadar.class")
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'license.txt','mcmod.info'
-        expand 'version': project.version,
-                'date': getDate(),
-                'mcversion': project.minecraft.version,
-                'forgeversion': project.forge_version,
-                'jmedition': project.fairplay,
-                'apiversion': project.journeymap_api_version
-    }
 }
 
 artifacts {
-    archives unlimitedJar
-    archives unlimitedSolder
-    archives fairPlayJar
-    archives fairPlaySolder
+    archives jar
+    archives solderZip
 }
 
 reobf {
-    unlimitedJar {}
-    fairPlayJar {}
-}
-
-task makePretty(type: Delete) {
-    delete "build/libs/${archivesBaseName}-${version}.jar"
-    delete '/tmp/'
+    jar
 }
 
 def getDate() {
@@ -258,8 +194,6 @@ def getDate() {
     def formattedDate = date.format(project.dateFormat)
     return formattedDate
 }
-
-build.dependsOn makePretty
 
 // Automated upload to CurseForge for the win!
 if (!project.hasProperty("curseForgeApiKey")) {
@@ -276,19 +210,12 @@ curseforge {
             tool 'journeymap-tools'
         }
 
-        mainArtifact(unlimitedJar) {
+        mainArtifact(jar) {
             displayName = "${archivesBaseName}-${version}"
             changelog = file('/build/doc/changelog.html')
         }
 
-        addArtifact(fairPlayJar) {
-        }
-
-        addArtifact(fairPlaySolder) {
-            changelog = file('/build/doc/solder.html')
-        }
-
-        addArtifact(unlimitedSolder) {
+        addArtifact(solderZip) {
             changelog = file('/build/doc/solder.html')
         }
     }
