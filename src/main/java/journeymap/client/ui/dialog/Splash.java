@@ -9,7 +9,6 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
@@ -60,7 +59,7 @@ public class Splash extends JmUI
 
     public Splash(JmUI returnDisplay)
     {
-        super(Constants.getString("jm.common.splash_title", JourneymapClient.EDITION), returnDisplay);
+        super(Constants.getString("jm.common.splash_title", Journeymap.JM_VERSION), returnDisplay);
 
         // Get splash strings
         info = FileHandler.getMessageModel(SplashInfo.class, "splash");

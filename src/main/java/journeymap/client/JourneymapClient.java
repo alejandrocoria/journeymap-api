@@ -15,7 +15,6 @@ import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
-import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
@@ -67,8 +66,8 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
-    public static final String EDITION = getEdition();
-    public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + EDITION;
+    public static final String FULL_VERSION = Journeymap.FORGE_VERSION + "-" + Journeymap.JM_VERSION;
+    public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
     private boolean serverEnabled = false;
     private boolean serverTeleportEnabled = false;
 
@@ -99,26 +98,6 @@ public class JourneymapClient implements CommonProxy
      */
     public JourneymapClient()
     {
-    }
-
-    /**
-     * Build the edition string.
-     *
-     * @return
-     */
-    private static String getEdition()
-    {
-        String ed;
-        try
-        {
-            ed = Journeymap.JM_VERSION + " " + FeatureManager.getPolicySetName();
-        }
-        catch (Throwable t)
-        {
-            ed = Journeymap.JM_VERSION + " ?";
-            t.printStackTrace(System.err);
-        }
-        return ed;
     }
 
     /**
@@ -338,7 +317,7 @@ public class JourneymapClient implements CommonProxy
             VersionCheck.getVersionAvailable();
 
             // ModInfo with a single ping
-            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, getEdition(), false);
+            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, false);
             modInfo.reportAppView();
 
             // threadLogging = getLogger().isTraceEnabled();
