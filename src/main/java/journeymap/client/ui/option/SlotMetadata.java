@@ -249,8 +249,18 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         {
             if (button instanceof IConfigFieldHolder)
             {
-                ConfigField configField = ((IConfigFieldHolder) button).getConfigField();
-                configField.setToDefault();
+                try
+                {
+                    ConfigField configField = ((IConfigFieldHolder) button).getConfigField();
+                    if (configField != null)
+                    {
+                        configField.setToDefault();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             button.refresh();
         }
