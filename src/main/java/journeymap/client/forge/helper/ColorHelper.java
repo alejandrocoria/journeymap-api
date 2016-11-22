@@ -159,10 +159,6 @@ public enum ColorHelper
                 break;
             }
         }
-        if (facings.isEmpty())
-        {
-            facings.add(EnumFacing.UP);
-        }
         return getFirstFoundSprite(blockState, facings);
     }
 
@@ -176,11 +172,19 @@ public enum ColorHelper
                 List<BakedQuad> quads = bms.getModelForState(blockState).getQuads(blockState, face, 0);
                 if (!quads.isEmpty())
                 {
-                    if(Journeymap.getLogger().isDebugEnabled())
+                    TextureAtlasSprite sprite = quads.get(0).getSprite();
+                    if (new ResourceLocation(sprite.getIconName()).equals(TextureMap.LOCATION_MISSING_TEXTURE))
                     {
-                        Journeymap.getLogger().info("Using face %s for block color in %s", face, blockState);
+                        continue;
                     }
-                    return quads.get(0).getSprite();
+                    else
+                    {
+                        if (Journeymap.getLogger().isDebugEnabled())
+                        {
+                            Journeymap.getLogger().info("Using face %s for block color in %s", face, blockState);
+                        }
+                        return sprite;
+                    }
                 }
             }
             catch (Exception e)
