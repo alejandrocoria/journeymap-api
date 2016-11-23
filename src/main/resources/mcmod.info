@@ -12,6 +12,8 @@
     "logoFile": "assets/journeymap/ui/img/ico/journeymap144.png",
     "screenshots": [],
     "dependants":[],
+    "dependencies": ["Forge@[${forgeversion},)"],
+    "requiredMods": [],
     "useDependencyInformation": true
   }]
 }
