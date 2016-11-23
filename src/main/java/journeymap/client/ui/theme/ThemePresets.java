@@ -37,7 +37,7 @@ public class ThemePresets
         Theme theme = new Theme();
         theme.name = "Victorian";
         theme.author = "techbrew";
-        theme.directory = "Victorian";
+        theme.directory = "victorian_";
 
         String vicRed = "#A56B46";
         String controlColor = Theme.toHexColor(new Color(132, 125, 102));
@@ -175,7 +175,7 @@ public class ThemePresets
         Theme theme = new Theme();
         theme.name = "Purist";
         theme.author = "techbrew";
-        theme.directory = "Victorian";
+        theme.directory = "victorian_";
 
         String veryDarkGray = Theme.toHexColor(new Color(34, 34, 34));
 

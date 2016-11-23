@@ -87,7 +87,7 @@ public class ThemeFileHandler
             @Override
             public boolean accept(File pathname)
             {
-                return pathname.isDirectory();
+                return pathname.isDirectory() && !pathname.getName().equals("Victorian");
             }
         });
         return themeDirs;
@@ -187,6 +187,11 @@ public class ThemeFileHandler
             TextureCache.purgeThemeImages(TextureCache.themeImages);
         }
 
+        if (FMLClientHandler.instance().getClient() == null || Journeymap.getClient() == null || Journeymap.getClient().getCoreProperties() == null)
+        {
+            return ThemePresets.THEME_VICTORIAN;
+        }
+
         String themeName = Journeymap.getClient().getCoreProperties().themeName.get();
         if (forceReload || currentTheme == null || !themeName.equals(currentTheme.name))
         {
@@ -216,7 +221,13 @@ public class ThemeFileHandler
             {
                 Charset UTF8 = Charset.forName("UTF-8");
                 String json = Files.toString(themeFile, UTF8);
-                return GSON.fromJson(json, Theme.class);
+                Theme theme = GSON.fromJson(json, Theme.class);
+                if ("Victorian".equals(theme.directory))
+                {
+                    // Handle pre-1.11 theme already on disk
+                    theme.directory = ThemePresets.THEME_VICTORIAN.directory;
+                }
+                return theme;
             }
             else if (createIfMissing)
             {
@@ -290,6 +301,19 @@ public class ThemeFileHandler
         try
         {
             pointer = loadDefaultPointer();
+            if ("Victorian".equals(pointer.directory))
+            {
+                // Handle pre-1.11 theme already on disk
+                File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
+                if (defaultThemeFile.delete())
+                {
+                    pointer = loadDefaultPointer();
+                }
+                else
+                {
+                    pointer.directory = ThemePresets.THEME_VICTORIAN.directory;
+                }
+            }
             pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
 
             themeFile = getThemeFile(pointer.directory, pointer.filename);
