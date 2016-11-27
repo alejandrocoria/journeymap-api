@@ -1,5 +1,4 @@
 <h1>JourneyMap ${version} for Minecraft ${mcversion}</h1>
-<p>(FairPlay Edition is available at the bottom of this page under "Additional Files".)</p>
 <p><strong>Requirements:</strong></p>
 <ul>
     <li>Java 8</li>
@@ -18,39 +17,6 @@
 </ul>
 <p><strong>CHANGELOG (${date}):</strong></p>
 <ul>
-    <li>Java 8 is now required. (Java 7 is no longer supported.)</li>
-    <li>Performance enhancements, including less memory use, faster loading, reduced CPU usage. Especially noticable
-        with larger texture
-        packs.
-    </li>
-    <li>New Minimap/Fullscreen Map option: "Mob Display". The new "Dot" option offers a clean look with a way to see mob
-        elevation relative to you.
-        The "Icon" option displays mob icons like older versions of JourneyMap. Use the Options Manager to set your
-        preferences.
-    </li>
-    <li>Mods and Resource Packs can now add their own mob icons.
-        See <a href="http://journeymap.info/Custom_Mob_Icon_Sets">http://journeymap.info/Custom_Mob_Icon_Sets</a> for
-        details.
-    </li>
-    <li>New features/permissions for JourneyMapServer, including Waypoint Teleporting. Server admins can now fine-tune
-        radar and
-        mapping permissions on a per-dimension basis.
-        See <a href="http://journeymap.info/Support">http://journeymap.info/JourneyMapServer</a> for details.
-    </li>
-    <li>JourneyMap is no longer built twice as FairPlay and Unlimited Editions. If you're in singleplayer, use the
-        Options Manager to turn off features you don't want. If you're in multiplayer, your server admin can use
-        JourneyMapServer to turn off features they don't want.
-    </li>
-    <li>Improved support for coloring blocks in some mods like AbyssalCraft that use Material.GRASS but don't inherit
-        from Block.grass.
-    </li>
-    <li>Normal surface/cave mapping is now supported in dimensions without a sky, instead of just cave mapping.
-    </li>
-    <li>Web Map simplified to simply show player location and waypoints. Mob radar no longer supported.
-    </li>
-    <li>Bugfix: Lag from overzealous logging on texturepack changes or unloading dimensions.
-    </li>
-    <li>Bugfix: Mapping would stop/start when a dimension unloaded that the player wasn't even in. (For example, when
-        pushing a mob through a Nether portal, the Nether would load/unload.)
-    </li>
+    <li>Critical Bugfix: Pressing the Reset button in Options Manager / Minimap could crash the game.</li>
+    <li>Rebuild for latest Forge compatibility (1.11 only)</li>
 </ul>
