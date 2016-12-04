@@ -1,6 +1,7 @@
 package journeymap.server.events;
 
 import journeymap.common.Journeymap;
+import journeymap.common.feature.JourneyMapTeleport;
 import journeymap.common.network.PacketHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.DimensionProperties;
@@ -74,15 +75,25 @@ public class ForgeEvents
     {
         if ((event.player instanceof EntityPlayerMP) && (event.player != null))
         {
-
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
             {
                 PacketHandler.sendPlayerWorldID((EntityPlayerMP) event.player);
             }
 
-            if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get()) {
+            if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get())
+            {
                 InitLogin init = new InitLogin();
-                init.setTeleportEnabled(PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get());
+                boolean canPlayerTeleport;
+                if (JourneyMapTeleport.isOp(player))
+                {
+                    canPlayerTeleport = true;
+                }
+                else
+                {
+                    canPlayerTeleport = PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get();
+                }
+                init.setTeleportEnabled(canPlayerTeleport);
                 PacketHandler.sendLoginPacket((EntityPlayerMP) event.player, init);
             }
 
