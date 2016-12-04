@@ -141,7 +141,7 @@ public class JourneyMapTeleport
         return false;
     }
 
-    private static boolean isOp(EntityPlayerMP player)
+    public static boolean isOp(EntityPlayerMP player)
     {
         String[] ops = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOppedPlayerNames();
         for (String opName : ops)
