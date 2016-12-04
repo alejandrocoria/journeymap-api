@@ -722,13 +722,11 @@ public class JourneymapClient implements CommonProxy
 
     public boolean isServerTeleportEnabled()
     {
-        logger.info("uhh hi " + this.serverTeleportEnabled);
         return serverTeleportEnabled;
     }
 
     public void setServerTeleportEnabled(boolean serverTeleportEnabled)
     {
-        logger.info("setting it to " + serverTeleportEnabled);
         this.serverTeleportEnabled = serverTeleportEnabled;
     }
 }

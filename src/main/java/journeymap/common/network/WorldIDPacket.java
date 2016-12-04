@@ -76,7 +76,7 @@ public class WorldIDPacket implements IMessage
         {
             Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
             Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
-            Journeymap.getClient().setServerEnabled(true);
+//            Journeymap.getClient().setServerEnabled(true);
             return null;
         }
     }
