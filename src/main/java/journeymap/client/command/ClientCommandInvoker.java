@@ -10,10 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import org.apache.logging.log4j.core.helpers.Strings;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Delegates /jm commands
@@ -56,7 +53,7 @@ public class ClientCommandInvoker implements ICommand
     @Override
     public List<String> getAliases()
     {
-        return Arrays.asList("journeymap");
+        return Collections.<String>emptyList();
     }
 
     @Override
