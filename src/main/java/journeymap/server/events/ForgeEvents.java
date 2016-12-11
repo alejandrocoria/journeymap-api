@@ -75,38 +75,26 @@ public class ForgeEvents
     {
         if ((event.player instanceof EntityPlayerMP) && (event.player != null))
         {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
             {
                 PacketHandler.sendPlayerWorldID((EntityPlayerMP) event.player);
             }
 
+            InitLogin init = new InitLogin();
+
             if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get())
             {
-                InitLogin init = new InitLogin();
-                boolean canPlayerTeleport;
-                if (JourneyMapTeleport.isOp(player))
-                {
-                    canPlayerTeleport = true;
-                }
-                else
-                {
-                    canPlayerTeleport = PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get();
-                }
-                init.setTeleportEnabled(canPlayerTeleport);
-                PacketHandler.sendLoginPacket((EntityPlayerMP) event.player, init);
+                init.setTeleportEnabled(true);
             }
-
-            if (isOp((EntityPlayerMP) event.player))
+            else if (isOp((EntityPlayerMP) event.player))
             {
-                //TODO: send op ui packet
-//                System.out.println("PLAYER IS OPS");
+                init.setTeleportEnabled(true);
             }
             else
             {
-                //TODO: sendplayer logged in packet(worldid)
-//                System.out.println("NOT OP");
+                init.setTeleportEnabled(false);
             }
+            PacketHandler.sendLoginPacket((EntityPlayerMP) event.player, init);
         }
     }
 
