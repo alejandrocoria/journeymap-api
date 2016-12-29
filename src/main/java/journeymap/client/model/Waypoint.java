@@ -19,6 +19,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointGroupStore;
+import journeymap.client.waypoint.WaypointParser;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -519,14 +520,19 @@ public class Waypoint implements Serializable
     public String toChatString()
     {
         boolean useName = !(getName().equals(String.format("%s, %s", getX(), getZ())));
+        return toChatString(useName);
+    }
+
+    public String toChatString(boolean useName)
+    {
         boolean useDim = dimensions.first() != 0;
 
         List<String> parts = new ArrayList<String>();
         List<Object> args = new ArrayList<Object>();
         if (useName)
         {
-            parts.add("name:%s");
-            args.add(getName().replaceAll(",", " "));
+            parts.add("name:\"%s\"");
+            args.add(getName().replaceAll("\"", " "));
         }
 
         parts.add("x:%s, y:%s, z:%s");
@@ -541,7 +547,16 @@ public class Waypoint implements Serializable
         }
 
         String format = "[" + Joiner.on(", ").join(parts) + "]";
-        return String.format(format, args.toArray());
+        String result = String.format(format, args.toArray());
+        if (WaypointParser.parse(result) == null)
+        {
+            Journeymap.getLogger().warn("Couldn't produce parsable chat string from Waypoint: " + this);
+            if (useName)
+            {
+                return toChatString(false);
+            }
+        }
+        return result;
     }
 
     @Override
