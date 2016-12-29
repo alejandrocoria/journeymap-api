@@ -139,7 +139,22 @@ public class DrawEntityStep implements DrawStep
 
             if (entityTexture != null)
             {
-                DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, heading);
+                if (useDots)
+                {
+                    boolean flip = false;
+                    elevationOffset = (int) (DataCache.getPlayer().posY - entityLiving.posY);
+                    if (elevationOffset < -1 || elevationOffset > 1)
+                    {
+                        flip = (elevationOffset < -1);
+                        // marker-chevron
+                        DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
+                    }
+
+                }
+                else
+                {
+                    DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, heading);
+                }
             }
         }
 
@@ -199,9 +214,9 @@ public class DrawEntityStep implements DrawStep
                     if (elevationOffset < -1 || elevationOffset > 1)
                     {
                         flip = (elevationOffset < -1);
+                        // marker-chevron
+                        DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
                     }
-                    // marker-chevron
-                    DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
                 }
                 else
                 {
