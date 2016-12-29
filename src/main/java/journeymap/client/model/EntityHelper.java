@@ -220,6 +220,7 @@ public class EntityHelper
             Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
 
             ResourceLocation original = null;
+
             // Manually handle horses
             if (entityRender instanceof RenderHorse)
             {
@@ -234,6 +235,12 @@ public class EntityHelper
             if (original == null)
             {
                 JMLogger.logOnce("Can't get entityTexture for " + entity.getClass() + " via " + entityRender.getClass(), null);
+                return null;
+            }
+
+            if (!(original.getResourcePath().contains("/entity/")))
+            {
+                //JMLogger.logOnce(original + " doesn't have /entity/ in path, so can't look for /entity_icon/", null);
                 return null;
             }
 
