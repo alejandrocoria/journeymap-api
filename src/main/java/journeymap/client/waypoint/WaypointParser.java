@@ -7,13 +7,13 @@ import net.minecraft.util.text.*;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -22,7 +22,8 @@ import java.util.regex.Pattern;
  */
 public class WaypointParser
 {
-    public static Pattern PATTERN = Pattern.compile("\\[(\\w+\\s*:\\s*-?[\\w\\d\\s]+,\\s*)+(\\w+\\s*:\\s*-?[\\w\\d\\s]+)\\]", Pattern.CASE_INSENSITIVE);
+    public static String[] QUOTES = {"'", "\""};
+    public static Pattern PATTERN = Pattern.compile("(\\w+\\s*:\\s*-?[\\w\\d\\s'\"]+,\\s*)+(\\w+\\s*:\\s*-?[\\w\\d\\s'\"]+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Returns the substrings of line which can become waypoints.
@@ -33,22 +34,57 @@ public class WaypointParser
     public static List<String> getWaypointStrings(String line)
     {
         List<String> list = null;
-        if (line.contains("["))
+        String[] candidates = StringUtils.substringsBetween(line, "[", "]");
+        if (candidates != null)
         {
-            Matcher matcher = PATTERN.matcher(line);
-            while (matcher.find())
+            for (String candidate : candidates)
             {
-                String original = matcher.group();
-                if (parse(original) != null)
+                if (PATTERN.matcher(candidate).find())
                 {
-                    if (list == null)
+                    if (parse(candidate) != null)
                     {
-                        list = new ArrayList<String>(1);
+                        if (list == null)
+                        {
+                            list = new ArrayList<>(1);
+                        }
+                        list.add("[" + candidate + "]");
                     }
-                    list.add(original);
                 }
             }
         }
+
+        return list;
+    }
+
+    /**
+     * Returns the substrings of line which can become waypoints.
+     *
+     * @param line text
+     * @return null if none found.
+     */
+    public static List<Waypoint> getWaypoints(String line)
+    {
+        List<Waypoint> list = null;
+        String[] candidates = StringUtils.substringsBetween(line, "[", "]");
+        if (candidates != null)
+        {
+            for (String candidate : candidates)
+            {
+                if (PATTERN.matcher(candidate).find())
+                {
+                    Waypoint waypoint = parse(candidate);
+                    if (waypoint != null)
+                    {
+                        if (list == null)
+                        {
+                            list = new ArrayList<>(1);
+                        }
+                        list.add(waypoint);
+                    }
+                }
+            }
+        }
+
         return list;
     }
 
@@ -58,9 +94,26 @@ public class WaypointParser
      * @param original text
      * @return null if not parsable.
      */
-    public static Waypoint parse(String original)
+    public static Waypoint parse(final String original)
     {
+        String[] quotedVals = null;
         String raw = original.replaceAll("[\\[\\]]", "");
+        for (String quoteChar : QUOTES)
+        {
+            if (raw.contains(quoteChar))
+            {
+                quotedVals = StringUtils.substringsBetween(raw, quoteChar, quoteChar);
+                if (quotedVals != null)
+                {
+                    for (int i = 0; i < quotedVals.length; i++)
+                    {
+                        String val = quotedVals[i];
+                        raw = raw.replaceAll(quoteChar + val + quoteChar, "__TEMP_" + i);
+                    }
+                }
+            }
+        }
+
         Integer x = null;
         Integer y = 63;
         Integer z = null;
@@ -95,13 +148,7 @@ public class WaypointParser
                         }
                         else if ("name".equals(key))
                         {
-                            name = val.replaceAll("\"", "");
-                            // remove matched singlequotes. leave single ones
-                            // assuming they're used as apostrophes
-                            if (name.indexOf("'") != name.lastIndexOf("'"))
-                            {
-                                name = name.replaceAll("'", "");
-                            }
+                            name = val;
                         }
                     }
                     catch (Exception e)
@@ -114,6 +161,15 @@ public class WaypointParser
 
         if (x != null && z != null)
         {
+            if (name != null && quotedVals != null)
+            {
+                for (int i = 0; i < quotedVals.length; i++)
+                {
+                    String val = quotedVals[i];
+                    name = name.replaceAll("__TEMP_" + i, val);
+                }
+            }
+
             if (name == null)
             {
                 name = String.format("%s,%s", x, z);
