@@ -1,7 +1,6 @@
 package journeymap.server.events;
 
 import journeymap.common.Journeymap;
-import journeymap.common.feature.JourneyMapTeleport;
 import journeymap.common.network.PacketHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.DimensionProperties;
@@ -25,7 +24,7 @@ public class ForgeEvents
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
     {
-        if ((event.getEntity() instanceof EntityPlayerMP) && (event.getEntity() != null))
+        if (event.getEntity() instanceof EntityPlayerMP)
         {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
 
@@ -73,7 +72,7 @@ public class ForgeEvents
     @SubscribeEvent
     public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event)
     {
-        if ((event.player instanceof EntityPlayerMP) && (event.player != null))
+        if (event.player instanceof EntityPlayerMP)
         {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
