@@ -171,7 +171,7 @@ public class MiniMap
             gridRenderer.clearGlErrors(false);
 
             // Check state
-            final boolean doStateRefresh = gridRenderer.hasUnloadedTile() || state.shouldRefresh(mc, miniMapProperties);
+            final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties);
 
             // Update the state first
             if (doStateRefresh)

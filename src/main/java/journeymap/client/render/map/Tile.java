@@ -137,12 +137,12 @@ public class Tile
         }
         for (TileDrawStep tileDrawStep : drawSteps)
         {
-            if (!tileDrawStep.hasTexture(mapType))
+            if (tileDrawStep.hasTexture(mapType))
             {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public void clear()
