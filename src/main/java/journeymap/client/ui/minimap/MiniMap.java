@@ -31,7 +31,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
@@ -172,7 +171,7 @@ public class MiniMap
             gridRenderer.clearGlErrors(false);
 
             // Check state
-            final boolean doStateRefresh = gridRenderer.hasUnloadedTile() || state.shouldRefresh(mc, miniMapProperties);
+            final boolean doStateRefresh = state.shouldRefresh(mc, miniMapProperties);
 
             // Update the state first
             if (doStateRefresh)
