@@ -1,6 +1,7 @@
 package journeymap.server.events;
 
 import journeymap.common.Journeymap;
+import journeymap.common.feature.JourneyMapTeleport;
 import journeymap.common.network.PacketHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.DimensionProperties;
