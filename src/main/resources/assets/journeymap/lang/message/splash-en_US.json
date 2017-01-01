@@ -3,24 +3,12 @@
 {
   "lines": [
     {
-      "label": "Performance enhancements! Less memory, faster loading.",
+      "label": "Performance improvements!",
       "action": ""
     },
     {
-      "label": "Minimap: Display Mobs as Dots or Icons.Click to Configure.",
-      "action": "dialog.OptionsManager#MiniMap1"
-    },
-    {
-      "label": "Fullscreen: Display Mobs as Dots or Icons. Click to Configure.",
-      "action": "dialog.OptionsManager#FullMap"
-    },
-    {
-      "label": "New features for Server Admins! Click to read more.",
-      "action": "dialog.FullscreenActions#launchWebsite#JourneyMapServer"
-    },
-    {
-      "label": "Mods/Packs can add mob icons! Click to read more.",
-      "action": "dialog.FullscreenActions#launchWebsite#Custom_Mob_Icon_Sets"
+      "label": "Need help? Click to visit journeymap.info",
+      "action": "dialog.FullscreenActions#launchWebsite#Home"
     }
   ]
 }
