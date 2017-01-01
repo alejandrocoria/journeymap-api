@@ -276,7 +276,7 @@ public enum ColorHelper
             int color = RGB.toInteger(rgba);
             float blockAlpha;
 
-            if (blockMD.hasFlag(BlockMD.Flag.Transparency))
+            if (blockMD.hasTranparency())
             {
                 // Use preset alpha
                 blockAlpha = blockMD.getAlpha();

@@ -32,6 +32,7 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.registry.GameData;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -58,7 +59,18 @@ public class BlockMD implements Comparable<BlockMD>
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
     private boolean useDefaultState;
 
-    public static BlockMD create(IBlockState blockState)
+    private boolean noShadow;
+    private boolean isAir;
+    private boolean isWater;
+    private boolean isLava;
+    private boolean isIce;
+    private boolean isFoliage;
+    private boolean isGrass;
+    private boolean isTransparentRoof;
+    private boolean isPlantOrCrop;
+    private boolean isBiomeColored;
+
+    public static BlockMD create(@Nonnull IBlockState blockState)
     {
         try
         {
@@ -88,7 +100,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Private constructor.
      */
-    private BlockMD(IBlockState blockState)
+    private BlockMD(@Nonnull IBlockState blockState)
     {
         this(blockState, blockState.getBlock().getRegistryName().toString(), BlockMD.getBlockName(blockState), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
     }
@@ -96,7 +108,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Private constructor
      */
-    private BlockMD(IBlockState blockState, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    private BlockMD(@Nonnull IBlockState blockState, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
     {
         this.blockState = blockState;
         this.uid = uid;
@@ -109,6 +121,27 @@ public class BlockMD implements Comparable<BlockMD>
         {
             modBlockDelegate.initialize(this);
         }
+        updateProperties();
+    }
+
+    private void updateProperties()
+    {
+
+        isAir = (blockState == null || hasFlag(Flag.HasAir) || blockState.getBlock() instanceof BlockAir);
+
+        if (blockState != null)
+        {
+            isLava = blockState.getBlock() == Blocks.LAVA || blockState.getBlock() == Blocks.FLOWING_LAVA;
+            isIce = blockState.getBlock() == Blocks.ICE;
+        }
+
+        isWater = hasFlag(Flag.Water);
+        isTransparentRoof = hasFlag(Flag.TransparentRoof);
+        noShadow = hasFlag(Flag.NoShadow);
+        isFoliage = hasFlag(Flag.Foliage);
+        isGrass = hasFlag(Flag.Grass);
+        isPlantOrCrop = hasAnyFlag(FlagsPlantAndCrop);
+        isBiomeColored = hasAnyFlag(FlagsBiomeColored);
     }
 
     public boolean isUseDefaultState()
@@ -337,6 +370,7 @@ public class BlockMD implements Comparable<BlockMD>
     public void addFlags(Flag... addFlags)
     {
         Collections.addAll(this.flags, addFlags);
+        updateProperties();
     }
 
     /**
@@ -345,14 +379,7 @@ public class BlockMD implements Comparable<BlockMD>
     public void addFlags(Collection<Flag> addFlags)
     {
         this.flags.addAll(addFlags);
-    }
-
-    /**
-     * Clear flags
-     */
-    public void clearFlags()
-    {
-        this.flags.clear();
+        updateProperties();
     }
 
     /**
@@ -423,10 +450,7 @@ public class BlockMD implements Comparable<BlockMD>
         }
         else
         {
-            if (this.hasFlag(Flag.Transparency))
-            {
-                this.flags.remove(Flag.Transparency);
-            }
+            this.flags.remove(Flag.Transparency);
         }
     }
 
@@ -437,18 +461,18 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean hasNoShadow()
     {
-        if (hasFlag(Flag.NoShadow))
+        if (noShadow)
         {
             return true;
         }
 
-        return (hasAnyFlag(FlagsPlantAndCrop) && !Journeymap.getClient().getCoreProperties().mapPlantShadows.get());
+        return (isPlantOrCrop && !Journeymap.getClient().getCoreProperties().mapPlantShadows.get());
     }
 
     /**
-     * Gets block.
+     * Gets the blockstate
      *
-     * @return the block
+     * @return the blockstate
      */
     public IBlockState getBlockState()
     {
@@ -462,7 +486,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean hasTranparency()
     {
-        return hasFlag(Flag.Transparency);
+        return alpha < 1f;
     }
 
     /**
@@ -472,14 +496,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isAir()
     {
-        try
-        {
-            return blockState==null || hasFlag(Flag.HasAir) || blockState.getBlock() instanceof BlockAir;
-        }
-        catch (Exception e)
-        {
-            return true;
-        }
+        return isAir;
     }
 
     /**
@@ -489,9 +506,8 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isIce()
     {
-        return blockState.getBlock() == Blocks.ICE;
+        return isIce;
     }
-
 
     /**
      * Is water.
@@ -500,7 +516,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isWater()
     {
-        return hasFlag(Flag.Water);
+        return isWater;
     }
 
     /**
@@ -510,7 +526,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isTransparentRoof()
     {
-        return hasFlag(Flag.TransparentRoof);
+        return isTransparentRoof;
     }
 
     /**
@@ -520,7 +536,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isLava()
     {
-        return blockState.getBlock() == Blocks.LAVA || blockState.getBlock() == Blocks.FLOWING_LAVA;
+        return isLava;
     }
 
     /**
@@ -530,7 +546,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isFoliage()
     {
-        return hasFlag(Flag.Foliage);
+        return isFoliage;
     }
 
     /**
@@ -540,7 +556,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isGrass()
     {
-        return hasFlag(Flag.Grass);
+        return isGrass;
     }
 
     /**
@@ -581,7 +597,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public boolean isBiomeColored()
     {
-        return hasAnyFlag(FlagsBiomeColored);
+        return isBiomeColored;
     }
 
     /**
