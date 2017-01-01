@@ -17,6 +17,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
+import journeymap.client.render.MonitoredBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
@@ -89,7 +90,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      * Render chunk image for caves in the overworld.
      */
     @Override
-    public synchronized boolean render(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
+    public synchronized boolean render(final MonitoredBufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
     {
         if (vSlice == null)
         {
@@ -99,15 +100,18 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
         updateOptions();
         boolean ok = false;
+        MonitoredBufferedImage initialChunkImage = null;
 
         // Surface prepass
         if (mapSurfaceAboveCaves)
         {
             if (!chunkMd.getHasNoSky() && surfaceRenderer != null)
             {
+                initialChunkImage = new MonitoredBufferedImage(chunkImage);
                 ok = surfaceRenderer.render(chunkImage, null, chunkMd, vSlice, true);
                 if (!ok)
                 {
+                    initialChunkImage = null;
                     Journeymap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
                 }
             }
@@ -143,8 +147,16 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             if (!ok)
             {
+                chunkImage.setChanged(false);
                 Journeymap.getLogger().debug("The underground chunk didn't paint: " + chunkMd.toString());
             }
+
+            // If prepass was done, this is a workaround to determine whether the final result is different.
+            if (ok && initialChunkImage != null)
+            {
+                chunkImage.setChanged(!chunkImage.identicalTo(initialChunkImage));
+            }
+
             return ok;
         }
         finally

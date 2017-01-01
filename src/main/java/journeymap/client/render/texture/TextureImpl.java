@@ -10,6 +10,7 @@ package journeymap.client.render.texture;
 
 import com.google.common.base.Objects;
 import journeymap.client.task.main.ExpireTextureTask;
+import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -18,12 +19,16 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
 {
-    private final ReentrantLock bufferLock = new ReentrantLock();
+    protected final ReentrantLock bufferLock = new ReentrantLock();
     protected BufferedImage image;
     protected boolean retainImage;
     protected int width;
@@ -33,6 +38,7 @@ public class TextureImpl extends AbstractTexture
     protected long lastBound;
     protected String description;
     protected ResourceLocation resourceLocation;
+    protected List<WeakReference<Listener>> listeners = new ArrayList<>(0);
 
     protected ByteBuffer buffer;
     protected boolean bindNeeded;
@@ -147,6 +153,7 @@ public class TextureImpl extends AbstractTexture
             bufferLock.unlock();
         }
         this.lastImageUpdate = System.currentTimeMillis();
+        notifyListeners();
     }
 
     /**
@@ -163,16 +170,14 @@ public class TextureImpl extends AbstractTexture
 
         if (bufferLock.tryLock())
         {
+            if (glTextureId > -1)
+            {
+                MapPlayerTask.addTempDebugMessage("tex" + glTextureId, "Updating: " + getDescription());
+            }
+
             try
             {
-//                int oldGlid = glTextureId;
                 GlStateManager.bindTexture(super.getGlTextureId());
-//                if(oldGlid!=glTextureId)
-//                {
-//                    Journeymap.getLogger().info(String.format("%s GLID %s -> %s", this, oldGlid, glTextureId));
-//                }
-
-                //Send texel data to OpenGL
 
                 // Setup wrap mode
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
@@ -182,6 +187,7 @@ public class TextureImpl extends AbstractTexture
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
+                // Texture
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
                 int glErr = GL11.glGetError();
@@ -204,10 +210,6 @@ public class TextureImpl extends AbstractTexture
             {
                 bufferLock.unlock();
             }
-        }
-        else
-        {
-            //System.out.println("Missed binding, will try later");
         }
     }
 
@@ -392,5 +394,50 @@ public class TextureImpl extends AbstractTexture
     public void setAlpha(float alpha)
     {
         this.alpha = alpha;
+    }
+
+    public void addListener(Listener addedListener)
+    {
+        Iterator<WeakReference<Listener>> iter = listeners.iterator();
+        while (iter.hasNext())
+        {
+            WeakReference<Listener> ref = iter.next();
+            Listener listener = ref.get();
+            if (listener == null)
+            {
+                iter.remove();
+            }
+            else
+            {
+                if (addedListener == listener)
+                {
+                    return;
+                }
+            }
+        }
+        this.listeners.add(new WeakReference<>(addedListener));
+    }
+
+    protected void notifyListeners()
+    {
+        Iterator<WeakReference<Listener>> iter = listeners.iterator();
+        while (iter.hasNext())
+        {
+            WeakReference<Listener> ref = iter.next();
+            Listener listener = ref.get();
+            if (listener == null)
+            {
+                iter.remove();
+            }
+            else
+            {
+                listener.textureImageUpdated(this);
+            }
+        }
+    }
+
+    public static interface Listener<T extends TextureImpl>
+    {
+        void textureImageUpdated(T textureImpl);
     }
 }

@@ -10,6 +10,7 @@ package journeymap.client.cartography;
 
 import journeymap.client.cartography.render.*;
 import journeymap.client.model.*;
+import journeymap.client.render.MonitoredBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import org.apache.logging.log4j.Level;
@@ -96,7 +97,7 @@ public class ChunkRenderController
             RegionImageSet regionImageSet = RegionImageCache.INSTANCE.getRegionImageSet(rCoord);
             if (mapType.isUnderground())
             {
-                BufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);
+                MonitoredBufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (chunkSliceImage != null)
                 {
                     switch (rCoord.dimension)
@@ -127,7 +128,7 @@ public class ChunkRenderController
             {
                 if (mapType.isTopo())
                 {
-                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                    MonitoredBufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
                     renderOkay = topoRenderer.render(imageTopo, chunkMd, null);
                     if (renderOkay)
                     {
@@ -137,8 +138,8 @@ public class ChunkRenderController
                 }
                 else
                 {
-                    BufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
-                    BufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
+                    MonitoredBufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
+                    MonitoredBufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
                     renderOkay = overWorldSurfaceRenderer.render(imageDay, imageNight, chunkMd);
                     if (renderOkay)
                     {
