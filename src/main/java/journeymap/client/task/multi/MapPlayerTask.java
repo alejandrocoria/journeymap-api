@@ -8,15 +8,17 @@
 
 package journeymap.client.task.multi;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
+import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -36,6 +38,11 @@ public class MapPlayerTask extends BaseMapTask
     private static volatile long lastTaskCompleted;
     private static long lastTaskTime;
     private static double lastTaskAvgChunkTime;
+    private static Cache<String, String> tempDebugLines = CacheBuilder.newBuilder()
+            .maximumSize(20)
+            .expireAfterWrite(1500, TimeUnit.MILLISECONDS)
+            .build();
+
     private final int maxRuntime = Journeymap.getClient().getCoreProperties().renderDelay.get() * 3000;
     private int scheduledChunks = 0;
     private long startNs;
@@ -110,19 +117,21 @@ public class MapPlayerTask extends BaseMapTask
     {
         try
         {
-            ArrayList<String> lines = new ArrayList<String>(3);
+            final CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
+            final boolean underground = DataCache.getPlayer().underground;
+            ArrayList<String> lines = new ArrayList<>(tempDebugLines.asMap().values());
 
-            if (DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapCaves.get())
+            if (underground || coreProperties.alwaysMapCaves.get())
             {
                 lines.add(RenderSpec.getUndergroundSpec().getDebugStats());
             }
 
-            if (!DataCache.getPlayer().underground || Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
+            if (!underground || coreProperties.alwaysMapSurface.get())
             {
                 lines.add(RenderSpec.getSurfaceSpec().getDebugStats());
             }
 
-            if (!DataCache.getPlayer().underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
+            if (!underground && coreProperties.mapTopography.get())
             {
                 lines.add(RenderSpec.getTopoSpec().getDebugStats());
             }
@@ -134,6 +143,19 @@ public class MapPlayerTask extends BaseMapTask
             logger.error(t);
             return new String[0];
         }
+    }
+
+    public static void addTempDebugMessage(String key, String message)
+    {
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo)
+        {
+            tempDebugLines.put(key, message);
+        }
+    }
+
+    public static void removeTempDebugMessage(String key)
+    {
+        tempDebugLines.invalidate(key);
     }
 
     public static String getSimpleStats()

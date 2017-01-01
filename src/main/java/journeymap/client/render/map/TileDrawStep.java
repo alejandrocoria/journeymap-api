@@ -14,23 +14,25 @@ import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.texture.RegionTextureImpl;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.Callable;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
  * Draw a map tile via the grid renderer.
  */
-public class TileDrawStep
+public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
 {
     private static final Integer bgColor = 0x222222;
     private static final Logger logger = Journeymap.getLogger();
@@ -49,8 +51,9 @@ public class TileDrawStep
     private final RegionImageSet.Key regionImageSetKey;
     private int sx1, sy1, sx2, sy2;
     private volatile TextureImpl scaledTexture;
-    private volatile Future<TextureImpl> regionFuture;
+    private volatile Future<RegionTextureImpl> regionFuture;
     private volatile Future<TextureImpl> scaledFuture;
+    private volatile boolean needsScaledUpdate;
     private int lastTextureFilter;
     private int lastTextureWrap;
 
@@ -90,7 +93,7 @@ public class TileDrawStep
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
         boolean regionUpdatePending = updateRegionTexture();
-        if (highQuality)
+        if (highQuality && !regionUpdatePending)
         {
             updateScaledTexture();
         }
@@ -279,21 +282,20 @@ public class TileDrawStep
         ImageHolder imageHolder = getRegionTextureHolder();
         if (imageHolder.hasTexture())
         {
-            if (imageHolder.getTexture().isBindNeeded())
+            RegionTextureImpl tex = imageHolder.getTexture();
+            tex.addListener(this);
+            if (tex.isBindNeeded())
             {
-                imageHolder.getTexture().bindTexture();
+                tex.bindTexture();
             }
             updateRegionTimer.stop();
             return false;
         }
 
-        regionFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
-        {
-            @Override
-            public TextureImpl call() throws Exception
-            {
-                return getRegionTextureHolder().getTexture();
-            }
+        regionFuture = TextureCache.scheduleTextureTask(() -> {
+            RegionTextureImpl tex = getRegionTextureHolder().getTexture();
+            tex.addListener(this);
+            return tex;
         });
 
         updateRegionTimer.stop();
@@ -326,30 +328,24 @@ public class TileDrawStep
             return false;
         }
 
+        //TODO: Only update the scaled image for a matching chunk
+
         if (scaledTexture == null)
         {
-            scaledFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
-            {
-                @Override
-                public TextureImpl call() throws Exception
-                {
-                    TextureImpl temp = new TextureImpl(null, getScaledRegionArea(), false, false);
-                    temp.setDescription("scaled for " + TileDrawStep.this);
-                    return temp;
-                }
+            needsScaledUpdate = false;
+            scaledFuture = TextureCache.scheduleTextureTask(() -> {
+                TextureImpl temp = new TextureImpl(null, getScaledRegionArea(), false, false);
+                temp.setDescription("Scaled " + TileDrawStep.this);
+                return temp;
             });
         }
-        else if (scaledTexture.getLastImageUpdate() < getRegionTextureHolder().getImageTimestamp())
+        else if (needsScaledUpdate)
         {
+            needsScaledUpdate = false;
             final TextureImpl temp = scaledTexture;
-            scaledFuture = TextureCache.scheduleTextureTask(new Callable<TextureImpl>()
-            {
-                @Override
-                public TextureImpl call() throws Exception
-                {
-                    temp.setImage(getScaledRegionArea(), false);
-                    return temp;
-                }
+            scaledFuture = TextureCache.scheduleTextureTask(() -> {
+                temp.setImage(getScaledRegionArea(), false);
+                return temp;
             });
         }
         updateScaledTimer.stop();
@@ -360,6 +356,12 @@ public class TileDrawStep
     {
         int scale = (int) Math.pow(2, zoom);
         int scaledSize = Tile.TILESIZE / scale;
+
+        // TODO: sx1, sy1  are pixel offsets within the region image, so you should be able to
+        // get the BlockPos for the region 0,0, add sx1,sy1 (or sx2,sy2) to determine the chunks
+        // shown within the scaled area.  Then its a matter of getting the chunks which have updated
+        // in the RegionTextureImpl and somehow notifying which scaled textures to update.
+        // Either work out a direct call, or perhaps call updates by cache key?
 
         try
         {
@@ -374,6 +376,24 @@ public class TileDrawStep
         {
             logger.error(e);
             return null;
+        }
+    }
+
+    @Override
+    public void textureImageUpdated(RegionTextureImpl textureImpl)
+    {
+        if (highQuality && zoom > 0)
+        {
+            Set<ChunkPos> dirtyAreas = textureImpl.getDirtyAreas();
+            for (ChunkPos area : dirtyAreas)
+            {
+                if (area.chunkXPos >= sx1 && area.chunkZPos >= sy1
+                        && area.chunkXPos + 16 <= sx2 && area.chunkZPos + 16 <= sy2)
+                {
+                    needsScaledUpdate = true;
+                    return;
+                }
+            }
         }
     }
 }

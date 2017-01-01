@@ -9,6 +9,7 @@
 package journeymap.client.model;
 
 import journeymap.client.io.RegionImageHandler;
+import journeymap.client.render.MonitoredBufferedImage;
 import journeymap.client.render.map.Tile;
 
 import java.awt.image.BufferedImage;
@@ -47,23 +48,29 @@ public class RegionImageSet extends ImageSet
         }
     }
 
-    public BufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
+    public MonitoredBufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
     {
-        BufferedImage regionImage = getHolder(mapType).getImage();
         RegionCoord regionCoord = getRegionCoord();
-        BufferedImage current = regionImage.getSubimage(
+        BufferedImage regionImage = getHolder(mapType).getImage();
+        BufferedImage sub = regionImage.getSubimage(
                 regionCoord.getXOffset(chunkMd.getCoord().chunkXPos),
                 regionCoord.getZOffset(chunkMd.getCoord().chunkZPos),
                 16, 16);
 
-        return current;
+        MonitoredBufferedImage chunk = new MonitoredBufferedImage(16, 16, regionImage.getType());
+        chunk.setData(sub.getData());
+
+        return chunk;
     }
 
-    public void setChunkImage(ChunkMD chunkMd, MapType mapType, BufferedImage chunkImage)
+    public void setChunkImage(ChunkMD chunkMd, MapType mapType, MonitoredBufferedImage chunkImage)
     {
-        ImageHolder holder = getHolder(mapType);
-        RegionCoord regionCoord = getRegionCoord();
-        holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().chunkXPos), regionCoord.getZOffset(chunkMd.getCoord().chunkZPos));
+        if (chunkImage.isChanged())
+        {
+            ImageHolder holder = getHolder(mapType);
+            RegionCoord regionCoord = getRegionCoord();
+            holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().chunkXPos), regionCoord.getZOffset(chunkMd.getCoord().chunkZPos));
+        }
     }
 
     public boolean hasChunkUpdates()
