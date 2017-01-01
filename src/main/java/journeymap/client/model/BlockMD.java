@@ -365,6 +365,7 @@ public class BlockMD implements Comparable<BlockMD>
 
     public Integer getColor()
     {
+        ensureColor();
         return this.color;
     }
 

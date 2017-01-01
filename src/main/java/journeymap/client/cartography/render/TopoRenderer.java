@@ -17,6 +17,7 @@ import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.TopoProperties;
+import journeymap.client.render.MonitoredBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
@@ -111,7 +112,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final MonitoredBufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
 
@@ -377,63 +378,71 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             return false;
         }
 
-        float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
-        boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
+        try
+        {
 
-        int color;
-        if (slope > 1)
-        {
-            // Contour lines between intervals
-            color = isWater ? waterContourColor : landContourColor;
-        }
-        else
-        {
-            if (topBlockMd.isLava())
+            float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
+            boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
+
+            int color;
+            if (slope > 1)
             {
-                // Use standard lava color
-                color = topBlockMd.getColor();
+                // Contour lines between intervals
+                color = isWater ? waterContourColor : landContourColor;
             }
-            else if (isWater)
+            else
             {
-                if (Boolean.TRUE.equals(getColumnProperty(PROP_SHORE, Boolean.FALSE, chunkMd, x, z)))
+                if (topBlockMd.isLava())
                 {
-                    // water is touching land, use the contour color
-                    color = waterContourColor;
+                    // Use standard lava color
+                    color = topBlockMd.getColor();
+                }
+                else if (isWater)
+                {
+                    if (Boolean.TRUE.equals(getColumnProperty(PROP_SHORE, Boolean.FALSE, chunkMd, x, z)))
+                    {
+                        // water is touching land, use the contour color
+                        color = waterContourColor;
+                    }
+                    else
+                    {
+                        // Get color from water palette
+                        int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);
+
+                        // Precautionary - ensure in range
+                        index = Math.max(0, Math.min(index, waterPaletteRange));
+                        color = waterPalette[index];
+
+                        // Darken downhill of contour line
+                        if (slope < 1)
+                        {
+                            color = RGB.adjustBrightness(color, .90f);
+                        }
+                    }
                 }
                 else
                 {
-                    // Get color from water palette
-                    int index = (int) Math.floor((y - (y % waterContourInterval)) / waterContourInterval);
+                    // Get color from land palette
+                    int index = (int) Math.floor((y - (y % landContourInterval)) / landContourInterval);
 
                     // Precautionary - ensure in range
-                    index = Math.max(0, Math.min(index, waterPaletteRange));
-                    color = waterPalette[index];
+                    index = Math.max(0, Math.min(index, landPaletteRange));
+                    color = landPalette[index];
 
                     // Darken downhill of contour line
                     if (slope < 1)
                     {
-                        color = RGB.adjustBrightness(color, .90f);
+                        color = RGB.adjustBrightness(color, .85f);
                     }
                 }
             }
-            else
-            {
-                // Get color from land palette
-                int index = (int) Math.floor((y - (y % landContourInterval)) / landContourInterval);
 
-                // Precautionary - ensure in range
-                index = Math.max(0, Math.min(index, landPaletteRange));
-                color = landPalette[index];
-
-                // Darken downhill of contour line
-                if (slope < 1)
-                {
-                    color = RGB.adjustBrightness(color, .85f);
-                }
-            }
+            paintBlock(chunkImage, x, z, color);
         }
-
-        paintBlock(chunkImage, x, z, color);
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         return true;
     }

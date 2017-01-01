@@ -115,7 +115,7 @@ public class TextureCache
         return (TextureImpl) textureObject;
     }
 
-    public static Future<TextureImpl> scheduleTextureTask(Callable<TextureImpl> textureTask)
+    public static <T extends TextureImpl> Future<T> scheduleTextureTask(Callable<T> textureTask)
     {
         return texExec.submit(textureTask);
     }

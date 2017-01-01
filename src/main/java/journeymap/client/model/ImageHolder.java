@@ -10,21 +10,23 @@ package journeymap.client.model;
 
 import com.google.common.base.Objects;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.log.StatTimer;
+import journeymap.client.render.texture.RegionTextureImpl;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.IThreadedFileIO;
 import net.minecraft.world.storage.ThreadedFileIOBase;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,8 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ImageHolder implements IThreadedFileIO
 {
-    public static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-
     final static Logger logger = Journeymap.getLogger();
     final MapType mapType;
     final Path imagePath;
@@ -43,8 +43,9 @@ public class ImageHolder implements IThreadedFileIO
     boolean dirty = true;
     boolean partialUpdate;
     private volatile ReentrantLock writeLock = new ReentrantLock();
-    private volatile TextureImpl texture;
+    private volatile RegionTextureImpl texture;
     private boolean debug;
+    private HashSet<ChunkPos> updatedChunks = new HashSet<>();
 
     ImageHolder(MapType mapType, File imageFile, int imageSize)
     {
@@ -53,14 +54,6 @@ public class ImageHolder implements IThreadedFileIO
         this.imageSize = imageSize;
         this.debug = logger.isEnabled(Level.DEBUG);
         getTexture();
-    }
-
-    public static Graphics2D initRenderingHints(Graphics2D g)
-    {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        return g;
     }
 
     File getFile()
@@ -87,17 +80,22 @@ public class ImageHolder implements IThreadedFileIO
     void partialImageUpdate(BufferedImage imagePart, int x, int y)
     {
         writeLock.lock();
+        final StatTimer timer = StatTimer.get("ImageHolder.partialImageUpdate", 5, 500);
+        timer.start();
         try
         {
             if (texture != null)
             {
-                BufferedImage textureImage = texture.getImage();
-                Graphics2D g2D = initRenderingHints(textureImage.createGraphics());
-                g2D.setComposite(ALPHA_OPAQUE);
-                g2D.drawImage(imagePart, x, y, null);
-                g2D.dispose();
-                partialUpdate = true;
                 blank = false;
+                int width = imagePart.getWidth();
+                int height = imagePart.getHeight();
+
+                int[] updatedPixels = new int[width * height];
+                imagePart.getRGB(0, 0, width, height, updatedPixels, 0, width);
+
+                texture.getImage().setRGB(x, y, width, height, updatedPixels, 0, width);
+                partialUpdate = true;
+                updatedChunks.add(new ChunkPos(x, y));
             }
             else
             {
@@ -106,6 +104,7 @@ public class ImageHolder implements IThreadedFileIO
         }
         finally
         {
+            timer.stop();
             writeLock.unlock();
         }
     }
@@ -115,12 +114,13 @@ public class ImageHolder implements IThreadedFileIO
         writeLock.lock();
         try
         {
-            if (partialUpdate)
+            if (partialUpdate && !updatedChunks.isEmpty())
             {
                 BufferedImage textureImage = texture.getImage();
-                texture.setImage(textureImage, true);
+                texture.setImage(textureImage, true, updatedChunks);
                 setDirty();
                 partialUpdate = false;
+                updatedChunks.clear();
                 //System.out.println("Finished image updates on " + this);
             }
         }
@@ -135,7 +135,7 @@ public class ImageHolder implements IThreadedFileIO
         return texture != null && !texture.isDefunct();
     }
 
-    public TextureImpl getTexture()
+    public RegionTextureImpl getTexture()
     {
         if (!hasTexture())
         {
@@ -161,7 +161,7 @@ public class ImageHolder implements IThreadedFileIO
             {
                 blank = false;
             }
-            this.texture = new TextureImpl(null, image, true, false);
+            this.texture = new RegionTextureImpl(image);
             texture.setDescription(imagePath.toString());
         }
         return texture;
@@ -191,6 +191,8 @@ public class ImageHolder implements IThreadedFileIO
         }
         else
         {
+            //MapPlayerTask.addTempDebugMessage("ImageHolder" + imagePath.hashCode(), "Writing to disk: " + imagePath);
+
             if (async)
             {
                 ThreadedFileIOBase.getThreadedIOInstance().queueIO(this);
