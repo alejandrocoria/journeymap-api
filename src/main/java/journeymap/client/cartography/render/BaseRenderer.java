@@ -502,7 +502,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                         continue;
                     }
 
-                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    if (!mapPlantShadows || !blockMD.hasNoShadow())
                     {
                         y--;
                     }
@@ -517,7 +517,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                         continue;
                     }
 
-                    if (!mapPlantShadows || !blockMD.hasFlag(BlockMD.Flag.NoShadow))
+                    if (!mapPlantShadows || !blockMD.hasNoShadow())
                     {
                         y--;
                     }

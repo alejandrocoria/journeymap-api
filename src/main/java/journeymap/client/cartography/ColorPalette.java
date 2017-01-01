@@ -593,7 +593,7 @@ public class ColorPalette
                 return;
             }
 
-            if (blockMD.hasFlag(BlockMD.Flag.Transparency))
+            if (blockMD.hasTranparency())
             {
                 blockMD.setAlpha((alpha != null) ? alpha : 1f);
             }
