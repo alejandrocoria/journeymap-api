@@ -193,7 +193,7 @@ public class TextureImpl extends AbstractTexture
                 int glErr = GL11.glGetError();
                 if (glErr != GL11.GL_NO_ERROR)
                 {
-                    Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr + " in " + this);
                 }
                 else
                 {
