@@ -314,21 +314,22 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
                 updateScaledTimer.stop();
                 return true;
             }
-            try
+            else
             {
-                scaledTexture = scaledFuture.get();
-                scaledTexture.bindTexture();
-            }
-            catch (Throwable e)
-            {
-                logger.error(e);
+                try
+                {
+                    scaledTexture = scaledFuture.get();
+                    scaledTexture.bindTexture();
+                }
+                catch (Throwable e)
+                {
+                    logger.error(e);
+                }
             }
             scaledFuture = null;
             updateScaledTimer.stop();
             return false;
         }
-
-        //TODO: Only update the scaled image for a matching chunk
 
         if (scaledTexture == null)
         {
@@ -357,12 +358,6 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         int scale = (int) Math.pow(2, zoom);
         int scaledSize = Tile.TILESIZE / scale;
 
-        // TODO: sx1, sy1  are pixel offsets within the region image, so you should be able to
-        // get the BlockPos for the region 0,0, add sx1,sy1 (or sx2,sy2) to determine the chunks
-        // shown within the scaled area.  Then its a matter of getting the chunks which have updated
-        // in the RegionTextureImpl and somehow notifying which scaled textures to update.
-        // Either work out a direct call, or perhaps call updates by cache key?
-
         try
         {
             BufferedImage subImage = this.getRegionTextureHolder().getTexture().getImage().getSubimage(sx1, sy1, scaledSize, scaledSize);
@@ -385,13 +380,20 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         if (highQuality && zoom > 0)
         {
             Set<ChunkPos> dirtyAreas = textureImpl.getDirtyAreas();
-            for (ChunkPos area : dirtyAreas)
+            if (dirtyAreas.isEmpty())
             {
-                if (area.chunkXPos >= sx1 && area.chunkZPos >= sy1
-                        && area.chunkXPos + 16 <= sx2 && area.chunkZPos + 16 <= sy2)
+                needsScaledUpdate = true;
+            }
+            else
+            {
+                for (ChunkPos area : dirtyAreas)
                 {
-                    needsScaledUpdate = true;
-                    return;
+                    if (area.chunkXPos >= sx1 && area.chunkZPos >= sy1
+                            && area.chunkXPos + 16 <= sx2 && area.chunkZPos + 16 <= sy2)
+                    {
+                        needsScaledUpdate = true;
+                        return;
+                    }
                 }
             }
         }

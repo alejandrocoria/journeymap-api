@@ -28,9 +28,9 @@ public enum RegionImageCache
 {
     INSTANCE;
 
-    public final long firstFlushInterval = TimeUnit.SECONDS.toMillis(5);
-    public final long flushInterval = TimeUnit.SECONDS.toMillis(30);
-    public final long regionCacheAge = flushInterval / 2;
+    public long firstFileFlushIntervalSecs = 5;
+    public long flushFileIntervalSecs = 60;
+    public long textureCacheAgeSecs = 30;
     static final Logger logger = Journeymap.getLogger();
     private volatile long lastFlush;
 
@@ -39,13 +39,13 @@ public enum RegionImageCache
      */
     private RegionImageCache()
     {
-        lastFlush = System.currentTimeMillis() + firstFlushInterval;
+        lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(firstFileFlushIntervalSecs);
     }
 
     public LoadingCache<RegionImageSet.Key, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
     {
         return builder
-                .expireAfterAccess(regionCacheAge, TimeUnit.SECONDS)
+                .expireAfterAccess(textureCacheAgeSecs, TimeUnit.SECONDS)
                 .removalListener(new RemovalListener<RegionImageSet.Key, RegionImageSet>()
                 {
                     @Override
@@ -101,14 +101,11 @@ public enum RegionImageCache
     {
         for (RegionImageSet regionImageSet : getRegionImageSets())
         {
-            if (regionImageSet.hasChunkUpdates())
-            {
-                regionImageSet.finishChunkUpdates();
-            }
+            regionImageSet.finishChunkUpdates();
         }
 
         // Write to disk if needed
-        if (forceFlush || (lastFlush + flushInterval < System.currentTimeMillis()))
+        if (forceFlush || (lastFlush + TimeUnit.SECONDS.toMillis(flushFileIntervalSecs) < System.currentTimeMillis()))
         {
             if (!forceFlush && logger.isEnabled(Level.DEBUG))
             {
