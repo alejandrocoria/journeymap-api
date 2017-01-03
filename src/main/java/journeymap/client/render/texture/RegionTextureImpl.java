@@ -103,7 +103,8 @@ public class RegionTextureImpl extends TextureImpl
                 int glErr = GL11.glGetError();
                 if (glErr != GL11.GL_NO_ERROR)
                 {
-                    Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    bindNeeded = true;
+                    Journeymap.getLogger().warn("GL Error in RegionTextureImpl after glTexSubImage2D: " + glErr + " in " + this);
                 }
                 else
                 {
