@@ -9,7 +9,6 @@
 package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.data.DataCache;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.common.Journeymap;
@@ -36,7 +35,6 @@ public class ChunkMD
     public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
     public static final String PROP_LOADED = "loaded";
     public static final String PROP_LAST_RENDERED = "lastRendered";
-    final static DataCache dataCache = DataCache.INSTANCE; // TODO REMOVE
     private final WeakReference<Chunk> chunkReference;
     private final ChunkPos coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
