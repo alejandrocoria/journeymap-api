@@ -9,11 +9,11 @@
 package journeymap.client.cartography;
 
 import journeymap.client.model.ChunkMD;
-import journeymap.client.render.MonitoredBufferedImage;
+import journeymap.client.render.ComparableBufferedImage;
 
 public interface IChunkRenderer
 {
-    public boolean render(final MonitoredBufferedImage chunkImage, final ChunkMD chunkStub, final Integer vSlice);
+    public boolean render(final ComparableBufferedImage chunkImage, final ChunkMD chunkStub, final Integer vSlice);
 
     public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting);
 

@@ -9,7 +9,7 @@
 package journeymap.client.model;
 
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.render.MonitoredBufferedImage;
+import journeymap.client.render.ComparableBufferedImage;
 import journeymap.client.render.map.Tile;
 
 import java.awt.image.BufferedImage;
@@ -48,7 +48,7 @@ public class RegionImageSet extends ImageSet
         }
     }
 
-    public MonitoredBufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
+    public ComparableBufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
     {
         RegionCoord regionCoord = getRegionCoord();
         BufferedImage regionImage = getHolder(mapType).getImage();
@@ -57,13 +57,13 @@ public class RegionImageSet extends ImageSet
                 regionCoord.getZOffset(chunkMd.getCoord().chunkZPos),
                 16, 16);
 
-        MonitoredBufferedImage chunk = new MonitoredBufferedImage(16, 16, regionImage.getType());
+        ComparableBufferedImage chunk = new ComparableBufferedImage(16, 16, regionImage.getType());
         chunk.setData(sub.getData());
 
         return chunk;
     }
 
-    public void setChunkImage(ChunkMD chunkMd, MapType mapType, MonitoredBufferedImage chunkImage)
+    public void setChunkImage(ChunkMD chunkMd, MapType mapType, ComparableBufferedImage chunkImage)
     {
         if (chunkImage.isChanged())
         {
