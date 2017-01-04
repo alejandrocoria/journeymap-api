@@ -13,6 +13,9 @@ import journeymap.client.data.DataCache;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.common.Journeymap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -73,6 +76,21 @@ public enum RegionImageCache
                         return new RegionImageSet(key);
                     }
                 });
+    }
+
+    public RegionImageSet getRegionImageSet(ChunkMD chunkMd, MapType mapType)
+    {
+        if (chunkMd.hasChunk())
+        {
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            Chunk chunk = chunkMd.getChunk();
+            RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), mapType, chunk.xPosition, chunk.zPosition);
+            return getRegionImageSet(rCoord);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)

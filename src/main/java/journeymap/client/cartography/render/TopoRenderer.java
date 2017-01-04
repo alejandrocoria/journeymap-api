@@ -17,7 +17,7 @@ import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.TopoProperties;
-import journeymap.client.render.MonitoredBufferedImage;
+import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
@@ -112,7 +112,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world.
      */
     @Override
-    public boolean render(final MonitoredBufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
+    public boolean render(final ComparableBufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice)
     {
         StatTimer timer = renderTopoTimer;
 

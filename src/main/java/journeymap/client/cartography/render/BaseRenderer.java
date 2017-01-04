@@ -690,6 +690,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     }
 
     /**
+     * Darken the existing color.
+     */
+    public void paintDimOverlay(BufferedImage sourceImage, BufferedImage targetImage, int x, int z, float alpha)
+    {
+        Integer color = sourceImage.getRGB(x, z);
+        paintBlock(targetImage, x, z, RGB.adjustBrightness(color, alpha));
+    }
+
+    /**
      * Paint the block.
      */
     public void paintBlock(BufferedImage image, final int x, final int z, final int color)

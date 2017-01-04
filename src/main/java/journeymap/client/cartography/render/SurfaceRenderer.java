@@ -17,7 +17,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
-import journeymap.client.render.MonitoredBufferedImage;
+import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
@@ -69,7 +69,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world, day only
      */
     @Override
-    public boolean render(final MonitoredBufferedImage dayChunkImage, final ChunkMD chunkMd, final Integer ignored)
+    public boolean render(final ComparableBufferedImage dayChunkImage, final ChunkMD chunkMd, final Integer ignored)
     {
         return render(dayChunkImage, null, chunkMd, null, false);
     }
@@ -77,7 +77,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the standard world
      */
-    public boolean render(final MonitoredBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd)
+    public boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd)
     {
         return render(dayChunkImage, nightChunkImage, chunkMd, null, false);
     }
@@ -85,7 +85,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for the standard world.
      */
-    public synchronized boolean render(final MonitoredBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
+    public synchronized boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
         StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
 
