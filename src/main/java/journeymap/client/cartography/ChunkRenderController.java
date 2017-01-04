@@ -10,7 +10,7 @@ package journeymap.client.cartography;
 
 import journeymap.client.cartography.render.*;
 import journeymap.client.model.*;
-import journeymap.client.render.MonitoredBufferedImage;
+import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import org.apache.logging.log4j.Level;
@@ -97,7 +97,7 @@ public class ChunkRenderController
             RegionImageSet regionImageSet = RegionImageCache.INSTANCE.getRegionImageSet(rCoord);
             if (mapType.isUnderground())
             {
-                MonitoredBufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);
+                ComparableBufferedImage chunkSliceImage = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (chunkSliceImage != null)
                 {
                     switch (rCoord.dimension)
@@ -128,7 +128,7 @@ public class ChunkRenderController
             {
                 if (mapType.isTopo())
                 {
-                    MonitoredBufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                    ComparableBufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
                     renderOkay = topoRenderer.render(imageTopo, chunkMd, null);
                     if (renderOkay)
                     {
@@ -138,8 +138,8 @@ public class ChunkRenderController
                 }
                 else
                 {
-                    MonitoredBufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
-                    MonitoredBufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
+                    ComparableBufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
+                    ComparableBufferedImage imageNight = regionImageSet.getChunkImage(chunkMd, MapType.night(rCoord.dimension));
                     renderOkay = overWorldSurfaceRenderer.render(imageDay, imageNight, chunkMd);
                     if (renderOkay)
                     {

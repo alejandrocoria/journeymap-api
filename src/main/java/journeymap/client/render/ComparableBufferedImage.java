@@ -6,21 +6,19 @@ import java.util.stream.IntStream;
 /**
  * Simple class extension to track whether the image has been altered.
  */
-public class MonitoredBufferedImage extends BufferedImage
+public class ComparableBufferedImage extends BufferedImage
 {
     private boolean changed = false;
 
-    public MonitoredBufferedImage(BufferedImage other)
+    public ComparableBufferedImage(BufferedImage other)
     {
         super(other.getWidth(), other.getHeight(), other.getType());
         int width = other.getWidth();
         int height = other.getHeight();
-        int[] otherPixels = new int[width * height];
-        other.getRGB(0, 0, width, height, otherPixels, 0, width);
-        this.setRGB(0, 0, width, height, otherPixels, 0, width);
+        this.setRGB(0, 0, width, height, getPixelData(other), 0, width);
     }
 
-    public MonitoredBufferedImage(int width, int height, int imageType)
+    public ComparableBufferedImage(int width, int height, int imageType)
     {
         super(width, height, imageType);
     }
@@ -57,21 +55,37 @@ public class MonitoredBufferedImage extends BufferedImage
 
     public boolean identicalTo(BufferedImage other)
     {
-        return identicalTo(other, this.getWidth(), this.getHeight());
+        return areIdentical(getPixelData(), getPixelData(other));
     }
 
-    public boolean identicalTo(BufferedImage other, int width, int height)
+    public static boolean areIdentical(final int[] pixels, final int[] otherPixels)
     {
-        int[] pixels = new int[width * height];
-        this.getRGB(0, 0, width, height, pixels, 0, width);
-
-        int[] otherPixels = new int[width * height];
-        other.getRGB(0, 0, width, height, otherPixels, 0, width);
-
-        boolean unchanged = IntStream.range(0, pixels.length)
+        return IntStream.range(0, pixels.length)
                 .map(i -> ~pixels[i] | otherPixels[i])
                 .allMatch(n -> n == ~0);
+    }
 
-        return unchanged;
+    public int[] getPixelData()
+    {
+        return getPixelData(this);
+    }
+
+    public ComparableBufferedImage copy()
+    {
+        return new ComparableBufferedImage(this);
+    }
+
+    public void copyTo(BufferedImage other)
+    {
+        other.setRGB(0, 0, getWidth(), getHeight(), getPixelData(), 0, getWidth());
+    }
+
+    public static int[] getPixelData(BufferedImage image)
+    {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int[] data = new int[width * height];
+        image.getRGB(0, 0, width, height, data, 0, width);
+        return data;
     }
 }
