@@ -11,16 +11,20 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.7'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.8'
+        classpath "com.eriwen:gradle-js-plugin:2.14.1"
+        classpath 'com.eriwen:gradle-css-plugin:2.14.0'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'com.eriwen.gradle.js'
+apply plugin: 'com.eriwen.gradle.css'
 
 ext {
-    srcWebDir = "src/main/resources/assets/journeymap/web/"
-    implSrc = "build/resources/java/journeymap/feature/impl/"
+    srcWebDir = "src/main/resources/assets/journeymap/ui/"
+    buildWebDir = "build/resources/main/assets/journeymap/ui/"
 }
 
 sourceCompatibility = 1.8
@@ -50,13 +54,8 @@ configurations.all {
 dependencies {
     compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
     //runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
-    runtime group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
     testCompile 'junit:junit:4.12'
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
-}
-
-manifest {
-    attributes 'FMLAT': 'journeymap_at.cfg'
 }
 
 minecraft {
@@ -74,6 +73,27 @@ minecraft {
     replace "@PATCH@", project.jm_patch
 }
 
+minifyJs {
+    source = file("${srcWebDir}/js/journeymap.js")
+    dest = ("${buildWebDir}/js/journeymap.js")
+    doFirst {
+        dest.parentFile.mkdirs()
+        dest.delete()
+    }
+}
+
+minifyCss {
+    source = file("${srcWebDir}/css/journeymap.css")
+    dest = file("${buildWebDir}/css/journeymap.css")
+    yuicompressor {
+        lineBreakPos = -1
+    }
+    doFirst {
+        dest.parentFile.mkdirs()
+        dest.delete()
+    }
+}
+
 processResources() {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
@@ -87,7 +107,7 @@ processResources() {
                 'forgeversion': project.forge_version,
                 'apiversion': project.journeymap_api_version
     }
-    // copy everything else, thats not the mcmod.info
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
         exclude 'license.txt'
@@ -107,18 +127,6 @@ task processDocs(type: Copy) {
     into 'build/doc'
 }
 
-task copyJs(type: Copy) {
-    from 'tmp'
-    into 'build/resources/main/assets/journeymap/web/css'
-    include 'journeymap.css'
-}
-
-task copyCss(type: Copy, dependsOn: copyJs) {
-    from 'tmp'
-    into 'build/resources/main/assets/journeymap/web/js'
-    include 'journeymap.js'
-}
-
 task includeJars(type: Copy) {
     dependsOn configurations.includeInJar
     from {
@@ -132,35 +140,9 @@ task includeJars(type: Copy) {
     include "journeymap/**"
 }
 
-task filter() {
-    def subdir = new File("tmp")
-
-    if( !subdir.exists() ) {
-        subdir.mkdirs()
-    }
-}
-
-task minifyJs(type: JavaExec, dependsOn: filter) {
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true)
-    {
-        arg(value: "${srcWebDir}js/journeymap.js")
-        arg(value: "-o")
-        arg(value: "build/tmp/journeymap.js")
-    }
-}
-
-task minifyCss(type: JavaExec, dependsOn: filter) {
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true)
-    {
-        arg(value: "${srcWebDir}css/journeymap.css")
-        arg(value: "-o")
-        arg(value: "build/tmp/journeymap.css")
-    }
-}
-
 /* Jar manifest */
 jar {
-    dependsOn 'processDocs', 'includeJars', 'copyCss'
+    dependsOn 'processDocs', 'includeJars', 'minifyJs', 'minifyCss'
     manifest {
         attributes = [
                 "Manifest-Version"      : "1.0",
@@ -199,6 +181,7 @@ def getDate() {
 if (!project.hasProperty("curseForgeApiKey")) {
     ext.curseForgeApiKey = "notset"
 }
+
 curseforge {
     project {
         id = '32274'
