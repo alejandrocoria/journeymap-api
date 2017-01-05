@@ -118,7 +118,7 @@ var JourneyMap = (function() {
 			
 			url : "/properties",
 			dataType : "jsonp",
-			contentType : "application/javascript; charset=utf-8",
+			contentType : "application/javascript; charset=utf-8"
 			
 		}).fail(handleError).done(function(data, textStatus, jqXHR) {
 			JM.properties = data;
@@ -137,7 +137,7 @@ var JourneyMap = (function() {
 			$.ajax({
 				url : "/data/messages",
 				dataType : "jsonp",
-				contentType : "application/javascript; charset=utf-8",
+				contentType : "application/javascript; charset=utf-8"
 			}).fail(handleError).done(function(data, textStatus, jqXHR) {
 				JM.messages = data;
 				initGame();
@@ -160,7 +160,7 @@ var JourneyMap = (function() {
 		$.ajax({
 			url : "/data/world",
 			dataType : "jsonp",
-			contentType : "application/javascript; charset=utf-8",
+			contentType : "application/javascript; charset=utf-8"
 		}).fail(handleError).done(
 			function(data, textStatus, jqXHR) {
 
@@ -1027,7 +1027,7 @@ var JourneyMap = (function() {
 				    draggable: false,
 				    flat: true,
 				    anchor: RichMarkerPosition.BOTTOM,
-				    content: '<div class="playerInfo">' + JM.player.username + '</div>',
+				    content: '<div class="playerInfo">' + JM.player.username + '</div>'
 		        })
 	        });
 
