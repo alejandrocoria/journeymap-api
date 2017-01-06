@@ -296,7 +296,7 @@ public class BlockMD implements Comparable<BlockMD>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(String.format("Couldn't get display name for %s: %s ", blockState, e));
+            Journeymap.getLogger().debug(String.format("Couldn't get display name for %s: %s ", blockState, e));
         }
 
         if (Strings.isNullOrEmpty(displayName) || displayName.contains("tile"))

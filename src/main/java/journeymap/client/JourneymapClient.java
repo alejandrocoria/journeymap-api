@@ -308,7 +308,7 @@ public class JourneymapClient implements CommonProxy
             IconSetFileHandler.initialize();
 
             // Ensure all themes are ready for use
-            ThemeFileHandler.initialize();
+            ThemeFileHandler.initialize(true);
 
             // Webserver
             WebServer.setEnabled(webMapProperties.enabled.get(), false);
