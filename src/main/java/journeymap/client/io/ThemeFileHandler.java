@@ -46,7 +46,7 @@ public class ThemeFileHandler
 
     private static transient Theme currentTheme = null;
 
-    public static void initialize()
+    public static void initialize(boolean preLoadCurrentTheme)
     {
         Journeymap.getLogger().trace("Initializing themes ...");
 
@@ -66,7 +66,10 @@ public class ThemeFileHandler
         ensureDefaultThemeFile();
 
         // Preload the current theme
-        preloadCurrentTheme();
+        if (preLoadCurrentTheme)
+        {
+            preloadCurrentTheme();
+        }
     }
 
     public static File getThemeIconDir()
@@ -99,7 +102,7 @@ public class ThemeFileHandler
         if (themeDirs == null || themeDirs.length == 0)
         {
             // This shouldn't happen unless somebody deleted a directory.
-            initialize();
+            initialize(false);
             themeDirs = getThemeDirectories();
             if (themeDirs == null || themeDirs.length == 0)
             {

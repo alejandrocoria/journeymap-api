@@ -174,7 +174,7 @@ public class FileService extends BaseService
                     serveImage(event, image);
                 }
             }
-            // Handle skin icon request
+            // Handle themed icon request
             else if (path.startsWith(ICON_THEME_PATH_PREFIX))
             {
                 String themeIconPath = path.split(ICON_THEME_PATH_PREFIX)[1].replace('/', File.separatorChar);
@@ -183,7 +183,7 @@ public class FileService extends BaseService
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
-                    String setName = themeIconPath.split(File.separator)[0];
+                    String setName = themeIconPath.split("\\" + File.separator)[0];
                     String iconPath = themeIconPath.substring(themeIconPath.indexOf(File.separatorChar) + 1);
 
                     if (event != null)
@@ -198,9 +198,15 @@ public class FileService extends BaseService
                         IResource resource = resourceManager.getResource(new ResourceLocation(Journeymap.MOD_ID, resourcePath));
                         fileStream = resource.getInputStream();
                     }
+                    catch (FileNotFoundException e)
+                    {
+                        JMLogger.logOnce("Resource not found: " + resourcePath, null);
+                        throwEventException(404, "Unknown: " + path, event, true);
+                    }
                     catch (Exception e)
                     {
-                        Journeymap.getLogger().error("Resource not usable as image: " + resourcePath, LogFormatter.toPartialString(e));
+                        JMLogger.logOnce("Resource not usable: " + resourcePath, e);
+                        throwEventException(415, "Not an image: " + path, event, true);
                     }
                 }
                 else
@@ -375,7 +381,6 @@ public class FileService extends BaseService
      */
     public void serveStream(final InputStream input, Event event) throws Event, IOException
     {
-
         // Transfer inputstream to event outputstream
         ReadableByteChannel inputChannel = null;
         WritableByteChannel outputChannel = null;

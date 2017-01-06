@@ -610,13 +610,13 @@ public class FileHandler
             if (fileLocation != null)
             {
                 String assetsPath;
-                if (location.getResourcePath().startsWith("/assets/"))
+                if (location.getResourcePath().startsWith("assets/"))
                 {
                     assetsPath = location.getResourcePath();
                 }
                 else
                 {
-                    assetsPath = String.format("/assets/%s/%s", domain, location.getResourcePath());
+                    assetsPath = String.format("assets/%s/%s", domain, location.getResourcePath());
                 }
                 return copyResources(targetDirectory, fileLocation, assetsPath, setName, overwrite);
             }

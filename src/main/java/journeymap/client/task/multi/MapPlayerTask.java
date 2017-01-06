@@ -147,7 +147,7 @@ public class MapPlayerTask extends BaseMapTask
 
     public static void addTempDebugMessage(String key, String message)
     {
-        if (Minecraft.getMinecraft().gameSettings.showDebugInfo)
+        if (Minecraft.getMinecraft().gameSettings.showLagometer)
         {
             tempDebugLines.put(key, message);
         }

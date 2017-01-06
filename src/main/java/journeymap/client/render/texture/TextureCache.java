@@ -165,7 +165,7 @@ public class TextureCache
         catch (Exception e)
         {
             //Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
-            Journeymap.getLogger().error("Resource not usable as image: " + location);
+            Journeymap.getLogger().warn("Resource not readable with TextureUtil.readBufferedImage(): " + location);
             return null;
         }
     }
