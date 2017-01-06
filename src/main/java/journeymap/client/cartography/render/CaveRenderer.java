@@ -151,20 +151,21 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected void mask(final BufferedImage chunkSurfaceImage, final BufferedImage chunkImage,
                         final ChunkMD chunkMd, final int x, final int y, final int z)
     {
-        if (chunkSurfaceImage == null || surfaceRenderer == null || !mapSurfaceAboveCaves)
+        if (chunkSurfaceImage == null || !mapSurfaceAboveCaves)
         {
             paintBlackBlock(chunkImage, x, z);
         }
         else
         {
-            int surfaceY = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, surfaceRenderer.chunkSurfaceHeights));
-            int distance = surfaceY - y;
-            if (distance > 8)
+            int surfaceY = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
+            int distance = Math.max(0, surfaceY - y);
+            if (distance > 16)
             {
                 paintBlackBlock(chunkImage, x, z);
             }
             else
             {
+                float dim = Math.max(defaultDim, 16f / distance);
                 paintDimOverlay(chunkSurfaceImage, chunkImage, x, z, defaultDim);
             }
         }
@@ -193,7 +194,6 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 try
                 {
                     final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
-                    //final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
 
                     // Oh look, a hole in the world.
                     if (ceiling < 0)
@@ -224,15 +224,16 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     buildStrata(strata, sliceMinY, chunkMd, x, y, z, chunkHeights, chunkSlopes);
 
-                    // No lit blocks
                     if (strata.isEmpty())
                     {
+                        // No lit blocks
                         if (strata.isBlocksFound())
                         {
                             mask(chunkSurfaceImage, chunkSliceImage, chunkMd, x, y, z);
                         }
                         else
                         {
+                            // No blocks at all?  Okay then.
                             paintVoidBlock(chunkSliceImage, x, z);
                         }
 

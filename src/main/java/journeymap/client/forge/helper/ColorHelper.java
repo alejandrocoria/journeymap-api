@@ -9,6 +9,7 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.cartography.RGB;
+import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.render.texture.TextureCache;
@@ -23,6 +24,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -169,7 +171,23 @@ public enum ColorHelper
         {
             try
             {
-                List<BakedQuad> quads = bms.getModelForState(blockState).getQuads(blockState, face, 0);
+                IBakedModel model = bms.getModelForState(blockState);
+                if (model == null)
+                {
+                    continue;
+                }
+                List<BakedQuad> quads = null;
+
+                try
+                {
+                    quads = model.getQuads(blockState, face, 0);
+                }
+                catch (Exception e)
+                {
+                    JMLogger.logOnce("Error calling " + model.getClass().getName() + ".getQuads()", e);
+                    break;
+                }
+
                 if (!quads.isEmpty())
                 {
                     TextureAtlasSprite sprite = quads.get(0).getSprite();
@@ -189,7 +207,9 @@ public enum ColorHelper
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().warn(String.format("Error getting EnumFacing.%s for %s", face, blockState));
+                Journeymap.getLogger().error(String.format("Error getting EnumFacing.%s for %s:\n%s\n\t%s\n\t%s",
+                        face, blockState, e, e.getStackTrace()[0], e.getStackTrace()[1]));
+                break;
             }
         }
 
@@ -268,7 +288,7 @@ public enum ColorHelper
         {
             if (rgba.length < 4)
             {
-                Journeymap.getLogger().warn(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Couldn't derive RGBA from %s", blockMD));
+                Journeymap.getLogger().debug(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Couldn't derive RGBA from %s", blockMD));
                 return false;
             }
 
@@ -496,7 +516,7 @@ public enum ColorHelper
             }
             else
             {
-                logger.warn("Texture was completely transparent for " + blockMD);
+                logger.debug("Texture was completely transparent for " + blockMD);
             }
         }
         catch (Throwable t)

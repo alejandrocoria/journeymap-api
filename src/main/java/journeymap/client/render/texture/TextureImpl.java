@@ -128,24 +128,8 @@ public class TextureImpl extends AbstractTexture
             {
                 buffer = ByteBuffer.allocateDirect(bufferSize);
             }
-            buffer.clear();
 
-            int[] pixels = new int[width * height];
-            bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-            int pixel;
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    pixel = pixels[y * width + x];
-                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
-                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
-                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
-                }
-            }
-            buffer.flip();
-            buffer.rewind();
+            loadByteBuffer(bufferedImage, buffer);
             bindNeeded = true;
         }
         finally
@@ -154,6 +138,30 @@ public class TextureImpl extends AbstractTexture
         }
         this.lastImageUpdate = System.currentTimeMillis();
         notifyListeners();
+    }
+
+    public static void loadByteBuffer(BufferedImage bufferedImage, ByteBuffer buffer)
+    {
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        buffer.clear();
+
+        int[] pixels = new int[width * height];
+        bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
+        int pixel;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                pixel = pixels[y * width + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
+                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
+                buffer.put((byte) ((pixel & 0xFF)));           // Blue
+                buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+            }
+        }
+        buffer.flip();
+        buffer.rewind();
     }
 
     /**
@@ -190,14 +198,17 @@ public class TextureImpl extends AbstractTexture
                 // Texture
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
-                int glErr = GL11.glGetError();
-                if (glErr != GL11.GL_NO_ERROR)
+                bindNeeded = false;
+
+                int glErr;
+                while ((glErr = GL11.glGetError()) != GL11.GL_NO_ERROR)
                 {
                     Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr + " in " + this);
+                    bindNeeded = true;
                 }
-                else
+
+                if (!bindNeeded)
                 {
-                    bindNeeded = false;
                     lastBound = System.currentTimeMillis();
                 }
             }
