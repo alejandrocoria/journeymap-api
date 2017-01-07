@@ -198,8 +198,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     // Oh look, a hole in the world.
                     if (ceiling < 0)
                     {
-                        chunkOk = true;
                         paintVoidBlock(chunkSliceImage, x, z);
+                        chunkOk = true;
                         continue;
                     }
 
