@@ -151,6 +151,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                         {
                             paintVoidBlock(nightChunkImage, x, z);
                         }
+                        chunkOk = true;
                         continue blockLoop;
                     }
 
