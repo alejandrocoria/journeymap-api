@@ -8,7 +8,10 @@
 
 package journeymap.client.io;
 
-import ar.com.hjg.pngj.*;
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.ImageLineInt;
+import ar.com.hjg.pngj.PngReader;
+import ar.com.hjg.pngj.PngWriter;
 import ar.com.hjg.pngj.chunks.ChunkLoadBehaviour;
 import journeymap.common.Journeymap;
 
@@ -16,13 +19,12 @@ import java.io.File;
 import java.util.Arrays;
 
 /**
- * Encapsulates knowledge of PngJ
+ * Encapsulates knowledge of PngJ 2.1.0
  *
  * @author mwoodman
  */
 public class PngjHelper
 {
-
     /**
      * @param tiles       Filenames of PNG files to tile
      * @param destFile    Destination PNG filename
@@ -36,11 +38,12 @@ public class PngjHelper
         final int tileRows = (ntiles + tileColumns - 1) / tileColumns; // integer ceil
         final PngReader[] readers = new PngReader[tileColumns];
         final ImageInfo destImgInfo = new ImageInfo(tileSize * tileColumns, tileSize * tileRows, 8, true); // bitdepth, alpha
-        final PngWriter pngw = FileHelper.createPngWriter(destFile, destImgInfo, true);
+        final PngWriter pngw = new PngWriter(destFile, destImgInfo, true);
+
         pngw.getMetadata().setText("Author", "JourneyMap" + Journeymap.JM_VERSION);
         pngw.getMetadata().setText("Comment", Journeymap.WEBSITE_URL);
 
-        final ImageLine destLine = new ImageLine(destImgInfo, ImageLine.SampleType.INT, false);
+        final ImageLineInt destLine = new ImageLineInt(destImgInfo);
         final int lineLen = tileSize * 4; // 4=bytesPixel
         final int gridColor = 135;
         final boolean showGrid = Journeymap.getClient().getFullMapProperties().showGrid.get();
@@ -50,13 +53,13 @@ public class PngjHelper
         for (int ty = 0; ty < tileRows; ty++)
         {
             int nTilesXcur = ty < tileRows - 1 ? tileColumns : ntiles - (tileRows - 1) * tileColumns;
-            Arrays.fill(destLine.scanline, 0);
+            Arrays.fill(destLine.getScanline(), 0);
 
             for (int tx = 0; tx < nTilesXcur; tx++)
             { // open several readers
-                readers[tx] = FileHelper.createPngReader(tiles[tx + ty * tileColumns]);
+                readers[tx] = new PngReader(tiles[tx + ty * tileColumns]);
                 readers[tx].setChunkLoadBehaviour(ChunkLoadBehaviour.LOAD_CHUNK_NEVER);
-                readers[tx].setUnpackedMode(false);
+                //readers[tx].setUnpackedMode(false); TODO: Still need this to be set somehow?
             }
 
             rowcopy:
@@ -64,8 +67,8 @@ public class PngjHelper
             {
                 for (int tx = 0; tx < nTilesXcur; tx++)
                 {
-                    ImageLine srcLine = readers[tx].readRowInt(srcRow); // read line
-                    int[] src = srcLine.scanline;
+                    ImageLineInt srcLine = (ImageLineInt) readers[tx].readRow(srcRow); // read line
+                    int[] src = srcLine.getScanline();
 
                     // Overlay chunk grid
                     if (showGrid)
@@ -80,7 +83,7 @@ public class PngjHelper
                         }
                     }
 
-                    int[] dest = destLine.scanline;
+                    int[] dest = destLine.getScanline();
                     int destPos = (lineLen * tx);
                     try
                     {
