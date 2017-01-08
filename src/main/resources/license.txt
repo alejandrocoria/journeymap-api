@@ -47,7 +47,7 @@ JourneyMap includes and/or makes use of the following software under their respe
     MIT License: http://opensource.org/licenses/mit-license.php
 
     PNGJ : PNG image IO Java library
-    https://code.google.com/p/pngj/
+    https://github.com/leonbloy/pngj
     Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
     Rupy NIO HTTP application server
