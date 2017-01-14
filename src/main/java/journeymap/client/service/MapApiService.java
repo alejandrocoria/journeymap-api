@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class MapApiService extends FileService
 {
+    private static final String API_KEY = "AIzaSyDeq8K0022T9N1y-7Q7GBYhwoDS2hruB3c";
+
     /**
      * Default constructor
      */
@@ -43,7 +45,7 @@ public class MapApiService extends FileService
     public void filter(Event event) throws Event, Exception
     {
         String domain = Journeymap.getClient().getWebMapProperties().googleMapApiDomain.get();
-        String apiUrl = String.format("http://maps.google%s/maps/api/js?libraries=geometry&sensor=false&key=AIzaSyDeq8K0022T9N1y-7Q7GBYhwoDS2hruB3c", domain);
+        String apiUrl = String.format("http://maps.google%s/maps/api/js?key=%s&libraries=geometry&sensor=false", domain, API_KEY);
 
         ResponseHeader.on(event).setHeader("Location", apiUrl).noCache();
         event.reply().code("303 See Other");
