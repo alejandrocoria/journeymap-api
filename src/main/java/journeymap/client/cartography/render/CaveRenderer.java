@@ -8,19 +8,16 @@
 
 package journeymap.client.cartography.render;
 
-import com.google.common.cache.RemovalNotification;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
-import journeymap.client.properties.CoreProperties;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldProviderHell;
 
 import java.awt.image.BufferedImage;
@@ -30,10 +27,9 @@ import java.awt.image.BufferedImage;
  */
 public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 {
-    private final Object chunkLock = new Object();
-    private final HeightsCache[] chunkSliceHeights = new HeightsCache[16];
-    private final SlopesCache[] chunkSliceSlopes = new SlopesCache[16];
-    protected CoreProperties coreProperties;
+    private static final String PROP_CAVE_SLOPES = "caveSlopes";
+    private static final String PROP_CAVE_HEIGHTS = "caveHeights";
+
     protected SurfaceRenderer surfaceRenderer;
     protected StatTimer renderCaveTimer = StatTimer.get("CaveRenderer.render");
     protected Strata strata = new Strata("Cave", 40, 8, true);
@@ -49,7 +45,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         this.surfaceRenderer = surfaceRenderer;
         cachePrefix = "Cave";
 
-        updateOptions();
+        updateOptions(null);
 
         // TODO: Put these in properties?
         shadingSlopeMin = 0.2f;
@@ -61,11 +57,14 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    protected void updateOptions()
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
-        super.updateOptions();
-
-        mapSurfaceAboveCaves = Journeymap.getClient().getCoreProperties().mapSurfaceAboveCaves.get();
+        if (super.updateOptions(chunkMd))
+        {
+            mapSurfaceAboveCaves = Journeymap.getClient().getCoreProperties().mapSurfaceAboveCaves.get();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -75,12 +74,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         final int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
         final int sliceMinY = sliceBounds[0];
         final int sliceMaxY = sliceBounds[1];
-        HeightsCache heightsCache = chunkSliceHeights[vSlice];
-        Integer y = null;
-        if (heightsCache != null)
-        {
-            y = getSliceBlockHeight(chunkMd, blockPos.getX() & 15, vSlice, blockPos.getZ() & 15, sliceMinY, sliceMaxY, heightsCache);
-        }
+        Integer y = getBlockHeight(chunkMd, blockPos.getX() & 15, vSlice, blockPos.getZ() & 15, sliceMinY, sliceMaxY);
 
         return (y == null) ? blockPos.getY() : y;
     }
@@ -97,33 +91,17 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             return false;
         }
 
-        updateOptions();
+        updateOptions(chunkMd);
         boolean ok = false;
 
         renderCaveTimer.start();
 
         try
         {
-            // Init heights if needed
-            if (chunkSliceHeights[vSlice] == null)
+            if (!hasSlopes(chunkMd, vSlice))
             {
-                chunkSliceHeights[vSlice] = new HeightsCache(String.format("%sHeights_%d", cachePrefix, vSlice));
+                populateSlopes(chunkMd, vSlice, getSlopes(chunkMd, vSlice));
             }
-            else
-            {
-                chunkSliceHeights[vSlice].invalidateAll();
-            }
-
-            // Init slopes within slice
-            if (chunkSliceSlopes[vSlice] == null)
-            {
-                chunkSliceSlopes[vSlice] = new SlopesCache(String.format("%sSlopes_%d", cachePrefix, vSlice));
-            }
-            else
-            {
-                chunkSliceSlopes[vSlice].invalidateAll();
-            }
-            populateSlopes(chunkMd, vSlice, chunkSliceHeights[vSlice], chunkSliceSlopes[vSlice]);
 
             // Get surface image
             BufferedImage chunkSurfaceImage = null;
@@ -138,7 +116,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render that lovely cave action
-            ok = renderUnderground(chunkSurfaceImage, chunkImage, chunkMd, vSlice, chunkSliceHeights[vSlice], chunkSliceSlopes[vSlice]);
+            ok = renderUnderground(chunkSurfaceImage, chunkImage, chunkMd, vSlice);
 
             return ok;
         }
@@ -174,7 +152,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Render blocks in the chunk for underground.
      */
-    protected boolean renderUnderground(final BufferedImage chunkSurfaceImage, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final int vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected boolean renderUnderground(final BufferedImage chunkSurfaceImage, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final int vSlice)
     {
         final int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
         final int sliceMinY = sliceBounds[0];
@@ -193,7 +171,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 try
                 {
-                    final int ceiling = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
+                    final int ceiling = getBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
 
                     // Oh look, a hole in the world.
                     if (ceiling < 0)
@@ -222,7 +200,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                         y = ceiling;
                     }
 
-                    buildStrata(strata, sliceMinY, chunkMd, x, y, z, chunkHeights, chunkSlopes);
+                    buildStrata(strata, sliceMinY, chunkMd, x, y, z);
 
                     if (strata.isEmpty())
                     {
@@ -242,7 +220,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     else
                     {
                         // Paint that action
-                        chunkOk = paintStrata(strata, chunkSliceImage, chunkMd, vSlice, x, ceiling, z, chunkHeights, chunkSlopes) || chunkOk;
+                        chunkOk = paintStrata(strata, chunkSliceImage, chunkMd, vSlice, x, ceiling, z) || chunkOk;
                     }
 
                 }
@@ -262,7 +240,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Create Strata for caves, using first lit blocks found.
      */
-    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)
     {
         BlockMD blockMD;
         BlockMD blockAboveMD;
@@ -271,7 +249,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         try
         {
             int lightLevel;
-            int y = getSliceBlockHeight(chunkMd, x, topY >> 4, z, minY, topY, chunkHeights);
+            int y = getBlockHeight(chunkMd, x, topY >> 4, z, minY, topY);
 
             while (y > 0)
             {
@@ -331,7 +309,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Paint the image with the color derived from a BlockStack
      */
-    protected boolean paintStrata(final Strata strata, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final Integer vSlice, final int x, final int y, final int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected boolean paintStrata(final Strata strata, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final Integer vSlice, final int x, final int y, final int z)
     {
         if (strata.isEmpty())
         {
@@ -373,7 +351,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             // Now add bevel for slope
             if (!(blockMD.hasNoShadow()))
             {
-                float slope = getSlope(chunkMd, blockMD, x, vSlice, z, chunkHeights, chunkSlopes);
+                float slope = getSlope(chunkMd, blockMD, x, vSlice, z);
                 if (slope != 1f)
                 {
                     strata.setRenderCaveColor(RGB.bevelSlope(strata.getRenderCaveColor(), slope));
@@ -396,10 +374,9 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      * Get block height within slice.
      */
     @Override
-    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
-                                          final HeightsCache chunkHeights)
+    protected Integer getBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY, final Integer sliceMaxY)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        Integer[][] blockSliceHeights = getHeights(chunkMd, vSlice);
         if (blockSliceHeights == null)
         {
             return null;
@@ -488,31 +465,5 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected int getSliceLightLevel(ChunkMD chunkMd, int x, int y, int z, boolean adjusted)
     {
         return mapCaveLighting ? chunkMd.getSavedLightValue(x, y + 1, z) : 15;
-    }
-
-    @Override
-    public void onRemoval(RemovalNotification<ChunkPos, ChunkMD> notification)
-    {
-        synchronized (chunkLock)
-        {
-            ChunkPos coord = notification.getKey();
-            for (HeightsCache heightsCache : chunkSliceHeights)
-            {
-                if (heightsCache != null)
-                {
-                    heightsCache.invalidate(coord);
-                }
-            }
-
-            for (SlopesCache slopesCache : chunkSliceSlopes)
-            {
-                if (slopesCache != null)
-                {
-                    slopesCache.invalidate(coord);
-                }
-            }
-
-            //JourneyMap.getLogger().info("Invalidated data related to chunk " + coord);
-        }
     }
 }

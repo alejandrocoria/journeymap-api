@@ -38,6 +38,8 @@ public class ChunkMD
     private final WeakReference<Chunk> chunkReference;
     private final ChunkPos coord;
     private final HashMap<String, Serializable> properties = new HashMap<String, Serializable>();
+    private BlockDataArrays blockDataArrays = new BlockDataArrays();
+
     private Chunk retainedChunk;
 
     public ChunkMD(Chunk chunk)
@@ -309,6 +311,26 @@ public class ChunkMD
     public int toWorldZ(int localZ)
     {
         return (coord.chunkZPos << 4) + localZ;
+    }
+
+    public BlockDataArrays getBlockData()
+    {
+        return blockDataArrays;
+    }
+
+    public BlockDataArrays.DataArray<Integer> getBlockDataInts(String namespace)
+    {
+        return blockDataArrays.get(namespace).ints();
+    }
+
+    public BlockDataArrays.DataArray<Float> getBlockDataFloats(String namespace)
+    {
+        return blockDataArrays.get(namespace).floats();
+    }
+
+    public BlockDataArrays.DataArray<Boolean> getBlockDataBooleans(String namespace)
+    {
+        return blockDataArrays.get(namespace).booleans();
     }
 
     @Override

@@ -11,7 +11,6 @@ package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
-import journeymap.client.cartography.Strata;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
@@ -23,7 +22,6 @@ import journeymap.common.Journeymap;
  */
 public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {
-    // Taken from WorldProviderHell.getFogColor(): {0.20000000298023224f, 0.029999999329447746f, 0.029999999329447746f};
     public NetherRenderer()
     {
         super(null);
@@ -31,21 +29,24 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     }
 
     @Override
-    protected void updateOptions()
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
-        super.updateOptions();
-        this.ambientColor = RGB.floats(tweakNetherAmbientColor);
-        this.mapSurfaceAboveCaves = false;
+        if (super.updateOptions(chunkMd))
+        {
+            this.ambientColor = RGB.floats(tweakNetherAmbientColor);
+            this.mapSurfaceAboveCaves = false;
+            return true;
+        }
+        return false;
     }
 
     /**
      * Get block height within slice.
      */
     @Override
-    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
-                                          final HeightsCache chunkHeights)
+    protected Integer getBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY, final Integer sliceMaxY)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        Integer[][] blockSliceHeights = getHeights(chunkMd, vSlice);
         if (blockSliceHeights == null)
         {
             return null;
@@ -101,14 +102,6 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 
         blockSliceHeights[x][z] = y;
         return y;
-    }
-
-    /**
-     * Create Strata for caves, using first lit blocks found.
-     */
-    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
-    {
-        super.buildStrata(strata, minY, chunkMd, x, topY, z, chunkHeights, chunkSlopes);
     }
 
     /**
