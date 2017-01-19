@@ -8,33 +8,29 @@
 
 package journeymap.client.cartography.render;
 
-import com.google.common.cache.RemovalNotification;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
-import journeymap.client.data.DataCache;
 import journeymap.client.log.StatTimer;
+import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
 
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
-    protected final Object chunkLock = new Object();
-    protected final HeightsCache chunkSurfaceHeights;
-    protected final SlopesCache chunkSurfaceSlopes;
     protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
     protected Strata strata = new Strata("Surface", 40, 8, false);
     protected float maxDepth = 8;
+
 
     public SurfaceRenderer()
     {
@@ -45,23 +41,23 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     {
         // TODO: Write the caches to disk and we'll have some useful data available.
         this.cachePrefix = cachePrefix;
-        columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
-        chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
-        chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
-        DataCache.INSTANCE.addChunkMDListener(this);
     }
 
     @Override
-    protected void updateOptions()
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
-        super.updateOptions();
-        this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
+        if (super.updateOptions(chunkMd))
+        {
+            this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
     {
-        Integer y = getSurfaceBlockHeight(chunkMd, blockPos.getX() & 15, blockPos.getZ() & 15, chunkSurfaceHeights);
+        Integer y = getBlockHeight(chunkMd, blockPos.getX() & 15, null, blockPos.getZ() & 15, null, null);
         return (y == null) ? blockPos.getY() : y;
     }
 
@@ -93,12 +89,12 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         {
             timer.start();
 
-            updateOptions();
+            updateOptions(chunkMd);
 
             // Initialize ChunkSub slopes if needed
-            if (chunkSurfaceSlopes.getIfPresent(chunkMd.getCoord()) == null)
+            if (!hasSlopes(chunkMd, vSlice))
             {
-                populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
+                populateSlopes(chunkMd, vSlice, getSlopes(chunkMd, vSlice));
             }
 
             // Render the chunk image
@@ -142,7 +138,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     strata.reset();
                     BlockMD topBlockMd = null;
 
-                    int standardY = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
+                    int standardY = Math.max(0, getBlockHeight(chunkMd, x, null, z, null, null));
 
                     if (standardY == 0)
                     {
@@ -202,7 +198,16 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     // Bathymetry - need to use water height instead of standardY, so we get the color blend
                     if (mapBathymetry)
                     {
-                        standardY = getColumnProperty(PROP_WATER_HEIGHT, standardY, chunkMd, x, z);
+                        Integer[][] waterHeights = getWaterHeights(chunkMd, null);
+                        Integer waterHeight = waterHeights[z][x];
+                        if (waterHeight == null)
+                        {
+                            waterHeights[z][x] = standardY;
+                        }
+                        else
+                        {
+                            standardY = waterHeight;
+                        }
                     }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
@@ -240,6 +245,146 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             strata.reset();
         }
         return chunkOk;
+    }
+
+    /**
+     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     */
+    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal)
+    {
+        ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
+        final int newX = ((chunkMd.getCoord().chunkXPos << 4) + (x + offset.x)) & 15;
+        final int newZ = ((chunkMd.getCoord().chunkZPos << 4) + (z + offset.z)) & 15;
+
+        if (targetChunkMd != null)
+        {
+            Integer height = getBlockHeight(targetChunkMd, newX, null, newZ, null, null);
+            if (height == null)
+            {
+                return defaultVal;
+            }
+            else
+            {
+                return height;
+            }
+        }
+        else
+        {
+            return defaultVal;
+        }
+    }
+
+    /**
+     * Added because getHeight() sometimes returns an air block.
+     * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
+     * blocks that shouldn't be used as the top block.
+     */
+    @Override
+    public Integer getBlockHeight(final ChunkMD chunkMd, int localX, Integer vSlice, int localZ, Integer sliceMinY, Integer sliceMaxY)
+    {
+        Integer[][] heights = getHeights(chunkMd, null);
+        if (heights == null)
+        {
+            // Not in cache anymore
+            return null;
+        }
+        Integer y;
+
+        y = heights[localX][localZ];
+
+        if (y != null)
+        {
+            // Already set
+            return y;
+        }
+
+        // Find the height.
+        y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
+
+        if (y == 0)
+        {
+            return 0;
+        }
+
+        BlockMD blockMD;
+        boolean propUnsetWaterHeight = true;
+
+        try
+        {
+            while (y > 0)
+            {
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
+
+                if (blockMD.isAir())
+                {
+                    y--;
+                    continue;
+                }
+                else if (blockMD.isWater())
+                {
+                    if (!mapBathymetry)
+                    {
+                        break;
+                    }
+                    else if (propUnsetWaterHeight)
+                    {
+                        getWaterHeights(chunkMd, null)[localZ][localX] = y;
+                        propUnsetWaterHeight = false;
+                    }
+                    y--;
+                    continue;
+                }
+                else if (blockMD.hasFlag(BlockMD.Flag.Plant))
+                {
+                    if (!mapPlants)
+                    {
+                        y--;
+                        continue;
+                    }
+
+                    if (!mapPlantShadows || !blockMD.hasNoShadow())
+                    {
+                        y--;
+                    }
+
+                    break;
+                }
+                else if (blockMD.hasFlag(BlockMD.Flag.Crop))
+                {
+                    if (!mapCrops)
+                    {
+                        y--;
+                        continue;
+                    }
+
+                    if (!mapPlantShadows || !blockMD.hasNoShadow())
+                    {
+                        y--;
+                    }
+
+                    break;
+
+                }
+                else if (!blockMD.isLava() && blockMD.hasNoShadow())
+                {
+                    y--;
+                }
+
+                break;
+            }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().warn(String.format("Couldn't get safe surface block height for %s coords %s,%s: %s",
+                    chunkMd, localX, localZ, LogFormatter.toString(e)));
+        }
+
+        //why is height 4 set on a chunk to the left?
+        y = Math.max(0, y);
+
+        heights[localX][localZ] = y;
+
+        return y;
     }
 
     /**
@@ -356,7 +501,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             // Now add bevel for slope
             if ((topBlockMd.isWater() && mapBathymetry) || !topBlockMd.hasNoShadow())
             {
-                float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
+                float slope = getSlope(chunkMd, topBlockMd, x, null, z);
                 if (slope != 1f)
                 {
                     strata.setRenderDayColor(RGB.bevelSlope(strata.getRenderDayColor(), slope));
@@ -379,18 +524,5 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         }
 
         return true;
-    }
-
-    @Override
-    public void onRemoval(RemovalNotification<ChunkPos, ChunkMD> notification)
-    {
-        synchronized (chunkLock)
-        {
-            ChunkPos coord = notification.getKey();
-            chunkSurfaceHeights.invalidate(coord);
-            chunkSurfaceSlopes.invalidate(coord);
-
-            //JourneyMap.getLogger().info("Invalidated data related to chunk " + coord);
-        }
     }
 }

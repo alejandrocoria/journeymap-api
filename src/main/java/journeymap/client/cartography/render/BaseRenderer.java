@@ -9,7 +9,6 @@
 package journeymap.client.cartography.render;
 
 
-import com.google.common.cache.*;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
@@ -19,7 +18,6 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
-import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -27,10 +25,8 @@ import net.minecraft.util.math.ChunkPos;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -38,16 +34,15 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author mwoodman
  */
-public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkPos, ChunkMD>
+public abstract class BaseRenderer implements IChunkRenderer
 {
     public static final int COLOR_BLACK = Color.black.getRGB();
     public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     public static volatile AtomicLong badBlockCount = new AtomicLong(0);
-    public static final String PROP_WATER_HEIGHT = "waterHeight";
+
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
     protected final DataCache dataCache = DataCache.INSTANCE;
     protected CoreProperties coreProperties;
-    protected BlockColumnPropertiesCache columnPropertiesCache = null;
     // Updated in updateOptions()
     protected boolean mapBathymetry;
     protected boolean mapTransparency;
@@ -57,9 +52,10 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapPlants;
     protected boolean mapPlantShadows;
     protected float[] ambientColor;
+    protected long lastPropFileUpdate;
 
-    protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
-    protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<BlockCoordIntPair>(4);
+    protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<>(3);
+    protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<>(4);
     protected String cachePrefix = "";
 
     // Need to go in properties
@@ -82,9 +78,13 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected int tweakNetherAmbientColor; // Range: int rgb
     protected int tweakEndAmbientColor; // Range: int rgb
 
+    private static final String PROP_SLOPES = "slopes";
+    private static final String PROP_HEIGHTS = "heights";
+    private static final String PROP_WATER_HEIGHTS = "waterHeights";
+
     public BaseRenderer()
     {
-        updateOptions();
+        updateOptions(null);
 
         // TODO: Put in properties
         this.shadingSlopeMin = 0.2f;
@@ -121,19 +121,44 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     /**
      * Ensures mapping options are up-to-date.
      */
-    protected void updateOptions()
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
+        boolean updateNeeded = false;
         coreProperties = Journeymap.getClient().getCoreProperties();
-        mapBathymetry = coreProperties.mapBathymetry.get();
-        mapTransparency = coreProperties.mapTransparency.get();
-        mapAntialiasing = coreProperties.mapAntialiasing.get();
-        mapCaveLighting = coreProperties.mapCaveLighting.get();
-        mapPlants = coreProperties.mapPlants.get();
-        mapPlantShadows = coreProperties.mapPlantShadows.get();
-        mapCrops = coreProperties.mapCrops.get();
+        long lastUpdate = Journeymap.getClient().getCoreProperties().lastModified();
+        if (lastUpdate == 0 || lastPropFileUpdate != lastUpdate)
+        {
+            updateNeeded = true;
+            lastPropFileUpdate = lastUpdate;
+            mapBathymetry = coreProperties.mapBathymetry.get();
+            mapTransparency = coreProperties.mapTransparency.get();
+            mapAntialiasing = coreProperties.mapAntialiasing.get();
+            mapCaveLighting = coreProperties.mapCaveLighting.get();
+            mapPlants = coreProperties.mapPlants.get();
+            mapPlantShadows = coreProperties.mapPlantShadows.get();
+            mapCrops = coreProperties.mapCrops.get();
 
-        // Subclasses should override
-        this.ambientColor = new float[]{0, 0, 0};
+            // Subclasses should override
+            this.ambientColor = new float[]{0, 0, 0};
+        }
+
+        if (chunkMd != null)
+        {
+            Long lastChunkUpdate = (Long) chunkMd.getProperty("lastPropFileUpdate", lastPropFileUpdate);
+            if (lastChunkUpdate < lastPropFileUpdate)
+            {
+                ;
+            }
+            {
+                updateNeeded = true;
+                resetHeights(chunkMd, null);
+                resetSlopes(chunkMd, null);
+                resetWaterHeights(chunkMd, null);
+            }
+            chunkMd.setProperty("lastPropFileUpdate", lastPropFileUpdate);
+        }
+
+        return updateNeeded;
     }
 
     @Override
@@ -228,10 +253,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      * Initialize surface slopes in chunk.  This is the black magic
      * that serves as the stand-in for true bump-mapping.
      */
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, Float[][] slopes)
     {
-
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
         int y = 0, sliceMinY = 0, sliceMaxY = 0;
         boolean isSurface = (vSlice == null);
         Float slope, primarySlope, secondarySlope;
@@ -248,18 +271,10 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         {
             for (int x = 0; x < 16; x++)
             {
-                // Get block height
-                if (isSurface)
-                {
-                    y = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
-                }
-                else
-                {
-                    y = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, chunkHeights);
-                }
+                y = getBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
 
                 // Calculate primary slope
-                primarySlope = calculateSlope(chunkMd, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights);
+                primarySlope = calculateSlope(chunkMd, primarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
                 // Exaggerate primary slope for normal shading
                 slope = primarySlope;
@@ -275,7 +290,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                 // Calculate secondary slope
                 if (mapAntialiasing && primarySlope == 1f)
                 {
-                    secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY, chunkHeights);
+                    secondarySlope = calculateSlope(chunkMd, secondarySlopeOffsets, x, y, z, isSurface, vSlice, sliceMinY, sliceMaxY);
 
                     if (secondarySlope > primarySlope)
                     {
@@ -304,20 +319,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     public abstract int getBlockHeight(final ChunkMD chunkMd, BlockPos blockPos);
 
     /**
-     * Get block height within slice.  Should lazy-populate sliceHeights. Can return null.
+     * Get block height on surface or within slice.  Should lazy-populate sliceHeights. Can return null.
      */
-    protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
-                                          final HeightsCache chunkHeights)
-    {
-        throw new RuntimeException("Not implemented");
-    }
+    protected abstract Integer getBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY, final Integer sliceMaxY);
 
     /**
-     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     * Get the height of the block at the coordinates + offsets.
      */
-    protected int getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY,
-                                      final int sliceMaxY, BlockCoordIntPair offset, int defaultVal,
-                                      final HeightsCache chunkHeights)
+    protected int getOffsetBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY,
+                                       final Integer sliceMaxY, BlockCoordIntPair offset, int defaultVal)
     {
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
@@ -335,7 +345,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 
         if (targetChunkMd != null)
         {
-            return getSliceBlockHeight(targetChunkMd, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY, chunkHeights);
+            return getBlockHeight(targetChunkMd, blockX & 15, vSlice, blockZ & 15, sliceMinY, sliceMaxY);
         }
         else
         {
@@ -344,8 +354,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     }
 
     protected float calculateSlope(final ChunkMD chunkMd, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface,
-                                   Integer vSlice, int sliceMinY, int sliceMaxY,
-                                   final HeightsCache chunkHeights)
+                                   Integer vSlice, int sliceMinY, int sliceMaxY)
     {
         if (y <= 0)
         {
@@ -360,14 +369,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         float offsetHeight;
         for (BlockCoordIntPair offset : offsets)
         {
-            if (isSurface)
-            {
-                offsetHeight = getSurfaceBlockHeight(chunkMd, x, z, offset, defaultHeight, chunkHeights);
-            }
-            else
-            {
-                offsetHeight = getSliceBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset, defaultHeight, chunkHeights);
-            }
+            offsetHeight = getOffsetBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset, defaultHeight);
             slopeSum += ((y * 1f) / offsetHeight);
         }
         Float slope = slopeSum / offsets.size();
@@ -398,22 +400,73 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return new int[]{sliceMinY, sliceMaxY};
     }
 
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z)
     {
-        Float[][] slopes = chunkSlopes.getIfPresent(chunkMd.getCoord());
-
-        if (slopes == null || slopes[x][z] == null)
-        {
-            slopes = populateSlopes(chunkMd, vSlice, chunkHeights, chunkSlopes);
-        }
+        Float[][] slopes = getSlopes(chunkMd, vSlice);
 
         Float slope = slopes[x][z];
+        if (slope == null)
+        {
+            populateSlopes(chunkMd, vSlice, slopes);
+            slope = slopes[x][z];
+        }
+
         if (slope == null || slope.isNaN())
         {
             Journeymap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd.getCoord(), x, z, slope));
             slope = 1f;
         }
         return slope;
+    }
+
+    protected final String getKey(String propName, Integer vSlice)
+    {
+        return vSlice == null ? propName : propName + vSlice;
+    }
+
+    protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataInts(cachePrefix).get(getKey(PROP_HEIGHTS, vSlice));
+    }
+
+    protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataInts(cachePrefix).has(getKey(PROP_HEIGHTS, vSlice));
+    }
+
+    protected final void resetHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        chunkMd.getBlockDataInts(cachePrefix).clear(getKey(PROP_HEIGHTS, vSlice));
+    }
+
+    protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataFloats(cachePrefix).get(getKey(PROP_SLOPES, vSlice));
+    }
+
+    protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataFloats(cachePrefix).has(getKey(PROP_SLOPES, vSlice));
+    }
+
+    protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
+        chunkMd.getBlockDataFloats(cachePrefix).clear(getKey(PROP_SLOPES, vSlice));
+    }
+
+    protected final Integer[][] getWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataInts(cachePrefix).get(getKey(PROP_WATER_HEIGHTS, vSlice));
+    }
+
+    protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        return chunkMd.getBlockDataInts(cachePrefix).has(getKey(PROP_WATER_HEIGHTS, vSlice));
+    }
+
+    protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    {
+        chunkMd.getBlockDataInts(cachePrefix).clear(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
 //    /**
@@ -436,148 +489,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
 //    }
 
     /**
-     * Added because getHeight() sometimes returns an air block.
-     * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
-     * blocks that shouldn't be used as the top block.
-     */
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int localX, int localZ, final HeightsCache chunkHeights)
-    {
-        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
-        if (heights == null)
-        {
-            // Not in cache anymore
-            return null;
-        }
-        Integer y;
-
-        y = heights[localX][localZ];
-
-        if (y != null)
-        {
-            // Already set
-            return y;
-        }
-
-        // Find the height.
-        y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
-
-        if (y == 0)
-        {
-            return 0;
-        }
-
-        BlockMD blockMD;
-        boolean propUnsetWaterHeight = true;
-
-        try
-        {
-            while (y > 0)
-            {
-                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
-
-                if (blockMD.isAir())
-                {
-                    y--;
-                    continue;
-                }
-                else if (blockMD.isWater())
-                {
-                    if (!mapBathymetry)
-                    {
-                        break;
-                    }
-                    else if (propUnsetWaterHeight)
-                    {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, localX, localZ);
-                        propUnsetWaterHeight = false;
-                    }
-                    y--;
-                    continue;
-                }
-                else if (blockMD.hasFlag(BlockMD.Flag.Plant))
-                {
-                    if (!mapPlants)
-                    {
-                        y--;
-                        continue;
-                    }
-
-                    if (!mapPlantShadows || !blockMD.hasNoShadow())
-                    {
-                        y--;
-                    }
-
-                    break;
-                }
-                else if (blockMD.hasFlag(BlockMD.Flag.Crop))
-                {
-                    if (!mapCrops)
-                    {
-                        y--;
-                        continue;
-                    }
-
-                    if (!mapPlantShadows || !blockMD.hasNoShadow())
-                    {
-                        y--;
-                    }
-
-                    break;
-
-                }
-                else if (!blockMD.isLava() && blockMD.hasNoShadow())
-                {
-                    y--;
-                }
-
-                break;
-            }
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().warn(String.format("Couldn't get safe surface block height for %s coords %s,%s: %s",
-                    chunkMd, localX, localZ, LogFormatter.toString(e)));
-        }
-
-        //why is height 4 set on a chunk to the left?
-        y = Math.max(0, y);
-
-        heights[localX][localZ] = y;
-
-        return y;
-    }
-
-    /**
-     * Get the col property at the coordinates + offsets.
-     * Returns null if target chunk not loaded.
-     */
-    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset)
-    {
-        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
-        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
-        final ChunkPos targetCoord = new ChunkPos(blockX >> 4, blockZ >> 4);
-        ChunkMD targetChunkMd = null;
-
-        if (targetCoord.equals(chunkMd.getCoord()))
-        {
-            targetChunkMd = chunkMd;
-        }
-        else
-        {
-            targetChunkMd = dataCache.getChunkMD(targetCoord);
-        }
-
-        if (targetChunkMd != null)
-        {
-            return getColumnProperty(name, defaultValue, targetChunkMd, x, z);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    /**
      * Get chunk using coord offsets.
      * @return null if chunk not in memory
      */
@@ -593,90 +504,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         else
         {
            return dataCache.getChunkMD(targetCoord);
-        }
-    }
-
-    /**
-     * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
-     */
-    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal,
-                                     final HeightsCache chunkHeights)
-    {
-        ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
-        final int newX = ((chunkMd.getCoord().chunkXPos << 4) + (x + offset.x)) & 15;
-        final int newZ = ((chunkMd.getCoord().chunkZPos << 4) + (z + offset.z)) & 15;
-
-        if (targetChunkMd != null)
-        {
-            Integer height = getSurfaceBlockHeight(targetChunkMd, newX, newZ, chunkHeights);
-            if (height == null)
-            {
-                return defaultVal;
-            }
-            else
-            {
-                return height;
-            }
-        }
-        else
-        {
-            return defaultVal;
-        }
-    }
-
-    /**
-     * Get a CacheBuilder with common configuration already set.
-     *
-     * @return
-     */
-    private CacheBuilder<Object, Object> getCacheBuilder()
-    {
-        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
-        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
-        {
-            builder.recordStats();
-        }
-        return builder;
-    }
-
-    protected void setColumnProperty(String name, Serializable value, ChunkMD chunkMD, int x, int z)
-    {
-        getColumnProperties(chunkMD, x, z, true).put(name, value);
-    }
-
-    protected <V extends Serializable> V getColumnProperty(String name, V defaultValue, ChunkMD chunkMD, int x, int z)
-    {
-        HashMap<String, Serializable> props = getColumnProperties(chunkMD, x, z);
-        V value = null;
-        if (props != null)
-        {
-            value = (V) props.get(name);
-        }
-        return (value != null) ? value : defaultValue;
-    }
-
-    protected HashMap<String, Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z)
-    {
-        return getColumnProperties(chunkMD, x, z, false);
-    }
-
-    protected HashMap<String, Serializable> getColumnProperties(ChunkMD chunkMD, int x, int z, boolean forceCreation)
-    {
-        try
-        {
-            HashMap<String, Serializable>[][] propArr = columnPropertiesCache.get(chunkMD.getCoord());
-            HashMap<String, Serializable> props = propArr[x][z];
-            if (props == null && forceCreation)
-            {
-                props = new HashMap<String, Serializable>();
-                propArr[x][z] = props;
-            }
-            return props;
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().warn("Error in getColumnProperties(): " + e.getMessage());
-            return null;
         }
     }
 
@@ -734,90 +561,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
             Journeymap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count
             );
-        }
-    }
-
-    /**
-     * Cache for storing block heights in a 2-dimensional array, keyed to chunk coordinates.
-     */
-    public class HeightsCache extends ForwardingLoadingCache<ChunkPos, Integer[][]>
-    {
-        final LoadingCache<ChunkPos, Integer[][]> internal;
-
-        protected HeightsCache(String name)
-        {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkPos, Integer[][]>()
-            {
-                @Override
-                public Integer[][] load(ChunkPos key) throws Exception
-                {
-                    //JourneyMap.getLogger().info("Initialized heights for chunk " + key);
-                    return new Integer[16][16];
-                }
-            });
-            DataCache.INSTANCE.addPrivateCache(name, this);
-        }
-
-        @Override
-        protected LoadingCache<ChunkPos, Integer[][]> delegate()
-        {
-            return internal;
-        }
-    }
-
-    /**
-     * Cache for storing block slopes in a 2-dimensional array, keyed to chunk coordinates.
-     */
-    public class SlopesCache extends ForwardingLoadingCache<ChunkPos, Float[][]>
-    {
-        final LoadingCache<ChunkPos, Float[][]> internal;
-
-        protected SlopesCache(String name)
-        {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkPos, Float[][]>()
-            {
-                @Override
-                public Float[][] load(ChunkPos key) throws Exception
-                {
-                    //JourneyMap.getLogger().info("Initialized slopes for chunk " + key);
-                    return new Float[16][16];
-                }
-            });
-            DataCache.INSTANCE.addPrivateCache(name, this);
-        }
-
-        @Override
-        protected LoadingCache<ChunkPos, Float[][]> delegate()
-        {
-            return internal;
-        }
-    }
-
-    /**
-     * Cache for storing block properties in a 2-dimensional array, keyed to chunk coordinates.
-     */
-    public class BlockColumnPropertiesCache extends ForwardingLoadingCache<ChunkPos, HashMap<String, Serializable>[][]>
-    {
-        final LoadingCache<ChunkPos, HashMap<String, Serializable>[][]> internal;
-
-        protected BlockColumnPropertiesCache(String name)
-        {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkPos, HashMap<String, Serializable>[][]>()
-            {
-                @Override
-                public HashMap<String, Serializable>[][] load(ChunkPos key) throws Exception
-                {
-                    //JourneyMap.getLogger().info("Initialized column properties for chunk " + key);
-                    return new HashMap[16][16];
-                }
-            });
-            DataCache.INSTANCE.addPrivateCache(name, this);
-        }
-
-        @Override
-        protected LoadingCache<ChunkPos, HashMap<String, Serializable>[][]> delegate()
-        {
-            return internal;
         }
     }
 
