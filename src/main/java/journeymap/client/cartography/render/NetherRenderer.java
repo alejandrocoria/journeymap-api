@@ -52,12 +52,14 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
             return null;
         }
 
-        Integer y = blockSliceHeights[x][z];
+        Integer intY = blockSliceHeights[x][z];
 
-        if (y != null)
+        if (intY != null)
         {
-            return y;
+            return intY;
         }
+
+        int y;
 
         try
         {
@@ -73,9 +75,9 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
                     break;
                 }
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMDAbove.isAir() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
-                    if (!blockMD.isAir() && !blockMD.hasTranparency() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMD.isAir() && !blockMD.hasTransparency() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
                         break;
                     }

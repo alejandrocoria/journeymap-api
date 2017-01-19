@@ -484,7 +484,7 @@ public class BlockMD implements Comparable<BlockMD>
      *
      * @return the boolean
      */
-    public boolean hasTranparency()
+    public boolean hasTransparency()
     {
         return alpha < 1f;
     }

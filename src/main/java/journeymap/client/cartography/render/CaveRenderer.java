@@ -143,7 +143,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
             else
             {
-                float dim = Math.max(defaultDim, 16f / distance);
+                //float dim = Math.max(defaultDim, 16f / distance);
                 paintDimOverlay(chunkSurfaceImage, chunkImage, x, z, defaultDim);
             }
         }
@@ -181,24 +181,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                         continue;
                     }
 
-                    // Nothing even in this slice.
-                    if (ceiling < sliceMinY)
-                    {
-                        mask(chunkSurfaceImage, chunkSliceImage, chunkMd, x, sliceMinY, z);
-                        chunkOk = true;
-                        continue;
-                    }
-
-                    if (ceiling > sliceMaxY)
-                    {
-                        // Solid stuff above the slice. Shouldn't be painted by surface renderer.
-                        y = sliceMaxY;
-                    }
-                    else
-                    {
-                        // Ceiling within slice. Should be painted by by surface renderer... should we dim it?
-                        y = ceiling;
-                    }
+                    y = Math.min(ceiling, sliceMaxY);
 
                     buildStrata(strata, sliceMinY, chunkMd, x, y, z);
 
@@ -428,9 +411,9 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                 inAirPocket = blockMD.isAir();
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTranparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMDAbove.isAir() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
                 {
-                    if (!blockMD.isAir() || !blockMD.hasTranparency() || !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMD.isAir() || !blockMD.hasTransparency() || !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
                     {
                         break;
                     }
