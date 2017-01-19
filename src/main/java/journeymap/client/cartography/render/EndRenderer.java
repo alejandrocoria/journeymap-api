@@ -31,18 +31,22 @@ public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
     }
 
     @Override
-    protected void updateOptions()
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
-        super.updateOptions();
-        this.ambientColor = RGB.floats(tweakEndAmbientColor);
-        this.tweakMoonlightLevel = 5f;
+        if (super.updateOptions(chunkMd))
+        {
+            this.ambientColor = RGB.floats(tweakEndAmbientColor);
+            this.tweakMoonlightLevel = 5f;
+            return true;
+        }
+        return false;
     }
 
     /**
      * Create Strata.
      */
     @Override
-    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)//, HeightsCache chunkHeights, SlopesCache chunkSlopes)
+    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)//, IntCache chunkHeights, FloatCache chunkSlopes)
     {
         super.buildStrata(strata, minY, chunkMd, x, topY, z);//, chunkHeights, chunkSlopes);
     }

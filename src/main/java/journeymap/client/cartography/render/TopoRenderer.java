@@ -8,10 +8,8 @@
 
 package journeymap.client.cartography.render;
 
-import com.google.common.cache.RemovalNotification;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
-import journeymap.client.data.DataCache;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
@@ -21,7 +19,6 @@ import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
@@ -33,16 +30,12 @@ import java.awt.image.BufferedImage;
  */
 public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 {
-    public static final String PROP_SHORE = "isShore";
-
-    protected final Object chunkLock = new Object();
+    private static final String PROP_SHORE = "isShore";
     private Integer[] waterPalette;
     private Integer[] landPalette;
     private int waterPaletteRange;
     private int landPaletteRange;
-    private final HeightsCache chunkSurfaceHeights;
-    private final SlopesCache chunkSurfaceSlopes;
-    private long lastPropFileUpdate;
+    private long lastTopoFileUpdate;
 
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
@@ -60,10 +53,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         // TODO: Write the caches to disk and we'll have some useful data available.
         this.cachePrefix = "Topo";
-        columnPropertiesCache = new BlockColumnPropertiesCache(cachePrefix + "ColumnProps");
-        chunkSurfaceHeights = new HeightsCache(cachePrefix + "Heights");
-        chunkSurfaceSlopes = new SlopesCache(cachePrefix + "Slopes");
-        DataCache.INSTANCE.addChunkMDListener(this);
 
         primarySlopeOffsets.clear();
         secondarySlopeOffsets.clear();
@@ -78,19 +67,21 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Ensures mapping options are up-to-date.
      */
-    protected void updateOptions()
+    @Override
+    protected boolean updateOptions(ChunkMD chunkMd)
     {
-        super.updateOptions();
-
-        World world = FMLClientHandler.instance().getClient().world;
+        super.updateOptions(chunkMd);
+        boolean needUpdate = false;
+        World world = FMLClientHandler.instance().getClient().theWorld;
         double worldHeight = world.getHeight();
 
         topoProperties = Journeymap.getClient().getTopoProperties();
-        if (System.currentTimeMillis() - lastPropFileUpdate > 5000 && lastPropFileUpdate < topoProperties.lastModified())
+        if (System.currentTimeMillis() - lastTopoFileUpdate > 5000 && lastTopoFileUpdate < topoProperties.lastModified())
         {
+            needUpdate = true;
             Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
             topoProperties.load();
-            lastPropFileUpdate = topoProperties.lastModified();
+            lastTopoFileUpdate = topoProperties.lastModified();
 
             landContourColor = topoProperties.getLandContourColor();
             waterContourColor = topoProperties.getWaterContourColor();
@@ -103,9 +94,26 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
             landPaletteRange = landPalette.length - 1;
             landContourInterval = worldHeight / Math.max(1, landPalette.length);
-
-            clearCaches();
         }
+
+        if (chunkMd != null)
+        {
+            Long lastUpdate = (Long) chunkMd.getProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
+            if (needUpdate || (lastUpdate < lastTopoFileUpdate))
+            {
+                ;
+            }
+            {
+                needUpdate = true;
+                resetHeights(chunkMd, null);
+                resetSlopes(chunkMd, null);
+                resetWaterHeights(chunkMd, null);
+                resetShore(chunkMd);
+            }
+            chunkMd.setProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
+        }
+
+        return needUpdate;
     }
 
     /**
@@ -125,12 +133,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         {
             timer.start();
 
-            updateOptions();
+            updateOptions(chunkMd);
 
             // Initialize ChunkSub slopes if needed
-            if (chunkSurfaceSlopes.getIfPresent(chunkMd.getCoord()) == null)
+            if (!hasSlopes(chunkMd, null))
             {
-                populateSlopes(chunkMd, null, chunkSurfaceHeights, chunkSurfaceSlopes);
+                populateSlopes(chunkMd);
             }
 
             // Render the chunk image
@@ -164,11 +172,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 {
                     BlockMD topBlockMd = null;
 
-                    int y = Math.max(0, getSurfaceBlockHeight(chunkMd, x, z, chunkSurfaceHeights));
+                    int y = Math.max(0, getBlockHeight(chunkMd, x, null, z, null, null));
 
                     if (mapBathymetry)
                     {
-                        y = getColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, x, z);
+                        y = getWaterHeights(chunkMd, null)[z][x];
                     }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);
@@ -190,9 +198,10 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return chunkOk;
     }
 
-    public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int localX, int localZ, final HeightsCache chunkHeights)
+    @Override
+    public Integer getBlockHeight(final ChunkMD chunkMd, int localX, Integer vSlice, int localZ, Integer sliceMinY, Integer sliceMaxY)
     {
-        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        Integer[][] heights = getHeights(chunkMd, null);
         if (heights == null)
         {
             // Not in cache anymore
@@ -218,7 +227,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 {
                     if (mapBathymetry)
                     {
-                        setColumnProperty(PROP_WATER_HEIGHT, y, chunkMd, localX, localZ);
+                        getWaterHeights(chunkMd, null)[localZ][localX] = y;
                     }
                     else
                     {
@@ -248,11 +257,9 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     /**
      * Initialize surface slopes in chunk if needed.
      */
-    protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice,
-                                       final HeightsCache chunkHeights,
-                                       final SlopesCache chunkSlopes)
+    protected Float[][] populateSlopes(final ChunkMD chunkMd)
     {
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
+        Float[][] slopes = getSlopes(chunkMd, null);
 
         float h;
         Float slope;
@@ -262,13 +269,13 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         {
             for (int x = 0; x < 16; x++)
             {
-                h = getSurfaceBlockHeight(chunkMd, x, z, chunkHeights);
+                h = getBlockHeight(chunkMd, x, null, z, null, null);
 
                 BlockMD blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, (int) h, z);
 
                 boolean isWater = false;
 
-                if (blockMD.isWater() || blockMD.isIce() || (mapBathymetry && getColumnProperty(PROP_WATER_HEIGHT, null, chunkMd, x, z) != null))
+                if (blockMD.isWater() || blockMD.isIce() || (mapBathymetry && getWaterHeights(chunkMd, null)[z][x] != null))
                 {
                     isWater = true;
                     contourInterval = waterContourInterval;
@@ -288,7 +295,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     BlockCoordIntPair offset = primarySlopeOffsets.get(i);
 
                     // Get height
-                    float offsetHeight = getSurfaceBlockHeight(chunkMd, x, z, offset, (int) h, chunkHeights);
+                    float offsetHeight = getOffsetBlockHeight(chunkMd, x, null, z, null, null, offset, (int) h);
 
                     // If water, check for neighboring land
                     if (isWater && !isShore)
@@ -300,14 +307,14 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                         if (targetChunkMd != null)
                         {
-                            if (mapBathymetry && getColumnProperty(PROP_WATER_HEIGHT, null, targetChunkMd, newX, newZ) == null)
+                            if (mapBathymetry && (mapBathymetry && getWaterHeights(chunkMd, null)[z][x] == null))
                             {
                                 isShore = true;
                             }
                             else
                             {
                                 int ceiling = targetChunkMd.ceiling(newX, newZ);
-                                BlockMD offsetBlock = targetChunkMd.getTopBlockMD(newX, (int) ceiling, newZ);
+                                BlockMD offsetBlock = targetChunkMd.getTopBlockMD(newX, ceiling, newZ);
                                 if (!offsetBlock.isWater() && !offsetBlock.isIce())
                                 {
                                     isShore = true;
@@ -332,7 +339,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                 if (isWater)
                 {
-                    setColumnProperty(PROP_SHORE, isShore, chunkMd, x, z);
+                    getShore(chunkMd)[z][x] = isShore;
                 }
 
 
@@ -368,7 +375,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     @Override
     public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
     {
-        return FMLClientHandler.instance().getClient().world.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
+        return FMLClientHandler.instance().getClient().theWorld.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
     }
 
     protected boolean paintContour(final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
@@ -381,7 +388,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         try
         {
 
-            float slope = getSlope(chunkMd, topBlockMd, x, null, z, chunkSurfaceHeights, chunkSurfaceSlopes);
+            float slope = getSlope(chunkMd, topBlockMd, x, null, z);
             boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
 
             int color;
@@ -399,7 +406,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 }
                 else if (isWater)
                 {
-                    if (Boolean.TRUE.equals(getColumnProperty(PROP_SHORE, Boolean.FALSE, chunkMd, x, z)))
+                    if (getShore(chunkMd)[z][x] == Boolean.TRUE)
                     {
                         // water is touching land, use the contour color
                         color = waterContourColor;
@@ -447,31 +454,18 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return true;
     }
 
-    @Override
-    public void onRemoval(RemovalNotification<ChunkPos, ChunkMD> notification)
+    protected final Boolean[][] getShore(ChunkMD chunkMd)
     {
-        synchronized (chunkLock)
-        {
-            ChunkPos coord = notification.getKey();
-            chunkSurfaceHeights.invalidate(coord);
-            chunkSurfaceSlopes.invalidate(coord);
-            columnPropertiesCache.invalidate(coord);
-        }
+        return chunkMd.getBlockDataBooleans(cachePrefix).get(PROP_SHORE);
     }
 
-    private void clearCaches()
+    protected final boolean hasShore(ChunkMD chunkMd)
     {
-        if (chunkSurfaceHeights != null)
-        {
-            chunkSurfaceHeights.invalidateAll();
-        }
-        if (chunkSurfaceSlopes != null)
-        {
-            chunkSurfaceSlopes.invalidateAll();
-        }
-        if (columnPropertiesCache != null)
-        {
-            columnPropertiesCache.invalidateAll();
-        }
+        return chunkMd.getBlockDataBooleans(cachePrefix).has(PROP_SHORE);
+    }
+
+    protected final void resetShore(ChunkMD chunkMd)
+    {
+        chunkMd.getBlockDataBooleans(cachePrefix).clear(PROP_SHORE);
     }
 }
