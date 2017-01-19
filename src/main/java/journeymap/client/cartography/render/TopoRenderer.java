@@ -72,7 +72,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     {
         super.updateOptions(chunkMd);
         boolean needUpdate = false;
-        World world = FMLClientHandler.instance().getClient().theWorld;
+        World world = FMLClientHandler.instance().getClient().world;
         double worldHeight = world.getHeight();
 
         topoProperties = Journeymap.getClient().getTopoProperties();
@@ -375,7 +375,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     @Override
     public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
     {
-        return FMLClientHandler.instance().getClient().theWorld.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
+        return FMLClientHandler.instance().getClient().world.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
     }
 
     protected boolean paintContour(final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
