@@ -66,7 +66,7 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
-    public static final String FULL_VERSION = Journeymap.FORGE_VERSION + "-" + Journeymap.JM_VERSION;
+    public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
     private boolean serverEnabled = false;
     private boolean serverTeleportEnabled = false;
