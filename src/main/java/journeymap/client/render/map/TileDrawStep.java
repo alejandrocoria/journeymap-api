@@ -160,6 +160,10 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
+        else
+        {
+            int i = 2;
+        }
 
         // Grid
         if (gridSpec != null)
