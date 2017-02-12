@@ -11,7 +11,6 @@ package journeymap.client.ui.component;
 
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -22,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import org.apache.logging.log4j.Logger;
@@ -77,7 +77,7 @@ public abstract class JmUI extends GuiScreen
     public void setWorldAndResolution(Minecraft minecraft, int width, int height)
     {
         super.setWorldAndResolution(minecraft, width, height);
-        this.scaleFactor = ForgeHelper.INSTANCE.getScaledResolution().getScaleFactor();
+        this.scaleFactor = new ScaledResolution(minecraft).getScaleFactor();
     }
 
     @Override

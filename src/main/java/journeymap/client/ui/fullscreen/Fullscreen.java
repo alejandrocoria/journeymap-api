@@ -19,7 +19,6 @@ import journeymap.client.api.util.UIState;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
@@ -1111,7 +1110,7 @@ public class Fullscreen extends JmUI
         state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                 MathHelper.floor(mc.player.posX),
                 MathHelper.floor(mc.player.posZ),
-                MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.player).minY),
+                MathHelper.floor(mc.player.getEntityBoundingBox().minY),
                 mc.player.chunkCoordY) + " " + state.getPlayerBiome();
 
         // Reset timer

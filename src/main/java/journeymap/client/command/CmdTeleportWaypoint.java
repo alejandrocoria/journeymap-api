@@ -9,7 +9,6 @@
 package journeymap.client.command;
 
 import com.mojang.authlib.GameProfile;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -42,7 +41,7 @@ public class CmdTeleportWaypoint
             GameProfile profile = null;
             try
             {
-                profile = new GameProfile(mc.player.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.player));
+                profile = new GameProfile(mc.player.getUniqueID(), mc.player.getName());
                 configurationManager = mcServer.getPlayerList();
 
                 // 1.7
@@ -96,7 +95,7 @@ public class CmdTeleportWaypoint
         if (Journeymap.getClient().isServerEnabled() || FMLClientHandler.instance().getClient().isSingleplayer()) {
             mc.player.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
         } else {
-            mc.player.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.player), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+            mc.player.sendChatMessage(String.format("/tp %s %s %s %s", mc.player.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
         }
     }
 }

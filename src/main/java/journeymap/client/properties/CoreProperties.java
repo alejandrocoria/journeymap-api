@@ -55,9 +55,9 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     public final BooleanField mapPlants = new BooleanField(Cartography, "jm.common.map_style_plants", false);
     public final BooleanField mapCrops = new BooleanField(Cartography, "jm.common.map_style_crops", true);
     public final BooleanField mapSurfaceAboveCaves = new BooleanField(Cartography, "jm.common.map_style_caveshowsurface", true);
-    public final IntegerField renderDistanceCaveMin = new IntegerField(Cartography, "jm.common.renderdistance_cave_min", 1, 32, 3, 101);
+    //public final IntegerField renderDistanceCaveMin = new IntegerField(Cartography, "jm.common.renderdistance_cave_min", 1, 32, 3, 101);
     public final IntegerField renderDistanceCaveMax = new IntegerField(Cartography, "jm.common.renderdistance_cave_max", 1, 32, 3, 102);
-    public final IntegerField renderDistanceSurfaceMin = new IntegerField(Cartography, "jm.common.renderdistance_surface_min", 1, 32, 4, 103);
+    //public final IntegerField renderDistanceSurfaceMin = new IntegerField(Cartography, "jm.common.renderdistance_surface_min", 1, 32, 4, 103);
     public final IntegerField renderDistanceSurfaceMax = new IntegerField(Cartography, "jm.common.renderdistance_surface_max", 1, 32, 7, 104);
     public final IntegerField renderDelay = new IntegerField(Cartography, "jm.common.renderdelay", 0, 10, 2);
     public final EnumField<RenderSpec.RevealShape> revealShape = new EnumField<RenderSpec.RevealShape>(Cartography, "jm.common.revealshape", RenderSpec.RevealShape.Circle);
@@ -124,7 +124,8 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
         if (FMLClientHandler.instance().getClient() != null)
         {
             int gameRenderDistance = FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks;
-            for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
+            //for (IntegerField prop : Arrays.asList(renderDistanceCaveMin, renderDistanceCaveMax, renderDistanceSurfaceMin, renderDistanceSurfaceMax))
+            for (IntegerField prop : Arrays.asList(renderDistanceCaveMax, renderDistanceSurfaceMax))
             {
                 if (prop.get() > gameRenderDistance)
                 {
@@ -143,15 +144,15 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
         return valid;
     }
 
-    public boolean hasValidCaveRenderDistances()
-    {
-        return renderDistanceCaveMax.get() >= renderDistanceCaveMin.get();
-    }
-
-    public boolean hasValidSurfaceRenderDistances()
-    {
-        return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
-    }
+//    public boolean hasValidCaveRenderDistances()
+//    {
+//        return renderDistanceCaveMax.get() >= renderDistanceCaveMin.get();
+//    }
+//
+//    public boolean hasValidSurfaceRenderDistances()
+//    {
+//        return renderDistanceSurfaceMax.get() >= renderDistanceSurfaceMin.get();
+//    }
 
     public int getColor(StringField colorField)
     {

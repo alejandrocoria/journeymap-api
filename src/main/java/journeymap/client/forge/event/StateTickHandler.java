@@ -10,7 +10,6 @@ package journeymap.client.forge.event;
 
 import journeymap.client.api.event.DeathWaypointEvent;
 import journeymap.client.api.impl.ClientAPI;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.waypoint.WaypointStore;
@@ -28,8 +27,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
-
 /**
  * Tick handler for JourneyMap state
  */
@@ -40,14 +37,6 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
     private boolean deathpointCreated;
-
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
-    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent()
@@ -137,7 +126,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             BlockPos pos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
             if (enabled)
             {
-                int dim = ForgeHelper.INSTANCE.getPlayerDimension();
+                int dim = FMLClientHandler.instance().getClient().player.world.provider.getDimension();
 
                 DeathWaypointEvent event = new DeathWaypointEvent(pos, dim);
                 ClientAPI.INSTANCE.getClientEventManager().fireDeathpointEvent(event);
@@ -153,7 +142,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             }
 
             Journeymap.getLogger().info(String.format("%s died at %s. Deathpoints enabled: %s. Deathpoint created: %s",
-                    ForgeHelper.INSTANCE.getEntityName(player),
+                    player.getName(),
                     pos,
                     enabled,
                     cancelled ? "cancelled" : true));

@@ -9,7 +9,6 @@
 package journeymap.client.render.draw;
 
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.common.Journeymap;
@@ -39,7 +38,7 @@ public class WaypointDrawStepFactory
         int dimension = player.dimension;
         int maxDistance = Journeymap.getClient().getWaypointProperties().maxDistance.get();
         checkDistance = checkDistance && maxDistance > 0;
-        Vec3d playerVec = checkDistance ? ForgeHelper.INSTANCE.getEntityPositionVector(player) : null;
+        Vec3d playerVec = checkDistance ? player.getPositionVector() : null;
         drawStepList.clear();
 
         try

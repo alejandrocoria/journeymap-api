@@ -59,8 +59,8 @@ public class ActionService extends BaseService
 
         // Check world
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        World theWorld = minecraft.world;
-        if (theWorld == null)
+        World world = minecraft.world;
+        if (world == null)
         {
             throwEventException(503, "World not connected", event, false);
         }
@@ -102,7 +102,7 @@ public class ActionService extends BaseService
         Query query = event.query();
 
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        World theWorld = minecraft.world;
+        World world = minecraft.world;
 
 
         try
@@ -136,7 +136,7 @@ public class ActionService extends BaseService
 
             // Validate cave mapping allowed
             // Check for hardcore
-            Boolean hardcore = theWorld.getWorldInfo().isHardcoreModeEnabled();
+            Boolean hardcore = world.getWorldInfo().isHardcoreModeEnabled();
             if (mapType.isUnderground() && hardcore)
             {
                 String error = "Cave mapping on hardcore servers is not allowed"; //$NON-NLS-1$

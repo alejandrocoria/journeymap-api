@@ -11,7 +11,6 @@ package journeymap.client.task.multi;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapType;
@@ -78,7 +77,7 @@ public abstract class BaseMapTask implements ITask
             final Iterator<ChunkPos> chunkIter = chunkCoords.iterator();
 
             // Check the dimension
-            int currentDimension = ForgeHelper.INSTANCE.getPlayerDimension();
+            int currentDimension = FMLClientHandler.instance().getClient().player.world.provider.getDimension();
             if (currentDimension != mapType.dimension)
             {
                 if (threadLogging)

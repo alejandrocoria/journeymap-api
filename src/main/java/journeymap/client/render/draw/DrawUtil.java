@@ -11,13 +11,13 @@ package journeymap.client.render.draw;
 
 import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -97,7 +97,7 @@ public class DrawUtil
             return;
         }
 
-        final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
 
         final double vpad = fontRenderer.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
         final double lineHeight = fontRenderer.FONT_HEIGHT * fontScale;
@@ -152,7 +152,7 @@ public class DrawUtil
         double bgHeight = 0;
         if (bgColor != null && bgAlpha > 0)
         {
-            final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+            final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
             bgWidth = fontRenderer.getStringWidth(text);
             bgHeight = getLabelHeight(fontRenderer, fontShadow);
         }
@@ -177,7 +177,7 @@ public class DrawUtil
             alpha = alpha / 255f;
         }
 
-        final FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
         final boolean drawRect = (bgColor != null && alpha > 0);
         final double width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;

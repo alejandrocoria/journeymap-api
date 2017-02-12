@@ -40,9 +40,9 @@ public class CorePropertiesTest extends PropertiesBaseTest<CoreProperties>
         randomize(p.mapPlants);
         randomize(p.mapCrops);
         randomize(p.mapSurfaceAboveCaves);
-        randomize(p.renderDistanceCaveMin);
+        //randomize(p.renderDistanceCaveMin);
         randomize(p.renderDistanceCaveMax);
-        randomize(p.renderDistanceSurfaceMin);
+        //randomize(p.renderDistanceSurfaceMin);
         randomize(p.renderDistanceSurfaceMax);
         randomize(p.renderDelay);
         randomize(p.revealShape);

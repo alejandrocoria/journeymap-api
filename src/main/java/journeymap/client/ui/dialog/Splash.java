@@ -44,9 +44,10 @@ public class Splash extends JmUI
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("indiemusicbus", "indiemusicbus", "jm.common.splash_patreon"),
-            new SplashPerson("CaerMaster", "CaerMaster", "jm.common.splash_patreon"),
-            new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon")
+            new SplashPerson("Indiemusicbus", "indiemusicbus", "jm.common.splash_patreon"),
+            new SplashPerson("Argonimer", "Argonimer", "jm.common.splash_patreon"),
+            new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
+            new SplashPerson("Blitzyuk", "Blitzyuk", "jm.common.splash_patreon")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
@@ -61,17 +62,6 @@ public class Splash extends JmUI
     {
         super(Constants.getString("jm.common.splash_title", Journeymap.JM_VERSION), returnDisplay);
 
-        // Get splash strings
-        info = FileHandler.getMessageModel(SplashInfo.class, "splash");
-
-        String bday = Constants.birthdayMessage();
-        if (bday != null)
-        {
-            info.lines.add(0, new SplashInfo.Line(bday, "dialog.FullscreenActions#tweet#" + bday));
-            devs = new ArrayList<SplashPerson>(devs);
-            devs.add(new SplashPerson.Fake("", "", TextureCache.getTexture(TextureCache.ColorPicker2)));
-        }
-
         // Get brick texture
         brickTex = TextureCache.getTexture(TextureCache.Brick);
     }
@@ -83,6 +73,24 @@ public class Splash extends JmUI
     public void initGui()
     {
         Journeymap.getClient().getCoreProperties().splashViewed.set(Journeymap.JM_VERSION.toString());
+
+        if (info == null)
+        {
+            // Get splash strings
+            info = FileHandler.getMessageModel(SplashInfo.class, "splash");
+            if (info == null)
+            {
+                info = new SplashInfo();
+            }
+
+            String bday = Constants.birthdayMessage();
+            if (bday != null)
+            {
+                info.lines.add(0, new SplashInfo.Line(bday, "dialog.FullscreenActions#tweet#" + bday));
+                devs = new ArrayList<SplashPerson>(devs);
+                devs.add(new SplashPerson.Fake("", "", TextureCache.getTexture(TextureCache.ColorPicker2)));
+            }
+        }
 
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();
@@ -213,11 +221,13 @@ public class Splash extends JmUI
             int titleY = by;
 
             by += (lineHeight * 2);
-
-            int listX = infoButtons.getLeftX() - 10;
             int listY = by - 30;
-            int listWidth = infoButtons.getRightX() + 10 - listX;
             int listHeight = 100;
+
+            peopleButtons.layoutCenteredHorizontal(bx, by, true, 10);
+            int listX = peopleButtons.getLeftX() - 10;
+            int listWidth = peopleButtons.getRightX() + 10 - listX;
+
 
             DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, RGB.LIGHT_GRAY_RGB, .8f, RGB.LIGHT_GRAY_RGB, .8f);
 
@@ -232,7 +242,6 @@ public class Splash extends JmUI
             DrawUtil.drawLabel(Constants.getString("jm.common.splash_walloffame"), bx, titleY,
                     DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, Color.cyan.getRGB(), 1f, 1, true);
 
-            peopleButtons.layoutCenteredHorizontal(bx, by, true, 10);
 
             if (devButtons.isEmpty())
             {

@@ -10,22 +10,29 @@ package journeymap.client.data;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.dto.RealmsServer;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiScreenRealmsProxy;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.realms.RealmsScreen;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
@@ -74,7 +81,65 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            return ForgeHelper.INSTANCE.getRealmsServerName();
+            String serverName = null;
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            if (!mc.isSingleplayer())
+            {
+                try
+                {
+                    NetHandlerPlayClient netHandler = mc.getConnection();
+                    GuiScreen netHandlerGui = ReflectionHelper.getPrivateValue(NetHandlerPlayClient.class, netHandler, "field_147307_j", "guiScreenServer");
+
+                    if (netHandlerGui instanceof GuiScreenRealmsProxy)
+                    {
+                        RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).getProxy();
+                        if (realmsScreen instanceof RealmsMainScreen)
+                        {
+                            RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
+                            long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
+                            List<RealmsServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
+                            for (RealmsServer mcoServer : mcoServers)
+                            {
+                                if (mcoServer.id == selectedServerId)
+                                {
+                                    serverName = mcoServer.name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Throwable t)
+                {
+                    Journeymap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
+                }
+            }
+
+            if (serverName != null)
+            {
+                return serverName;
+            }
+            else
+            {
+                mc = FMLClientHandler.instance().getClient();
+                ServerData serverData = mc.getCurrentServerData(); // 1.8 getServerData()
+
+                if (serverData != null)
+                {
+                    serverName = serverData.serverName;
+                    if (serverName != null)
+                    {
+                        serverName = serverName.replaceAll("\\W+", "~").trim();
+
+                        if (Strings.isNullOrEmpty(serverName.replaceAll("~", "")))
+                        {
+                            serverName = serverData.serverIP;
+                        }
+                        return serverName;
+                    }
+                }
+            }
+            return null;
         }
         catch (Throwable t)
         {
@@ -91,7 +156,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
             NetworkManager netManager = FMLClientHandler.instance().getClientToServerNetworkManager();
             if (netManager != null)
             {
-                SocketAddress socketAddress = ForgeHelper.INSTANCE.getSocketAddress(netManager);
+                SocketAddress socketAddress = netManager.getRemoteAddress();
                 if ((socketAddress != null && socketAddress instanceof InetSocketAddress))
                 {
                     InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
@@ -197,8 +262,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
             requiredDims.addAll(Arrays.asList(dims));
 
             // Use the player's provider
-            WorldProvider playerProvider = FMLClientHandler.instance().getClient().player.world.provider;
-            int dimId = ForgeHelper.INSTANCE.getDimension();
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            WorldProvider playerProvider = mc.player.world.provider;
+            int dimId = mc.player.dimension;
             DimensionProvider playerDimProvider = new WrappedProvider(playerProvider);
             dimProviders.put(dimId, playerDimProvider);
             requiredDims.remove(dimId);
@@ -290,7 +356,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Exception e)
         {
-            return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension());
+            Minecraft mc = FMLClientHandler.instance().getClient();
+            return Constants.getString("jm.common.dimension", mc.world.provider.getDimension());
         }
     }
 
@@ -304,7 +371,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         boolean multiplayer = server == null || server.getPublic();
 
         name = getWorldName(mc, false);
-        dimension = ForgeHelper.INSTANCE.getDimension();
+        dimension = mc.world.provider.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
         time = mc.world.getWorldTime() % 24000L;

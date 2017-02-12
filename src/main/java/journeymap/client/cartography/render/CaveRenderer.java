@@ -188,16 +188,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     if (strata.isEmpty())
                     {
                         // No lit blocks
-                        if (strata.isBlocksFound())
-                        {
-                            mask(chunkSurfaceImage, chunkSliceImage, chunkMd, x, y, z);
-                        }
-                        else
-                        {
-                            // No blocks at all?  Okay then.
-                            paintVoidBlock(chunkSliceImage, x, z);
-                        }
-
+                        mask(chunkSurfaceImage, chunkSliceImage, chunkMd, x, y, z);
                         chunkOk = true;
                     }
                     else

@@ -11,7 +11,6 @@ package journeymap.client.ui.waypoint;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.WorldData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
@@ -126,7 +125,7 @@ public class WaypointEditor extends JmUI
             String pos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                     MathHelper.floor(mc.player.posX),
                     MathHelper.floor(mc.player.posZ),
-                    MathHelper.floor(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.player).minY),
+                    MathHelper.floor(mc.player.getEntityBoundingBox().minY),
                     MathHelper.floor(mc.player.chunkCoordY));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 

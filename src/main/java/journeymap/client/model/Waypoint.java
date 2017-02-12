@@ -15,7 +15,6 @@ import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointGroupStore;
@@ -148,7 +147,7 @@ public class Waypoint implements Serializable
         if (dimensions == null || dimensions.size() == 0)
         {
             dimensions = new TreeSet<Integer>();
-            dimensions.add(ForgeHelper.INSTANCE.getPlayerDimension());
+            dimensions.add(FMLClientHandler.instance().getClient().player.world.provider.getDimension());
         }
         this.dimensions = new TreeSet<Integer>(dimensions);
         this.dimensions.add(currentDimension);
@@ -182,7 +181,7 @@ public class Waypoint implements Serializable
     public static Waypoint of(EntityPlayer player)
     {
         BlockPos blockPos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
-        return at(blockPos, Type.Normal, ForgeHelper.INSTANCE.getPlayerDimension());
+        return at(blockPos, Type.Normal, FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
 
     public static Waypoint at(BlockPos blockPos, Type type, int dimension)
@@ -323,7 +322,7 @@ public class Waypoint implements Serializable
 
     public boolean isInPlayerDimension()
     {
-        return dimensions.contains(ForgeHelper.INSTANCE.getPlayerDimension());
+        return dimensions.contains(FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
 
     public String getId()
@@ -398,7 +397,7 @@ public class Waypoint implements Serializable
 
     public Vec3d getPosition()
     {
-        return ForgeHelper.INSTANCE.newVec3(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
+        return new Vec3d(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
     public BlockPos getBlockPos()

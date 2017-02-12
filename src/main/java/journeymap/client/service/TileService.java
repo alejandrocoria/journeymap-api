@@ -63,8 +63,8 @@ public class TileService extends FileService
         query.parse();
 
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        World theWorld = minecraft.world;
-        if (theWorld == null)
+        World world = minecraft.world;
+        if (world == null)
         {
             throwEventException(503, "World not connected", event, false);
         }
