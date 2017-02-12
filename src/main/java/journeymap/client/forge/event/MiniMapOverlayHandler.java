@@ -25,7 +25,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -47,12 +46,6 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     {
         EVENT_TYPE = Journeymap.getClient().getCoreProperties().renderOverlayEventTypeName.get();
         EVENT_PRE = Journeymap.getClient().getCoreProperties().renderOverlayPreEvent.get();
-    }
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)

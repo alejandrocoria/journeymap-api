@@ -9,13 +9,13 @@
 package journeymap.client.io.nbt;
 
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
@@ -72,10 +72,13 @@ public class ChunkLoader
 
     public static ChunkMD getChunkMdFromMemory(World world, int chunkX, int chunkZ)
     {
-        Chunk theChunk = world.getChunkProvider().getLoadedChunk(chunkX, chunkZ);
-        if (theChunk != null && ForgeHelper.INSTANCE.hasChunkData(theChunk))
+        if (world != null)
         {
-            return new ChunkMD(theChunk);
+            Chunk theChunk = world.getChunkProvider().getLoadedChunk(chunkX, chunkZ);
+            if (theChunk != null && theChunk.isLoaded() && !(theChunk instanceof EmptyChunk))
+            {
+                return new ChunkMD(theChunk);
+            }
         }
         return null;
     }

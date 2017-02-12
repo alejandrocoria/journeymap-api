@@ -11,35 +11,26 @@ package journeymap.client.forge.event;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
+import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
-
 /**
- * Created by mwoodman on 1/29/14.
+ * Stop mapping and reset features when world unloads.
  */
 @SideOnly(Side.CLIENT)
 public class WorldEventHandler implements EventHandlerManager.EventHandler
 {
-
-    String playerName;
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
-    }
-
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void invoke(WorldEvent.Unload event)
+    public void onUnload(WorldEvent.Unload event)
     {
         try
         {
-            if (DataCache.getPlayer().dimension == event.getWorld().provider.getDimension())
+            World world = event.getWorld();
+            if (DataCache.getPlayer().dimension == world.provider.getDimension())
             {
                 Journeymap.getClient().stopMapping();
                 FeatureManager.instance().reset();

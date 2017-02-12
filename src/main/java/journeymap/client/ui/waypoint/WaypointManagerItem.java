@@ -12,7 +12,6 @@ import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;
@@ -188,7 +187,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             color = waypointValid ? waypoint.getSafeColor() : RGB.GRAY_RGB;
         }
 
-        FontRenderer fr = ForgeHelper.INSTANCE.getFontRenderer();
+        FontRenderer fr = FMLClientHandler.instance().getClient().fontRendererObj;
 
         int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
         fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color);
@@ -299,7 +298,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     {
         if (distance == null)
         {
-            distance = (int) ForgeHelper.INSTANCE.getEntityPositionVector(player).distanceTo(waypoint.getPosition());
+            distance = (int) player.getPositionVector().distanceTo(waypoint.getPosition());
         }
         return distance;
     }
@@ -363,7 +362,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         {
             if (button.isMouseOver())
             {
-                manager.drawHoveringText(button.getTooltip(), x, y, ForgeHelper.INSTANCE.getFontRenderer());
+                manager.drawHoveringText(button.getTooltip(), x, y, FMLClientHandler.instance().getClient().fontRendererObj);
             }
         }
 

@@ -9,13 +9,14 @@
 package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.nbt.ChunkLoader;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
@@ -79,7 +80,7 @@ public class ChunkMD
 
     public IBlockState getBlockState(BlockPos blockPos)
     {
-        return ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
+        return JmBlockAccess.INSTANCE.getBlockState(blockPos);
     }
 
     public BlockMD getBlockMD(BlockPos blockPos)
@@ -92,7 +93,15 @@ public class ChunkMD
      */
     public int getSavedLightValue(int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getSavedLightValue(getChunk(), getBlockPos(localX, y, localZ));
+        try
+        {
+            return getChunk().getLightFor(EnumSkyBlock.BLOCK, getBlockPos(localX, y, localZ));
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        {
+            // Encountered on a custom-gen world where the value was 16
+            return 1; // At least let it show up
+        }
     }
 
     /**
@@ -150,7 +159,7 @@ public class ChunkMD
                 {
                     y--;
                 }
-                else if (ForgeHelper.INSTANCE.canBlockSeeTheSky(chunk, blockPos))
+                else if (chunk.canSeeSky(blockPos))
                 {
                     y--;
                 }
@@ -191,7 +200,7 @@ public class ChunkMD
 
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.getLightOpacity(blockMD, getBlockPos(localX, y, localZ));
+        return JmBlockAccess.INSTANCE.getLightOpacity(blockMD, getBlockPos(localX, y, localZ));
     }
 
     public Serializable getProperty(String name)
@@ -252,7 +261,7 @@ public class ChunkMD
 
     public World getWorld()
     {
-        return ForgeHelper.INSTANCE.getWorld();
+        return FMLClientHandler.instance().getClient().theWorld;
     }
 
     public int getWorldActualHeight()
@@ -263,12 +272,12 @@ public class ChunkMD
 
     public Boolean getHasNoSky()
     {
-        return ForgeHelper.INSTANCE.hasNoSky(getWorld());
+        return getWorld().provider.getHasNoSky();
     }
 
     public boolean canBlockSeeTheSky(int localX, int y, int localZ)
     {
-        return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), getBlockPos(localX, y, localZ));
+        return getChunk().canSeeSky(getBlockPos(localX, y, localZ));
     }
 
     public ChunkPos getCoord()
@@ -286,15 +295,32 @@ public class ChunkMD
         return (Long) getProperty(PROP_LOADED, 0L);
     }
 
-    public long getLastRendered()
+    public void resetRenderTimes()
     {
-        return (Long) getProperty(PROP_LAST_RENDERED, 0L);
+        getRenderTimes().clear();
     }
 
-    public long setRendered()
+    protected HashMap<MapType, Long> getRenderTimes()
+    {
+        Serializable obj = properties.get(PROP_LAST_RENDERED);
+        if (!(obj instanceof HashMap))
+        {
+            obj = new HashMap<MapType, Long>();
+            properties.put(PROP_LAST_RENDERED, obj);
+        }
+        return (HashMap<MapType, Long>) obj;
+    }
+
+    public long getLastRendered(MapType mapType)
+    {
+        return getRenderTimes().getOrDefault(mapType, 0L);
+    }
+
+
+    public long setRendered(MapType mapType)
     {
         long now = System.currentTimeMillis();
-        setProperty(PROP_LAST_RENDERED, now);
+        getRenderTimes().put(mapType, now);
         return now;
     }
 
@@ -344,7 +370,7 @@ public class ChunkMD
 
     public int getDimension()
     {
-        return ForgeHelper.INSTANCE.getDimension();
+        return getWorld().provider.getDimension();
     }
 
     public void stopChunkRetention()

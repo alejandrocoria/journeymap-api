@@ -57,8 +57,9 @@ public class RenderSpec
         this.player = minecraft.thePlayer;
         final CoreProperties props = Journeymap.getClient().getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
-        int mapRenderDistanceMin = mapType.isUnderground() ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
+        // int mapRenderDistanceMin = mapType.isUnderground() ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
         final int mapRenderDistanceMax = mapType.isUnderground() ? props.renderDistanceCaveMax.get() : props.renderDistanceSurfaceMax.get();
+        final int mapRenderDistanceMin = mapRenderDistanceMax;
 
         this.mapType = mapType;
         int rdMin = Math.min(gameRenderDistance, mapRenderDistanceMin);
@@ -334,23 +335,23 @@ public class RenderSpec
             debugString = "jm.common.renderstats_debug_surface";
         }
 
-        if (primaryRenderDistance != maxSecondaryRenderDistance)
-        {
-            // Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
-            String avg = decFormat.format(lastTaskAvgChunkTime);
-            if (lastTaskAvgChunkTime >= 10)
-            {
-                avg += "!";
-            }
-
-            return Constants.getString(debugString,
-                    primaryRenderDistance, getPrimaryRenderSize(),
-                    getLastSecondaryRenderDistance(), getLastSecondaryRenderSize(),
-                    lastTaskChunks,
-                    lastTaskTime,
-                    avg);
-        }
-        else
+//        if (primaryRenderDistance != maxSecondaryRenderDistance)
+//        {
+//            // Caves: %1$s (%2$s) + %3$s (%4$s) = %5$s chunks in %6$sms (avg %7$sms)
+//            String avg = decFormat.format(lastTaskAvgChunkTime);
+//            if (lastTaskAvgChunkTime >= 10)
+//            {
+//                avg += "!";
+//            }
+//
+//            return Constants.getString(debugString,
+//                    primaryRenderDistance, getPrimaryRenderSize(),
+//                    getLastSecondaryRenderDistance(), getLastSecondaryRenderSize(),
+//                    lastTaskChunks,
+//                    lastTaskTime,
+//                    avg);
+//        }
+//        else
         {
             // Caves: %1$s = %2$s chunks in %3$sms (avg %4$sms)
             debugString += "_simple";

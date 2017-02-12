@@ -10,7 +10,6 @@ package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
@@ -39,7 +38,7 @@ class DimensionsButton extends Button
         updateLabel();
 
         // Determine width
-        fitWidth(ForgeHelper.INSTANCE.getFontRenderer());
+        fitWidth(FMLClientHandler.instance().getClient().fontRendererObj);
     }
 
     protected void updateLabel()
@@ -64,7 +63,7 @@ class DimensionsButton extends Button
         for (WorldData.DimensionProvider dimensionProvider : dimensionProviders)
         {
             String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(dimensionProvider));
-            maxWidth = Math.max(maxWidth, ForgeHelper.INSTANCE.getFontRenderer().getStringWidth(name));
+            maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRendererObj.getStringWidth(name));
         }
         return maxWidth + 12;
     }

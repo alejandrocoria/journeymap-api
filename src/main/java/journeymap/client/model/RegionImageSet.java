@@ -65,12 +65,20 @@ public class RegionImageSet extends ImageSet
 
     public void setChunkImage(ChunkMD chunkMd, MapType mapType, ComparableBufferedImage chunkImage)
     {
-        if (chunkImage.isChanged())
+        ImageHolder holder = getHolder(mapType);
+        boolean wasBlank = holder.blank;
+        if (chunkImage.isChanged() || wasBlank)
         {
-            ImageHolder holder = getHolder(mapType);
             RegionCoord regionCoord = getRegionCoord();
             holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().chunkXPos), regionCoord.getZOffset(chunkMd.getCoord().chunkZPos));
         }
+        if (wasBlank)
+        {
+            holder.getTexture();
+            holder.finishPartialImageUpdates();
+            RegionImageCache.INSTANCE.getRegionImageSet(getRegionCoord());
+        }
+        chunkMd.setRendered(mapType);
     }
 
     public boolean hasChunkUpdates()

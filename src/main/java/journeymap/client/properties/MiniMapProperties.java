@@ -7,7 +7,7 @@
  */
 package journeymap.client.properties;
 
-import journeymap.client.forge.helper.ForgeHelper;
+
 import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
@@ -101,7 +101,7 @@ public class MiniMapProperties extends InGameMapProperties
             if (getId() == 1)
             {
                 this.setActive(true);
-                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                if (FMLClientHandler.instance().getClient() != null && FMLClientHandler.instance().getClient().fontRendererObj.getUnicodeFlag())
                 {
                     super.fontScale.set(2);
                     compassFontScale.set(2);
@@ -118,7 +118,7 @@ public class MiniMapProperties extends InGameMapProperties
                 this.orientation.set(Orientation.North);
                 this.reticleOrientation.set(ReticleOrientation.Compass);
                 this.sizePercent.set(30);
-                if (FMLClientHandler.instance().getClient() != null && ForgeHelper.INSTANCE.getFontRenderer().getUnicodeFlag())
+                if (FMLClientHandler.instance().getClient() != null && FMLClientHandler.instance().getClient().fontRendererObj.getUnicodeFlag())
                 {
                     super.fontScale.set(2);
                     compassFontScale.set(2);

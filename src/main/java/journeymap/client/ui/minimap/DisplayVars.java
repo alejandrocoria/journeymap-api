@@ -9,7 +9,6 @@
 package journeymap.client.ui.minimap;
 
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.MiniMapProperties;
@@ -76,7 +75,7 @@ public class DisplayVars
     DisplayVars(Minecraft mc, final MiniMapProperties miniMapProperties)
     {
         // Immutable member and local vars
-        this.scaledResolution = ForgeHelper.INSTANCE.getScaledResolution();
+        this.scaledResolution = new ScaledResolution(mc);
         this.showFps = miniMapProperties.showFps.get();
         this.showBiome = miniMapProperties.showBiome.get();
         this.showLocation = miniMapProperties.showLocation.get();
@@ -133,7 +132,7 @@ public class DisplayVars
 
         this.fontScale = miniMapProperties.fontScale.get();
 
-        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+        FontRenderer fontRenderer = mc.fontRendererObj;
         fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
 

@@ -8,9 +8,10 @@
 
 package journeymap.client.model.mod;
 
-import journeymap.client.forge.helper.ForgeHelper;
+
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.world.JmBlockAccess;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -68,7 +69,7 @@ public class CarpentersBlocks
         @Override
         public BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
         {
-            final TileEntity tileEntity = ForgeHelper.INSTANCE.getTileEntity(blockPos);
+            final TileEntity tileEntity = JmBlockAccess.INSTANCE.getTileEntity(blockPos);
             if (tileEntity != null)
             {
                 final NBTTagCompound tag = new NBTTagCompound();

@@ -9,6 +9,7 @@
 package journeymap.client.task.main;
 
 import journeymap.client.JourneymapClient;
+import journeymap.client.data.DataCache;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.render.map.GridRenderer;
@@ -50,6 +51,7 @@ public class DeleteMapTask implements IMainThreadTask
                 Journeymap.getClient().stopMapping();
             }
 
+            DataCache.INSTANCE.invalidateChunkMDCache();
             boolean ok = RegionImageCache.INSTANCE.deleteMap(Fullscreen.state(), allDims);
             if (ok)
             {

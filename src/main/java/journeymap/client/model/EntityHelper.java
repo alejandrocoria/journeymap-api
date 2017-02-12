@@ -10,7 +10,6 @@ package journeymap.client.model;
 
 import com.google.common.collect.ImmutableSortedMap;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.common.Journeymap;
@@ -59,7 +58,7 @@ public class EntityHelper
         {
             for (Entity entity : allEntities)
             {
-                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(ForgeHelper.INSTANCE.getEntityBoundingBox((EntityLivingBase) entity)))
+                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.getEntityBoundingBox()))
                 {
                     for (Class entityClass : entityClasses)
                     {
@@ -176,7 +175,12 @@ public class EntityHelper
     {
         int lateralDistance = Journeymap.getClient().getCoreProperties().radarLateralDistance.get();
         int verticalDistance = Journeymap.getClient().getCoreProperties().radarVerticalDistance.get();
-        return ForgeHelper.INSTANCE.getBoundingBox(player, lateralDistance, verticalDistance);
+        return getBoundingBox(player, lateralDistance, verticalDistance);
+    }
+
+    public static AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance)
+    {
+        return new AxisAlignedBB(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
     }
 
     /**
@@ -217,7 +221,7 @@ public class EntityHelper
     {
         try
         {
-            Render entityRender = ForgeHelper.INSTANCE.getRenderManager().getEntityRenderObject(entity);
+            Render entityRender = FMLClientHandler.instance().getClient().getRenderManager().getEntityRenderObject(entity);
 
             ResourceLocation original = null;
 

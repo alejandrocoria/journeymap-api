@@ -176,7 +176,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (mapBathymetry)
                     {
-                        y = getWaterHeights(chunkMd, null)[z][x];
+                        Integer[][] waterHeights = getWaterHeights(chunkMd, null);
+                        if (waterHeights[z] != null && waterHeights[z][x] != null)
+                        {
+                            y = getWaterHeights(chunkMd, null)[z][x];
+                        }
                     }
 
                     topBlockMd = chunkMd.getTopBlockMD(x, y, z);

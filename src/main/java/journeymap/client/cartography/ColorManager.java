@@ -10,7 +10,6 @@ package journeymap.client.cartography;
 
 import com.google.common.base.Joiner;
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ColorHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;

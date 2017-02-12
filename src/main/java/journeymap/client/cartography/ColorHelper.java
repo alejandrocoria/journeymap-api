@@ -6,13 +6,13 @@
  * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
-package journeymap.client.forge.helper;
+package journeymap.client.cartography;
 
-import journeymap.client.cartography.RGB;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.render.texture.TextureCache;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
@@ -79,7 +79,7 @@ public enum ColorHelper
     {
         if (chunkMD == null || !chunkMD.hasChunk())
         {
-            return blockColors.colorMultiplier(blockMD.getBlockState(), ForgeHelper.INSTANCE.getIBlockAccess(), blockPos, 2);
+            return blockColors.colorMultiplier(blockMD.getBlockState(), JmBlockAccess.INSTANCE, blockPos, 2);
         }
         else
         {
@@ -90,7 +90,7 @@ public enum ColorHelper
             }
             else
             {
-                return blockColors.colorMultiplier(blockMD.getBlockState(), ForgeHelper.INSTANCE.getIBlockAccess(), blockPos, 2);
+                return blockColors.colorMultiplier(blockMD.getBlockState(), JmBlockAccess.INSTANCE, blockPos, 2);
             }
         }
     }

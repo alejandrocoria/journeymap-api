@@ -8,7 +8,6 @@
 
 package journeymap.client.network;
 
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.common.Journeymap;
 import journeymap.common.network.WorldIDPacket;
 import net.minecraft.client.Minecraft;
@@ -107,7 +106,7 @@ public class WorldInfoHandler
         {
             if (!mc.isSingleplayer() && mc.thePlayer != null && !mc.thePlayer.isDead)
             {
-                if (ForgeHelper.INSTANCE.getEntityName(event.getEntity()).equals(ForgeHelper.INSTANCE.getEntityName(mc.thePlayer)))
+                if (event.getEntity().getName().equals(mc.thePlayer.getName()))
                 {
                     requestWorldID();
                 }

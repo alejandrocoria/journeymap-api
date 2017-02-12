@@ -10,7 +10,6 @@ package journeymap.client.data;
 
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
@@ -42,7 +41,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         }
 
         final int posX = MathHelper.floor_double(player.posX);
-        final int posY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(player).minY);
+        final int posY = MathHelper.floor_double(player.getEntityBoundingBox().minY);
         final int posZ = MathHelper.floor_double(player.posZ);
         final int offset = 1;
 
@@ -100,7 +99,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         {
             try
             {
-                Biome biome = ForgeHelper.INSTANCE.getBiome(player.getPosition());
+                Biome biome = FMLClientHandler.instance().getClient().theWorld.getBiomeForCoordsBody(player.getPosition());
                 // Can be null right after spawn/teleport before chunks loaded
                 if (biome != null)
                 {

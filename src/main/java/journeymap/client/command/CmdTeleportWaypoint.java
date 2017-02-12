@@ -9,12 +9,9 @@
 package journeymap.client.command;
 
 import com.mojang.authlib.GameProfile;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.PacketHandler;
-import journeymap.common.network.model.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerList;
@@ -44,7 +41,7 @@ public class CmdTeleportWaypoint
             GameProfile profile = null;
             try
             {
-                profile = new GameProfile(mc.thePlayer.getUniqueID(), ForgeHelper.INSTANCE.getEntityName(mc.thePlayer));
+                profile = new GameProfile(mc.thePlayer.getUniqueID(), mc.thePlayer.getName());
                 configurationManager = mcServer.getPlayerList();
 
                 // 1.7
@@ -98,7 +95,7 @@ public class CmdTeleportWaypoint
         if (Journeymap.getClient().isServerEnabled() || FMLClientHandler.instance().getClient().isSingleplayer()) {
             mc.thePlayer.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
         } else {
-            mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", ForgeHelper.INSTANCE.getEntityName(mc.thePlayer), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+            mc.thePlayer.sendChatMessage(String.format("/tp %s %s %s %s", mc.thePlayer.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
         }
     }
 }

@@ -1,7 +1,7 @@
 package journeymap.client.model.mod.vanilla;
 
+import journeymap.client.cartography.ColorHelper;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ColorHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;

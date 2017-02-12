@@ -133,7 +133,6 @@ public class ChunkRenderController
                     if (renderOkay)
                     {
                         regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
-                        chunkMd.setRendered();
                     }
                 }
                 else
@@ -145,7 +144,6 @@ public class ChunkRenderController
                     {
                         regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
                         regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
-                        chunkMd.setRendered();
                     }
                 }
             }

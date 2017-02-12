@@ -14,7 +14,6 @@ import journeymap.client.api.util.UIState;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -688,7 +687,7 @@ public class MiniMap
                 // FPS
                 if (dv.showFps)
                 {
-                    fpsLabelText = ForgeHelper.INSTANCE.getFPS();
+                    fpsLabelText = String.format("%s fps", Minecraft.getDebugFPS());
                 }
 
                 // Location key
@@ -696,7 +695,7 @@ public class MiniMap
                 {
                     final int playerX = MathHelper.floor_double(mc.thePlayer.posX);
                     final int playerZ = MathHelper.floor_double(mc.thePlayer.posZ);
-                    final int playerY = MathHelper.floor_double(ForgeHelper.INSTANCE.getEntityBoundingBox(mc.thePlayer).minY);
+                    final int playerY = MathHelper.floor_double(mc.thePlayer.getEntityBoundingBox().minY);
                     locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
                 }
 

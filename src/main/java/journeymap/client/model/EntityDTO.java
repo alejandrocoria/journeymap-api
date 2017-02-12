@@ -10,7 +10,6 @@ package journeymap.client.model;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -99,7 +98,7 @@ public class EntityDTO implements Serializable
         // Player check
         if (entity instanceof EntityPlayer)
         {
-            String name = StringUtils.stripControlCodes(ForgeHelper.INSTANCE.getEntityName(entity));
+            String name = StringUtils.stripControlCodes(entity.getName());
             this.username = name;
             try
             {
@@ -156,7 +155,7 @@ public class EntityDTO implements Serializable
             Entity ownerEntity = ((EntityTameable) entity).getOwner();
             if (ownerEntity != null)
             {
-                owner = ForgeHelper.INSTANCE.getEntityName(ownerEntity);
+                owner = ownerEntity.getName();
             }
         }
         else if (entity instanceof IEntityOwnable)
@@ -164,7 +163,7 @@ public class EntityDTO implements Serializable
             Entity ownerEntity = ((IEntityOwnable) entity).getOwner();
             if (ownerEntity != null)
             {
-                owner = ForgeHelper.INSTANCE.getEntityName(ownerEntity);
+                owner = ownerEntity.getName();
             }
         }
         else if (entity instanceof EntityHorse)
@@ -179,7 +178,7 @@ public class EntityDTO implements Serializable
                     String playerUuid = currentPlayer.getUniqueID().toString();
                     if (playerUuid.equals(ownerUuid))
                     {
-                        owner = ForgeHelper.INSTANCE.getEntityName(currentPlayer);
+                        owner = currentPlayer.getName();
                     }
                 }
                 catch (Throwable t)
@@ -199,7 +198,7 @@ public class EntityDTO implements Serializable
             EntityLiving entityLiving = (EntityLiving) entity;
 
             // CustomName
-            if (ForgeHelper.INSTANCE.hasCustomName(entity) && entityLiving.getAlwaysRenderNameTag())
+            if (entity.hasCustomName() && entityLiving.getAlwaysRenderNameTag())
             {
                 customName = StringUtils.stripControlCodes(((EntityLiving) entity).getCustomNameTag());
             }

@@ -17,8 +17,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
-
 /**
  * Event handler for rendering waypoints in-game.
  */
@@ -28,12 +26,6 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
 
     public WaypointBeaconHandler()
     {
-    }
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
     }
 
     @SideOnly(Side.CLIENT)

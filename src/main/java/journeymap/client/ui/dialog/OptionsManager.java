@@ -383,38 +383,38 @@ public class OptionsManager extends JmUI
                             boolean limitButtonRange = false;
                             if (property == coreProperties.renderDistanceCaveMax)
                             {
-                                boolean valid = Journeymap.getClient().getCoreProperties().hasValidCaveRenderDistances();
+                                //boolean valid = Journeymap.getClient().getCoreProperties().hasValidCaveRenderDistances();
                                 limitButtonRange = true;
-                                if (valid)
+                                //if (valid)
                                 {
                                     slotMetadata.getButton().resetLabelColors();
                                 }
-                                else
-                                {
-                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
-                                }
+//                                else
+//                                {
+//                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
+//                                }
                             }
                             else if (property == coreProperties.renderDistanceSurfaceMax)
                             {
-                                boolean valid = Journeymap.getClient().getCoreProperties().hasValidSurfaceRenderDistances();
+                                //boolean valid = Journeymap.getClient().getCoreProperties().hasValidSurfaceRenderDistances();
                                 limitButtonRange = true;
-                                if (valid)
+                                //if (valid)
                                 {
                                     slotMetadata.getButton().resetLabelColors();
                                 }
-                                else
-                                {
-                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
-                                }
+//                                else
+//                                {
+//                                    slotMetadata.getButton().setLabelColors(RGB.RED_RGB, RGB.RED_RGB, null);
+//                                }
                             }
-                            else if (property == coreProperties.renderDistanceCaveMin)
-                            {
-                                limitButtonRange = true;
-                            }
-                            else if (property == coreProperties.renderDistanceSurfaceMin)
-                            {
-                                limitButtonRange = true;
-                            }
+//                            else if (property == coreProperties.renderDistanceCaveMin)
+//                            {
+//                                limitButtonRange = true;
+//                            }
+//                            else if (property == coreProperties.renderDistanceSurfaceMin)
+//                            {
+//                                limitButtonRange = true;
+//                            }
 
                             if (limitButtonRange)
                             {
