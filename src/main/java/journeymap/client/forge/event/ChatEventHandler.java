@@ -21,7 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -32,12 +31,6 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
 {
 
     Set<String> featureControlCodes = FeatureManager.instance().getControlCodes();
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
-    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

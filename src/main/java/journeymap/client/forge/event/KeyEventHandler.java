@@ -26,17 +26,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 
 /**
- * Created by mwoodman on 1/29/14.
+ * Key even handling + init code for key bindings.
  */
 public class KeyEventHandler implements EventHandlerManager.EventHandler
 {
-
-    public KeyEventHandler()
+    @SubscribeEvent()
+    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
     {
+        boolean clearKeys = KeyEventHandler.onKeypress(false);
+        if (clearKeys)
+        {
+            KeyBinding.unPressAllKeys();
+        }
     }
 
     public static void initKeyBindings()
@@ -162,22 +166,6 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             Journeymap.getLogger().error("Error during keypress: " + LogFormatter.toPartialString(e));
         }
         return false;
-    }
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.FMLCommonHandlerBus);
-    }
-
-    @SubscribeEvent()
-    public void onKeyboardEvent(InputEvent.KeyInputEvent event)
-    {
-        boolean clearKeys = KeyEventHandler.onKeypress(false);
-        if (clearKeys)
-        {
-            KeyBinding.unPressAllKeys();
-        }
     }
 }
 

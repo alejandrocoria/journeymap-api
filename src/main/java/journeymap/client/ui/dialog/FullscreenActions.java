@@ -9,6 +9,7 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
+import journeymap.client.data.DataCache;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.BlockMD;
@@ -270,6 +271,7 @@ public class FullscreenActions extends JmUI
             buttonEnableMapping.toggle();
             if (Journeymap.getClient().getCoreProperties().mappingEnabled.get())
             {
+                DataCache.INSTANCE.invalidateChunkMDCache();
                 UIManager.INSTANCE.openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
                 return;

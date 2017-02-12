@@ -9,7 +9,6 @@
 package journeymap.client.ui.option;
 
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.IConfigFieldHolder;
 import journeymap.client.ui.component.IntSliderButton;
@@ -18,6 +17,7 @@ import journeymap.common.properties.config.ConfigField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,7 +190,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public String[] getTooltip()
     {
-        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
         String bidiColor = fontRenderer.getBidiFlag() ? "%2$s%1$s" : "%1$s%2$s";
 
         if (tooltipLines == null)
@@ -232,7 +232,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     protected List<TextComponentTranslation> getWordWrappedLines(String color, String original)
     {
-        FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
         List<TextComponentTranslation> list = new ArrayList<TextComponentTranslation>();
 
         int max = fontRenderer.getBidiFlag() ? 170 : 250;

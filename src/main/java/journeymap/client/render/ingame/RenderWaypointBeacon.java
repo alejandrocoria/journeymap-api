@@ -10,7 +10,6 @@ package journeymap.client.render.ingame;
 
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;
@@ -41,7 +40,7 @@ public class RenderWaypointBeacon
     //    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
     static Minecraft mc = FMLClientHandler.instance().getClient();
-    static RenderManager renderManager = ForgeHelper.INSTANCE.getRenderManager();
+    static RenderManager renderManager = mc.getRenderManager();
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
 
@@ -100,7 +99,7 @@ public class RenderWaypointBeacon
         try
         {
             // Player coords
-            Vec3d playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.renderViewEntity);
+            Vec3d playerVec = renderManager.renderViewEntity.getPositionVector();
 
             // Move y up to put icon at eye height
             Vec3d waypointVec = waypoint.getPosition().addVector(0, .118, 0);

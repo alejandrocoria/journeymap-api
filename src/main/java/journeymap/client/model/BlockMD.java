@@ -12,11 +12,11 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
+import journeymap.client.cartography.ColorHelper;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ColorHelper;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.mod.ModBlockDelegate;
 import journeymap.client.model.mod.vanilla.VanillaColorHandler;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
@@ -226,7 +226,7 @@ public class BlockMD implements Comparable<BlockMD>
                 }
                 else
                 {
-                    blockState = ForgeHelper.INSTANCE.getIBlockAccess().getBlockState(blockPos);
+                    blockState = JmBlockAccess.INSTANCE.getBlockState(blockPos);
                 }
 
                 return get(blockState);

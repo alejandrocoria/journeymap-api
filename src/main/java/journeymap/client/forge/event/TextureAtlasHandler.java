@@ -13,20 +13,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
-
 /**
  * Handles events related to the TextureAtlas for Blocks.
  */
 public class TextureAtlasHandler implements EventHandlerManager.EventHandler
 {
     IMainThreadTask task = new EnsureCurrentColorsTask();
-
-    @Override
-    public EnumSet<EventHandlerManager.BusType> getBus()
-    {
-        return EnumSet.of(EventHandlerManager.BusType.MinecraftForgeBus);
-    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent()

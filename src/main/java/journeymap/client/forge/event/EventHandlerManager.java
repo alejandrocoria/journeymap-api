@@ -12,15 +12,13 @@ import journeymap.client.cartography.ColorManager;
 import journeymap.client.command.ClientCommandInvoker;
 import journeymap.client.command.CmdChatPosition;
 import journeymap.client.command.CmdEditWaypoint;
+import journeymap.client.world.ChunkMonitor;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 
 /**
@@ -28,17 +26,24 @@ import java.util.HashMap;
  */
 public class EventHandlerManager
 {
-    private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
+    private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<>();
+
+    /**
+     * Marker interface for now
+     */
+    public static interface EventHandler
+    {
+    }
 
     public static void registerGeneralHandlers()
     {
         register(new ChatEventHandler());
         register(new StateTickHandler());
         register(new WorldEventHandler());
-        register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
 
+        // TODO: Why does this need to be forced?
         ColorManager.instance();
 
         ClientCommandInvoker clientCommandInvoker = new ClientCommandInvoker();
@@ -46,6 +51,7 @@ public class EventHandlerManager
         clientCommandInvoker.register(new CmdEditWaypoint());
         ClientCommandHandler.instance.registerCommand(clientCommandInvoker);
 
+        register(ChunkMonitor.INSTANCE);
     }
 
     public static void registerGuiHandlers()
@@ -66,35 +72,22 @@ public class EventHandlerManager
 
     private static void register(EventHandler handler)
     {
-        if (handlers.containsKey(handler.getClass()))
+        Class<? extends EventHandler> handlerClass = handler.getClass();
+        if (handlers.containsKey(handlerClass))
         {
-            Journeymap.getLogger().warn("Handler already registered: " + handler.getClass().getName());
+            Journeymap.getLogger().warn("Handler already registered: " + handlerClass.getName());
             return;
         }
 
-        boolean registered = false;
-        for (BusType busType : handler.getBus())
+        try
         {
-            String name = handler.getClass().getName();
-            try
-            {
-                busType.eventBus.register(handler);
-                registered = true;
-                Journeymap.getLogger().debug(name + " registered in " + busType);
-            }
-            catch (Throwable t)
-            {
-                Journeymap.getLogger().error(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
-            }
-        }
-
-        if (registered)
-        {
+            MinecraftForge.EVENT_BUS.register(handler);
+            Journeymap.getLogger().debug("Handler registered: " + handlerClass.getName());
             handlers.put(handler.getClass(), handler);
         }
-        else
+        catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Handler was not registered at all: " + handler.getClass().getName());
+            Journeymap.getLogger().error(handlerClass.getName() + " registration FAILED: " + LogFormatter.toString(t));
         }
     }
 
@@ -103,48 +96,15 @@ public class EventHandlerManager
         EventHandler handler = handlers.remove(handlerClass);
         if (handler != null)
         {
-            EnumSet<BusType> buses = handler.getBus();
-            for (BusType busType : handler.getBus())
+            try
             {
-                String name = handler.getClass().getName();
-                try
-                {
-                    boolean unregistered = false;
-                    switch (busType)
-                    {
-                        case MinecraftForgeBus:
-                            MinecraftForge.EVENT_BUS.unregister(handler);
-                            unregistered = true;
-                            break;
-                    }
-                    if (unregistered)
-                    {
-                        Journeymap.getLogger().debug(name + " unregistered from " + busType);
-                    }
-                }
-                catch (Throwable t)
-                {
-                    Journeymap.getLogger().error(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
-                }
+                MinecraftForge.EVENT_BUS.unregister(handler);
+                Journeymap.getLogger().debug("Handler unregistered: " + handlerClass.getName());
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error(handler + " unregistration FAILED: " + LogFormatter.toString(t));
             }
         }
-    }
-
-    public enum BusType
-    {
-        FMLCommonHandlerBus(FMLCommonHandler.instance().bus()),
-        MinecraftForgeBus(MinecraftForge.EVENT_BUS);
-
-        protected final EventBus eventBus;
-
-        private BusType(EventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-    }
-
-    public static interface EventHandler
-    {
-        EnumSet<BusType> getBus();
     }
 }

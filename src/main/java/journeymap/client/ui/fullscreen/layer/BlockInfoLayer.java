@@ -11,7 +11,6 @@ package journeymap.client.ui.fullscreen.layer;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.FullMapProperties;
@@ -23,6 +22,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     int lastMouseX;
     int lastMouseY;
     BlockInfoStep blockInfoStep;
-    FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
 
     public BlockInfoLayer()
     {
@@ -72,7 +72,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                     blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
 
-                String biome = ForgeHelper.INSTANCE.getBiome(blockPos).getBiomeName();
+                String biome = chunkMD.getWorld().getBiomeForCoordsBody(blockPos).getBiomeName();
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockPos.getX(),

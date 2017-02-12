@@ -9,7 +9,6 @@
 package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
@@ -17,6 +16,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
 
-    FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
 
     public Button(String label)
     {

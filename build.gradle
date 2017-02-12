@@ -114,6 +114,9 @@ processResources() {
         exclude 'mcmod.info'
         exclude 'license.txt'
     }
+
+    // Process AT files
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
 task processDocs(type: Copy) {
@@ -151,7 +154,8 @@ jar {
                 "Manifest-Version"      : "1.0",
                 "Implementation-Title"  : "JourneyMap",
                 "Implementation-Version": project.version,
-                "Implementation-URL"    : "http://journeymap.info"
+                "Implementation-URL"    : "http://journeymap.info",
+                "FMLAT"                 : "journeymap_at.cfg"
         ]
     }
 }

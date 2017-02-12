@@ -11,7 +11,6 @@ package journeymap.client.ui.fullscreen.layer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
@@ -23,6 +22,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
@@ -78,12 +78,12 @@ public class WaypointLayer implements LayerDelegate.Layer
             drawStepList.add(clickDrawStep);
         }
 
-        AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
+        AxisAlignedBB area = new AxisAlignedBB(blockCoord.getX() - proximity, -1, blockCoord.getZ() - proximity,
                 blockCoord.getX() + proximity, mc.world.getActualHeight() + 1, blockCoord.getZ() + proximity);
 
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(ForgeHelper.INSTANCE.newVec3(lastCoord.getX(), 1, lastCoord.getZ())))
+            if (!area.isVecInside(new Vec3d(lastCoord.getX(), 1, lastCoord.getZ())))
             {
                 selected = null;
                 lastCoord = blockCoord;
@@ -114,7 +114,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if (waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if (area.isVecInside(ForgeHelper.INSTANCE.newVec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
+                if (area.isVecInside(new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
                     proximal.add(waypoint);
                 }

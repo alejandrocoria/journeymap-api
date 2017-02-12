@@ -14,7 +14,6 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.StatTimer;
 import journeymap.client.properties.InGameMapProperties;

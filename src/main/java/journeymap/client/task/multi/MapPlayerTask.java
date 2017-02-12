@@ -16,6 +16,7 @@ import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
+import journeymap.client.model.ChunkMD;
 import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -219,7 +221,14 @@ public class MapPlayerTask extends BaseMapTask
             renderSpec = RenderSpec.getSurfaceSpec();
         }
 
-        chunkCoords.addAll(renderSpec.getRenderAreaCoords());
+        long now = System.currentTimeMillis();
+        HashSet<ChunkPos> renderArea = new HashSet<>(renderSpec.getRenderAreaCoords());
+        renderArea.removeIf(chunkPos -> {
+            ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(chunkPos);
+            return chunkMD != null && (now - chunkMD.getLastRendered(mapType)) < 30000;
+        });
+
+        chunkCoords.addAll(renderArea);
         this.scheduledChunks = chunkCoords.size();
     }
 
@@ -312,7 +321,7 @@ public class MapPlayerTask extends BaseMapTask
 
             startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
-            DataCache.INSTANCE.invalidateChunkMDCache();
+            //DataCache.INSTANCE.invalidateChunkMDCache();
 
             super.performTask(mc, jm, jmWorldDir, threadLogging);
 
