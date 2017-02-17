@@ -11,7 +11,6 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
-import journeymap.common.feature.JourneyMapTeleport;
 import journeymap.common.network.model.Location;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -79,7 +78,7 @@ public class TeleportPacket implements IMessage
         public IMessage onMessage(TeleportPacket message, MessageContext ctx)
         {
             Entity player = null;
-            player = ctx.getServerHandler().playerEntity;
+            player = ctx.getServerHandler().player;
             Location location = Location.GSON.fromJson(message.getLocation(), Location.class);
 //            JourneyMapTeleport.attemptTeleport(player, location, false);
             return null;

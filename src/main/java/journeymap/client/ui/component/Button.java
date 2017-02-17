@@ -48,7 +48,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
 
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
     public Button(String label)
     {

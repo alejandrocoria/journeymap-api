@@ -42,7 +42,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     int lastMouseX;
     int lastMouseY;
     BlockInfoStep blockInfoStep;
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
     public BlockInfoLayer()
     {

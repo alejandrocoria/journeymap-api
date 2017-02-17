@@ -88,7 +88,7 @@ public abstract class JmUI extends GuiScreen
 
     public FontRenderer getFontRenderer()
     {
-        return this.fontRendererObj;
+        return this.fontRenderer;
     }
 
     public void sizeDisplay(boolean scaled)

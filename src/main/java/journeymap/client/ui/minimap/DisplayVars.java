@@ -132,7 +132,7 @@ public class DisplayVars
 
         this.fontScale = miniMapProperties.fontScale.get();
 
-        FontRenderer fontRenderer = mc.fontRendererObj;
+        FontRenderer fontRenderer = mc.fontRenderer;
         fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
 

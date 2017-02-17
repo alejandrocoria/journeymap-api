@@ -30,7 +30,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
 {
     static int hgap = 8;
     Minecraft mc = FMLClientHandler.instance().getClient();
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;

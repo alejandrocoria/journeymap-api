@@ -190,7 +190,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public String[] getTooltip()
     {
-        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
         String bidiColor = fontRenderer.getBidiFlag() ? "%2$s%1$s" : "%1$s%2$s";
 
         if (tooltipLines == null)
@@ -232,7 +232,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     protected List<TextComponentTranslation> getWordWrappedLines(String color, String original)
     {
-        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
         List<TextComponentTranslation> list = new ArrayList<TextComponentTranslation>();
 
         int max = fontRenderer.getBidiFlag() ? 170 : 250;

@@ -97,7 +97,7 @@ public class DrawUtil
             return;
         }
 
-        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
         final double vpad = fontRenderer.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
         final double lineHeight = fontRenderer.FONT_HEIGHT * fontScale;
@@ -152,7 +152,7 @@ public class DrawUtil
         double bgHeight = 0;
         if (bgColor != null && bgAlpha > 0)
         {
-            final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+            final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
             bgWidth = fontRenderer.getStringWidth(text);
             bgHeight = getLabelHeight(fontRenderer, fontShadow);
         }
@@ -177,7 +177,7 @@ public class DrawUtil
             alpha = alpha / 255f;
         }
 
-        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
         final boolean drawRect = (bgColor != null && alpha > 0);
         final double width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;

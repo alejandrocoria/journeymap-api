@@ -187,7 +187,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
             color = waypointValid ? waypoint.getSafeColor() : RGB.GRAY_RGB;
         }
 
-        FontRenderer fr = FMLClientHandler.instance().getClient().fontRendererObj;
+        FontRenderer fr = FMLClientHandler.instance().getClient().fontRenderer;
 
         int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
         fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color);
@@ -362,7 +362,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         {
             if (button.isMouseOver())
             {
-                manager.drawHoveringText(button.getTooltip(), x, y, FMLClientHandler.instance().getClient().fontRendererObj);
+                manager.drawHoveringText(button.getTooltip(), x, y, FMLClientHandler.instance().getClient().fontRenderer);
             }
         }
 
