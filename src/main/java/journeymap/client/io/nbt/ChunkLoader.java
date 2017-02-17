@@ -16,6 +16,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.apache.logging.log4j.Logger;
 
@@ -74,10 +75,14 @@ public class ChunkLoader
     {
         if (world != null)
         {
-            Chunk theChunk = world.getChunkProvider().getLoadedChunk(chunkX, chunkZ);
-            if (theChunk != null && theChunk.isLoaded() && !(theChunk instanceof EmptyChunk))
+            IChunkProvider provider = world.getChunkProvider();
+            if(provider!=null)
             {
-                return new ChunkMD(theChunk);
+                Chunk theChunk = provider.getLoadedChunk(chunkX, chunkZ);
+                if (theChunk != null && theChunk.isLoaded() && !(theChunk instanceof EmptyChunk))
+                {
+                    return new ChunkMD(theChunk);
+                }
             }
         }
         return null;

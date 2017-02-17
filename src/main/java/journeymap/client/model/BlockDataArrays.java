@@ -16,6 +16,11 @@ public class BlockDataArrays
 {
     private HashMap<String, Dataset> datasets = new HashMap<>(8);
 
+    public void clear()
+    {
+        datasets.clear();
+    }
+
     public Dataset get(String namespace)
     {
         return datasets.computeIfAbsent(namespace, s -> new Dataset());

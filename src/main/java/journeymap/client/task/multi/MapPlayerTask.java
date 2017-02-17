@@ -225,7 +225,21 @@ public class MapPlayerTask extends BaseMapTask
         HashSet<ChunkPos> renderArea = new HashSet<>(renderSpec.getRenderAreaCoords());
         renderArea.removeIf(chunkPos -> {
             ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(chunkPos);
-            return chunkMD != null && (now - chunkMD.getLastRendered(mapType)) < 30000;
+            if (chunkMD == null)
+            {
+                return true;
+            }
+            if ((now - chunkMD.getLastRendered(mapType)) < 30000)
+            {
+                return true;
+            }
+            else
+            {
+                // Clear blockdata to let it get remapped
+                chunkMD.getBlockData().clear();
+                // Keep it
+                return false;
+            }
         });
 
         chunkCoords.addAll(renderArea);
@@ -321,8 +335,6 @@ public class MapPlayerTask extends BaseMapTask
 
             startNs = System.nanoTime();
             List<ITask> tasks = new ArrayList<ITask>(taskList);
-            //DataCache.INSTANCE.invalidateChunkMDCache();
-
             super.performTask(mc, jm, jmWorldDir, threadLogging);
 
             elapsedNs = System.nanoTime() - startNs;
