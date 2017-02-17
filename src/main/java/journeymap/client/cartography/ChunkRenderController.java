@@ -162,7 +162,7 @@ public class ChunkRenderController
         {
             if (Journeymap.getLogger().isDebugEnabled())
             {
-                Journeymap.getLogger().debug("Chunk render failed: %s / %s / %s", rCoord, chunkMd, mapType);
+                Journeymap.getLogger().debug(String.format("Chunk %s render failed for %s", chunkMd.getCoord(),mapType));
             }
         }
 

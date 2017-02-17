@@ -10,6 +10,7 @@ package journeymap.client.model;
 
 import com.google.common.cache.CacheLoader;
 import journeymap.client.io.nbt.ChunkLoader;
+import journeymap.client.log.JMLogger;
 import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.block.state.IBlockState;
@@ -400,11 +401,26 @@ public class ChunkMD
         Minecraft mc = FMLClientHandler.instance().getClient();
 
         @Override
-        public ChunkMD load(ChunkPos coord) throws Exception
+        public ChunkMD load(ChunkPos coord)
         {
             synchronized (this)
             {
-                return ChunkLoader.getChunkMdFromMemory(mc.world, coord.chunkXPos, coord.chunkZPos);
+                try
+                {
+                    if (mc != null && mc.world != null && coord != null)
+                    {
+                        return ChunkLoader.getChunkMdFromMemory(mc.world, coord.chunkXPos, coord.chunkZPos);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Throwable e)
+                {
+                    JMLogger.logOnce("CacheLoader error", e);
+                    return null;
+                }
             }
         }
     }
