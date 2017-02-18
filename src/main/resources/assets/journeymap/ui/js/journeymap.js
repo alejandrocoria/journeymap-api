@@ -888,6 +888,7 @@ var JourneyMap = (function() {
 			return "!" + key + "!";
 		} else {
 			var msg = JM.messages[key];
+			msg = msg.replace("Format error: ", ""); // TODO: Track down why these are found
 			if(!params) {
 				return msg;
 			} else {

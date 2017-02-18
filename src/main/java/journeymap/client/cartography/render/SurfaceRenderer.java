@@ -16,6 +16,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -31,22 +32,15 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     protected Strata strata = new Strata("Surface", 40, 8, false);
     protected float maxDepth = 8;
 
-
     public SurfaceRenderer()
     {
-        this("Surface");
-    }
-
-    protected SurfaceRenderer(String cachePrefix)
-    {
-        // TODO: Write the caches to disk and we'll have some useful data available.
-        this.cachePrefix = cachePrefix;
+        updateOptions(null, null);
     }
 
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
-        if (super.updateOptions(chunkMd))
+        if (super.updateOptions(chunkMd, mapType))
         {
             this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
             return true;
@@ -89,7 +83,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         {
             timer.start();
 
-            updateOptions(chunkMd);
+            updateOptions(chunkMd, MapType.from(MapType.Name.surface, null, chunkMd.getDimension()));
 
             // Initialize ChunkSub slopes if needed
             if (!hasSlopes(chunkMd, vSlice))

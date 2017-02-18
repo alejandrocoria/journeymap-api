@@ -29,6 +29,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -162,8 +164,29 @@ public class TextureCache
             InputStream is = resource.getInputStream();
             return TextureUtil.readBufferedImage(is);
         }
+        catch (FileNotFoundException e)
+        {
+            if ("journeymap".equals(location.getResourceDomain()))
+            {
+                // Dev environment
+                File imgFile = new File("../src/main/resources/assets/journeymap/" + location.getResourcePath());
+                if (imgFile.exists())
+                {
+                    try
+                    {
+                        return ImageIO.read(imgFile);
+                    }
+                    catch (IOException e1)
+                    {
+                    }
+                }
+            }
+            Journeymap.getLogger().warn("Image not found: " + e.getMessage());
+            return null;
+        }
         catch (Exception e)
         {
+
             //Journeymap.getLogger().error("Resource not usable as image: " + location, LogFormatter.toPartialString(e));
             Journeymap.getLogger().warn("Resource not readable with TextureUtil.readBufferedImage(): " + location);
             return null;

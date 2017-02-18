@@ -10,6 +10,7 @@ package journeymap.client.data;
 
 import com.google.common.cache.*;
 import com.google.common.collect.MapMaker;
+import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
@@ -20,6 +21,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -50,10 +52,10 @@ public enum DataCache
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
     final Map<IBlockState, BlockMD> blockMetadata;
-    final LoadingCache<ChunkPos, ChunkMD> chunkMetadata;
+    final Cache<ChunkPos, ChunkMD> chunkMetadata;
     final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
-    final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
+    //final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
     private final int defaultConcurrencyLevel = 1;
 
@@ -112,7 +114,7 @@ public enum DataCache
         blockMetadata = new MapMaker().weakKeys().initialCapacity(5000).concurrencyLevel(2).makeMap();
 
         chunkMetadataRemovalListener = new ProxyRemovalListener<>();
-        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
+        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build();
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
@@ -143,26 +145,26 @@ public enum DataCache
         return builder;
     }
 
-    public void addPrivateCache(String name, Cache cache)
-    {
-        if (privateCaches.containsValue(name))
-        {
-            Journeymap.getLogger().warn("Overriding private cache: " + name);
-        }
-        privateCaches.put(cache, name);
-    }
-
-    public Cache getPrivateCache(String name)
-    {
-        for (Map.Entry<Cache, String> entry : privateCaches.entrySet())
-        {
-            if (entry.getValue().equals(name))
-            {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
+//    public void addPrivateCache(String name, Cache cache)
+//    {
+//        if (privateCaches.containsValue(name))
+//        {
+//            Journeymap.getLogger().warn("Overriding private cache: " + name);
+//        }
+//        privateCaches.put(cache, name);
+//    }
+//
+//    public Cache getPrivateCache(String name)
+//    {
+//        for (Map.Entry<Cache, String> entry : privateCaches.entrySet())
+//        {
+//            if (entry.getValue().equals(name))
+//            {
+//                return entry.getKey();
+//            }
+//        }
+//        return null;
+//    }
 
     public Map getAll(long since)
     {
@@ -411,13 +413,21 @@ public enum DataCache
 
     public ChunkMD getChunkMD(ChunkPos coord)
     {
-        //synchronized (chunkMetadata)
+        synchronized (chunkMetadata)
         {
             ChunkMD chunkMD = null;
 
             try
             {
-                chunkMD = chunkMetadata.getUnchecked(coord);
+                chunkMD = chunkMetadata.getIfPresent(coord);
+                if (chunkMD == null)
+                {
+                    chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.chunkXPos, coord.chunkZPos);
+                    if (chunkMD != null)
+                    {
+                        chunkMetadata.put(coord, chunkMD);
+                    }
+                }
                 if (chunkMD != null && !chunkMD.hasChunk())
                 {
                     chunkMetadata.invalidate(coord);
@@ -439,27 +449,27 @@ public enum DataCache
 
     public void addChunkMD(ChunkMD chunkMD)
     {
-        //synchronized (chunkMetadata)
+        synchronized (chunkMetadata)
         {
             chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
     }
 
-    public Set<ChunkPos> getCachedChunkCoordinates()
-    {
-        //synchronized (chunkMetadata)
-        {
-            return chunkMetadata.asMap().keySet();
-        }
-    }
-
-    public void invalidateChunkMD(ChunkPos coord)
-    {
-        //synchronized (chunkMetadata)
-        {
-            chunkMetadata.invalidate(coord);
-        }
-    }
+//    public Set<ChunkPos> getCachedChunkCoordinates()
+//    {
+//        //synchronized (chunkMetadata)
+//        {
+//            return chunkMetadata.asMap().keySet();
+//        }
+//    }
+//
+//    public void invalidateChunkMD(ChunkPos coord)
+//    {
+//        //synchronized (chunkMetadata)
+//        {
+//            chunkMetadata.invalidate(coord);
+//        }
+//    }
 
     public void invalidateChunkMDCache()
     {
@@ -483,13 +493,13 @@ public enum DataCache
         }
     }
 
-    public void addChunkMDListener(RemovalListener<ChunkPos, ChunkMD> listener)
-    {
-        synchronized (chunkMetadataRemovalListener)
-        {
-            chunkMetadataRemovalListener.addDelegateListener(listener);
-        }
-    }
+//    public void addChunkMDListener(RemovalListener<ChunkPos, ChunkMD> listener)
+//    {
+//        synchronized (chunkMetadataRemovalListener)
+//        {
+//            chunkMetadataRemovalListener.addDelegateListener(listener);
+//        }
+//    }
 
 //    public void resetBlockMetadata()
 //    {
@@ -531,22 +541,22 @@ public enum DataCache
             }
         }
 
-        synchronized (privateCaches)
-        {
-            for (Cache cache : privateCaches.keySet())
-            {
-                try
-                {
-                    cache.invalidateAll();
-                }
-                catch (Exception e)
-                {
-                    Journeymap.getLogger().warn("Couldn't purge private cache: " + cache);
-                }
-            }
-
-            privateCaches.clear();
-        }
+//        synchronized (privateCaches)
+//        {
+//            for (Cache cache : privateCaches.keySet())
+//            {
+//                try
+//                {
+//                    cache.invalidateAll();
+//                }
+//                catch (Exception e)
+//                {
+//                    Journeymap.getLogger().warn("Couldn't purge private cache: " + cache);
+//                }
+//            }
+//
+//            privateCaches.clear();
+//        }
     }
 
     public String getDebugHtml()
@@ -555,7 +565,7 @@ public enum DataCache
         if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
         {
             appendDebugHtml(sb, "Managed Caches", managedCaches);
-            appendDebugHtml(sb, "Private Caches", privateCaches);
+            //appendDebugHtml(sb, "Private Caches", privateCaches);
         }
         else
         {

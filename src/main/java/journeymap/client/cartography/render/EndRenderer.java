@@ -10,11 +10,8 @@ package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
-import journeymap.client.cartography.Strata;
-import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
-
-import java.awt.image.BufferedImage;
+import journeymap.client.model.MapType;
 
 /**
  * Render a chunk in the End.
@@ -23,17 +20,14 @@ import java.awt.image.BufferedImage;
  */
 public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
 {
-    private static final int MIN_LIGHT_LEVEL = 2;
-
     public EndRenderer()
     {
-        super("End");
     }
 
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
-        if (super.updateOptions(chunkMd))
+        if (super.updateOptions(chunkMd, mapType))
         {
             this.ambientColor = RGB.floats(tweakEndAmbientColor);
             this.tweakMoonlightLevel = 5f;
@@ -41,23 +35,4 @@ public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
         }
         return false;
     }
-
-    /**
-     * Create Strata.
-     */
-    @Override
-    protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)//, IntCache chunkHeights, FloatCache chunkSlopes)
-    {
-        super.buildStrata(strata, minY, chunkMd, x, topY, z);//, chunkHeights, chunkSlopes);
-    }
-
-
-    /**
-     * Paint the image with the color derived from a BlockStack
-     */
-    protected boolean paintStrata(final Strata strata, final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
-    {
-        return super.paintStrata(strata, chunkImage, null, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass);
-    }
-
 }
