@@ -43,9 +43,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     public CaveRenderer(SurfaceRenderer surfaceRenderer)
     {
         this.surfaceRenderer = surfaceRenderer;
-        cachePrefix = "Cave";
-
-        updateOptions(null);
+        updateOptions(null, null);
 
         // TODO: Put these in properties?
         shadingSlopeMin = 0.2f;
@@ -57,9 +55,9 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
-        if (super.updateOptions(chunkMd))
+        if (super.updateOptions(chunkMd, mapType))
         {
             mapSurfaceAboveCaves = Journeymap.getClient().getCoreProperties().mapSurfaceAboveCaves.get();
             return true;
@@ -91,8 +89,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             return false;
         }
 
-        updateOptions(chunkMd);
-        boolean ok = false;
+        updateOptions(chunkMd, MapType.underground(vSlice, chunkMd.getDimension()));
 
         renderCaveTimer.start();
 
@@ -116,9 +113,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             }
 
             // Render that lovely cave action
-            ok = renderUnderground(chunkSurfaceImage, chunkImage, chunkMd, vSlice);
-
-            return ok;
+            return renderUnderground(chunkSurfaceImage, chunkImage, chunkMd, vSlice);
         }
         finally
         {

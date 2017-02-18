@@ -14,12 +14,12 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
 import journeymap.client.properties.TopoProperties;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 
@@ -51,9 +51,6 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     public TopoRenderer()
     {
-        // TODO: Write the caches to disk and we'll have some useful data available.
-        this.cachePrefix = "Topo";
-
         primarySlopeOffsets.clear();
         secondarySlopeOffsets.clear();
 
@@ -68,49 +65,48 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
      * Ensures mapping options are up-to-date.
      */
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
-        super.updateOptions(chunkMd);
         boolean needUpdate = false;
-        World world = FMLClientHandler.instance().getClient().theWorld;
-        double worldHeight = world.getHeight();
-
-        topoProperties = Journeymap.getClient().getTopoProperties();
-        if (System.currentTimeMillis() - lastTopoFileUpdate > 5000 && lastTopoFileUpdate < topoProperties.lastModified())
+        if (super.updateOptions(chunkMd, mapType))
         {
-            needUpdate = true;
-            Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
-            topoProperties.load();
-            lastTopoFileUpdate = topoProperties.lastModified();
-
-            landContourColor = topoProperties.getLandContourColor();
-            waterContourColor = topoProperties.getWaterContourColor();
-
-            waterPalette = topoProperties.getWaterColors();
-            waterPaletteRange = waterPalette.length - 1;
-            waterContourInterval = worldHeight / Math.max(1, waterPalette.length);
-
-            landPalette = topoProperties.getLandColors();
-
-            landPaletteRange = landPalette.length - 1;
-            landContourInterval = worldHeight / Math.max(1, landPalette.length);
-        }
-
-        if (chunkMd != null)
-        {
-            Long lastUpdate = (Long) chunkMd.getProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
-            if (needUpdate || (lastUpdate < lastTopoFileUpdate))
+            double worldHeight = 256;
+            if (chunkMd != null)
             {
-                ;
+                worldHeight = chunkMd.getWorld().getHeight();
             }
+
+            topoProperties = Journeymap.getClient().getTopoProperties();
+            if (System.currentTimeMillis() - lastTopoFileUpdate > 5000 && lastTopoFileUpdate < topoProperties.lastModified())
             {
                 needUpdate = true;
-                resetHeights(chunkMd, null);
-                resetSlopes(chunkMd, null);
-                resetWaterHeights(chunkMd, null);
-                resetShore(chunkMd);
+                Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
+                topoProperties.load();
+                lastTopoFileUpdate = topoProperties.lastModified();
+
+                landContourColor = topoProperties.getLandContourColor();
+                waterContourColor = topoProperties.getWaterContourColor();
+
+                waterPalette = topoProperties.getWaterColors();
+                waterPaletteRange = waterPalette.length - 1;
+                waterContourInterval = worldHeight / Math.max(1, waterPalette.length);
+
+                landPalette = topoProperties.getLandColors();
+
+                landPaletteRange = landPalette.length - 1;
+                landContourInterval = worldHeight / Math.max(1, landPalette.length);
             }
-            chunkMd.setProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
+
+            if (chunkMd != null)
+            {
+                Long lastUpdate = (Long) chunkMd.getProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
+                if (needUpdate || (lastUpdate < lastTopoFileUpdate))
+                {
+                    needUpdate = true;
+                    chunkMd.resetBlockData(getCurrentMapType());
+                }
+                chunkMd.setProperty("lastTopoPropFileUpdate", lastTopoFileUpdate);
+            }
         }
 
         return needUpdate;
@@ -133,7 +129,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         {
             timer.start();
 
-            updateOptions(chunkMd);
+            updateOptions(chunkMd, MapType.from(MapType.Name.topo, null, chunkMd.getDimension()));
 
             // Initialize ChunkSub slopes if needed
             if (!hasSlopes(chunkMd, null))
@@ -460,16 +456,16 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     protected final Boolean[][] getShore(ChunkMD chunkMd)
     {
-        return chunkMd.getBlockDataBooleans(cachePrefix).get(PROP_SHORE);
+        return chunkMd.getBlockDataBooleans(getCurrentMapType()).get(PROP_SHORE);
     }
 
     protected final boolean hasShore(ChunkMD chunkMd)
     {
-        return chunkMd.getBlockDataBooleans(cachePrefix).has(PROP_SHORE);
+        return chunkMd.getBlockDataBooleans(getCurrentMapType()).has(PROP_SHORE);
     }
 
     protected final void resetShore(ChunkMD chunkMd)
     {
-        chunkMd.getBlockDataBooleans(cachePrefix).clear(PROP_SHORE);
+        chunkMd.getBlockDataBooleans(getCurrentMapType()).clear(PROP_SHORE);
     }
 }

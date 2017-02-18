@@ -8,13 +8,9 @@
 
 package journeymap.client.model;
 
-import com.google.common.cache.CacheLoader;
-import journeymap.client.io.nbt.ChunkLoader;
-import journeymap.client.log.JMLogger;
 import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -301,6 +297,16 @@ public class ChunkMD
         getRenderTimes().clear();
     }
 
+    public void resetRenderTime(MapType mapType)
+    {
+        getRenderTimes().put(mapType, 0L);
+    }
+
+    public void resetBlockData(MapType mapType)
+    {
+        getBlockData().get(mapType).clear();
+    }
+
     protected HashMap<MapType, Long> getRenderTimes()
     {
         Serializable obj = properties.get(PROP_LAST_RENDERED);
@@ -316,7 +322,6 @@ public class ChunkMD
     {
         return getRenderTimes().getOrDefault(mapType, 0L);
     }
-
 
     public long setRendered(MapType mapType)
     {
@@ -345,19 +350,19 @@ public class ChunkMD
         return blockDataArrays;
     }
 
-    public BlockDataArrays.DataArray<Integer> getBlockDataInts(String namespace)
+    public BlockDataArrays.DataArray<Integer> getBlockDataInts(MapType mapType)
     {
-        return blockDataArrays.get(namespace).ints();
+        return blockDataArrays.get(mapType).ints();
     }
 
-    public BlockDataArrays.DataArray<Float> getBlockDataFloats(String namespace)
+    public BlockDataArrays.DataArray<Float> getBlockDataFloats(MapType mapType)
     {
-        return blockDataArrays.get(namespace).floats();
+        return blockDataArrays.get(mapType).floats();
     }
 
-    public BlockDataArrays.DataArray<Boolean> getBlockDataBooleans(String namespace)
+    public BlockDataArrays.DataArray<Boolean> getBlockDataBooleans(MapType mapType)
     {
-        return blockDataArrays.get(namespace).booleans();
+        return blockDataArrays.get(mapType).booleans();
     }
 
     @Override
@@ -393,35 +398,6 @@ public class ChunkMD
         ChunkMissingException(ChunkPos coord)
         {
             super("Chunk missing: " + coord);
-        }
-    }
-
-    public static class SimpleCacheLoader extends CacheLoader<ChunkPos, ChunkMD>
-    {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-
-        @Override
-        public ChunkMD load(ChunkPos coord)
-        {
-            synchronized (this)
-            {
-                try
-                {
-                    if (mc != null && mc.theWorld != null && coord != null)
-                    {
-                        return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch (Throwable e)
-                {
-                    JMLogger.logOnce("CacheLoader error", e);
-                    return null;
-                }
-            }
         }
     }
 }

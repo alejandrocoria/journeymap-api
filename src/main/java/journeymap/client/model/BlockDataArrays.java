@@ -14,16 +14,16 @@ import java.util.stream.IntStream;
  */
 public class BlockDataArrays
 {
-    private HashMap<String, Dataset> datasets = new HashMap<>(8);
+    private HashMap<MapType, Dataset> datasets = new HashMap<>(8);
 
-    public void clear()
+    public void clearAll()
     {
         datasets.clear();
     }
 
-    public Dataset get(String namespace)
+    public Dataset get(MapType mapType)
     {
-        return datasets.computeIfAbsent(namespace, s -> new Dataset());
+        return datasets.computeIfAbsent(mapType, s -> new Dataset());
     }
 
     public static class Dataset
@@ -33,7 +33,7 @@ public class BlockDataArrays
         private DataArray<Boolean> booleans;
         private DataArray<Object> objects;
 
-        public void clear()
+        protected void clear()
         {
             ints = null;
             floats = null;

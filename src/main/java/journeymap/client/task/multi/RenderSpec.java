@@ -23,7 +23,6 @@ import net.minecraft.util.math.ChunkPos;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -138,6 +137,12 @@ public class RenderSpec
             offset--;
         }
 
+        // Sort results by distance from center
+        for (int i = minOffset; i <= maxOffset; i++)
+        {
+            multimap.get(i).sort((o1, o2) -> Double.compare(o1.distance(), o2.distance()));
+        }
+
         return new ImmutableListMultimap.Builder<Integer, Offset>().putAll(multimap).build();
     }
 
@@ -187,7 +192,7 @@ public class RenderSpec
         lastTopoRenderSpec = null;
     }
 
-    protected Collection<ChunkPos> getRenderAreaCoords()
+    protected List<ChunkPos> getRenderAreaCoords()
     {
         // Lazy init offsets on first use
         if (offsets == null)
@@ -220,8 +225,7 @@ public class RenderSpec
 
         if (maxSecondaryRenderDistance == primaryRenderDistance)
         {
-            // Someday it may be necessary to return an immutable list if these will be consumed elsewhere
-            return primaryRenderCoords;
+            return new ArrayList<>(primaryRenderCoords);
         }
         else
         {
@@ -234,15 +238,13 @@ public class RenderSpec
             List<Offset> secondaryOffsets = offsets.get(lastSecondaryRenderDistance);
 
             ArrayList<ChunkPos> renderCoords = new ArrayList<ChunkPos>(primaryRenderCoords.size() + secondaryOffsets.size());
-            renderCoords.addAll(primaryRenderCoords);
-
             for (Offset offset : secondaryOffsets)
             {
                 ChunkPos secondaryCoord = offset.from(lastPlayerCoord);
                 renderCoords.add(secondaryCoord);
                 dataCache.getChunkMD(secondaryCoord);
             }
-
+            renderCoords.addAll(0, primaryRenderCoords);
             return renderCoords;
         }
     }
@@ -471,6 +473,11 @@ public class RenderSpec
             }
 
             return true;
+        }
+
+        public double distance()
+        {
+            return Math.sqrt(x * x + z * z);
         }
 
         @Override

@@ -93,7 +93,7 @@ public class MapType
 
     public static String toCacheKey(Name name, Integer vSlice, int dimension)
     {
-        return "" + dimension + name + vSlice;
+        return String.format("%s|%s|%s", dimension, name, vSlice == null ? "_" : vSlice);
     }
 
     private Context.MapType toApiContextMapType(Name name)
@@ -103,7 +103,7 @@ public class MapType
             case day:
                 return Context.MapType.Day;
             case topo:
-                return Context.MapType.Day; // TODO: Add to topo
+                return Context.MapType.Topo;
             case night:
                 return Context.MapType.Night;
             case underground:

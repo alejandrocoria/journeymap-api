@@ -29,13 +29,15 @@ import net.minecraft.world.World;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MapPlayerTask extends BaseMapTask
 {
+    private static int MAX_STALE_MILLISECONDS = 30000;
+    private static int MAX_BATCH_SIZE = 32;
     private static DecimalFormat decFormat = new DecimalFormat("##.#");
     private static volatile long lastTaskCompleted;
     private static long lastTaskTime;
@@ -206,8 +208,8 @@ public class MapPlayerTask extends BaseMapTask
     {
         startNs = System.nanoTime();
 
+        // Get candidate coordinates from the renderspec
         RenderSpec renderSpec = null;
-
         if (mapType.isUnderground())
         {
             renderSpec = RenderSpec.getUndergroundSpec();
@@ -222,27 +224,47 @@ public class MapPlayerTask extends BaseMapTask
         }
 
         long now = System.currentTimeMillis();
-        HashSet<ChunkPos> renderArea = new HashSet<>(renderSpec.getRenderAreaCoords());
+        List<ChunkPos> renderArea = renderSpec.getRenderAreaCoords();
+        int maxBatchSize = renderArea.size() / 4;
+
+        // Remove coords of unloaded chunks or if they've been mapped too recently
         renderArea.removeIf(chunkPos -> {
             ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(chunkPos);
-            if (chunkMD == null)
+            if (chunkMD == null || !chunkMD.hasChunk() || (now - chunkMD.getLastRendered(mapType)) < 30000)
             {
-                return true;
-            }
-            if ((now - chunkMD.getLastRendered(mapType)) < 30000)
-            {
+                // Remove it
                 return true;
             }
             else
             {
-                // Clear blockdata to let it get remapped
-                chunkMD.getBlockData().clear();
+                // Clear blockdata to ensure it is remapped
+                chunkMD.resetBlockData(mapType);
+
                 // Keep it
                 return false;
             }
         });
 
-        chunkCoords.addAll(renderArea);
+        // Keep batch size reasonable
+        if (renderArea.size() <= maxBatchSize)
+        {
+            chunkCoords.addAll(renderArea);
+        }
+        else
+        {
+//            // Add player's current chunk every time.
+//            ChunkPos playerPos = new ChunkPos(minecraft.player.getPosition());
+//            ChunkMD playerChunk = DataCache.INSTANCE.getChunkMD(playerPos);
+//            if(playerChunk!=null) {
+//                playerChunk.resetBlockData(mapType);
+//                renderArea.remove(playerChunk);
+//                chunkCoords.add(playerChunk.getCoord());
+//            }
+
+            List<ChunkPos> list = Arrays.asList(renderArea.toArray(new ChunkPos[renderArea.size()]));
+            chunkCoords.addAll(list.subList(0, maxBatchSize));
+        }
+
         this.scheduledChunks = chunkCoords.size();
     }
 

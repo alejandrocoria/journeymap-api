@@ -389,8 +389,17 @@ public class FileHandler
             InputStream is = JourneymapClient.class.getResourceAsStream("/assets/journeymap/lang/" + fileName);
             if (is == null)
             {
-                Journeymap.getLogger().warn("Language file not found: " + fileName);
-                return null;
+                // Dev environment
+                File file = new File("../src/main/resources/assets/journeymap/lang/" + fileName);
+                if (file.exists())
+                {
+                    is = new FileInputStream(file);
+                }
+                else
+                {
+                    Journeymap.getLogger().warn("Language file not found: " + fileName);
+                    return null;
+                }
             }
             Properties properties = new Properties();
             properties.load(is);
