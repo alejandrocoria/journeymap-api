@@ -16,6 +16,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
@@ -56,7 +57,6 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<>(3);
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<>(4);
-    protected String cachePrefix = "";
 
     // Need to go in properties
     protected float shadingSlopeMin; // Range: 0-1
@@ -82,9 +82,11 @@ public abstract class BaseRenderer implements IChunkRenderer
     private static final String PROP_HEIGHTS = "heights";
     private static final String PROP_WATER_HEIGHTS = "waterHeights";
 
+    private MapType currentMapType;
+
     public BaseRenderer()
     {
-        updateOptions(null);
+        updateOptions(null, null);
 
         // TODO: Put in properties
         this.shadingSlopeMin = 0.2f;
@@ -121,8 +123,10 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Ensures mapping options are up-to-date.
      */
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
+        this.currentMapType = mapType;
+
         boolean updateNeeded = false;
         coreProperties = Journeymap.getClient().getCoreProperties();
         long lastUpdate = Journeymap.getClient().getCoreProperties().lastModified();
@@ -145,17 +149,9 @@ public abstract class BaseRenderer implements IChunkRenderer
         if (chunkMd != null)
         {
             Long lastChunkUpdate = (Long) chunkMd.getProperty("lastPropFileUpdate", lastPropFileUpdate);
-            if (lastChunkUpdate < lastPropFileUpdate)
-            {
-                ;
-            }
-            {
-                updateNeeded = true;
-                resetHeights(chunkMd, null);
-                resetSlopes(chunkMd, null);
-                resetWaterHeights(chunkMd, null);
-            }
-            chunkMd.setProperty("lastPropFileUpdate", lastPropFileUpdate);
+            updateNeeded = true;
+            chunkMd.resetBlockData(getCurrentMapType());
+            chunkMd.setProperty("lastPropFileUpdate", lastChunkUpdate);
         }
 
         return updateNeeded;
@@ -315,6 +311,11 @@ public abstract class BaseRenderer implements IChunkRenderer
         return slopes;
 
     }
+    
+    protected MapType getCurrentMapType()
+    {
+        return this.currentMapType;
+    }
 
     public abstract int getBlockHeight(final ChunkMD chunkMd, BlockPos blockPos);
 
@@ -426,47 +427,47 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataInts(cachePrefix).get(getKey(PROP_HEIGHTS, vSlice));
+        return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_HEIGHTS, vSlice));
     }
 
     protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataInts(cachePrefix).has(getKey(PROP_HEIGHTS, vSlice));
+        return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_HEIGHTS, vSlice));
     }
 
     protected final void resetHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        chunkMd.getBlockDataInts(cachePrefix).clear(getKey(PROP_HEIGHTS, vSlice));
+        chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_HEIGHTS, vSlice));
     }
 
     protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataFloats(cachePrefix).get(getKey(PROP_SLOPES, vSlice));
+        return chunkMd.getBlockDataFloats(getCurrentMapType()).get(getKey(PROP_SLOPES, vSlice));
     }
 
     protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataFloats(cachePrefix).has(getKey(PROP_SLOPES, vSlice));
+        return chunkMd.getBlockDataFloats(getCurrentMapType()).has(getKey(PROP_SLOPES, vSlice));
     }
 
     protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice)
     {
-        chunkMd.getBlockDataFloats(cachePrefix).clear(getKey(PROP_SLOPES, vSlice));
+        chunkMd.getBlockDataFloats(getCurrentMapType()).clear(getKey(PROP_SLOPES, vSlice));
     }
 
     protected final Integer[][] getWaterHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataInts(cachePrefix).get(getKey(PROP_WATER_HEIGHTS, vSlice));
+        return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
     protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        return chunkMd.getBlockDataInts(cachePrefix).has(getKey(PROP_WATER_HEIGHTS, vSlice));
+        return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
     protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice)
     {
-        chunkMd.getBlockDataInts(cachePrefix).clear(getKey(PROP_WATER_HEIGHTS, vSlice));
+        chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
 //    /**

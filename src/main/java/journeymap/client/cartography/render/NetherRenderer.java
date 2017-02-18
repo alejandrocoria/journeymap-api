@@ -13,6 +13,7 @@ import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.RGB;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
 import journeymap.common.Journeymap;
 
 /**
@@ -25,13 +26,12 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
     public NetherRenderer()
     {
         super(null);
-        cachePrefix = "Nether";
     }
 
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd)
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
-        if (super.updateOptions(chunkMd))
+        if (super.updateOptions(chunkMd, mapType))
         {
             this.ambientColor = RGB.floats(tweakNetherAmbientColor);
             this.mapSurfaceAboveCaves = false;

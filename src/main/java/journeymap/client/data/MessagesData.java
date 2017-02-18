@@ -45,16 +45,19 @@ public class MessagesData extends CacheLoader<Class, Map<String, Object>>
         props.put("lang", FMLClientHandler.instance().getClient().gameSettings.language);
 
         Properties properties = FileHandler.getLangFile("en_US.lang");
-        Enumeration<Object> allKeys = properties.keys();
-
-        while (allKeys.hasMoreElements())
+        if (properties != null)
         {
-            String key = (String) allKeys.nextElement();
-            if (key.startsWith(KEY_PREFIX))
+            Enumeration<Object> allKeys = properties.keys();
+
+            while (allKeys.hasMoreElements())
             {
-                String name = key.split(KEY_PREFIX)[1];
-                String value = Constants.getString(key);
-                props.put(name, value);
+                String key = (String) allKeys.nextElement();
+                if (key.startsWith(KEY_PREFIX))
+                {
+                    String name = key.split(KEY_PREFIX)[1];
+                    String value = Constants.getString(key);
+                    props.put(name, value);
+                }
             }
         }
 
