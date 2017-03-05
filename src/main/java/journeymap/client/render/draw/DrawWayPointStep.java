@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.render.draw;
@@ -18,7 +15,7 @@ import journeymap.client.render.texture.TextureImpl;
 import java.awt.geom.Point2D;
 
 /**
- * Created by mwoodman on 12/26/13.
+ * @author techbrew 12/26/13.
  */
 public class DrawWayPointStep implements DrawStep
 {

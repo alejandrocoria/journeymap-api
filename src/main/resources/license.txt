@@ -1,12 +1,10 @@
-JourneyMap ${version} for Minecraft ${mcversion} (${date})
+JourneyMap ${version} Mod for Minecraft ${mcversion} (${date})
 http://journeymap.info/
-Copyright (C) 2011-2016 Mark Woodman (techbrew).  All Rights Reserved.
+Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
 
-This mod may not be altered, file-hosted, re-packaged, reverse-engineered, or distributed
-in part or in whole without express written permission by Mark Woodman (techbrew).
-
-JourneyMap may only be distributed in a Modpack if the qualifications and conditions have
-been met according to: http://journeymap.info/Modpacks/
+JourneyMap may not be altered, file-hosted, re-packaged, reverse-engineered, or distributed
+in part or in whole. JourneyMap may only be distributed in a Modpack if the qualifications
+and conditions have been met according to: http://journeymap.info/Modpacks/
 
 JourneyMap includes and/or makes use of the following software under their respective licenses:
 

@@ -1,4 +1,9 @@
-﻿### JourneyMap 5.2.0 Resource Bundle - hu_HU
+﻿#
+# JourneyMap Mod <journeymap.info> for Minecraft
+# Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+#
+
+### JourneyMap 5.2.0 Resource Bundle - hu_HU
 ### Translation by: Tudi20
 ### Note: Translated a bit of it: 14th Dec, 2015. Needs further translation. Issue: #23. ~Tudi20.
 jm.advanced.announcemod=Hirdető mod

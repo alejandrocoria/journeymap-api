@@ -1,3 +1,8 @@
+#
+# JourneyMap Mod <journeymap.info> for Minecraft
+# Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+#
+
 ### JourneyMap 5.1.1 Resource Bundle - de_DE
 jm.advanced.announcemod=Mod ankündigen
 jm.advanced.announcemod.tooltip=Schreibt im Chat-Fenster, ob JourneyMap einsatzfähig ist.
