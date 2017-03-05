@@ -33,10 +33,16 @@ import org.apache.logging.log4j.Logger;
  */
 public enum UIManager
 {
+    /**
+     * Instance ui manager.
+     */
     INSTANCE;
 
     private final Logger logger = Journeymap.getLogger();
     private final MiniMap miniMap;
+    /**
+     * The Minecraft.
+     */
     Minecraft minecraft = FMLClientHandler.instance().getClient();
 
     private UIManager()
@@ -59,6 +65,11 @@ public enum UIManager
         this.miniMap = tmp;
     }
 
+    /**
+     * Handle linkage error.
+     *
+     * @param error the error
+     */
     public static void handleLinkageError(LinkageError error)
     {
         Journeymap.getLogger().error(LogFormatter.toString(error));
@@ -72,6 +83,9 @@ public enum UIManager
         }
     }
 
+    /**
+     * Close all.
+     */
     public void closeAll()
     {
         try
@@ -90,6 +104,9 @@ public enum UIManager
         minecraft.setIngameFocus();
     }
 
+    /**
+     * Close current.
+     */
     public void closeCurrent()
     {
         try
@@ -111,6 +128,9 @@ public enum UIManager
         KeyBinding.unPressAllKeys();
     }
 
+    /**
+     * Open inventory.
+     */
     public void openInventory()
     {
         logger.debug("Opening inventory");
@@ -118,6 +138,14 @@ public enum UIManager
         minecraft.displayGuiScreen(new GuiInventory(minecraft.player)); // displayGuiScreen
     }
 
+    /**
+     * Open t.
+     *
+     * @param <T>           the type parameter
+     * @param uiClass       the ui class
+     * @param returnDisplay the return display
+     * @return the t
+     */
     public <T extends JmUI> T open(Class<T> uiClass, JmUI returnDisplay)
     {
         try
@@ -147,6 +175,13 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open t.
+     *
+     * @param <T>     the type parameter
+     * @param uiClass the ui class
+     * @return the t
+     */
     public <T extends JmUI> T open(Class<T> uiClass)
     {
         try
@@ -172,6 +207,13 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open t.
+     *
+     * @param <T> the type parameter
+     * @param ui  the ui
+     * @return the t
+     */
     public <T extends GuiScreen> T open(T ui)
     {
         closeCurrent();
@@ -193,6 +235,9 @@ public enum UIManager
         return ui;
     }
 
+    /**
+     * Toggle minimap.
+     */
     public void toggleMinimap()
     {
         try
@@ -209,6 +254,11 @@ public enum UIManager
         }
     }
 
+    /**
+     * Is mini map enabled boolean.
+     *
+     * @return the boolean
+     */
     public boolean isMiniMapEnabled()
     {
         try
@@ -226,6 +276,11 @@ public enum UIManager
         return false;
     }
 
+    /**
+     * Sets mini map enabled.
+     *
+     * @param enable the enable
+     */
     public void setMiniMapEnabled(boolean enable)
     {
         try
@@ -243,6 +298,9 @@ public enum UIManager
         }
     }
 
+    /**
+     * Draw mini map.
+     */
     public void drawMiniMap()
     {
         minecraft.mcProfiler.startSection("journeymap");
@@ -288,17 +346,30 @@ public enum UIManager
         }
     }
 
+    /**
+     * Gets mini map.
+     *
+     * @return the mini map
+     */
     public MiniMap getMiniMap()
     {
         return miniMap;
     }
 
+    /**
+     * Open fullscreen map.
+     */
     public void openFullscreenMap()
     {
         KeyBinding.unPressAllKeys();
         open(Fullscreen.class);
     }
 
+    /**
+     * Open fullscreen map.
+     *
+     * @param waypoint the waypoint
+     */
     public void openFullscreenMap(Waypoint waypoint)
     {
         try
@@ -320,21 +391,40 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open map hotkey help.
+     *
+     * @param returnDisplay the return display
+     */
     public void openMapHotkeyHelp(JmUI returnDisplay)
     {
         open(FullscreenHotkeysHelp.class, returnDisplay);
     }
 
+    /**
+     * Open mini map hotkey help.
+     *
+     * @param returnDisplay the return display
+     */
     public void openMiniMapHotkeyHelp(JmUI returnDisplay)
     {
         open(MiniMapHotkeysHelp.class, returnDisplay);
     }
 
+    /**
+     * Open options manager.
+     */
     public void openOptionsManager()
     {
         open(OptionsManager.class);
     }
 
+    /**
+     * Open options manager.
+     *
+     * @param returnDisplay     the return display
+     * @param initialCategories the initial categories
+     */
     public void openOptionsManager(JmUI returnDisplay, Category... initialCategories)
     {
         try
@@ -351,16 +441,30 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open map actions.
+     */
     public void openMapActions()
     {
         open(FullscreenActions.class);
     }
 
+    /**
+     * Open splash.
+     *
+     * @param returnDisplay the return display
+     */
     public void openSplash(JmUI returnDisplay)
     {
         open(Splash.class, returnDisplay);
     }
 
+    /**
+     * Open waypoint manager.
+     *
+     * @param waypoint      the waypoint
+     * @param returnDisplay the return display
+     */
     public void openWaypointManager(Waypoint waypoint, JmUI returnDisplay)
     {
         if (WaypointsData.isManagerEnabled())
@@ -381,6 +485,13 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open waypoint editor.
+     *
+     * @param waypoint      the waypoint
+     * @param isNew         the is new
+     * @param returnDisplay the return display
+     */
     public void openWaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay)
     {
         if (WaypointsData.isManagerEnabled())
@@ -401,6 +512,11 @@ public enum UIManager
         }
     }
 
+    /**
+     * Open grid editor.
+     *
+     * @param returnDisplay the return display
+     */
     public void openGridEditor(JmUI returnDisplay)
     {
         try
@@ -418,6 +534,9 @@ public enum UIManager
         }
     }
 
+    /**
+     * Reset.
+     */
     public void reset()
     {
         try
@@ -435,6 +554,9 @@ public enum UIManager
         }
     }
 
+    /**
+     * Switch mini map preset.
+     */
     public void switchMiniMapPreset()
     {
         try
@@ -452,6 +574,11 @@ public enum UIManager
         }
     }
 
+    /**
+     * Switch mini map preset.
+     *
+     * @param which the which
+     */
     public void switchMiniMapPreset(int which)
     {
         try

@@ -12,12 +12,27 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 
 
+/**
+ * The type Map chat.
+ */
 public class MapChat extends GuiChat
 {
+    /**
+     * The Hidden.
+     */
     protected boolean hidden = false;
+    /**
+     * The Bottom margin.
+     */
     protected int bottomMargin = 8;
     private int cursorCounter;
 
+    /**
+     * Instantiates a new Map chat.
+     *
+     * @param defaultText the default text
+     * @param hidden      the hidden
+     */
     public MapChat(String defaultText, boolean hidden)
     {
         super(defaultText);
@@ -31,6 +46,9 @@ public class MapChat extends GuiChat
         hidden = true;
     }
 
+    /**
+     * Close.
+     */
     public void close()
     {
         onGuiClosed();
@@ -124,16 +142,31 @@ public class MapChat extends GuiChat
         super.drawScreen(par1, par2, par3);
     }
 
+    /**
+     * Is hidden boolean.
+     *
+     * @return the boolean
+     */
     public boolean isHidden()
     {
         return hidden;
     }
 
+    /**
+     * Sets hidden.
+     *
+     * @param hidden the hidden
+     */
     public void setHidden(boolean hidden)
     {
         this.hidden = hidden;
     }
 
+    /**
+     * Sets text.
+     *
+     * @param defaultText the default text
+     */
     public void setText(String defaultText)
     {
         this.inputField.setText(defaultText);

@@ -17,17 +17,29 @@ import java.util.Arrays;
  */
 public class Version implements Comparable<Version>
 {
+    /**
+     * The Major.
+     */
     public final int major;
+    /**
+     * The Minor.
+     */
     public final int minor;
+    /**
+     * The Micro.
+     */
     public final int micro;
+    /**
+     * The Patch.
+     */
     public final String patch;
 
     /**
      * Constructor without a patch modifier.
      *
-     * @param major
-     * @param minor
-     * @param micro
+     * @param major the major
+     * @param minor the minor
+     * @param micro the micro
      */
     public Version(int major, int minor, int micro)
     {
@@ -37,10 +49,10 @@ public class Version implements Comparable<Version>
     /**
      * Constructor with a patch modifier.
      *
-     * @param major
-     * @param minor
-     * @param micro
-     * @param patch
+     * @param major the major
+     * @param minor the minor
+     * @param micro the micro
+     * @param patch the patch
      */
     public Version(int major, int minor, int micro, String patch)
     {
@@ -53,12 +65,12 @@ public class Version implements Comparable<Version>
     /**
      * Creates a Version using parameters and a default Version if the parameters can't be parsed.
      *
-     * @param major
-     * @param minor
-     * @param micro
-     * @param patch
-     * @param defaultVersion
-     * @return
+     * @param major          the major
+     * @param minor          the minor
+     * @param micro          the micro
+     * @param patch          the patch
+     * @param defaultVersion the default version
+     * @return version
      */
     public static Version from(String major, String minor, String micro, String patch, Version defaultVersion)
     {
@@ -90,9 +102,9 @@ public class Version implements Comparable<Version>
     /**
      * Converts a version string to a Version.
      *
-     * @param versionString
-     * @param defaultVersion
-     * @return
+     * @param versionString  the version string
+     * @param defaultVersion the default version
+     * @return version
      */
     public static Version from(String versionString, Version defaultVersion)
     {
@@ -136,7 +148,7 @@ public class Version implements Comparable<Version>
     /**
      * Creates a MAJOR.MINOR string from this instance.
      *
-     * @return
+     * @return string
      */
     public String toMajorMinorString()
     {
@@ -146,8 +158,8 @@ public class Version implements Comparable<Version>
     /**
      * Whether this is a newer version than the other.
      *
-     * @param other
-     * @return
+     * @param other the other
+     * @return boolean
      */
     public boolean isNewerThan(Version other)
     {
@@ -157,7 +169,7 @@ public class Version implements Comparable<Version>
     /**
      * Whether this version is a release (no patch).
      *
-     * @return
+     * @return boolean
      */
     public boolean isRelease()
     {

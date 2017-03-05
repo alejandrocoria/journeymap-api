@@ -12,18 +12,46 @@ import journeymap.common.properties.Category;
  */
 public class IntegerField extends ConfigField<Integer>
 {
+    /**
+     * The constant ATTR_MIN.
+     */
     public static final String ATTR_MIN = "min";
+    /**
+     * The constant ATTR_MAX.
+     */
     public static final String ATTR_MAX = "max";
 
+    /**
+     * Instantiates a new Integer field.
+     */
     protected IntegerField()
     {
     }
 
+    /**
+     * Instantiates a new Integer field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param minValue     the min value
+     * @param maxValue     the max value
+     * @param defaultValue the default value
+     */
     public IntegerField(Category category, String key, int minValue, int maxValue, int defaultValue)
     {
         this(category, key, minValue, maxValue, defaultValue, 100);
     }
 
+    /**
+     * Instantiates a new Integer field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param minValue     the min value
+     * @param maxValue     the max value
+     * @param defaultValue the default value
+     * @param sortOrder    the sort order
+     */
     public IntegerField(Category category, String key, int minValue, int maxValue, int defaultValue, int sortOrder)
     {
         super(category, key);
@@ -65,6 +93,13 @@ public class IntegerField extends ConfigField<Integer>
         return valid;
     }
 
+    /**
+     * Range integer field.
+     *
+     * @param min the min
+     * @param max the max
+     * @return the integer field
+     */
     public IntegerField range(int min, int max)
     {
         put(ATTR_MIN, min);
@@ -72,16 +107,31 @@ public class IntegerField extends ConfigField<Integer>
         return this;
     }
 
+    /**
+     * Gets min value.
+     *
+     * @return the min value
+     */
     public int getMinValue()
     {
         return getIntegerAttr(ATTR_MIN);
     }
 
+    /**
+     * Gets max value.
+     *
+     * @return the max value
+     */
     public int getMaxValue()
     {
         return getIntegerAttr(ATTR_MAX);
     }
 
+    /**
+     * Increment and get integer.
+     *
+     * @return the integer
+     */
     public Integer incrementAndGet()
     {
         Integer value = Math.min(getMaxValue(), get() + 1);
@@ -89,6 +139,11 @@ public class IntegerField extends ConfigField<Integer>
         return value;
     }
 
+    /**
+     * Decrement and get integer.
+     *
+     * @return the integer
+     */
     public Integer decrementAndGet()
     {
         Integer value = Math.max(getMinValue(), get() - 1);

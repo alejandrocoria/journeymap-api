@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ * The type Event handler manager.
+ *
  * @author techbrew 1/29/14.
  */
 public class EventHandlerManager
@@ -32,6 +34,9 @@ public class EventHandlerManager
     {
     }
 
+    /**
+     * Register general handlers.
+     */
     public static void registerGeneralHandlers()
     {
         register(new ChatEventHandler());
@@ -51,6 +56,9 @@ public class EventHandlerManager
         register(ChunkMonitor.INSTANCE);
     }
 
+    /**
+     * Register gui handlers.
+     */
     public static void registerGuiHandlers()
     {
         register(new MiniMapOverlayHandler());
@@ -58,6 +66,9 @@ public class EventHandlerManager
         register(new KeyEventHandler());
     }
 
+    /**
+     * Unregister all.
+     */
     public static void unregisterAll()
     {
         ArrayList<Class<? extends EventHandler>> list = new ArrayList<Class<? extends EventHandler>>(handlers.keySet());
@@ -88,6 +99,11 @@ public class EventHandlerManager
         }
     }
 
+    /**
+     * Unregister.
+     *
+     * @param handlerClass the handler class
+     */
     public static void unregister(Class<? extends EventHandler> handlerClass)
     {
         EventHandler handler = handlers.remove(handlerClass);

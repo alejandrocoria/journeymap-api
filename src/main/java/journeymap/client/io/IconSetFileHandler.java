@@ -22,7 +22,13 @@ import java.util.*;
  */
 public class IconSetFileHandler
 {
+    /**
+     * The constant ASSETS_JOURNEYMAP_ICON_ENTITY.
+     */
     public static final ResourceLocation ASSETS_JOURNEYMAP_ICON_ENTITY = new ResourceLocation(Journeymap.MOD_ID, "icon/entity");
+    /**
+     * The constant MOB_ICON_SET_DEFAULT.
+     */
     public final static String MOB_ICON_SET_DEFAULT = "Default";
 
     private static final Set<String> modUpdatedSetNames = new HashSet<>();
@@ -33,12 +39,21 @@ public class IconSetFileHandler
         registerEntityIconDirectory(ASSETS_JOURNEYMAP_ICON_ENTITY);
     }
 
+    /**
+     * Initialize.
+     */
     public static void initialize()
     {
         // Assume all entityIconLocations registered by now
         modUpdatedSetNames.add(MOB_ICON_SET_DEFAULT);
     }
 
+    /**
+     * Register entity icon directory boolean.
+     *
+     * @param resourceLocation the resource location
+     * @return the boolean
+     */
     public static boolean registerEntityIconDirectory(ResourceLocation resourceLocation)
     {
         boolean valid = addEntityIcons(resourceLocation, MOB_ICON_SET_DEFAULT, false);
@@ -49,11 +64,22 @@ public class IconSetFileHandler
         return valid;
     }
 
+    /**
+     * Ensure entity icon set.
+     *
+     * @param setName the set name
+     */
     public static void ensureEntityIconSet(String setName)
     {
         ensureEntityIconSet(setName, false);
     }
 
+    /**
+     * Ensure entity icon set.
+     *
+     * @param setName   the set name
+     * @param overwrite the overwrite
+     */
     public static void ensureEntityIconSet(String setName, boolean overwrite)
     {
         if (!modUpdatedSetNames.contains(setName))
@@ -103,6 +129,11 @@ public class IconSetFileHandler
         return result;
     }
 
+    /**
+     * Gets entity icon dir.
+     *
+     * @return the entity icon dir
+     */
     public static File getEntityIconDir()
     {
         File dir = new File(FileHandler.getMinecraftDirectory(), Constants.ENTITY_ICON_DIR);
@@ -113,11 +144,23 @@ public class IconSetFileHandler
         return dir;
     }
 
+    /**
+     * Gets entity icon set names.
+     *
+     * @return the entity icon set names
+     */
     public static ArrayList<String> getEntityIconSetNames()
     {
         return getIconSetNames(getEntityIconDir(), Collections.singletonList(MOB_ICON_SET_DEFAULT));
     }
 
+    /**
+     * Gets icon set names.
+     *
+     * @param parentDir       the parent dir
+     * @param defaultIconSets the default icon sets
+     * @return the icon set names
+     */
     public static ArrayList<String> getIconSetNames(File parentDir, List<String> defaultIconSets)
     {
         try
@@ -152,6 +195,9 @@ public class IconSetFileHandler
         return names;
     }
 
+    /**
+     * The type Icon set values provider.
+     */
     public static class IconSetValuesProvider implements StringField.ValuesProvider
     {
         @Override

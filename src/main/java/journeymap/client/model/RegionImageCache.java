@@ -24,13 +24,31 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The enum Region image cache.
+ */
 public enum RegionImageCache
 {
+    /**
+     * Instance region image cache.
+     */
     INSTANCE;
 
+    /**
+     * The First file flush interval secs.
+     */
     public long firstFileFlushIntervalSecs = 5;
+    /**
+     * The Flush file interval secs.
+     */
     public long flushFileIntervalSecs = 60;
+    /**
+     * The Texture cache age secs.
+     */
     public long textureCacheAgeSecs = 30;
+    /**
+     * The Logger.
+     */
     static final Logger logger = Journeymap.getLogger();
     private volatile long lastFlush;
 
@@ -42,6 +60,12 @@ public enum RegionImageCache
         lastFlush = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(firstFileFlushIntervalSecs);
     }
 
+    /**
+     * Init region image sets cache loading cache.
+     *
+     * @param builder the builder
+     * @return the loading cache
+     */
     public LoadingCache<RegionImageSet.Key, RegionImageSet> initRegionImageSetsCache(CacheBuilder<Object, Object> builder)
     {
         return builder
@@ -75,6 +99,13 @@ public enum RegionImageCache
                 });
     }
 
+    /**
+     * Gets region image set.
+     *
+     * @param chunkMd the chunk md
+     * @param mapType the map type
+     * @return the region image set
+     */
     public RegionImageSet getRegionImageSet(ChunkMD chunkMd, MapType mapType)
     {
         if (chunkMd.hasChunk())
@@ -90,11 +121,23 @@ public enum RegionImageCache
         }
     }
 
+    /**
+     * Gets region image set.
+     *
+     * @param rCoord the r coord
+     * @return the region image set
+     */
     public RegionImageSet getRegionImageSet(RegionCoord rCoord)
     {
         return DataCache.INSTANCE.getRegionImageSets().getUnchecked(RegionImageSet.Key.from(rCoord));
     }
 
+    /**
+     * Gets region image set.
+     *
+     * @param rCoordKey the r coord key
+     * @return the region image set
+     */
     public RegionImageSet getRegionImageSet(RegionImageSet.Key rCoordKey)
     {
         return DataCache.INSTANCE.getRegionImageSets().getUnchecked(rCoordKey);
@@ -171,6 +214,8 @@ public enum RegionImageCache
 
     /**
      * lol
+     *
+     * @return the last flush
      */
     public long getLastFlush()
     {
@@ -181,8 +226,9 @@ public enum RegionImageCache
      * Get a list of region images in the cache updated since the time specified.
      * This won't include regions which changed but have already been removed from the cache.
      *
-     * @param time
-     * @return
+     * @param mapType the map type
+     * @param time    the time
+     * @return changed since
      */
     public List<RegionCoord> getChangedSince(final MapType mapType, long time)
     {
@@ -204,8 +250,10 @@ public enum RegionImageCache
     /**
      * Check whether a given RegionCoord is dirty since a given time
      *
-     * @param time
-     * @return
+     * @param rc      the rc
+     * @param mapType the map type
+     * @param time    the time
+     * @return boolean
      */
     public boolean isDirtySince(final RegionCoord rc, final MapType mapType, final long time)
     {
@@ -220,6 +268,9 @@ public enum RegionImageCache
         }
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         for (RegionImageSet regionImageSet : getRegionImageSets())
@@ -231,6 +282,13 @@ public enum RegionImageCache
         DataCache.INSTANCE.getRegionImageSets().cleanUp();
     }
 
+    /**
+     * Delete map boolean.
+     *
+     * @param state   the state
+     * @param allDims the all dims
+     * @return the boolean
+     */
     public boolean deleteMap(MapState state, boolean allDims)
     {
         RegionCoord fakeRc = new RegionCoord(state.getWorldDir(), 0, 0, state.getDimension());

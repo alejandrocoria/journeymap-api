@@ -59,7 +59,13 @@ public class GridRenderer
     private final Point2D.Double centerPixelOffset = new Point2D.Double();
     private final int maxGlErrors = 20;
     private final Context.UI contextUi;
+    /**
+     * The Update tiles timer 1.
+     */
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
+    /**
+     * The Update tiles timer 2.
+     */
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
     private UIState uiState;
     private int glErrors = 0;
@@ -84,6 +90,12 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
+    /**
+     * Instantiates a new Grid renderer.
+     *
+     * @param contextUi the context ui
+     * @param gridSize  the grid size
+     */
     public GridRenderer(Context.UI contextUi, int gridSize)
     {
         this.contextUi = contextUi;
@@ -96,16 +108,31 @@ public class GridRenderer
         setGridSize(gridSize);
     }
 
+    /**
+     * Add debug message.
+     *
+     * @param key     the key
+     * @param message the message
+     */
     public static void addDebugMessage(String key, String message)
     {
         messages.put(key, message);
     }
 
+    /**
+     * Remove debug message.
+     *
+     * @param key     the key
+     * @param message the message
+     */
     public static void removeDebugMessage(String key, String message)
     {
         messages.remove(key);
     }
 
+    /**
+     * Clear debug messages.
+     */
     public static void clearDebugMessages()
     {
         messages.clear();
@@ -114,7 +141,7 @@ public class GridRenderer
     /**
      * Be sure this is called on the main thread only
      *
-     * @param enabled
+     * @param enabled the enabled
      */
     public static void setEnabled(boolean enabled)
     {
@@ -125,11 +152,21 @@ public class GridRenderer
         }
     }
 
+    /**
+     * Gets display.
+     *
+     * @return the display
+     */
     public Context.UI getDisplay()
     {
         return contextUi;
     }
 
+    /**
+     * Sets view port.
+     *
+     * @param viewPort the view port
+     */
     public void setViewPort(Rectangle2D.Double viewPort)
     {
         this.viewPort = viewPort;
@@ -157,32 +194,64 @@ public class GridRenderer
         //if(debug) logger.info("Grid cen done for cols " + startCol + " to " + endCol + " and rows " + startRow + " to " + endRow);
     }
 
+    /**
+     * Move.
+     *
+     * @param deltaBlockX the delta block x
+     * @param deltaBlockZ the delta block z
+     */
     public void move(final int deltaBlockX, final int deltaBlockZ)
     {
         center(worldDir, mapType, centerBlockX + deltaBlockX, centerBlockZ + deltaBlockZ, zoom);
     }
 
+    /**
+     * Center boolean.
+     *
+     * @return the boolean
+     */
     public boolean center()
     {
         return center(worldDir, mapType, centerBlockX, centerBlockZ, zoom);
     }
 
+    /**
+     * Has unloaded tile boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasUnloadedTile()
     {
         return hasUnloadedTile(false);
     }
 
+    /**
+     * Gets grid size.
+     *
+     * @return the grid size
+     */
     public int getGridSize()
     {
         return gridSize;
     }
 
+    /**
+     * Sets grid size.
+     *
+     * @param gridSize the grid size
+     */
     public void setGridSize(int gridSize)
     {
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize * Tile.TILESIZE;
     }
 
+    /**
+     * Has unloaded tile boolean.
+     *
+     * @param preview the preview
+     * @return the boolean
+     */
     public boolean hasUnloadedTile(boolean preview)
     {
         Tile tile;
@@ -200,6 +269,16 @@ public class GridRenderer
         return false;
     }
 
+    /**
+     * Center boolean.
+     *
+     * @param worldDir the world dir
+     * @param mapType  the map type
+     * @param blockX   the block x
+     * @param blockZ   the block z
+     * @param zoom     the zoom
+     * @return the boolean
+     */
     public boolean center(File worldDir, MapType mapType, final double blockX, final double blockZ, final int zoom)
     {
         boolean mapTypeChanged = !Objects.equals(worldDir, this.worldDir) || !Objects.equals(mapType, this.mapType);
@@ -257,6 +336,18 @@ public class GridRenderer
         return true;
     }
 
+    /**
+     * Update tiles.
+     *
+     * @param mapType     the map type
+     * @param zoom        the zoom
+     * @param highQuality the high quality
+     * @param width       the width
+     * @param height      the height
+     * @param fullUpdate  the full update
+     * @param xOffset     the x offset
+     * @param yOffset     the y offset
+     */
     public void updateTiles(MapType mapType, int zoom, boolean highQuality, int width, int height, boolean fullUpdate, double xOffset, double yOffset)
     {
         updateTilesTimer1.start();
@@ -341,16 +432,32 @@ public class GridRenderer
         return;
     }
 
+    /**
+     * Gets center pixel offset.
+     *
+     * @return the center pixel offset
+     */
     public Point2D.Double getCenterPixelOffset()
     {
         return centerPixelOffset;
     }
 
+    /**
+     * Gets block bounds.
+     *
+     * @return the block bounds
+     */
     public AxisAlignedBB getBlockBounds()
     {
         return blockBounds;
     }
 
+    /**
+     * Gets block at pixel.
+     *
+     * @param pixel the pixel
+     * @return the block at pixel
+     */
     public BlockPos getBlockAtPixel(Point2D.Double pixel)
     {
         double centerPixelX = lastWidth / 2.0;
@@ -375,11 +482,24 @@ public class GridRenderer
         return new BlockPos(x, y, z);
     }
 
+    /**
+     * Gets block pixel in grid.
+     *
+     * @param pos the pos
+     * @return the block pixel in grid
+     */
     public Point2D.Double getBlockPixelInGrid(BlockPos pos)
     {
         return getBlockPixelInGrid(pos.getX(), pos.getZ());
     }
 
+    /**
+     * Gets block pixel in grid.
+     *
+     * @param blockX the block x
+     * @param blockZ the block z
+     * @return the block pixel in grid
+     */
     public Point2D.Double getBlockPixelInGrid(double blockX, double blockZ)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
@@ -396,9 +516,11 @@ public class GridRenderer
     /**
      * Draw a list of steps
      *
-     * @param drawStepList
-     * @param xOffset
-     * @param yOffset
+     * @param drawStepList the draw step list
+     * @param xOffset      the x offset
+     * @param yOffset      the y offset
+     * @param fontScale    the font scale
+     * @param rotation     the rotation
      */
     public void draw(final List<? extends DrawStep> drawStepList, double xOffset, double yOffset, double fontScale, double rotation)
     {
@@ -411,6 +533,12 @@ public class GridRenderer
 
     /**
      * Draw an array of steps
+     *
+     * @param xOffset   the x offset
+     * @param yOffset   the y offset
+     * @param fontScale the font scale
+     * @param rotation  the rotation
+     * @param drawSteps the draw steps
      */
     public void draw(double xOffset, double yOffset, double fontScale, double rotation, DrawStep... drawSteps)
     {
@@ -426,6 +554,14 @@ public class GridRenderer
         }
     }
 
+    /**
+     * Draw.
+     *
+     * @param alpha    the alpha
+     * @param offsetX  the offset x
+     * @param offsetZ  the offset z
+     * @param showGrid the show grid
+     */
     public void draw(final float alpha, final double offsetX, final double offsetZ, boolean showGrid)
     {
         if (enabled && !grid.isEmpty())
@@ -475,6 +611,8 @@ public class GridRenderer
 
     /**
      * Clear GL error queue, optionally log them
+     *
+     * @param report the report
      */
     public void clearGlErrors(boolean report)
     {
@@ -501,7 +639,7 @@ public class GridRenderer
      *
      * @param blockX pos x
      * @param blockZ pos z
-     * @return pixel
+     * @return pixel pixel
      */
     public Point2D.Double getPixel(double blockX, double blockZ)
     {
@@ -518,6 +656,8 @@ public class GridRenderer
 
     /**
      * Adjusts a pixel to the nearest edge if it is not on screen.
+     *
+     * @param pixel the pixel
      */
     public void ensureOnScreen(Point2D pixel)
     {
@@ -650,6 +790,11 @@ public class GridRenderer
         }
     }
 
+    /**
+     * Update ui state.
+     *
+     * @param isActive the is active
+     */
     public void updateUIState(boolean isActive)
     {
         if (isActive && (screenBounds == null))
@@ -711,6 +856,12 @@ public class GridRenderer
         return Tile.create(tileX, tileZ, zoom, worldDir, mapType, Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get());
     }
 
+    /**
+     * Sets context.
+     *
+     * @param worldDir the world dir
+     * @param mapType  the map type
+     */
     public void setContext(File worldDir, MapType mapType)
     {
         this.worldDir = worldDir;
@@ -718,6 +869,11 @@ public class GridRenderer
         TileDrawStepCache.setContext(worldDir, mapType);
     }
 
+    /**
+     * Update rotation.
+     *
+     * @param rotation the rotation
+     */
     public void updateRotation(double rotation)
     {
         currentRotation = rotation;
@@ -726,6 +882,15 @@ public class GridRenderer
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projMatrixBuf);
     }
 
+    /**
+     * Shift window position point 2 d.
+     *
+     * @param x      the x
+     * @param y      the y
+     * @param shiftX the shift x
+     * @param shiftY the shift y
+     * @return the point 2 d
+     */
     public Point2D shiftWindowPosition(double x, double y, int shiftX, int shiftY)
     {
         if (currentRotation % 360 == 0)
@@ -740,6 +905,12 @@ public class GridRenderer
         }
     }
 
+    /**
+     * Gets window position.
+     *
+     * @param matrixPixel the matrix pixel
+     * @return the window position
+     */
     public Point2D.Double getWindowPosition(Point2D.Double matrixPixel)
     {
         if (currentRotation % 360 == 0)
@@ -753,63 +924,123 @@ public class GridRenderer
         }
     }
 
+    /**
+     * Gets matrix position.
+     *
+     * @param windowPixel the window pixel
+     * @return the matrix position
+     */
     public Point2D.Double getMatrixPosition(Point2D.Double windowPixel)
     {
         GLU.gluUnProject((float) windowPixel.x, (float) windowPixel.y, 0, modelMatrixBuf, projMatrixBuf, viewportBuf, objPosBuf);
         return new Point2D.Double(objPosBuf.get(0), objPosBuf.get(1));
     }
 
+    /**
+     * Gets center block x.
+     *
+     * @return the center block x
+     */
     public double getCenterBlockX()
     {
         return centerBlockX;
     }
 
+    /**
+     * Gets center block z.
+     *
+     * @return the center block z
+     */
     public double getCenterBlockZ()
     {
         return centerBlockZ;
     }
 
+    /**
+     * Gets world dir.
+     *
+     * @return the world dir
+     */
     public File getWorldDir()
     {
         return worldDir;
     }
 
+    /**
+     * Gets map type.
+     *
+     * @return the map type
+     */
     public MapType getMapType()
     {
         return mapType;
     }
 
+    /**
+     * Gets zoom.
+     *
+     * @return the zoom
+     */
     public int getZoom()
     {
         return zoom;
     }
 
+    /**
+     * Sets zoom.
+     *
+     * @param zoom the zoom
+     * @return the zoom
+     */
     public boolean setZoom(int zoom)
     {
         return center(worldDir, mapType, centerBlockX, centerBlockZ, zoom);
     }
 
+    /**
+     * Gets render size.
+     *
+     * @return the render size
+     */
     public int getRenderSize()
     {
         return this.gridSize * Tile.TILESIZE;
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         grid.clear();
         messages.clear();
     }
 
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
     public int getWidth()
     {
         return lastWidth;
     }
 
+    /**
+     * Gets height.
+     *
+     * @return the height
+     */
     public int getHeight()
     {
         return lastHeight;
     }
 
+    /**
+     * Gets ui state.
+     *
+     * @return the ui state
+     */
     public UIState getUIState()
     {
         return uiState;

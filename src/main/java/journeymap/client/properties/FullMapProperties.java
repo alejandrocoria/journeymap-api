@@ -11,6 +11,9 @@ import net.minecraftforge.fml.client.FMLClientHandler;
  */
 public class FullMapProperties extends InGameMapProperties
 {
+    /**
+     * Instantiates a new Full map properties.
+     */
     public FullMapProperties()
     {
     }

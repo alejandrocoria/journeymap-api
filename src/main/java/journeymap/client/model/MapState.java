@@ -32,16 +32,37 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * The type Map state.
+ */
 public class MapState
 {
+    /**
+     * The Min zoom.
+     */
     public final int minZoom = 0;
+    /**
+     * The Max zoom.
+     */
     public final int maxZoom = 5;
 
-    // These can be safely changed at will
+    /**
+     * The Follow.
+     */
+// These can be safely changed at will
     public AtomicBoolean follow = new AtomicBoolean(true);
 
+    /**
+     * The Player last pos.
+     */
     public String playerLastPos = "0,0"; //$NON-NLS-1$
+    /**
+     * The Refresh timer.
+     */
     StatTimer refreshTimer = StatTimer.get("MapState.refresh");
+    /**
+     * The Generate draw steps timer.
+     */
     StatTimer generateDrawStepsTimer = StatTimer.get("MapState.generateDrawSteps");
 
     // These must be internally managed
@@ -70,6 +91,13 @@ public class MapState
     {
     }
 
+    /**
+     * Refresh.
+     *
+     * @param mc            the mc
+     * @param player        the player
+     * @param mapProperties the map properties
+     */
     public void refresh(Minecraft mc, EntityPlayer player, InGameMapProperties mapProperties)
     {
         refreshTimer.start();
@@ -116,11 +144,19 @@ public class MapState
         refreshTimer.stop();
     }
 
+    /**
+     * Sets map type.
+     *
+     * @param mapTypeName the map type name
+     */
     public void setMapType(MapType.Name mapTypeName)
     {
         setMapType(MapType.from(mapTypeName, DataCache.getPlayer()));
     }
 
+    /**
+     * Toggle map type.
+     */
     public void toggleMapType()
     {
         EntityDTO player = DataCache.getPlayer();
@@ -159,6 +195,11 @@ public class MapState
         }
     }
 
+    /**
+     * Sets map type.
+     *
+     * @param mapType the map type
+     */
     public void setMapType(MapType mapType)
     {
         if (!mapType.equals(getCurrentMapType()))
@@ -174,12 +215,23 @@ public class MapState
         requireRefresh();
     }
 
+    /**
+     * Gets current map type.
+     *
+     * @return the current map type
+     */
     public MapType getCurrentMapType()
     {
         boolean showCaves = lastMapProperties.showCaves.get();
         return getMapType(showCaves);
     }
 
+    /**
+     * Gets map type.
+     *
+     * @param showCaves the show caves
+     * @return the map type
+     */
     public MapType getMapType(boolean showCaves)
     {
         MapType mapType = null;
@@ -207,6 +259,11 @@ public class MapState
         return mapType;
     }
 
+    /**
+     * Gets last map type change.
+     *
+     * @return the last map type change
+     */
     public long getLastMapTypeChange()
     {
         return lastMapTypeChange;
@@ -221,31 +278,66 @@ public class MapState
         this.lastMapType = mapType;
     }
 
+    /**
+     * Is underground boolean.
+     *
+     * @return the boolean
+     */
     public boolean isUnderground()
     {
         return underground;
     }
 
+    /**
+     * Gets world dir.
+     *
+     * @return the world dir
+     */
     public File getWorldDir()
     {
         return worldDir;
     }
 
+    /**
+     * Gets player biome.
+     *
+     * @return the player biome
+     */
     public String getPlayerBiome()
     {
         return playerBiome;
     }
 
+    /**
+     * Gets draw steps.
+     *
+     * @return the draw steps
+     */
     public List<? extends DrawStep> getDrawSteps()
     {
         return drawStepList;
     }
 
+    /**
+     * Gets draw waypoint steps.
+     *
+     * @return the draw waypoint steps
+     */
     public List<DrawWayPointStep> getDrawWaypointSteps()
     {
         return drawWaypointStepList;
     }
 
+    /**
+     * Generate draw steps.
+     *
+     * @param mc                    the mc
+     * @param gridRenderer          the grid renderer
+     * @param waypointRenderer      the waypoint renderer
+     * @param radarRenderer         the radar renderer
+     * @param mapProperties         the map properties
+     * @param checkWaypointDistance the check waypoint distance
+     */
     public void generateDrawSteps(Minecraft mc, GridRenderer gridRenderer, WaypointDrawStepFactory waypointRenderer, RadarDrawStepFactory radarRenderer, InGameMapProperties mapProperties, boolean checkWaypointDistance)
     {
         generateDrawStepsTimer.start();
@@ -304,6 +396,11 @@ public class MapState
         generateDrawStepsTimer.stop();
     }
 
+    /**
+     * Zoom in boolean.
+     *
+     * @return the boolean
+     */
     public boolean zoomIn()
     {
         if (lastMapProperties.zoomLevel.get() < maxZoom)
@@ -313,6 +410,11 @@ public class MapState
         return false;
     }
 
+    /**
+     * Zoom out boolean.
+     *
+     * @return the boolean
+     */
     public boolean zoomOut()
     {
         if (lastMapProperties.zoomLevel.get() > minZoom)
@@ -322,6 +424,12 @@ public class MapState
         return false;
     }
 
+    /**
+     * Sets zoom.
+     *
+     * @param zoom the zoom
+     * @return the zoom
+     */
     public boolean setZoom(int zoom)
     {
         if (zoom > maxZoom || zoom < minZoom || zoom == lastMapProperties.zoomLevel.get())
@@ -333,21 +441,39 @@ public class MapState
         return true;
     }
 
+    /**
+     * Gets zoom.
+     *
+     * @return the zoom
+     */
     public int getZoom()
     {
         return lastMapProperties.zoomLevel.get();
     }
 
+    /**
+     * Require refresh.
+     */
     public void requireRefresh()
     {
         this.lastRefresh = 0;
     }
 
+    /**
+     * Update last refresh.
+     */
     public void updateLastRefresh()
     {
         this.lastRefresh = System.currentTimeMillis();
     }
 
+    /**
+     * Should refresh boolean.
+     *
+     * @param mc            the mc
+     * @param mapProperties the map properties
+     * @return the boolean
+     */
     public boolean shouldRefresh(Minecraft mc, MapProperties mapProperties)
     {
         EntityDTO player = DataCache.getPlayer();
@@ -400,16 +526,31 @@ public class MapState
         return false;
     }
 
+    /**
+     * Is high quality boolean.
+     *
+     * @return the boolean
+     */
     public boolean isHighQuality()
     {
         return highQuality;
     }
 
+    /**
+     * Is cave mapping allowed boolean.
+     *
+     * @return the boolean
+     */
     public boolean isCaveMappingAllowed()
     {
         return caveMappingAllowed;
     }
 
+    /**
+     * Gets dimension.
+     *
+     * @return the dimension
+     */
     public int getDimension()
     {
         return getCurrentMapType().dimension;

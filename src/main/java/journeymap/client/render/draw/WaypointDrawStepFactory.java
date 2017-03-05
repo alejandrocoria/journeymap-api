@@ -26,8 +26,20 @@ import java.util.List;
  */
 public class WaypointDrawStepFactory
 {
+    /**
+     * The Draw step list.
+     */
     final List<DrawWayPointStep> drawStepList = new ArrayList<DrawWayPointStep>();
 
+    /**
+     * Prepare steps list.
+     *
+     * @param waypoints     the waypoints
+     * @param grid          the grid
+     * @param checkDistance the check distance
+     * @param showLabel     the show label
+     * @return the list
+     */
     public List<DrawWayPointStep> prepareSteps(Collection<Waypoint> waypoints, GridRenderer grid, boolean checkDistance, boolean showLabel)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();

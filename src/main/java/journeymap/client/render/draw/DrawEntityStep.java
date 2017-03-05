@@ -26,22 +26,70 @@ import java.lang.ref.WeakReference;
  */
 public class DrawEntityStep implements DrawStep
 {
+    /**
+     * The Label bg.
+     */
     static final Integer labelBg = RGB.BLACK_RGB;
+    /**
+     * The Label bg alpha.
+     */
     static final int labelBgAlpha = 180;
+    /**
+     * The Label fg.
+     */
     static final Integer labelFg = RGB.WHITE_RGB;
+    /**
+     * The Label fg alpha.
+     */
     static final int labelFgAlpha = 225;
 
+    /**
+     * The Use dots.
+     */
     boolean useDots;
+    /**
+     * The Elevation offset.
+     */
     int elevationOffset;
+    /**
+     * The Color.
+     */
     int color;
+    /**
+     * The Hide sneaks.
+     */
     boolean hideSneaks;
+    /**
+     * The Show heading.
+     */
     boolean showHeading = true;
+    /**
+     * The Minecraft.
+     */
     Minecraft minecraft = Minecraft.getMinecraft();
+    /**
+     * The Entity texture.
+     */
     TextureImpl entityTexture;
+    /**
+     * The Locator texture.
+     */
     TextureImpl locatorTexture;
+    /**
+     * The Entity living ref.
+     */
     WeakReference<EntityLivingBase> entityLivingRef;
+    /**
+     * The Custom name.
+     */
     String customName;
+    /**
+     * The Screen position.
+     */
     Point2D screenPosition;
+    /**
+     * The Draw scale.
+     */
     float drawScale = 1f;
 
     private DrawEntityStep(EntityLivingBase entityLiving)
@@ -51,6 +99,15 @@ public class DrawEntityStep implements DrawStep
         hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
     }
 
+    /**
+     * Update.
+     *
+     * @param entityDisplay  the entity display
+     * @param locatorTexture the locator texture
+     * @param entityTexture  the entity texture
+     * @param color          the color
+     * @param showHeading    the show heading
+     */
     public void update(EntityDisplay entityDisplay, TextureImpl locatorTexture, TextureImpl entityTexture, int color, boolean showHeading)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
@@ -236,6 +293,9 @@ public class DrawEntityStep implements DrawStep
         return Journeymap.MOD_ID;
     }
 
+    /**
+     * The type Simple cache loader.
+     */
     public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep>
     {
         @Override

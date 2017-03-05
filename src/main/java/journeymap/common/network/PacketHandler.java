@@ -20,14 +20,34 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 
+/**
+ * The type Packet handler.
+ */
 public class PacketHandler
 {
 
+    /**
+     * The constant WORLD_INFO_CHANNEL.
+     */
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
+    /**
+     * The constant DIMENSION_PERMISSIONS_CHANNEL.
+     */
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
+    /**
+     * The constant TELEPORT_CHANNEL.
+     */
     public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
+    /**
+     * The constant INIT_LOGIN_CHANNEL.
+     */
     public static final SimpleNetworkWrapper INIT_LOGIN_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(LoginPacket.CHANNEL_NAME);
 
+    /**
+     * Init.
+     *
+     * @param side the side
+     */
     public static void init(Side side)
     {
 
@@ -46,21 +66,42 @@ public class PacketHandler
         }
     }
 
+    /**
+     * Teleport player.
+     *
+     * @param location the location
+     */
     public static void teleportPlayer(Location location)
     {
         TELEPORT_CHANNEL.sendToServer(new TeleportPacket(location));
     }
 
+    /**
+     * Send dimension packet to player.
+     *
+     * @param player   the player
+     * @param property the property
+     */
     public static void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)
     {
         DIMENSION_PERMISSIONS_CHANNEL.sendTo(new DimensionPermissionPacket(property), player);
     }
 
+    /**
+     * Send all players world id.
+     *
+     * @param worldID the world id
+     */
     public static void sendAllPlayersWorldID(String worldID)
     {
         WORLD_INFO_CHANNEL.sendToAll(new WorldIDPacket(worldID));
     }
 
+    /**
+     * Send player world id.
+     *
+     * @param player the player
+     */
     public static void sendPlayerWorldID(EntityPlayerMP player)
     {
         if ((player instanceof EntityPlayerMP) && (player != null))
@@ -84,6 +125,12 @@ public class PacketHandler
         }
     }
 
+    /**
+     * Send login packet.
+     *
+     * @param player     the player
+     * @param packetData the packet data
+     */
     public static void sendLoginPacket(EntityPlayerMP player, InitLogin packetData)
     {
         if ((player instanceof EntityPlayerMP) && (player != null))

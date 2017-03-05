@@ -15,11 +15,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JMThreadFactory implements ThreadFactory
 {
+    /**
+     * The constant threadNumber.
+     */
     final static AtomicInteger threadNumber = new AtomicInteger(1);
+    /**
+     * The constant namePrefix.
+     */
     final static String namePrefix = "JM-"; //$NON-NLS-1$
+    /**
+     * The Group.
+     */
     final ThreadGroup group;
+    /**
+     * The Name.
+     */
     final String name;
 
+    /**
+     * Instantiates a new Jm thread factory.
+     *
+     * @param name the name
+     */
     public JMThreadFactory(String name)
     {
         this.name = namePrefix + name;

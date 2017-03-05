@@ -68,6 +68,8 @@ public class MiniMap
 
     /**
      * Default constructor
+     *
+     * @param miniMapProperties the mini map properties
      */
     public MiniMap(MiniMapProperties miniMapProperties)
     {
@@ -75,16 +77,31 @@ public class MiniMap
         setMiniMapProperties(miniMapProperties);
     }
 
+    /**
+     * State map state.
+     *
+     * @return the map state
+     */
     public static synchronized MapState state()
     {
         return state;
     }
 
+    /**
+     * Ui state ui state.
+     *
+     * @return the ui state
+     */
     public static synchronized UIState uiState()
     {
         return gridRenderer.getUIState();
     }
 
+    /**
+     * Update ui state.
+     *
+     * @param isActive the is active
+     */
     public static void updateUIState(boolean isActive)
     {
         if (FMLClientHandler.instance().getClient().world != null)
@@ -116,11 +133,19 @@ public class MiniMap
         gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
     }
 
+    /**
+     * Reset init time.
+     */
     public void resetInitTime()
     {
         initTime = System.currentTimeMillis();
     }
 
+    /**
+     * Sets mini map properties.
+     *
+     * @param miniMapProperties the mini map properties
+     */
     public void setMiniMapProperties(MiniMapProperties miniMapProperties)
     {
         this.miniMapProperties = miniMapProperties;
@@ -128,6 +153,11 @@ public class MiniMap
         reset();
     }
 
+    /**
+     * Gets current minimap properties.
+     *
+     * @return the current minimap properties
+     */
     public MiniMapProperties getCurrentMinimapProperties()
     {
         return miniMapProperties;
@@ -148,6 +178,8 @@ public class MiniMap
 
     /**
      * Called in the render loop.
+     *
+     * @param preview the preview
      */
     public void drawMap(boolean preview)
     {
@@ -594,6 +626,9 @@ public class MiniMap
         }
     }
 
+    /**
+     * Reset.
+     */
     public void reset()
     {
         initTime = System.currentTimeMillis();
@@ -617,6 +652,11 @@ public class MiniMap
     }
 
 
+    /**
+     * Update display vars.
+     *
+     * @param force the force
+     */
     public void updateDisplayVars(boolean force)
     {
         if (dv != null)
@@ -625,6 +665,13 @@ public class MiniMap
         }
     }
 
+    /**
+     * Update display vars.
+     *
+     * @param shape    the shape
+     * @param position the position
+     * @param force    the force
+     */
     public void updateDisplayVars(Shape shape, Position position, boolean force)
     {
         if (dv != null

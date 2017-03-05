@@ -20,6 +20,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class WorldEventHandler implements EventHandlerManager.EventHandler
 {
+    /**
+     * On unload.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onUnload(WorldEvent.Unload event)

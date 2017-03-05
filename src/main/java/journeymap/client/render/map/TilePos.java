@@ -5,17 +5,44 @@
 
 package journeymap.client.render.map;
 
+/**
+ * The type Tile pos.
+ */
 public class TilePos implements Comparable<TilePos>
 {
 
+    /**
+     * The Delta x.
+     */
     public final int deltaX;
+    /**
+     * The Delta z.
+     */
     public final int deltaZ;
 
+    /**
+     * The Start x.
+     */
     final double startX;
+    /**
+     * The Start z.
+     */
     final double startZ;
+    /**
+     * The End x.
+     */
     final double endX;
+    /**
+     * The End z.
+     */
     final double endZ;
 
+    /**
+     * Instantiates a new Tile pos.
+     *
+     * @param deltaX the delta x
+     * @param deltaZ the delta z
+     */
     TilePos(int deltaX, int deltaZ)
     {
         this.deltaX = deltaX;

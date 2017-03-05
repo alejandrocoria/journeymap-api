@@ -37,38 +37,89 @@ import java.util.regex.Matcher;
  */
 public class ColorPalette
 {
+    /**
+     * The constant HELP_PAGE.
+     */
     public static final String HELP_PAGE = "http://journeymap.info/Color_Palette";
+    /**
+     * The constant SAMPLE_STANDARD_PATH.
+     */
     public static final String SAMPLE_STANDARD_PATH = ".minecraft/journeymap/";
+    /**
+     * The constant SAMPLE_WORLD_PATH.
+     */
     public static final String SAMPLE_WORLD_PATH = SAMPLE_STANDARD_PATH + "data/*/worldname/";
+    /**
+     * The constant JSON_FILENAME.
+     */
     public static final String JSON_FILENAME = "colorpalette.json";
+    /**
+     * The constant HTML_FILENAME.
+     */
     public static final String HTML_FILENAME = "colorpalette.html";
+    /**
+     * The constant VARIABLE.
+     */
     public static final String VARIABLE = "var colorpalette=";
+    /**
+     * The constant UTF8.
+     */
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
+    /**
+     * The constant VERSION.
+     */
     public static final double VERSION = 5.3;
+    /**
+     * The constant GSON.
+     */
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
 
+    /**
+     * The Version.
+     */
     @Since(3)
     double version;
 
+    /**
+     * The Name.
+     */
     @Since(1)
     String name;
 
+    /**
+     * The Generated.
+     */
     @Since(1)
     String generated;
 
+    /**
+     * The Description.
+     */
     @Since(1)
     String[] description;
 
+    /**
+     * The Permanent.
+     */
     @Since(1)
     boolean permanent;
 
+    /**
+     * The Resource packs.
+     */
     @Since(1)
     String resourcePacks;
 
+    /**
+     * The Mod names.
+     */
     @Since(2)
     String modNames;
 
+    /**
+     * The Block colors.
+     */
     @Since(5.2)
     ArrayList<BlockColor> blockColors = new ArrayList<BlockColor>(0);
 
@@ -106,7 +157,7 @@ public class ColorPalette
     /**
      * Returns the active pallete.
      *
-     * @return
+     * @return active color palette
      */
     public static ColorPalette getActiveColorPalette()
     {
@@ -175,6 +226,10 @@ public class ColorPalette
 
     /**
      * Create a color palette based on current block colors and write it to file.
+     *
+     * @param standard  the standard
+     * @param permanent the permanent
+     * @return the color palette
      */
     public static ColorPalette create(boolean standard, boolean permanent)
     {
@@ -371,6 +426,9 @@ public class ColorPalette
 
     /**
      * Get the file this instance came from.
+     *
+     * @return the origin
+     * @throws IOException the io exception
      */
     public File getOrigin() throws IOException
     {
@@ -379,6 +437,10 @@ public class ColorPalette
 
     /**
      * Get/create the companion html file for viewing the palette.
+     *
+     * @param createIfMissing   the create if missing
+     * @param overwriteExisting the overwrite existing
+     * @return the origin html
      */
     public File getOriginHtml(boolean createIfMissing, boolean overwriteExisting)
     {
@@ -415,21 +477,41 @@ public class ColorPalette
         return null;
     }
 
+    /**
+     * Is permanent boolean.
+     *
+     * @return the boolean
+     */
     public boolean isPermanent()
     {
         return permanent;
     }
 
+    /**
+     * Sets permanent.
+     *
+     * @param permanent the permanent
+     */
     public void setPermanent(boolean permanent)
     {
         this.permanent = permanent;
     }
 
+    /**
+     * Is standard boolean.
+     *
+     * @return the boolean
+     */
     public boolean isStandard()
     {
         return origin != null && origin.getParentFile().getAbsoluteFile().equals(FileHandler.getJourneyMapDir().getAbsoluteFile());
     }
 
+    /**
+     * Size int.
+     *
+     * @return the int
+     */
     public int size()
     {
         int size = 0;
@@ -446,30 +528,60 @@ public class ColorPalette
         return "ColorPalette[" + resourcePacks + "]";
     }
 
+    /**
+     * The type Block color.
+     */
     class BlockColor implements Comparable<BlockColor>
     {
+        /**
+         * The Uid.
+         */
         @Since(5.2)
         String uid;
 
+        /**
+         * The Name.
+         */
         @Since(5.2)
         String name;
 
+        /**
+         * The Color.
+         */
         @Since(5.2)
         String color;
 
+        /**
+         * The Alpha.
+         */
         @Since(5.2)
         Float alpha;
 
+        /**
+         * The Meta.
+         */
         @Since(5.2)
         Integer meta;
 
+        /**
+         * The Variants.
+         */
         @Since(5.2)
         ArrayList<BlockColor> variants;
 
+        /**
+         * Instantiates a new Block color.
+         */
         BlockColor()
         {
         }
 
+        /**
+         * Instantiates a new Block color.
+         *
+         * @param blockMD the block md
+         * @param color   the color
+         */
         BlockColor(BlockMD blockMD, Integer color)
         {
             this.uid = blockMD.getUid();
@@ -481,6 +593,9 @@ public class ColorPalette
 
         /**
          * Add a variant of this BlockColor, ideally with as few deltas as possible.
+         *
+         * @param blockMD the block md
+         * @param color   the color
          */
         void addVariant(BlockMD blockMD, Integer color)
         {
@@ -512,6 +627,8 @@ public class ColorPalette
         /**
          * Nulls any properties the variant has in common with this one.
          * Makes for more efficient serialization.
+         *
+         * @param variant the variant
          */
         void deflate(BlockColor variant)
         {
@@ -536,6 +653,8 @@ public class ColorPalette
 
         /**
          * Replaces nulls on variants with properties set on this one.
+         *
+         * @return the block color
          */
         BlockColor inflate()
         {
@@ -551,6 +670,8 @@ public class ColorPalette
 
         /**
          * Replaces nulls on a variant with properties set on this one.
+         *
+         * @param variant the variant
          */
         void inflate(BlockColor variant)
         {
@@ -606,6 +727,11 @@ public class ColorPalette
             }
         }
 
+        /**
+         * Is inflated boolean.
+         *
+         * @return the boolean
+         */
         boolean isInflated()
         {
             return (this.uid != null && this.meta != null && this.alpha != null && this.color != null);
@@ -624,6 +750,11 @@ public class ColorPalette
                     .result();
         }
 
+        /**
+         * Size int.
+         *
+         * @return the int
+         */
         public int size()
         {
             int size = 1;
@@ -637,6 +768,9 @@ public class ColorPalette
             return size;
         }
 
+        /**
+         * Sort.
+         */
         public void sort()
         {
             if (variants!=null)

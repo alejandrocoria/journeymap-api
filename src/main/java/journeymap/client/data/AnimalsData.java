@@ -54,6 +54,11 @@ public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
         return EntityHelper.buildEntityIdMap(finalList, true);
     }
 
+    /**
+     * Gets ttl.
+     *
+     * @return the ttl
+     */
     public long getTTL()
     {
         return Math.max(1000, Journeymap.getClient().getCoreProperties().cacheAnimalsData.get());

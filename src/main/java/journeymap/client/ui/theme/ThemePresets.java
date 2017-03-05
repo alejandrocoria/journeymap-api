@@ -16,14 +16,30 @@ import java.util.List;
  */
 public class ThemePresets
 {
+    /**
+     * The constant THEME_VICTORIAN.
+     */
     public static final Theme THEME_VICTORIAN = createVictorian();
+    /**
+     * The constant THEME_PURIST.
+     */
     public static final Theme THEME_PURIST = createPurist();
 
+    /**
+     * Gets presets.
+     *
+     * @return the presets
+     */
     public static List<Theme> getPresets()
     {
         return Arrays.asList(THEME_PURIST, THEME_VICTORIAN);
     }
 
+    /**
+     * Gets preset dirs.
+     *
+     * @return the preset dirs
+     */
     public static List<String> getPresetDirs()
     {
         return Arrays.asList(THEME_PURIST.directory, THEME_VICTORIAN.directory);

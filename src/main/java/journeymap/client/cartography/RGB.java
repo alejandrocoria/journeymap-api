@@ -16,17 +16,53 @@ import java.util.Random;
  */
 public final class RGB
 {
+    /**
+     * The constant ALPHA_OPAQUE.
+     */
     public static final int ALPHA_OPAQUE = 0xff000000;
+    /**
+     * The constant BLACK_ARGB.
+     */
     public static final int BLACK_ARGB = 0xFF000000; // -16777216
+    /**
+     * The constant BLACK_RGB.
+     */
     public static final int BLACK_RGB = 0x000000; // 0
+    /**
+     * The constant WHITE_ARGB.
+     */
     public static final int WHITE_ARGB = 0xFFFFFFFF; // 4294967295
+    /**
+     * The constant WHITE_RGB.
+     */
     public static final int WHITE_RGB = 0xFFFFFF; // 16777215
+    /**
+     * The constant GREEN_RGB.
+     */
     public static final int GREEN_RGB = 0x00FF00;
+    /**
+     * The constant RED_RGB.
+     */
     public static final int RED_RGB = 0xFF0000;
+    /**
+     * The constant BLUE_RGB.
+     */
     public static final int BLUE_RGB = 0x0000FF;
+    /**
+     * The constant CYAN_RGB.
+     */
     public static final int CYAN_RGB = 0x00FFFF;
+    /**
+     * The constant GRAY_RGB.
+     */
     public static final int GRAY_RGB = 0x808080;
+    /**
+     * The constant DARK_GRAY_RGB.
+     */
     public static final int DARK_GRAY_RGB = 0x404040;
+    /**
+     * The constant LIGHT_GRAY_RGB.
+     */
     public static final int LIGHT_GRAY_RGB = 0xC0C0C0;
 
     /**
@@ -38,6 +74,9 @@ public final class RGB
 
     /**
      * Whether a color is black, with our without the alpha channel.
+     *
+     * @param rgb the rgb
+     * @return the boolean
      */
     public static boolean isBlack(int rgb)
     {
@@ -46,12 +85,21 @@ public final class RGB
 
     /**
      * Whether a color is white, with our without the alpha channel.
+     *
+     * @param rgb the rgb
+     * @return the boolean
      */
     public static boolean isWhite(int rgb)
     {
         return rgb == WHITE_ARGB || rgb == WHITE_RGB;
     }
 
+    /**
+     * Max integer.
+     *
+     * @param colors the colors
+     * @return the integer
+     */
     public static Integer max(Integer... colors)
     {
         int[] out = {0, 0, 0};
@@ -79,6 +127,14 @@ public final class RGB
         return toInteger(out);
     }
 
+    /**
+     * To integer int.
+     *
+     * @param r the r
+     * @param g the g
+     * @param b the b
+     * @return the int
+     */
     public static int toInteger(float r, float g, float b)
     {
         return ((0xFF) << 24) |
@@ -87,6 +143,12 @@ public final class RGB
                 (((int) (b * 255 + 0.5) & 0xFF));
     }
 
+    /**
+     * To integer int.
+     *
+     * @param rgb the rgb
+     * @return the int
+     */
     public static int toInteger(float[] rgb)
     {
         return ((0xFF) << 24) |
@@ -95,6 +157,14 @@ public final class RGB
                 (((int) (rgb[2] * 255 + 0.5) & 0xFF));
     }
 
+    /**
+     * To integer int.
+     *
+     * @param r the r
+     * @param g the g
+     * @param b the b
+     * @return the int
+     */
     public static int toInteger(int r, int g, int b)
     {
         return ((0xFF) << 24) |
@@ -103,6 +173,12 @@ public final class RGB
                 ((b & 0xFF));
     }
 
+    /**
+     * To integer int.
+     *
+     * @param rgb the rgb
+     * @return the int
+     */
     public static int toInteger(int[] rgb)
     {
         return ((0xFF) << 24) |
@@ -111,11 +187,23 @@ public final class RGB
                 ((rgb[2] & 0xFF));
     }
 
+    /**
+     * To color color.
+     *
+     * @param rgb the rgb
+     * @return the color
+     */
     public static Color toColor(Integer rgb)
     {
         return rgb == null ? null : new Color(rgb);
     }
 
+    /**
+     * To string string.
+     *
+     * @param rgb the rgb
+     * @return the string
+     */
     public static String toString(Integer rgb)
     {
         if (rgb == null)
@@ -126,6 +214,12 @@ public final class RGB
         return String.format("r=%s,g=%s,b=%s", ints[0], ints[1], ints[2]);
     }
 
+    /**
+     * To hex string string.
+     *
+     * @param rgb the rgb
+     * @return the string
+     */
     public static String toHexString(Integer rgb)
     {
         int[] ints = ints(rgb);
@@ -134,6 +228,10 @@ public final class RGB
 
     /**
      * Darken/Lighten a color by a factor.
+     *
+     * @param rgb    the rgb
+     * @param factor the factor
+     * @return the int
      */
     public static int adjustBrightness(int rgb, float factor)
     {
@@ -146,6 +244,9 @@ public final class RGB
 
     /**
      * Desaturate a color.  Not perfect, it'll do.
+     *
+     * @param rgb the rgb
+     * @return the int
      */
     public static int greyScale(int rgb)
     {
@@ -157,6 +258,10 @@ public final class RGB
     /**
      * Darken or lighten a color by a factor.
      * If adjustBrightness, add a blue tint to simulate shadow.
+     *
+     * @param rgb    the rgb
+     * @param factor the factor
+     * @return the int
      */
     public static int bevelSlope(int rgb, float factor)
     {
@@ -170,6 +275,11 @@ public final class RGB
 
     /**
      * Darken a color by a factor, add a fog tint.
+     *
+     * @param rgb     the rgb
+     * @param factor  the factor
+     * @param ambient the ambient
+     * @return the int
      */
     public static int darkenAmbient(int rgb, float factor, float[] ambient)
     {
@@ -184,7 +294,7 @@ public final class RGB
      * Creates an array with three elements [r,g,b]
      *
      * @param rgb color integer
-     * @return array
+     * @return array int [ ]
      */
     public static int[] ints(int rgb)
     {
@@ -196,7 +306,7 @@ public final class RGB
      *
      * @param rgb   color integer
      * @param alpha alpha (0-255)
-     * @return array
+     * @return array int [ ]
      */
     public static int[] ints(int rgb, int alpha)
     {
@@ -208,7 +318,7 @@ public final class RGB
      *
      * @param rgb   color integer
      * @param alpha alpha (0-255)
-     * @return array
+     * @return array int [ ]
      */
     public static int[] ints(int rgb, float alpha)
     {
@@ -216,6 +326,12 @@ public final class RGB
     }
 
 
+    /**
+     * Floats float [ ].
+     *
+     * @param rgb the rgb
+     * @return the float [ ]
+     */
     public static float[] floats(int rgb)
     {
         return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f};
@@ -226,7 +342,7 @@ public final class RGB
      *
      * @param rgb   color integer
      * @param alpha alpha (0-255)
-     * @return array
+     * @return array float [ ]
      */
     public static float[] floats(int rgb, float alpha)
     {
@@ -235,6 +351,11 @@ public final class RGB
 
     /**
      * Blends otherRgb into rgb using alpha as a percentage.
+     *
+     * @param rgb        the rgb
+     * @param otherRgb   the other rgb
+     * @param otherAlpha the other alpha
+     * @return the int
      */
     public static int blendWith(int rgb, int otherRgb, float otherAlpha)
     {
@@ -260,9 +381,9 @@ public final class RGB
     /**
      * Adjust color rgb using a multiplier
      *
-     * @param rgb
-     * @param multiplier
-     * @return
+     * @param rgb        the rgb
+     * @param multiplier the multiplier
+     * @return int
      */
     public static int multiply(int rgb, int multiplier)
     {
@@ -279,8 +400,8 @@ public final class RGB
     /**
      * Returns a float guaranteed to be between 0 and 1, inclusive.
      *
-     * @param value
-     * @return
+     * @param value the value
+     * @return float
      */
     public static float clampFloat(float value)
     {
@@ -289,6 +410,10 @@ public final class RGB
 
     /**
      * Returns an rgb array of floats clamped between 0 and 1 after a factor is applied.
+     *
+     * @param rgbFloats the rgb floats
+     * @param factor    the factor
+     * @return the float [ ]
      */
     public static float[] clampFloats(float[] rgbFloats, float factor)
     {
@@ -305,8 +430,8 @@ public final class RGB
     /**
      * Returns an int guaranteed to be between 0 and 255, inclusive.
      *
-     * @param value
-     * @return
+     * @param value the value
+     * @return int
      */
     public static int clampInt(int value)
     {
@@ -316,8 +441,8 @@ public final class RGB
     /**
      * Returns an int guaranteed to be between 0 and 255, inclusive.
      *
-     * @param value
-     * @return
+     * @param value the value
+     * @return int
      */
     public static int toClampedInt(float value)
     {
@@ -327,8 +452,8 @@ public final class RGB
     /**
      * Returns a float scaled between 0-1 from an integer scaled between 0-255
      *
-     * @param value
-     * @return
+     * @param value the value
+     * @return float
      */
     public static float toScaledFloat(int value)
     {
@@ -337,6 +462,9 @@ public final class RGB
 
     /**
      * Hex string to Color int.
+     *
+     * @param hexColor the hex color
+     * @return the int
      */
     public static int hexToInt(String hexColor)
     {
@@ -354,6 +482,11 @@ public final class RGB
         return RGB.BLACK_RGB;
     }
 
+    /**
+     * Random color int.
+     *
+     * @return the int
+     */
     public static int randomColor()
     {
         Random random = new Random();

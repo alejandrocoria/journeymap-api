@@ -55,6 +55,18 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
     private int lastTextureWrap;
 
 
+    /**
+     * Instantiates a new Tile draw step.
+     *
+     * @param regionCoord the region coord
+     * @param mapType     the map type
+     * @param zoom        the zoom
+     * @param highQuality the high quality
+     * @param sx1         the sx 1
+     * @param sy1         the sy 1
+     * @param sx2         the sx 2
+     * @param sy2         the sy 2
+     */
     public TileDrawStep(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         this.mapType = mapType;
@@ -77,16 +89,46 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         }
     }
 
+    /**
+     * To cache key string.
+     *
+     * @param regionCoord the region coord
+     * @param mapType     the map type
+     * @param zoom        the zoom
+     * @param highQuality the high quality
+     * @param sx1         the sx 1
+     * @param sy1         the sy 1
+     * @param sx2         the sx 2
+     * @param sy2         the sy 2
+     * @return the string
+     */
     public static String toCacheKey(RegionCoord regionCoord, final MapType mapType, Integer zoom, boolean highQuality, int sx1, int sy1, int sx2, int sy2)
     {
         return regionCoord.cacheKey() + mapType.toCacheKey() + zoom + highQuality + sx1 + "," + sy1 + "," + sx2 + "," + sy2;
     }
 
+    /**
+     * Gets region texture holder.
+     *
+     * @return the region texture holder
+     */
     ImageHolder getRegionTextureHolder()
     {
         return regionImageCache.getRegionImageSet(regionImageSetKey).getHolder(mapType);
     }
 
+    /**
+     * Draw boolean.
+     *
+     * @param pos           the pos
+     * @param offsetX       the offset x
+     * @param offsetZ       the offset z
+     * @param alpha         the alpha
+     * @param textureFilter the texture filter
+     * @param textureWrap   the texture wrap
+     * @param gridSpec      the grid spec
+     * @return the boolean
+     */
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, int textureFilter, int textureWrap, GridSpec gridSpec)
     {
         boolean regionUpdatePending = updateRegionTexture();
@@ -200,6 +242,9 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
     }
 
 
+    /**
+     * Clear texture.
+     */
     public void clearTexture()
     {
         ExpireTextureTask.queue(scaledTexture);
@@ -216,16 +261,31 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         regionFuture = null;
     }
 
+    /**
+     * Gets map type.
+     *
+     * @return the map type
+     */
     public MapType getMapType()
     {
         return mapType;
     }
 
+    /**
+     * Gets zoom.
+     *
+     * @return the zoom
+     */
     public Integer getZoom()
     {
         return zoom;
     }
 
+    /**
+     * Cache key string.
+     *
+     * @return the string
+     */
     public String cacheKey()
     {
         return theCacheKey;
@@ -250,6 +310,12 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
                 .toString();
     }
 
+    /**
+     * Has texture boolean.
+     *
+     * @param mapType the map type
+     * @return the boolean
+     */
     boolean hasTexture(MapType mapType)
     {
         if (!Objects.equal(this.mapType, mapType))
@@ -354,6 +420,11 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         return true;
     }
 
+    /**
+     * Gets scaled region area.
+     *
+     * @return the scaled region area
+     */
     public BufferedImage getScaledRegionArea()
     {
         int scale = (int) Math.pow(2, zoom);

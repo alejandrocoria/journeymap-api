@@ -17,11 +17,26 @@ import net.minecraft.util.ResourceLocation;
  */
 public enum EntityDisplay implements KeyedEnum
 {
+    /**
+     * Small dots entity display.
+     */
     SmallDots("jm.common.entity_display.small_dots"),
+    /**
+     * Large dots entity display.
+     */
     LargeDots("jm.common.entity_display.large_dots"),
+    /**
+     * Small icons entity display.
+     */
     SmallIcons("jm.common.entity_display.small_icons"),
+    /**
+     * Large icons entity display.
+     */
     LargeIcons("jm.common.entity_display.large_icons");
 
+    /**
+     * The Key.
+     */
     public final String key;
 
     EntityDisplay(String key)
@@ -29,6 +44,13 @@ public enum EntityDisplay implements KeyedEnum
         this.key = key;
     }
 
+    /**
+     * Gets locator texture.
+     *
+     * @param entityDisplay the entity display
+     * @param showHeading   the show heading
+     * @return the locator texture
+     */
     public static TextureImpl getLocatorTexture(EntityDisplay entityDisplay, boolean showHeading)
     {
         ResourceLocation texLocation = null;
@@ -58,11 +80,24 @@ public enum EntityDisplay implements KeyedEnum
         return TextureCache.getTexture(texLocation);
     }
 
+    /**
+     * Gets entity texture.
+     *
+     * @param entityDisplay the entity display
+     * @return the entity texture
+     */
     public static TextureImpl getEntityTexture(EntityDisplay entityDisplay)
     {
         return getEntityTexture(entityDisplay, (String) null);
     }
 
+    /**
+     * Gets entity texture.
+     *
+     * @param entityDisplay the entity display
+     * @param playerName    the player name
+     * @return the entity texture
+     */
     public static TextureImpl getEntityTexture(EntityDisplay entityDisplay, String playerName)
     {
         switch (entityDisplay)
@@ -85,6 +120,13 @@ public enum EntityDisplay implements KeyedEnum
         return null;
     }
 
+    /**
+     * Gets entity texture.
+     *
+     * @param entityDisplay the entity display
+     * @param iconLocation  the icon location
+     * @return the entity texture
+     */
     public static TextureImpl getEntityTexture(EntityDisplay entityDisplay, ResourceLocation iconLocation)
     {
         switch (entityDisplay)
@@ -113,11 +155,21 @@ public enum EntityDisplay implements KeyedEnum
         return Constants.getString(this.key);
     }
 
+    /**
+     * Is dots boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDots()
     {
         return this == LargeDots || this == SmallDots;
     }
 
+    /**
+     * Is large boolean.
+     *
+     * @return the boolean
+     */
     public boolean isLarge()
     {
         return this == LargeDots || this == LargeIcons;

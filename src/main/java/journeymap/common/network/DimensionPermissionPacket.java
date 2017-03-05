@@ -21,20 +21,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class DimensionPermissionPacket implements IMessage
 {
-    // Channel name
+    /**
+     * The constant CHANNEL_NAME.
+     */
+// Channel name
     public static final String CHANNEL_NAME = "jm_dim_permission";
 
     private String prop;
 
+    /**
+     * Instantiates a new Dimension permission packet.
+     */
     public DimensionPermissionPacket()
     {
     }
 
+    /**
+     * Instantiates a new Dimension permission packet.
+     *
+     * @param prop the prop
+     */
     public DimensionPermissionPacket(PermissionProperties prop)
     {
         this.prop = prop.toJsonString(false);
     }
 
+    /**
+     * Gets prop.
+     *
+     * @return the prop
+     */
     public String getProp()
     {
         return prop;
@@ -69,6 +85,9 @@ public class DimensionPermissionPacket implements IMessage
         }
     }
 
+    /**
+     * The type Listener.
+     */
     public static class Listener implements IMessageHandler<DimensionPermissionPacket, IMessage>
     {
         @Override

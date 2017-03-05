@@ -30,13 +30,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The type Splash.
+ */
 public class Splash extends JmUI
 {
+    /**
+     * The Patreon logo.
+     */
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
-    Button buttonClose, buttonOptions, buttonDonate;
+    /**
+     * The Button close.
+     */
+    Button buttonClose, /**
+ * The Button options.
+ */
+buttonOptions, /**
+ * The Button donate.
+ */
+buttonDonate;
+    /**
+     * The People buttons.
+     */
     ButtonList peopleButtons;
+    /**
+     * The Dev buttons.
+     */
     ButtonList devButtons;
+    /**
+     * The Bottom buttons.
+     */
     ButtonList bottomButtons;
+    /**
+     * The Info buttons.
+     */
     ButtonList infoButtons;
 
     private List<SplashPerson> people = Arrays.asList(
@@ -55,6 +82,11 @@ public class Splash extends JmUI
     private SplashInfo info;
     private TextureImpl brickTex;
 
+    /**
+     * Instantiates a new Splash.
+     *
+     * @param returnDisplay the return display
+     */
     public Splash(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.splash_title", Journeymap.JM_VERSION), returnDisplay);
@@ -270,6 +302,14 @@ public class Splash extends JmUI
         DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
     }
 
+    /**
+     * Draw person int.
+     *
+     * @param by         the by
+     * @param lineHeight the line height
+     * @param person     the person
+     * @return the int
+     */
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
     {
         float scale = 1;
@@ -365,8 +405,16 @@ public class Splash extends JmUI
      */
     class SplashInfoButton extends Button
     {
+        /**
+         * The Info line.
+         */
         final SplashInfo.Line infoLine;
 
+        /**
+         * Instantiates a new Splash info button.
+         *
+         * @param infoLine the info line
+         */
         public SplashInfoButton(SplashInfo.Line infoLine)
         {
             super(infoLine.label);

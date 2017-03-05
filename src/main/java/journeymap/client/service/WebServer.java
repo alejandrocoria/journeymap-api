@@ -45,6 +45,12 @@ public class WebServer
         validatePort();
     }
 
+    /**
+     * Sets enabled.
+     *
+     * @param enable        the enable
+     * @param forceAnnounce the force announce
+     */
     public static void setEnabled(Boolean enable, boolean forceAnnounce)
     {
         WebMapProperties webMapProperties = Journeymap.getClient().getWebMapProperties();
@@ -95,6 +101,11 @@ public class WebServer
         ChatLog.announceMod(forceAnnounce);
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static WebServer getInstance()
     {
         return instance;
@@ -165,16 +176,31 @@ public class WebServer
 
     }
 
+    /**
+     * Is ready boolean.
+     *
+     * @return the boolean
+     */
     public boolean isReady()
     {
         return ready;
     }
 
+    /**
+     * Gets port.
+     *
+     * @return the port
+     */
     public int getPort()
     {
         return port;
     }
 
+    /**
+     * Start.
+     *
+     * @throws Exception the exception
+     */
     public void start() throws Exception
     {
 
@@ -238,6 +264,9 @@ public class WebServer
 
     }
 
+    /**
+     * Stop.
+     */
     public void stop()
     {
         try

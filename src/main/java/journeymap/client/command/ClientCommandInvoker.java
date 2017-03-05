@@ -22,8 +22,17 @@ import java.util.*;
  */
 public class ClientCommandInvoker implements ICommand
 {
+    /**
+     * The Command map.
+     */
     Map<String, ICommand> commandMap = new HashMap<String, ICommand>();
 
+    /**
+     * Register client command invoker.
+     *
+     * @param command the command
+     * @return the client command invoker
+     */
     public ClientCommandInvoker register(ICommand command)
     {
         commandMap.put(command.getName().toLowerCase(), command);
@@ -113,6 +122,12 @@ public class ClientCommandInvoker implements ICommand
         return null;
     }
 
+    /**
+     * Gets sub command.
+     *
+     * @param args the args
+     * @return the sub command
+     */
     public ICommand getSubCommand(String[] args)
     {
         if (args.length > 0)

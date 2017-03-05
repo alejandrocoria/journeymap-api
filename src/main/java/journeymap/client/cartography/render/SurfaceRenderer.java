@@ -22,13 +22,31 @@ import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * The type Surface renderer.
+ */
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
+    /**
+     * The Render surface timer.
+     */
     protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
+    /**
+     * The Render surface prepass timer.
+     */
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
+    /**
+     * The Strata.
+     */
     protected Strata strata = new Strata("Surface", 40, 8, false);
+    /**
+     * The Max depth.
+     */
     protected float maxDepth = 8;
 
+    /**
+     * Instantiates a new Surface renderer.
+     */
     public SurfaceRenderer()
     {
         updateOptions(null, null);
@@ -63,6 +81,11 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for the standard world
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @return the boolean
      */
     public boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd)
     {
@@ -71,6 +94,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for the standard world.
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param vSlice          the v slice
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
     public synchronized boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
@@ -106,6 +136,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for the surface.
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param vSlice          the v slice
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
     protected boolean renderSurface(final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
@@ -240,6 +277,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     *
+     * @param chunkMd    the chunk md
+     * @param x          the x
+     * @param z          the z
+     * @param offset     the offset
+     * @param defaultVal the default val
+     * @return the surface block height
      */
     public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal)
     {
@@ -380,6 +424,13 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Create a BlockStack.
+     *
+     * @param strata  the strata
+     * @param roofY   the roof y
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param y       the y
+     * @param z       the z
      */
     protected void buildStrata(Strata strata, int roofY, ChunkMD chunkMd, int x, int y, int z)
     {
@@ -428,6 +479,18 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Paint the image with the color derived from a BlockStack
+     *
+     * @param strata          the strata
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param topBlockMd      the top block md
+     * @param vSlice          the v slice
+     * @param x               the x
+     * @param y               the y
+     * @param z               the z
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
     protected boolean paintStrata(final Strata strata, final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
     {

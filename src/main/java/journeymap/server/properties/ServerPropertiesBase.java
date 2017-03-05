@@ -19,7 +19,13 @@ import java.util.List;
  */
 public abstract class ServerPropertiesBase extends PropertiesBase implements Cloneable
 {
+    /**
+     * The Display name.
+     */
     protected final String displayName;
+    /**
+     * The Description.
+     */
     protected final String description;
 
     /**
@@ -62,9 +68,9 @@ public abstract class ServerPropertiesBase extends PropertiesBase implements Clo
     /**
      * Returns an instance with values loaded from string, or null if failed
      *
+     * @param <T>        properties type
      * @param jsonString json to load config from
      * @param verbose    whether to deserialize all field attributes.
-     * @param <T>        properties type
      * @return loaded instance or null
      */
     public <T extends PropertiesBase> T load(String jsonString, boolean verbose)

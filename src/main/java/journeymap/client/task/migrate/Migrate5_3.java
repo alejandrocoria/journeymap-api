@@ -29,16 +29,28 @@ import java.util.List;
  */
 public class Migrate5_3 implements MigrationTask
 {
-    // GSON charset
+    /**
+     * The constant UTF8.
+     */
+// GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
-    // Gson for file persistence
+    /**
+     * The Gson.
+     */
+// Gson for file persistence
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
+    /**
+     * The Logger.
+     */
     Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
 
+    /**
+     * Instantiates a new Migrate 5 3.
+     */
     public Migrate5_3()
     {
     }

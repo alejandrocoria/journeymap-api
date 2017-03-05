@@ -13,16 +13,31 @@ import java.util.Set;
 
 /**
  * Enum property field.
+ *
+ * @param <E> the type parameter
  */
 public class EnumField<E extends Enum> extends ConfigField<E>
 {
+    /**
+     * The constant ATTR_ENUM_TYPE.
+     */
     public static final String ATTR_ENUM_TYPE = "enumType";
 
+    /**
+     * Instantiates a new Enum field.
+     */
     protected EnumField()
     {
     }
 
-    // category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class
+    /**
+     * Instantiates a new Enum field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param defaultValue the default value
+     */
+// category = Advanced, key = "jm.advanced.loglevel", stringListProvider = JMLogger.LogLevelStringProvider.class
     public EnumField(Category category, String key, E defaultValue)
     {
         super(category, key);
@@ -51,6 +66,11 @@ public class EnumField<E extends Enum> extends ConfigField<E>
     }
 
 
+    /**
+     * Gets enum class.
+     *
+     * @return the enum class
+     */
     public Class<E> getEnumClass()
     {
         Object value = get(ATTR_ENUM_TYPE);
@@ -74,6 +94,11 @@ public class EnumField<E extends Enum> extends ConfigField<E>
         return null;
     }
 
+    /**
+     * Gets valid values.
+     *
+     * @return the valid values
+     */
     public Set<E> getValidValues()
     {
         Class<? extends Enum> enumClass = getEnumClass();

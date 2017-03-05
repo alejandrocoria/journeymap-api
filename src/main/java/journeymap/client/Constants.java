@@ -27,29 +27,92 @@ import java.util.*;
  */
 public class Constants
 {
+    /**
+     * The constant CASE_INSENSITIVE_NULL_SAFE_ORDER.
+     */
     public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast(); // or nullsFirst()
+    /**
+     * The constant GMT.
+     */
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     private static final Joiner path = Joiner.on(File.separator).useForNull("");
     private static final String END = null;
+    /**
+     * The constant JOURNEYMAP_DIR.
+     */
     public static String JOURNEYMAP_DIR = "journeymap";
+    /**
+     * The constant CONFIG_DIR_LEGACY.
+     */
     public static String CONFIG_DIR_LEGACY = path.join(JOURNEYMAP_DIR, "config");
+    /**
+     * The constant CONFIG_DIR.
+     */
     public static String CONFIG_DIR = path.join(JOURNEYMAP_DIR, "config", Journeymap.JM_VERSION.toMajorMinorString(), END);
+    /**
+     * The constant DATA_DIR.
+     */
     public static String DATA_DIR = path.join(JOURNEYMAP_DIR, "data");
+    /**
+     * The constant SP_DATA_DIR.
+     */
     public static String SP_DATA_DIR = path.join(DATA_DIR, WorldType.sp, END);
+    /**
+     * The constant MP_DATA_DIR.
+     */
     public static String MP_DATA_DIR = path.join(DATA_DIR, WorldType.mp, END);
+    /**
+     * The constant RESOURCE_PACKS_DEFAULT.
+     */
     public static String RESOURCE_PACKS_DEFAULT = "Default";
+    /**
+     * The constant CONTROL_KEYNAME_COMBO.
+     */
     public static String CONTROL_KEYNAME_COMBO;
+    /**
+     * The constant KEYBINDING_CATEGORY.
+     */
     public static String KEYBINDING_CATEGORY;
+    /**
+     * The constant KB_MAP.
+     */
     public static KeyBinding KB_MAP;
+    /**
+     * The constant KB_MAP_ZOOMIN.
+     */
     public static KeyBinding KB_MAP_ZOOMIN;
+    /**
+     * The constant KB_MAP_ZOOMOUT.
+     */
     public static KeyBinding KB_MAP_ZOOMOUT;
+    /**
+     * The constant KB_MAP_DAY.
+     */
     public static KeyBinding KB_MAP_DAY;
+    /**
+     * The constant KB_MAP_NIGHT.
+     */
     public static KeyBinding KB_MAP_NIGHT;
+    /**
+     * The constant KB_MINIMAP_PRESET.
+     */
     public static KeyBinding KB_MINIMAP_PRESET;
+    /**
+     * The constant KB_WAYPOINT.
+     */
     public static KeyBinding KB_WAYPOINT;
     private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
+    /**
+     * The constant ENTITY_ICON_DIR.
+     */
     public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
+    /**
+     * The constant WAYPOINT_ICON_DIR.
+     */
     public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
+    /**
+     * The constant THEME_ICON_DIR.
+     */
     public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
 
     // Network Channel IDs
@@ -57,7 +120,7 @@ public class Constants
     /**
      * Initialize the keybindings, return them as a list.
      *
-     * @return
+     * @return list
      */
     public static List<KeyBinding> initKeybindings()
     {
@@ -76,7 +139,7 @@ public class Constants
     /**
      * Get the current locale
      *
-     * @return
+     * @return locale
      */
     public static Locale getLocale()
     {
@@ -96,8 +159,8 @@ public class Constants
     /**
      * Get the localized string for a given key.
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @return string
      */
     public static String getString(String key)
     {
@@ -125,9 +188,9 @@ public class Constants
     /**
      * Get the localized string for a key and parameters.
      *
-     * @param key
-     * @param params
-     * @return
+     * @param key    the key
+     * @param params the params
+     * @return string
      */
     public static String getString(String key, Object... params)
     {
@@ -155,8 +218,8 @@ public class Constants
     /**
      * Get the key name for a binding.
      *
-     * @param keyBinding
-     * @return
+     * @param keyBinding the key binding
+     * @return key name
      */
     public static String getKeyName(KeyBinding keyBinding)
     {
@@ -166,9 +229,9 @@ public class Constants
     /**
      * Safely check two strings for case-insensitive equality.
      *
-     * @param first
-     * @param second
-     * @return
+     * @param first  the first
+     * @param second the second
+     * @return boolean
      */
     public static boolean safeEqual(String first, String second)
     {
@@ -183,7 +246,7 @@ public class Constants
     /**
      * Get a list of all resource pack names.
      *
-     * @return
+     * @return resource packs
      */
     public static List<ResourcePackRepository.Entry> getResourcePacks()
     {
@@ -205,7 +268,7 @@ public class Constants
      * Get a list of all loaded mod names.
      * TODO:  Why did this end up here?
      *
-     * @return
+     * @return mod names
      */
     public static String getModNames()
     {
@@ -221,6 +284,11 @@ public class Constants
         return Joiner.on(", ").join(list);
     }
 
+    /**
+     * Birthday message string.
+     *
+     * @return the string
+     */
     public static String birthdayMessage()
     {
         Calendar today = Calendar.getInstance();
@@ -238,9 +306,18 @@ public class Constants
         return null;
     }
 
+    /**
+     * The enum World type.
+     */
     public enum WorldType
     {
-        mp, sp
+        /**
+         * Mp world type.
+         */
+        mp, /**
+     * Sp world type.
+     */
+    sp
     }
 
 

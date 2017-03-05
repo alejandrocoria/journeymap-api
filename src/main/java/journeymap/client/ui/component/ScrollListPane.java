@@ -17,23 +17,75 @@ import java.util.List;
 
 /**
  * Adapted from GuiListExtended
+ *
+ * @param <T> the type parameter
  */
 public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExtended
 {
+    /**
+     * The Parent.
+     */
     final JmUI parent;
+    /**
+     * The Last tooltip metadata.
+     */
     public SlotMetadata lastTooltipMetadata;
+    /**
+     * The Last tooltip.
+     */
     public String[] lastTooltip;
+    /**
+     * The Last tooltip time.
+     */
     public long lastTooltipTime;
+    /**
+     * The Hover delay.
+     */
     public long hoverDelay = 800;
+    /**
+     * The Hpad.
+     */
     int hpad = 12;
+    /**
+     * The Root slots.
+     */
     List<T> rootSlots;
+    /**
+     * The Current slots.
+     */
     List<ISlot> currentSlots = new ArrayList<ISlot>(0);
+    /**
+     * The Last pressed.
+     */
     SlotMetadata lastPressed;
+    /**
+     * The Last clicked index.
+     */
     int lastClickedIndex;
+    /**
+     * The Scrollbar x.
+     */
     int scrollbarX;
+    /**
+     * The List width.
+     */
     int listWidth;
+    /**
+     * The Align top.
+     */
     boolean alignTop;
 
+    /**
+     * Instantiates a new Scroll list pane.
+     *
+     * @param parent     the parent
+     * @param mc         the mc
+     * @param width      the width
+     * @param height     the height
+     * @param top        the top
+     * @param bottom     the bottom
+     * @param slotHeight the slot height
+     */
     public ScrollListPane(JmUI parent, Minecraft mc, int width, int height, int top, int bottom, int slotHeight)
     {
         super(mc, width, height, top, bottom, slotHeight);
@@ -54,17 +106,30 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
         return this.currentSlots == null ? 0 : currentSlots.size();
     }
 
+    /**
+     * Sets slots.
+     *
+     * @param slots the slots
+     */
     public void setSlots(List<T> slots)
     {
         this.rootSlots = slots;
         updateSlots();
     }
 
+    /**
+     * Gets root slots.
+     *
+     * @return the root slots
+     */
     public List<T> getRootSlots()
     {
         return rootSlots;
     }
 
+    /**
+     * Update slots.
+     */
     public void updateSlots()
     {
         int sizeBefore = currentSlots.size();
@@ -94,6 +159,11 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
         }
     }
 
+    /**
+     * Scroll to.
+     *
+     * @param slot the slot
+     */
     public void scrollTo(ISlot slot)
     {
         scrollBy(-(currentSlots.size() * slotHeight));
@@ -201,22 +271,38 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
 
     /**
      * Gets the ISlot object for the given index
+     *
+     * @param index the index
+     * @return the slot
      */
     public ISlot getSlot(int index)
     {
         return currentSlots.get(index);
     }
 
+    /**
+     * Gets last pressed.
+     *
+     * @return the last pressed
+     */
     public SlotMetadata getLastPressed()
     {
         return lastPressed;
     }
 
+    /**
+     * Reset last pressed.
+     */
     public void resetLastPressed()
     {
         lastPressed = null;
     }
 
+    /**
+     * Gets last pressed parent slot.
+     *
+     * @return the last pressed parent slot
+     */
     public ISlot getLastPressedParentSlot()
     {
         if (lastPressed != null)
@@ -232,6 +318,13 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
         return null;
     }
 
+    /**
+     * Key typed boolean.
+     *
+     * @param c the c
+     * @param i the
+     * @return the boolean
+     */
     public boolean keyTyped(char c, int i)
     {
         for (int slotIndex = 0; slotIndex < this.getSize(); ++slotIndex)
@@ -270,14 +363,27 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
         return contentHeight;
     }
 
+    /**
+     * Sets align top.
+     *
+     * @param alignTop the align top
+     */
     public void setAlignTop(boolean alignTop)
     {
         this.alignTop = alignTop;
     }
 
 
+    /**
+     * The interface Slot.
+     */
     public interface ISlot extends IGuiListEntry
     {
+        /**
+         * Gets metadata.
+         *
+         * @return the metadata
+         */
         Collection<SlotMetadata> getMetadata();
 
         /**
@@ -293,6 +399,14 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
 
         /**
          * Returns array of strings to display in a hover if the mouse is over the slot
+         *
+         * @param slotIndex  the slot index
+         * @param x          the x
+         * @param y          the y
+         * @param mouseEvent the mouse event
+         * @param relativeX  the relative x
+         * @param relativeY  the relative y
+         * @return the string [ ]
          */
         String[] mouseHover(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY);
 
@@ -303,19 +417,56 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
 
         /**
          * Called when a key is pressed. Return true to prevent event propagation further.
+         *
+         * @param c the c
+         * @param i the
+         * @return the boolean
          */
         boolean keyTyped(char c, int i);
 
+        /**
+         * Gets child slots.
+         *
+         * @param listWidth   the list width
+         * @param columnWidth the column width
+         * @return the child slots
+         */
         List<? extends ISlot> getChildSlots(int listWidth, int columnWidth);
 
+        /**
+         * Gets last pressed.
+         *
+         * @return the last pressed
+         */
         SlotMetadata getLastPressed();
 
+        /**
+         * Gets current tooltip.
+         *
+         * @return the current tooltip
+         */
         SlotMetadata getCurrentTooltip();
 
+        /**
+         * Sets enabled.
+         *
+         * @param enabled the enabled
+         */
         void setEnabled(boolean enabled);
 
+        /**
+         * Gets column width.
+         *
+         * @return the column width
+         */
         int getColumnWidth();
 
+        /**
+         * Contains boolean.
+         *
+         * @param slotMetadata the slot metadata
+         * @return the boolean
+         */
         boolean contains(SlotMetadata slotMetadata);
     }
 }

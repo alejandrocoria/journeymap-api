@@ -39,12 +39,20 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     private long statTimerCheck;
     private List<String> statTimerReport = Collections.EMPTY_LIST;
 
+    /**
+     * Check event config.
+     */
     public static void checkEventConfig()
     {
         EVENT_TYPE = Journeymap.getClient().getCoreProperties().renderOverlayEventTypeName.get();
         EVENT_PRE = Journeymap.getClient().getCoreProperties().renderOverlayPreEvent.get();
     }
 
+    /**
+     * On render overlay debug.
+     *
+     * @param event the event
+     */
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRenderOverlayDebug(RenderGameOverlayEvent.Text event)
     {
@@ -88,6 +96,11 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
         }
     }
 
+    /**
+     * On render overlay.
+     *
+     * @param event the event
+     */
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRenderOverlay(RenderGameOverlayEvent event)
     {

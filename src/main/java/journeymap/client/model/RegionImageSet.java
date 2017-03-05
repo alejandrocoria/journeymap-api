@@ -19,8 +19,16 @@ import java.io.File;
  */
 public class RegionImageSet extends ImageSet
 {
+    /**
+     * The Key.
+     */
     protected final Key key;
 
+    /**
+     * Instantiates a new Region image set.
+     *
+     * @param key the key
+     */
     public RegionImageSet(Key key)
     {
         super();
@@ -45,6 +53,13 @@ public class RegionImageSet extends ImageSet
         }
     }
 
+    /**
+     * Gets chunk image.
+     *
+     * @param chunkMd the chunk md
+     * @param mapType the map type
+     * @return the chunk image
+     */
     public ComparableBufferedImage getChunkImage(ChunkMD chunkMd, MapType mapType)
     {
         RegionCoord regionCoord = getRegionCoord();
@@ -60,6 +75,13 @@ public class RegionImageSet extends ImageSet
         return chunk;
     }
 
+    /**
+     * Sets chunk image.
+     *
+     * @param chunkMd    the chunk md
+     * @param mapType    the map type
+     * @param chunkImage the chunk image
+     */
     public void setChunkImage(ChunkMD chunkMd, MapType mapType, ComparableBufferedImage chunkImage)
     {
         ImageHolder holder = getHolder(mapType);
@@ -78,6 +100,11 @@ public class RegionImageSet extends ImageSet
         chunkMd.setRendered(mapType);
     }
 
+    /**
+     * Has chunk updates boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasChunkUpdates()
     {
         synchronized (imageHolders)
@@ -93,6 +120,9 @@ public class RegionImageSet extends ImageSet
         return false;
     }
 
+    /**
+     * Finish chunk updates.
+     */
     public void finishChunkUpdates()
     {
         synchronized (imageHolders)
@@ -104,11 +134,21 @@ public class RegionImageSet extends ImageSet
         }
     }
 
+    /**
+     * Gets region coord.
+     *
+     * @return the region coord
+     */
     public RegionCoord getRegionCoord()
     {
         return RegionCoord.fromRegionPos(key.worldDir, key.regionX, key.regionZ, key.dimension);
     }
 
+    /**
+     * Gets oldest timestamp.
+     *
+     * @return the oldest timestamp
+     */
     public long getOldestTimestamp()
     {
         long time = System.currentTimeMillis();
@@ -155,6 +195,9 @@ public class RegionImageSet extends ImageSet
         return Tile.TILESIZE;
     }
 
+    /**
+     * The type Key.
+     */
     public static class Key
     {
         private final File worldDir;
@@ -170,6 +213,12 @@ public class RegionImageSet extends ImageSet
             this.dimension = dimension;
         }
 
+        /**
+         * From key.
+         *
+         * @param rCoord the r coord
+         * @return the key
+         */
         public static Key from(RegionCoord rCoord)
         {
             return new Key(rCoord.worldDir, rCoord.regionX, rCoord.regionZ, rCoord.dimension);

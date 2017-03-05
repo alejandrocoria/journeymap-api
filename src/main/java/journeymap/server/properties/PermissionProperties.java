@@ -12,13 +12,37 @@ import journeymap.common.properties.config.BooleanField;
  */
 public abstract class PermissionProperties extends ServerPropertiesBase
 {
+    /**
+     * The Op cave mapping enabled.
+     */
     public final BooleanField opCaveMappingEnabled = new BooleanField(ServerCategory.Cave, "Enable Op cave maps", true);
+    /**
+     * The Cave mapping enabled.
+     */
     public final BooleanField caveMappingEnabled = new BooleanField(ServerCategory.Cave, "Enable cave maps", true);
+    /**
+     * The Op radar enabled.
+     */
     public final BooleanField opRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable Op radar", true);
+    /**
+     * The Radar enabled.
+     */
     public final BooleanField radarEnabled = new BooleanField(ServerCategory.Radar, "Enable radar", true);
+    /**
+     * The Player radar enabled.
+     */
     public final BooleanField playerRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable player radar", true);
+    /**
+     * The Villager radar enabled.
+     */
     public final BooleanField villagerRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable villager radar", true);
+    /**
+     * The Animal radar enabled.
+     */
     public final BooleanField animalRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable animal radar", true);
+    /**
+     * The Mob radar enabled.
+     */
     public final BooleanField mobRadarEnabled = new BooleanField(ServerCategory.Radar, "Enable mob radar", true);
 
     /**

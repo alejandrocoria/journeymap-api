@@ -10,15 +10,23 @@ import net.minecraft.client.Minecraft;
 import java.util.ArrayList;
 
 /**
- * Created by Mark on 9/2/2014.
+ * @author techbrew 9/2/2014.
  */
 public class ButtonSpacer extends Button
 {
+    /**
+     * Instantiates a new Button spacer.
+     */
     public ButtonSpacer()
     {
         super("");
     }
 
+    /**
+     * Instantiates a new Button spacer.
+     *
+     * @param size the size
+     */
     public ButtonSpacer(int size)
     {
         super(size, size, "");

@@ -31,7 +31,7 @@ public class DrawMarkerStep extends BaseOverlayDrawStep<MarkerOverlay>
     /**
      * Draw a marker on the map.
      *
-     * @param marker
+     * @param marker the marker
      */
     public DrawMarkerStep(MarkerOverlay marker)
     {

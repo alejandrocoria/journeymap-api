@@ -20,11 +20,21 @@ public class Migration
 {
     private final String targetPackage;
 
+    /**
+     * Instantiates a new Migration.
+     *
+     * @param targetPackage the target package
+     */
     public Migration(String targetPackage)
     {
         this.targetPackage = targetPackage;
     }
 
+    /**
+     * Perform tasks boolean.
+     *
+     * @return the boolean
+     */
     public boolean performTasks()
     {
         boolean success = true;

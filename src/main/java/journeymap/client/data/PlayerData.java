@@ -29,6 +29,10 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
     /**
      * "Underground" means the player isn't under sky (within a 1 block radius),
      * or is under a block that should be treated as potential sky like glass or ladders.
+     *
+     * @param mc     the mc
+     * @param player the player
+     * @return the boolean
      */
     public static boolean playerIsUnderground(Minecraft mc, EntityPlayer player)
     {
@@ -112,6 +116,11 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         return "?";
     }
 
+    /**
+     * Gets ttl.
+     *
+     * @return the ttl
+     */
     public long getTTL()
     {
         return Journeymap.getClient().getCoreProperties().cachePlayerData.get();

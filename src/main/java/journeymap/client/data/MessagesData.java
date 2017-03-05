@@ -63,6 +63,8 @@ public class MessagesData extends CacheLoader<Class, Map<String, Object>>
 
     /**
      * Return length of time in millis data should be kept.
+     *
+     * @return the ttl
      */
     public long getTTL()
     {

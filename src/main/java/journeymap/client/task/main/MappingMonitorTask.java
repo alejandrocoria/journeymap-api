@@ -20,6 +20,9 @@ import org.apache.logging.log4j.Logger;
 public class MappingMonitorTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
+    /**
+     * The Logger.
+     */
     Logger logger = Journeymap.getLogger();
     private int lastDimension = 0;
 

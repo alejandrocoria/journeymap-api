@@ -39,18 +39,44 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+/**
+ * The type File handler.
+ */
 public class FileHandler
 {
+    /**
+     * The constant DEV_MINECRAFT_DIR.
+     */
     public static final String DEV_MINECRAFT_DIR = "run/";
+    /**
+     * The constant ASSETS_JOURNEYMAP.
+     */
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
+    /**
+     * The constant ASSETS_JOURNEYMAP_UI.
+     */
     public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/ui";
 
+    /**
+     * The constant MinecraftDirectory.
+     */
     public static final File MinecraftDirectory = getMinecraftDirectory();
+    /**
+     * The constant JourneyMapDirectory.
+     */
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
+    /**
+     * The constant StandardConfigDirectory.
+     */
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
 
     private static WorldClient theLastWorld;
 
+    /**
+     * Gets minecraft directory.
+     *
+     * @return the minecraft directory
+     */
     public static File getMinecraftDirectory()
     {
         Minecraft minecraft = FMLClientHandler.instance().getClient();
@@ -64,6 +90,12 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets mc world dir.
+     *
+     * @param minecraft the minecraft
+     * @return the mc world dir
+     */
     public static File getMCWorldDir(Minecraft minecraft)
     {
         if (minecraft.isIntegratedServerRunning())
@@ -75,6 +107,12 @@ public class FileHandler
         return null;
     }
 
+    /**
+     * Gets world save dir.
+     *
+     * @param minecraft the minecraft
+     * @return the world save dir
+     */
     public static File getWorldSaveDir(Minecraft minecraft)
     {
         if (minecraft.isSingleplayer())
@@ -102,6 +140,13 @@ public class FileHandler
         return null;
     }
 
+    /**
+     * Gets mc world dir.
+     *
+     * @param minecraft the minecraft
+     * @param dimension the dimension
+     * @return the mc world dir
+     */
     public static File getMCWorldDir(Minecraft minecraft, final int dimension)
     {
         File worldDir = getMCWorldDir(minecraft);
@@ -165,11 +210,22 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets journey map dir.
+     *
+     * @return the journey map dir
+     */
     public static File getJourneyMapDir()
     {
         return JourneyMapDirectory;
     }
 
+    /**
+     * Gets jm world dir.
+     *
+     * @param minecraft the minecraft
+     * @return the jm world dir
+     */
     public static File getJMWorldDir(Minecraft minecraft)
     {
         if (minecraft.world == null)
@@ -187,6 +243,13 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets jm world dir.
+     *
+     * @param minecraft the minecraft
+     * @param worldId   the world id
+     * @return the jm world dir
+     */
     public static synchronized File getJMWorldDir(Minecraft minecraft, String worldId)
     {
         if (minecraft.world == null)
@@ -291,6 +354,13 @@ public class FileHandler
         return worldDirectory;
     }
 
+    /**
+     * Gets jm world dir for world id.
+     *
+     * @param minecraft the minecraft
+     * @param worldId   the world id
+     * @return the jm world dir for world id
+     */
     public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
     {
         if (minecraft == null || minecraft.world == null)
@@ -360,11 +430,22 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets waypoint dir.
+     *
+     * @return the waypoint dir
+     */
     public static File getWaypointDir()
     {
         return getWaypointDir(getJMWorldDir(FMLClientHandler.instance().getClient()));
     }
 
+    /**
+     * Gets waypoint dir.
+     *
+     * @param jmWorldDir the jm world dir
+     * @return the waypoint dir
+     */
     public static File getWaypointDir(File jmWorldDir)
     {
         File waypointDir = new File(jmWorldDir, "waypoints");
@@ -379,6 +460,12 @@ public class FileHandler
         return waypointDir;
     }
 
+    /**
+     * Gets lang file.
+     *
+     * @param fileName the file name
+     * @return the lang file
+     */
     public static Properties getLangFile(String fileName)
     {
         try
@@ -411,6 +498,14 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets message model.
+     *
+     * @param <M>        the type parameter
+     * @param model      the model
+     * @param filePrefix the file prefix
+     * @return the message model
+     */
     public static <M> M getMessageModel(Class<M> model, String filePrefix)
     {
         try
@@ -436,12 +531,25 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets message model input stream.
+     *
+     * @param filePrefix the file prefix
+     * @param lang       the lang
+     * @return the message model input stream
+     */
     public static InputStream getMessageModelInputStream(String filePrefix, String lang)
     {
         String file = String.format("/assets/journeymap/lang/message/%s-%s.json", filePrefix, lang);
         return JourneymapClient.class.getResourceAsStream(file);
     }
 
+    /**
+     * Gets world config dir.
+     *
+     * @param fallbackToStandardConfigDir the fallback to standard config dir
+     * @return the world config dir
+     */
     public static File getWorldConfigDir(boolean fallbackToStandardConfigDir)
     {
         File worldDir = getJMWorldDirForWorldId(FMLClientHandler.instance().getClient(), null); // always use the "base" folder for multiplayer
@@ -457,6 +565,12 @@ public class FileHandler
         return fallbackToStandardConfigDir ? StandardConfigDirectory : null;
     }
 
+    /**
+     * Gets image.
+     *
+     * @param imageFile the image file
+     * @return the image
+     */
     public static BufferedImage getImage(File imageFile)
     {
         try
@@ -475,11 +589,22 @@ public class FileHandler
         }
     }
 
+    /**
+     * Is in jar boolean.
+     *
+     * @return the boolean
+     */
     public static boolean isInJar()
     {
         return isInJar(JourneymapClient.class.getProtectionDomain().getCodeSource().getLocation());
     }
 
+    /**
+     * Is in jar boolean.
+     *
+     * @param location the location
+     * @return the boolean
+     */
     public static boolean isInJar(URL location)
     {
         if ("jar".equals(location.getProtocol()))
@@ -504,6 +629,13 @@ public class FileHandler
         return false;
     }
 
+    /**
+     * Copy color palette html file file.
+     *
+     * @param toDir    the to dir
+     * @param fileName the file name
+     * @return the file
+     */
     public static File copyColorPaletteHtmlFile(File toDir, String fileName)
     {
         try
@@ -531,6 +663,11 @@ public class FileHandler
         }
     }
 
+    /**
+     * Open.
+     *
+     * @param file the file
+     */
     public static void open(File file)
     {
 
@@ -580,6 +717,15 @@ public class FileHandler
         }
     }
 
+    /**
+     * Copy resources boolean.
+     *
+     * @param targetDirectory the target directory
+     * @param location        the location
+     * @param setName         the set name
+     * @param overwrite       the overwrite
+     * @return the boolean
+     */
     public static boolean copyResources(File targetDirectory, ResourceLocation location, String setName, boolean overwrite)
     {
         String fromPath = null;
@@ -634,6 +780,15 @@ public class FileHandler
         return false;
     }
 
+    /**
+     * Copy resources boolean.
+     *
+     * @param targetDirectory the target directory
+     * @param assetsPath      the assets path
+     * @param setName         the set name
+     * @param overwrite       the overwrite
+     * @return the boolean
+     */
     public static boolean copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {
         ModContainer modContainer = Loader.instance().getIndexedModList().get(Journeymap.MOD_ID);
@@ -652,6 +807,16 @@ public class FileHandler
         return false;
     }
 
+    /**
+     * Copy resources boolean.
+     *
+     * @param targetDirectory the target directory
+     * @param resourceDir     the resource dir
+     * @param assetsPath      the assets path
+     * @param setName         the set name
+     * @param overwrite       the overwrite
+     * @return the boolean
+     */
     public static boolean copyResources(File targetDirectory, URL resourceDir, String assetsPath, String setName, boolean overwrite)
     {
         String fromPath = null;
@@ -697,7 +862,12 @@ public class FileHandler
      * Extracts a zip file specified by the zipFilePath to a directory specified by
      * destDirectory (will be created if does not exists)
      *
-     * @throws IOException
+     * @param zipFilePath  the zip file path
+     * @param zipEntryName the zip entry name
+     * @param destDir      the dest dir
+     * @param overWrite    the over write
+     * @return the boolean
+     * @throws Throwable the throwable
      */
     static boolean copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
     {
@@ -743,6 +913,12 @@ public class FileHandler
 
     /**
      * Copies contents of one directory to another
+     *
+     * @param fromDir   the from dir
+     * @param toDir     the to dir
+     * @param overWrite the over write
+     * @return the boolean
+     * @throws IOException the io exception
      */
     static boolean copyFromDirectory(File fromDir, File toDir, boolean overWrite) throws IOException
     {
@@ -783,6 +959,12 @@ public class FileHandler
         return success;
     }
 
+    /**
+     * Delete boolean.
+     *
+     * @param file the file
+     * @return the boolean
+     */
     public static boolean delete(File file)
     {
         if (!file.exists())
@@ -833,6 +1015,14 @@ public class FileHandler
         return file.exists();
     }
 
+    /**
+     * Gets icon from file.
+     *
+     * @param parentdir the parentdir
+     * @param setName   the set name
+     * @param iconPath  the icon path
+     * @return the icon from file
+     */
     public static BufferedImage getIconFromFile(File parentdir, String setName, String iconPath)
     {
         BufferedImage img = null;
@@ -893,6 +1083,14 @@ public class FileHandler
 //        }
 //    }
 
+    /**
+     * Gets icon from resource.
+     *
+     * @param assetsPath the assets path
+     * @param setName    the set name
+     * @param iconPath   the icon path
+     * @return the icon from resource
+     */
     public static BufferedImage getIconFromResource(String assetsPath, String setName, String iconPath)
     {
         try
@@ -914,6 +1112,14 @@ public class FileHandler
         }
     }
 
+    /**
+     * Gets icon stream.
+     *
+     * @param assetsPath the assets path
+     * @param setName    the set name
+     * @param iconPath   the icon path
+     * @return the icon stream
+     */
     public static InputStream getIconStream(String assetsPath, String setName, String iconPath)
     {
         try
@@ -937,9 +1143,21 @@ public class FileHandler
 
     private static class ZipEntryByteSource extends ByteSource
     {
+        /**
+         * The File.
+         */
         final ZipFile file;
+        /**
+         * The Entry.
+         */
         final ZipEntry entry;
 
+        /**
+         * Instantiates a new Zip entry byte source.
+         *
+         * @param file  the file
+         * @param entry the entry
+         */
         ZipEntryByteSource(ZipFile file, ZipEntry entry)
         {
             this.file = file;

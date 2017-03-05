@@ -17,15 +17,39 @@ import java.util.List;
 
 /**
  * Base class for a field that has a list of values.
+ *
+ * @param <T> the type parameter
  */
 public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<ConfigField<T>>
 {
+    /**
+     * The Field.
+     */
     protected final ConfigField<T> field;
+    /**
+     * The Values.
+     */
     protected final List<T> values;
+    /**
+     * The Base label.
+     */
     protected final String baseLabel;
+    /**
+     * The Glyph.
+     */
     protected final String glyph = "\u21D5";
+    /**
+     * The Label pattern.
+     */
     protected final String labelPattern = "%1$s : %2$s %3$s %2$s";
 
+    /**
+     * Instantiates a new List property button.
+     *
+     * @param values the values
+     * @param label  the label
+     * @param field  the field
+     */
     public ListPropertyButton(Collection<T> values, String label, ConfigField<T> field)
     {
         super("");
@@ -36,6 +60,11 @@ public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<
         disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
+    /**
+     * Sets value.
+     *
+     * @param value the value
+     */
     public void setValue(T value)
     {
         if (!field.get().equals(value))
@@ -46,11 +75,19 @@ public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<
         displayString = getFormattedLabel(value.toString());
     }
 
+    /**
+     * Gets field.
+     *
+     * @return the field
+     */
     public ConfigField<T> getField()
     {
         return field;
     }
 
+    /**
+     * Next option.
+     */
     public void nextOption()
     {
         int index = values.indexOf(field.get()) + 1;
@@ -61,6 +98,9 @@ public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<
         setValue(values.get(index));
     }
 
+    /**
+     * Prev option.
+     */
     public void prevOption()
     {
         int index = values.indexOf(field.get()) - 1;
@@ -82,6 +122,12 @@ public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<
         return false;
     }
 
+    /**
+     * Gets formatted label.
+     *
+     * @param value the value
+     * @return the formatted label
+     */
     protected String getFormattedLabel(String value)
     {
         return String.format(labelPattern, baseLabel, glyph, value);

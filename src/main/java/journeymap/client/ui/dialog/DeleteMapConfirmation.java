@@ -13,11 +13,26 @@ import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
+/**
+ * The type Delete map confirmation.
+ */
 public class DeleteMapConfirmation extends JmUI
 {
 
-    Button buttonAll, buttonCurrent, buttonClose;
+    /**
+     * The Button all.
+     */
+    Button buttonAll, /**
+ * The Button current.
+ */
+buttonCurrent, /**
+ * The Button close.
+ */
+buttonClose;
 
+    /**
+     * Instantiates a new Delete map confirmation.
+     */
     public DeleteMapConfirmation()
     {
         super(Constants.getString("jm.common.deletemap_dialog"));

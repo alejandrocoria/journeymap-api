@@ -42,36 +42,81 @@ import java.util.*;
  */
 public enum ColorHelper
 {
+    /**
+     * Instance color helper.
+     */
     INSTANCE;
 
+    /**
+     * The Sprite facings.
+     */
     static List<EnumFacing> spriteFacings = Arrays.asList(EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST);
 
+    /**
+     * The Logger.
+     */
     Logger logger = Journeymap.getLogger();
+    /**
+     * The Failed.
+     */
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
+    /**
+     * The Block colors.
+     */
     BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
+    /**
+     * The Icon color cache.
+     */
     HashMap<String, float[]> iconColorCache = new HashMap<>();
 
+    /**
+     * Reset icon color cache.
+     */
     public void resetIconColorCache()
     {
         iconColorCache.clear();
         failed.clear();
     }
 
+    /**
+     * Has cached icon colors boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasCachedIconColors()
     {
         return !iconColorCache.isEmpty();
     }
 
+    /**
+     * Cached icon colors int.
+     *
+     * @return the int
+     */
     public int cachedIconColors()
     {
         return iconColorCache.size();
     }
 
+    /**
+     * Failed for boolean.
+     *
+     * @param blockMD the block md
+     * @return the boolean
+     */
     public boolean failedFor(BlockMD blockMD)
     {
         return failed.contains(blockMD);
     }
 
+    /**
+     * Gets color multiplier.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the color multiplier
+     */
     public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         if (chunkMD == null || !chunkMD.hasChunk())
@@ -93,6 +138,12 @@ public enum ColorHelper
     }
 
 
+    /**
+     * Gets map color.
+     *
+     * @param blockMD the block md
+     * @return the map color
+     */
     public int getMapColor(BlockMD blockMD)
     {
         return blockMD.getBlockState().getMaterial().getMaterialMapColor().colorValue;
@@ -100,8 +151,10 @@ public enum ColorHelper
 
     /**
      * Derive block color from the corresponding texture.
+     *
+     * @param blockMD the block md
+     * @return the texture color
      */
-
     public Integer getTextureColor(BlockMD blockMD)
     {
         try

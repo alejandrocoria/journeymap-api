@@ -13,14 +13,33 @@ import journeymap.client.data.DataCache;
  */
 public class MapType
 {
+    /**
+     * The V slice.
+     */
     public final Integer vSlice;
+    /**
+     * The Name.
+     */
     public final Name name;
+    /**
+     * The Dimension.
+     */
     public final int dimension;
+    /**
+     * The Api map type.
+     */
     public final Context.MapType apiMapType;
     private final int theHashCode;
     private final String theCacheKey;
 
 
+    /**
+     * Instantiates a new Map type.
+     *
+     * @param name      the name
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     */
     public MapType(Name name, Integer vSlice, int dimension)
     {
         // Guarantee surface types don't use a slice
@@ -33,61 +52,140 @@ public class MapType
         this.theHashCode = theCacheKey.hashCode();
     }
 
+    /**
+     * From map type.
+     *
+     * @param name      the name
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType from(Name name, Integer vSlice, int dimension)
     {
         return DataCache.INSTANCE.getMapType(name, vSlice, dimension);
     }
 
+    /**
+     * From map type.
+     *
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType from(Integer vSlice, int dimension)
     {
         return from(vSlice == null ? Name.surface : Name.underground, vSlice, dimension);
     }
 
+    /**
+     * From map type.
+     *
+     * @param name   the name
+     * @param player the player
+     * @return the map type
+     */
     public static MapType from(Name name, EntityDTO player)
     {
         return from(name, player.chunkCoordY, player.dimension);
     }
 
+    /**
+     * Day map type.
+     *
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType day(int dimension)
     {
         return from(Name.day, null, dimension);
     }
 
+    /**
+     * Day map type.
+     *
+     * @param player the player
+     * @return the map type
+     */
     public static MapType day(EntityDTO player)
     {
         return from(Name.day, null, player.dimension);
     }
 
+    /**
+     * Night map type.
+     *
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType night(int dimension)
     {
         return from(Name.night, null, dimension);
     }
 
+    /**
+     * Night map type.
+     *
+     * @param player the player
+     * @return the map type
+     */
     public static MapType night(EntityDTO player)
     {
         return from(Name.night, null, player.dimension);
     }
 
+    /**
+     * Topo map type.
+     *
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType topo(int dimension)
     {
         return from(Name.topo, null, dimension);
     }
 
+    /**
+     * Topo map type.
+     *
+     * @param player the player
+     * @return the map type
+     */
     public static MapType topo(EntityDTO player)
     {
         return from(Name.topo, null, player.dimension);
     }
 
+    /**
+     * Underground map type.
+     *
+     * @param player the player
+     * @return the map type
+     */
     public static MapType underground(EntityDTO player)
     {
         return from(Name.underground, player.chunkCoordY, player.dimension);
     }
 
+    /**
+     * Underground map type.
+     *
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the map type
+     */
     public static MapType underground(Integer vSlice, int dimension)
     {
         return from(Name.underground, vSlice, dimension);
     }
 
+    /**
+     * To cache key string.
+     *
+     * @param name      the name
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the string
+     */
     public static String toCacheKey(Name name, Integer vSlice, int dimension)
     {
         return String.format("%s|%s|%s", dimension, name, vSlice == null ? "_" : vSlice);
@@ -110,6 +208,14 @@ public class MapType
         }
     }
 
+    /**
+     * From api context map type map type.
+     *
+     * @param apiMapType the api map type
+     * @param vSlice     the v slice
+     * @param dimension  the dimension
+     * @return the map type
+     */
     public static MapType fromApiContextMapType(final Context.MapType apiMapType, Integer vSlice, int dimension)
     {
         switch (apiMapType)
@@ -137,6 +243,11 @@ public class MapType
         }
     }
 
+    /**
+     * To cache key string.
+     *
+     * @return the string
+     */
     public String toCacheKey()
     {
         return theCacheKey;
@@ -147,31 +258,61 @@ public class MapType
         return name.name();
     }
 
+    /**
+     * Name string.
+     *
+     * @return the string
+     */
     public String name()
     {
         return name.name();
     }
 
+    /**
+     * Is underground boolean.
+     *
+     * @return the boolean
+     */
     public boolean isUnderground()
     {
         return name == Name.underground;
     }
 
+    /**
+     * Is surface boolean.
+     *
+     * @return the boolean
+     */
     public boolean isSurface()
     {
         return name == Name.surface;
     }
 
+    /**
+     * Is day boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDay()
     {
         return name == Name.day;
     }
 
+    /**
+     * Is night boolean.
+     *
+     * @return the boolean
+     */
     public boolean isNight()
     {
         return name == Name.night;
     }
 
+    /**
+     * Is topo boolean.
+     *
+     * @return the boolean
+     */
     public boolean isTopo()
     {
         return name == Name.topo;
@@ -213,9 +354,27 @@ public class MapType
         return true;
     }
 
+    /**
+     * The enum Name.
+     */
     public enum Name
     {
-        day, night, underground, surface, topo
+        /**
+         * Day name.
+         */
+        day, /**
+     * Night name.
+     */
+    night, /**
+     * Underground name.
+     */
+    underground, /**
+     * Surface name.
+     */
+    surface, /**
+     * Topo name.
+     */
+    topo
     }
 
 }

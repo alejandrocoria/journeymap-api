@@ -21,26 +21,67 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Mark on 9/29/2014.
+ * @author techbrew 9/29/2014.
  */
 public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonListSlot>
 {
+    /**
+     * The Hgap.
+     */
     static int hgap = 8;
+    /**
+     * Minecraft client
+     */
     Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Font renderer.
+     */
     FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+    /**
+     * The Buttons.
+     */
     ButtonList buttons = new ButtonList();
+    /**
+     * The Button option metadata.
+     */
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
+    /**
+     * The Parent.
+     */
     CategorySlot parent;
+    /**
+     * The Last pressed.
+     */
     SlotMetadata lastPressed = null;
+    /**
+     * The Current tool tip.
+     */
     SlotMetadata currentToolTip = null;
+    /**
+     * The Color toolbar bg start.
+     */
     Integer colorToolbarBgStart = new Color(0, 0, 100).getRGB();
+    /**
+     * The Color toolbar bg end.
+     */
     Integer colorToolbarBgEnd = new Color(0, 0, 100).getRGB();
 
+    /**
+     * Instantiates a new Button list slot.
+     *
+     * @param parent the parent
+     */
     public ButtonListSlot(CategorySlot parent)
     {
         this.parent = parent;
     }
 
+    /**
+     * Add button list slot.
+     *
+     * @param slotMetadata the slot metadata
+     * @return the button list slot
+     */
     public ButtonListSlot add(SlotMetadata slotMetadata)
     {
         buttons.add(slotMetadata.getButton());
@@ -48,6 +89,12 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         return this;
     }
 
+    /**
+     * Add all button list slot.
+     *
+     * @param slotMetadataCollection the slot metadata collection
+     * @return the button list slot
+     */
     public ButtonListSlot addAll(Collection<SlotMetadata> slotMetadataCollection)
     {
         for (SlotMetadata slotMetadata : slotMetadataCollection)
@@ -57,6 +104,12 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         return this;
     }
 
+    /**
+     * Merge button list slot.
+     *
+     * @param other the other
+     * @return the button list slot
+     */
     public ButtonListSlot merge(ButtonListSlot other)
     {
         for (SlotMetadata otherSlot : other.buttonOptionMetadata.values())
@@ -66,6 +119,9 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         return this;
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         buttons.clear();
@@ -221,6 +277,11 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         return buttonOptionMetadata.values().contains(slotMetadata);
     }
 
+    /**
+     * Gets first button string.
+     *
+     * @return the first button string
+     */
     protected String getFirstButtonString()
     {
         if (buttons.size() > 0)

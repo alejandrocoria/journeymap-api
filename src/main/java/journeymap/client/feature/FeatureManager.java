@@ -42,6 +42,8 @@ public class FeatureManager
 
     /**
      * Gets a detailed description of all policies.
+     *
+     * @return the policy details
      */
     public static String getPolicyDetails()
     {
@@ -63,6 +65,8 @@ public class FeatureManager
 
     /**
      * Gets the singleton.
+     *
+     * @return the feature manager
      */
     public static FeatureManager instance()
     {
@@ -84,7 +88,7 @@ public class FeatureManager
     /**
      * Returns a map of all features and whether they are currently permitted.
      *
-     * @return
+     * @return allowed features
      */
     public static Map<Feature, Boolean> getAllowedFeatures()
     {
@@ -99,18 +103,28 @@ public class FeatureManager
     /**
      * Gets the name of the PolicySet.
      *
-     * @return
+     * @return policy set name
      */
     public static String getPolicySetName()
     {
         return instance().policySet.getName();
     }
 
+    /**
+     * Gets control codes.
+     *
+     * @return the control codes
+     */
     public Set<String> getControlCodes()
     {
         return disableControlCodes.keySet();
     }
 
+    /**
+     * Handle control code.
+     *
+     * @param controlCode the control code
+     */
     public void handleControlCode(String controlCode)
     {
         if (disableControlCodes.containsKey(controlCode))
@@ -125,6 +139,11 @@ public class FeatureManager
         }
     }
 
+    /**
+     * Disable dimension feature.
+     *
+     * @param properties the properties
+     */
     public void disableDimensionFeature(PermissionProperties properties)
     {
         FeatureManager.instance().reset();
@@ -274,8 +293,18 @@ public class FeatureManager
      */
     public static interface PolicySet
     {
+        /**
+         * Gets policies.
+         *
+         * @return the policies
+         */
         public Set<Policy> getPolicies();
 
+        /**
+         * Gets name.
+         *
+         * @return the name
+         */
         public String getName();
     }
 

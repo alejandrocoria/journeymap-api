@@ -19,19 +19,45 @@ import java.util.List;
  */
 public class StringField extends ConfigField<String>
 {
+    /**
+     * The constant ATTR_VALUE_PROVIDER.
+     */
     public static final String ATTR_VALUE_PROVIDER = "valueProvider";
+    /**
+     * The constant ATTR_VALUE_PATTERN.
+     */
     public static final String ATTR_VALUE_PATTERN = "pattern";
+    /**
+     * The constant ATTR_MULTILINE.
+     */
     public static final String ATTR_MULTILINE = "multiline";
 
+    /**
+     * Instantiates a new String field.
+     */
     protected StringField()
     {
     }
 
+    /**
+     * Instantiates a new String field.
+     *
+     * @param category the category
+     * @param key      the key
+     */
     public StringField(Category category, String key)
     {
         this(category, key, null, null);
     }
 
+    /**
+     * Instantiates a new String field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param validValues  the valid values
+     * @param defaultValue the default value
+     */
     public StringField(Category category, String key, String[] validValues, String defaultValue)
     {
         super(category, key);
@@ -46,6 +72,13 @@ public class StringField extends ConfigField<String>
         }
     }
 
+    /**
+     * Instantiates a new String field.
+     *
+     * @param category           the category
+     * @param key                the key
+     * @param valueProviderClass the value provider class
+     */
     public StringField(Category category, String key, Class<? extends ValuesProvider> valueProviderClass)
     {
         super(category, key);
@@ -96,7 +129,7 @@ public class StringField extends ConfigField<String>
      * Sets a regex pattern used to ensureValid the value;
      *
      * @param regexPattern pattern
-     * @return this
+     * @return this string field
      */
     public StringField pattern(String regexPattern)
     {
@@ -107,7 +140,7 @@ public class StringField extends ConfigField<String>
     /**
      * Gets the regex pattern used to ensureValid the value
      *
-     * @return regex
+     * @return regex pattern
      */
     public String getPattern()
     {
@@ -117,7 +150,7 @@ public class StringField extends ConfigField<String>
     /**
      * Class that provides default and valid values
      *
-     * @return
+     * @return values provider class
      */
     public Class<? extends ValuesProvider> getValuesProviderClass()
     {
@@ -219,7 +252,7 @@ public class StringField extends ConfigField<String>
      * Sets the valid values.
      *
      * @param values list
-     * @return this
+     * @return this string field
      */
     public StringField validValues(Iterable<String> values)
     {
@@ -242,7 +275,7 @@ public class StringField extends ConfigField<String>
      * Sets whether this should be displayed with multiple lines
      *
      * @param isMultiline true if multiline
-     * @return this
+     * @return this string field
      */
     public StringField multiline(boolean isMultiline)
     {
@@ -255,8 +288,18 @@ public class StringField extends ConfigField<String>
      */
     public static interface ValuesProvider
     {
+        /**
+         * Gets strings.
+         *
+         * @return the strings
+         */
         public List<String> getStrings();
 
+        /**
+         * Gets default string.
+         *
+         * @return the default string
+         */
         public String getDefaultString();
     }
 }

@@ -30,10 +30,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Deprecated
 public class WorldInfoHandler
 {
-    // Packet discriminator for World ID message
+    /**
+     * The constant PACKET_WORLDID.
+     */
+// Packet discriminator for World ID message
     public static final int PACKET_WORLDID = 0;
 
-    // Minimum time in millis that must pass before subsequent requests can be made
+    /**
+     * The constant MIN_DELAY_MS.
+     */
+// Minimum time in millis that must pass before subsequent requests can be made
     public static final int MIN_DELAY_MS = 1000;
 
     // Timestamp in millis of the last request by client
@@ -43,7 +49,10 @@ public class WorldInfoHandler
     private static long lastResponse;
     // Network wrapper of the channel for requests/response
     private static SimpleNetworkWrapper channel;
-    // Handle to Minecraft client
+    /**
+     * Minecraft client
+     */
+// Handle to Minecraft client
     Minecraft mc = FMLClientHandler.instance().getClient();
 
     /**
@@ -84,6 +93,11 @@ public class WorldInfoHandler
         }
     }
 
+    /**
+     * On connected.
+     *
+     * @param event the event
+     */
     @SubscribeEvent
     public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event)
     {
@@ -93,7 +107,7 @@ public class WorldInfoHandler
     /**
      * Use the EntityJoinWorldEvent of the player as a trigger to request the World ID.
      *
-     * @param event
+     * @param event the event
      */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

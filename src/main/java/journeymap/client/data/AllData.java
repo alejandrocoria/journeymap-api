@@ -99,21 +99,50 @@ public class AllData extends CacheLoader<Long, Map>
 
     /**
      * Return length of time in millis data should be kept.
+     *
+     * @return the ttl
      */
     public long getTTL()
     {
         return Journeymap.getClient().getCoreProperties().renderDelay.get() * 2000;
     }
 
+    /**
+     * The enum Key.
+     */
     public static enum Key
     {
+        /**
+         * Animals key.
+         */
         animals,
+        /**
+         * Images key.
+         */
         images,
+        /**
+         * Mobs key.
+         */
         mobs,
+        /**
+         * Player key.
+         */
         player,
+        /**
+         * Players key.
+         */
         players,
+        /**
+         * Villagers key.
+         */
         villagers,
+        /**
+         * Waypoints key.
+         */
         waypoints,
+        /**
+         * World key.
+         */
         world
     }
 }

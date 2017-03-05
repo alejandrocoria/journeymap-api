@@ -20,20 +20,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class TeleportPacket implements IMessage
 {
-    // Channel name
+    /**
+     * The constant CHANNEL_NAME.
+     */
+// Channel name
     public static final String CHANNEL_NAME = "jtp";
 
     private String location;
 
+    /**
+     * Instantiates a new Teleport packet.
+     */
     public TeleportPacket()
     {
     }
 
+    /**
+     * Instantiates a new Teleport packet.
+     *
+     * @param location the location
+     */
     public TeleportPacket(Location location)
     {
         this.location = Location.GSON.toJson(location);
     }
 
+    /**
+     * Gets location.
+     *
+     * @return the location
+     */
     public String getLocation()
     {
         return location;
@@ -69,6 +85,9 @@ public class TeleportPacket implements IMessage
         }
     }
 
+    /**
+     * The type Listener.
+     */
     public static class Listener implements IMessageHandler<TeleportPacket, IMessage>
     {
         @Override

@@ -30,11 +30,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class StateTickHandler implements EventHandlerManager.EventHandler
 {
+    /**
+     * The Java checked.
+     */
     static boolean javaChecked = false;
+    /**
+     * Minecraft client
+     */
     Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Counter.
+     */
     int counter = 0;
     private boolean deathpointCreated;
 
+    /**
+     * On client tick.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent()
     public void onClientTick(TickEvent.ClientTickEvent event)

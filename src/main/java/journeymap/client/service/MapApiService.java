@@ -49,6 +49,9 @@ public class MapApiService extends FileService
         throw event;
     }
 
+    /**
+     * The type Top level domains.
+     */
     public static class TopLevelDomains implements StringField.ValuesProvider
     {
         @Override

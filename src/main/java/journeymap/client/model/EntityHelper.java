@@ -33,13 +33,34 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.*;
 
+/**
+ * The type Entity helper.
+ */
 public class EntityHelper
 {
+    /**
+     * The constant entityDistanceComparator.
+     */
     public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
+    /**
+     * The constant entityDTODistanceComparator.
+     */
     public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
+    /**
+     * The constant entityMapComparator.
+     */
     public static EntityMapComparator entityMapComparator = new EntityMapComparator();
     private static final String[] HORSE_TEXTURES = new String[]{"textures/entity/horse/horse_white.png", "textures/entity/horse/horse_creamy.png", "textures/entity/horse/horse_chestnut.png", "textures/entity/horse/horse_brown.png", "textures/entity/horse/horse_black.png", "textures/entity/horse/horse_gray.png", "textures/entity/horse/horse_darkbrown.png"};
 
+    /**
+     * Gets entities nearby.
+     *
+     * @param timerName     the timer name
+     * @param maxEntities   the max entities
+     * @param hostile       the hostile
+     * @param entityClasses the entity classes
+     * @return the entities nearby
+     */
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
     {
         StatTimer timer = StatTimer.get("EntityHelper." + timerName);
@@ -88,21 +109,42 @@ public class EntityHelper
         return list;
     }
 
+    /**
+     * Gets mobs nearby.
+     *
+     * @return the mobs nearby
+     */
     public static List<EntityDTO> getMobsNearby()
     {
         return getEntitiesNearby("getMobsNearby", Journeymap.getClient().getCoreProperties().maxMobsData.get(), true, IMob.class);
     }
 
+    /**
+     * Gets villagers nearby.
+     *
+     * @return the villagers nearby
+     */
     public static List<EntityDTO> getVillagersNearby()
     {
         return getEntitiesNearby("getVillagersNearby", Journeymap.getClient().getCoreProperties().maxVillagersData.get(), false, EntityVillager.class);
     }
 
+    /**
+     * Gets animals nearby.
+     *
+     * @return the animals nearby
+     */
     public static List<EntityDTO> getAnimalsNearby()
     {
         return getEntitiesNearby("getAnimalsNearby", Journeymap.getClient().getCoreProperties().maxAnimalsData.get(), false, EntityAnimal.class, EntityGolem.class, EntityWaterMob.class);
     }
 
+    /**
+     * Is passive boolean.
+     *
+     * @param entityLiving the entity living
+     * @return the boolean
+     */
     public static boolean isPassive(EntityLiving entityLiving)
     {
         if (entityLiving == null)
@@ -130,7 +172,7 @@ public class EntityHelper
     /**
      * Get nearby non-player entities
      *
-     * @return
+     * @return players nearby
      */
     public static List<EntityDTO> getPlayersNearby()
     {
@@ -175,6 +217,14 @@ public class EntityHelper
         return getBoundingBox(player, lateralDistance, verticalDistance);
     }
 
+    /**
+     * Gets bounding box.
+     *
+     * @param player           the player
+     * @param lateralDistance  the lateral distance
+     * @param verticalDistance the vertical distance
+     * @return the bounding box
+     */
     public static AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance)
     {
         return new AxisAlignedBB(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
@@ -183,8 +233,9 @@ public class EntityHelper
     /**
      * Put entities into map, preserving the order, using entityId as key
      *
-     * @param list
-     * @return
+     * @param list the list
+     * @param sort the sort
+     * @return map
      */
     public static Map<String, EntityDTO> buildEntityIdMap(List<? extends EntityDTO> list, boolean sort)
     {
@@ -211,8 +262,8 @@ public class EntityHelper
     /**
      * Get the simple name of the entity (without Entity prefix)
      *
-     * @param entity
-     * @return
+     * @param entity the entity
+     * @return icon texture location
      */
     public static ResourceLocation getIconTextureLocation(Entity entity)
     {
@@ -296,6 +347,9 @@ public class EntityHelper
 
     private static class EntityDistanceComparator implements Comparator<Entity>
     {
+        /**
+         * The Player.
+         */
         EntityPlayer player;
 
         @Override
@@ -307,6 +361,9 @@ public class EntityHelper
 
     private static class EntityDTODistanceComparator implements Comparator<EntityDTO>
     {
+        /**
+         * The Player.
+         */
         EntityPlayer player;
 
         @Override

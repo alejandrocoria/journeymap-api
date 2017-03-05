@@ -9,11 +9,23 @@ import journeymap.client.JourneymapClient;
 import net.minecraft.client.Minecraft;
 
 /**
- * Created by Mark on 3/21/2016.
+ * @author techbrew 3/21/2016.
  */
 public interface IMainThreadTask
 {
+    /**
+     * Perform main thread task.
+     *
+     * @param mc the mc
+     * @param jm the jm
+     * @return the main thread task
+     */
     public IMainThreadTask perform(Minecraft mc, JourneymapClient jm);
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName();
 }

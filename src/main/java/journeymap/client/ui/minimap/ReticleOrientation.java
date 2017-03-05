@@ -9,13 +9,22 @@ import journeymap.client.Constants;
 import journeymap.client.ui.option.KeyedEnum;
 
 /**
- * Created by Mark on 9/26/2014.
+ * @author techbrew 9/26/2014.
  */
 public enum ReticleOrientation implements KeyedEnum
 {
+    /**
+     * Compass reticle orientation.
+     */
     Compass("jm.minimap.orientation.compass"),
+    /**
+     * Player heading reticle orientation.
+     */
     PlayerHeading("jm.minimap.orientation.playerheading");
 
+    /**
+     * The Key.
+     */
     public final String key;
 
     ReticleOrientation(String key)

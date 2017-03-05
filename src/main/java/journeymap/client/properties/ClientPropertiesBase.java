@@ -64,7 +64,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     /**
      * Whether the current source file is associated with a specific world.
      *
-     * @return
+     * @return boolean
      */
     public boolean isWorldConfig()
     {
@@ -148,7 +148,7 @@ public abstract class ClientPropertiesBase extends PropertiesBase
     /**
      * Copies world config over standard config
      *
-     * @return
+     * @return boolean
      */
     public boolean copyToStandardConfig()
     {

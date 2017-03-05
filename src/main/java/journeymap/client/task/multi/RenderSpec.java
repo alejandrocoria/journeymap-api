@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Mark on 2/27/2016.
+ * @author techbrew 2/27/2016.
  */
 public class RenderSpec
 {
@@ -88,6 +88,15 @@ public class RenderSpec
         return Math.sqrt(x * x + z * z);
     }
 
+    /**
+     * In range boolean.
+     *
+     * @param playerCoord    the player coord
+     * @param coord          the coord
+     * @param renderDistance the render distance
+     * @param revealShape    the reveal shape
+     * @return the boolean
+     */
     static boolean inRange(ChunkPos playerCoord, ChunkPos coord, int renderDistance, RenderSpec.RevealShape revealShape)
     {
         if (revealShape == RenderSpec.RevealShape.Circle)
@@ -144,6 +153,11 @@ public class RenderSpec
         return new ImmutableListMultimap.Builder<Integer, Offset>().putAll(multimap).build();
     }
 
+    /**
+     * Gets surface spec.
+     *
+     * @return the surface spec
+     */
     public static RenderSpec getSurfaceSpec()
     {
         if (lastSurfaceRenderSpec == null
@@ -157,6 +171,11 @@ public class RenderSpec
         return lastSurfaceRenderSpec;
     }
 
+    /**
+     * Gets topo spec.
+     *
+     * @return the topo spec
+     */
     public static RenderSpec getTopoSpec()
     {
         if (lastTopoRenderSpec == null
@@ -170,6 +189,11 @@ public class RenderSpec
         return lastTopoRenderSpec;
     }
 
+    /**
+     * Gets underground spec.
+     *
+     * @return the underground spec
+     */
     public static RenderSpec getUndergroundSpec()
     {
         if (lastUndergroundRenderSpec == null
@@ -183,6 +207,9 @@ public class RenderSpec
         return lastUndergroundRenderSpec;
     }
 
+    /**
+     * Reset render specs.
+     */
     public static void resetRenderSpecs()
     {
         lastUndergroundRenderSpec = null;
@@ -190,6 +217,11 @@ public class RenderSpec
         lastTopoRenderSpec = null;
     }
 
+    /**
+     * Gets render area coords.
+     *
+     * @return the render area coords
+     */
     protected List<ChunkPos> getRenderAreaCoords()
     {
         // Lazy init offsets on first use
@@ -247,41 +279,81 @@ public class RenderSpec
         }
     }
 
+    /**
+     * Is underground boolean.
+     *
+     * @return the boolean
+     */
     public Boolean isUnderground()
     {
         return mapType.isUnderground();
     }
 
+    /**
+     * Is topo boolean.
+     *
+     * @return the boolean
+     */
     public Boolean isTopo()
     {
         return mapType.isTopo();
     }
 
+    /**
+     * Gets surface.
+     *
+     * @return the surface
+     */
     public Boolean getSurface()
     {
         return mapType.isSurface();
     }
 
+    /**
+     * Gets primary render distance.
+     *
+     * @return the primary render distance
+     */
     public int getPrimaryRenderDistance()
     {
         return primaryRenderDistance;
     }
 
+    /**
+     * Gets max secondary render distance.
+     *
+     * @return the max secondary render distance
+     */
     public int getMaxSecondaryRenderDistance()
     {
         return maxSecondaryRenderDistance;
     }
 
+    /**
+     * Gets last secondary render distance.
+     *
+     * @return the last secondary render distance
+     */
     public int getLastSecondaryRenderDistance()
     {
         return lastSecondaryRenderDistance;
     }
 
+    /**
+     * Gets reveal shape.
+     *
+     * @return the reveal shape
+     */
     public RevealShape getRevealShape()
     {
         return revealShape;
     }
 
+    /**
+     * Gets last secondary render size.
+     *
+     * @return the last secondary render size
+     */
     public int getLastSecondaryRenderSize()
     {
         if (primaryRenderDistance == maxSecondaryRenderDistance)
@@ -291,11 +363,22 @@ public class RenderSpec
         return offsets == null ? 0 : offsets.get(lastSecondaryRenderDistance).size();
     }
 
+    /**
+     * Gets primary render size.
+     *
+     * @return the primary render size
+     */
     public int getPrimaryRenderSize()
     {
         return offsets == null ? 0 : offsets.get(primaryRenderDistance).size();
     }
 
+    /**
+     * Sets last task info.
+     *
+     * @param chunks    the chunks
+     * @param elapsedNs the elapsed ns
+     */
     public void setLastTaskInfo(int chunks, long elapsedNs)
     {
         lastTaskChunks = chunks;
@@ -303,11 +386,21 @@ public class RenderSpec
         lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunks) / 1000000D;
     }
 
+    /**
+     * Gets last task chunks.
+     *
+     * @return the last task chunks
+     */
     public int getLastTaskChunks()
     {
         return lastTaskChunks;
     }
 
+    /**
+     * Copy last stats from.
+     *
+     * @param other the other
+     */
     public void copyLastStatsFrom(RenderSpec other)
     {
         if (other != null)
@@ -318,6 +411,11 @@ public class RenderSpec
         }
     }
 
+    /**
+     * Gets debug stats.
+     *
+     * @return the debug stats
+     */
     public String getDebugStats()
     {
         String debugString;
@@ -407,10 +505,22 @@ public class RenderSpec
         return result;
     }
 
+    /**
+     * The enum Reveal shape.
+     */
     public enum RevealShape implements KeyedEnum
     {
+        /**
+         * Square reveal shape.
+         */
         Square("jm.minimap.shape_square"),
+        /**
+         * Circle reveal shape.
+         */
         Circle("jm.minimap.shape_circle");
+        /**
+         * The Key.
+         */
         public final String key;
 
         RevealShape(String key)
@@ -433,7 +543,13 @@ public class RenderSpec
 
     private static class Offset
     {
+        /**
+         * The X.
+         */
         final int x;
+        /**
+         * The Z.
+         */
         final int z;
 
         private Offset(int x, int z)
@@ -442,6 +558,12 @@ public class RenderSpec
             this.z = z;
         }
 
+        /**
+         * From chunk pos.
+         *
+         * @param coord the coord
+         * @return the chunk pos
+         */
         ChunkPos from(ChunkPos coord)
         {
             return new ChunkPos(coord.chunkXPos + x, coord.chunkZPos + z);
@@ -473,6 +595,11 @@ public class RenderSpec
             return true;
         }
 
+        /**
+         * Distance double.
+         *
+         * @return the double
+         */
         public double distance()
         {
             return Math.sqrt(x * x + z * z);

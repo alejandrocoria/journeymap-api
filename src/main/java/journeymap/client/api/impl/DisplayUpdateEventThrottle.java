@@ -61,7 +61,7 @@ class DisplayUpdateEventThrottle
      * Iterator of events ready to fire.  Caller should
      * use remove() after each event is used.
      *
-     * @return iterator
+     * @return iterator iterator
      */
     public Iterator<DisplayUpdateEvent> iterator()
     {
@@ -112,11 +112,21 @@ class DisplayUpdateEventThrottle
         private boolean throttleNext;
         private long releaseTime;
 
+        /**
+         * Instantiates a new Queue.
+         *
+         * @param delay the delay
+         */
         Queue(long delay)
         {
             this.delay = delay;
         }
 
+        /**
+         * Offer.
+         *
+         * @param event the event
+         */
         void offer(DisplayUpdateEvent event)
         {
             if (releaseTime == 0 && lastEvent != null)
@@ -126,6 +136,11 @@ class DisplayUpdateEventThrottle
             lastEvent = event;
         }
 
+        /**
+         * Remove display update event.
+         *
+         * @return the display update event
+         */
         DisplayUpdateEvent remove()
         {
             DisplayUpdateEvent event = lastEvent;

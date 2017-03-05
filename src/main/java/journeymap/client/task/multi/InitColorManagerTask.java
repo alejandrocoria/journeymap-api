@@ -28,8 +28,14 @@ public class InitColorManagerTask implements ITask
         ColorManager.instance().ensureCurrent();
     }
 
+    /**
+     * The type Manager.
+     */
     public static class Manager implements ITaskManager
     {
+        /**
+         * The Enabled.
+         */
         static boolean enabled = false;
 
         @Override

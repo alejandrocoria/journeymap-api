@@ -21,14 +21,24 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Set;
 
 /**
+ * The type Chat event handler.
+ *
  * @author techbrew 1/29/14.
  */
 @SideOnly(Side.CLIENT)
 public class ChatEventHandler implements EventHandlerManager.EventHandler
 {
 
+    /**
+     * The Feature control codes.
+     */
     Set<String> featureControlCodes = FeatureManager.instance().getControlCodes();
 
+    /**
+     * Invoke.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void invoke(ClientChatReceivedEvent event)

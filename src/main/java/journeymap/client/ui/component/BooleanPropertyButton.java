@@ -13,14 +13,29 @@ import journeymap.common.properties.config.BooleanField;
  */
 public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHolder<BooleanField>
 {
+    /**
+     * The Boolean field.
+     */
     final BooleanField booleanField;
 
+    /**
+     * Instantiates a new Boolean property button.
+     *
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param field    the field
+     */
     public BooleanPropertyButton(String labelOn, String labelOff, BooleanField field)
     {
         super(labelOn, labelOff, (field != null) && field.get());
         this.booleanField = field;
     }
 
+    /**
+     * Gets field.
+     *
+     * @return the field
+     */
     public BooleanField getField()
     {
         return booleanField;
@@ -51,6 +66,11 @@ public class BooleanPropertyButton extends OnOffButton implements IConfigFieldHo
         }
     }
 
+    /**
+     * Sets value.
+     *
+     * @param value the value
+     */
     public void setValue(Boolean value)
     {
         if (booleanField == null)

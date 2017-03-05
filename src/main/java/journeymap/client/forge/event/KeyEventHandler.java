@@ -30,6 +30,11 @@ import java.util.HashSet;
  */
 public class KeyEventHandler implements EventHandlerManager.EventHandler
 {
+    /**
+     * On keyboard event.
+     *
+     * @param event the event
+     */
     @SubscribeEvent()
     public void onKeyboardEvent(InputEvent.KeyInputEvent event)
     {
@@ -40,6 +45,9 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         }
     }
 
+    /**
+     * Init key bindings.
+     */
     public static void initKeyBindings()
     {
         Minecraft minecraft = Minecraft.getMinecraft();
@@ -79,6 +87,12 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
         }
     }
 
+    /**
+     * On keypress boolean.
+     *
+     * @param minimapOnly the minimap only
+     * @return the boolean
+     */
     public static boolean onKeypress(boolean minimapOnly)
     {
         try

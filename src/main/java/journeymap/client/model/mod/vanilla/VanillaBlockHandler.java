@@ -27,15 +27,42 @@ import static journeymap.client.model.BlockMD.Flag.*;
  */
 public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHandler
 {
+    /**
+     * The Material flags.
+     */
     ListMultimap<Material, BlockMD.Flag> materialFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
+    /**
+     * The Block class flags.
+     */
     ListMultimap<Class<? extends Block>, BlockMD.Flag> blockClassFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
+    /**
+     * The Block flags.
+     */
     ListMultimap<Block, BlockMD.Flag> blockFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
+    /**
+     * The Material alphas.
+     */
     HashMap<Material, Float> materialAlphas = new HashMap<Material, Float>();
+    /**
+     * The Block alphas.
+     */
     HashMap<Block, Float> blockAlphas = new HashMap<Block, Float>();
+    /**
+     * The Block class alphas.
+     */
     HashMap<Class<? extends Block>, Float> blockClassAlphas = new HashMap<Class<? extends Block>, Float>();
+    /**
+     * The Block texture sides.
+     */
     HashMap<Block, Integer> blockTextureSides = new HashMap<Block, Integer>();
+    /**
+     * The Block class texture sides.
+     */
     HashMap<Class<? extends Block>, Integer> blockClassTextureSides = new HashMap<Class<? extends Block>, Integer>();
 
+    /**
+     * Instantiates a new Vanilla block handler.
+     */
     public VanillaBlockHandler()
     {
         preInitialize();

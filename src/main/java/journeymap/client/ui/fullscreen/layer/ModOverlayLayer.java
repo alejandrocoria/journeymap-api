@@ -28,12 +28,33 @@ import java.util.Objects;
  */
 public class ModOverlayLayer implements LayerDelegate.Layer
 {
+    /**
+     * The All draw steps.
+     */
     protected List<OverlayDrawStep> allDrawSteps = new ArrayList<OverlayDrawStep>();
+    /**
+     * The Visible steps.
+     */
     protected List<OverlayDrawStep> visibleSteps = new ArrayList<OverlayDrawStep>();
+    /**
+     * The Touched steps.
+     */
     protected List<OverlayDrawStep> touchedSteps = new ArrayList<OverlayDrawStep>();
+    /**
+     * The Last coord.
+     */
     protected BlockPos lastCoord;
+    /**
+     * The Last mouse position.
+     */
     protected Point2D.Double lastMousePosition;
+    /**
+     * The Last ui state.
+     */
     protected UIState lastUiState;
+    /**
+     * The Propagate click.
+     */
     protected boolean propagateClick;
 
     /**

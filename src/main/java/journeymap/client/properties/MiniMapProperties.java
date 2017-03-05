@@ -22,24 +22,77 @@ import static journeymap.common.properties.Category.Inherit;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
+    /**
+     * The Enabled.
+     */
     public final BooleanField enabled = new BooleanField(Inherit, "jm.minimap.enable_minimap", true, true);
+    /**
+     * The Shape.
+     */
     public final EnumField<Shape> shape = new EnumField<Shape>(Inherit, "jm.minimap.shape", Shape.Circle);
+    /**
+     * The Position.
+     */
     public final EnumField<Position> position = new EnumField<Position>(Inherit, "jm.minimap.position", Position.TopRight);
+    /**
+     * The Show fps.
+     */
     public final BooleanField showFps = new BooleanField(Inherit, "jm.minimap.show_fps", false);
+    /**
+     * The Show biome.
+     */
     public final BooleanField showBiome = new BooleanField(Inherit, "jm.minimap.show_biome", true);
+    /**
+     * The Show location.
+     */
     public final BooleanField showLocation = new BooleanField(Inherit, "jm.minimap.show_location", true);
+    /**
+     * The Size percent.
+     */
     public final IntegerField sizePercent = new IntegerField(Inherit, "jm.minimap.size", 1, 100, 30);
+    /**
+     * The Frame alpha.
+     */
     public final IntegerField frameAlpha = new IntegerField(Inherit, "jm.minimap.frame_alpha", 0, 100, 100);
+    /**
+     * The Terrain alpha.
+     */
     public final IntegerField terrainAlpha = new IntegerField(Inherit, "jm.minimap.terrain_alpha", 0, 100, 100);
+    /**
+     * The Orientation.
+     */
     public final EnumField<Orientation> orientation = new EnumField<Orientation>(Inherit, "jm.minimap.orientation.button", Orientation.North);
+    /**
+     * The Compass font scale.
+     */
     public final IntegerField compassFontScale = new IntegerField(Inherit, "jm.minimap.compass_font_scale", 1, 4, 1);
+    /**
+     * The Show compass.
+     */
     public final BooleanField showCompass = new BooleanField(Inherit, "jm.minimap.show_compass", true);
+    /**
+     * The Show reticle.
+     */
     public final BooleanField showReticle = new BooleanField(Inherit, "jm.minimap.show_reticle", true);
+    /**
+     * The Reticle orientation.
+     */
     public final EnumField<ReticleOrientation> reticleOrientation = new EnumField<ReticleOrientation>(Inherit, "jm.minimap.reticle_orientation", ReticleOrientation.Compass);
 
+    /**
+     * The Id.
+     */
     protected final transient int id;
+    /**
+     * The Active.
+     */
     protected boolean active = false;
 
+    /**
+     * Instantiates a new Mini map properties.
+     *
+     * @param id the id
+     */
     public MiniMapProperties(int id)
     {
         this.id = id;
@@ -51,11 +104,21 @@ public class MiniMapProperties extends InGameMapProperties
         return String.format("minimap%s", (id > 1) ? id : "");
     }
 
+    /**
+     * Is active boolean.
+     *
+     * @return the boolean
+     */
     public boolean isActive()
     {
         return active;
     }
 
+    /**
+     * Sets active.
+     *
+     * @param active the active
+     */
     public void setActive(boolean active)
     {
         if (this.active != active)
@@ -65,6 +128,11 @@ public class MiniMapProperties extends InGameMapProperties
         }
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public int getId()
     {
         return id;
@@ -82,6 +150,8 @@ public class MiniMapProperties extends InGameMapProperties
 
     /**
      * Gets the size relative to current screen height.
+     *
+     * @return the size
      */
     public int getSize()
     {

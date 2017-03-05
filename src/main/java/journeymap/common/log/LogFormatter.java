@@ -8,18 +8,33 @@ package journeymap.common.log;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+/**
+ * The type Log formatter.
+ */
 public class LogFormatter
 {
+    /**
+     * The constant LINEBREAK.
+     */
     public static final String LINEBREAK = System.getProperty("line.separator");
 
     private static int OutOfMemoryWarnings = 0;
     private static int LinkageErrorWarnings = 0;
 
+    /**
+     * Instantiates a new Log formatter.
+     */
     public LogFormatter()
     {
         super();
     }
 
+    /**
+     * To string string.
+     *
+     * @param thrown the thrown
+     * @return the string
+     */
     public static String toString(Throwable thrown)
     {
         checkErrors(thrown);
@@ -71,8 +86,8 @@ public class LogFormatter
     /**
      * Creates a String of the stacktrace only up to the same method which calls this one.
      *
-     * @param t
-     * @return
+     * @param t the t
+     * @return string
      */
     public static String toPartialString(Throwable t)
     {

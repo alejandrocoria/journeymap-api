@@ -15,15 +15,32 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by Mark on 7/16/2014.
+ * @author techbrew 7/16/2014.
  */
 public class TaskBatch implements ITask
 {
+    /**
+     * The Task list.
+     */
     final List<ITask> taskList;
+    /**
+     * The Timeout.
+     */
     final int timeout;
+    /**
+     * The Start ns.
+     */
     protected long startNs;
+    /**
+     * The Elapsed ns.
+     */
     protected long elapsedNs;
 
+    /**
+     * Instantiates a new Task batch.
+     *
+     * @param tasks the tasks
+     */
     public TaskBatch(List<ITask> tasks)
     {
         taskList = tasks;

@@ -6,9 +6,14 @@
 package journeymap.client.ui.option;
 
 /**
- * Created by Mark on 9/26/2014.
+ * @author techbrew 9/26/2014.
  */
 public interface KeyedEnum
 {
+    /**
+     * Gets key.
+     *
+     * @return the key
+     */
     public String getKey();
 }

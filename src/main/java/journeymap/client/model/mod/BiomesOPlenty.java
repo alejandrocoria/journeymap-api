@@ -22,6 +22,9 @@ public class BiomesOPlenty
 {
     private static final String MODID = "biomesoplenty";
 
+    /**
+     * The type Bop block handler.
+     */
     public static class BopBlockHandler implements ModBlockDelegate.IModBlockHandler
     {
         private List<String> plants = Arrays.asList("flower", "mushroom", "sapling");

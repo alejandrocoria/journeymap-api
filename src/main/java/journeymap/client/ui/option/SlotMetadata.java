@@ -20,54 +20,139 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Mark on 9/29/2014.
+ * @author techbrew 9/29/2014.
+ *
+ * @param <T> the type parameter
  */
 public class SlotMetadata<T> implements Comparable<SlotMetadata>
 {
+    /**
+     * The Button.
+     */
     protected final Button button;
+    /**
+     * The Range.
+     */
     protected final String range;
+    /**
+     * The Default value.
+     */
     protected final T defaultValue;
+    /**
+     * The Value type.
+     */
     protected final ValueType valueType;
+    /**
+     * The Name.
+     */
     protected String name;
+    /**
+     * The Tooltip.
+     */
     protected String tooltip;
+    /**
+     * The Advanced.
+     */
     protected boolean advanced;
+    /**
+     * The Tooltip lines.
+     */
     protected String[] tooltipLines;
+    /**
+     * The Value list.
+     */
     protected List valueList;
+    /**
+     * The Master.
+     */
     protected boolean master;
+    /**
+     * The Order.
+     */
     protected int order;
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button the button
+     */
     public SlotMetadata(Button button)
     {
         this(button, false);
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button the button
+     * @param order  the order
+     */
     public SlotMetadata(Button button, int order)
     {
         this(button, false);
         this.order = order;
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button   the button
+     * @param advanced the advanced
+     */
     public SlotMetadata(Button button, boolean advanced)
     {
         this(button, button.displayString, button.getUnformattedTooltip(), null, null, advanced);
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button   the button
+     * @param name     the name
+     * @param tooltip  the tooltip
+     * @param advanced the advanced
+     */
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
     {
         this(button, name, tooltip, null, null, advanced);
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button  the button
+     * @param name    the name
+     * @param tooltip the tooltip
+     */
     public SlotMetadata(Button button, String name, String tooltip)
     {
         this(button, name, tooltip, null, null, false);
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button  the button
+     * @param name    the name
+     * @param tooltip the tooltip
+     * @param order   the order
+     */
     public SlotMetadata(Button button, String name, String tooltip, int order)
     {
         this(button, name, tooltip, null, null, false);
         this.order = order;
     }
 
+    /**
+     * Instantiates a new Slot metadata.
+     *
+     * @param button       the button
+     * @param name         the name
+     * @param tooltip      the tooltip
+     * @param range        the range
+     * @param defaultValue the default value
+     * @param advanced     the advanced
+     */
     public SlotMetadata(Button button, String name, String tooltip, String range, T defaultValue, boolean advanced)
     {
         this.button = button;
@@ -95,86 +180,169 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
     }
 
+    /**
+     * Is master property for category boolean.
+     *
+     * @return the boolean
+     */
     public boolean isMasterPropertyForCategory()
     {
         return this.master;
     }
 
+    /**
+     * Sets master property for category.
+     *
+     * @param master the master
+     */
     public void setMasterPropertyForCategory(boolean master)
     {
         this.master = master;
     }
 
+    /**
+     * Gets button.
+     *
+     * @return the button
+     */
     public Button getButton()
     {
         return button;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Gets range.
+     *
+     * @return the range
+     */
     public String getRange()
     {
         return range;
     }
 
+    /**
+     * Is advanced boolean.
+     *
+     * @return the boolean
+     */
     public boolean isAdvanced()
     {
         return advanced;
     }
 
+    /**
+     * Sets advanced.
+     *
+     * @param advanced the advanced
+     */
     public void setAdvanced(boolean advanced)
     {
         this.advanced = advanced;
     }
 
+    /**
+     * Gets value type.
+     *
+     * @return the value type
+     */
     public ValueType getValueType()
     {
         return valueType;
     }
 
+    /**
+     * Get tooltip lines string [ ].
+     *
+     * @return the string [ ]
+     */
     public String[] getTooltipLines()
     {
         return tooltipLines;
     }
 
+    /**
+     * Is master boolean.
+     *
+     * @return the boolean
+     */
     public boolean isMaster()
     {
         return master;
     }
 
+    /**
+     * Gets default value.
+     *
+     * @return the default value
+     */
     public T getDefaultValue()
     {
         return defaultValue;
     }
 
+    /**
+     * Is toolbar boolean.
+     *
+     * @return the boolean
+     */
     public boolean isToolbar()
     {
         return valueType == ValueType.Toolbar;
     }
 
+    /**
+     * Gets order.
+     *
+     * @return the order
+     */
     public int getOrder()
     {
         return order;
     }
 
+    /**
+     * Sets order.
+     *
+     * @param order the order
+     */
     public void setOrder(int order)
     {
         this.order = order;
     }
 
+    /**
+     * Gets value list.
+     *
+     * @return the value list
+     */
     public List getValueList()
     {
         return valueList;
     }
 
+    /**
+     * Sets value list.
+     *
+     * @param valueList the value list
+     */
     public void setValueList(List valueList)
     {
         this.valueList = valueList;
     }
 
+    /**
+     * Update from button.
+     */
     public void updateFromButton()
     {
         if (button != null)
@@ -185,6 +353,11 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
     }
 
+    /**
+     * Get tooltip string [ ].
+     *
+     * @return the string [ ]
+     */
     public String[] getTooltip()
     {
         FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
@@ -227,6 +400,13 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return tooltipLines;
     }
 
+    /**
+     * Gets word wrapped lines.
+     *
+     * @param color    the color
+     * @param original the original
+     * @return the word wrapped lines
+     */
     protected List<TextComponentTranslation> getWordWrappedLines(String color, String original)
     {
         FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
@@ -240,6 +420,9 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return list;
     }
 
+    /**
+     * Reset to default value.
+     */
     public void resetToDefaultValue()
     {
         if (button != null)
@@ -263,11 +446,21 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
     }
 
+    /**
+     * Has config field boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasConfigField()
     {
         return button != null && button instanceof IConfigFieldHolder && ((IConfigFieldHolder) button).getConfigField() != null;
     }
 
+    /**
+     * Gets properties.
+     *
+     * @return the properties
+     */
     public PropertiesBase getProperties()
     {
         if (hasConfigField())
@@ -305,8 +498,23 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         return result;
     }
 
+    /**
+     * The enum Value type.
+     */
     public enum ValueType
     {
-        Boolean, Set, Integer, Toolbar
+        /**
+         * Boolean value type.
+         */
+        Boolean, /**
+     * Set value type.
+     */
+    Set, /**
+     * Integer value type.
+     */
+    Integer, /**
+     * Toolbar value type.
+     */
+    Toolbar
     }
 }

@@ -46,38 +46,115 @@ import java.util.*;
  */
 public class OptionsManager extends JmUI
 {
+    /**
+     * The constant openCategories.
+     */
     protected static Set<Category> openCategories = new HashSet<Category>();
 
+    /**
+     * The In game minimap id.
+     */
     protected final int inGameMinimapId;
+    /**
+     * The Initial categories.
+     */
     protected Category[] initialCategories;
+    /**
+     * The Minimap 1 preview button.
+     */
     protected CheckBox minimap1PreviewButton;
+    /**
+     * The Minimap 2 preview button.
+     */
     protected CheckBox minimap2PreviewButton;
-    protected Button minimap1KeysButton, minimap2KeysButton;
+    /**
+     * The Minimap 1 keys button.
+     */
+    protected Button minimap1KeysButton, /**
+ * The Minimap 2 keys button.
+ */
+minimap2KeysButton;
+    /**
+     * The Fullscreen keys button.
+     */
     protected Button fullscreenKeysButton;
+    /**
+     * The Button close.
+     */
     protected Button buttonClose;
+    /**
+     * The Button about.
+     */
     protected Button buttonAbout;
+    /**
+     * The Render stats button.
+     */
     protected Button renderStatsButton;
+    /**
+     * The Edit grid minimap 1 button.
+     */
     protected Button editGridMinimap1Button;
+    /**
+     * The Edit grid minimap 2 button.
+     */
     protected Button editGridMinimap2Button;
+    /**
+     * The Edit grid fullscreen button.
+     */
     protected Button editGridFullscreenButton;
+    /**
+     * The Render stats slot metadata.
+     */
     protected SlotMetadata renderStatsSlotMetadata;
+    /**
+     * The Cartography category slot.
+     */
     protected CategorySlot cartographyCategorySlot;
+    /**
+     * The Options list pane.
+     */
     protected ScrollListPane<CategorySlot> optionsListPane;
+    /**
+     * The Toolbars.
+     */
     protected Map<Category, List<SlotMetadata>> toolbars;
+    /**
+     * The Changed categories.
+     */
     protected Set<Category> changedCategories = new HashSet<Category>();
+    /**
+     * The Force minimap update.
+     */
     protected boolean forceMinimapUpdate;
+    /**
+     * The Edit grid buttons.
+     */
     protected ButtonList editGridButtons = new ButtonList();
 
+    /**
+     * Instantiates a new Options manager.
+     */
     public OptionsManager()
     {
         this(null);
     }
 
+    /**
+     * Instantiates a new Options manager.
+     *
+     * @param returnDisplay the return display
+     */
     public OptionsManager(GuiScreen returnDisplay)
     {
         this(returnDisplay, openCategories.toArray(new Category[0]));
     }
 
+    /**
+     * Instantiates a new Options manager.
+     *
+     * @param returnDisplay     the return display
+     * @param initialCategories the initial categories
+     */
     public OptionsManager(GuiScreen returnDisplay, Category... initialCategories)
     {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
@@ -628,6 +705,11 @@ public class OptionsManager extends JmUI
         }
     }
 
+    /**
+     * Reset options.
+     *
+     * @param category the category
+     */
     protected void resetOptions(Category category)
     {
         Set<PropertiesBase> updatedProperties = new HashSet<PropertiesBase>();
@@ -660,11 +742,19 @@ public class OptionsManager extends JmUI
         RenderSpec.resetRenderSpecs();
     }
 
+    /**
+     * Preview mini map boolean.
+     *
+     * @return the boolean
+     */
     protected boolean previewMiniMap()
     {
         return minimap1PreviewButton.getToggled() || minimap2PreviewButton.getToggled();
     }
 
+    /**
+     * Refresh minimap options.
+     */
     protected void refreshMinimapOptions()
     {
         Set<Category> cats = new HashSet<Category>();
@@ -770,6 +860,11 @@ public class OptionsManager extends JmUI
         super.closeAndReturn();
     }
 
+    /**
+     * Gets toolbars.
+     *
+     * @return the toolbars
+     */
     Map<Category, List<SlotMetadata>> getToolbars()
     {
         if (toolbars == null)
@@ -786,10 +881,21 @@ public class OptionsManager extends JmUI
         return toolbars;
     }
 
+    /**
+     * The type Reset button.
+     */
     public static class ResetButton extends Button
     {
+        /**
+         * The Category.
+         */
         public final Category category;
 
+        /**
+         * Instantiates a new Reset button.
+         *
+         * @param category the category
+         */
         public ResetButton(Category category)
         {
             super(Constants.getString("jm.config.reset"));
@@ -800,10 +906,23 @@ public class OptionsManager extends JmUI
         }
     }
 
+    /**
+     * The type Label button.
+     */
     public static class LabelButton extends Button
     {
+        /**
+         * The H align.
+         */
         DrawUtil.HAlign hAlign = DrawUtil.HAlign.Left;
 
+        /**
+         * Instantiates a new Label button.
+         *
+         * @param width     the width
+         * @param key       the key
+         * @param labelArgs the label args
+         */
         public LabelButton(int width, String key, Object... labelArgs)
         {
             super(Constants.getString(key, labelArgs));
@@ -826,6 +945,11 @@ public class OptionsManager extends JmUI
         {
         }
 
+        /**
+         * Sets h align.
+         *
+         * @param hAlign the h align
+         */
         public void setHAlign(DrawUtil.HAlign hAlign)
         {
             this.hAlign = hAlign;

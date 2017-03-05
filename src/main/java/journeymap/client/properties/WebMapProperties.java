@@ -16,8 +16,17 @@ import static journeymap.client.properties.ClientCategory.WebMap;
  */
 public class WebMapProperties extends MapProperties
 {
+    /**
+     * The Enabled.
+     */
     public final BooleanField enabled = new BooleanField(WebMap, "jm.webmap.enable", false, true);
+    /**
+     * The Port.
+     */
     public final IntegerField port = new IntegerField(WebMap, "jm.advanced.port", 80, 10000, 8080);
+    /**
+     * The Google map api domain.
+     */
     public final StringField googleMapApiDomain = new StringField(WebMap, "jm.webmap.google_domain", MapApiService.TopLevelDomains.class);
 
     @Override

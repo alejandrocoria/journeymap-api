@@ -41,6 +41,11 @@ public class ModBlockDelegate
     /**
      * Provide special handling of a block in-situ when encountered during a mapping task.
      * The block returned will be used to color that spot on the map.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the block md
      */
     public static BlockMD handleBlock(ChunkMD chunkMD, final BlockMD blockMD, BlockPos blockPos)
     {
@@ -71,6 +76,8 @@ public class ModBlockDelegate
 
     /**
      * Call handlers to initialize their blocks' flags with the cache.
+     *
+     * @param blockMD the block md
      */
     public void initialize(BlockMD blockMD)
     {
@@ -116,12 +123,20 @@ public class ModBlockDelegate
         /**
          * Provide Block UIDs that will be registered with as needing a special handler.
          * If return is true, it should be registered for handleBlock
+         *
+         * @param blockMD the block md
+         * @return the boolean
          */
         boolean initialize(BlockMD blockMD);
 
         /**
          * Provide special handling of a block in-situ when encountered during a mapping task.
          * The block returned will be used to color that spot on the map.
+         *
+         * @param chunkMD  the chunk md
+         * @param blockMD  the block md
+         * @param blockPos the block pos
+         * @return the block md
          */
         BlockMD handleBlock(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos);
     }
@@ -131,8 +146,22 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
+        /**
+         * Gets block color.
+         *
+         * @param chunkMD  the chunk md
+         * @param blockMD  the block md
+         * @param blockPos the block pos
+         * @return the block color
+         */
         public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos);
 
+        /**
+         * Gets texture color.
+         *
+         * @param blockMD the block md
+         * @return the texture color
+         */
         public Integer getTextureColor(BlockMD blockMD);
     }
 }

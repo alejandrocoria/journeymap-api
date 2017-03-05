@@ -9,14 +9,26 @@ import journeymap.client.Constants;
 import journeymap.client.ui.option.KeyedEnum;
 
 /**
- * Created by Mark on 9/26/2014.
+ * @author techbrew 9/26/2014.
  */
 public enum Orientation implements KeyedEnum
 {
+    /**
+     * North orientation.
+     */
     North("jm.minimap.orientation.north"),
+    /**
+     * Old north orientation.
+     */
     OldNorth("jm.minimap.orientation.oldnorth"),
+    /**
+     * Player heading orientation.
+     */
     PlayerHeading("jm.minimap.orientation.playerheading");
 
+    /**
+     * The Key.
+     */
     public final String key;
 
     Orientation(String key)

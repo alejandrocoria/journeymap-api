@@ -21,6 +21,9 @@ public class TerraFirmaCraft
     private static final String MODID2 = "tfc2";
     private static final int WATER_COLOR = 0x0b1940;
 
+    /**
+     * The type Tfc block handler.
+     */
     public static class TfcBlockHandler implements ModBlockDelegate.IModBlockHandler
     {
         private final TfcWaterColorHandler waterColorHandler = new TfcWaterColorHandler();
@@ -77,6 +80,9 @@ public class TerraFirmaCraft
 
     }
 
+    /**
+     * The type Tfc water color handler.
+     */
     public static class TfcWaterColorHandler extends VanillaColorHandler
     {
         @Override

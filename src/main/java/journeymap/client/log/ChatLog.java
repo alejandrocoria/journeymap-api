@@ -29,15 +29,21 @@ import java.util.List;
  */
 public class ChatLog
 {
-    // Announcements
+    /**
+     * The constant announcements.
+     */
+// Announcements
     static final List<TextComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<TextComponentTranslation>());
+    /**
+     * The constant enableAnnounceMod.
+     */
     public static boolean enableAnnounceMod = false;
     private static boolean initialized = false;
 
     /**
      * Announce chat component.
      *
-     * @param chat
+     * @param chat the chat
      */
     public static void queueAnnouncement(ITextComponent chat)
     {
@@ -48,8 +54,8 @@ public class ChatLog
     /**
      * Announce URL with link.
      *
-     * @param message
-     * @param url
+     * @param message the message
+     * @param url     the url
      */
     public static void announceURL(String message, String url)
     {
@@ -63,8 +69,8 @@ public class ChatLog
     /**
      * Announce file with link.
      *
-     * @param message
-     * @param file
+     * @param message the message
+     * @param file    the file
      */
     public static void announceFile(String message, File file)
     {
@@ -97,7 +103,7 @@ public class ChatLog
     /**
      * Queue an announcement to be shown in the UI.
      *
-     * @param text
+     * @param text the text
      */
     public static void announceError(String text)
     {
@@ -109,7 +115,7 @@ public class ChatLog
     /**
      * Show queued announcements in chat and log.
      *
-     * @param mc
+     * @param mc the mc
      */
     public static void showChatAnnouncements(Minecraft mc)
     {
@@ -147,6 +153,11 @@ public class ChatLog
         }
     }
 
+    /**
+     * Announce mod.
+     *
+     * @param forced the forced
+     */
     public static void announceMod(boolean forced)
     {
         if (enableAnnounceMod)
@@ -187,6 +198,11 @@ public class ChatLog
     private static class ErrorChat extends TextComponentString
     {
 
+        /**
+         * Instantiates a new Error chat.
+         *
+         * @param text the text
+         */
         public ErrorChat(String text)
         {
             super(text);

@@ -19,10 +19,22 @@ import java.io.File;
  */
 public class Constants
 {
+    /**
+     * The constant SERVER.
+     */
     public static MinecraftServer SERVER = FMLCommonHandler.instance().getMinecraftServerInstance();
     private static final Joiner path = Joiner.on(File.separator).useForNull("");
     private static final String END = null;
+    /**
+     * The constant MC_DATA_DIR.
+     */
     public static final File MC_DATA_DIR = SERVER.getDataDirectory();
+    /**
+     * The constant JOURNEYMAP_DIR.
+     */
     public static String JOURNEYMAP_DIR = "journeymap";
+    /**
+     * The constant CONFIG_DIR.
+     */
     public static String CONFIG_DIR = path.join(MC_DATA_DIR, JOURNEYMAP_DIR, "server", Journeymap.JM_VERSION.toMajorMinorString(), END);
 }

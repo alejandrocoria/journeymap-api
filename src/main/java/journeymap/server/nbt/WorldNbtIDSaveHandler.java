@@ -7,7 +7,6 @@ package journeymap.server.nbt;
 
 import journeymap.server.Constants;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.server.FMLServerHandler;
 
 import java.util.UUID;
 
@@ -24,6 +23,9 @@ public class WorldNbtIDSaveHandler
     private NBTWorldSaveDataHandler legacyData;
     private World world;
 
+    /**
+     * Instantiates a new World nbt id save handler.
+     */
     public WorldNbtIDSaveHandler()
     {
         world = Constants.SERVER.getEntityWorld();
@@ -31,12 +33,22 @@ public class WorldNbtIDSaveHandler
         data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, DAT_FILE);
     }
 
+    /**
+     * Gets world id.
+     *
+     * @return the world id
+     */
     public String getWorldID()
     {
         return getNBTWorldID();
     }
 
 
+    /**
+     * Sets world id.
+     *
+     * @param worldID the world id
+     */
     public void setWorldID(String worldID)
     {
         saveWorldID(worldID);

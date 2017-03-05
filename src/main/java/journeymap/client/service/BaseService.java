@@ -34,17 +34,32 @@ import java.util.zip.ZipEntry;
 public abstract class BaseService extends Service
 {
 
+    /**
+     * The constant UTF8.
+     */
     public static final Charset UTF8 = Charset.forName("UTF-8"); //$NON-NLS-1$
+    /**
+     * The constant CALLBACK_PARAM.
+     */
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
+    /**
+     * The constant GSON.
+     */
     protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    /**
+     * The Path.
+     */
     protected String path;
 
     /**
      * Log and throw a Rupy Event exception.
      *
-     * @param code
-     * @param message
-     * @param event
+     * @param code    the code
+     * @param message the message
+     * @param event   the event
+     * @param isError the is error
+     * @throws Event     the event
+     * @throws Exception the exception
      */
     protected void throwEventException(int code, String message, Event event, boolean isError) throws Event, Exception
     {
@@ -89,8 +104,9 @@ public abstract class BaseService extends Service
     /**
      * Get request headers and remote address for a request Event.
      *
-     * @param event
-     * @return
+     * @param event the event
+     * @return string
+     * @throws Exception the exception
      */
     protected String debugRequestHeaders(Event event) throws Exception
     {
@@ -120,8 +136,9 @@ public abstract class BaseService extends Service
     /**
      * Log a bad request coming from the browser.
      *
-     * @param event
-     * @throws Event
+     * @param event the event
+     * @throws Event     the event
+     * @throws Exception the exception
      */
     protected void reportMalformedRequest(Event event) throws Event, Exception
     {
@@ -133,10 +150,10 @@ public abstract class BaseService extends Service
     /**
      * Get a request parameter String value or return the default provided.
      *
-     * @param map
-     * @param key
-     * @param defaultValue
-     * @return
+     * @param map          the map
+     * @param key          the key
+     * @param defaultValue the default value
+     * @return parameter
      */
     protected String getParameter(Query map, String key, String defaultValue)
     {
@@ -147,10 +164,10 @@ public abstract class BaseService extends Service
     /**
      * Get a request parameter int value or return the default provided.
      *
-     * @param map
-     * @param key
-     * @param defaultValue
-     * @return
+     * @param map          the map
+     * @param key          the key
+     * @param defaultValue the default value
+     * @return parameter
      */
     protected Integer getParameter(Map<String, String[]> map, String key, Integer defaultValue)
     {
@@ -173,10 +190,10 @@ public abstract class BaseService extends Service
     /**
      * Get a request parameter int value or return the default provided.
      *
-     * @param map
-     * @param key
-     * @param defaultValue
-     * @return
+     * @param map          the map
+     * @param key          the key
+     * @param defaultValue the default value
+     * @return parameter
      */
     protected Long getParameter(Map<String, String[]> map, String key, Long defaultValue)
     {
@@ -200,8 +217,9 @@ public abstract class BaseService extends Service
      * Attempt to output the data in gzip format, setting headers accordingly.
      * Falls back to sending plain text otherwise.
      *
-     * @param event
-     * @param data
+     * @param event the event
+     * @param data  the data
+     * @throws Exception the exception
      */
     protected void gzipResponse(Event event, String data) throws Exception
     {
@@ -224,8 +242,9 @@ public abstract class BaseService extends Service
      * Attempt to output the data in gzip format, setting headers accordingly.
      * Falls back to sending without gzip otherwise.
      *
-     * @param event
-     * @param data
+     * @param event the event
+     * @param data  the data
+     * @throws Exception the exception
      */
     protected void gzipResponse(Event event, byte[] data) throws Exception
     {
@@ -247,9 +266,9 @@ public abstract class BaseService extends Service
     /**
      * Respond with a JSON-encoded Map.  Uses JSONP if needed.
      *
-     * @param event
-     * @param responseObj
-     * @throws Exception
+     * @param event       the event
+     * @param responseObj the response obj
+     * @throws Exception the exception
      */
     protected void respondJson(Event event, Map responseObj) throws Exception
     {
@@ -297,8 +316,8 @@ public abstract class BaseService extends Service
     /**
      * Gzip encode a string and return the byte array.
      *
-     * @param data
-     * @return
+     * @param data the data
+     * @return byte [ ]
      */
     protected byte[] gzip(String data)
     {
@@ -317,8 +336,8 @@ public abstract class BaseService extends Service
     /**
      * Gzip encode a byte array.
      *
-     * @param data
-     * @return
+     * @param data the data
+     * @return byte [ ]
      */
     protected byte[] gzip(byte[] data)
     {
@@ -341,6 +360,13 @@ public abstract class BaseService extends Service
         }
     }
 
+    /**
+     * Serve image.
+     *
+     * @param event the event
+     * @param img   the img
+     * @throws Exception the exception
+     */
     protected void serveImage(Event event, BufferedImage img) throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -362,20 +388,65 @@ public abstract class BaseService extends Service
     enum ContentType
     {
 
+        /**
+         * Css content type.
+         */
         css("text/css; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Gif content type.
+         */
         gif("image/gif"), //$NON-NLS-1$
+        /**
+         * Ico content type.
+         */
         ico("image/x-icon"), //$NON-NLS-1$
+        /**
+         * Htm content type.
+         */
         htm("text/html; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Html content type.
+         */
         html("text/html; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Js content type.
+         */
         js("application/javascript; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Json content type.
+         */
         json("application/json; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Jsonp content type.
+         */
         jsonp("application/javascript; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Png content type.
+         */
         png("image/png"), //$NON-NLS-1$
+        /**
+         * Jpeg content type.
+         */
         jpeg("image/jpeg"), //$NON-NLS-1$
+        /**
+         * Jpg content type.
+         */
         jpg("image/jpeg"), //$NON-NLS-1$
+        /**
+         * Log content type.
+         */
         log("text/plain; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Txt content type.
+         */
         txt("text/plain; charset=utf-8"), //$NON-NLS-1$
+        /**
+         * Unknown content type.
+         */
         UNKNOWN("application/x-unknown"); //$NON-NLS-1$
+        /**
+         * The Html types.
+         */
         static final EnumSet htmlTypes = EnumSet.of(ContentType.htm, ContentType.html, ContentType.txt);
         private final String mime;
 
@@ -384,6 +455,12 @@ public abstract class BaseService extends Service
             this.mime = mime;
         }
 
+        /**
+         * From file name content type.
+         *
+         * @param fileName the file name
+         * @return the content type
+         */
         static ContentType fromFileName(String fileName)
         {
             String name = fileName.toLowerCase(Locale.ENGLISH);
@@ -399,6 +476,11 @@ public abstract class BaseService extends Service
             }
         }
 
+        /**
+         * Gets mime.
+         *
+         * @return the mime
+         */
         String getMime()
         {
             return mime;
@@ -433,11 +515,24 @@ public abstract class BaseService extends Service
             this.reply = event.reply();
         }
 
+        /**
+         * On response header.
+         *
+         * @param event the event
+         * @return the response header
+         */
         static ResponseHeader on(Event event)
         {
             return new ResponseHeader(event);
         }
 
+        /**
+         * Sets header.
+         *
+         * @param name  the name
+         * @param value the value
+         * @return the header
+         */
         ResponseHeader setHeader(String name, String value)
         {
             if (reply == null)
@@ -451,7 +546,7 @@ public abstract class BaseService extends Service
         /**
          * Set headers to prevent browser caching of the response.
          *
-         * @return
+         * @return response header
          */
         ResponseHeader noCache()
         {
@@ -464,8 +559,8 @@ public abstract class BaseService extends Service
         /**
          * Set content headers for the file to be returned.
          *
-         * @param file
-         * @return
+         * @param file the file
+         * @return response header
          */
         ResponseHeader content(File file)
         {
@@ -477,8 +572,8 @@ public abstract class BaseService extends Service
         /**
          * Set content headers for the ZipEntry-based file to be returned.
          *
-         * @param zipEntry
-         * @return
+         * @param zipEntry the zip entry
+         * @return response header
          */
         ResponseHeader content(ZipEntry zipEntry)
         {
@@ -499,8 +594,8 @@ public abstract class BaseService extends Service
         /**
          * Set content length for the file to be returned.
          *
-         * @param input
-         * @return
+         * @param input the input
+         * @return response header
          */
         ResponseHeader contentLength(FileInputStream input)
         {
@@ -518,8 +613,8 @@ public abstract class BaseService extends Service
         /**
          * Set content last=modified timestamp.
          *
-         * @param timestamp
-         * @return
+         * @param timestamp the timestamp
+         * @return response header
          */
         ResponseHeader contentModified(long timestamp)
         {
@@ -529,8 +624,8 @@ public abstract class BaseService extends Service
         /**
          * Set content length for the file to be returned.
          *
-         * @param fileSize
-         * @return
+         * @param fileSize the file size
+         * @return response header
          */
         ResponseHeader contentLength(long fileSize)
         {
@@ -540,8 +635,8 @@ public abstract class BaseService extends Service
         /**
          * Set expires of data to be returned.
          *
-         * @param timestamp
-         * @return
+         * @param timestamp the timestamp
+         * @return response header
          */
         ResponseHeader expires(long timestamp)
         {
@@ -552,8 +647,8 @@ public abstract class BaseService extends Service
          * Set MIME content type for the file to be returned. Also sets the language if
          * the type is HTML or TEXT.
          *
-         * @param type
-         * @return
+         * @param type the type
+         * @return response header
          */
         ResponseHeader contentType(ContentType type)
         {
@@ -571,8 +666,8 @@ public abstract class BaseService extends Service
         /**
          * Set language for the file to be returned.
          *
-         * @param locale
-         * @return
+         * @param locale the locale
+         * @return response header
          */
         ResponseHeader contentLanguage(Locale locale)
         {
@@ -583,8 +678,8 @@ public abstract class BaseService extends Service
         /**
          * Set the inline content filename of the data being returned.
          *
-         * @param name
-         * @return
+         * @param name the name
+         * @return response header
          */
         ResponseHeader inlineFilename(String name)
         {

@@ -21,32 +21,66 @@ import java.util.ArrayList;
  */
 public class SplashInfo
 {
+    /**
+     * The Lines.
+     */
     public ArrayList<Line> lines = new ArrayList<Line>();
 
+    /**
+     * Instantiates a new Splash info.
+     */
     public SplashInfo()
     {
     }
 
+    /**
+     * The type Line.
+     */
     public static class Line
     {
+        /**
+         * The Label.
+         */
         public String label;
+        /**
+         * The Action.
+         */
         public String action;
 
+        /**
+         * Instantiates a new Line.
+         */
         public Line()
         {
         }
 
+        /**
+         * Instantiates a new Line.
+         *
+         * @param label  the label
+         * @param action the action
+         */
         public Line(String label, String action)
         {
             this.label = label;
             this.action = action;
         }
 
+        /**
+         * Has action boolean.
+         *
+         * @return the boolean
+         */
         public boolean hasAction()
         {
             return action != null && action.trim().length() > 0;
         }
 
+        /**
+         * Invoke action.
+         *
+         * @param returnUi the return ui
+         */
         public void invokeAction(JmUI returnUi)
         {
             if (!hasAction())

@@ -21,19 +21,33 @@ import java.util.List;
  */
 public class ImagesData
 {
+    /**
+     * The constant PARAM_SINCE.
+     */
     public static final String PARAM_SINCE = "images.since";
 
-    // last query time
+    /**
+     * The Since.
+     */
+// last query time
     final long since;
 
-    // list of region coords changed {[x][z]}
+    /**
+     * The Regions.
+     */
+// list of region coords changed {[x][z]}
     final List<Object[]> regions;
 
-    // Last time this was queried
+    /**
+     * The Query time.
+     */
+// Last time this was queried
     final long queryTime;
 
     /**
      * Constructor.
+     *
+     * @param since the since
      */
     public ImagesData(Long since)
     {

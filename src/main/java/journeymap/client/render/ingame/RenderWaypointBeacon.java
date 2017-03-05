@@ -33,20 +33,41 @@ import java.util.Collection;
  */
 public class RenderWaypointBeacon
 {
+    /**
+     * The Beam.
+     */
     static final ResourceLocation beam = new ResourceLocation("textures/entity/beacon_beam.png");
-    //    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
+    /**
+     * The constant mc.
+     */
+//    static StatTimer timer = StatTimer.get("WaypointBeacon.doRender", 100);
 //    static StatTimer allTimer = StatTimer.get("WaypointBeacon.renderAll", 100);
     static Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Render manager.
+     */
     static RenderManager renderManager = mc.getRenderManager();
+    /**
+     * The Distance label.
+     */
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
+    /**
+     * The Waypoint properties.
+     */
     static WaypointProperties waypointProperties;
 
+    /**
+     * Reset stat timers.
+     */
     public static void resetStatTimers()
     {
 //        timer.reset();
 //        allTimer.reset();
     }
 
+    /**
+     * Render all.
+     */
     public static void renderAll()
     {
         try
@@ -82,6 +103,11 @@ public class RenderWaypointBeacon
         }
     }
 
+    /**
+     * Do render.
+     *
+     * @param waypoint the waypoint
+     */
     static void doRender(Waypoint waypoint)
     {
         if (renderManager.renderViewEntity == null)
@@ -288,6 +314,14 @@ public class RenderWaypointBeacon
 
     /**
      * Render beam
+     *
+     * @param x            the x
+     * @param y            the y
+     * @param z            the z
+     * @param color        the color
+     * @param alpha        the alpha
+     * @param staticBeam   the static beam
+     * @param rotatingBeam the rotating beam
      */
     static void renderBeam(double x, double y, double z, Integer color, float alpha, boolean staticBeam, boolean rotatingBeam)
     {

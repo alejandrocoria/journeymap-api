@@ -17,6 +17,9 @@ import java.io.Serializable;
 public class Location implements Serializable
 {
 
+    /**
+     * The constant GSON.
+     */
     public static final Gson GSON = new GsonBuilder().create();
 
 
@@ -28,10 +31,21 @@ public class Location implements Serializable
 
     private int dim;
 
+    /**
+     * Instantiates a new Location.
+     */
     public Location()
     {
     }
 
+    /**
+     * Instantiates a new Location.
+     *
+     * @param x   the x
+     * @param y   the y
+     * @param z   the z
+     * @param dim the dim
+     */
     public Location(double x, double y, double z, int dim)
     {
         this.x = x;
@@ -40,21 +54,41 @@ public class Location implements Serializable
         this.dim = dim;
     }
 
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
     public double getX()
     {
         return x;
     }
 
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
     public double getY()
     {
         return y;
     }
 
+    /**
+     * Gets z.
+     *
+     * @return the z
+     */
     public double getZ()
     {
         return z;
     }
 
+    /**
+     * Gets dim.
+     *
+     * @return the dim
+     */
     public int getDim()
     {
         return dim;

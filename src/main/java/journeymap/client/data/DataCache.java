@@ -31,26 +31,86 @@ import java.util.concurrent.TimeUnit;
  */
 public enum DataCache
 {
+    /**
+     * Instance data cache.
+     */
     INSTANCE;
 
+    /**
+     * The All.
+     */
     final LoadingCache<Long, Map> all;
+    /**
+     * The Animals.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> animals;
+    /**
+     * The Mobs.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> mobs;
+    /**
+     * The Players.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> players;
+    /**
+     * The Villagers.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> villagers;
+    /**
+     * The Waypoints.
+     */
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
+    /**
+     * The Player.
+     */
     final LoadingCache<Class, EntityDTO> player;
+    /**
+     * The World.
+     */
     final LoadingCache<Class, WorldData> world;
+    /**
+     * The Region image sets.
+     */
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSets;
+    /**
+     * The Messages.
+     */
     final LoadingCache<Class, Map<String, Object>> messages;
+    /**
+     * The Entity draw steps.
+     */
     final LoadingCache<EntityLivingBase, DrawEntityStep> entityDrawSteps;
+    /**
+     * The Waypoint draw steps.
+     */
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
+    /**
+     * The Entity dt os.
+     */
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
+    /**
+     * The Region coords.
+     */
     final Cache<String, RegionCoord> regionCoords;
+    /**
+     * The Map types.
+     */
     final Cache<String, MapType> mapTypes;
+    /**
+     * The Block metadata.
+     */
     final Map<IBlockState, BlockMD> blockMetadata;
+    /**
+     * The Chunk metadata.
+     */
     final Cache<ChunkPos, ChunkMD> chunkMetadata;
+    /**
+     * The Chunk metadata removal listener.
+     */
     final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
+    /**
+     * The Managed caches.
+     */
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     //final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
@@ -121,6 +181,11 @@ public enum DataCache
         managedCaches.put(mapTypes, "MapType");
     }
 
+    /**
+     * Gets player.
+     *
+     * @return the player
+     */
     public static EntityDTO getPlayer()
     {
         return INSTANCE.getPlayer(false);
@@ -163,6 +228,12 @@ public enum DataCache
 //        return null;
 //    }
 
+    /**
+     * Gets all.
+     *
+     * @param since the since
+     * @return the all
+     */
     public Map getAll(long since)
     {
         synchronized (all)
@@ -179,6 +250,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets animals.
+     *
+     * @param forceRefresh the force refresh
+     * @return the animals
+     */
     public Map<String, EntityDTO> getAnimals(boolean forceRefresh)
     {
         synchronized (animals)
@@ -199,6 +276,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets mobs.
+     *
+     * @param forceRefresh the force refresh
+     * @return the mobs
+     */
     public Map<String, EntityDTO> getMobs(boolean forceRefresh)
     {
         synchronized (mobs)
@@ -219,6 +302,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets players.
+     *
+     * @param forceRefresh the force refresh
+     * @return the players
+     */
     public Map<String, EntityDTO> getPlayers(boolean forceRefresh)
     {
         synchronized (players)
@@ -239,6 +328,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets player.
+     *
+     * @param forceRefresh the force refresh
+     * @return the player
+     */
     public EntityDTO getPlayer(boolean forceRefresh)
     {
         synchronized (player)
@@ -259,6 +354,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets villagers.
+     *
+     * @param forceRefresh the force refresh
+     * @return the villagers
+     */
     public Map<String, EntityDTO> getVillagers(boolean forceRefresh)
     {
         synchronized (villagers)
@@ -279,6 +380,14 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets map type.
+     *
+     * @param name      the name
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the map type
+     */
     public MapType getMapType(MapType.Name name, Integer vSlice, int dimension)
     {
         // Guarantee surface types don't use a slice
@@ -293,6 +402,12 @@ public enum DataCache
         return mapType;
     }
 
+    /**
+     * Gets waypoints.
+     *
+     * @param forceRefresh the force refresh
+     * @return the waypoints
+     */
     public Collection<Waypoint> getWaypoints(boolean forceRefresh)
     {
         synchronized (waypoints)
@@ -309,6 +424,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets messages.
+     *
+     * @param forceRefresh the force refresh
+     * @return the messages
+     */
     public Map<String, Object> getMessages(boolean forceRefresh)
     {
         synchronized (messages)
@@ -329,6 +450,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets world.
+     *
+     * @param forceRefresh the force refresh
+     * @return the world
+     */
     public WorldData getWorld(boolean forceRefresh)
     {
         synchronized (world)
@@ -362,6 +489,12 @@ public enum DataCache
         entityDTOs.invalidateAll();
     }
 
+    /**
+     * Gets draw entity step.
+     *
+     * @param entity the entity
+     * @return the draw entity step
+     */
     public DrawEntityStep getDrawEntityStep(EntityLivingBase entity)
     {
         synchronized (entityDrawSteps)
@@ -370,6 +503,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets entity dto.
+     *
+     * @param entity the entity
+     * @return the entity dto
+     */
     public EntityDTO getEntityDTO(EntityLivingBase entity)
     {
         synchronized (entityDTOs)
@@ -378,6 +517,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets draw way point step.
+     *
+     * @param waypoint the waypoint
+     * @return the draw way point step
+     */
     public DrawWayPointStep getDrawWayPointStep(Waypoint waypoint)
     {
         synchronized (waypointDrawSteps)
@@ -386,6 +531,12 @@ public enum DataCache
         }
     }
 
+    /**
+     * Gets block md.
+     *
+     * @param aBlockState the a block state
+     * @return the block md
+     */
     public BlockMD getBlockMD(final IBlockState aBlockState)
     {
         try
@@ -398,16 +549,31 @@ public enum DataCache
         }
     }
 
+    /**
+     * Reset block metadata.
+     */
     public void resetBlockMetadata()
     {
         blockMetadata.clear();
     }
 
+    /**
+     * Gets chunk md.
+     *
+     * @param blockPos the block pos
+     * @return the chunk md
+     */
     public ChunkMD getChunkMD(BlockPos blockPos)
     {
         return getChunkMD(new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4));
     }
 
+    /**
+     * Gets chunk md.
+     *
+     * @param coord the coord
+     * @return the chunk md
+     */
     public ChunkMD getChunkMD(ChunkPos coord)
     {
         synchronized (chunkMetadata)
@@ -444,6 +610,11 @@ public enum DataCache
         }
     }
 
+    /**
+     * Add chunk md.
+     *
+     * @param chunkMD the chunk md
+     */
     public void addChunkMD(ChunkMD chunkMD)
     {
         synchronized (chunkMetadata)
@@ -468,6 +639,9 @@ public enum DataCache
 //        }
 //    }
 
+    /**
+     * Invalidate chunk md cache.
+     */
     public void invalidateChunkMDCache()
     {
         //synchronized (chunkMetadata)
@@ -476,6 +650,9 @@ public enum DataCache
         }
     }
 
+    /**
+     * Stop chunk md retention.
+     */
     public void stopChunkMDRetention()
     {
         //synchronized (chunkMetadata)
@@ -503,11 +680,21 @@ public enum DataCache
 //        BlockMD.reset();
 //    }
 
+    /**
+     * Gets region image sets.
+     *
+     * @return the region image sets
+     */
     public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
     {
         return regionImageSets;
     }
 
+    /**
+     * Gets region coords.
+     *
+     * @return the region coords
+     */
     public Cache<String, RegionCoord> getRegionCoords()
     {
         return regionCoords;
@@ -556,6 +743,11 @@ public enum DataCache
 //        }
     }
 
+    /**
+     * Gets debug html.
+     *
+     * @return the debug html
+     */
     public String getDebugHtml()
     {
         StringBuffer sb = new StringBuffer();
@@ -604,10 +796,24 @@ public enum DataCache
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
     }
 
+    /**
+     * The type Proxy removal listener.
+     *
+     * @param <K> the type parameter
+     * @param <V> the type parameter
+     */
     class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
     {
+        /**
+         * The Delegates.
+         */
         final Map<RemovalListener<K, V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K, V>, Void>());
 
+        /**
+         * Add delegate listener.
+         *
+         * @param delegate the delegate
+         */
         void addDelegateListener(RemovalListener<K, V> delegate)
         {
             if (delegates.containsKey(delegate))
@@ -620,6 +826,11 @@ public enum DataCache
             }
         }
 
+        /**
+         * Remove delegate listener.
+         *
+         * @param delegate the delegate
+         */
         void removeDelegateListener(RemovalListener<K, V> delegate)
         {
             delegates.remove(delegate);

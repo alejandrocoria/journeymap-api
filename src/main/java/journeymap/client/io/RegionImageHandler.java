@@ -26,9 +26,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Region image handler.
+ */
 public class RegionImageHandler
 {
 
+    /**
+     * Gets image dir.
+     *
+     * @param rCoord  the r coord
+     * @param mapType the map type
+     * @return the image dir
+     */
     public static File getImageDir(RegionCoord rCoord, MapType mapType)
     {
         File dimDir = rCoord.dimDir.toFile();
@@ -48,6 +58,13 @@ public class RegionImageHandler
         return subDir;
     }
 
+    /**
+     * Gets dimension dir.
+     *
+     * @param worldDir  the world dir
+     * @param dimension the dimension
+     * @return the dimension dir
+     */
     @Deprecated
     public static File getDimensionDir(File worldDir, int dimension)
     {
@@ -59,6 +76,14 @@ public class RegionImageHandler
         return dimDir;
     }
 
+    /**
+     * Gets region image file.
+     *
+     * @param rCoord      the r coord
+     * @param mapType     the map type
+     * @param allowLegacy the allow legacy
+     * @return the region image file
+     */
     public static File getRegionImageFile(RegionCoord rCoord, MapType mapType, boolean allowLegacy)
     {
         StringBuffer sb = new StringBuffer();
@@ -68,6 +93,13 @@ public class RegionImageHandler
         return regionFile;
     }
 
+    /**
+     * Create blank image buffered image.
+     *
+     * @param width  the width
+     * @param height the height
+     * @return the buffered image
+     */
     public static BufferedImage createBlankImage(int width, int height)
     {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -79,6 +111,13 @@ public class RegionImageHandler
         return img;
     }
 
+    /**
+     * Read region image buffered image.
+     *
+     * @param regionFile the region file
+     * @param returnNull the return null
+     * @return the buffered image
+     */
     public static BufferedImage readRegionImage(File regionFile, boolean returnNull)
     {
         BufferedImage image = null;
@@ -98,6 +137,12 @@ public class RegionImageHandler
         return image;
     }
 
+    /**
+     * Gets image.
+     *
+     * @param file the file
+     * @return the image
+     */
     public static BufferedImage getImage(File file)
     {
         try
@@ -114,6 +159,18 @@ public class RegionImageHandler
 
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
+     *
+     * @param worldDir       the world dir
+     * @param startCoord     the start coord
+     * @param endCoord       the end coord
+     * @param mapType        the map type
+     * @param useCache       the use cache
+     * @param image          the image
+     * @param imageWidth     the image width
+     * @param imageHeight    the image height
+     * @param allowNullImage the allow null image
+     * @param showGrid       the show grid
+     * @return the merged chunks
      */
     public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
                                                              final Boolean useCache, BufferedImage image, final Integer imageWidth, final Integer imageHeight,
@@ -231,6 +288,14 @@ public class RegionImageHandler
 
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
+     *
+     * @param worldDir   the world dir
+     * @param startCoord the start coord
+     * @param endCoord   the end coord
+     * @param mapType    the map type
+     * @param scale      the scale
+     * @param showGrid   the show grid
+     * @return the merged chunks
      */
     public static synchronized BufferedImage getMergedChunks(final File worldDir, final ChunkPos startCoord, final ChunkPos endCoord, final MapType mapType,
                                                              int scale, boolean showGrid)
@@ -325,6 +390,14 @@ public class RegionImageHandler
 
     /**
      * Used by MapOverlay to let the image dimensions be directly specified (as a power of 2).
+     *
+     * @param worldDir    the world dir
+     * @param startCoord  the start coord
+     * @param endCoord    the end coord
+     * @param mapType     the map type
+     * @param zoom        the zoom
+     * @param highQuality the high quality
+     * @return the tile draw steps
      */
     public static synchronized List<TileDrawStep> getTileDrawSteps(final File worldDir, final ChunkPos startCoord,
                                                                    final ChunkPos endCoord, final MapType mapType,
@@ -366,6 +439,11 @@ public class RegionImageHandler
         return drawSteps;
     }
 
+    /**
+     * Gets blank 512 x 512 image file.
+     *
+     * @return the blank 512 x 512 image file
+     */
     public static File getBlank512x512ImageFile()
     {
         final File dataDir = new File(FileHandler.MinecraftDirectory, Constants.DATA_DIR);
@@ -389,6 +467,12 @@ public class RegionImageHandler
         return tmpFile;
     }
 
+    /**
+     * Init rendering hints graphics 2 d.
+     *
+     * @param g the g
+     * @return the graphics 2 d
+     */
     public static Graphics2D initRenderingHints(Graphics2D g)
     {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);

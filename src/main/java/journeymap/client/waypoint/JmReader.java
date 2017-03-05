@@ -20,6 +20,12 @@ import java.util.Collection;
  */
 public class JmReader
 {
+    /**
+     * Load waypoints collection.
+     *
+     * @param waypointDir the waypoint dir
+     * @return the collection
+     */
     public Collection<Waypoint> loadWaypoints(File waypointDir)
     {
         ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();

@@ -47,8 +47,17 @@ public class MapRegionTask extends BaseMapTask
     private static final Logger logger = Journeymap.getLogger();
     private static volatile long lastTaskCompleted;
 
+    /**
+     * The Region overlay.
+     */
     final PolygonOverlay regionOverlay;
+    /**
+     * The R coord.
+     */
     final RegionCoord rCoord;
+    /**
+     * The Retained coords.
+     */
     final Collection<ChunkPos> retainedCoords;
 
     private MapRegionTask(ChunkRenderController renderController, World world, MapType mapType, RegionCoord rCoord, Collection<ChunkPos> chunkCoords, Collection<ChunkPos> retainCoords)
@@ -59,6 +68,15 @@ public class MapRegionTask extends BaseMapTask
         this.regionOverlay = createOverlay();
     }
 
+    /**
+     * Create base map task.
+     *
+     * @param renderController the render controller
+     * @param rCoord           the r coord
+     * @param mapType          the map type
+     * @param minecraft        the minecraft
+     * @return the base map task
+     */
     public static BaseMapTask create(ChunkRenderController renderController, RegionCoord rCoord, MapType mapType, Minecraft minecraft)
     {
         final World world = minecraft.world;
@@ -142,6 +160,11 @@ public class MapRegionTask extends BaseMapTask
         }
     }
 
+    /**
+     * Create overlay polygon overlay.
+     *
+     * @return the polygon overlay
+     */
     protected PolygonOverlay createOverlay()
     {
         String displayId = "AutoMap" + rCoord;
@@ -242,9 +265,18 @@ public class MapRegionTask extends BaseMapTask
      */
     public static class Manager implements ITaskManager
     {
+        /**
+         * The Map task delay.
+         */
         final int mapTaskDelay = 0;
 
+        /**
+         * The Region loader.
+         */
         RegionLoader regionLoader;
+        /**
+         * The Enabled.
+         */
         boolean enabled;
 
         @Override

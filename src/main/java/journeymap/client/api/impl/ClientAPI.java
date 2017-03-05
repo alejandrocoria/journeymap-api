@@ -37,6 +37,9 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 public enum ClientAPI implements IClientAPI
 {
+    /**
+     * ClientAPI singleton
+     */
     INSTANCE;
 
     private final Logger LOGGER = Journeymap.getLogger();
@@ -259,7 +262,7 @@ public enum ClientAPI implements IClientAPI
     /**
      * Gets the manager of client event handling.
      *
-     * @return clientEventManager
+     * @return clientEventManager client event manager
      */
     public ClientEventManager getClientEventManager()
     {
@@ -268,6 +271,9 @@ public enum ClientAPI implements IClientAPI
 
     /**
      * Get all draw steps from all plugins. Builds and sorts the list only when needed.
+     *
+     * @param list    the list
+     * @param uiState the ui state
      */
     public void getDrawSteps(List<? super OverlayDrawStep> list, UIState uiState)
     {
@@ -349,6 +355,11 @@ public enum ClientAPI implements IClientAPI
         return pluginWrapper;
     }
 
+    /**
+     * Is draw steps update needed boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDrawStepsUpdateNeeded()
     {
         return drawStepsUpdateNeeded;
@@ -357,7 +368,7 @@ public enum ClientAPI implements IClientAPI
     /**
      * Log a message
      *
-     * @param message
+     * @param message the message
      */
     void log(String message)
     {
@@ -369,11 +380,20 @@ public enum ClientAPI implements IClientAPI
         LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message));
     }
 
+    /**
+     * Log error.
+     *
+     * @param message the message
+     * @param t       the t
+     */
     void logError(String message, Throwable t)
     {
         LOGGER.error(String.format("[%s] %s", getClass().getSimpleName(), message), t);
     }
 
+    /**
+     * Flag overlays for rerender.
+     */
     public void flagOverlaysForRerender()
     {
         for (OverlayDrawStep overlayDrawStep : lastDrawSteps)

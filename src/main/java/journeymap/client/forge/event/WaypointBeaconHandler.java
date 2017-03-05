@@ -19,12 +19,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
 {
+    /**
+     * Minecraft client
+     */
     final Minecraft mc = FMLClientHandler.instance().getClient();
 
+    /**
+     * Instantiates a new Waypoint beacon handler.
+     */
     public WaypointBeaconHandler()
     {
     }
 
+    /**
+     * On render world last event.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)

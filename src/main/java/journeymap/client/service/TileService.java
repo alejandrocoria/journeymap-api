@@ -30,7 +30,13 @@ import java.io.File;
 public class TileService extends FileService
 {
 
+    /**
+     * The constant CALLBACK_PARAM.
+     */
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
+    /**
+     * The constant CHARACTER_ENCODING.
+     */
     public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
     private static final long serialVersionUID = 4412225358529161454L;
     private byte[] blankImage;

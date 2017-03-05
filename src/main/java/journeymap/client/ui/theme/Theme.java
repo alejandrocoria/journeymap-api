@@ -74,6 +74,9 @@ public class Theme implements Comparable<Theme>
 
     /**
      * Color to hex string.
+     *
+     * @param color the color
+     * @return the string
      */
     public static String toHexColor(Color color)
     {
@@ -82,6 +85,9 @@ public class Theme implements Comparable<Theme>
 
     /**
      * Hex string to Color int.
+     *
+     * @param hexColor the hex color
+     * @return the color
      */
     public static int getColor(String hexColor)
     {
@@ -102,6 +108,9 @@ public class Theme implements Comparable<Theme>
 
     /**
      * Int alpha (0-255) to float (0f-1f)
+     *
+     * @param alpha the alpha
+     * @return the alpha
      */
     public static float getAlpha(int alpha)
     {
@@ -374,10 +383,19 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public int height;
 
+        /**
+         * Instantiates a new Image spec.
+         */
         public ImageSpec()
         {
         }
 
+        /**
+         * Instantiates a new Image spec.
+         *
+         * @param width  the width
+         * @param height the height
+         */
         public ImageSpec(int width, int height)
         {
             this.width = width;
@@ -746,10 +764,18 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public String name;
 
+        /**
+         * Instantiates a new Default pointer.
+         */
         protected DefaultPointer()
         {
         }
 
+        /**
+         * Instantiates a new Default pointer.
+         *
+         * @param theme the theme
+         */
         public DefaultPointer(Theme theme)
         {
             this.name = theme.name;

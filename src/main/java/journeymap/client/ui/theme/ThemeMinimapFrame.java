@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
- * Created by Mark on 9/7/2014.
+ * @author techbrew 9/7/2014.
  */
 public class ThemeMinimapFrame
 {
@@ -56,6 +56,15 @@ public class ThemeMinimapFrame
     private Integer reticleColor;
     private Rectangle.Double frameBounds;
 
+    /**
+     * Instantiates a new Theme minimap frame.
+     *
+     * @param theme             the theme
+     * @param minimapSpec       the minimap spec
+     * @param miniMapProperties the mini map properties
+     * @param width             the width
+     * @param height            the height
+     */
     public ThemeMinimapFrame(Theme theme, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, int width, int height)
     {
         this.theme = theme;
@@ -117,6 +126,12 @@ public class ThemeMinimapFrame
 
     }
 
+    /**
+     * Sets position.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void setPosition(final double x, final double y)
     {
         this.x = x;
@@ -124,6 +139,9 @@ public class ThemeMinimapFrame
         this.frameBounds = new Rectangle2D.Double(x, y, width, height);
     }
 
+    /**
+     * Draw mask.
+     */
     public void drawMask()
     {
         if (isSquare)
@@ -136,6 +154,9 @@ public class ThemeMinimapFrame
         }
     }
 
+    /**
+     * Draw reticle.
+     */
     public void drawReticle()
     {
         reticleHeadingAlpha = 1f;
@@ -191,6 +212,9 @@ public class ThemeMinimapFrame
         }
     }
 
+    /**
+     * Draw frame.
+     */
     public void drawFrame()
     {
         if (frameAlpha > 0)
@@ -214,6 +238,11 @@ public class ThemeMinimapFrame
         }
     }
 
+    /**
+     * Gets compass point.
+     *
+     * @return the compass point
+     */
     public TextureImpl getCompassPoint()
     {
         return textureCompassPoint;
@@ -229,41 +258,81 @@ public class ThemeMinimapFrame
         return TextureCache.getSizedThemeTexture(theme, String.format(resourcePattern, suffix), width, height, resize, 1f, retain);
     }
 
+    /**
+     * Gets frame bounds.
+     *
+     * @return the frame bounds
+     */
     public Rectangle.Double getFrameBounds()
     {
         return frameBounds;
     }
 
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
     public double getX()
     {
         return x;
     }
 
+    /**
+     * Sets x.
+     *
+     * @param x the x
+     */
     public void setX(double x)
     {
         this.x = x;
     }
 
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
     public double getY()
     {
         return y;
     }
 
+    /**
+     * Sets y.
+     *
+     * @param y the y
+     */
     public void setY(double y)
     {
         this.y = y;
     }
 
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
     public double getWidth()
     {
         return width;
     }
 
+    /**
+     * Gets height.
+     *
+     * @return the height
+     */
     public double getHeight()
     {
         return height;
     }
 
+    /**
+     * Gets reticle orientation.
+     *
+     * @return the reticle orientation
+     */
     public ReticleOrientation getReticleOrientation()
     {
         return reticleOrientation;

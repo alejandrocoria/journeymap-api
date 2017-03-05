@@ -33,7 +33,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
     /**
      * Whether native waypoint management is enabled.
      *
-     * @return
+     * @return boolean
      */
     public static boolean isManagerEnabled()
     {
@@ -43,7 +43,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
     /**
      * Get waypoints from whatever sources are supported.
      *
-     * @return
+     * @return waypoints
      */
     protected static List<journeymap.client.model.Waypoint> getWaypoints()
     {
@@ -107,6 +107,11 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
         return getWaypoints();
     }
 
+    /**
+     * Gets ttl.
+     *
+     * @return the ttl
+     */
     public long getTTL()
     {
         return 5000;

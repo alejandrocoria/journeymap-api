@@ -17,10 +17,16 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * The type Delete map task.
+ */
 public class DeleteMapTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + MappingMonitorTask.class.getSimpleName();
     private static Logger LOGGER = Journeymap.getLogger();
+    /**
+     * The All dims.
+     */
     boolean allDims;
 
     private DeleteMapTask(boolean allDims)
@@ -28,6 +34,11 @@ public class DeleteMapTask implements IMainThreadTask
         this.allDims = allDims;
     }
 
+    /**
+     * Queue.
+     *
+     * @param allDims the all dims
+     */
     public static void queue(boolean allDims)
     {
         Journeymap.getClient().queueMainThreadTask(new DeleteMapTask(allDims));

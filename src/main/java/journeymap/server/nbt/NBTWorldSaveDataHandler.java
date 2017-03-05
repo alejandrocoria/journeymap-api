@@ -17,6 +17,11 @@ public class NBTWorldSaveDataHandler extends WorldSavedData
     private NBTTagCompound data = new NBTTagCompound();
     private String tagName;
 
+    /**
+     * Instantiates a new Nbt world save data handler.
+     *
+     * @param tagName the tag name
+     */
     public NBTWorldSaveDataHandler(String tagName)
     {
         super(tagName);
@@ -36,6 +41,11 @@ public class NBTWorldSaveDataHandler extends WorldSavedData
         return compound;
     }
 
+    /**
+     * Gets data.
+     *
+     * @return the data
+     */
     public NBTTagCompound getData()
     {
         return data;

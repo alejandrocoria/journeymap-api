@@ -77,34 +77,181 @@ import java.util.List;
  */
 public class Fullscreen extends JmUI
 {
+    /**
+     * The constant state.
+     */
     final static MapState state = new MapState();
+    /**
+     * The constant gridRenderer.
+     */
     final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Fullscreen, 5);
+    /**
+     * The Waypoint renderer.
+     */
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
+    /**
+     * The Radar renderer.
+     */
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
+    /**
+     * The Layer delegate.
+     */
     final LayerDelegate layerDelegate = new LayerDelegate();
+    /**
+     * The Full map properties.
+     */
     FullMapProperties fullMapProperties = Journeymap.getClient().getFullMapProperties();
+    /**
+     * The Core properties.
+     */
     CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
+    /**
+     * The First layout pass.
+     */
     boolean firstLayoutPass = true;
+    /**
+     * The Hide options toolbar.
+     */
     boolean hideOptionsToolbar = false;
+    /**
+     * The Is scrolling.
+     */
     Boolean isScrolling = false;
-    int msx, msy, mx, my;
+    /**
+     * The Msx.
+     */
+    int msx, /**
+ * The Msy.
+ */
+msy, /**
+ * The Mx.
+ */
+mx, /**
+ * The My.
+ */
+my;
+    /**
+     * The Logger.
+     */
     Logger logger = Journeymap.getLogger();
+    /**
+     * The Chat.
+     */
     MapChat chat;
-    ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonTopo, buttonCaves;
-    ThemeButton buttonAlert, buttonOptions, buttonActions, buttonClose;
-    ThemeButton buttonTheme, buttonWaypointManager;
-    ThemeButton buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid;
-    ThemeToolbar mapTypeToolbar, optionsToolbar, menuToolbar, zoomToolbar;//, northEastToolbar;
+    /**
+     * The Button follow.
+     */
+    ThemeButton buttonFollow, /**
+ * The Button zoom in.
+ */
+buttonZoomIn, /**
+ * The Button zoom out.
+ */
+buttonZoomOut, /**
+ * The Button day.
+ */
+buttonDay, /**
+ * The Button night.
+ */
+buttonNight, /**
+ * The Button topo.
+ */
+buttonTopo, /**
+ * The Button caves.
+ */
+buttonCaves;
+    /**
+     * The Button alert.
+     */
+    ThemeButton buttonAlert, /**
+ * The Button options.
+ */
+buttonOptions, /**
+ * The Button actions.
+ */
+buttonActions, /**
+ * The Button close.
+ */
+buttonClose;
+    /**
+     * The Button theme.
+     */
+    ThemeButton buttonTheme, /**
+ * The Button waypoint manager.
+ */
+buttonWaypointManager;
+    /**
+     * The Button mobs.
+     */
+    ThemeButton buttonMobs, /**
+ * The Button animals.
+ */
+buttonAnimals, /**
+ * The Button pets.
+ */
+buttonPets, /**
+ * The Button villagers.
+ */
+buttonVillagers, /**
+ * The Button players.
+ */
+buttonPlayers, /**
+ * The Button grid.
+ */
+buttonGrid;
+    /**
+     * The Map type toolbar.
+     */
+    ThemeToolbar mapTypeToolbar, /**
+ * The Options toolbar.
+ */
+optionsToolbar, /**
+ * The Menu toolbar.
+ */
+menuToolbar, /**
+ * The Zoom toolbar.
+ */
+zoomToolbar;//, northEastToolbar;
+    /**
+     * The Bg color.
+     */
     int bgColor = 0x222222;
+    /**
+     * The Status foreground color.
+     */
     int statusForegroundColor;
+    /**
+     * The Status background color.
+     */
     int statusBackgroundColor;
+    /**
+     * The Status foreground alpha.
+     */
     float statusForegroundAlpha;
+    /**
+     * The Status background alpha.
+     */
     float statusBackgroundAlpha;
+    /**
+     * The Draw screen timer.
+     */
     StatTimer drawScreenTimer = StatTimer.get("Fullscreen.drawScreen");
+    /**
+     * The Draw map timer.
+     */
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
+    /**
+     * The Draw map timer with refresh.
+     */
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
+    /**
+     * The Location format.
+     */
     LocationFormat locationFormat = new LocationFormat();
 
+    /**
+     * The Temp overlays.
+     */
     List<Overlay> tempOverlays = new ArrayList<Overlay>();
 
     /**
@@ -121,16 +268,29 @@ public class Fullscreen extends JmUI
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
     }
 
+    /**
+     * State map state.
+     *
+     * @return the map state
+     */
     public static synchronized MapState state()
     {
         return state;
     }
 
+    /**
+     * Ui state ui state.
+     *
+     * @return the ui state
+     */
     public static synchronized UIState uiState()
     {
         return gridRenderer.getUIState();
     }
 
+    /**
+     * Reset.
+     */
     public void reset()
     {
         state.requireRefresh();
@@ -586,6 +746,14 @@ public class Fullscreen extends JmUI
 
     }
 
+    /**
+     * Layout toolbars.
+     *
+     * @param margin             the margin
+     * @param topY               the top y
+     * @param padding            the padding
+     * @param hideOptionsToolbar the hide options toolbar
+     */
     protected void layoutToolbars(int margin, int topY, int padding, boolean hideOptionsToolbar)
     {
         if (hideOptionsToolbar)
@@ -739,6 +907,9 @@ public class Fullscreen extends JmUI
         }
     }
 
+    /**
+     * Zoom in.
+     */
     void zoomIn()
     {
         if (fullMapProperties.zoomLevel.get() < state.maxZoom)
@@ -747,6 +918,9 @@ public class Fullscreen extends JmUI
         }
     }
 
+    /**
+     * Zoom out.
+     */
     void zoomOut()
     {
         if (fullMapProperties.zoomLevel.get() > state.minZoom)
@@ -765,11 +939,19 @@ public class Fullscreen extends JmUI
         }
     }
 
+    /**
+     * Toggle follow.
+     */
     void toggleFollow()
     {
         setFollow(!state.follow.get());
     }
 
+    /**
+     * Sets follow.
+     *
+     * @param follow the follow
+     */
     void setFollow(Boolean follow)
     {
         state.follow.set(follow);
@@ -923,6 +1105,9 @@ public class Fullscreen extends JmUI
         DrawUtil.drawRectangle(0, 0, width, height, bgColor, 1f);
     }
 
+    /**
+     * Draw map.
+     */
     void drawMap()
     {
         final boolean refreshReady = isRefreshReady();
@@ -1016,6 +1201,11 @@ public class Fullscreen extends JmUI
         return (fullMapProperties.fontScale.get());
     }
 
+    /**
+     * Center on.
+     *
+     * @param waypoint the waypoint
+     */
     public void centerOn(Waypoint waypoint)
     {
         if (waypoint.getDimensions().contains(mc.player.dimension))
@@ -1037,6 +1227,11 @@ public class Fullscreen extends JmUI
         }
     }
 
+    /**
+     * Add temp marker.
+     *
+     * @param waypoint the waypoint
+     */
     public void addTempMarker(Waypoint waypoint)
     {
         try
@@ -1120,6 +1315,11 @@ public class Fullscreen extends JmUI
 
     }
 
+    /**
+     * Open chat.
+     *
+     * @param defaultText the default text
+     */
     void openChat(String defaultText)
     {
         if (chat != null)
@@ -1156,6 +1356,11 @@ public class Fullscreen extends JmUI
         Keyboard.enableRepeatEvents(false);
     }
 
+    /**
+     * Is refresh ready boolean.
+     *
+     * @return the boolean
+     */
     boolean isRefreshReady()
     {
         if (isScrolling)
@@ -1168,6 +1373,12 @@ public class Fullscreen extends JmUI
         }
     }
 
+    /**
+     * Move canvas.
+     *
+     * @param deltaBlockX the delta block x
+     * @param deltaBlockz the delta blockz
+     */
     void moveCanvas(int deltaBlockX, int deltaBlockz)
     {
         refreshState();
@@ -1197,6 +1408,8 @@ public class Fullscreen extends JmUI
 
     /**
      * Set theme by name
+     *
+     * @param name the name
      */
     public void setTheme(String name)
     {

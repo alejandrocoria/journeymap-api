@@ -16,18 +16,54 @@ import java.awt.*;
 public class TextField extends GuiTextField
 {
 
+    /**
+     * The Numeric regex.
+     */
     protected final String numericRegex;
+    /**
+     * The Numeric.
+     */
     protected final boolean numeric;
+    /**
+     * The Allow negative.
+     */
     protected final boolean allowNegative;
+    /**
+     * The Min length.
+     */
     protected int minLength;
+    /**
+     * The Clamp min.
+     */
     protected Integer clampMin;
+    /**
+     * The Clamp max.
+     */
     protected Integer clampMax;
 
+    /**
+     * Instantiates a new Text field.
+     *
+     * @param text         the text
+     * @param fontRenderer the font renderer
+     * @param width        the width
+     * @param height       the height
+     */
     public TextField(Object text, FontRenderer fontRenderer, int width, int height)
     {
         this(text, fontRenderer, width, height, false, false);
     }
 
+    /**
+     * Instantiates a new Text field.
+     *
+     * @param text         the text
+     * @param fontRenderer the font renderer
+     * @param width        the width
+     * @param height       the height
+     * @param isNumeric    the is numeric
+     * @param negative     the negative
+     */
     public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
     {
         // 1.7
@@ -55,12 +91,23 @@ public class TextField extends GuiTextField
         numericRegex = regex;
     }
 
+    /**
+     * Sets clamp.
+     *
+     * @param min the min
+     * @param max the max
+     */
     public void setClamp(Integer min, Integer max)
     {
         this.clampMin = min;
         this.clampMax = max;
     }
 
+    /**
+     * Sets min length.
+     *
+     * @param minLength the min length
+     */
     public void setMinLength(int minLength)
     {
         this.minLength = minLength;
@@ -83,16 +130,31 @@ public class TextField extends GuiTextField
         }
     }
 
+    /**
+     * Sets text.
+     *
+     * @param object the object
+     */
     public void setText(Object object)
     {
         super.setText(object.toString());
     }
 
+    /**
+     * Is numeric boolean.
+     *
+     * @return the boolean
+     */
     public boolean isNumeric()
     {
         return numeric;
     }
 
+    /**
+     * Has min length boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasMinLength()
     {
         String text = getText();
@@ -138,6 +200,8 @@ public class TextField extends GuiTextField
 
     /**
      * If numeric field, clamp values in range.
+     *
+     * @return the integer
      */
     public Integer clamp()
     {
@@ -185,6 +249,11 @@ public class TextField extends GuiTextField
         }
     }
 
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
     public int getX()
     {
         // 1.7
@@ -194,6 +263,11 @@ public class TextField extends GuiTextField
         return xPosition;
     }
 
+    /**
+     * Sets x.
+     *
+     * @param x the x
+     */
     public void setX(int x)
     {
         // 1.7
@@ -203,6 +277,11 @@ public class TextField extends GuiTextField
         xPosition = x;
     }
 
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
     public int getY()
     {
         // 1.7
@@ -212,6 +291,11 @@ public class TextField extends GuiTextField
         return yPosition;
     }
 
+    /**
+     * Sets y.
+     *
+     * @param y the y
+     */
     public void setY(int y)
     {
         // 1.7
@@ -230,6 +314,11 @@ public class TextField extends GuiTextField
         return width;
     }
 
+    /**
+     * Sets width.
+     *
+     * @param w the w
+     */
     public void setWidth(int w)
     {
         // 1.7
@@ -239,6 +328,11 @@ public class TextField extends GuiTextField
         width = w;
     }
 
+    /**
+     * Gets height.
+     *
+     * @return the height
+     */
     public int getHeight()
     {
         // 1.7
@@ -248,21 +342,41 @@ public class TextField extends GuiTextField
         return height;
     }
 
+    /**
+     * Gets center x.
+     *
+     * @return the center x
+     */
     public int getCenterX()
     {
         return getX() + (getWidth() / 2);
     }
 
+    /**
+     * Gets middle y.
+     *
+     * @return the middle y
+     */
     public int getMiddleY()
     {
         return getY() + (getHeight() / 2);
     }
 
+    /**
+     * Gets bottom y.
+     *
+     * @return the bottom y
+     */
     public int getBottomY()
     {
         return getY() + getHeight();
     }
 
+    /**
+     * Gets right x.
+     *
+     * @return the right x
+     */
     public int getRightX()
     {
         return getX() + getWidth();

@@ -13,11 +13,17 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
+/**
+ * The type Save map task.
+ */
 public class SaveMapTask implements ITask
 {
 
     private static final Logger logger = Journeymap.getLogger();
 
+    /**
+     * The Map saver.
+     */
     MapSaver mapSaver;
 
     private SaveMapTask(MapSaver mapSaver)
@@ -45,6 +51,9 @@ public class SaveMapTask implements ITask
     public static class Manager implements ITaskManager
     {
 
+        /**
+         * The Map saver.
+         */
         MapSaver mapSaver;
 
         @Override
