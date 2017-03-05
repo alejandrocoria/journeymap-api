@@ -29,20 +29,43 @@ import java.util.regex.Pattern;
 /**
  * Merges all region files into a single image
  *
- * @author Mark
+ * @author techbrew
  */
 public class MapSaver
 {
-
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
+    /**
+     * The World dir.
+     */
     final File worldDir;
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Save file.
+     */
     File saveFile;
+    /**
+     * The Output columns.
+     */
     int outputColumns;
+    /**
+     * The Output rows.
+     */
     int outputRows;
+    /**
+     * The Files.
+     */
     ArrayList<File> files;
 
+    /**
+     * Instantiates a new Map saver.
+     *
+     * @param worldDir the world dir
+     * @param mapType  the map type
+     */
     public MapSaver(File worldDir, MapType mapType)
     {
         super();
@@ -54,6 +77,8 @@ public class MapSaver
 
     /**
      * Use pngj to assemble region files.
+     *
+     * @return the file
      */
     public File saveMap()
     {
@@ -103,11 +128,21 @@ public class MapSaver
         return saveFile;
     }
 
+    /**
+     * Gets save file name.
+     *
+     * @return the save file name
+     */
     public String getSaveFileName()
     {
         return saveFile.getName();
     }
 
+    /**
+     * Is valid boolean.
+     *
+     * @return the boolean
+     */
     public boolean isValid()
     {
         return files != null && files.size() > 0;

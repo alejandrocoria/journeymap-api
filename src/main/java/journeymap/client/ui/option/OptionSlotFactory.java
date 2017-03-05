@@ -31,11 +31,29 @@ import static journeymap.client.properties.ClientCategory.*;
  */
 public class OptionSlotFactory
 {
+    /**
+     * The constant UTF8.
+     */
     protected static final Charset UTF8 = Charset.forName("UTF-8");
+    /**
+     * The constant docWriter.
+     */
     protected static BufferedWriter docWriter;
+    /**
+     * The constant docFile.
+     */
     protected static File docFile;
+    /**
+     * The constant generateDocs.
+     */
     protected static boolean generateDocs = false;
 
+    /**
+     * Gets slots.
+     *
+     * @param toolbars the toolbars
+     * @return the slots
+     */
     public static List<CategorySlot> getSlots(Map<Category, List<SlotMetadata>> toolbars)
     {
         HashMap<Category, List<SlotMetadata>> mergedMap = new HashMap<Category, List<SlotMetadata>>();
@@ -107,6 +125,13 @@ public class OptionSlotFactory
         return categories;
     }
 
+    /**
+     * Add slots.
+     *
+     * @param mergedMap         the merged map
+     * @param inheritedCategory the inherited category
+     * @param properties        the properties
+     */
     protected static void addSlots(HashMap<Category, List<SlotMetadata>> mergedMap, Category inheritedCategory, PropertiesBase properties)
     {
         Class<? extends PropertiesBase> propertiesClass = properties.getClass();
@@ -134,6 +159,15 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Build slots hash map.
+     *
+     * @param map               the map
+     * @param inheritedCategory the inherited category
+     * @param propertiesClass   the properties class
+     * @param properties        the properties
+     * @return the hash map
+     */
     protected static HashMap<Category, List<SlotMetadata>> buildSlots(HashMap<Category, List<SlotMetadata>> map, Category inheritedCategory, Class<? extends PropertiesBase> propertiesClass, PropertiesBase properties)
     {
         if (map == null)
@@ -203,6 +237,12 @@ public class OptionSlotFactory
         return map;
     }
 
+    /**
+     * Gets tooltip.
+     *
+     * @param configField the config field
+     * @return the tooltip
+     */
     static String getTooltip(ConfigField configField)
     {
         String tooltipKey = configField.getKey() + ".tooltip";
@@ -216,8 +256,9 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for a boolean property
-     * @param field
-     * @return
+     *
+     * @param field the field
+     * @return boolean slot metadata
      */
     static SlotMetadata<Boolean> getBooleanSlotMetadata(BooleanField field)
     {
@@ -239,8 +280,8 @@ public class OptionSlotFactory
     /**
      * Create a slot for an Integer property
      *
-     * @param field
-     * @return
+     * @param field the field
+     * @return integer slot metadata
      */
     static SlotMetadata<Integer> getIntegerSlotMetadata(IntegerField field)
     {
@@ -259,8 +300,8 @@ public class OptionSlotFactory
     /**
      * Create a slot for a bound list of strings property
      *
-     * @param field
-     * @return
+     * @param field the field
+     * @return string slot metadata
      */
     static SlotMetadata<String> getStringSlotMetadata(StringField field)
     {
@@ -300,8 +341,8 @@ public class OptionSlotFactory
     /**
      * Create a slot for a bound list of strings property
      *
-     * @param field
-     * @return
+     * @param field the field
+     * @return enum slot metadata
      */
     static SlotMetadata<Enum> getEnumSlotMetadata(EnumField field)
     {
@@ -328,6 +369,9 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Ensure doc file.
+     */
     static void ensureDocFile()
     {
         if (docFile == null)
@@ -360,6 +404,11 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Doc.
+     *
+     * @param categorySlot the category slot
+     */
     static void doc(CategorySlot categorySlot)
     {
         try
@@ -377,6 +426,11 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Doc table.
+     *
+     * @param start the start
+     */
     static void docTable(boolean start)
     {
         try
@@ -407,6 +461,12 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * Doc.
+     *
+     * @param slotMetadata the slot metadata
+     * @param advanced     the advanced
+     */
     static void doc(SlotMetadata slotMetadata, boolean advanced)
     {
         try
@@ -431,6 +491,9 @@ public class OptionSlotFactory
         }
     }
 
+    /**
+     * End doc.
+     */
     static void endDoc()
     {
         try

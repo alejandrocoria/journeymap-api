@@ -32,18 +32,46 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ImageHolder implements IThreadedFileIO
 {
+    /**
+     * The constant logger.
+     */
     final static Logger logger = Journeymap.getLogger();
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Image path.
+     */
     final Path imagePath;
+    /**
+     * The Image size.
+     */
     final int imageSize;
+    /**
+     * The Blank.
+     */
     boolean blank = true;
+    /**
+     * The Dirty.
+     */
     boolean dirty = true;
+    /**
+     * The Partial update.
+     */
     boolean partialUpdate;
     private volatile ReentrantLock writeLock = new ReentrantLock();
     private volatile RegionTextureImpl texture;
     private boolean debug;
     private HashSet<ChunkPos> updatedChunks = new HashSet<>();
 
+    /**
+     * Instantiates a new Image holder.
+     *
+     * @param mapType   the map type
+     * @param imageFile the image file
+     * @param imageSize the image size
+     */
     ImageHolder(MapType mapType, File imageFile, int imageSize)
     {
         this.mapType = mapType;
@@ -53,27 +81,54 @@ public class ImageHolder implements IThreadedFileIO
         getTexture();
     }
 
+    /**
+     * Gets file.
+     *
+     * @return the file
+     */
     File getFile()
     {
         return imagePath.toFile();
     }
 
+    /**
+     * Gets map type.
+     *
+     * @return the map type
+     */
     MapType getMapType()
     {
         return mapType;
     }
 
+    /**
+     * Gets image.
+     *
+     * @return the image
+     */
     BufferedImage getImage()
     {
         return texture.getImage();
     }
 
+    /**
+     * Sets image.
+     *
+     * @param image the image
+     */
     void setImage(BufferedImage image)
     {
         texture.setImage(image, true);
         setDirty();
     }
 
+    /**
+     * Partial image update.
+     *
+     * @param imagePart the image part
+     * @param x         the x
+     * @param y         the y
+     */
     void partialImageUpdate(BufferedImage imagePart, int x, int y)
     {
         writeLock.lock();
@@ -106,6 +161,9 @@ public class ImageHolder implements IThreadedFileIO
         }
     }
 
+    /**
+     * Finish partial image updates.
+     */
     void finishPartialImageUpdates()
     {
         writeLock.lock();
@@ -127,11 +185,21 @@ public class ImageHolder implements IThreadedFileIO
         }
     }
 
+    /**
+     * Has texture boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasTexture()
     {
         return texture != null && !texture.isDefunct();
     }
 
+    /**
+     * Gets texture.
+     *
+     * @return the texture
+     */
     public RegionTextureImpl getTexture()
     {
         if (!hasTexture())
@@ -169,6 +237,11 @@ public class ImageHolder implements IThreadedFileIO
         dirty = true;
     }
 
+    /**
+     * Is dirty boolean.
+     *
+     * @return the boolean
+     */
     boolean isDirty()
     {
         return dirty;
@@ -333,6 +406,9 @@ public class ImageHolder implements IThreadedFileIO
                 .toString();
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         writeLock.lock();
@@ -350,6 +426,11 @@ public class ImageHolder implements IThreadedFileIO
         }
     }
 
+    /**
+     * Gets image timestamp.
+     *
+     * @return the image timestamp
+     */
     public long getImageTimestamp()
     {
         if (texture != null)

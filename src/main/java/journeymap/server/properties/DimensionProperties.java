@@ -12,8 +12,14 @@ import journeymap.common.properties.config.BooleanField;
  */
 public class DimensionProperties extends PermissionProperties
 {
-    // Whether or not these properties should override GlobalProperties
+    /**
+     * The Enabled.
+     */
+// Whether or not these properties should override GlobalProperties
     public final BooleanField enabled = new BooleanField(ServerCategory.General, "Enable Configuration", false).categoryMaster(true);
+    /**
+     * The Dimension.
+     */
     protected final Integer dimension;
 
     /**
@@ -34,11 +40,21 @@ public class DimensionProperties extends PermissionProperties
         return "dim" + dimension;
     }
 
+    /**
+     * Gets dimension.
+     *
+     * @return the dimension
+     */
     public Integer getDimension()
     {
         return dimension;
     }
 
+    /**
+     * Build dimension properties.
+     *
+     * @return the dimension properties
+     */
     public DimensionProperties build()
     {
         GlobalProperties gProp = PropertiesManager.getInstance().getGlobalProperties();

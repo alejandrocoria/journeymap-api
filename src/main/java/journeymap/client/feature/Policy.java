@@ -18,13 +18,29 @@ import java.util.Set;
  */
 public class Policy
 {
+    /**
+     * Minecraft client
+     */
     static Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Feature.
+     */
     final Feature feature;
+    /**
+     * The Allow in singleplayer.
+     */
     final boolean allowInSingleplayer;
+    /**
+     * The Allow in multiplayer.
+     */
     final boolean allowInMultiplayer;
 
     /**
      * Constructor.
+     *
+     * @param feature             the feature
+     * @param allowInSingleplayer the allow in singleplayer
+     * @param allowInMultiplayer  the allow in multiplayer
      */
     public Policy(Feature feature, boolean allowInSingleplayer, boolean allowInMultiplayer)
     {
@@ -36,9 +52,9 @@ public class Policy
     /**
      * Get a set of Policies based on categorical usage of all features.
      *
-     * @param allowInSingleplayer
-     * @param allowInMultiplayer
-     * @return
+     * @param allowInSingleplayer the allow in singleplayer
+     * @param allowInMultiplayer  the allow in multiplayer
+     * @return set
      */
     public static Set<Policy> bulkCreate(boolean allowInSingleplayer, boolean allowInMultiplayer)
     {
@@ -48,9 +64,10 @@ public class Policy
     /**
      * Get a set of Policies based on categorical usage of a set of features.
      *
-     * @param allowInSingleplayer
-     * @param allowInMultiplayer
-     * @return
+     * @param features            the features
+     * @param allowInSingleplayer the allow in singleplayer
+     * @param allowInMultiplayer  the allow in multiplayer
+     * @return set
      */
     public static Set<Policy> bulkCreate(EnumSet<Feature> features, boolean allowInSingleplayer, boolean allowInMultiplayer)
     {

@@ -23,11 +23,12 @@ import java.util.Arrays;
 public class PngjHelper
 {
     /**
+     * Merge files.
+     *
      * @param tiles       Filenames of PNG files to tile
      * @param destFile    Destination PNG filename
-     * @param tileColumns How many tiles per row?
-     *                    <p/>
-     *                    Original: https://code.google.com/p/pngj/wiki/Snippets
+     * @param tileColumns How many tiles per row?                    <p/>                    Original: https://code.google.com/p/pngj/wiki/Snippets
+     * @param tileSize    the tile size
      */
     public static void mergeFiles(final File tiles[], final File destFile, final int tileColumns, final int tileSize)
     {

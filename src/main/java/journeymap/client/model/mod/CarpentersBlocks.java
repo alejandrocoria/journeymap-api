@@ -23,6 +23,9 @@ import static journeymap.client.model.BlockMD.Flag.*;
  */
 public class CarpentersBlocks
 {
+    /**
+     * The type Common handler.
+     */
     public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
     {
         private static final String MODID = "CarpentersBlocks";

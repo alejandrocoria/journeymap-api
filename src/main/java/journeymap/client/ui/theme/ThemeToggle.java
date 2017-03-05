@@ -14,16 +14,39 @@ import journeymap.common.properties.config.BooleanField;
  */
 public class ThemeToggle extends ThemeButton
 {
+    /**
+     * Instantiates a new Theme toggle.
+     *
+     * @param theme    the theme
+     * @param rawlabel the rawlabel
+     * @param iconName the icon name
+     */
     public ThemeToggle(Theme theme, String rawlabel, String iconName)
     {
         super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, null);
     }
 
+    /**
+     * Instantiates a new Theme toggle.
+     *
+     * @param theme    the theme
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param iconName the icon name
+     */
     public ThemeToggle(Theme theme, String labelOn, String labelOff, String iconName)
     {
         super(theme, labelOn, labelOff, iconName, null);
     }
 
+    /**
+     * Instantiates a new Theme toggle.
+     *
+     * @param theme    the theme
+     * @param rawlabel the rawlabel
+     * @param iconName the icon name
+     * @param field    the field
+     */
     public ThemeToggle(Theme theme, String rawlabel, String iconName, BooleanField field)
     {
         super(theme, Constants.getString(rawlabel), Constants.getString(rawlabel), iconName, field);

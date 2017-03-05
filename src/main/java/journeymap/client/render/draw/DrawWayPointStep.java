@@ -15,23 +15,49 @@ import journeymap.client.render.texture.TextureImpl;
 import java.awt.geom.Point2D;
 
 /**
+ * The type Draw way point step.
+ *
  * @author techbrew 12/26/13.
  */
 public class DrawWayPointStep implements DrawStep
 {
+    /**
+     * The Waypoint.
+     */
     public final Waypoint waypoint;
+    /**
+     * The Color.
+     */
     final Integer color;
+    /**
+     * The Font color.
+     */
     final Integer fontColor;
+    /**
+     * The Texture.
+     */
     final TextureImpl texture;
+    /**
+     * The Is edit.
+     */
     final boolean isEdit;
+    /**
+     * The Last position.
+     */
     Point2D.Double lastPosition;
+    /**
+     * The Last on screen.
+     */
     boolean lastOnScreen;
+    /**
+     * The Show label.
+     */
     boolean showLabel;
 
     /**
      * Draw a waypoint on the map.
      *
-     * @param waypoint
+     * @param waypoint the waypoint
      */
     public DrawWayPointStep(Waypoint waypoint)
     {
@@ -41,9 +67,10 @@ public class DrawWayPointStep implements DrawStep
     /**
      * Draw a waypoint on the map.
      *
-     * @param waypoint
-     * @param color
-     * @param fontColor
+     * @param waypoint  the waypoint
+     * @param color     the color
+     * @param fontColor the font color
+     * @param isEdit    the is edit
      */
     public DrawWayPointStep(Waypoint waypoint, Integer color, Integer fontColor, boolean isEdit)
     {
@@ -54,6 +81,11 @@ public class DrawWayPointStep implements DrawStep
         this.texture = waypoint.getTexture();
     }
 
+    /**
+     * Sets show label.
+     *
+     * @param showLabel the show label
+     */
     public void setShowLabel(boolean showLabel)
     {
         this.showLabel = showLabel;
@@ -94,6 +126,13 @@ public class DrawWayPointStep implements DrawStep
         }
     }
 
+    /**
+     * Draw offscreen.
+     *
+     * @param pass     the pass
+     * @param pixel    the pixel
+     * @param rotation the rotation
+     */
     public void drawOffscreen(Pass pass, Point2D pixel, double rotation)
     {
         if (pass == Pass.Object)
@@ -102,6 +141,15 @@ public class DrawWayPointStep implements DrawStep
         }
     }
 
+    /**
+     * Gets position.
+     *
+     * @param xOffset      the x offset
+     * @param yOffset      the y offset
+     * @param gridRenderer the grid renderer
+     * @param forceUpdate  the force update
+     * @return the position
+     */
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
     {
         if (!forceUpdate && lastPosition != null)
@@ -120,11 +168,21 @@ public class DrawWayPointStep implements DrawStep
         return pixel;
     }
 
+    /**
+     * Is on screen boolean.
+     *
+     * @return the boolean
+     */
     public boolean isOnScreen()
     {
         return lastOnScreen;
     }
 
+    /**
+     * Sets on screen.
+     *
+     * @param lastOnScreen the last on screen
+     */
     public void setOnScreen(boolean lastOnScreen)
     {
         this.lastOnScreen = lastOnScreen;
@@ -142,6 +200,9 @@ public class DrawWayPointStep implements DrawStep
         return waypoint.getOrigin();
     }
 
+    /**
+     * The type Simple cache loader.
+     */
     public static class SimpleCacheLoader extends CacheLoader<Waypoint, DrawWayPointStep>
     {
         @Override

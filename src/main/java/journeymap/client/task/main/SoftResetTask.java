@@ -25,12 +25,18 @@ import org.apache.logging.log4j.Logger;
 public class SoftResetTask implements IMainThreadTask
 {
     private static String NAME = "Tick." + SoftResetTask.class.getSimpleName();
+    /**
+     * The Logger.
+     */
     Logger logger = Journeymap.getLogger();
 
     private SoftResetTask()
     {
     }
 
+    /**
+     * Queue.
+     */
     public static void queue()
     {
         Journeymap.getClient().queueMainThreadTask(new SoftResetTask());

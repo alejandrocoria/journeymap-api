@@ -16,19 +16,48 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Region coord.
+ */
 public class RegionCoord implements Comparable<RegionCoord>
 {
+    /**
+     * The constant SIZE.
+     */
     public transient static final int SIZE = 5;
     private transient static final int chunkSqRt = (int) Math.pow(2, SIZE);
-    // TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
+    /**
+     * The World dir.
+     */
+// TODO: worldDir should serialize as a relative path to allow data files to be usable after being moved
     public final File worldDir;
+    /**
+     * The Dim dir.
+     */
     public final Path dimDir;
+    /**
+     * The Region x.
+     */
     public final int regionX;
+    /**
+     * The Region z.
+     */
     public final int regionZ;
+    /**
+     * The Dimension.
+     */
     public final int dimension;
     private final int theHashCode;
     private final String theCacheKey;
 
+    /**
+     * Instantiates a new Region coord.
+     *
+     * @param worldDir  the world dir
+     * @param regionX   the region x
+     * @param regionZ   the region z
+     * @param dimension the dimension
+     */
     public RegionCoord(File worldDir, int regionX, int regionZ, int dimension)
     {
         this.worldDir = worldDir;
@@ -40,6 +69,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         this.theHashCode = theCacheKey.hashCode();
     }
 
+    /**
+     * From chunk pos region coord.
+     *
+     * @param worldDir the world dir
+     * @param mapType  the map type
+     * @param chunkX   the chunk x
+     * @param chunkZ   the chunk z
+     * @return the region coord
+     */
     public static RegionCoord fromChunkPos(File worldDir, MapType mapType, int chunkX, int chunkZ)
     {
         final int regionX = getRegionPos(chunkX);
@@ -48,6 +86,15 @@ public class RegionCoord implements Comparable<RegionCoord>
         return fromRegionPos(worldDir, regionX, regionZ, mapType.dimension);
     }
 
+    /**
+     * From region pos region coord.
+     *
+     * @param worldDir  the world dir
+     * @param regionX   the region x
+     * @param regionZ   the region z
+     * @param dimension the dimension
+     * @return the region coord
+     */
     public static RegionCoord fromRegionPos(File worldDir, int regionX, int regionZ, int dimension)
     {
         // The cache is primarily just used to reduce heap thrash.  Hashing on x,z has a lot of collisions,
@@ -62,46 +109,102 @@ public class RegionCoord implements Comparable<RegionCoord>
         return regionCoord;
     }
 
+    /**
+     * Gets dim path.
+     *
+     * @param worldDir  the world dir
+     * @param dimension the dimension
+     * @return the dim path
+     */
     public static Path getDimPath(File worldDir, int dimension)
     {
         return new File(worldDir, "DIM" + dimension).toPath();
     }
 
+    /**
+     * Gets min chunk x.
+     *
+     * @param rX the r x
+     * @return the min chunk x
+     */
     public static int getMinChunkX(int rX)
     {
         return rX << SIZE;
     }
 
+    /**
+     * Gets max chunk x.
+     *
+     * @param rX the r x
+     * @return the max chunk x
+     */
     public static int getMaxChunkX(int rX)
     {
         return getMinChunkX(rX) + (int) Math.pow(2, SIZE) - 1;
     }
 
+    /**
+     * Gets min chunk z.
+     *
+     * @param rZ the r z
+     * @return the min chunk z
+     */
     public static int getMinChunkZ(int rZ)
     {
         return rZ << SIZE;
     }
 
+    /**
+     * Gets max chunk z.
+     *
+     * @param rZ the r z
+     * @return the max chunk z
+     */
     public static int getMaxChunkZ(int rZ)
     {
         return getMinChunkZ(rZ) + (int) Math.pow(2, SIZE) - 1;
     }
 
+    /**
+     * Gets region pos.
+     *
+     * @param chunkPos the chunk pos
+     * @return the region pos
+     */
     public static int getRegionPos(int chunkPos)
     {
         return chunkPos >> SIZE;
     }
 
+    /**
+     * To cache key string.
+     *
+     * @param dimDir  the dim dir
+     * @param regionX the region x
+     * @param regionZ the region z
+     * @return the string
+     */
     public static String toCacheKey(Path dimDir, int regionX, int regionZ)
     {
         return regionX + dimDir.toString() + regionZ;
     }
 
+    /**
+     * Exists boolean.
+     *
+     * @return the boolean
+     */
     public boolean exists()
     {
         return RegionLoader.getRegionFile(FMLClientHandler.instance().getClient(), getMinChunkX(), getMinChunkZ()).exists();
     }
 
+    /**
+     * Gets x offset.
+     *
+     * @param chunkX the chunk x
+     * @return the x offset
+     */
     public int getXOffset(int chunkX)
     {
         if (chunkX >> SIZE != regionX)
@@ -116,6 +219,12 @@ public class RegionCoord implements Comparable<RegionCoord>
         return offset;
     }
 
+    /**
+     * Gets z offset.
+     *
+     * @param chunkZ the chunk z
+     * @return the z offset
+     */
     public int getZOffset(int chunkZ)
     {
         if (getRegionPos(chunkZ) != regionZ)
@@ -130,36 +239,71 @@ public class RegionCoord implements Comparable<RegionCoord>
         return offset;
     }
 
+    /**
+     * Gets min chunk x.
+     *
+     * @return the min chunk x
+     */
     public int getMinChunkX()
     {
         return getMinChunkX(regionX);
     }
 
+    /**
+     * Gets max chunk x.
+     *
+     * @return the max chunk x
+     */
     public int getMaxChunkX()
     {
         return getMaxChunkX(regionX);
     }
 
+    /**
+     * Gets min chunk z.
+     *
+     * @return the min chunk z
+     */
     public int getMinChunkZ()
     {
         return getMinChunkZ(regionZ);
     }
 
+    /**
+     * Gets max chunk z.
+     *
+     * @return the max chunk z
+     */
     public int getMaxChunkZ()
     {
         return getMaxChunkZ(regionZ);
     }
 
+    /**
+     * Gets min chunk coord.
+     *
+     * @return the min chunk coord
+     */
     public ChunkPos getMinChunkCoord()
     {
         return new ChunkPos(getMinChunkX(), getMinChunkZ());
     }
 
+    /**
+     * Gets max chunk coord.
+     *
+     * @return the max chunk coord
+     */
     public ChunkPos getMaxChunkCoord()
     {
         return new ChunkPos(getMaxChunkX(), getMaxChunkZ());
     }
 
+    /**
+     * Gets chunk coords in region.
+     *
+     * @return the chunk coords in region
+     */
     public List<ChunkPos> getChunkCoordsInRegion()
     {
         final List<ChunkPos> list = new ArrayList<ChunkPos>(1024);
@@ -227,6 +371,11 @@ public class RegionCoord implements Comparable<RegionCoord>
         return true;
     }
 
+    /**
+     * Cache key string.
+     *
+     * @return the string
+     */
     public String cacheKey()
     {
         return theCacheKey;

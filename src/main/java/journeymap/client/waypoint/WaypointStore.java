@@ -30,6 +30,9 @@ import java.util.*;
 @ParametersAreNonnullByDefault
 public enum WaypointStore
 {
+    /**
+     * Instance waypoint store.
+     */
     INSTANCE;
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -62,11 +65,22 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Gets all.
+     *
+     * @return the all
+     */
     public Collection<Waypoint> getAll()
     {
         return cache.asMap().values();
     }
 
+    /**
+     * Gets all.
+     *
+     * @param group the group
+     * @return the all
+     */
     public Collection<Waypoint> getAll(final WaypointGroup group)
     {
         return Maps.filterEntries(cache.asMap(), new Predicate<Map.Entry<String, Waypoint>>()
@@ -79,6 +93,11 @@ public enum WaypointStore
         }).values();
     }
 
+    /**
+     * Add.
+     *
+     * @param waypoint the waypoint
+     */
     public void add(Waypoint waypoint)
     {
         if (cache.getIfPresent(waypoint.getId()) == null)
@@ -87,6 +106,11 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Save.
+     *
+     * @param waypoint the waypoint
+     */
     public void save(Waypoint waypoint)
     {
         cache.put(waypoint.getId(), waypoint);
@@ -97,6 +121,9 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Bulk save.
+     */
     public void bulkSave()
     {
         for (Waypoint waypoint : cache.asMap().values())
@@ -112,6 +139,11 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Remove.
+     *
+     * @param waypoint the waypoint
+     */
     public void remove(Waypoint waypoint)
     {
         cache.invalidate(waypoint.getId());
@@ -133,6 +165,9 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Reset.
+     */
     public void reset()
     {
         cache.invalidateAll();
@@ -168,6 +203,12 @@ public enum WaypointStore
         }
     }
 
+    /**
+     * Load.
+     *
+     * @param waypoints the waypoints
+     * @param forceSave the force save
+     */
     public void load(Collection<Waypoint> waypoints, boolean forceSave)
     {
         for (Waypoint waypoint : waypoints)
@@ -186,11 +227,21 @@ public enum WaypointStore
         loaded = true;
     }
 
+    /**
+     * Has loaded boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasLoaded()
     {
         return loaded;
     }
 
+    /**
+     * Gets loaded dimensions.
+     *
+     * @return the loaded dimensions
+     */
     public List<Integer> getLoadedDimensions()
     {
         return new ArrayList<Integer>(dimensions);

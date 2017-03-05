@@ -19,6 +19,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * The type Chunk loader.
+ */
 public class ChunkLoader
 {
     private static Logger logger = Journeymap.getLogger();
@@ -26,6 +29,12 @@ public class ChunkLoader
     /**
      * Gets the chunk from the region file on disk.  Only works in SinglePlayer, and assumes the current dimension
      * is the intended dimension.
+     *
+     * @param loader      the loader
+     * @param mc          the mc
+     * @param coord       the coord
+     * @param forceRetain the force retain
+     * @return the chunk md
      */
     public static ChunkMD getChunkMD(AnvilChunkLoader loader, Minecraft mc, ChunkPos coord, boolean forceRetain)
     {
@@ -68,6 +77,14 @@ public class ChunkLoader
         return null;
     }
 
+    /**
+     * Gets chunk md from memory.
+     *
+     * @param world  the world
+     * @param chunkX the chunk x
+     * @param chunkZ the chunk z
+     * @return the chunk md from memory
+     */
     public static ChunkMD getChunkMdFromMemory(World world, int chunkX, int chunkZ)
     {
         if (world != null)

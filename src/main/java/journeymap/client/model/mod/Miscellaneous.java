@@ -19,16 +19,31 @@ import static journeymap.client.model.BlockMD.Flag.*;
  */
 public class Miscellaneous
 {
+    /**
+     * The type Common handler.
+     */
     public static class CommonHandler implements ModBlockDelegate.IModBlockHandler
     {
-        // Mariculture Kelp
+        /**
+         * The Mariculture kelp id.
+         */
+// Mariculture Kelp
         String maricultureKelpId = "Mariculture:kelp";
 
-        // Thaumcraft leaves (greatwood, silverwood)
+        /**
+         * The Thaumcraft leaves id.
+         */
+// Thaumcraft leaves (greatwood, silverwood)
         String thaumcraftLeavesId = "Thaumcraft:blockMagicalLeaves";
 
+        /**
+         * The Torches.
+         */
         List<String> torches = new ArrayList<String>();
 
+        /**
+         * Instantiates a new Common handler.
+         */
         public CommonHandler()
         {
             torches.add("TConstruct:decoration.stonetorch");

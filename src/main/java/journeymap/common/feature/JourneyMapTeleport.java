@@ -28,6 +28,13 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
  */
 public class JourneyMapTeleport
 {
+    /**
+     * Attempt teleport boolean.
+     *
+     * @param entity   the entity
+     * @param location the location
+     * @return the boolean
+     */
     public static boolean attemptTeleport(Entity entity, Location location)
     {
         MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -146,6 +153,12 @@ public class JourneyMapTeleport
         return false;
     }
 
+    /**
+     * Is op boolean.
+     *
+     * @param player the player
+     * @return the boolean
+     */
     public static boolean isOp(EntityPlayerMP player)
     {
         String[] ops = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOppedPlayerNames();

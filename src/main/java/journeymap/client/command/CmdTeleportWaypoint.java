@@ -17,18 +17,38 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.TreeSet;
 
 /**
+ * The type Cmd teleport waypoint.
+ *
  * @author techbrew 4/8/2014.
  */
-public class CmdTeleportWaypoint
+public class CmdTeleportWaypoint implements Runnable
 {
+    /**
+     * Minecraft client
+     */
     final Minecraft mc = FMLClientHandler.instance().getClient();
+
+    /**
+     * The Waypoint.
+     */
     final Waypoint waypoint;
 
+    /**
+     * Instantiates a new Cmd teleport waypoint.
+     *
+     * @param waypoint the waypoint
+     */
     public CmdTeleportWaypoint(Waypoint waypoint)
     {
         this.waypoint = waypoint;
     }
 
+    /**
+     * Is permitted boolean.
+     *
+     * @param mc the mc
+     * @return the boolean
+     */
     public static boolean isPermitted(Minecraft mc)
     {
         if (mc.getIntegratedServer() != null)
@@ -73,6 +93,9 @@ public class CmdTeleportWaypoint
         return true;
     }
 
+    /**
+     * Run.
+     */
     public void run()
     {
         double x = waypoint.getBlockCenteredX();

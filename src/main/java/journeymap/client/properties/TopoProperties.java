@@ -40,10 +40,25 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
             "#1a1aaa,#2a2aaf,#3939b5,#4848bb,#5757c0,#6767c6,#7676cc,#8585d2,#9494d7,#a4a4dd,#b3b3e3,#c2c2e8,#d1d1ee," +
             "#d7d7f0,#ddddf2,#e2e2f4,#e8e8f6,#eeeef9,#f4f4fb,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff,#f9f9ff";
 
+    /**
+     * The Show contour.
+     */
     public final BooleanField showContour = new BooleanField(Category.Hidden, true);
+    /**
+     * The Land contour.
+     */
     public final StringField landContour = new StringField(Category.Hidden, "").set(DEFAULT_LAND_CONTOUR_COLOR);
+    /**
+     * The Water contour.
+     */
     public final StringField waterContour = new StringField(Category.Hidden, "").set(DEFAULT_WATER_CONTOUR_COLOR);
+    /**
+     * The Land.
+     */
     public final StringField land = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_LAND_COLORS);
+    /**
+     * The Water.
+     */
     public final StringField water = new StringField(Category.Hidden, "").multiline(true).set(DEFAULT_WATER_COLORS);
 
     private transient Integer[] landColors;
@@ -51,6 +66,9 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
     private transient Integer landContourColor;
     private transient Integer waterContourColor;
 
+    /**
+     * Instantiates a new Topo properties.
+     */
     public TopoProperties()
     {
     }
@@ -61,6 +79,11 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return "topo";
     }
 
+    /**
+     * Get land colors integer [ ].
+     *
+     * @return the integer [ ]
+     */
     public Integer[] getLandColors()
     {
         if (landColors == null)
@@ -76,6 +99,11 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return landColors;
     }
 
+    /**
+     * Get water colors integer [ ].
+     *
+     * @return the integer [ ]
+     */
     public Integer[] getWaterColors()
     {
         if (waterColors == null)
@@ -91,6 +119,11 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return waterColors;
     }
 
+    /**
+     * Gets land contour color.
+     *
+     * @return the land contour color
+     */
     public Integer getLandContourColor()
     {
         if (!showContour.get())
@@ -104,6 +137,11 @@ public class TopoProperties extends ClientPropertiesBase implements Comparable<T
         return landContourColor;
     }
 
+    /**
+     * Gets water contour color.
+     *
+     * @return the water contour color
+     */
     public Integer getWaterContourColor()
     {
         if (!showContour.get())

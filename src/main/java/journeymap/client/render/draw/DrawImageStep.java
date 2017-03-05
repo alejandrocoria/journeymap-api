@@ -33,7 +33,7 @@ public class DrawImageStep extends BaseOverlayDrawStep<ImageOverlay>
     /**
      * Draw a marker on the map.
      *
-     * @param marker
+     * @param marker the marker
      */
     public DrawImageStep(ImageOverlay marker)
     {

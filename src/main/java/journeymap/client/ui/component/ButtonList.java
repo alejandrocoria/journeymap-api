@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * The type Button list.
+ *
  * @author techbrew 4/2/2014.
  */
 public class ButtonList extends ArrayList<Button>
@@ -23,16 +25,29 @@ public class ButtonList extends ArrayList<Button>
     private Direction direction = Direction.LeftToRight;
     private String label;
 
+    /**
+     * Instantiates a new Button list.
+     */
     public ButtonList()
     {
 
     }
 
+    /**
+     * Instantiates a new Button list.
+     *
+     * @param label the label
+     */
     public ButtonList(String label)
     {
         this.label = label;
     }
 
+    /**
+     * Instantiates a new Button list.
+     *
+     * @param buttons the buttons
+     */
     public ButtonList(List<GuiButton> buttons)
     {
         for (GuiButton button : buttons)
@@ -44,11 +59,22 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Instantiates a new Button list.
+     *
+     * @param buttons the buttons
+     */
     public ButtonList(Button... buttons)
     {
         super(Arrays.asList(buttons));
     }
 
+    /**
+     * Gets width.
+     *
+     * @param hgap the hgap
+     * @return the width
+     */
     public int getWidth(int hgap)
     {
         return getWidth(-1, hgap);
@@ -86,6 +112,12 @@ public class ButtonList extends ArrayList<Button>
         return total;
     }
 
+    /**
+     * Gets height.
+     *
+     * @param vgap the vgap
+     * @return the height
+     */
     public int getHeight(int vgap)
     {
         if (this.isEmpty())
@@ -111,6 +143,11 @@ public class ButtonList extends ArrayList<Button>
         return total;
     }
 
+    /**
+     * Gets left x.
+     *
+     * @return the left x
+     */
     public int getLeftX()
     {
         int left = Integer.MAX_VALUE;
@@ -128,6 +165,11 @@ public class ButtonList extends ArrayList<Button>
         return left;
     }
 
+    /**
+     * Gets top y.
+     *
+     * @return the top y
+     */
     public int getTopY()
     {
         int top = Integer.MAX_VALUE;
@@ -145,6 +187,11 @@ public class ButtonList extends ArrayList<Button>
         return top;
     }
 
+    /**
+     * Gets bottom y.
+     *
+     * @return the bottom y
+     */
     public int getBottomY()
     {
         int bottom = Integer.MIN_VALUE;
@@ -162,6 +209,11 @@ public class ButtonList extends ArrayList<Button>
         return bottom;
     }
 
+    /**
+     * Gets right x.
+     *
+     * @return the right x
+     */
     public int getRightX()
     {
         int right = 0;
@@ -175,6 +227,12 @@ public class ButtonList extends ArrayList<Button>
         return right;
     }
 
+    /**
+     * Find button button.
+     *
+     * @param id the id
+     * @return the button
+     */
     public Button findButton(int id)
     {
         for (Button button : this)
@@ -187,12 +245,27 @@ public class ButtonList extends ArrayList<Button>
         return null;
     }
 
+    /**
+     * Sets layout.
+     *
+     * @param layout    the layout
+     * @param direction the direction
+     */
     public void setLayout(Layout layout, Direction direction)
     {
         this.layout = layout;
         this.direction = direction;
     }
 
+    /**
+     * Layout horizontal button list.
+     *
+     * @param startX      the start x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @return the button list
+     */
     public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap)
     {
         this.layout = Layout.Horizontal;
@@ -233,6 +306,15 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Layout vertical button list.
+     *
+     * @param x           the x
+     * @param startY      the start y
+     * @param leftToRight the left to right
+     * @param vgap        the vgap
+     * @return the button list
+     */
     public ButtonList layoutVertical(final int x, int startY, boolean leftToRight, int vgap)
     {
         this.layout = Layout.Vertical;
@@ -269,6 +351,15 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Layout centered vertical button list.
+     *
+     * @param x           the x
+     * @param centerY     the center y
+     * @param leftToRight the left to right
+     * @param vgap        the vgap
+     * @return the button list
+     */
     public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
     {
         int height = getHeight(vgap);
@@ -277,6 +368,15 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Layout centered horizontal button list.
+     *
+     * @param centerX     the center x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @return the button list
+     */
     public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
     {
         int width = getWidth(hgap);
@@ -285,6 +385,15 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Layout distributed horizontal button list.
+     *
+     * @param leftX       the left x
+     * @param y           the y
+     * @param rightX      the right x
+     * @param leftToRight the left to right
+     * @return the button list
+     */
     public ButtonList layoutDistributedHorizontal(final int leftX, final int y, final int rightX, final boolean leftToRight)
     {
         if (this.size() == 0)
@@ -309,6 +418,17 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Layout filled horizontal button list.
+     *
+     * @param fr          the fr
+     * @param leftX       the left x
+     * @param y           the y
+     * @param rightX      the right x
+     * @param hgap        the hgap
+     * @param leftToRight the left to right
+     * @return the button list
+     */
     public ButtonList layoutFilledHorizontal(FontRenderer fr, final int leftX, final int y, final int rightX, final int hgap, final boolean leftToRight)
     {
         if (this.size() == 0)
@@ -336,16 +456,32 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Sets fit widths.
+     *
+     * @param fr the fr
+     */
     public void setFitWidths(FontRenderer fr)
     {
         fitWidths(fr);
     }
 
+    /**
+     * Is horizontal boolean.
+     *
+     * @return the boolean
+     */
     public boolean isHorizontal()
     {
         return layout != Layout.Vertical && layout != Layout.CenteredVertical;
     }
 
+    /**
+     * Sets enabled.
+     *
+     * @param enabled the enabled
+     * @return the enabled
+     */
     public ButtonList setEnabled(boolean enabled)
     {
         for (Button button : this)
@@ -355,6 +491,14 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Sets options.
+     *
+     * @param enabled        the enabled
+     * @param drawBackground the draw background
+     * @param drawFrame      the draw frame
+     * @return the options
+     */
     public ButtonList setOptions(boolean enabled, boolean drawBackground, boolean drawFrame)
     {
         for (Button button : this)
@@ -366,6 +510,12 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Sets default style.
+     *
+     * @param defaultStyle the default style
+     * @return the default style
+     */
     public ButtonList setDefaultStyle(boolean defaultStyle)
     {
         for (Button button : this)
@@ -375,6 +525,14 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Draw button list.
+     *
+     * @param minecraft the minecraft
+     * @param mouseX    the mouse x
+     * @param mouseY    the mouse y
+     * @return the button list
+     */
     public ButtonList draw(Minecraft minecraft, int mouseX, int mouseY)
     {
         for (Button button : this)
@@ -384,6 +542,11 @@ public class ButtonList extends ArrayList<Button>
         return this;
     }
 
+    /**
+     * Sets heights.
+     *
+     * @param height the height
+     */
     public void setHeights(int height)
     {
         for (Button button : this)
@@ -392,6 +555,11 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Sets widths.
+     *
+     * @param width the width
+     */
     public void setWidths(int width)
     {
         for (Button button : this)
@@ -400,6 +568,11 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Fit widths.
+     *
+     * @param fr the fr
+     */
     public void fitWidths(FontRenderer fr)
     {
         for (Button button : this)
@@ -408,6 +581,11 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Sets draw buttons.
+     *
+     * @param draw the draw
+     */
     public void setDrawButtons(boolean draw)
     {
         for (Button button : this)
@@ -416,6 +594,11 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Equalize widths.
+     *
+     * @param fr the fr
+     */
     public void equalizeWidths(FontRenderer fr)
     {
         int maxWidth = 0;
@@ -472,6 +655,11 @@ public class ButtonList extends ArrayList<Button>
         }
     }
 
+    /**
+     * Gets visible button count.
+     *
+     * @return the visible button count
+     */
     public int getVisibleButtonCount()
     {
         int count = 0;
@@ -485,29 +673,74 @@ public class ButtonList extends ArrayList<Button>
         return count;
     }
 
+    /**
+     * Gets label.
+     *
+     * @return the label
+     */
     public String getLabel()
     {
         return label;
     }
 
+    /**
+     * Sets label.
+     *
+     * @param label the label
+     */
     public void setLabel(String label)
     {
         this.label = label;
     }
 
+    /**
+     * Reverse button list.
+     *
+     * @return the button list
+     */
     public ButtonList reverse()
     {
         Collections.reverse(this);
         return this;
     }
 
+    /**
+     * The enum Layout.
+     */
     public enum Layout
     {
-        Horizontal, Vertical, CenteredHorizontal, CenteredVertical, DistributedHorizontal, FilledHorizontal
+        /**
+         * Horizontal layout.
+         */
+        Horizontal, /**
+     * Vertical layout.
+     */
+    Vertical, /**
+     * Centered horizontal layout.
+     */
+    CenteredHorizontal, /**
+     * Centered vertical layout.
+     */
+    CenteredVertical, /**
+     * Distributed horizontal layout.
+     */
+    DistributedHorizontal, /**
+     * Filled horizontal layout.
+     */
+    FilledHorizontal
     }
 
+    /**
+     * The enum Direction.
+     */
     public enum Direction
     {
-        LeftToRight, RightToLeft
+        /**
+         * Left to right direction.
+         */
+        LeftToRight, /**
+     * Right to left direction.
+     */
+    RightToLeft
     }
 }

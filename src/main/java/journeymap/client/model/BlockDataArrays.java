@@ -21,16 +21,28 @@ public class BlockDataArrays
 {
     private HashMap<MapType, Dataset> datasets = new HashMap<>(8);
 
+    /**
+     * Clear all.
+     */
     public void clearAll()
     {
         datasets.clear();
     }
 
+    /**
+     * Get dataset.
+     *
+     * @param mapType the map type
+     * @return the dataset
+     */
     public Dataset get(MapType mapType)
     {
         return datasets.computeIfAbsent(mapType, s -> new Dataset());
     }
 
+    /**
+     * The type Dataset.
+     */
     public static class Dataset
     {
         private DataArray<Integer> ints;
@@ -38,6 +50,9 @@ public class BlockDataArrays
         private DataArray<Boolean> booleans;
         private DataArray<Object> objects;
 
+        /**
+         * Clear.
+         */
         protected void clear()
         {
             ints = null;
@@ -46,6 +61,11 @@ public class BlockDataArrays
             objects = null;
         }
 
+        /**
+         * Ints data array.
+         *
+         * @return the data array
+         */
         public DataArray<Integer> ints()
         {
             if (ints == null)
@@ -55,6 +75,11 @@ public class BlockDataArrays
             return ints;
         }
 
+        /**
+         * Floats data array.
+         *
+         * @return the data array
+         */
         public DataArray<Float> floats()
         {
             if (floats == null)
@@ -64,6 +89,11 @@ public class BlockDataArrays
             return floats;
         }
 
+        /**
+         * Booleans data array.
+         *
+         * @return the data array
+         */
         public DataArray<Boolean> booleans()
         {
             if (booleans == null)
@@ -73,6 +103,11 @@ public class BlockDataArrays
             return booleans;
         }
 
+        /**
+         * Objects data array.
+         *
+         * @return the data array
+         */
         public DataArray<Object> objects()
         {
             if (objects == null)
@@ -83,31 +118,70 @@ public class BlockDataArrays
         }
     }
 
+    /**
+     * The type Data array.
+     *
+     * @param <T> the type parameter
+     */
     public static class DataArray<T>
     {
         private final HashMap<String, T[][]> map = new HashMap<>(4);
         private final Supplier<T[][]> initFn;
 
+        /**
+         * Instantiates a new Data array.
+         *
+         * @param initFn the init fn
+         */
         protected DataArray(Supplier<T[][]> initFn)
         {
             this.initFn = initFn;
         }
 
+        /**
+         * Has boolean.
+         *
+         * @param name the name
+         * @return the boolean
+         */
         public boolean has(String name)
         {
             return map.containsKey(name);
         }
 
+        /**
+         * Get t [ ] [ ].
+         *
+         * @param name the name
+         * @return the t [ ] [ ]
+         */
         public T[][] get(String name)
         {
             return map.computeIfAbsent(name, s -> initFn.get());
         }
 
+        /**
+         * Get t.
+         *
+         * @param name the name
+         * @param x    the x
+         * @param z    the z
+         * @return the t
+         */
         public T get(String name, int x, int z)
         {
             return get(name)[z][x];
         }
 
+        /**
+         * Set boolean.
+         *
+         * @param name  the name
+         * @param x     the x
+         * @param z     the z
+         * @param value the value
+         * @return the boolean
+         */
         public boolean set(String name, int x, int z, T value)
         {
             T[][] arr = get(name);
@@ -116,6 +190,12 @@ public class BlockDataArrays
             return (value != old);
         }
 
+        /**
+         * Copy t [ ] [ ].
+         *
+         * @param name the name
+         * @return the t [ ] [ ]
+         */
         public T[][] copy(String name)
         {
             T[][] src = get(name);
@@ -127,17 +207,35 @@ public class BlockDataArrays
             return dest;
         }
 
+        /**
+         * Copy to.
+         *
+         * @param srcName the src name
+         * @param dstName the dst name
+         */
         public void copyTo(String srcName, String dstName)
         {
             map.put(dstName, copy(srcName));
         }
 
+        /**
+         * Clear.
+         *
+         * @param name the name
+         */
         public void clear(String name)
         {
             map.remove(name);
         }
     }
 
+    /**
+     * Are identical boolean.
+     *
+     * @param arr  the arr
+     * @param arr2 the arr 2
+     * @return the boolean
+     */
     public static boolean areIdentical(final int[][] arr, final int[][] arr2)
     {
         boolean match = true;

@@ -48,11 +48,29 @@ public class FileService extends BaseService
 {
 
     private static final long serialVersionUID = 2L;
+    /**
+     * The Resource path.
+     */
     protected final String resourcePath;
+    /**
+     * The Color palette json.
+     */
     final String COLOR_PALETTE_JSON = "/" + ColorPalette.JSON_FILENAME;
+    /**
+     * The Color palette html.
+     */
     final String COLOR_PALETTE_HTML = "/" + ColorPalette.HTML_FILENAME;
+    /**
+     * The Entity icon prefix.
+     */
     final String ENTITY_ICON_PREFIX = "/entity_icon";
+    /**
+     * The Icon theme path prefix.
+     */
     final String ICON_THEME_PATH_PREFIX = "/theme/";
+    /**
+     * The Skin prefix.
+     */
     final String SKIN_PREFIX = "/skin/";
     private boolean useZipEntry;
     private File zipFile;
@@ -244,6 +262,13 @@ public class FileService extends BaseService
         }
     }
 
+    /**
+     * Gets stream.
+     *
+     * @param path  the path
+     * @param event the event
+     * @return the stream
+     */
     protected InputStream getStream(String path, Event event)
     {
         InputStream in = null;
@@ -333,6 +358,13 @@ public class FileService extends BaseService
         return in;
     }
 
+    /**
+     * Serve skin.
+     *
+     * @param username the username
+     * @param event    the event
+     * @throws Exception the exception
+     */
     public void serveSkin(String username, Event event) throws Exception
     {
 
@@ -353,10 +385,10 @@ public class FileService extends BaseService
     /**
      * Respond with the contents of a file.
      *
-     * @param sourceFile
-     * @param event
-     * @throws Event
-     * @throws IOException
+     * @param sourceFile the source file
+     * @param event      the event
+     * @throws Event       the event
+     * @throws IOException the io exception
      */
     public void serveFile(File sourceFile, Event event) throws Event, IOException
     {
@@ -371,10 +403,10 @@ public class FileService extends BaseService
     /**
      * Respond with the contents of a file input stream.
      *
-     * @param input
-     * @param event
-     * @throws Event
-     * @throws IOException
+     * @param input the input
+     * @param event the event
+     * @throws Event       the event
+     * @throws IOException the io exception
      */
     public void serveStream(final InputStream input, Event event) throws Event, IOException
     {

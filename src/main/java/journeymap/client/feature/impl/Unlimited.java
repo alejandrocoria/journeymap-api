@@ -22,6 +22,9 @@ public class Unlimited implements FeatureManager.PolicySet
     private final Set<Policy> policies;
     private final String name = "Unlimited";
 
+    /**
+     * Instantiates a new Unlimited.
+     */
     public Unlimited()
     {
         policies = Collections.unmodifiableSet(Policy.bulkCreate(true, true));

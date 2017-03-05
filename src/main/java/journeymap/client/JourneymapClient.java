@@ -63,7 +63,13 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
+    /**
+     * The constant FULL_VERSION.
+     */
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
+    /**
+     * The constant MOD_NAME.
+     */
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
     private boolean serverEnabled = false;
     private boolean serverTeleportEnabled = false;
@@ -99,6 +105,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the core properties.
+     *
+     * @return the core properties
      */
     public CoreProperties getCoreProperties()
     {
@@ -107,6 +115,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the fullmap properties.
+     *
+     * @return the full map properties
      */
     public FullMapProperties getFullMapProperties()
     {
@@ -115,6 +125,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the core properties.
+     *
+     * @return the topo properties
      */
     public TopoProperties getTopoProperties()
     {
@@ -135,6 +147,9 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the minimap properties for the active minimap.
+     *
+     * @param which the which
+     * @return the mini map properties
      */
     public MiniMapProperties getMiniMapProperties(int which)
     {
@@ -157,6 +172,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the active minimap id.
+     *
+     * @return the active minimap id
      */
     public int getActiveMinimapId()
     {
@@ -172,6 +189,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get properties for minimap 1.
+     *
+     * @return the mini map properties 1
      */
     public MiniMapProperties getMiniMapProperties1()
     {
@@ -180,6 +199,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get properties for minimap 2.
+     *
+     * @return the mini map properties 2
      */
     public MiniMapProperties getMiniMapProperties2()
     {
@@ -188,6 +209,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the webmap properties.
+     *
+     * @return the web map properties
      */
     public WebMapProperties getWebMapProperties()
     {
@@ -196,6 +219,8 @@ public class JourneymapClient implements CommonProxy
 
     /**
      * Get the waypoint properties.
+     *
+     * @return the waypoint properties
      */
     public WaypointProperties getWaypointProperties()
     {
@@ -355,6 +380,11 @@ public class JourneymapClient implements CommonProxy
         return getCoreProperties().checkUpdates.get();
     }
 
+    /**
+     * Handle imc.
+     *
+     * @param event the event
+     */
     @Mod.EventHandler
     public void handleIMC(FMLInterModComms.IMCEvent event)
     {
@@ -364,7 +394,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Whether the instance is initialized.
      *
-     * @return
+     * @return boolean
      */
     public Boolean isInitialized()
     {
@@ -374,7 +404,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Whether the client is mapping.
      *
-     * @return
+     * @return boolean
      */
     public Boolean isMapping()
     {
@@ -384,7 +414,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Whether thread logging is enabled.
      *
-     * @return
+     * @return boolean
      */
     public Boolean isThreadLogging()
     {
@@ -394,7 +424,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Initialize the webserver
      *
-     * @return
+     * @return jm server
      */
     public WebServer getJmServer()
     {
@@ -404,7 +434,8 @@ public class JourneymapClient implements CommonProxy
     /**
      * Queue a Runnable on the multithreaded task controller.
      *
-     * @param runnable
+     * @param runnable the runnable
+     * @throws Exception the exception
      */
     public void queueOneOff(Runnable runnable) throws Exception
     {
@@ -417,7 +448,9 @@ public class JourneymapClient implements CommonProxy
     /**
      * Toggles a recurring task
      *
-     * @param enable
+     * @param managerClass the manager class
+     * @param enable       the enable
+     * @param params       the params
      */
     public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params)
     {
@@ -430,8 +463,8 @@ public class JourneymapClient implements CommonProxy
     /**
      * Checks whether a task manager is managerEnabled.
      *
-     * @param managerClass
-     * @return
+     * @param managerClass the manager class
+     * @return boolean
      */
     public boolean isTaskManagerEnabled(Class<? extends ITaskManager> managerClass)
     {
@@ -553,7 +586,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Queue a task that has to be run on the main thread.
      *
-     * @param task
+     * @param task the task
      */
     public void queueMainThreadTask(IMainThreadTask task)
     {
@@ -594,7 +627,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Get the chunk render controller   May be null.
      *
-     * @return
+     * @return chunk render controller
      */
     public ChunkRenderController getChunkRenderController()
     {
@@ -670,7 +703,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Get the current world id.  May be null.
      *
-     * @return
+     * @return current world id
      */
     public String getCurrentWorldId()
     {
@@ -680,7 +713,7 @@ public class JourneymapClient implements CommonProxy
     /**
      * Set the current world id.
      *
-     * @param worldId
+     * @param worldId the world id
      */
     public void setCurrentWorldId(String worldId)
     {
@@ -710,21 +743,41 @@ public class JourneymapClient implements CommonProxy
         }
     }
 
+    /**
+     * Is server enabled boolean.
+     *
+     * @return the boolean
+     */
     public boolean isServerEnabled()
     {
         return serverEnabled;
     }
 
+    /**
+     * Sets server enabled.
+     *
+     * @param serverEnabled the server enabled
+     */
     public void setServerEnabled(boolean serverEnabled)
     {
         this.serverEnabled = serverEnabled;
     }
 
+    /**
+     * Is server teleport enabled boolean.
+     *
+     * @return the boolean
+     */
     public boolean isServerTeleportEnabled()
     {
         return serverTeleportEnabled;
     }
 
+    /**
+     * Sets server teleport enabled.
+     *
+     * @param serverTeleportEnabled the server teleport enabled
+     */
     public void setServerTeleportEnabled(boolean serverTeleportEnabled)
     {
         this.serverTeleportEnabled = serverTeleportEnabled;

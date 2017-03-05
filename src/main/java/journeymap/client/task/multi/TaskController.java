@@ -20,17 +20,38 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The type Task controller.
+ */
 public class TaskController
 {
+    /**
+     * The constant logger.
+     */
     final static Logger logger = Journeymap.getLogger();
+    /**
+     * The Queue.
+     */
     final ArrayBlockingQueue<Future> queue = new ArrayBlockingQueue<Future>(1);
+    /**
+     * The Managers.
+     */
     final List<ITaskManager> managers = new LinkedList<ITaskManager>();
+    /**
+     * The Minecraft.
+     */
     final Minecraft minecraft = FMLClientHandler.instance().getClient();
+    /**
+     * The Lock.
+     */
     final ReentrantLock lock = new ReentrantLock();
 
     // Executor for task threads
     private volatile ScheduledExecutorService taskExecutor;
 
+    /**
+     * Instantiates a new Task controller.
+     */
     public TaskController()
     {
         managers.add(new MapRegionTask.Manager());
@@ -48,11 +69,19 @@ public class TaskController
         }
     }
 
+    /**
+     * Is active boolean.
+     *
+     * @return the boolean
+     */
     public Boolean isActive()
     {
         return taskExecutor != null && !taskExecutor.isShutdown();
     }
 
+    /**
+     * Enable tasks.
+     */
     public void enableTasks()
     {
         queue.clear();
@@ -74,6 +103,9 @@ public class TaskController
 
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         managers.clear();
@@ -108,6 +140,12 @@ public class TaskController
         return taskManager;
     }
 
+    /**
+     * Is task manager enabled boolean.
+     *
+     * @param managerClass the manager class
+     * @return the boolean
+     */
     public boolean isTaskManagerEnabled(Class<? extends ITaskManager> managerClass)
     {
         ITaskManager taskManager = getManager(managerClass);
@@ -122,6 +160,13 @@ public class TaskController
         }
     }
 
+    /**
+     * Toggle task.
+     *
+     * @param managerClass the manager class
+     * @param enable       the enable
+     * @param params       the params
+     */
     public void toggleTask(Class<? extends ITaskManager> managerClass, boolean enable, Object params)
     {
 
@@ -144,6 +189,13 @@ public class TaskController
         }
     }
 
+    /**
+     * Toggle task.
+     *
+     * @param manager the manager
+     * @param enable  the enable
+     * @param params  the params
+     */
     public void toggleTask(ITaskManager manager, boolean enable, Object params)
     {
         Minecraft minecraft = FMLClientHandler.instance().getClient();
@@ -173,6 +225,9 @@ public class TaskController
         }
     }
 
+    /**
+     * Disable tasks.
+     */
     public void disableTasks()
     {
         for (ITaskManager manager : managers)
@@ -185,11 +240,22 @@ public class TaskController
         }
     }
 
+    /**
+     * Has running task boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasRunningTask()
     {
         return !queue.isEmpty();
     }
 
+    /**
+     * Queue one off.
+     *
+     * @param runnable the runnable
+     * @throws Exception the exception
+     */
     public void queueOneOff(Runnable runnable) throws Exception
     {
         try
@@ -211,6 +277,9 @@ public class TaskController
         }
     }
 
+    /**
+     * Perform tasks.
+     */
     public void performTasks()
     {
         Profiler profiler = FMLClientHandler.instance().getClient().mcProfiler;

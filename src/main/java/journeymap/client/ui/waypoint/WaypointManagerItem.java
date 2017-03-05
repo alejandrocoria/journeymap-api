@@ -33,33 +33,103 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by Mark on 3/15/14.
+ * @author techbrew 3/15/14.
  */
 public class WaypointManagerItem implements ScrollListPane.ISlot
 {
 
+    /**
+     * The Background.
+     */
     static Integer background = new Color(20, 20, 20).getRGB();
+    /**
+     * The Background hover.
+     */
     static Integer backgroundHover = new Color(40, 40, 40).getRGB();
+    /**
+     * The Font renderer.
+     */
     final FontRenderer fontRenderer;
+    /**
+     * The Manager.
+     */
     final WaypointManager manager;
+    /**
+     * The X.
+     */
     int x;
+    /**
+     * The Y.
+     */
     int y;
+    /**
+     * The Width.
+     */
     int width;
+    /**
+     * The Internal width.
+     */
     int internalWidth;
+    /**
+     * The Distance.
+     */
     Integer distance;
+    /**
+     * The Waypoint.
+     */
     Waypoint waypoint;
+    /**
+     * The Button enable.
+     */
     OnOffButton buttonEnable;
+    /**
+     * The Button remove.
+     */
     Button buttonRemove;
+    /**
+     * The Button edit.
+     */
     Button buttonEdit;
+    /**
+     * The Button find.
+     */
     Button buttonFind;
+    /**
+     * The Button teleport.
+     */
     Button buttonTeleport;
+    /**
+     * The Button chat.
+     */
     Button buttonChat;
+    /**
+     * The Hgap.
+     */
     int hgap = 4;
+    /**
+     * The Button list left.
+     */
     ButtonList buttonListLeft;
+    /**
+     * The Button list right.
+     */
     ButtonList buttonListRight;
+    /**
+     * The Slot index.
+     */
     int slotIndex; // TODO
+    /**
+     * The Slot metadata.
+     */
     SlotMetadata<Waypoint> slotMetadata;
 
+    /**
+     * Instantiates a new Waypoint manager item.
+     *
+     * @param waypoint     the waypoint
+     * @param fontRenderer the font renderer
+     * @param manager      the manager
+     */
     public WaypointManagerItem(Waypoint waypoint, FontRenderer fontRenderer, WaypointManager manager)
     {
         int id = 0;
@@ -111,65 +181,129 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         internalWidth += 10; // Pad that action
     }
 
+    /**
+     * Gets slot index.
+     *
+     * @return the slot index
+     */
     public int getSlotIndex()
     {
         return slotIndex;
     }
 
+    /**
+     * Sets slot index.
+     *
+     * @param slotIndex the slot index
+     */
     public void setSlotIndex(int slotIndex)
     {
         this.slotIndex = slotIndex;
     }
 
-    //@Override
+    /**
+     * Sets position.
+     *
+     * @param x the x
+     * @param y the y
+     */
+//@Override
     public void setPosition(int x, int y)
     {
         this.x = x;
         this.y = y;
     }
 
-    //@Override
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
+//@Override
     public int getX()
     {
         return x;
     }
 
-    //@Override
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
+//@Override
     public int getY()
     {
         return y;
     }
 
-    //@Override
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
+//@Override
     public int getWidth()
     {
         return width;
     }
 
-    //@Override
+    /**
+     * Sets width.
+     *
+     * @param width the width
+     */
+//@Override
     public void setWidth(int width)
     {
         this.width = width;
     }
 
-    //@Override
+    /**
+     * Gets fit width.
+     *
+     * @param fr the fr
+     * @return the fit width
+     */
+//@Override
     public int getFitWidth(FontRenderer fr)
     {
         return width;
     }
 
-    //@Override
+    /**
+     * Gets height.
+     *
+     * @return the height
+     */
+//@Override
     public int getHeight()
     {
         return manager.rowHeight;
     }
 
-    //@Override
+    /**
+     * Draw partial scrollable.
+     *
+     * @param mc     the mc
+     * @param x      the x
+     * @param y      the y
+     * @param width  the width
+     * @param height the height
+     */
+//@Override
     public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height)
     {
         DrawUtil.drawRectangle(this.x, this.y, this.width, manager.rowHeight, background, .4f);
     }
 
+    /**
+     * Draw labels.
+     *
+     * @param mc    the mc
+     * @param x     the x
+     * @param y     the y
+     * @param color the color
+     */
     protected void drawLabels(Minecraft mc, int x, int y, Integer color)
     {
         if (this.waypoint == null)
@@ -193,34 +327,67 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         fr.drawStringWithShadow(name, manager.colName, y + yOffset, color);
     }
 
+    /**
+     * Draw waypoint.
+     *
+     * @param x the x
+     * @param y the y
+     */
     protected void drawWaypoint(int x, int y)
     {
         TextureImpl wpTexture = waypoint.getTexture();
         DrawUtil.drawColoredImage(wpTexture, waypoint.getColor(), 1f, x, y - (wpTexture.getHeight() / 2), 0);
     }
 
+    /**
+     * Enable waypoint.
+     *
+     * @param enable the enable
+     */
     protected void enableWaypoint(boolean enable)
     {
         buttonEnable.setToggled(enable);
         waypoint.setEnable(enable);
     }
 
+    /**
+     * Gets button enable center x.
+     *
+     * @return the button enable center x
+     */
     protected int getButtonEnableCenterX()
     {
         return buttonEnable.getCenterX();
     }
 
+    /**
+     * Gets name left x.
+     *
+     * @return the name left x
+     */
     protected int getNameLeftX()
     {
         return this.x + manager.getMargin() + manager.colName;
     }
 
+    /**
+     * Gets location left x.
+     *
+     * @return the location left x
+     */
     protected int getLocationLeftX()
     {
         return this.x + manager.getMargin() + manager.colLocation;
     }
 
-    //@Override
+    /**
+     * Click scrollable boolean.
+     *
+     * @param mouseX the mouse x
+     * @param mouseY the mouse y
+     * @return the boolean
+     */
+//@Override
     public boolean clickScrollable(int mouseX, int mouseY)
     {
         boolean mouseOver = false;
@@ -283,6 +450,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         return mouseOver;
     }
 
+    /**
+     * Gets distance.
+     *
+     * @return the distance
+     */
     public int getDistance()
     {
         return distance == null ? 0 : distance;
@@ -290,6 +462,9 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
     /**
      * Returns the squared distance to the entity. Only calculated once.
+     *
+     * @param player the player
+     * @return the distance to
      */
     public int getDistanceTo(EntityPlayer player)
     {
@@ -414,10 +589,21 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         return false;
     }
 
+    /**
+     * The type Sort.
+     */
     abstract static class Sort implements Comparator<WaypointManagerItem>
     {
+        /**
+         * The Ascending.
+         */
         boolean ascending;
 
+        /**
+         * Instantiates a new Sort.
+         *
+         * @param ascending the ascending
+         */
         Sort(boolean ascending)
         {
             this.ascending = ascending;
@@ -444,8 +630,16 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
     }
 
+    /**
+     * The type Name comparator.
+     */
     static class NameComparator extends Sort
     {
+        /**
+         * Instantiates a new Name comparator.
+         *
+         * @param ascending the ascending
+         */
         public NameComparator(boolean ascending)
         {
             super(ascending);
@@ -465,10 +659,22 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
     }
 
+    /**
+     * The type Distance comparator.
+     */
     static class DistanceComparator extends Sort
     {
+        /**
+         * The Player.
+         */
         EntityPlayer player;
 
+        /**
+         * Instantiates a new Distance comparator.
+         *
+         * @param player    the player
+         * @param ascending the ascending
+         */
         public DistanceComparator(EntityPlayer player, boolean ascending)
         {
             super(ascending);

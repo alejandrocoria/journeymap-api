@@ -36,28 +36,97 @@ import java.util.UUID;
  */
 public class EntityDTO implements Serializable
 {
+    /**
+     * The Entity id.
+     */
     public final String entityId;
+    /**
+     * The Entity living ref.
+     */
     public transient WeakReference<EntityLivingBase> entityLivingRef;
+    /**
+     * The Entity icon location.
+     */
     public transient ResourceLocation entityIconLocation;
+    /**
+     * The Icon location.
+     */
     public String iconLocation;
+    /**
+     * The Hostile.
+     */
     public Boolean hostile;
+    /**
+     * The Pos x.
+     */
     public double posX;
+    /**
+     * The Pos y.
+     */
     public double posY;
+    /**
+     * The Pos z.
+     */
     public double posZ;
+    /**
+     * The Chunk coord x.
+     */
     public int chunkCoordX;
+    /**
+     * The Chunk coord y.
+     */
     public int chunkCoordY;
+    /**
+     * The Chunk coord z.
+     */
     public int chunkCoordZ;
+    /**
+     * The Heading.
+     */
     public double heading;
+    /**
+     * The Custom name.
+     */
     public String customName;
+    /**
+     * The Owner.
+     */
     public String owner;
+    /**
+     * The Profession.
+     */
     public Integer profession;
+    /**
+     * The Username.
+     */
     public String username;
+    /**
+     * The Biome.
+     */
     public String biome;
+    /**
+     * The Dimension.
+     */
     public int dimension;
+    /**
+     * The Underground.
+     */
     public Boolean underground;
+    /**
+     * The Invisible.
+     */
     public boolean invisible;
+    /**
+     * The Sneaking.
+     */
     public boolean sneaking;
+    /**
+     * The Passive animal.
+     */
     public boolean passiveAnimal;
+    /**
+     * The Color.
+     */
     public int color;
 
     private EntityDTO(EntityLivingBase entity)
@@ -66,6 +135,12 @@ public class EntityDTO implements Serializable
         this.entityId = entity.getUniqueID().toString();
     }
 
+    /**
+     * Update.
+     *
+     * @param entity  the entity
+     * @param hostile the hostile
+     */
     public void update(EntityLivingBase entity, boolean hostile)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -259,6 +334,9 @@ public class EntityDTO implements Serializable
         }
     }
 
+    /**
+     * The type Simple cache loader.
+     */
     public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, EntityDTO>
     {
         @Override

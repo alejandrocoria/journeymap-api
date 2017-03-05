@@ -17,26 +17,73 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.*;
 
 /**
- *
+ * The type Category slot.
  */
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {
+    /**
+     * Minecraft client
+     */
     Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Metadata.
+     */
     SlotMetadata metadata;
+    /**
+     * The Category.
+     */
     Category category;
+    /**
+     * The Current slot index.
+     */
     int currentSlotIndex;
+    /**
+     * The Button.
+     */
     Button button;
+    /**
+     * The Current list width.
+     */
     int currentListWidth;
+    /**
+     * The Current columns.
+     */
     int currentColumns;
+    /**
+     * The Current column width.
+     */
     int currentColumnWidth;
+    /**
+     * The Master slot.
+     */
     SlotMetadata masterSlot;
+    /**
+     * The Current tooltip.
+     */
     SlotMetadata currentTooltip;
+    /**
+     * The Child metadata list.
+     */
     LinkedList<SlotMetadata> childMetadataList = new LinkedList<SlotMetadata>();
+    /**
+     * The Child slots.
+     */
     List<ScrollListPane.ISlot> childSlots = new ArrayList<ScrollListPane.ISlot>();
+    /**
+     * The Glyph closed.
+     */
     String glyphClosed = "\u25B6";
+    /**
+     * The Glyph open.
+     */
     String glyphOpen = "\u25BC";
     private boolean selected;
 
+    /**
+     * Instantiates a new Category slot.
+     *
+     * @param category the category
+     */
     public CategorySlot(Category category)
     {
         this.category = category;
@@ -56,6 +103,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         updateButtonLabel();
     }
 
+    /**
+     * Add category slot.
+     *
+     * @param slot the slot
+     * @return the category slot
+     */
     public CategorySlot add(ScrollListPane.ISlot slot)
     {
         childSlots.add(slot);
@@ -70,16 +123,27 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return this;
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         childSlots.clear();
     }
 
+    /**
+     * Size int.
+     *
+     * @return the int
+     */
     public int size()
     {
         return childSlots.size();
     }
 
+    /**
+     * Sort.
+     */
     public void sort()
     {
         Collections.sort(childMetadataList);
@@ -171,16 +235,31 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return Arrays.asList(metadata);
     }
 
+    /**
+     * Gets all child metadata.
+     *
+     * @return the all child metadata
+     */
     public List<SlotMetadata> getAllChildMetadata()
     {
         return childMetadataList;
     }
 
+    /**
+     * Gets current columns.
+     *
+     * @return the current columns
+     */
     public int getCurrentColumns()
     {
         return currentColumns;
     }
 
+    /**
+     * Gets current column width.
+     *
+     * @return the current column width
+     */
     public int getCurrentColumnWidth()
     {
         return currentColumnWidth;
@@ -225,11 +304,21 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         this.button.displayString = category.getLabel();
     }
 
+    /**
+     * Is selected boolean.
+     *
+     * @return the boolean
+     */
     public boolean isSelected()
     {
         return this.selected;
     }
 
+    /**
+     * Sets selected.
+     *
+     * @param selected the selected
+     */
     public void setSelected(boolean selected)
     {
         this.selected = selected;
@@ -297,6 +386,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return childMetadataList.contains(slotMetadata);
     }
 
+    /**
+     * Gets category.
+     *
+     * @return the category
+     */
     public Category getCategory()
     {
         return category;

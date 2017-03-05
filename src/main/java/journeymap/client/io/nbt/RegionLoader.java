@@ -23,16 +23,39 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The type Region loader.
+ */
 public class RegionLoader
 {
     private static final Pattern anvilPattern = Pattern.compile("r\\.([^\\.]+)\\.([^\\.]+)\\.mca");
 
+    /**
+     * The Logger.
+     */
     final Logger logger = Journeymap.getLogger();
 
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Regions.
+     */
     final Stack<RegionCoord> regions;
+    /**
+     * The Regions found.
+     */
     final int regionsFound;
 
+    /**
+     * Instantiates a new Region loader.
+     *
+     * @param minecraft the minecraft
+     * @param mapType   the map type
+     * @param all       the all
+     * @throws IOException the io exception
+     */
     public RegionLoader(final Minecraft minecraft, final MapType mapType, boolean all) throws IOException
     {
         this.mapType = mapType;
@@ -40,6 +63,15 @@ public class RegionLoader
         this.regionsFound = regions.size();
     }
 
+    /**
+     * Gets region file.
+     *
+     * @param minecraft the minecraft
+     * @param dimension the dimension
+     * @param chunkX    the chunk x
+     * @param chunkZ    the chunk z
+     * @return the region file
+     */
     public static File getRegionFile(Minecraft minecraft, int dimension, int chunkX, int chunkZ)
     {
         File regionDir = new File(FileHandler.getWorldSaveDir(minecraft), "region");
@@ -47,6 +79,14 @@ public class RegionLoader
         return regionFile;
     }
 
+    /**
+     * Gets region file.
+     *
+     * @param minecraft the minecraft
+     * @param chunkX    the chunk x
+     * @param chunkZ    the chunk z
+     * @return the region file
+     */
     public static File getRegionFile(Minecraft minecraft, int chunkX, int chunkZ)
     {
         File regionDir = new File(FileHandler.getWorldSaveDir(minecraft), "region");
@@ -54,31 +94,64 @@ public class RegionLoader
         return regionFile;
     }
 
+    /**
+     * Region iterator iterator.
+     *
+     * @return the iterator
+     */
     public Iterator<RegionCoord> regionIterator()
     {
         return regions.iterator();
     }
 
+    /**
+     * Gets regions.
+     *
+     * @return the regions
+     */
     public Stack<RegionCoord> getRegions()
     {
         return regions;
     }
 
+    /**
+     * Gets regions found.
+     *
+     * @return the regions found
+     */
     public int getRegionsFound()
     {
         return regionsFound;
     }
 
+    /**
+     * Is underground boolean.
+     *
+     * @return the boolean
+     */
     public boolean isUnderground()
     {
         return mapType.isUnderground();
     }
 
+    /**
+     * Gets v slice.
+     *
+     * @return the v slice
+     */
     public Integer getVSlice()
     {
         return mapType.vSlice;
     }
 
+    /**
+     * Find regions stack.
+     *
+     * @param mc      the mc
+     * @param mapType the map type
+     * @param all     the all
+     * @return the stack
+     */
     Stack<RegionCoord> findRegions(final Minecraft mc, final MapType mapType, boolean all)
     {
 
@@ -178,6 +251,11 @@ public class RegionLoader
         return stack;
     }
 
+    /**
+     * Gets map type.
+     *
+     * @return the map type
+     */
     public MapType getMapType()
     {
         return mapType;

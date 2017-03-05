@@ -16,7 +16,7 @@ public class IMCHandler
     /**
      * Handle an InterModComms event.
      *
-     * @param event
+     * @param event the event
      */
     public static void handle(FMLInterModComms.IMCEvent event)
     {

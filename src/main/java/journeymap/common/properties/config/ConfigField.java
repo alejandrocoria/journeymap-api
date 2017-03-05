@@ -19,39 +19,91 @@ import java.util.TreeMap;
  * Parent class for typed configuration field which has both metadata and data.
  * Intended to be self-describing and JSON-serializable. Values are serialized as
  * Strings and lazily converted to the proper types upon first use.
+ *
+ * @param <T> the type parameter
  */
 public abstract class ConfigField<T>
 {
+    /**
+     * The constant ATTR_TYPE.
+     */
     public static final String ATTR_TYPE = "type";
+    /**
+     * The constant ATTR_CATEGORY.
+     */
     public static final String ATTR_CATEGORY = "category";
+    /**
+     * The constant ATTR_KEY.
+     */
     public static final String ATTR_KEY = "key";
+    /**
+     * The constant ATTR_LABEL.
+     */
     public static final String ATTR_LABEL = "label";
+    /**
+     * The constant ATTR_TOOLTIP.
+     */
     public static final String ATTR_TOOLTIP = "tooltip";
+    /**
+     * The constant ATTR_ORDER.
+     */
     public static final String ATTR_ORDER = "order";
+    /**
+     * The constant ATTR_VALUE.
+     */
     public static final String ATTR_VALUE = "value";
+    /**
+     * The constant ATTR_DEFAULT.
+     */
     public static final String ATTR_DEFAULT = "default";
+    /**
+     * The constant ATTR_VALID_VALUES.
+     */
     public static final String ATTR_VALID_VALUES = "validValues";
 
-    // Map of all attributes
+    /**
+     * The Attributes.
+     */
+// Map of all attributes
     protected final transient Map<String, Object> attributes = new TreeMap<String, Object>();
 
-    // Owning Properties class
+    /**
+     * The Owner.
+     */
+// Owning Properties class
     protected transient PropertiesBase owner;
 
-    // Field name used by owning properties class
+    /**
+     * The Field name.
+     */
+// Field name used by owning properties class
     protected transient String fieldName;
 
+    /**
+     * Instantiates a new Config field.
+     */
     public ConfigField()
     {
         put(ATTR_TYPE, getClass().getSimpleName());
     }
 
+    /**
+     * Instantiates a new Config field.
+     *
+     * @param category the category
+     */
     protected ConfigField(Category category)
     {
         put(ATTR_TYPE, getClass().getSimpleName());
         put(ATTR_CATEGORY, category);
     }
 
+    /**
+     * Instantiates a new Config field.
+     *
+     * @param category the category
+     * @param key      the key
+     */
     protected ConfigField(Category category, String key)
     {
         put(ATTR_TYPE, getClass().getSimpleName());
@@ -88,7 +140,7 @@ public abstract class ConfigField<T>
      *
      * @param attrName attribute name
      * @param value    attribute value
-     * @return this
+     * @return this config field
      */
     public ConfigField<T> put(String attrName, Object value)
     {
@@ -99,14 +151,14 @@ public abstract class ConfigField<T>
     /**
      * Gets the default value.
      *
-     * @return T
+     * @return T default value
      */
     public abstract T getDefaultValue();
 
     /**
      * Gets the field value.
      *
-     * @return T
+     * @return T t
      */
     public abstract T get();
 
@@ -114,7 +166,7 @@ public abstract class ConfigField<T>
      * Sets the field value
      *
      * @param value T
-     * @return this
+     * @return this config field
      */
     public ConfigField<T> set(T value)
     {
@@ -139,7 +191,7 @@ public abstract class ConfigField<T>
      * Sets the sort order.
      *
      * @param order sort order
-     * @return this.
+     * @return this. config field
      */
     public ConfigField<T> sortOrder(int order)
     {
@@ -161,7 +213,7 @@ public abstract class ConfigField<T>
      * Sets the Category.
      *
      * @param category category
-     * @return this
+     * @return this config field
      */
     public ConfigField<T> category(Category category)
     {
@@ -196,7 +248,7 @@ public abstract class ConfigField<T>
     /**
      * Gets the label.
      *
-     * @return label
+     * @return label label
      */
     public String getLabel()
     {
@@ -207,7 +259,7 @@ public abstract class ConfigField<T>
      * Sets the label.
      *
      * @param label label
-     * @return this
+     * @return this config field
      */
     public ConfigField<T> label(String label)
     {
@@ -218,7 +270,7 @@ public abstract class ConfigField<T>
     /**
      * Gets the tooltip.
      *
-     * @return tooltip
+     * @return tooltip tooltip
      */
     public String getTooltip()
     {
@@ -228,7 +280,7 @@ public abstract class ConfigField<T>
     /**
      * Gets the field type.
      *
-     * @return type
+     * @return type type
      */
     public String getType()
     {
@@ -238,7 +290,7 @@ public abstract class ConfigField<T>
     /**
      * Gets the sort order for the field when displayed.
      *
-     * @return order
+     * @return order sort order
      */
     public int getSortOrder()
     {
@@ -323,9 +375,9 @@ public abstract class ConfigField<T>
     /**
      * Get the attribute of the Enum type specified.
      *
+     * @param <E>      Enum
      * @param attrName attribute name
      * @param enumType Enum class
-     * @param <E>      Enum
      * @return Enum value of attribute
      */
     public <E extends Enum> E getEnumAttr(String attrName, Class<E> enumType)
@@ -364,7 +416,7 @@ public abstract class ConfigField<T>
      * Sets the default value
      *
      * @param defaultValue defaultValue
-     * @return this
+     * @return this config field
      */
     public ConfigField<T> defaultValue(T defaultValue)
     {
@@ -400,7 +452,7 @@ public abstract class ConfigField<T>
     /**
      * Get the map of attributes
      *
-     * @return map
+     * @return map attribute map
      */
     public Map<String, Object> getAttributeMap()
     {
@@ -410,7 +462,7 @@ public abstract class ConfigField<T>
     /**
      * Get the set of attribute names
      *
-     * @return set
+     * @return set attribute names
      */
     public Set<String> getAttributeNames()
     {
@@ -430,6 +482,7 @@ public abstract class ConfigField<T>
     /**
      * Sets the owning properties class and the fieldname it declared.
      *
+     * @param fieldName  the field name
      * @param properties owner
      */
     public void setOwner(String fieldName, PropertiesBase properties)
@@ -441,7 +494,7 @@ public abstract class ConfigField<T>
     /**
      * Save the owner properties file so this value is persisted.
      *
-     * @return
+     * @return boolean
      */
     public boolean save()
     {
@@ -478,6 +531,11 @@ public abstract class ConfigField<T>
         return Objects.hashCode(getKey(), getCategory(), get());
     }
 
+    /**
+     * Gets declared field.
+     *
+     * @return the declared field
+     */
     public String getDeclaredField()
     {
         if (owner == null)

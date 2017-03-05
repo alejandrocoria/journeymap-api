@@ -13,6 +13,9 @@ import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
 
+/**
+ * The type Fullscreen hotkeys help.
+ */
 public class FullscreenHotkeysHelp extends JmUI
 {
     private int lastWidth = 0;
@@ -21,6 +24,11 @@ public class FullscreenHotkeysHelp extends JmUI
 
     private KeyEventHandler keyEventHandler;
 
+    /**
+     * Instantiates a new Fullscreen hotkeys help.
+     *
+     * @param returnDisplay the return display
+     */
     public FullscreenHotkeysHelp(JmUI returnDisplay)
     {
         super(Constants.getString("jm.fullscreen.hotkeys_title"), returnDisplay);
@@ -107,6 +115,14 @@ public class FullscreenHotkeysHelp extends JmUI
         buttonClose.setY(y + 16);
     }
 
+    /**
+     * Draw help strings.
+     *
+     * @param title the title
+     * @param key   the key
+     * @param x     the x
+     * @param y     the y
+     */
     protected void drawHelpStrings(String title, String key, int x, int y)
     {
         int hgap = 8;

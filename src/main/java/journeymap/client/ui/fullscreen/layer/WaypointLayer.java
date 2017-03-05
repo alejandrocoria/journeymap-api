@@ -33,13 +33,28 @@ public class WaypointLayer implements LayerDelegate.Layer
     private final long hoverDelay = 100;
     private final List<DrawStep> drawStepList;
     private final BlockOutlineDrawStep clickDrawStep;
+    /**
+     * The Last coord.
+     */
     BlockPos lastCoord = null;
 
+    /**
+     * The Start hover.
+     */
     long startHover = 0;
 
+    /**
+     * The Selected waypoint step.
+     */
     DrawWayPointStep selectedWaypointStep = null;
+    /**
+     * The Selected.
+     */
     Waypoint selected = null;
 
+    /**
+     * Instantiates a new Waypoint layer.
+     */
     public WaypointLayer()
     {
         drawStepList = new ArrayList<DrawStep>(1);
@@ -214,11 +229,25 @@ public class WaypointLayer implements LayerDelegate.Layer
         drawStepList.remove(clickDrawStep);
     }
 
+    /**
+     * The type Block outline draw step.
+     */
     class BlockOutlineDrawStep implements DrawStep
     {
+        /**
+         * The Block coord.
+         */
         BlockPos blockCoord;
+        /**
+         * The Pixel.
+         */
         Point2D.Double pixel;
 
+        /**
+         * Instantiates a new Block outline draw step.
+         *
+         * @param blockCoord the block coord
+         */
         BlockOutlineDrawStep(BlockPos blockCoord)
         {
             this.blockCoord = blockCoord;

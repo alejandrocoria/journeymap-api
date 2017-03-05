@@ -28,6 +28,9 @@ import java.util.Properties;
 public class ActionService extends BaseService
 {
 
+    /**
+     * The constant CHARACTER_ENCODING.
+     */
     public static final String CHARACTER_ENCODING = "UTF-8"; //$NON-NLS-1$
     private static final long serialVersionUID = 4412225358529161454L;
     private static boolean debug = true;

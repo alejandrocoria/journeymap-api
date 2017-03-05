@@ -28,7 +28,13 @@ import java.util.Map;
 public class DataService extends BaseService
 {
 
+    /**
+     * The constant combinedPath.
+     */
     public static final String combinedPath;
+    /**
+     * The constant providerMap.
+     */
     public static final HashMap<String, Class> providerMap;
     private static final long serialVersionUID = 4412225358529161454L;
 

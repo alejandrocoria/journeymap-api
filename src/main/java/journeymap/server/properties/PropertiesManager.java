@@ -19,6 +19,11 @@ public class PropertiesManager
     private Map<Integer, DimensionProperties> dimensionProperties;
     private GlobalProperties globalProperties;
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static PropertiesManager getInstance()
     {
         if (INSTANCE == null)
@@ -41,6 +46,12 @@ public class PropertiesManager
         }
     }
 
+    /**
+     * Gets dim properties.
+     *
+     * @param dim the dim
+     * @return the dim properties
+     */
     public DimensionProperties getDimProperties(int dim)
     {
         if (dimensionProperties.get(dim) == null)
@@ -50,6 +61,11 @@ public class PropertiesManager
         return dimensionProperties.get(dim);
     }
 
+    /**
+     * Gets global properties.
+     *
+     * @return the global properties
+     */
     public GlobalProperties getGlobalProperties()
     {
         return globalProperties;

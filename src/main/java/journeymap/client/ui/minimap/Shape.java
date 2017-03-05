@@ -13,9 +13,21 @@ import journeymap.client.ui.option.KeyedEnum;
  */
 public enum Shape implements KeyedEnum
 {
+    /**
+     * Square shape.
+     */
     Square("jm.minimap.shape_square"),
+    /**
+     * Rectangle shape.
+     */
     Rectangle("jm.minimap.shape_rectangle"),
+    /**
+     * Circle shape.
+     */
     Circle("jm.minimap.shape_circle");
+    /**
+     * The Key.
+     */
     public final String key;
 
     Shape(String key)

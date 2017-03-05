@@ -13,11 +13,21 @@ import net.minecraft.client.gui.GuiChat;
  */
 public class WaypointChat extends GuiChat
 {
+    /**
+     * Instantiates a new Waypoint chat.
+     *
+     * @param waypoint the waypoint
+     */
     public WaypointChat(Waypoint waypoint)
     {
         this(waypoint.toChatString());
     }
 
+    /**
+     * Instantiates a new Waypoint chat.
+     *
+     * @param text the text
+     */
     public WaypointChat(String text)
     {
         super(text);

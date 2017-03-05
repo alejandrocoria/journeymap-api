@@ -12,7 +12,6 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -25,10 +24,18 @@ public class MainTaskController
     private final ConcurrentLinkedQueue<IMainThreadTask> currentQueue = Queues.newConcurrentLinkedQueue();
     private final ConcurrentLinkedQueue<IMainThreadTask> deferredQueue = Queues.newConcurrentLinkedQueue();
 
+    /**
+     * Instantiates a new Main task controller.
+     */
     public MainTaskController()
     {
     }
 
+    /**
+     * Add task.
+     *
+     * @param task the task
+     */
     public void addTask(IMainThreadTask task)
     {
         synchronized (currentQueue)
@@ -37,6 +44,9 @@ public class MainTaskController
         }
     }
 
+    /**
+     * Perform tasks.
+     */
     public void performTasks()
     {
         try

@@ -33,6 +33,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 
+/**
+ * The type Grid editor.
+ */
 public class GridEditor extends JmUI
 {
     private final TextureImpl colorPickTexture;
@@ -62,6 +65,11 @@ public class GridEditor extends JmUI
 
     private ResourceLocation colorPicResource;
 
+    /**
+     * Instantiates a new Grid editor.
+     *
+     * @param returnDisplay the return display
+     */
     public GridEditor(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.grid_editor"), returnDisplay);
@@ -216,6 +224,13 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Draw color picker.
+     *
+     * @param x    the x
+     * @param y    the y
+     * @param size the size
+     */
     protected void drawColorPicker(int x, int y, float size)
     {
         int sizeI = (int) size;
@@ -248,6 +263,12 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Draw map tile.
+     *
+     * @param x the x
+     * @param y the y
+     */
     protected void drawMapTile(int x, int y)
     {
         float scale = tileSize / sampleTextureSize;
@@ -269,6 +290,13 @@ public class GridEditor extends JmUI
         gridSpec.finishTexture();
     }
 
+    /**
+     * Draw label.
+     *
+     * @param label the label
+     * @param x     the x
+     * @param y     the y
+     */
     protected void drawLabel(String label, int x, int y)
     {
         drawString(getFontRenderer(), label, x, y, Color.cyan.getRGB());
@@ -330,6 +358,12 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Check color picker.
+     *
+     * @param mouseX the mouse x
+     * @param mouseY the mouse y
+     */
     protected void checkColorPicker(int mouseX, int mouseY)
     {
         if (colorPickRect.contains(mouseX, mouseY))
@@ -386,6 +420,11 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Update preview.
+     *
+     * @param mapType the map type
+     */
     protected void updatePreview(MapType mapType)
     {
         activeMapType = mapType;
@@ -402,6 +441,9 @@ public class GridEditor extends JmUI
         buttonUnderground.setToggled(mapType.isUnderground());
     }
 
+    /**
+     * Update grid specs.
+     */
     protected void updateGridSpecs()
     {
         GridSpec activeSpec = gridSpecs.getSpec(activeMapType);
@@ -426,6 +468,9 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Save and close.
+     */
     protected void saveAndClose()
     {
         updateGridSpecs();
@@ -434,6 +479,9 @@ public class GridEditor extends JmUI
         closeAndReturn();
     }
 
+    /**
+     * Reset grid specs.
+     */
     protected void resetGridSpecs()
     {
         if (checkDay.getToggled())
@@ -465,6 +513,12 @@ public class GridEditor extends JmUI
         }
     }
 
+    /**
+     * Gets tile sample.
+     *
+     * @param mapType the map type
+     * @return the tile sample
+     */
     public TextureImpl getTileSample(MapType mapType)
     {
         if (mapType.isNight())

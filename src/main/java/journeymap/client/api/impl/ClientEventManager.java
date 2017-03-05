@@ -24,6 +24,11 @@ public class ClientEventManager
     private final Collection<PluginWrapper> plugins;
     private EnumSet<ClientEvent.Type> subscribedClientEventTypes = EnumSet.noneOf(ClientEvent.Type.class);
 
+    /**
+     * Instantiates a new Client event manager.
+     *
+     * @param plugins the plugins
+     */
     public ClientEventManager(Collection<PluginWrapper> plugins)
     {
         this.plugins = plugins;

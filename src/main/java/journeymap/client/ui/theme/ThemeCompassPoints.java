@@ -17,35 +17,125 @@ import java.awt.geom.Point2D;
  */
 public class ThemeCompassPoints
 {
+    /**
+     * The Text north.
+     */
     final String textNorth = Constants.getString("jm.minimap.compass.n");
+    /**
+     * The Text south.
+     */
     final String textSouth = Constants.getString("jm.minimap.compass.s");
+    /**
+     * The Text east.
+     */
     final String textEast = Constants.getString("jm.minimap.compass.e");
+    /**
+     * The Text west.
+     */
     final String textWest = Constants.getString("jm.minimap.compass.w");
+    /**
+     * The Point north.
+     */
     final Point2D pointNorth;
+    /**
+     * The Point south.
+     */
     final Point2D pointSouth;
+    /**
+     * The Point west.
+     */
     final Point2D pointWest;
+    /**
+     * The Point east.
+     */
     final Point2D pointEast;
+    /**
+     * The Show north.
+     */
     final boolean showNorth;
+    /**
+     * The Show south.
+     */
     final boolean showSouth;
+    /**
+     * The Show east.
+     */
     final boolean showEast;
+    /**
+     * The Show west.
+     */
     final boolean showWest;
+    /**
+     * The Bg alpha.
+     */
     final float bgAlpha;
+    /**
+     * The Bg color.
+     */
     final Integer bgColor;
+    /**
+     * The Fg alpha.
+     */
     final float fgAlpha;
+    /**
+     * The Fg color.
+     */
     final Integer fgColor;
+    /**
+     * The Font scale.
+     */
     final double fontScale;
+    /**
+     * The Compass label height.
+     */
     final int compassLabelHeight;
+    /**
+     * The Compass point color.
+     */
     final Integer compassPointColor;
+    /**
+     * The Compass point tex.
+     */
     final TextureImpl compassPointTex;
+    /**
+     * The Compass point scale.
+     */
     final float compassPointScale;
+    /**
+     * The X offset.
+     */
     final int xOffset;
+    /**
+     * The Y offset.
+     */
     final int yOffset;
+    /**
+     * The Shift vert.
+     */
     final double shiftVert;
+    /**
+     * The Shift horz.
+     */
     final double shiftHorz;
+    /**
+     * The Label shift vert.
+     */
     final int labelShiftVert;
     private double x;
     private double y;
 
+    /**
+     * Instantiates a new Theme compass points.
+     *
+     * @param x                 the x
+     * @param y                 the y
+     * @param halfWidth         the half width
+     * @param halfHeight        the half height
+     * @param minimapSpec       the minimap spec
+     * @param miniMapProperties the mini map properties
+     * @param compassPointTex   the compass point tex
+     * @param labelHeight       the label height
+     */
     public ThemeCompassPoints(int x, int y, int halfWidth, int halfHeight, Theme.Minimap.MinimapSpec minimapSpec, MiniMapProperties miniMapProperties, TextureImpl compassPointTex, int labelHeight)
     {
         this.x = x;
@@ -101,17 +191,36 @@ public class ThemeCompassPoints
         showWest = minimapSpec.compassShowWest;
     }
 
+    /**
+     * Gets compass point scale.
+     *
+     * @param compassLabelHeight the compass label height
+     * @param minimapSpec        the minimap spec
+     * @param compassPointTex    the compass point tex
+     * @return the compass point scale
+     */
     public static float getCompassPointScale(int compassLabelHeight, Theme.Minimap.MinimapSpec minimapSpec, TextureImpl compassPointTex)
     {
         return (compassLabelHeight + minimapSpec.compassPointLabelPad) / (compassPointTex.getHeight() * 1f);
     }
 
+    /**
+     * Sets position.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void setPosition(final double x, final double y)
     {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Draw points.
+     *
+     * @param rotation the rotation
+     */
     public void drawPoints(double rotation)
     {
         if (compassPointTex != null)
@@ -138,6 +247,11 @@ public class ThemeCompassPoints
         }
     }
 
+    /**
+     * Draw labels.
+     *
+     * @param rotation the rotation
+     */
     public void drawLabels(double rotation)
     {
 

@@ -40,6 +40,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The type Waypoint editor.
+ */
 public class WaypointEditor extends JmUI
 {
 
@@ -47,18 +50,54 @@ public class WaypointEditor extends JmUI
     private final TextureImpl colorPickTexture;
     private final Waypoint originalWaypoint;
     private final boolean isNew;
+    /**
+     * The Label name.
+     */
     String labelName = Constants.getString("jm.waypoint.name");
+    /**
+     * The Location title.
+     */
     String locationTitle = Constants.getString("jm.waypoint.location");
+    /**
+     * The Color title.
+     */
     String colorTitle = Constants.getString("jm.waypoint.color");
+    /**
+     * The Dimensions title.
+     */
     String dimensionsTitle = Constants.getString("jm.waypoint.dimensions");
+    /**
+     * The Label x.
+     */
     String labelX = Constants.getString("jm.waypoint.x");
+    /**
+     * The Label y.
+     */
     String labelY = Constants.getString("jm.waypoint.y");
+    /**
+     * The Label z.
+     */
     String labelZ = Constants.getString("jm.waypoint.z");
+    /**
+     * The Label r.
+     */
     String labelR = Constants.getString("jm.waypoint.red_abbreviated");
 
+    /**
+     * The Label g.
+     */
     String labelG = Constants.getString("jm.waypoint.green_abbreviated");
+    /**
+     * The Label b.
+     */
     String labelB = Constants.getString("jm.waypoint.blue_abbreviated");
+    /**
+     * The Current location.
+     */
     String currentLocation = "";
+    /**
+     * The Location format keys.
+     */
     LocationFormat.LocationFormatKeys locationFormatKeys;
     private Button buttonRandomize;
     private OnOffButton buttonEnable;
@@ -83,6 +122,13 @@ public class WaypointEditor extends JmUI
     private Waypoint editedWaypoint;
     private ButtonList bottomButtons;
 
+    /**
+     * Instantiates a new Waypoint editor.
+     *
+     * @param waypoint      the waypoint
+     * @param isNew         the is new
+     * @param returnDisplay the return display
+     */
     public WaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay)
     {
         super(Constants.getString(isNew ? "jm.waypoint.new_title" : "jm.waypoint.edit_title"), returnDisplay);
@@ -385,11 +431,24 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * Draw waypoint.
+     *
+     * @param x the x
+     * @param y the y
+     */
     protected void drawWaypoint(int x, int y)
     {
         DrawUtil.drawColoredImage(wpTexture, currentColor, 1f, x, y - (wpTexture.getHeight() / 2), 0);
     }
 
+    /**
+     * Draw color picker.
+     *
+     * @param x    the x
+     * @param y    the y
+     * @param size the size
+     */
     protected void drawColorPicker(int x, int y, float size)
     {
         int sizeI = (int) size;
@@ -413,6 +472,14 @@ public class WaypointEditor extends JmUI
         //drawRect(x, y, x + sizeI, y + sizeI, -16777216);
     }
 
+    /**
+     * Draw label and field.
+     *
+     * @param label the label
+     * @param field the field
+     * @param x     the x
+     * @param y     the y
+     */
     protected void drawLabelAndField(String label, TextField field, int x, int y)
     {
         field.setX(x);
@@ -423,6 +490,13 @@ public class WaypointEditor extends JmUI
         field.drawTextBox();
     }
 
+    /**
+     * Draw label.
+     *
+     * @param label the label
+     * @param x     the x
+     * @param y     the y
+     */
     protected void drawLabel(String label, int x, int y)
     {
         drawString(getFontRenderer(), label, x, y, Color.cyan.getRGB());
@@ -489,6 +563,12 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * Check color picker.
+     *
+     * @param mouseX the mouse x
+     * @param mouseY the mouse y
+     */
     protected void checkColorPicker(int mouseX, int mouseY)
     {
         if (colorPickRect.contains(mouseX, mouseY))
@@ -499,6 +579,11 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * Sets form color.
+     *
+     * @param color the color
+     */
     protected void setFormColor(Integer color)
     {
         //if(color!=null && color.equals(currentColor)) return;
@@ -556,12 +641,18 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * Sets random color.
+     */
     protected void setRandomColor()
     {
         editedWaypoint.setRandomColor();
         setFormColor(editedWaypoint.getColor());
     }
 
+    /**
+     * On tab.
+     */
     protected void onTab()
     {
         boolean focusNext = false;
@@ -587,6 +678,11 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * Validate boolean.
+     *
+     * @return the boolean
+     */
     protected boolean validate()
     {
         boolean valid = true;
@@ -608,12 +704,18 @@ public class WaypointEditor extends JmUI
         return valid;
     }
 
+    /**
+     * Remove.
+     */
     protected void remove()
     {
         WaypointStore.INSTANCE.remove(originalWaypoint);
         refreshAndClose(null);
     }
 
+    /**
+     * Save.
+     */
     protected void save()
     {
         if (!validate())
@@ -626,6 +728,9 @@ public class WaypointEditor extends JmUI
         refreshAndClose(editedWaypoint);
     }
 
+    /**
+     * Reset form.
+     */
     protected void resetForm()
     {
         this.editedWaypoint = new Waypoint(originalWaypoint);
@@ -636,6 +741,9 @@ public class WaypointEditor extends JmUI
         validate();
     }
 
+    /**
+     * Update waypoint from form.
+     */
     protected void updateWaypointFromForm()
     {
         currentColor = RGB.toInteger(getSafeColorInt(fieldR), getSafeColorInt(fieldG), getSafeColorInt(fieldB));
@@ -657,6 +765,12 @@ public class WaypointEditor extends JmUI
         editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.thePlayer.dimension);
     }
 
+    /**
+     * Gets safe color int.
+     *
+     * @param field the field
+     * @return the safe color int
+     */
     protected int getSafeColorInt(TextField field)
     {
         field.clamp();
@@ -678,6 +792,12 @@ public class WaypointEditor extends JmUI
         return Math.max(0, Math.min(255, val));
     }
 
+    /**
+     * Gets safe coord int.
+     *
+     * @param field the field
+     * @return the safe coord int
+     */
     protected int getSafeCoordInt(TextField field)
     {
         String text = field.getText();
@@ -697,6 +817,11 @@ public class WaypointEditor extends JmUI
         return val;
     }
 
+    /**
+     * Refresh and close.
+     *
+     * @param focusWaypoint the focus waypoint
+     */
     protected void refreshAndClose(Waypoint focusWaypoint)
     {
         if (returnDisplay != null && returnDisplay instanceof WaypointManager)
@@ -723,10 +848,24 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    /**
+     * The type Dimension button.
+     */
     class DimensionButton extends OnOffButton
     {
+        /**
+         * The Dimension.
+         */
         public final int dimension;
 
+        /**
+         * Instantiates a new Dimension button.
+         *
+         * @param id            the id
+         * @param dimension     the dimension
+         * @param dimensionName the dimension name
+         * @param toggled       the toggled
+         */
         DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
         {
             super(id, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);

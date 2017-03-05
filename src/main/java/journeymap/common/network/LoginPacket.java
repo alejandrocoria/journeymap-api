@@ -18,20 +18,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class LoginPacket implements IMessage
 {
-    // Channel name
+    /**
+     * The constant CHANNEL_NAME.
+     */
+// Channel name
     public static final String CHANNEL_NAME = "jm_init_login";
 
     private String packet;
 
+    /**
+     * Instantiates a new Login packet.
+     */
     public LoginPacket()
     {
     }
 
+    /**
+     * Instantiates a new Login packet.
+     *
+     * @param packet the packet
+     */
     public LoginPacket(InitLogin packet)
     {
         this.packet = InitLogin.GSON.toJson(packet);
     }
 
+    /**
+     * Gets packet.
+     *
+     * @return the packet
+     */
     public String getPacket()
     {
         return packet;
@@ -66,6 +82,9 @@ public class LoginPacket implements IMessage
         }
     }
 
+    /**
+     * The type Listener.
+     */
     public static class Listener implements IMessageHandler<LoginPacket, IMessage>
     {
         @Override

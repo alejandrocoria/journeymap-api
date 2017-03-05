@@ -26,29 +26,65 @@ import java.util.TreeMap;
 @ParametersAreNonnullByDefault
 public enum WaypointGroupStore
 {
+    /**
+     * Instance waypoint group store.
+     */
     INSTANCE;
 
+    /**
+     * The constant KEY_PATTERN.
+     */
     public final static String KEY_PATTERN = "%s:%s";
+    /**
+     * The constant FILENAME.
+     */
     public final static String FILENAME = "waypoint_groups.json";
+    /**
+     * The Cache.
+     */
     public final LoadingCache<String, WaypointGroup> cache = createCache();
 
+    /**
+     * Get waypoint group.
+     *
+     * @param name the name
+     * @return the waypoint group
+     */
     public WaypointGroup get(String name)
     {
         return get(Journeymap.MOD_ID, name);
     }
 
+    /**
+     * Get waypoint group.
+     *
+     * @param origin the origin
+     * @param name   the name
+     * @return the waypoint group
+     */
     public WaypointGroup get(String origin, String name)
     {
         ensureLoaded();
         return cache.getUnchecked(String.format(KEY_PATTERN, origin, name));
     }
 
+    /**
+     * Exists boolean.
+     *
+     * @param waypointGroup the waypoint group
+     * @return the boolean
+     */
     public boolean exists(WaypointGroup waypointGroup)
     {
         ensureLoaded();
         return cache.getIfPresent(waypointGroup.getKey()) != null;
     }
 
+    /**
+     * Put.
+     *
+     * @param waypointGroup the waypoint group
+     */
     public void put(WaypointGroup waypointGroup)
     {
         ensureLoaded();
@@ -56,6 +92,12 @@ public enum WaypointGroupStore
         save(true);
     }
 
+    /**
+     * Put if new boolean.
+     *
+     * @param waypointGroup the waypoint group
+     * @return the boolean
+     */
     public boolean putIfNew(WaypointGroup waypointGroup)
     {
         if (exists(waypointGroup))
@@ -66,6 +108,11 @@ public enum WaypointGroupStore
         return true;
     }
 
+    /**
+     * Remove.
+     *
+     * @param waypointGroup the waypoint group
+     */
     public void remove(WaypointGroup waypointGroup)
     {
         ensureLoaded();
@@ -127,11 +174,19 @@ public enum WaypointGroupStore
         save(true);
     }
 
+    /**
+     * Save.
+     */
     public void save()
     {
         save(true);
     }
 
+    /**
+     * Save.
+     *
+     * @param force the force
+     */
     public void save(boolean force)
     {
         boolean doWrite = force;

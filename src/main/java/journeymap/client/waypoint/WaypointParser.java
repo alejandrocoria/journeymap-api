@@ -27,7 +27,13 @@ import java.util.regex.Pattern;
  */
 public class WaypointParser
 {
+    /**
+     * The Quotes.
+     */
     public static String[] QUOTES = {"'", "\""};
+    /**
+     * The constant PATTERN.
+     */
     public static Pattern PATTERN = Pattern.compile("(\\w+\\s*:\\s*-?[\\w\\d\\s'\"]+,\\s*)+(\\w+\\s*:\\s*-?[\\w\\d\\s'\"]+)", Pattern.CASE_INSENSITIVE);
 
     /**
@@ -187,6 +193,12 @@ public class WaypointParser
         return null;
     }
 
+    /**
+     * Parse chat for waypoints.
+     *
+     * @param event           the event
+     * @param unformattedText the unformatted text
+     */
     public static void parseChatForWaypoints(ClientChatReceivedEvent event, String unformattedText)
     {
         List<String> matches = getWaypointStrings(unformattedText);

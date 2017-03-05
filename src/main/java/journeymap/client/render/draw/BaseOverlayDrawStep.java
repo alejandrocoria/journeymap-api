@@ -19,21 +19,55 @@ import java.util.Objects;
 
 /**
  * Reusable functionality for OverlayDrawStep implementations
+ *
+ * @param <T> the type parameter
  */
 public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayDrawStep
 {
+    /**
+     * The Overlay.
+     */
     public final T overlay;
 
+    /**
+     * The Screen bounds.
+     */
     protected Rectangle2D.Double screenBounds = new Rectangle2D.Double();
+    /**
+     * The Title position.
+     */
     protected Point2D.Double titlePosition = new Point2D.Double();
+    /**
+     * The Label position.
+     */
     protected Point2D.Double labelPosition = new Point2D.Double();
+    /**
+     * The Last ui state.
+     */
     protected UIState lastUiState = null;
+    /**
+     * The Dragging.
+     */
     protected boolean dragging = false;
+    /**
+     * The Enabled.
+     */
     protected boolean enabled = true;
 
+    /**
+     * The Label lines.
+     */
     protected String[] labelLines;
+    /**
+     * The Title lines.
+     */
     protected String[] titleLines;
 
+    /**
+     * Instantiates a new Base overlay draw step.
+     *
+     * @param overlay the overlay
+     */
     protected BaseOverlayDrawStep(T overlay)
     {
         this.overlay = overlay;
@@ -42,20 +76,20 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
     /**
      * Update positions of screenBounds, labelPosition, and other points as needed.
      *
-     * @param gridRenderer
+     * @param gridRenderer the grid renderer
+     * @param rotation     the rotation
      */
     protected abstract void updatePositions(GridRenderer gridRenderer, double rotation);
 
     /**
      * Draw label and/or title
      *
-     * @param pass
-     * @param xOffset
-     * @param yOffset
-     * @param gridRenderer
-     * @param drawScale
-     * @param fontScale
-     * @param rotation
+     * @param pass         the pass
+     * @param xOffset      the x offset
+     * @param yOffset      the y offset
+     * @param gridRenderer the grid renderer
+     * @param fontScale    the font scale
+     * @param rotation     the rotation
      */
     protected void drawText(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
     {
@@ -169,6 +203,9 @@ public abstract class BaseOverlayDrawStep<T extends Overlay> implements OverlayD
         return gridRenderer.isOnScreen(screenBounds);
     }
 
+    /**
+     * Update text fields.
+     */
     protected void updateTextFields()
     {
         if (labelPosition != null)

@@ -24,17 +24,60 @@ import java.util.function.Consumer;
  */
 public class ApiImageTask implements Runnable
 {
+    /**
+     * The Mod id.
+     */
     final String modId;
+    /**
+     * The Dimension.
+     */
     final int dimension;
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Start chunk.
+     */
     final ChunkPos startChunk;
+    /**
+     * The End chunk.
+     */
     final ChunkPos endChunk;
+    /**
+     * The V slice.
+     */
     final Integer vSlice;
+    /**
+     * The Zoom.
+     */
     final int zoom;
+    /**
+     * The Show grid.
+     */
     final boolean showGrid;
+    /**
+     * The Jm world dir.
+     */
     final File jmWorldDir;
+    /**
+     * The Callback.
+     */
     final Consumer<BufferedImage> callback;
 
+    /**
+     * Instantiates a new Api image task.
+     *
+     * @param modId      the mod id
+     * @param dimension  the dimension
+     * @param apiMapType the api map type
+     * @param startChunk the start chunk
+     * @param endChunk   the end chunk
+     * @param vSlice     the v slice
+     * @param zoom       the zoom
+     * @param showGrid   the show grid
+     * @param callback   the callback
+     */
     public ApiImageTask(final String modId, final int dimension, final Context.MapType apiMapType,
                         final ChunkPos startChunk, final ChunkPos endChunk, Integer vSlice, final int zoom, final boolean showGrid,
                         final Consumer<BufferedImage> callback)

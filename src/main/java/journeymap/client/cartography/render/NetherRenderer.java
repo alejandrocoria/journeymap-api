@@ -20,6 +20,9 @@ import journeymap.common.Journeymap;
  */
 public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {
+    /**
+     * Instantiates a new Nether renderer.
+     */
     public NetherRenderer()
     {
         super(null);

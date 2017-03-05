@@ -20,29 +20,84 @@ import org.lwjgl.opengl.GL11;
 import java.util.List;
 
 /**
- * Created by Mark on 8/30/2014.
+ * @author techbrew 8/30/2014.
  */
 public class ThemeButton extends BooleanPropertyButton
 {
+    /**
+     * The Theme.
+     */
     protected Theme theme;
+    /**
+     * The Button spec.
+     */
     protected Theme.Control.ButtonSpec buttonSpec;
+    /**
+     * The Texture on.
+     */
     protected TextureImpl textureOn;
+    /**
+     * The Texture hover.
+     */
     protected TextureImpl textureHover;
+    /**
+     * The Texture off.
+     */
     protected TextureImpl textureOff;
+    /**
+     * The Texture disabled.
+     */
     protected TextureImpl textureDisabled;
+    /**
+     * The Texture icon.
+     */
     protected TextureImpl textureIcon;
+    /**
+     * The Icon on color.
+     */
     protected Integer iconOnColor;
+    /**
+     * The Icon off color.
+     */
     protected Integer iconOffColor;
+    /**
+     * The Icon hover color.
+     */
     protected Integer iconHoverColor;
+    /**
+     * The Icon disabled color.
+     */
     protected Integer iconDisabledColor;
+    /**
+     * The Icon name.
+     */
     protected String iconName;
+    /**
+     * The Additional tooltips.
+     */
     protected List<String> additionalTooltips;
 
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param rawLabel the raw label
+     * @param iconName the icon name
+     */
     public ThemeButton(Theme theme, String rawLabel, String iconName)
     {
         this(theme, Constants.getString(rawLabel), Constants.getString(rawLabel), false, iconName);
     }
 
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param toggled  the toggled
+     * @param iconName the icon name
+     */
     public ThemeButton(Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
         super(labelOn, labelOff, null);
@@ -51,6 +106,15 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param iconName the icon name
+     * @param field    the field
+     */
     protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, BooleanField field)
     {
         super(labelOn, labelOff, field);
@@ -58,6 +122,11 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
+    /**
+     * Update theme.
+     *
+     * @param theme the theme
+     */
     public void updateTheme(Theme theme)
     {
         this.theme = theme;
@@ -92,6 +161,11 @@ public class ThemeButton extends BooleanPropertyButton
         setToggled(false, false);
     }
 
+    /**
+     * Has valid textures boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasValidTextures()
     {
         if (buttonSpec.useThemeImages)
@@ -105,16 +179,33 @@ public class ThemeButton extends BooleanPropertyButton
         }
     }
 
+    /**
+     * Gets path pattern.
+     *
+     * @return the path pattern
+     */
     protected String getPathPattern()
     {
         return "control/%sbutton_%s.png";
     }
 
+    /**
+     * Gets button spec.
+     *
+     * @param theme the theme
+     * @return the button spec
+     */
     protected Theme.Control.ButtonSpec getButtonSpec(Theme theme)
     {
         return theme.control.button;
     }
 
+    /**
+     * Gets active texture.
+     *
+     * @param isMouseOver the is mouse over
+     * @return the active texture
+     */
     protected TextureImpl getActiveTexture(boolean isMouseOver)
     {
         if (isEnabled())
@@ -128,6 +219,12 @@ public class ThemeButton extends BooleanPropertyButton
         }
     }
 
+    /**
+     * Gets icon color.
+     *
+     * @param isMouseOver the is mouse over
+     * @return the icon color
+     */
     protected Integer getIconColor(boolean isMouseOver)
     {
         if (!isEnabled())
@@ -201,6 +298,13 @@ public class ThemeButton extends BooleanPropertyButton
         DrawUtil.drawColoredImage(textureIcon, iconColor, 1f, drawX, drawY, iconScale, 0);
     }
 
+    /**
+     * Draw native button.
+     *
+     * @param minecraft the minecraft
+     * @param mouseX    the mouse x
+     * @param mouseY    the mouse y
+     */
     public void drawNativeButton(Minecraft minecraft, int mouseX, int mouseY)
     {
         int magic = 20;
@@ -216,6 +320,11 @@ public class ThemeButton extends BooleanPropertyButton
         int l = 14737632;
     }
 
+    /**
+     * Sets additional tooltips.
+     *
+     * @param additionalTooltips the additional tooltips
+     */
     public void setAdditionalTooltips(List<String> additionalTooltips)
     {
         this.additionalTooltips = additionalTooltips;

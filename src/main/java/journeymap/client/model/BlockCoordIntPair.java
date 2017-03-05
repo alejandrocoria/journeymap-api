@@ -5,22 +5,46 @@
 
 package journeymap.client.model;
 
+/**
+ * The type Block coord int pair.
+ */
 public class BlockCoordIntPair
 {
 
+    /**
+     * The X.
+     */
     public int x;
+    /**
+     * The Z.
+     */
     public int z;
 
+    /**
+     * Instantiates a new Block coord int pair.
+     */
     public BlockCoordIntPair()
     {
         setLocation(0, 0);
     }
 
+    /**
+     * Instantiates a new Block coord int pair.
+     *
+     * @param x the x
+     * @param z the z
+     */
     public BlockCoordIntPair(int x, int z)
     {
         setLocation(x, z);
     }
 
+    /**
+     * Sets location.
+     *
+     * @param x the x
+     * @param z the z
+     */
     public void setLocation(int x, int z)
     {
         this.x = x;

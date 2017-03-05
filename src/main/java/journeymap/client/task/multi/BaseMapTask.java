@@ -25,18 +25,59 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * The type Base map task.
+ */
 public abstract class BaseMapTask implements ITask
 {
+    /**
+     * The Logger.
+     */
     static final Logger logger = Journeymap.getLogger();
+    /**
+     * The constant keepAliveOffsets.
+     */
     protected static ChunkPos[] keepAliveOffsets = new ChunkPos[]{new ChunkPos(0, -1), new ChunkPos(-1, 0), new ChunkPos(-1, -1)};
+    /**
+     * The World.
+     */
     final World world;
+    /**
+     * The Chunk coords.
+     */
     final Collection<ChunkPos> chunkCoords;
+    /**
+     * The Flush cache when done.
+     */
     final boolean flushCacheWhenDone;
+    /**
+     * The Render controller.
+     */
     final ChunkRenderController renderController;
+    /**
+     * The Elapsed limit.
+     */
     final int elapsedLimit;
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Async file writes.
+     */
     final boolean asyncFileWrites;
 
+    /**
+     * Instantiates a new Base map task.
+     *
+     * @param renderController   the render controller
+     * @param world              the world
+     * @param mapType            the map type
+     * @param chunkCoords        the chunk coords
+     * @param flushCacheWhenDone the flush cache when done
+     * @param asyncFileWrites    the async file writes
+     * @param elapsedLimit       the elapsed limit
+     */
     public BaseMapTask(ChunkRenderController renderController, World world, MapType mapType, Collection<ChunkPos> chunkCoords, boolean flushCacheWhenDone, boolean asyncFileWrites, int elapsedLimit)
     {
         this.renderController = renderController;
@@ -48,6 +89,15 @@ public abstract class BaseMapTask implements ITask
         this.elapsedLimit = elapsedLimit;
     }
 
+    /**
+     * Init task.
+     *
+     * @param mc            the mc
+     * @param jm            the jm
+     * @param jmWorldDir    the jm world dir
+     * @param threadLogging the thread logging
+     * @throws InterruptedException the interrupted exception
+     */
     public void initTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
 
@@ -172,6 +222,13 @@ public abstract class BaseMapTask implements ITask
         }
     }
 
+    /**
+     * Complete.
+     *
+     * @param mappedChunks the mapped chunks
+     * @param cancelled    the cancelled
+     * @param hadError     the had error
+     */
     protected abstract void complete(int mappedChunks, boolean cancelled, boolean hadError);
 
     @Override

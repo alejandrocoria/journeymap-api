@@ -38,9 +38,21 @@ import java.util.*;
  */
 public class BlockMD implements Comparable<BlockMD>
 {
+    /**
+     * The constant FlagsPlantAndCrop.
+     */
     public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
+    /**
+     * The constant FlagsBiomeColored.
+     */
     public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
+    /**
+     * The constant AIRBLOCK.
+     */
     public static BlockMD AIRBLOCK;
+    /**
+     * The constant VOIDBLOCK.
+     */
     public static BlockMD VOIDBLOCK;
     private static Logger LOGGER = Journeymap.getLogger();
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
@@ -67,6 +79,12 @@ public class BlockMD implements Comparable<BlockMD>
     private boolean isPlantOrCrop;
     private boolean isBiomeColored;
 
+    /**
+     * Create block md.
+     *
+     * @param blockState the block state
+     * @return the block md
+     */
     public static BlockMD create(@Nonnull IBlockState blockState)
     {
         try
@@ -141,22 +159,43 @@ public class BlockMD implements Comparable<BlockMD>
         isBiomeColored = hasAnyFlag(FlagsBiomeColored);
     }
 
+    /**
+     * Is use default state boolean.
+     *
+     * @return the boolean
+     */
     public boolean isUseDefaultState()
     {
         return useDefaultState;
     }
 
+    /**
+     * Sets use default state.
+     *
+     * @param useDefaultState the use default state
+     * @return the use default state
+     */
     public BlockMD setUseDefaultState(boolean useDefaultState)
     {
         this.useDefaultState = useDefaultState;
         return this;
     }
 
+    /**
+     * Gets block.
+     *
+     * @return the block
+     */
     public Block getBlock()
     {
         return blockState.getBlock();
     }
 
+    /**
+     * Gets meta.
+     *
+     * @return the meta
+     */
     public int getMeta()
     {
         return blockState.getBlock().getMetaFromState(blockState);
@@ -187,7 +226,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Get all BlockMDs.
      *
-     * @return
+     * @return all
      */
     public static Collection<BlockMD> getAll()
     {
@@ -201,6 +240,12 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Retrieves a BlockMD instance corresponding to chunk-local coords.
+     *
+     * @param chunkMd the chunk md
+     * @param localX  the local x
+     * @param y       the y
+     * @param localZ  the local z
+     * @return the block md from chunk local
      */
     public static BlockMD getBlockMDFromChunkLocal(ChunkMD chunkMd, int localX, int y, int localZ)
     {
@@ -209,6 +254,10 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Retrieves a BlockMD instance
+     *
+     * @param chunkMd  the chunk md
+     * @param blockPos the block pos
+     * @return the block md
      */
     public static BlockMD getBlockMD(ChunkMD chunkMd, BlockPos blockPos)
     {
@@ -242,6 +291,10 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Finds BlockMD by block uid + meta
+     *
+     * @param uid  the uid
+     * @param meta the meta
+     * @return the block md
      */
     public static BlockMD get(String uid, int meta)
     {
@@ -255,12 +308,18 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Retrieves/lazy-creates the corresponding BlockMD instance.
+     *
+     * @param blockState the block state
+     * @return the block md
      */
     public static BlockMD get(IBlockState blockState)
     {
         return DataCache.INSTANCE.getBlockMD(blockState);
     }
 
+    /**
+     * Debug.
+     */
     public static void debug()
     {
         for (BlockMD blockMD : getAll())
@@ -306,6 +365,9 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Get all BlockMD variations for a given block.
+     *
+     * @param block the block
+     * @return the all block m ds
      */
     public static Collection<BlockMD> getAllBlockMDs(Block block)
     {
@@ -322,6 +384,9 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Set flags on all BlockMD variations of Block.
+     *
+     * @param block the block
+     * @param flags the flags
      */
     public static void setAllFlags(Block block, BlockMD.Flag... flags)
     {
@@ -363,6 +428,8 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Add flags.
+     *
+     * @param addFlags the add flags
      */
     public void addFlags(Flag... addFlags)
     {
@@ -372,6 +439,8 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Add flags.
+     *
+     * @param addFlags the add flags
      */
     public void addFlags(Collection<Flag> addFlags)
     {
@@ -381,23 +450,42 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Gets block color using world coordinates.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockPos the block pos
+     * @return the color
      */
     public int getColor(ChunkMD chunkMD, BlockPos blockPos)
     {
         return blockColorHandler.getBlockColor(chunkMD, this, blockPos);
     }
 
+    /**
+     * Gets color.
+     *
+     * @return the color
+     */
     public Integer getColor()
     {
         ensureColor();
         return this.color;
     }
 
+    /**
+     * Sets color.
+     *
+     * @param baseColor the base color
+     */
     public void setColor(Integer baseColor)
     {
         this.color = baseColor;
     }
 
+    /**
+     * Ensure color boolean.
+     *
+     * @return the boolean
+     */
     public boolean ensureColor()
     {
         if (this.color == null)
@@ -408,16 +496,31 @@ public class BlockMD implements Comparable<BlockMD>
         return false;
     }
 
+    /**
+     * Sets block color handler.
+     *
+     * @param blockColorHandler the block color handler
+     */
     public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
     {
         this.blockColorHandler = blockColorHandler;
     }
 
+    /**
+     * Gets icon name.
+     *
+     * @return the icon name
+     */
     public String getIconName()
     {
         return iconName == null ? "" : iconName;
     }
 
+    /**
+     * Sets icon name.
+     *
+     * @param iconName the icon name
+     */
     public void setIconName(String iconName)
     {
         this.iconName = iconName;
@@ -454,7 +557,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Whether it should be used for beveled slope coloration.
      *
-     * @return
+     * @return boolean
      */
     public boolean hasNoShadow()
     {
@@ -569,7 +672,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Gets UID
      *
-     * @return
+     * @return uid
      */
     public String getUid()
     {
@@ -580,7 +683,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Gets flags
      *
-     * @return
+     * @return flags
      */
     public EnumSet<Flag> getFlags()
     {
@@ -599,6 +702,8 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Gets handler for special mod blocks.
+     *
+     * @return the mod block handler
      */
     public ModBlockDelegate.IModBlockHandler getModBlockHandler()
     {
@@ -608,7 +713,7 @@ public class BlockMD implements Comparable<BlockMD>
     /**
      * Sets handler for special mod blocks.
      *
-     * @param modBlockHandler
+     * @param modBlockHandler the mod block handler
      */
     public void setModBlockHandler(ModBlockDelegate.IModBlockHandler modBlockHandler)
     {

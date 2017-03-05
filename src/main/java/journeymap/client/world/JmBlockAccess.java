@@ -24,12 +24,22 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 /**
- * Created by Mark on 2/12/2017.
+ * @author techbrew 2/12/2017.
  */
 public enum JmBlockAccess implements IBlockAccess
 {
+    /**
+     * Instance jm block access.
+     */
     INSTANCE;
 
+    /**
+     * Gets light opacity.
+     *
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the light opacity
+     */
     public int getLightOpacity(BlockMD blockMD, BlockPos blockPos)
     {
         return blockMD.getBlockState().getBlock().getLightOpacity(blockMD.getBlockState(), this, blockPos);
@@ -110,6 +120,11 @@ public enum JmBlockAccess implements IBlockAccess
         return getWorld().getStrongPower(pos, direction);
     }
 
+    /**
+     * Gets world.
+     *
+     * @return the world
+     */
     public World getWorld()
     {
         return FMLClientHandler.instance().getClient().theWorld;

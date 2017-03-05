@@ -14,18 +14,34 @@ import com.google.gson.GsonBuilder;
  */
 public class InitLogin
 {
+    /**
+     * The constant GSON.
+     */
     public static final Gson GSON = new GsonBuilder().create();
     private boolean teleportEnabled;
 
+    /**
+     * Instantiates a new Init login.
+     */
     public InitLogin()
     {
     }
 
+    /**
+     * Is teleport enabled boolean.
+     *
+     * @return the boolean
+     */
     public boolean isTeleportEnabled()
     {
         return teleportEnabled;
     }
 
+    /**
+     * Sets teleport enabled.
+     *
+     * @param teleportEnabled the teleport enabled
+     */
     public void setTeleportEnabled(boolean teleportEnabled)
     {
         this.teleportEnabled = teleportEnabled;

@@ -23,8 +23,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class TextureAtlasHandler implements EventHandlerManager.EventHandler
 {
+    /**
+     * The Task.
+     */
     IMainThreadTask task = new EnsureCurrentColorsTask();
 
+    /**
+     * On texture stiched.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent()
     public void onTextureStiched(TextureStitchEvent.Post event)

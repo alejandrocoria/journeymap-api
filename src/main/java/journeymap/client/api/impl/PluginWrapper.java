@@ -77,6 +77,9 @@ class PluginWrapper
     /**
      * Add (or update) a displayable object to the player's maps. If you modify a Displayable after it
      * has been added, call this method again to ensure the maps reflect your changes.
+     *
+     * @param displayable the displayable
+     * @throws Exception the exception
      */
     public void show(Displayable displayable) throws Exception
     {
@@ -108,6 +111,8 @@ class PluginWrapper
 
     /**
      * Remove a displayable from API management
+     *
+     * @param displayable the displayable
      */
     public void remove(Displayable displayable)
     {
@@ -138,7 +143,7 @@ class PluginWrapper
     /**
      * Remove a waypoint.
      *
-     * @param modWaypoint
+     * @param modWaypoint the mod waypoint
      */
     public void remove(ModWaypoint modWaypoint)
     {
@@ -155,6 +160,8 @@ class PluginWrapper
     /**
      * Remove all displayables by DisplayType from the player's maps.
      * Not efficient, but it probably doesn't matter.
+     *
+     * @param displayType the display type
      */
     public void removeAll(DisplayType displayType)
     {
@@ -207,6 +214,7 @@ class PluginWrapper
      * indicated displayable, but not necessarily that the player has made it visible.
      *
      * @param displayable the object
+     * @return the boolean
      */
     public boolean exists(Displayable displayable)
     {
@@ -227,6 +235,9 @@ class PluginWrapper
 
     /**
      * Populates the provided list with all overlay drawsteps.
+     *
+     * @param list    the list
+     * @param uiState the ui state
      */
     public void getDrawSteps(List<OverlayDrawStep> list, UIState uiState)
     {

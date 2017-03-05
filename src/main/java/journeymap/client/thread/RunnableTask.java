@@ -17,11 +17,26 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * The type Runnable task.
+ */
 public class RunnableTask implements Runnable
 {
+    /**
+     * The Jm.
+     */
     static final JourneymapClient jm = Journeymap.getClient();
+    /**
+     * The Logger.
+     */
     static final Logger logger = Journeymap.getLogger();
+    /**
+     * Minecraft client
+     */
     static final Minecraft mc = FMLClientHandler.instance().getClient();
+    /**
+     * The Thread logging.
+     */
     static final boolean threadLogging = jm.isThreadLogging();
 
     private final ExecutorService taskExecutor;
@@ -30,6 +45,12 @@ public class RunnableTask implements Runnable
     private final int timeout;
 
 
+    /**
+     * Instantiates a new Runnable task.
+     *
+     * @param taskExecutor the task executor
+     * @param task         the task
+     */
     public RunnableTask(final ExecutorService taskExecutor, ITask task)
     {
         this.taskExecutor = taskExecutor;
@@ -52,6 +73,9 @@ public class RunnableTask implements Runnable
         }
     }
 
+    /**
+     * The type Inner.
+     */
     class Inner implements Runnable
     {
 

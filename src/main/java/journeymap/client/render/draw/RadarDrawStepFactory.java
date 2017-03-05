@@ -27,6 +27,14 @@ import java.util.List;
  */
 public class RadarDrawStepFactory
 {
+    /**
+     * Prepare steps list.
+     *
+     * @param entityDTOs    the entity dt os
+     * @param grid          the grid
+     * @param mapProperties the map properties
+     * @return the list
+     */
     public List<DrawStep> prepareSteps(List<EntityDTO> entityDTOs, GridRenderer grid, InGameMapProperties mapProperties)
     {
         final boolean showAnimals = mapProperties.showAnimals.get();

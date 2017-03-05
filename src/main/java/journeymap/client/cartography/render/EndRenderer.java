@@ -17,6 +17,9 @@ import journeymap.client.model.MapType;
  */
 public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
 {
+    /**
+     * Instantiates a new End renderer.
+     */
     public EndRenderer()
     {
     }

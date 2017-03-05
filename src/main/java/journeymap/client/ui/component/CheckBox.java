@@ -17,15 +17,33 @@ import org.lwjgl.input.Keyboard;
  */
 public class CheckBox extends BooleanPropertyButton
 {
+    /**
+     * The Box width.
+     */
     public int boxWidth = 11;
+    /**
+     * The Glyph.
+     */
     String glyph = "\u2714";
 
+    /**
+     * Instantiates a new Check box.
+     *
+     * @param displayString the display string
+     * @param checked       the checked
+     */
     public CheckBox(String displayString, boolean checked)
     {
         this(displayString, null);
         this.toggled = checked;
     }
 
+    /**
+     * Instantiates a new Check box.
+     *
+     * @param displayString the display string
+     * @param field         the field
+     */
     public CheckBox(String displayString, BooleanField field)
     {
         super(displayString, displayString, field);

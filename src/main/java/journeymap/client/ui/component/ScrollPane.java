@@ -18,11 +18,26 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Scroll pane.
+ */
 public class ScrollPane extends GuiSlot
 {
+    /**
+     * The Pane width.
+     */
     public int paneWidth = 0;
+    /**
+     * The Pane height.
+     */
     public int paneHeight = 0;
+    /**
+     * The Origin.
+     */
     public Point.Double origin = new Point2D.Double();
+    /**
+     * The Selected.
+     */
     protected Scrollable selected = null;
     private Integer frameColor = new Color(-6250336).getRGB();
     private List<? extends Scrollable> items;
@@ -33,6 +48,16 @@ public class ScrollPane extends GuiSlot
     private int firstVisibleIndex;
     private int lastVisibleIndex;
 
+    /**
+     * Instantiates a new Scroll pane.
+     *
+     * @param mc         the mc
+     * @param width      the width
+     * @param height     the height
+     * @param items      the items
+     * @param itemHeight the item height
+     * @param itemGap    the item gap
+     */
     public ScrollPane(Minecraft mc, int width, int height, List<? extends Scrollable> items, int itemHeight, int itemGap)
     {
         super(mc, width, height, 16, height, itemHeight + itemGap);
@@ -42,11 +67,21 @@ public class ScrollPane extends GuiSlot
         this.mc = mc;
     }
 
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
     public int getX()
     {
         return (int) origin.getX();
     }
 
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
     public int getY()
     {
         return (int) origin.getY();
@@ -57,6 +92,16 @@ public class ScrollPane extends GuiSlot
         return this.slotHeight;
     }
 
+    /**
+     * Sets dimensions.
+     *
+     * @param width        the width
+     * @param height       the height
+     * @param marginTop    the margin top
+     * @param marginBottom the margin bottom
+     * @param x            the x
+     * @param y            the y
+     */
     public void setDimensions(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
         // 1.7
@@ -87,11 +132,22 @@ public class ScrollPane extends GuiSlot
         return items.get(i) == selected;
     }
 
+    /**
+     * Is selected boolean.
+     *
+     * @param item the item
+     * @return the boolean
+     */
     public boolean isSelected(Scrollable item)
     {
         return item == selected;
     }
 
+    /**
+     * Select.
+     *
+     * @param item the item
+     */
     public void select(Scrollable item)
     {
         selected = item;
@@ -104,6 +160,11 @@ public class ScrollPane extends GuiSlot
 
     /**
      * Call when the mouse is clicked.  Returns a Button if one was clicked.
+     *
+     * @param mouseX      the mouse x
+     * @param mouseY      the mouse y
+     * @param mouseButton the mouse button
+     * @return the journeymap . client . ui . component . button
      */
     public journeymap.client.ui.component.Button mouseClicked(int mouseX, int mouseY, int mouseButton)
     {
@@ -162,7 +223,18 @@ public class ScrollPane extends GuiSlot
         GlStateManager.popMatrix();
     }
 
-    // 1.7
+    /**
+     * Draw slot.
+     *
+     * @param index       the index
+     * @param xPosition   the x position
+     * @param yPosition   the y position
+     * @param l           the l
+     * @param tessellator the tessellator
+     * @param var6        the var 6
+     * @param var7        the var 7
+     */
+// 1.7
     // @Override
     protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
     {
@@ -223,6 +295,12 @@ public class ScrollPane extends GuiSlot
         GlStateManager.popMatrix();
     }
 
+    /**
+     * In full view boolean.
+     *
+     * @param item the item
+     * @return the boolean
+     */
     public boolean inFullView(Scrollable item)
     {
         return (item.getY() >= this.getY()) && item.getY() + item.getHeight() <= this.getY() + this.paneHeight;
@@ -234,12 +312,23 @@ public class ScrollPane extends GuiSlot
         return this.paneWidth;
     }
 
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
     public int getWidth()
     {
         boolean scrollVisible = 0 < this.getAmountScrolled(); // TODO right super?
         return paneWidth + (scrollVisible ? 5 : 0);
     }
 
+    /**
+     * Gets fit width.
+     *
+     * @param fr the fr
+     * @return the fit width
+     */
     public int getFitWidth(FontRenderer fr)
     {
         int fit = 0;
@@ -250,6 +339,11 @@ public class ScrollPane extends GuiSlot
         return fit;
     }
 
+    /**
+     * Sets show frame.
+     *
+     * @param showFrame the show frame
+     */
     public void setShowFrame(boolean showFrame)
     {
         this.showFrame = showFrame;
@@ -277,36 +371,109 @@ public class ScrollPane extends GuiSlot
         }
     }
 
+    /**
+     * Gets first visible index.
+     *
+     * @return the first visible index
+     */
     public int getFirstVisibleIndex()
     {
         return firstVisibleIndex;
     }
 
+    /**
+     * Gets last visible index.
+     *
+     * @return the last visible index
+     */
     public int getLastVisibleIndex()
     {
         return lastVisibleIndex;
     }
 
+    /**
+     * The interface Scrollable.
+     */
     public interface Scrollable
     {
+        /**
+         * Sets position.
+         *
+         * @param x the x
+         * @param y the y
+         */
         public void setPosition(int x, int y);
 
+        /**
+         * Gets x.
+         *
+         * @return the x
+         */
         public int getX();
 
+        /**
+         * Gets y.
+         *
+         * @return the y
+         */
         public int getY();
 
+        /**
+         * Gets width.
+         *
+         * @return the width
+         */
         public int getWidth();
 
+        /**
+         * Sets scrollable width.
+         *
+         * @param width the width
+         */
         public void setScrollableWidth(int width);
 
+        /**
+         * Gets fit width.
+         *
+         * @param fr the fr
+         * @return the fit width
+         */
         public int getFitWidth(FontRenderer fr);
 
+        /**
+         * Gets height.
+         *
+         * @return the height
+         */
         public int getHeight();
 
+        /**
+         * Draw scrollable.
+         *
+         * @param mc     the mc
+         * @param mouseX the mouse x
+         * @param mouseY the mouse y
+         */
         public void drawScrollable(Minecraft mc, int mouseX, int mouseY);
 
+        /**
+         * Draw partial scrollable.
+         *
+         * @param mc     the mc
+         * @param x      the x
+         * @param y      the y
+         * @param width  the width
+         * @param height the height
+         */
         public void drawPartialScrollable(Minecraft mc, int x, int y, int width, int height);
 
+        /**
+         * Click scrollable.
+         *
+         * @param mc     the mc
+         * @param mouseX the mouse x
+         * @param mouseY the mouse y
+         */
         public void clickScrollable(Minecraft mc, int mouseX, int mouseY);
     }
 }

@@ -23,25 +23,69 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The type Texture.
+ */
 public class TextureImpl extends AbstractTexture
 {
+    /**
+     * The Buffer lock.
+     */
     protected final ReentrantLock bufferLock = new ReentrantLock();
+    /**
+     * The Image.
+     */
     protected BufferedImage image;
+    /**
+     * The Retain image.
+     */
     protected boolean retainImage;
+    /**
+     * The Width.
+     */
     protected int width;
+    /**
+     * The Height.
+     */
     protected int height;
+    /**
+     * The Alpha.
+     */
     protected float alpha;
+    /**
+     * The Last image update.
+     */
     protected long lastImageUpdate;
+    /**
+     * The Last bound.
+     */
     protected long lastBound;
+    /**
+     * The Description.
+     */
     protected String description;
+    /**
+     * The Resource location.
+     */
     protected ResourceLocation resourceLocation;
+    /**
+     * The Listeners.
+     */
     protected List<WeakReference<Listener>> listeners = new ArrayList<>(0);
 
+    /**
+     * The Buffer.
+     */
     protected ByteBuffer buffer;
+    /**
+     * The Bind needed.
+     */
     protected boolean bindNeeded;
 
     /**
      * Must be called on thread with OpenGL Context.  Texture is immediately bound.
+     *
+     * @param resourceLocation the resource location
      */
     public TextureImpl(ResourceLocation resourceLocation)
     {
@@ -52,6 +96,8 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * Must be called on thread with OpenGL Context.  Texture is immediately bound.
+     *
+     * @param image the image
      */
     public TextureImpl(BufferedImage image)
     {
@@ -60,6 +106,9 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * Must be called on thread with OpenGL Context.  Texture is immediately bound.
+     *
+     * @param image       the image
+     * @param retainImage the retain image
      */
     public TextureImpl(BufferedImage image, boolean retainImage)
     {
@@ -68,6 +117,10 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * If bindImmediately, must be called on thread with OpenGL Context.
+     *
+     * @param glId        the gl id
+     * @param image       the image
+     * @param retainImage the retain image
      */
     public TextureImpl(Integer glId, BufferedImage image, boolean retainImage)
     {
@@ -76,6 +129,11 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * If bindImmediately, must be called on thread with OpenGL Context.
+     *
+     * @param glId            the gl id
+     * @param image           the image
+     * @param retainImage     the retain image
+     * @param bindImmediately the bind immediately
      */
     public TextureImpl(Integer glId, BufferedImage image, boolean retainImage, boolean bindImmediately)
     {
@@ -99,6 +157,9 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * Can be safely called without the OpenGL Context.
+     *
+     * @param bufferedImage the buffered image
+     * @param retainImage   the retain image
      */
     public void setImage(BufferedImage bufferedImage, boolean retainImage)
     {
@@ -137,6 +198,12 @@ public class TextureImpl extends AbstractTexture
         notifyListeners();
     }
 
+    /**
+     * Load byte buffer.
+     *
+     * @param bufferedImage the buffered image
+     * @param buffer        the buffer
+     */
     public static void loadByteBuffer(BufferedImage bufferedImage, ByteBuffer buffer)
     {
         int width = bufferedImage.getWidth();
@@ -221,21 +288,41 @@ public class TextureImpl extends AbstractTexture
         }
     }
 
+    /**
+     * Is bind needed boolean.
+     *
+     * @return the boolean
+     */
     public boolean isBindNeeded()
     {
         return bindNeeded;
     }
 
+    /**
+     * Is bound boolean.
+     *
+     * @return the boolean
+     */
     public boolean isBound()
     {
         return glTextureId != -1;
     }
 
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * Sets description.
+     *
+     * @param description the description
+     */
     public void setDescription(String description)
     {
         this.description = description;
@@ -243,6 +330,8 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * Must be called on same thread as OpenGL Context
+     *
+     * @param image the image
      */
     public void updateAndBind(BufferedImage image)
     {
@@ -251,6 +340,9 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * Must be called on same thread as OpenGL Context
+     *
+     * @param image       the image
+     * @param retainImage the retain image
      */
     public void updateAndBind(BufferedImage image, boolean retainImage)
     {
@@ -259,11 +351,21 @@ public class TextureImpl extends AbstractTexture
 
     }
 
+    /**
+     * Has image boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasImage()
     {
         return image != null;
     }
 
+    /**
+     * Gets image.
+     *
+     * @return the image
+     */
     public BufferedImage getImage()
     {
         if (image != null)
@@ -277,6 +379,11 @@ public class TextureImpl extends AbstractTexture
         return null;
     }
 
+    /**
+     * Is defunct boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDefunct()
     {
         return this.glTextureId == -1 && image == null && buffer == null;
@@ -295,6 +402,12 @@ public class TextureImpl extends AbstractTexture
         return super.getGlTextureId();
     }
 
+    /**
+     * Gets gl texture id.
+     *
+     * @param forceBind the force bind
+     * @return the gl texture id
+     */
     public int getGlTextureId(boolean forceBind)
     {
         if (forceBind || glTextureId == -1)
@@ -330,11 +443,21 @@ public class TextureImpl extends AbstractTexture
         ExpireTextureTask.queue(this);
     }
 
+    /**
+     * Gets last image update.
+     *
+     * @return the last image update
+     */
     public long getLastImageUpdate()
     {
         return lastImageUpdate;
     }
 
+    /**
+     * Gets last bound.
+     *
+     * @return the last bound
+     */
     public long getLastBound()
     {
         return lastBound;
@@ -370,12 +493,19 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * width of this icon in pixels
+     *
+     * @return the width
      */
     public int getWidth()
     {
         return width;
     }
 
+    /**
+     * Sets width.
+     *
+     * @param width the width
+     */
     public void setWidth(int width)
     {
         this.width = width;
@@ -383,27 +513,49 @@ public class TextureImpl extends AbstractTexture
 
     /**
      * height of this icon in pixels
+     *
+     * @return the height
      */
     public int getHeight()
     {
         return height;
     }
 
+    /**
+     * Sets height.
+     *
+     * @param height the height
+     */
     public void setHeight(int height)
     {
         this.height = height;
     }
 
+    /**
+     * Gets alpha.
+     *
+     * @return the alpha
+     */
     public float getAlpha()
     {
         return alpha;
     }
 
+    /**
+     * Sets alpha.
+     *
+     * @param alpha the alpha
+     */
     public void setAlpha(float alpha)
     {
         this.alpha = alpha;
     }
 
+    /**
+     * Add listener.
+     *
+     * @param addedListener the added listener
+     */
     public void addListener(Listener addedListener)
     {
         Iterator<WeakReference<Listener>> iter = listeners.iterator();
@@ -426,6 +578,9 @@ public class TextureImpl extends AbstractTexture
         this.listeners.add(new WeakReference<>(addedListener));
     }
 
+    /**
+     * Notify listeners.
+     */
     protected void notifyListeners()
     {
         Iterator<WeakReference<Listener>> iter = listeners.iterator();
@@ -444,8 +599,18 @@ public class TextureImpl extends AbstractTexture
         }
     }
 
+    /**
+     * The interface Listener.
+     *
+     * @param <T> the type parameter
+     */
     public static interface Listener<T extends TextureImpl>
     {
+        /**
+         * Texture image updated.
+         *
+         * @param textureImpl the texture
+         */
         void textureImageUpdated(T textureImpl);
     }
 }

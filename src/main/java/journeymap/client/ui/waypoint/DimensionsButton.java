@@ -15,14 +15,26 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.List;
 
 /**
- * Created by Mark on 10/12/2014.
+ * @author techbrew 10/12/2014.
  */
 class DimensionsButton extends Button
 {
+    /**
+     * The Need init.
+     */
     static boolean needInit = true;
+    /**
+     * The Current world provider.
+     */
     static WorldData.DimensionProvider currentWorldProvider;
+    /**
+     * The Dimension providers.
+     */
     final List<WorldData.DimensionProvider> dimensionProviders = WorldData.getDimensionProviders(WaypointStore.INSTANCE.getLoadedDimensions());
 
+    /**
+     * Instantiates a new Dimensions button.
+     */
     public DimensionsButton()
     {
         super(0, 0, "");
@@ -66,6 +78,9 @@ class DimensionsButton extends Button
     }
 
 
+    /**
+     * Next value.
+     */
     public void nextValue()
     {
         int index;

@@ -34,6 +34,9 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     private int landPaletteRange;
     private long lastTopoFileUpdate;
 
+    /**
+     * The Render topo timer.
+     */
     protected StatTimer renderTopoTimer = StatTimer.get("TopoRenderer.renderSurface");
 
     // Vertical size in blocks of each contour
@@ -43,9 +46,15 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     private double waterContourInterval;
     private double landContourInterval;
 
+    /**
+     * The Topo properties.
+     */
     TopoProperties topoProperties;
 
 
+    /**
+     * Instantiates a new Topo renderer.
+     */
     public TopoRenderer()
     {
         primarySlopeOffsets.clear();
@@ -151,6 +160,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for the surface.
+     *
+     * @param chunkImage  the chunk image
+     * @param chunkMd     the chunk md
+     * @param vSlice      the v slice
+     * @param cavePrePass the cave pre pass
+     * @return the boolean
      */
     protected boolean renderSurface(final BufferedImage chunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
     {
@@ -253,6 +268,9 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Initialize surface slopes in chunk if needed.
+     *
+     * @param chunkMd the chunk md
+     * @return the float [ ] [ ]
      */
     protected Float[][] populateSlopes(final ChunkMD chunkMd)
     {
@@ -375,6 +393,17 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return FMLClientHandler.instance().getClient().theWorld.getChunkFromBlockCoords(blockPos).getPrecipitationHeight(blockPos).getY();
     }
 
+    /**
+     * Paint contour boolean.
+     *
+     * @param chunkImage the chunk image
+     * @param chunkMd    the chunk md
+     * @param topBlockMd the top block md
+     * @param x          the x
+     * @param y          the y
+     * @param z          the z
+     * @return the boolean
+     */
     protected boolean paintContour(final BufferedImage chunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final int x, final int y, final int z)
     {
         if (!chunkMd.hasChunk())
@@ -451,16 +480,33 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         return true;
     }
 
+    /**
+     * Get shore boolean [ ] [ ].
+     *
+     * @param chunkMd the chunk md
+     * @return the boolean [ ] [ ]
+     */
     protected final Boolean[][] getShore(ChunkMD chunkMd)
     {
         return chunkMd.getBlockDataBooleans(getCurrentMapType()).get(PROP_SHORE);
     }
 
+    /**
+     * Has shore boolean.
+     *
+     * @param chunkMd the chunk md
+     * @return the boolean
+     */
     protected final boolean hasShore(ChunkMD chunkMd)
     {
         return chunkMd.getBlockDataBooleans(getCurrentMapType()).has(PROP_SHORE);
     }
 
+    /**
+     * Reset shore.
+     *
+     * @param chunkMd the chunk md
+     */
     protected final void resetShore(ChunkMD chunkMd)
     {
         chunkMd.getBlockDataBooleans(getCurrentMapType()).clear(PROP_SHORE);

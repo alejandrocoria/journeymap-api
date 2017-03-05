@@ -16,19 +16,47 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Mark on 5/8/2016.
+ * @author techbrew 5/8/2016.
  */
 public class SplashPerson
 {
+    /**
+     * The Name.
+     */
     public final String name;
+    /**
+     * The Ign.
+     */
     public final String ign;
+    /**
+     * The Title.
+     */
     public final String title;
+    /**
+     * The Button.
+     */
     public Button button;
+    /**
+     * The Width.
+     */
     public int width;
+    /**
+     * The Move x.
+     */
     public int moveX;
+    /**
+     * The Move y.
+     */
     public int moveY;
     private int moveDistance = 1;
 
+    /**
+     * Instantiates a new Splash person.
+     *
+     * @param ign      the ign
+     * @param name     the name
+     * @param titleKey the title key
+     */
     public SplashPerson(String ign, String name, String titleKey)
     {
         this.ign = ign;
@@ -43,22 +71,43 @@ public class SplashPerson
         }
     }
 
+    /**
+     * Gets button.
+     *
+     * @return the button
+     */
     public Button getButton()
     {
         return button;
     }
 
+    /**
+     * Sets button.
+     *
+     * @param button the button
+     */
     public void setButton(Button button)
     {
         this.button = button;
         randomizeVector();
     }
 
+    /**
+     * Gets skin.
+     *
+     * @return the skin
+     */
     public TextureImpl getSkin()
     {
         return TextureCache.getPlayerSkin(ign);
     }
 
+    /**
+     * Gets width.
+     *
+     * @param fr the fr
+     * @return the width
+     */
     public int getWidth(FontRenderer fr)
     {
         width = fr.getStringWidth(title);
@@ -70,11 +119,19 @@ public class SplashPerson
         return width;
     }
 
+    /**
+     * Sets width.
+     *
+     * @param minWidth the min width
+     */
     public void setWidth(int minWidth)
     {
         this.width = minWidth;
     }
 
+    /**
+     * Randomize vector.
+     */
     public void randomizeVector()
     {
         this.moveDistance = new Random().nextInt(2) + 1;
@@ -94,6 +151,12 @@ public class SplashPerson
         this.moveY = (moveY < 0) ? moveDistance : -moveDistance;
     }
 
+    /**
+     * Adjust vector.
+     *
+     * @param screenWidth  the screen width
+     * @param screenHeight the screen height
+     */
     public void adjustVector(int screenWidth, int screenHeight)
     {
         if (button.xPosition <= moveDistance || button.xPosition + button.getWidth() >= screenWidth - moveDistance)
@@ -109,6 +172,11 @@ public class SplashPerson
         button.yPosition += moveY;
     }
 
+    /**
+     * Avoid.
+     *
+     * @param devs the devs
+     */
     public void avoid(List<SplashPerson> devs)
     {
         for (SplashPerson dev : devs)
@@ -136,10 +204,20 @@ public class SplashPerson
         }
     }
 
+    /**
+     * The type Fake.
+     */
     public static class Fake extends SplashPerson
     {
         private TextureImpl texture;
 
+        /**
+         * Instantiates a new Fake.
+         *
+         * @param name    the name
+         * @param title   the title
+         * @param texture the texture
+         */
         public Fake(String name, String title, TextureImpl texture)
         {
             super(name, title, null);

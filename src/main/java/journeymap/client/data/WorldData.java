@@ -47,18 +47,57 @@ import java.util.*;
  */
 public class WorldData extends CacheLoader<Class, WorldData>
 {
+    /**
+     * The Name.
+     */
     String name;
+    /**
+     * The Dimension.
+     */
     int dimension;
+    /**
+     * The Time.
+     */
     long time;
+    /**
+     * The Hardcore.
+     */
     boolean hardcore;
+    /**
+     * The Single player.
+     */
     boolean singlePlayer;
+    /**
+     * The Features.
+     */
     Map<Feature, Boolean> features;
+    /**
+     * The Jm version.
+     */
     String jm_version;
+    /**
+     * The Latest journeymap version.
+     */
     String latest_journeymap_version;
+    /**
+     * The Mc version.
+     */
     String mc_version;
+    /**
+     * The Mod name.
+     */
     String mod_name = JourneymapClient.MOD_NAME;
+    /**
+     * The Icon set name.
+     */
     String iconSetName;
+    /**
+     * The Icon set names.
+     */
     String[] iconSetNames;
+    /**
+     * The Browser poll.
+     */
     int browser_poll;
 
     /**
@@ -68,6 +107,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
     }
 
+    /**
+     * Is hardcore and multiplayer boolean.
+     *
+     * @return the boolean
+     */
     public static boolean isHardcoreAndMultiplayer()
     {
         WorldData world = DataCache.INSTANCE.getWorld(false);
@@ -146,6 +190,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    /**
+     * Gets legacy server name.
+     *
+     * @return the legacy server name
+     */
     public static String getLegacyServerName()
     {
         try
@@ -171,8 +220,9 @@ public class WorldData extends CacheLoader<Class, WorldData>
     /**
      * Get the current world name.
      *
-     * @param mc
-     * @return
+     * @param mc            the mc
+     * @param useLegacyName the use legacy name
+     * @return world name
      */
     public static String getWorldName(Minecraft mc, boolean useLegacyName)
     {
@@ -238,6 +288,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    /**
+     * Gets dimension providers.
+     *
+     * @param requiredDimensionList the required dimension list
+     * @return the dimension providers
+     */
     public static List<DimensionProvider> getDimensionProviders(List<Integer> requiredDimensionList)
     {
         try
@@ -340,6 +396,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    /**
+     * Gets safe dimension name.
+     *
+     * @param dimensionProvider the dimension provider
+     * @return the safe dimension name
+     */
     public static String getSafeDimensionName(DimensionProvider dimensionProvider)
     {
         if (dimensionProvider == null || dimensionProvider.getName()==null)
@@ -385,6 +447,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
     /**
      * Return length of time in millis data should be kept.
+     *
+     * @return the ttl
      */
     public long getTTL()
     {
@@ -396,7 +460,18 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static interface DimensionProvider
     {
+        /**
+         * Gets dimension.
+         *
+         * @return the dimension
+         */
         int getDimension();
+
+        /**
+         * Gets name.
+         *
+         * @return the name
+         */
         String getName();
     }
 
@@ -405,8 +480,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static class WrappedProvider implements DimensionProvider
     {
+        /**
+         * The World provider.
+         */
         WorldProvider worldProvider;
 
+        /**
+         * Instantiates a new Wrapped provider.
+         *
+         * @param worldProvider the world provider
+         */
         public WrappedProvider(WorldProvider worldProvider)
         {
             this.worldProvider = worldProvider;
@@ -430,8 +513,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     static class DummyProvider implements DimensionProvider
     {
+        /**
+         * The Dim.
+         */
         final int dim;
 
+        /**
+         * Instantiates a new Dummy provider.
+         *
+         * @param dim the dim
+         */
         DummyProvider(int dim)
         {
             this.dim = dim;

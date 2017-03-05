@@ -35,24 +35,68 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 
+/**
+ * The type Fullscreen actions.
+ */
 public class FullscreenActions extends JmUI
 {
+    /**
+     * The Patreon logo.
+     */
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
 
-    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
+    /**
+     * The Button automap.
+     */
+    Button buttonAutomap, /**
+ * The Button save.
+ */
+buttonSave, /**
+ * The Button about.
+ */
+buttonAbout, /**
+ * The Button close.
+ */
+buttonClose, /**
+ * The Button browser.
+ */
+buttonBrowser, /**
+ * The Button check.
+ */
+buttonCheck, /**
+ * The Button donate.
+ */
+buttonDonate, /**
+ * The Button delete map.
+ */
+buttonDeleteMap;
+    /**
+     * The Button enable mapping.
+     */
     BooleanPropertyButton buttonEnableMapping;
 
+    /**
+     * Instantiates a new Fullscreen actions.
+     */
     public FullscreenActions()
     {
         super(Constants.getString("jm.common.actions"));
     }
 
+    /**
+     * Instantiates a new Fullscreen actions.
+     *
+     * @param returnDisplay the return display
+     */
     public FullscreenActions(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.actions"), returnDisplay);
     }
 
 
+    /**
+     * Launch localhost.
+     */
     public static void launchLocalhost()
     {
         String url = "http://localhost:" + Journeymap.getClient().getWebMapProperties().port.get();
@@ -66,6 +110,9 @@ public class FullscreenActions extends JmUI
         }
     }
 
+    /**
+     * Launch patreon.
+     */
     public static void launchPatreon()
     {
         String url = "http://patreon.com/techbrew";
@@ -81,6 +128,8 @@ public class FullscreenActions extends JmUI
 
     /**
      * Launch the JourneyMap website in the native OS.
+     *
+     * @param path the path
      */
     public static void launchWebsite(String path)
     {
@@ -97,6 +146,8 @@ public class FullscreenActions extends JmUI
 
     /**
      * Suggest a tweet message
+     *
+     * @param message the message
      */
     public static void tweet(String message)
     {
@@ -285,6 +336,9 @@ public class FullscreenActions extends JmUI
 
     }
 
+    /**
+     * Save.
+     */
     void save()
     {
         final MapState state = Fullscreen.state();

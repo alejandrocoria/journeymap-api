@@ -21,13 +21,25 @@ import java.util.Map;
  */
 public abstract class ImageSet
 {
+    /**
+     * The Image holders.
+     */
     protected final Map<MapType, ImageHolder> imageHolders;
 
+    /**
+     * Instantiates a new Image set.
+     */
     public ImageSet()
     {
         imageHolders = Collections.synchronizedMap(new HashMap<MapType, ImageHolder>(8));
     }
 
+    /**
+     * Gets holder.
+     *
+     * @param mapType the map type
+     * @return the holder
+     */
     protected abstract ImageHolder getHolder(MapType mapType);
 
     @Override
@@ -37,6 +49,12 @@ public abstract class ImageSet
     public abstract boolean equals(Object obj);
 
 
+    /**
+     * Gets image.
+     *
+     * @param mapType the map type
+     * @return the image
+     */
     public BufferedImage getImage(MapType mapType)
     {
         return getHolder(mapType).getImage();
@@ -46,6 +64,7 @@ public abstract class ImageSet
      * Returns the number of imageHolders that should be updated.
      *
      * @param force write even if image isn't flagged as dirty
+     * @return the int
      */
     public int writeToDiskAsync(boolean force)
     {
@@ -56,6 +75,7 @@ public abstract class ImageSet
      * Returns the number of imageHolders actually written to disk.
      *
      * @param force write even if image isn't flagged as dirty
+     * @return the int
      */
     public int writeToDisk(boolean force)
     {
@@ -98,6 +118,13 @@ public abstract class ImageSet
         return count;
     }
 
+    /**
+     * Updated since boolean.
+     *
+     * @param mapType the map type
+     * @param time    the time
+     * @return the boolean
+     */
     public boolean updatedSince(MapType mapType, long time)
     {
         synchronized (imageHolders)
@@ -124,6 +151,9 @@ public abstract class ImageSet
         return false;
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         synchronized (imageHolders)
@@ -146,15 +176,29 @@ public abstract class ImageSet
 
     /**
      * ************************
+     *
+     * @return the image size
      */
-
     protected abstract int getImageSize();
 
+    /**
+     * Add holder image holder.
+     *
+     * @param mapType   the map type
+     * @param imageFile the image file
+     * @return the image holder
+     */
     protected ImageHolder addHolder(MapType mapType, File imageFile)
     {
         return addHolder(new ImageHolder(mapType, imageFile, getImageSize()));
     }
 
+    /**
+     * Add holder image holder.
+     *
+     * @param imageHolder the image holder
+     * @return the image holder
+     */
     protected ImageHolder addHolder(ImageHolder imageHolder)
     {
         imageHolders.put(imageHolder.mapType, imageHolder);

@@ -32,15 +32,42 @@ import java.util.List;
 public class BlockInfoLayer implements LayerDelegate.Layer
 {
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
+    /**
+     * The Location format.
+     */
     LocationFormat locationFormat = new LocationFormat();
+    /**
+     * The Location format keys.
+     */
     LocationFormat.LocationFormatKeys locationFormatKeys;
+    /**
+     * The Last coord.
+     */
     BlockPos lastCoord = null;
+    /**
+     * The Last clicked.
+     */
     long lastClicked = 0;
+    /**
+     * The Last mouse x.
+     */
     int lastMouseX;
+    /**
+     * The Last mouse y.
+     */
     int lastMouseY;
+    /**
+     * The Block info step.
+     */
     BlockInfoStep blockInfoStep;
+    /**
+     * The Font renderer.
+     */
     FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
 
+    /**
+     * Instantiates a new Block info layer.
+     */
     public BlockInfoLayer()
     {
         blockInfoStep = new BlockInfoStep();
@@ -120,18 +147,46 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         return true;
     }
 
+    /**
+     * The type Block info step.
+     */
     class BlockInfoStep implements DrawStep
     {
+        /**
+         * The Bg color.
+         */
         Integer bgColor = RGB.DARK_GRAY_RGB;
+        /**
+         * The Fg color.
+         */
         Integer fgColor = RGB.WHITE_RGB;
+        /**
+         * The Font scale.
+         */
         double fontScale = 1;
+        /**
+         * The Font shadow.
+         */
         boolean fontShadow = false;
+        /**
+         * The Alpha.
+         */
         float alpha = 1;
+        /**
+         * The Ticks.
+         */
         int ticks = 20 * 5;
         private double x;
         private double y;
         private String text;
 
+        /**
+         * Update.
+         *
+         * @param text the text
+         * @param x    the x
+         * @param y    the y
+         */
         void update(String text, double x, double y)
         {
             this.text = text;

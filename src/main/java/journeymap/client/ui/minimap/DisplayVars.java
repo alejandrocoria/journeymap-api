@@ -32,42 +32,156 @@ import java.awt.geom.Point2D;
  */
 public class DisplayVars
 {
+    /**
+     * The Position.
+     */
     final Position position;
+    /**
+     * The Shape.
+     */
     final Shape shape;
+    /**
+     * The Orientation.
+     */
     final Orientation orientation;
+    /**
+     * The Font scale.
+     */
     final double fontScale;
+    /**
+     * The Display width.
+     */
     final int displayWidth;
+    /**
+     * The Display height.
+     */
     final int displayHeight;
+    /**
+     * The Terrain alpha.
+     */
     final float terrainAlpha;
+    /**
+     * The Scaled resolution.
+     */
     final ScaledResolution scaledResolution;
-    final int minimapWidth, minimapHeight;
-    final int textureX, textureY;
-    final int translateX, translateY;
+    /**
+     * The Minimap width.
+     */
+    final int minimapWidth, /**
+ * The Minimap height.
+ */
+minimapHeight;
+    /**
+     * The Texture x.
+     */
+    final int textureX, /**
+ * The Texture y.
+ */
+textureY;
+    /**
+     * The Translate x.
+     */
+    final int translateX, /**
+ * The Translate y.
+ */
+translateY;
+    /**
+     * The Reticle segment length.
+     */
     final double reticleSegmentLength;
+    /**
+     * The Fps label height.
+     */
     final int fpsLabelHeight;
+    /**
+     * The Location label height.
+     */
     final int locationLabelHeight;
+    /**
+     * The Center point.
+     */
     final Point2D.Double centerPoint;
+    /**
+     * The Show fps.
+     */
     final boolean showFps;
+    /**
+     * The Show biome.
+     */
     final boolean showBiome;
+    /**
+     * The Show location.
+     */
     final boolean showLocation;
+    /**
+     * The Show compass.
+     */
     final boolean showCompass;
+    /**
+     * The Show reticle.
+     */
     final boolean showReticle;
-    final LabelVars labelFps, labelLocation, labelBiome, labelDebug1, labelDebug2;
+    /**
+     * The Label fps.
+     */
+    final LabelVars labelFps, /**
+ * The Label location.
+ */
+labelLocation, /**
+ * The Label biome.
+ */
+labelBiome, /**
+ * The Label debug 1.
+ */
+labelDebug1, /**
+ * The Label debug 2.
+ */
+labelDebug2;
+    /**
+     * The Theme.
+     */
     final Theme theme;
+    /**
+     * The Minimap frame.
+     */
     final ThemeMinimapFrame minimapFrame;
+    /**
+     * The Minimap compass points.
+     */
     final ThemeCompassPoints minimapCompassPoints;
+    /**
+     * The Minimap spec.
+     */
     final Theme.Minimap.MinimapSpec minimapSpec;
+    /**
+     * The Location format keys.
+     */
     final LocationFormat.LocationFormatKeys locationFormatKeys;
+    /**
+     * The Location format verbose.
+     */
     final boolean locationFormatVerbose;
-    int marginX, marginY;
+    /**
+     * The Margin x.
+     */
+    int marginX, /**
+ * The Margin y.
+ */
+marginY;
+    /**
+     * The Map type status.
+     */
     MapTypeStatus mapTypeStatus;
+    /**
+     * The Map preset status.
+     */
     MapPresetStatus mapPresetStatus;
 
     /**
      * Constructor.
      *
      * @param mc                Minecraft
-     * @param miniMapProperties
+     * @param miniMapProperties the mini map properties
      */
     DisplayVars(Minecraft mc, final MiniMapProperties miniMapProperties)
     {
@@ -326,9 +440,9 @@ public class DisplayVars
     /**
      * Get or create a MapPresetStatus instance
      *
-     * @param mapType
-     * @param miniMapId
-     * @return
+     * @param mapType   the map type
+     * @param miniMapId the mini map id
+     * @return map preset status
      */
     MapPresetStatus getMapPresetStatus(MapType mapType, int miniMapId)
     {
@@ -339,6 +453,12 @@ public class DisplayVars
         return mapPresetStatus;
     }
 
+    /**
+     * Gets map type status.
+     *
+     * @param mapType the map type
+     * @return the map type status
+     */
     MapTypeStatus getMapTypeStatus(MapType mapType)
     {
         if (this.mapTypeStatus == null || !mapType.equals(this.mapTypeStatus.mapType))
@@ -359,6 +479,12 @@ public class DisplayVars
         private String name;
         private Integer color;
 
+        /**
+         * Instantiates a new Map preset status.
+         *
+         * @param mapType   the map type
+         * @param miniMapId the mini map id
+         */
         MapPresetStatus(MapType mapType, int miniMapId)
         {
             this.miniMapId = miniMapId;
@@ -367,6 +493,13 @@ public class DisplayVars
             this.name = Integer.toString(miniMapId);
         }
 
+        /**
+         * Draw.
+         *
+         * @param mapCenter the map center
+         * @param alpha     the alpha
+         * @param rotation  the rotation
+         */
         void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, color, alpha, scale, true, rotation);
@@ -389,6 +522,11 @@ public class DisplayVars
         private float bgScale;
         private float scaleHeightOffset;
 
+        /**
+         * Instantiates a new Map type status.
+         *
+         * @param mapType the map type
+         */
         MapTypeStatus(MapType mapType)
         {
             this.mapType = mapType;
@@ -400,6 +538,13 @@ public class DisplayVars
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }
 
+        /**
+         * Draw.
+         *
+         * @param mapCenter the map center
+         * @param alpha     the alpha
+         * @param rotation  the rotation
+         */
         void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             x = mapCenter.getX() - (tex.getWidth() / 2);

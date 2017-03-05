@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by Mark on 8/30/2014.
+ * @author techbrew 8/30/2014.
  */
 public class ThemeToolbar extends Button
 {
@@ -30,11 +30,23 @@ public class ThemeToolbar extends Button
     private TextureImpl textureInner;
     private TextureImpl textureEnd;
 
+    /**
+     * Instantiates a new Theme toolbar.
+     *
+     * @param theme   the theme
+     * @param buttons the buttons
+     */
     public ThemeToolbar(Theme theme, Button... buttons)
     {
         this(theme, new ButtonList(buttons));
     }
 
+    /**
+     * Instantiates a new Theme toolbar.
+     *
+     * @param theme      the theme
+     * @param buttonList the button list
+     */
     public ThemeToolbar(Theme theme, ButtonList buttonList)
     {
         super(0, 0, "");
@@ -43,12 +55,22 @@ public class ThemeToolbar extends Button
         updateTheme(theme);
     }
 
+    /**
+     * Update theme.
+     *
+     * @param theme the theme
+     */
     public void updateTheme(Theme theme)
     {
         this.theme = theme;
         updateTextures();
     }
 
+    /**
+     * Update textures theme . container . toolbar . toolbar spec.
+     *
+     * @return the theme . container . toolbar . toolbar spec
+     */
     public Theme.Container.Toolbar.ToolbarSpec updateTextures()
     {
         Theme.Container.Toolbar.ToolbarSpec toolbarSpec;
@@ -81,6 +103,9 @@ public class ThemeToolbar extends Button
         return this.toolbarSpec;
     }
 
+    /**
+     * Update layout.
+     */
     public void updateLayout()
     {
         updateTextures();
@@ -102,6 +127,11 @@ public class ThemeToolbar extends Button
         this.setPosition(drawX, drawY);
     }
 
+    /**
+     * Gets toolbar spec.
+     *
+     * @return the toolbar spec
+     */
     public Theme.Container.Toolbar.ToolbarSpec getToolbarSpec()
     {
         return toolbarSpec;
@@ -112,16 +142,33 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Contains boolean.
+     *
+     * @param button the button
+     * @return the boolean
+     */
     public boolean contains(GuiButton button)
     {
         return buttonList.contains(button);
     }
 
+    /**
+     * Add.
+     *
+     * @param <B>     the type parameter
+     * @param buttons the buttons
+     */
     public <B extends Button> void add(B... buttons)
     {
         buttonList.addAll(Arrays.asList(buttons));
     }
 
+    /**
+     * Gets v margin.
+     *
+     * @return the v margin
+     */
     public int getVMargin()
     {
         if (buttonList.isHorizontal())
@@ -135,6 +182,11 @@ public class ThemeToolbar extends Button
         }
     }
 
+    /**
+     * Gets h margin.
+     *
+     * @return the h margin
+     */
     public int getHMargin()
     {
         if (buttonList.isHorizontal())
@@ -148,6 +200,11 @@ public class ThemeToolbar extends Button
         }
     }
 
+    /**
+     * Sets draw toolbar.
+     *
+     * @param draw the draw
+     */
     public void setDrawToolbar(boolean draw)
     {
         super.setDrawButton(draw);
@@ -254,6 +311,15 @@ public class ThemeToolbar extends Button
         return null;
     }
 
+    /**
+     * Layout horizontal button list.
+     *
+     * @param startX      the start x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @return the button list
+     */
     public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap)
     {
         buttonList.layoutHorizontal(startX, y, leftToRight, hgap);
@@ -261,6 +327,15 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Layout centered vertical button list.
+     *
+     * @param x           the x
+     * @param centerY     the center y
+     * @param leftToRight the left to right
+     * @param vgap        the vgap
+     * @return the button list
+     */
     public ButtonList layoutCenteredVertical(final int x, final int centerY, final boolean leftToRight, final int vgap)
     {
         buttonList.layoutCenteredVertical(x, centerY, leftToRight, vgap);
@@ -268,6 +343,15 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Layout vertical button list.
+     *
+     * @param x           the x
+     * @param startY      the start y
+     * @param leftToRight the left to right
+     * @param vgap        the vgap
+     * @return the button list
+     */
     public ButtonList layoutVertical(final int x, int startY, boolean leftToRight, int vgap)
     {
         buttonList.layoutVertical(x, startY, leftToRight, vgap);
@@ -275,6 +359,15 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Layout centered horizontal button list.
+     *
+     * @param centerX     the center x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @return the button list
+     */
     public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
     {
         buttonList.layoutCenteredHorizontal(centerX, y, leftToRight, hgap);
@@ -282,6 +375,15 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Layout distributed horizontal button list.
+     *
+     * @param leftX       the left x
+     * @param y           the y
+     * @param rightX      the right x
+     * @param leftToRight the left to right
+     * @return the button list
+     */
     public ButtonList layoutDistributedHorizontal(final int leftX, final int y, final int rightX, final boolean leftToRight)
     {
         buttonList.layoutDistributedHorizontal(leftX, y, rightX, leftToRight);
@@ -289,6 +391,17 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Layout filled horizontal button list.
+     *
+     * @param fr          the fr
+     * @param leftX       the left x
+     * @param y           the y
+     * @param rightX      the right x
+     * @param hgap        the hgap
+     * @param leftToRight the left to right
+     * @return the button list
+     */
     public ButtonList layoutFilledHorizontal(FontRenderer fr, final int leftX, final int y, final int rightX, final int hgap, final boolean leftToRight)
     {
         buttonList.layoutFilledHorizontal(fr, leftX, y, rightX, hgap, leftToRight);
@@ -296,12 +409,23 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Sets layout.
+     *
+     * @param layout    the layout
+     * @param direction the direction
+     */
     public void setLayout(ButtonList.Layout layout, ButtonList.Direction direction)
     {
         buttonList.setLayout(layout, direction);
         updateLayout();
     }
 
+    /**
+     * Reverse button list.
+     *
+     * @return the button list
+     */
     public ButtonList reverse()
     {
         buttonList.reverse();
@@ -309,6 +433,11 @@ public class ThemeToolbar extends Button
         return buttonList;
     }
 
+    /**
+     * Add all buttons.
+     *
+     * @param gui the gui
+     */
     public void addAllButtons(JmUI gui)
     {
         gui.getButtonList().add(this);

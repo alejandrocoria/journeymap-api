@@ -9,8 +9,15 @@ import journeymap.common.properties.config.ConfigField;
 
 /**
  * Indicates a class wraps a ConfigField.
+ *
+ * @param <T> the type parameter
  */
 public interface IConfigFieldHolder<T extends ConfigField>
 {
+    /**
+     * Gets config field.
+     *
+     * @return the config field
+     */
     public T getConfigField();
 }

@@ -35,10 +35,16 @@ import javax.annotation.Nullable;
  */
 public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.EventHandler
 {
+    /**
+     * Instance chunk monitor.
+     */
     INSTANCE;
 
     private World theWorld;
 
+    /**
+     * Reset.
+     */
     public void reset()
     {
         if (theWorld != null)
@@ -48,6 +54,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         theWorld = null;
     }
 
+    /**
+     * Reset render times.
+     *
+     * @param pos the pos
+     */
     public void resetRenderTimes(ChunkPos pos)
     {
         ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(pos);
@@ -57,6 +68,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         }
     }
 
+    /**
+     * On chunk load.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event)
@@ -84,6 +100,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
 //        }
     }
 
+    /**
+     * On chunk unload.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onChunkUnload(ChunkEvent.Unload event)
@@ -93,6 +114,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         //DataCache.INSTANCE.invalidateChunkMD(pos);
     }
 
+    /**
+     * On world unload.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event)

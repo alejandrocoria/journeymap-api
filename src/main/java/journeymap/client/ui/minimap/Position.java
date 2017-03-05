@@ -13,13 +13,34 @@ import journeymap.client.ui.option.KeyedEnum;
  */
 public enum Position implements KeyedEnum
 {
+    /**
+     * Top right position.
+     */
     TopRight("jm.minimap.position_topright"),
+    /**
+     * Bottom right position.
+     */
     BottomRight("jm.minimap.position_bottomright"),
+    /**
+     * Bottom left position.
+     */
     BottomLeft("jm.minimap.position_bottomleft"),
+    /**
+     * Top left position.
+     */
     TopLeft("jm.minimap.position_topleft"),
+    /**
+     * Top center position.
+     */
     TopCenter("jm.minimap.position_topcenter"),
+    /**
+     * Center position.
+     */
     Center("jm.minimap.position_center");
 
+    /**
+     * The Key.
+     */
     public final String key;
 
     Position(String key)

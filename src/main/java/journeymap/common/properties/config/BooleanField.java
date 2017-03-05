@@ -12,22 +12,49 @@ import journeymap.common.properties.Category;
  */
 public class BooleanField extends ConfigField<Boolean>
 {
+    /**
+     * The constant ATTR_CATEGORY_MASTER.
+     */
     public static final String ATTR_CATEGORY_MASTER = "isMaster";
 
+    /**
+     * Instantiates a new Boolean field.
+     */
     protected BooleanField()
     {
     }
 
+    /**
+     * Instantiates a new Boolean field.
+     *
+     * @param category     the category
+     * @param defaultValue the default value
+     */
     public BooleanField(Category category, boolean defaultValue)
     {
         this(category, null, defaultValue);
     }
 
+    /**
+     * Instantiates a new Boolean field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param defaultValue the default value
+     */
     public BooleanField(Category category, String key, boolean defaultValue)
     {
         this(category, key, defaultValue, false);
     }
 
+    /**
+     * Instantiates a new Boolean field.
+     *
+     * @param category     the category
+     * @param key          the key
+     * @param defaultValue the default value
+     * @param isMaster     the is master
+     */
     public BooleanField(Category category, String key, boolean defaultValue, boolean isMaster)
     {
         super(category, key);
@@ -81,7 +108,7 @@ public class BooleanField extends ConfigField<Boolean>
     /**
      * Whether this field is the master checkbox for the entire category
      *
-     * @return
+     * @return boolean
      */
     public boolean isCategoryMaster()
     {
@@ -91,7 +118,8 @@ public class BooleanField extends ConfigField<Boolean>
     /**
      * Whether this field is the master checkbox for the entire category
      *
-     * @return this
+     * @param isMaster the is master
+     * @return this boolean field
      */
     public BooleanField categoryMaster(boolean isMaster)
     {

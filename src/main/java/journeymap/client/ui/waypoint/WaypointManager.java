@@ -30,21 +30,60 @@ import java.util.*;
  */
 public class WaypointManager extends JmUI
 {
+    /**
+     * The constant ASCEND.
+     */
     final static String ASCEND = "\u25B2";
+    /**
+     * The constant DESCEND.
+     */
     final static String DESCEND = "\u25BC";
+    /**
+     * The constant COLWAYPOINT.
+     */
     final static int COLWAYPOINT = 0;
+    /**
+     * The constant COLLOCATION.
+     */
     final static int COLLOCATION = 20;
+    /**
+     * The constant COLNAME.
+     */
     final static int COLNAME = 60;
+    /**
+     * The constant DEFAULT_ITEMWIDTH.
+     */
     final static int DEFAULT_ITEMWIDTH = 460;
     private static WaypointManagerItem.Sort currentSort;
     private final String on = Constants.getString("jm.common.on");
     private final String off = Constants.getString("jm.common.off");
+    /**
+     * The Col waypoint.
+     */
     protected int colWaypoint = COLWAYPOINT;
+    /**
+     * The Col location.
+     */
     protected int colLocation = COLLOCATION;
+    /**
+     * The Col name.
+     */
     protected int colName = COLNAME;
+    /**
+     * The Item width.
+     */
     protected int itemWidth = DEFAULT_ITEMWIDTH;
+    /**
+     * The Item scroll pane.
+     */
     protected ScrollListPane itemScrollPane;
+    /**
+     * The Row height.
+     */
     protected int rowHeight = 16;
+    /**
+     * The Can user teleport.
+     */
     Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
@@ -54,16 +93,30 @@ public class WaypointManager extends JmUI
     private Waypoint focusWaypoint;
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
 
+    /**
+     * Instantiates a new Waypoint manager.
+     */
     public WaypointManager()
     {
         this(null, null);
     }
 
+    /**
+     * Instantiates a new Waypoint manager.
+     *
+     * @param returnDisplay the return display
+     */
     public WaypointManager(JmUI returnDisplay)
     {
         this(null, returnDisplay);
     }
 
+    /**
+     * Instantiates a new Waypoint manager.
+     *
+     * @param focusWaypoint the focus waypoint
+     * @param returnDisplay the return display
+     */
     public WaypointManager(Waypoint focusWaypoint, JmUI returnDisplay)
     {
         super(Constants.getString("jm.waypoint.manage_title"), returnDisplay);
@@ -446,6 +499,12 @@ public class WaypointManager extends JmUI
         }
     }
 
+    /**
+     * Toggle items boolean.
+     *
+     * @param enable the enable
+     * @return the boolean
+     */
     protected boolean toggleItems(boolean enable)
     {
         for (WaypointManagerItem item : items)
@@ -466,6 +525,9 @@ public class WaypointManager extends JmUI
         return !enable;
     }
 
+    /**
+     * Update items.
+     */
     protected void updateItems()
     {
         items.clear();
@@ -507,6 +569,11 @@ public class WaypointManager extends JmUI
         }
     }
 
+    /**
+     * Update sort.
+     *
+     * @param sortButton the sort button
+     */
     protected void updateSort(SortButton sortButton)
     {
         // 1.8
@@ -548,6 +615,9 @@ public class WaypointManager extends JmUI
         //layoutButtons();
     }
 
+    /**
+     * Update count.
+     */
     protected void updateCount()
     {
         String itemCount = items.isEmpty() ? "" : Integer.toString(items.size());
@@ -556,22 +626,41 @@ public class WaypointManager extends JmUI
         buttonToggleAll.setLabels(enableOff, enableOn);
     }
 
+    /**
+     * Is selected boolean.
+     *
+     * @param item the item
+     * @return the boolean
+     */
     protected boolean isSelected(WaypointManagerItem item)
     {
         return itemScrollPane.isSelected(item.getSlotIndex()); // TODO
     }
 
+    /**
+     * Gets margin.
+     *
+     * @return the margin
+     */
     protected int getMargin()
     {
         return width > itemWidth + 2 ? (width - itemWidth) / 2 : 0;
     }
 
+    /**
+     * Remove waypoint.
+     *
+     * @param item the item
+     */
     public void removeWaypoint(WaypointManagerItem item)
     {
         WaypointStore.INSTANCE.remove(item.waypoint);
         this.items.remove(item);
     }
 
+    /**
+     * Refresh and close.
+     */
     protected void refreshAndClose()
     {
         closeAndReturn();
@@ -595,6 +684,11 @@ public class WaypointManager extends JmUI
         }
     }
 
+    /**
+     * Gets toolbars.
+     *
+     * @return the toolbars
+     */
     Map<Category, List<SlotMetadata>> getToolbars()
     {
         return Collections.EMPTY_MAP;

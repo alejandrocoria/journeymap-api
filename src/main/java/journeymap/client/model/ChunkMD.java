@@ -27,8 +27,17 @@ import java.util.HashMap;
  */
 public class ChunkMD
 {
+    /**
+     * The constant PROP_IS_SLIME_CHUNK.
+     */
     public static final String PROP_IS_SLIME_CHUNK = "isSlimeChunk";
+    /**
+     * The constant PROP_LOADED.
+     */
     public static final String PROP_LOADED = "loaded";
+    /**
+     * The constant PROP_LAST_RENDERED.
+     */
     public static final String PROP_LAST_RENDERED = "lastRendered";
     private final WeakReference<Chunk> chunkReference;
     private final ChunkPos coord;
@@ -37,11 +46,22 @@ public class ChunkMD
 
     private Chunk retainedChunk;
 
+    /**
+     * Instantiates a new Chunk md.
+     *
+     * @param chunk the chunk
+     */
     public ChunkMD(Chunk chunk)
     {
         this(chunk, false);
     }
 
+    /**
+     * Instantiates a new Chunk md.
+     *
+     * @param chunk       the chunk
+     * @param forceRetain the force retain
+     */
     public ChunkMD(Chunk chunk, boolean forceRetain)
     {
         if (chunk == null)
@@ -63,6 +83,14 @@ public class ChunkMD
         }
     }
 
+    /**
+     * Gets block state.
+     *
+     * @param localX the local x
+     * @param y      the y
+     * @param localZ the local z
+     * @return the block state
+     */
     public IBlockState getBlockState(int localX, int y, int localZ)
     {
         if (localX < 0 || localX > 15 || localZ < 0 || localZ > 15)
@@ -72,11 +100,23 @@ public class ChunkMD
         return getBlockState(new BlockPos(toWorldX(localX), y, toWorldZ(localZ)));
     }
 
+    /**
+     * Gets block state.
+     *
+     * @param blockPos the block pos
+     * @return the block state
+     */
     public IBlockState getBlockState(BlockPos blockPos)
     {
         return JmBlockAccess.INSTANCE.getBlockState(blockPos);
     }
 
+    /**
+     * Gets block md.
+     *
+     * @param blockPos the block pos
+     * @return the block md
+     */
     public BlockMD getBlockMD(BlockPos blockPos)
     {
         return BlockMD.getBlockMD(this, blockPos);
@@ -84,6 +124,11 @@ public class ChunkMD
 
     /**
      * Added to do a safety check on the world height value
+     *
+     * @param localX the local x
+     * @param y      the y
+     * @param localZ the local z
+     * @return the saved light value
      */
     public int getSavedLightValue(int localX, int y, int localZ)
     {
@@ -100,6 +145,11 @@ public class ChunkMD
 
     /**
      * Get the top block ignoring transparent roof blocks, air. etc.
+     *
+     * @param localX the local x
+     * @param y      the y
+     * @param localZ the local z
+     * @return the top block md
      */
     public final BlockMD getTopBlockMD(final int localX, int y, final int localZ)
     {
@@ -130,6 +180,10 @@ public class ChunkMD
 
     /**
      * Finds the top sky-obscuring block in the column.
+     *
+     * @param localX the local x
+     * @param localZ the local z
+     * @return the int
      */
     public int ceiling(final int localX, final int localZ)
     {
@@ -171,37 +225,83 @@ public class ChunkMD
         return Math.max(0, y);
     }
 
+    /**
+     * Has chunk boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasChunk()
     {
         Chunk chunk = chunkReference.get();
         return chunk != null && !(chunk instanceof EmptyChunk) && chunk.isLoaded();
     }
 
+    /**
+     * Gets height.
+     *
+     * @param blockPos the block pos
+     * @return the height
+     */
     public int getHeight(BlockPos blockPos)
     {
         return getChunk().getHeight(blockPos);
     }
 
+    /**
+     * Gets precipitation height.
+     *
+     * @param localX the local x
+     * @param localZ the local z
+     * @return the precipitation height
+     */
     public int getPrecipitationHeight(int localX, int localZ)
     {
         return getChunk().getPrecipitationHeight(getBlockPos(localX, 0, localZ)).getY();
     }
 
+    /**
+     * Gets precipitation height.
+     *
+     * @param blockPos the block pos
+     * @return the precipitation height
+     */
     public int getPrecipitationHeight(BlockPos blockPos)
     {
         return getChunk().getPrecipitationHeight(blockPos).getY();
     }
 
+    /**
+     * Gets light opacity.
+     *
+     * @param blockMD the block md
+     * @param localX  the local x
+     * @param y       the y
+     * @param localZ  the local z
+     * @return the light opacity
+     */
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
         return JmBlockAccess.INSTANCE.getLightOpacity(blockMD, getBlockPos(localX, y, localZ));
     }
 
+    /**
+     * Gets property.
+     *
+     * @param name the name
+     * @return the property
+     */
     public Serializable getProperty(String name)
     {
         return properties.get(name);
     }
 
+    /**
+     * Gets property.
+     *
+     * @param name         the name
+     * @param defaultValue the default value
+     * @return the property
+     */
     public Serializable getProperty(String name, Serializable defaultValue)
     {
         Serializable currentValue = getProperty(name);
@@ -213,6 +313,13 @@ public class ChunkMD
         return currentValue;
     }
 
+    /**
+     * Sets property.
+     *
+     * @param name  the name
+     * @param value the value
+     * @return the property
+     */
     public Serializable setProperty(String name, Serializable value)
     {
         return properties.put(name, value);
@@ -243,6 +350,11 @@ public class ChunkMD
         return getCoord().equals(other.getCoord());
     }
 
+    /**
+     * Gets chunk.
+     *
+     * @return the chunk
+     */
     public Chunk getChunk()
     {
         Chunk chunk = chunkReference.get();
@@ -253,57 +365,113 @@ public class ChunkMD
         return chunk;
     }
 
+    /**
+     * Gets world.
+     *
+     * @return the world
+     */
     public World getWorld()
     {
         return FMLClientHandler.instance().getClient().theWorld;
     }
 
+    /**
+     * Gets world actual height.
+     *
+     * @return the world actual height
+     */
     public int getWorldActualHeight()
     {
         // add one to get above the top block for some worlds that paste in to 256
         return getWorld().getActualHeight() + 1;
     }
 
+    /**
+     * Gets has no sky.
+     *
+     * @return the has no sky
+     */
     public Boolean getHasNoSky()
     {
         return getWorld().provider.getHasNoSky();
     }
 
+    /**
+     * Can block see the sky boolean.
+     *
+     * @param localX the local x
+     * @param y      the y
+     * @param localZ the local z
+     * @return the boolean
+     */
     public boolean canBlockSeeTheSky(int localX, int y, int localZ)
     {
         return getChunk().canSeeSky(getBlockPos(localX, y, localZ));
     }
 
+    /**
+     * Gets coord.
+     *
+     * @return the coord
+     */
     public ChunkPos getCoord()
     {
         return coord;
     }
 
+    /**
+     * Is slime chunk boolean.
+     *
+     * @return the boolean
+     */
     public boolean isSlimeChunk()
     {
         return (Boolean) getProperty(PROP_IS_SLIME_CHUNK, Boolean.FALSE);
     }
 
+    /**
+     * Gets loaded.
+     *
+     * @return the loaded
+     */
     public long getLoaded()
     {
         return (Long) getProperty(PROP_LOADED, 0L);
     }
 
+    /**
+     * Reset render times.
+     */
     public void resetRenderTimes()
     {
         getRenderTimes().clear();
     }
 
+    /**
+     * Reset render time.
+     *
+     * @param mapType the map type
+     */
     public void resetRenderTime(MapType mapType)
     {
         getRenderTimes().put(mapType, 0L);
     }
 
+    /**
+     * Reset block data.
+     *
+     * @param mapType the map type
+     */
     public void resetBlockData(MapType mapType)
     {
         getBlockData().get(mapType).clear();
     }
 
+    /**
+     * Gets render times.
+     *
+     * @return the render times
+     */
     protected HashMap<MapType, Long> getRenderTimes()
     {
         Serializable obj = properties.get(PROP_LAST_RENDERED);
@@ -315,11 +483,23 @@ public class ChunkMD
         return (HashMap<MapType, Long>) obj;
     }
 
+    /**
+     * Gets last rendered.
+     *
+     * @param mapType the map type
+     * @return the last rendered
+     */
     public long getLastRendered(MapType mapType)
     {
         return getRenderTimes().getOrDefault(mapType, 0L);
     }
 
+    /**
+     * Sets rendered.
+     *
+     * @param mapType the map type
+     * @return the rendered
+     */
     public long setRendered(MapType mapType)
     {
         long now = System.currentTimeMillis();
@@ -327,36 +507,79 @@ public class ChunkMD
         return now;
     }
 
+    /**
+     * Gets block pos.
+     *
+     * @param localX the local x
+     * @param y      the y
+     * @param localZ the local z
+     * @return the block pos
+     */
     public BlockPos getBlockPos(int localX, int y, int localZ)
     {
         return new BlockPos(toWorldX(localX), y, toWorldZ(localZ));
     }
 
+    /**
+     * To world x int.
+     *
+     * @param localX the local x
+     * @return the int
+     */
     public int toWorldX(int localX)
     {
         return (coord.chunkXPos << 4) + localX;
     }
 
+    /**
+     * To world z int.
+     *
+     * @param localZ the local z
+     * @return the int
+     */
     public int toWorldZ(int localZ)
     {
         return (coord.chunkZPos << 4) + localZ;
     }
 
+    /**
+     * Gets block data.
+     *
+     * @return the block data
+     */
     public BlockDataArrays getBlockData()
     {
         return blockDataArrays;
     }
 
+    /**
+     * Gets block data ints.
+     *
+     * @param mapType the map type
+     * @return the block data ints
+     */
     public BlockDataArrays.DataArray<Integer> getBlockDataInts(MapType mapType)
     {
         return blockDataArrays.get(mapType).ints();
     }
 
+    /**
+     * Gets block data floats.
+     *
+     * @param mapType the map type
+     * @return the block data floats
+     */
     public BlockDataArrays.DataArray<Float> getBlockDataFloats(MapType mapType)
     {
         return blockDataArrays.get(mapType).floats();
     }
 
+    /**
+     * Gets block data booleans.
+     *
+     * @param mapType the map type
+     * @return the block data booleans
+     */
     public BlockDataArrays.DataArray<Boolean> getBlockDataBooleans(MapType mapType)
     {
         return blockDataArrays.get(mapType).booleans();
@@ -371,11 +594,19 @@ public class ChunkMD
                 '}';
     }
 
+    /**
+     * Gets dimension.
+     *
+     * @return the dimension
+     */
     public int getDimension()
     {
         return getWorld().provider.getDimension();
     }
 
+    /**
+     * Stop chunk retention.
+     */
     public void stopChunkRetention()
     {
         this.retainedChunk = null;
@@ -390,8 +621,16 @@ public class ChunkMD
         }
     }
 
+    /**
+     * The type Chunk missing exception.
+     */
     public static class ChunkMissingException extends RuntimeException
     {
+        /**
+         * Instantiates a new Chunk missing exception.
+         *
+         * @param coord the coord
+         */
         ChunkMissingException(ChunkPos coord)
         {
             super("Chunk missing: " + coord);

@@ -16,12 +16,30 @@ import java.util.List;
 public class ServerCategory
 {
     private static int order = 1;
+    /**
+     * The constant General.
+     */
     public static final Category General = create("General", "General Configuration");
+    /**
+     * The constant Radar.
+     */
     public static final Category Radar = create("Radar", "Radar Features");
+    /**
+     * The constant Cave.
+     */
     public static final Category Cave = create("Cave", "Cave Mapping");
 
+    /**
+     * The constant values.
+     */
     public static final List<Category> values = Arrays.asList(Category.Inherit, Category.Hidden, General, Radar, Cave);
 
+    /**
+     * Value of category.
+     *
+     * @param name the name
+     * @return the category
+     */
     public static Category valueOf(String name)
     {
         for (Category category : values)

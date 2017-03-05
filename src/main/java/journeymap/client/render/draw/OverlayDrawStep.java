@@ -20,38 +20,39 @@ public interface OverlayDrawStep extends DrawStep
     /**
      * Gets the overlay related to this DrawStep
      *
-     * @return
+     * @return overlay
      */
     Overlay getOverlay();
 
     /**
      * Gets the screen bounds of the DrawStep
      *
-     * @return
+     * @return bounds
      */
     Rectangle2D.Double getBounds();
 
     /**
      * Evaluates whether the DrawStep is on screen
      *
-     * @param xOffset
-     * @param yOffset
-     * @param gridRenderer
-     * @return
+     * @param xOffset      the x offset
+     * @param yOffset      the y offset
+     * @param gridRenderer the grid renderer
+     * @param rotation     the rotation
+     * @return boolean
      */
     boolean isOnScreen(double xOffset, double yOffset, GridRenderer gridRenderer, double rotation);
 
     /**
      * Sets the position of the overlay title (tooltip)
      *
-     * @param titlePosition
+     * @param titlePosition the title position
      */
     void setTitlePosition(@Nullable Point2D.Double titlePosition);
 
     /**
      * Enable or disable the DrawStep
      *
-     * @param enabled
+     * @param enabled the enabled
      */
     public void setEnabled(boolean enabled);
 }

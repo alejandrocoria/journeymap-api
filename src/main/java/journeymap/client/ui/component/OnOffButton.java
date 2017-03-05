@@ -12,20 +12,47 @@ import net.minecraft.client.gui.FontRenderer;
 import java.util.ArrayList;
 
 /**
- * Created by Mark on 10/2/2014.
+ * @author techbrew 10/2/2014.
  */
 public class OnOffButton extends Button
 {
+    /**
+     * The Toggled.
+     */
     protected Boolean toggled = true;
+    /**
+     * The Label on.
+     */
     protected String labelOn;
+    /**
+     * The Label off.
+     */
     protected String labelOff;
+    /**
+     * The Toggle listeners.
+     */
     protected ArrayList<ToggleListener> toggleListeners = new ArrayList<ToggleListener>(0);
 
+    /**
+     * Instantiates a new On off button.
+     *
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param toggled  the toggled
+     */
     public OnOffButton(String labelOn, String labelOff, boolean toggled)
     {
         this(0, labelOn, labelOff, toggled);
     }
 
+    /**
+     * Instantiates a new On off button.
+     *
+     * @param id       the id
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param toggled  the toggled
+     */
     public OnOffButton(int id, String labelOn, String labelOff, boolean toggled)
     {
         super(toggled ? labelOn : labelOff);
@@ -35,6 +62,12 @@ public class OnOffButton extends Button
         finishInit();
     }
 
+    /**
+     * Sets labels.
+     *
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     */
     public void setLabels(String labelOn, String labelOff)
     {
         this.labelOn = labelOn;
@@ -50,6 +83,9 @@ public class OnOffButton extends Button
         }
     }
 
+    /**
+     * Toggle.
+     */
     public void toggle()
     {
         setToggled(!getToggled());
@@ -75,16 +111,32 @@ public class OnOffButton extends Button
         return isEnabled() && toggled;
     }
 
+    /**
+     * Gets toggled.
+     *
+     * @return the toggled
+     */
     public Boolean getToggled()
     {
         return toggled;
     }
 
+    /**
+     * Sets toggled.
+     *
+     * @param toggled the toggled
+     */
     public void setToggled(Boolean toggled)
     {
         setToggled(toggled, true);
     }
 
+    /**
+     * Sets toggled.
+     *
+     * @param toggled              the toggled
+     * @param notifyToggleListener the notify toggle listener
+     */
     public void setToggled(Boolean toggled, boolean notifyToggleListener)
     {
         if (this.toggled == toggled || !this.isEnabled() || !this.visible)
@@ -120,13 +172,28 @@ public class OnOffButton extends Button
         }
     }
 
+    /**
+     * Add toggle listener.
+     *
+     * @param toggleListener the toggle listener
+     */
     public void addToggleListener(ToggleListener toggleListener)
     {
         this.toggleListeners.add(toggleListener);
     }
 
+    /**
+     * The interface Toggle listener.
+     */
     public static interface ToggleListener
     {
+        /**
+         * On toggle boolean.
+         *
+         * @param button  the button
+         * @param toggled the toggled
+         * @return the boolean
+         */
         public boolean onToggle(OnOffButton button, boolean toggled);
     }
 }

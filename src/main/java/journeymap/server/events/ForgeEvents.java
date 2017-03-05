@@ -25,6 +25,11 @@ import net.minecraftforge.fml.server.FMLServerHandler;
  */
 public class ForgeEvents
 {
+    /**
+     * On.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void on(EntityJoinWorldEvent event)
@@ -73,6 +78,11 @@ public class ForgeEvents
         }
     }
 
+    /**
+     * Player logged in event.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event)

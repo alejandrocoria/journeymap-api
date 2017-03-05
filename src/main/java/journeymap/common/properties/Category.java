@@ -12,17 +12,43 @@ import com.google.common.base.Objects;
  */
 public class Category implements Comparable<Category>
 {
-    // Category used to group a field within a category specified elsewhere
+    /**
+     * The constant Inherit.
+     */
+// Category used to group a field within a category specified elsewhere
     public static final Category Inherit = new Category("Inherit", 0, "", "");
 
-    // Category used to indicate the field shouldn't be visible in a UI
+    /**
+     * The constant Hidden.
+     */
+// Category used to indicate the field shouldn't be visible in a UI
     public static final Category Hidden = new Category("Hidden", 0, "", "");
 
+    /**
+     * The Name.
+     */
     String name;
+    /**
+     * The Label.
+     */
     String label;
+    /**
+     * The Tooltip.
+     */
     String tooltip;
+    /**
+     * The Order.
+     */
     int order;
 
+    /**
+     * Instantiates a new Category.
+     *
+     * @param name    the name
+     * @param order   the order
+     * @param label   the label
+     * @param tooltip the tooltip
+     */
     public Category(String name, int order, String label, String tooltip)
     {
         this.name = name;
@@ -31,21 +57,41 @@ public class Category implements Comparable<Category>
         this.tooltip = tooltip;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Gets label.
+     *
+     * @return the label
+     */
     public String getLabel()
     {
         return label == null ? getName() : label;
     }
 
+    /**
+     * Gets tooltip.
+     *
+     * @return the tooltip
+     */
     public String getTooltip()
     {
         return tooltip == null ? getLabel() : tooltip;
     }
 
+    /**
+     * Gets order.
+     *
+     * @return the order
+     */
     public int getOrder()
     {
         return order;

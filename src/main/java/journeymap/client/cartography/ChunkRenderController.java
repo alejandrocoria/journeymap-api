@@ -27,6 +27,9 @@ public class ChunkRenderController
     private final BaseRenderer topoRenderer;
     private final BaseRenderer overWorldCaveRenderer;
 
+    /**
+     * Instantiates a new Chunk render controller.
+     */
     public ChunkRenderController()
     {
         netherRenderer = new NetherRenderer();
@@ -39,6 +42,11 @@ public class ChunkRenderController
 
     /**
      * Get the renderer that would be used for the given params.
+     *
+     * @param rCoord  the r coord
+     * @param mapType the map type
+     * @param chunkMd the chunk md
+     * @return the renderer
      */
     public BaseRenderer getRenderer(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
@@ -80,6 +88,14 @@ public class ChunkRenderController
         return null;
     }
 
+    /**
+     * Render chunk boolean.
+     *
+     * @param rCoord  the r coord
+     * @param mapType the map type
+     * @param chunkMd the chunk md
+     * @return the boolean
+     */
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
     {
         if (!Journeymap.getClient().isMapping())

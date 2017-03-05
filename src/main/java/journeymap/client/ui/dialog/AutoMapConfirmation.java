@@ -17,11 +17,29 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
+/**
+ * The type Auto map confirmation.
+ */
 public class AutoMapConfirmation extends JmUI
 {
 
-    Button buttonAll, buttonMissing, buttonNone, buttonClose;
+    /**
+     * The Button all.
+     */
+    Button buttonAll, /**
+ * The Button missing.
+ */
+buttonMissing, /**
+ * The Button none.
+ */
+buttonNone, /**
+ * The Button close.
+ */
+buttonClose;
 
+    /**
+     * Instantiates a new Auto map confirmation.
+     */
     public AutoMapConfirmation()
     {
         super(Constants.getString("jm.common.automap_dialog"));

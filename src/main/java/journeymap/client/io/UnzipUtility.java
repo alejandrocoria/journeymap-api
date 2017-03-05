@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
+ * The type Unzip utility.
+ *
  * @author techbrew 6/19/2014.
  */
 public class UnzipUtility
@@ -24,9 +26,9 @@ public class UnzipUtility
      * Extracts a zip file specified by the zipFilePath to a directory specified by
      * destDirectory (will be created if does not exists)
      *
-     * @param zipFilePath
-     * @param destDirectory
-     * @throws IOException
+     * @param zipFilePath   the zip file path
+     * @param destDirectory the dest directory
+     * @throws IOException the io exception
      */
     public static void unzip(String zipFilePath, String destDirectory) throws IOException
     {

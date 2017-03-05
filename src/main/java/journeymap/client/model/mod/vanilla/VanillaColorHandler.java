@@ -21,6 +21,9 @@ import net.minecraft.util.math.BlockPos;
  */
 public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandler
 {
+    /**
+     * The constant INSTANCE.
+     */
     public static final VanillaColorHandler INSTANCE = new VanillaColorHandler();
 
     @Override
@@ -52,6 +55,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the biome-based block color at the world coordinates
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the biome color
      */
     protected Integer getBiomeColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -76,6 +84,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Gets the color for the block.  If one isn't set yet, it is loaded from the block texture.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the base color
      */
     protected int getBaseColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -100,6 +113,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the block's tint based on the biome position it's in.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the custom biome color
      */
     protected Integer getCustomBiomeColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -125,6 +143,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the foliage color for the block.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the foliage color
      */
     protected Integer getFoliageColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -137,6 +160,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the grass color for the block.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the grass color
      */
     protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -151,6 +179,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the water color for the block.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the water color
      */
     protected Integer getWaterColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -159,6 +192,11 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 
     /**
      * Get the tint (color multiplier) for the block.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the tint
      */
     protected Integer getTint(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
@@ -199,6 +237,10 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     /**
      * Provides a color using the icon loader.
      * For non-biome blocks, the base color is multiplied against the block's render color.
+     *
+     * @param blockMD  the block md
+     * @param blockPos the block pos
+     * @return the integer
      */
     protected Integer loadTextureColor(BlockMD blockMD, BlockPos blockPos)
     {

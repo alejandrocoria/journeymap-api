@@ -21,6 +21,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class StatTimer
 {
+    /**
+     * The constant NS.
+     */
     public static final double NS = 1000000D;
     private static final int WARMUP_COUNT_DEFAULT = 10;
     private static final int MAX_COUNT = 1000000;
@@ -64,8 +67,8 @@ public class StatTimer
     /**
      * Get a timer by name.  If it hasn't been created, it will have WARMUP_COUNT_DEFAULT.
      *
-     * @param name
-     * @return
+     * @param name the name
+     * @return stat timer
      */
     public synchronized static StatTimer get(String name)
     {
@@ -75,9 +78,9 @@ public class StatTimer
     /**
      * Get a timer by name.  If it hasn't been created, it will have the warmupCount value provided.
      *
-     * @param name
-     * @param warmupCount
-     * @return
+     * @param name        the name
+     * @param warmupCount the warmup count
+     * @return stat timer
      */
     public synchronized static StatTimer get(String name, int warmupCount)
     {
@@ -97,10 +100,10 @@ public class StatTimer
     /**
      * Get a timer by name.  If it hasn't been created, it will have the warmupCount and elapsedLimit value provided.
      *
-     * @param name
-     * @param warmupCount
-     * @param warmupCount
-     * @return
+     * @param name         the name
+     * @param warmupCount  the warmup count
+     * @param elapsedLimit the elapsed limit
+     * @return stat timer
      */
     public synchronized static StatTimer get(String name, int warmupCount, int elapsedLimit)
     {
@@ -120,8 +123,8 @@ public class StatTimer
     /**
      * Create a disposable timer with a warmupCount of 0.
      *
-     * @param name
-     * @return
+     * @param name the name
+     * @return disposable
      */
     public static StatTimer getDisposable(String name)
     {
@@ -131,8 +134,9 @@ public class StatTimer
     /**
      * Create a disposable timer with a warmupCount of 0.
      *
-     * @param name
-     * @return
+     * @param name         the name
+     * @param elapsedLimit the elapsed limit
+     * @return disposable
      */
     public static StatTimer getDisposable(String name, int elapsedLimit)
     {
@@ -152,6 +156,8 @@ public class StatTimer
 
     /**
      * Report all timers via log file.
+     *
+     * @return the report
      */
     public synchronized static String getReport()
     {
@@ -177,6 +183,10 @@ public class StatTimer
 
     /**
      * Report all timers sorted by most time consumed
+     *
+     * @param prefix the prefix
+     * @param suffix the suffix
+     * @return the report by total time
      */
     public synchronized static List<String> getReportByTotalTime(String prefix, String suffix)
     {
@@ -220,7 +230,7 @@ public class StatTimer
     /**
      * Start the timer.
      *
-     * @return
+     * @return stat timer
      */
     public StatTimer start()
     {
@@ -267,6 +277,8 @@ public class StatTimer
 
     /**
      * Stop the timer, returns elapsed time in milliseconds.
+     *
+     * @return the double
      */
     public double stop()
     {
@@ -336,6 +348,8 @@ public class StatTimer
 
     /**
      * Returns elapsed time in milliseconds.
+     *
+     * @return the double
      */
     public double elapsed()
     {
@@ -353,18 +367,28 @@ public class StatTimer
     /**
      * Only useful after stop();
      *
-     * @return
+     * @return boolean
      */
     public boolean hasReachedElapsedLimit()
     {
         return ranTooLong;
     }
 
+    /**
+     * Gets elapsed limit reached count.
+     *
+     * @return the elapsed limit reached count
+     */
     public int getElapsedLimitReachedCount()
     {
         return ranTooLongCount;
     }
 
+    /**
+     * Gets elapsed limit warnings remaining.
+     *
+     * @return the elapsed limit warnings remaining
+     */
     public int getElapsedLimitWarningsRemaining()
     {
         return elapsedLimitWarnings;
@@ -373,7 +397,7 @@ public class StatTimer
     /**
      * Stop the timer, return simple report of results.
      *
-     * @return
+     * @return string
      */
     public String stopAndReport()
     {
@@ -424,7 +448,7 @@ public class StatTimer
      * Get the timer's stats as a HTML string.
      * TODO: Yes, this is horrible, it should be in JSON
      *
-     * @return
+     * @return report string
      */
     public String getReportString()
     {
@@ -452,6 +476,11 @@ public class StatTimer
         }
     }
 
+    /**
+     * Gets log report string.
+     *
+     * @return the log report string
+     */
     public String getLogReportString()
     {
         return TextFormatting.getTextWithoutFormattingCodes(getSimpleReportString());
@@ -460,7 +489,7 @@ public class StatTimer
     /**
      * Gets a simplified report of the timer stats with color formatting for Shift-F3 display.
      *
-     * @return
+     * @return simple report string
      */
     public String getSimpleReportString()
     {
@@ -500,6 +529,11 @@ public class StatTimer
         }
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName()
     {
         return name;

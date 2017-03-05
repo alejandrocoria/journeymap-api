@@ -12,7 +12,13 @@ import journeymap.common.properties.config.BooleanField;
  */
 public class GlobalProperties extends PermissionProperties
 {
+    /**
+     * The Teleport enabled.
+     */
     public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
+    /**
+     * The Use world id.
+     */
     public final BooleanField useWorldId = new BooleanField(ServerCategory.General, "Use world id", false);
 
     /**

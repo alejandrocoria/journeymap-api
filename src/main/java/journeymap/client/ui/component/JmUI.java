@@ -32,21 +32,53 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * The type Jm ui.
+ */
 public abstract class JmUI extends GuiScreen
 {
 
+    /**
+     * The Title.
+     */
     protected final String title;
+    /**
+     * The Header height.
+     */
     protected final int headerHeight = 35;
+    /**
+     * The Logger.
+     */
     protected final Logger logger = Journeymap.getLogger();
+    /**
+     * The Return display.
+     */
     protected GuiScreen returnDisplay;
+    /**
+     * The Scale factor.
+     */
     protected int scaleFactor = 1;
+    /**
+     * The Logo.
+     */
     protected TextureImpl logo = TextureCache.getTexture(TextureCache.Logo);
 
+    /**
+     * Instantiates a new Jm ui.
+     *
+     * @param title the title
+     */
     public JmUI(String title)
     {
         this(title, null);
     }
 
+    /**
+     * Instantiates a new Jm ui.
+     *
+     * @param title         the title
+     * @param returnDisplay the return display
+     */
     public JmUI(String title, GuiScreen returnDisplay)
     {
         super();
@@ -65,6 +97,11 @@ public abstract class JmUI extends GuiScreen
     }
 
 
+    /**
+     * Gets minecraft.
+     *
+     * @return the minecraft
+     */
     public Minecraft getMinecraft()
     {
         return this.mc;
@@ -83,11 +120,21 @@ public abstract class JmUI extends GuiScreen
         return true;
     }
 
+    /**
+     * Gets font renderer.
+     *
+     * @return the font renderer
+     */
     public FontRenderer getFontRenderer()
     {
         return this.fontRendererObj;
     }
 
+    /**
+     * Size display.
+     *
+     * @param scaled the scaled
+     */
     public void sizeDisplay(boolean scaled)
     {
         final int glwidth = scaled ? this.width : mc.displayWidth;
@@ -95,6 +142,13 @@ public abstract class JmUI extends GuiScreen
         DrawUtil.sizeDisplay(glwidth, glheight);
     }
 
+    /**
+     * Is mouse over button boolean.
+     *
+     * @param mouseX the mouse x
+     * @param mouseY the mouse y
+     * @return the boolean
+     */
     protected boolean isMouseOverButton(int mouseX, int mouseY)
     {
         for (int k = 0; k < this.buttonList.size(); ++k)
@@ -139,6 +193,9 @@ public abstract class JmUI extends GuiScreen
 //        return false;
 //    }
 
+    /**
+     * Draw logo.
+     */
     protected void drawLogo()
     {
         if (logo.isDefunct())
@@ -150,6 +207,9 @@ public abstract class JmUI extends GuiScreen
         DrawUtil.sizeDisplay(width, height);
     }
 
+    /**
+     * Draw title.
+     */
     protected void drawTitle()
     {
         DrawUtil.drawRectangle(0, 0, this.width, headerHeight, RGB.BLACK_RGB, .4f);
@@ -181,8 +241,16 @@ public abstract class JmUI extends GuiScreen
         }
     }
 
+    /**
+     * Layout buttons.
+     */
     protected abstract void layoutButtons();
 
+    /**
+     * Gets button list.
+     *
+     * @return the button list
+     */
     public java.util.List getButtonList()
     {
         return buttonList;
@@ -238,11 +306,17 @@ public abstract class JmUI extends GuiScreen
         super.drawGradientRect(p_73733_1_, p_73733_2_, p_73733_3_, p_73733_4_, p_73733_5_, p_73733_6_);
     }
 
+    /**
+     * Close.
+     */
     public void close()
     {
 
     }
 
+    /**
+     * Close and return.
+     */
     protected void closeAndReturn()
     {
         if (returnDisplay == null)
@@ -279,11 +353,23 @@ public abstract class JmUI extends GuiScreen
         }
     }
 
+    /**
+     * Draw hovering text.
+     *
+     * @param tooltip the tooltip
+     * @param mouseX  the mouse x
+     * @param mouseY  the mouse y
+     */
     public void drawHoveringText(String[] tooltip, int mouseX, int mouseY)
     {
         drawHoveringText(Arrays.asList(tooltip), mouseX, mouseY, getFontRenderer());
     }
 
+    /**
+     * Gets return display.
+     *
+     * @return the return display
+     */
     public GuiScreen getReturnDisplay()
     {
         return returnDisplay;

@@ -50,6 +50,11 @@ public class ExpireTextureTask implements IMainThreadTask
         this.textureId = -1;
     }
 
+    /**
+     * Queue.
+     *
+     * @param textureId the texture id
+     */
     public static void queue(int textureId)
     {
         if (textureId != -1)
@@ -58,11 +63,21 @@ public class ExpireTextureTask implements IMainThreadTask
         }
     }
 
+    /**
+     * Queue.
+     *
+     * @param texture the texture
+     */
     public static void queue(TextureImpl texture)
     {
         Journeymap.getClient().queueMainThreadTask(new ExpireTextureTask(texture));
     }
 
+    /**
+     * Queue.
+     *
+     * @param textureCollection the texture collection
+     */
     public static void queue(Collection<TextureImpl> textureCollection)
     {
         Journeymap.getClient().queueMainThreadTask(new ExpireTextureTask(textureCollection));

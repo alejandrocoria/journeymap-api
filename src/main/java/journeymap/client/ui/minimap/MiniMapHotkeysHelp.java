@@ -14,6 +14,9 @@ import net.minecraft.client.gui.GuiButton;
 import java.awt.*;
 import java.io.IOException;
 
+/**
+ * The type Mini map hotkeys help.
+ */
 public class MiniMapHotkeysHelp extends JmUI
 {
 
@@ -24,6 +27,11 @@ public class MiniMapHotkeysHelp extends JmUI
     private Position currentPosition;
     private KeyEventHandler keyEventHandler;
 
+    /**
+     * Instantiates a new Mini map hotkeys help.
+     *
+     * @param returnDisplay the return display
+     */
     public MiniMapHotkeysHelp(JmUI returnDisplay)
     {
         super(Constants.getString("jm.minimap.hotkeys_title"), returnDisplay);
@@ -100,6 +108,14 @@ public class MiniMapHotkeysHelp extends JmUI
         buttonClose.setY(y + 16);
     }
 
+    /**
+     * Draw help strings.
+     *
+     * @param title the title
+     * @param key   the key
+     * @param x     the x
+     * @param y     the y
+     */
     protected void drawHelpStrings(String title, String key, int x, int y)
     {
         int hgap = 8;

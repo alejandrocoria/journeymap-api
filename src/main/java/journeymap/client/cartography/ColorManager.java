@@ -30,6 +30,11 @@ public class ColorManager
     private String lastResourcePackNames;
     private String lastModNames;
 
+    /**
+     * Instance color manager.
+     *
+     * @return the color manager
+     */
     public static ColorManager instance()
     {
         return Holder.INSTANCE;
@@ -38,7 +43,7 @@ public class ColorManager
     /**
      * Get a list of all resource pack names.
      *
-     * @return
+     * @return resource pack names
      */
     public static String getResourcePackNames()
     {
@@ -135,7 +140,7 @@ public class ColorManager
     /**
      * Get the current palette.
      *
-     * @return
+     * @return current palette
      */
     public ColorPalette getCurrentPalette()
     {

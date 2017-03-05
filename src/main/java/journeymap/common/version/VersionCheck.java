@@ -37,7 +37,7 @@ public class VersionCheck
     /**
      * Whether this build is the current version available.
      *
-     * @return
+     * @return version is current
      */
     public static Boolean getVersionIsCurrent()
     {
@@ -51,7 +51,7 @@ public class VersionCheck
     /**
      * Whether the current version available has been checked.
      *
-     * @return
+     * @return version is checked
      */
     public static Boolean getVersionIsChecked()
     {
@@ -65,7 +65,7 @@ public class VersionCheck
     /**
      * Gets the current version available.
      *
-     * @return
+     * @return version available
      */
     public static String getVersionAvailable()
     {
@@ -79,7 +79,7 @@ public class VersionCheck
     /**
      * Gets the current version available.
      *
-     * @return
+     * @return download url
      */
     public static String getDownloadUrl()
     {

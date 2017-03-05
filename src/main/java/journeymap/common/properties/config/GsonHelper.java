@@ -21,12 +21,22 @@ import java.util.Set;
 
 /**
  * Serializers for Config classes.
+ *
+ * @param <T> the type parameter
  */
 public abstract class GsonHelper<T extends ConfigField>
 {
-    // Indicates full serialization should be used
+    /**
+     * The Verbose.
+     */
+// Indicates full serialization should be used
     protected final boolean verbose;
 
+    /**
+     * Instantiates a new Gson helper.
+     *
+     * @param verbose the verbose
+     */
     public GsonHelper(Boolean verbose)
     {
         this.verbose = verbose;
@@ -34,6 +44,11 @@ public abstract class GsonHelper<T extends ConfigField>
 
     /**
      * Serialize attributes as Strings.
+     *
+     * @param src       the src
+     * @param typeOfSrc the type of src
+     * @param context   the context
+     * @return the json element
      */
     public JsonElement serializeAttributes(ConfigField<?> src, Type typeOfSrc, JsonSerializationContext context)
     {
@@ -56,6 +71,13 @@ public abstract class GsonHelper<T extends ConfigField>
 
     /**
      * Deserialize attributes as Strings.
+     *
+     * @param result  the result
+     * @param json    the json
+     * @param typeOfT the type of t
+     * @param context the context
+     * @return the t
+     * @throws JsonParseException the json parse exception
      */
     protected T deserializeAttributes(T result, JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
     {
@@ -88,9 +110,17 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class CategorySetSerializer implements JsonSerializer<CategorySet>, JsonDeserializer<CategorySet>
     {
-        // Indicates full serialization should be used
+        /**
+         * The Verbose.
+         */
+// Indicates full serialization should be used
         protected final boolean verbose;
 
+        /**
+         * Instantiates a new Category set serializer.
+         *
+         * @param verbose the verbose
+         */
         public CategorySetSerializer(boolean verbose)
         {
             this.verbose = verbose;
@@ -128,6 +158,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class VersionSerializer implements JsonSerializer<Version>, JsonDeserializer<Version>
     {
+        /**
+         * Instantiates a new Version serializer.
+         *
+         * @param verbose the verbose
+         */
         public VersionSerializer(boolean verbose)
         {
         }
@@ -178,6 +213,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class GridSpecSerializer implements JsonSerializer<GridSpec>, JsonDeserializer<GridSpec>
     {
+        /**
+         * Instantiates a new Grid spec serializer.
+         *
+         * @param verbose the verbose
+         */
         public GridSpecSerializer(boolean verbose)
         {
         }
@@ -227,6 +267,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class BooleanFieldSerializer extends GsonHelper<BooleanField> implements JsonSerializer<BooleanField>, JsonDeserializer<BooleanField>
     {
+        /**
+         * Instantiates a new Boolean field serializer.
+         *
+         * @param verbose the verbose
+         */
         public BooleanFieldSerializer(boolean verbose)
         {
             super(verbose);
@@ -250,6 +295,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class IntegerFieldSerializer extends GsonHelper<IntegerField> implements JsonSerializer<IntegerField>, JsonDeserializer<IntegerField>
     {
+        /**
+         * Instantiates a new Integer field serializer.
+         *
+         * @param verbose the verbose
+         */
         public IntegerFieldSerializer(boolean verbose)
         {
             super(verbose);
@@ -273,6 +323,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class StringFieldSerializer extends GsonHelper<StringField> implements JsonSerializer<StringField>, JsonDeserializer<StringField>
     {
+        /**
+         * Instantiates a new String field serializer.
+         *
+         * @param verbose the verbose
+         */
         public StringFieldSerializer(boolean verbose)
         {
             super(verbose);
@@ -296,6 +351,11 @@ public abstract class GsonHelper<T extends ConfigField>
      */
     public static class EnumFieldSerializer extends GsonHelper<EnumField> implements JsonSerializer<EnumField>, JsonDeserializer<EnumField>
     {
+        /**
+         * Instantiates a new Enum field serializer.
+         *
+         * @param verbose the verbose
+         */
         public EnumFieldSerializer(boolean verbose)
         {
             super(verbose);

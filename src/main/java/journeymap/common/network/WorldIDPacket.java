@@ -18,20 +18,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class WorldIDPacket implements IMessage
 {
-    // Channel name
+    /**
+     * The constant CHANNEL_NAME.
+     */
+// Channel name
     public static final String CHANNEL_NAME = "world_info";
 
     private String worldID;
 
+    /**
+     * Instantiates a new World id packet.
+     */
     public WorldIDPacket()
     {
     }
 
+    /**
+     * Instantiates a new World id packet.
+     *
+     * @param worldID the world id
+     */
     public WorldIDPacket(String worldID)
     {
         this.worldID = worldID;
     }
 
+    /**
+     * Gets world id.
+     *
+     * @return the world id
+     */
     public String getWorldID()
     {
         return worldID;
@@ -66,6 +82,9 @@ public class WorldIDPacket implements IMessage
         }
     }
 
+    /**
+     * The type World id listener.
+     */
     public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage>
     {
         @Override

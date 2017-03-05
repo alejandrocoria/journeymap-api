@@ -28,10 +28,16 @@ import java.util.List;
  */
 public class LayerDelegate
 {
+    /**
+     * The Last click.
+     */
     long lastClick = 0;
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();
 
+    /**
+     * Instantiates a new Layer delegate.
+     */
     public LayerDelegate()
     {
         layers.add(new ModOverlayLayer());
@@ -39,6 +45,14 @@ public class LayerDelegate
         layers.add(new WaypointLayer());
     }
 
+    /**
+     * On mouse move.
+     *
+     * @param mc            the mc
+     * @param gridRenderer  the grid renderer
+     * @param mousePosition the mouse position
+     * @param fontScale     the font scale
+     */
     public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale)
     {
         BlockPos blockCoord = getBlockPos(mc, gridRenderer, mousePosition);
@@ -57,6 +71,15 @@ public class LayerDelegate
         }
     }
 
+    /**
+     * On mouse clicked.
+     *
+     * @param mc            the mc
+     * @param gridRenderer  the grid renderer
+     * @param mousePosition the mouse position
+     * @param button        the button
+     * @param fontScale     the font scale
+     */
     public void onMouseClicked(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, int button, float fontScale)
     {
         BlockPos blockCoord = gridRenderer.getBlockAtPixel(mousePosition);
@@ -103,17 +126,52 @@ public class LayerDelegate
         return seaLevel;
     }
 
+    /**
+     * Gets draw steps.
+     *
+     * @return the draw steps
+     */
     public List<DrawStep> getDrawSteps()
     {
         return drawSteps;
     }
 
+    /**
+     * The interface Layer.
+     */
     public interface Layer
     {
+        /**
+         * On mouse move list.
+         *
+         * @param mc            the mc
+         * @param gridRenderer  the grid renderer
+         * @param mousePosition the mouse position
+         * @param blockCoord    the block coord
+         * @param fontScale     the font scale
+         * @return the list
+         */
         public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale);
 
+        /**
+         * On mouse click list.
+         *
+         * @param mc            the mc
+         * @param gridRenderer  the grid renderer
+         * @param mousePosition the mouse position
+         * @param blockCoord    the block coord
+         * @param button        the button
+         * @param doubleClick   the double click
+         * @param fontScale     the font scale
+         * @return the list
+         */
         public List<DrawStep> onMouseClick(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, int button, boolean doubleClick, float fontScale);
 
+        /**
+         * Propagate click boolean.
+         *
+         * @return the boolean
+         */
         public boolean propagateClick();
     }
 

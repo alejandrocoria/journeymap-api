@@ -20,15 +20,37 @@ import java.awt.*;
  */
 public class GridSpec
 {
+    /**
+     * The Style.
+     */
     public final Style style;
+    /**
+     * The Red.
+     */
     public final float red;
+    /**
+     * The Green.
+     */
     public final float green;
+    /**
+     * The Blue.
+     */
     public final float blue;
+    /**
+     * The Alpha.
+     */
     public final float alpha;
     private int colorX = -1;
     private int colorY = -1;
     private transient TextureImpl texture = null;
 
+    /**
+     * Instantiates a new Grid spec.
+     *
+     * @param style the style
+     * @param color the color
+     * @param alpha the alpha
+     */
     public GridSpec(Style style, Color color, float alpha)
     {
         this.style = style;
@@ -48,6 +70,15 @@ public class GridSpec
         assert (alpha <= 1);
     }
 
+    /**
+     * Instantiates a new Grid spec.
+     *
+     * @param style the style
+     * @param red   the red
+     * @param green the green
+     * @param blue  the blue
+     * @param alpha the alpha
+     */
     public GridSpec(Style style, float red, float green, float blue, float alpha)
     {
         this.style = style;
@@ -58,6 +89,13 @@ public class GridSpec
         assert (alpha <= 1);
     }
 
+    /**
+     * Sets color coords.
+     *
+     * @param x the x
+     * @param y the y
+     * @return the color coords
+     */
     public GridSpec setColorCoords(int x, int y)
     {
         this.colorX = x;
@@ -67,6 +105,9 @@ public class GridSpec
 
     /**
      * MUST CALL GlStateManager.color(1, 1, 1, alpha); when done
+     *
+     * @param textureWrap the texture wrap
+     * @param mapAlpha    the map alpha
      */
     public void beginTexture(int textureWrap, float mapAlpha)
     {
@@ -82,6 +123,11 @@ public class GridSpec
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
     }
 
+    /**
+     * Gets texture.
+     *
+     * @return the texture
+     */
     public TextureImpl getTexture()
     {
         if (texture == null || texture.isDefunct())
@@ -96,31 +142,61 @@ public class GridSpec
         return new GridSpec(style, red, green, blue, alpha).setColorCoords(colorX, colorY);
     }
 
+    /**
+     * Finish texture.
+     */
     public void finishTexture()
     {
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.clearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
+    /**
+     * Gets color.
+     *
+     * @return the color
+     */
     public Integer getColor()
     {
         return RGB.toInteger(red, green, blue);
     }
 
+    /**
+     * Gets color x.
+     *
+     * @return the color x
+     */
     public int getColorX()
     {
         return colorX;
     }
 
+    /**
+     * Gets color y.
+     *
+     * @return the color y
+     */
     public int getColorY()
     {
         return colorY;
     }
 
+    /**
+     * The enum Style.
+     */
     public enum Style
     {
+        /**
+         * Squares style.
+         */
         Squares("jm.common.grid_style_squares", TextureCache.GridSquares),
+        /**
+         * Dots style.
+         */
         Dots("jm.common.grid_style_dots", TextureCache.GridDots),
+        /**
+         * Checkers style.
+         */
         Checkers("jm.common.grid_style_checkers", TextureCache.GridCheckers);
 
         private final String key;
@@ -132,6 +208,11 @@ public class GridSpec
             this.textureLocation = textureLocation;
         }
 
+        /**
+         * Display name string.
+         *
+         * @return the string
+         */
         public String displayName()
         {
             return Constants.getString(key);

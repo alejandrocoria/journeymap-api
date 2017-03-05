@@ -17,15 +17,33 @@ import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The type Region texture.
+ */
 public class RegionTextureImpl extends TextureImpl
 {
+    /**
+     * The Dirty chunks.
+     */
     protected HashSet<ChunkPos> dirtyChunks = new HashSet<>();
 
+    /**
+     * Instantiates a new Region texture.
+     *
+     * @param image the image
+     */
     public RegionTextureImpl(BufferedImage image)
     {
         super(null, image, true, false);
     }
 
+    /**
+     * Sets image.
+     *
+     * @param bufferedImage the buffered image
+     * @param retainImage   the retain image
+     * @param updatedChunks the updated chunks
+     */
     public void setImage(BufferedImage bufferedImage, boolean retainImage, HashSet<ChunkPos> updatedChunks)
     {
         if (updatedChunks.size() > 15)
@@ -151,6 +169,8 @@ public class RegionTextureImpl extends TextureImpl
     /**
      * WARNING:  These aren't actual ChunkPos coordinates, they're simply x,z pixel offsets within the image.
      * Each one does line up with a chunk, however.
+     *
+     * @return the dirty areas
      */
     public Set<ChunkPos> getDirtyAreas()
     {

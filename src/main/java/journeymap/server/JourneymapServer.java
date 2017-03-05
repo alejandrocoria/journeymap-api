@@ -9,7 +9,6 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
 import journeymap.server.events.ForgeEvents;
-import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,6 +29,9 @@ import java.util.Map;
 public class JourneymapServer implements CommonProxy
 {
     private Logger logger;
+    /**
+     * The constant DEV_MODE.
+     */
     public static boolean DEV_MODE = false;
 
     /**

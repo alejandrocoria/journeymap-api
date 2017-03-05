@@ -19,14 +19,20 @@ import java.util.List;
  */
 public class DrawPolygonStep extends BaseOverlayDrawStep<PolygonOverlay>
 {
+    /**
+     * The Screen points.
+     */
     protected List<Point2D.Double> screenPoints = new ArrayList<Point2D.Double>();
 
+    /**
+     * The On screen.
+     */
     boolean onScreen;
 
     /**
      * Draw a polygon on the map.
      *
-     * @param polygon
+     * @param polygon the polygon
      */
     public DrawPolygonStep(PolygonOverlay polygon)
     {

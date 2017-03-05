@@ -26,24 +26,69 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * The type Tile.
+ */
 public class Tile
 {
+    /**
+     * The constant TILESIZE.
+     */
     public final static int TILESIZE = 512;
+    /**
+     * The constant LOAD_RADIUS.
+     */
     public final static int LOAD_RADIUS = (int) (TILESIZE * 1.5);
+    /**
+     * The Debug gl settings.
+     */
     static String debugGlSettings = "";
+    /**
+     * The Zoom.
+     */
     final int zoom;
+    /**
+     * The Tile x.
+     */
     final int tileX;
+    /**
+     * The Tile z.
+     */
     final int tileZ;
+    /**
+     * The Ul chunk.
+     */
     final ChunkPos ulChunk;
+    /**
+     * The Lr chunk.
+     */
     final ChunkPos lrChunk;
+    /**
+     * The Ul block.
+     */
     final Point ulBlock;
+    /**
+     * The Lr block.
+     */
     final Point lrBlock;
+    /**
+     * The Draw steps.
+     */
     final ArrayList<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
     private final Logger logger = Journeymap.getLogger();
     private final int theHashCode;
     private final String theCacheKey;
+    /**
+     * The Render type.
+     */
     int renderType = 0;
+    /**
+     * The Texture filter.
+     */
     int textureFilter = 0;
+    /**
+     * The Texture wrap.
+     */
     int textureWrap = 0;
 
     private Tile(final int tileX, final int tileZ, final int zoom)
@@ -61,6 +106,17 @@ public class Tile
         updateRenderType();
     }
 
+    /**
+     * Create tile.
+     *
+     * @param tileX       the tile x
+     * @param tileZ       the tile z
+     * @param zoom        the zoom
+     * @param worldDir    the world dir
+     * @param mapType     the map type
+     * @param highQuality the high quality
+     * @return the tile
+     */
     public static Tile create(final int tileX, final int tileZ, final int zoom, File worldDir, final MapType mapType, boolean highQuality)
     {
         Tile tile = new Tile(tileX, tileZ, zoom);
@@ -68,22 +124,47 @@ public class Tile
         return tile;
     }
 
+    /**
+     * Block pos to tile int.
+     *
+     * @param b    the b
+     * @param zoom the zoom
+     * @return the int
+     */
     public static int blockPosToTile(int b, int zoom)
     {
         int tile = b >> (9 - zoom);  // (2 pow 9 = 512)
         return tile;
     }
 
+    /**
+     * Tile to block int.
+     *
+     * @param t    the t
+     * @param zoom the zoom
+     * @return the int
+     */
     public static int tileToBlock(int t, int zoom)
     {
         return t << (9 - zoom);
     }
 
+    /**
+     * To cache key string.
+     *
+     * @param tileX the tile x
+     * @param tileZ the tile z
+     * @param zoom  the zoom
+     * @return the string
+     */
     public static String toCacheKey(final int tileX, final int tileZ, final int zoom)
     {
         return "" + tileX + "," + tileZ + "@" + zoom;
     }
 
+    /**
+     * Switch tile render type.
+     */
     public static void switchTileRenderType()
     {
         // Switch Tile Render Type
@@ -100,6 +181,9 @@ public class Tile
         resetTileDisplay();
     }
 
+    /**
+     * Switch tile display quality.
+     */
     public static void switchTileDisplayQuality()
     {
         CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
@@ -118,6 +202,14 @@ public class Tile
         Fullscreen.state().requireRefresh();
     }
 
+    /**
+     * Update texture boolean.
+     *
+     * @param worldDir    the world dir
+     * @param mapType     the map type
+     * @param highQuality the high quality
+     * @return the boolean
+     */
     public boolean updateTexture(File worldDir, final MapType mapType, boolean highQuality)
     {
         updateRenderType();
@@ -126,6 +218,12 @@ public class Tile
         return drawSteps.size() > 1;
     }
 
+    /**
+     * Has texture boolean.
+     *
+     * @param mapType the map type
+     * @return the boolean
+     */
     public boolean hasTexture(MapType mapType)
     {
         if (drawSteps.isEmpty())
@@ -142,6 +240,9 @@ public class Tile
         return false;
     }
 
+    /**
+     * Clear.
+     */
     public void clear()
     {
         drawSteps.clear();
@@ -189,6 +290,11 @@ public class Tile
         return "Tile [ r" + tileX + ", r" + tileZ + " (zoom " + zoom + ") ]";
     }
 
+    /**
+     * Cache key string.
+     *
+     * @return the string
+     */
     public String cacheKey()
     {
         return theCacheKey;
@@ -200,6 +306,13 @@ public class Tile
         return theHashCode;
     }
 
+    /**
+     * Block pixel offset in tile point 2 d.
+     *
+     * @param x the x
+     * @param z the z
+     * @return the point 2 d
+     */
     public Point2D blockPixelOffsetInTile(double x, double z)
     {
         if (x < ulBlock.x || Math.floor(x) > lrBlock.x || z < ulBlock.y || Math.floor(z) > lrBlock.y)
@@ -229,6 +342,16 @@ public class Tile
         return new Point2D.Double(pixelOffsetX, pixelOffsetZ);
     }
 
+    /**
+     * Draw boolean.
+     *
+     * @param pos      the pos
+     * @param offsetX  the offset x
+     * @param offsetZ  the offset z
+     * @param alpha    the alpha
+     * @param gridSpec the grid spec
+     * @return the boolean
+     */
     boolean draw(final TilePos pos, final double offsetX, final double offsetZ, float alpha, GridSpec gridSpec)
     {
         boolean somethingDrew = false;

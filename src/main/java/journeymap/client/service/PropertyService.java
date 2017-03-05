@@ -23,8 +23,17 @@ import java.util.Map;
  */
 public class PropertyService extends BaseService
 {
+    /**
+     * The constant CALLBACK_PARAM.
+     */
     public static final String CALLBACK_PARAM = "callback";  //$NON-NLS-1$
+    /**
+     * The Web map properties.
+     */
     WebMapProperties webMapProperties;
+    /**
+     * The Prop map.
+     */
     HashMap<String, BooleanField> propMap = new HashMap<String, BooleanField>();
 
     /**
@@ -125,6 +134,13 @@ public class PropertyService extends BaseService
         }
     }
 
+    /**
+     * Post.
+     *
+     * @param event the event
+     * @throws Event     the event
+     * @throws Exception the exception
+     */
     public void post(Event event) throws Event, Exception
     {
 

@@ -22,6 +22,9 @@ public class LocationFormat
     private static String[] locationFormatIds = new String[]{"xzyv", "xyvz", "xzy", "xyz", "xz"};
     private HashMap<String, LocationFormatKeys> idToFormat = new HashMap<String, LocationFormatKeys>();
 
+    /**
+     * Instantiates a new Location format.
+     */
     public LocationFormat()
     {
         for (String id : locationFormatIds)
@@ -30,6 +33,12 @@ public class LocationFormat
         }
     }
 
+    /**
+     * Gets format keys.
+     *
+     * @param id the id
+     * @return the format keys
+     */
     public LocationFormatKeys getFormatKeys(String id)
     {
         LocationFormatKeys locationLocationFormatKeys = idToFormat.get(id);
@@ -42,13 +51,25 @@ public class LocationFormat
         return locationLocationFormatKeys;
     }
 
+    /**
+     * Gets label.
+     *
+     * @param id the id
+     * @return the label
+     */
     public String getLabel(String id)
     {
         return Constants.getString(getFormatKeys(id).label_key);
     }
 
+    /**
+     * The type Id provider.
+     */
     public static class IdProvider implements StringField.ValuesProvider
     {
+        /**
+         * Instantiates a new Id provider.
+         */
         public IdProvider()
         {
         }
@@ -66,13 +87,33 @@ public class LocationFormat
         }
     }
 
+    /**
+     * The type Location format keys.
+     */
     public static class LocationFormatKeys
     {
+        /**
+         * The Id.
+         */
         final String id;
+        /**
+         * The Label key.
+         */
         final String label_key;
+        /**
+         * The Verbose key.
+         */
         final String verbose_key;
+        /**
+         * The Plain key.
+         */
         final String plain_key;
 
+        /**
+         * Instantiates a new Location format keys.
+         *
+         * @param id the id
+         */
         LocationFormatKeys(String id)
         {
             this.id = id;
@@ -81,6 +122,16 @@ public class LocationFormat
             this.plain_key = String.format("jm.common.location_%s_plain", id);
         }
 
+        /**
+         * Format string.
+         *
+         * @param verbose the verbose
+         * @param x       the x
+         * @param z       the z
+         * @param y       the y
+         * @param vslice  the vslice
+         * @return the string
+         */
         public String format(boolean verbose, int x, int z, int y, int vslice)
         {
             if (verbose)
@@ -94,10 +145,21 @@ public class LocationFormat
         }
     }
 
+    /**
+     * The type Button.
+     */
     public static class Button extends ListPropertyButton<String>
     {
+        /**
+         * The Location format.
+         */
         LocationFormat locationFormat;
 
+        /**
+         * Instantiates a new Button.
+         *
+         * @param valueHolder the value holder
+         */
         public Button(StringField valueHolder)
         {
             super(Arrays.asList(locationFormatIds), Constants.getString("jm.common.location_format"), valueHolder);
@@ -117,6 +179,12 @@ public class LocationFormat
             return String.format(labelPattern, baseLabel, glyph, locationFormat.getLabel(id));
         }
 
+        /**
+         * Gets label.
+         *
+         * @param id the id
+         * @return the label
+         */
         public String getLabel(String id)
         {
             return locationFormat.getLabel(id);

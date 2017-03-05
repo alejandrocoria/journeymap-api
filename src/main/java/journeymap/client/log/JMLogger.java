@@ -30,9 +30,18 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+/**
+ * The type Jm logger.
+ */
 public class JMLogger
 {
+    /**
+     * The constant DEPRECATED_LOG_FILE.
+     */
     public static final String DEPRECATED_LOG_FILE = "journeyMap.log"; //$NON-NLS-1$
+    /**
+     * The constant LOG_FILE.
+     */
     public static final String LOG_FILE = "journeymap.log"; //$NON-NLS-1$
 
     // Singleton error hashcodes
@@ -41,6 +50,11 @@ public class JMLogger
 
     private static RandomAccessFileAppender fileAppender;
 
+    /**
+     * Init logger.
+     *
+     * @return the logger
+     */
     public static Logger init()
     {
         final Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
@@ -116,6 +130,9 @@ public class JMLogger
         return logger;
     }
 
+    /**
+     * Sets level from properties.
+     */
     public static void setLevelFromProperties()
     {
         try
@@ -143,6 +160,8 @@ public class JMLogger
 
     /**
      * TODO: Clean up
+     *
+     * @return the properties summary
      */
     public static String getPropertiesSummary()
     {
@@ -200,13 +219,19 @@ public class JMLogger
     /**
      * Return a handle to the log file used.
      *
-     * @return
+     * @return log file
      */
     public static File getLogFile()
     {
         return new File(FileHandler.getJourneyMapDir(), LOG_FILE);
     }
 
+    /**
+     * Log once.
+     *
+     * @param text      the text
+     * @param throwable the throwable
+     */
     public static void logOnce(String text, Throwable throwable)
     {
         if (!singletonErrors.contains(text.hashCode()))
@@ -229,6 +254,9 @@ public class JMLogger
         }
     }
 
+    /**
+     * The type Log level string provider.
+     */
     public static class LogLevelStringProvider implements StringField.ValuesProvider
     {
         @Override
