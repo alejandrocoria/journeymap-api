@@ -1,4 +1,9 @@
-﻿### JourneyMap 5.2.0 Resource Bundle - no_NO
+﻿#
+# JourneyMap Mod <journeymap.info> for Minecraft
+# Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+#
+
+### JourneyMap 5.2.0 Resource Bundle - no_NO
 ### Translation by: Sindre Sandhaaland, Somonekilledme and roandr
 jm.advanced.announcemod=Kunngjør Mod
 jm.advanced.announcemod.tooltip=Kunngjør i chatten at JourneyMap er klar.

@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.service;
@@ -32,7 +29,7 @@ import java.util.zip.ZipEntry;
 /**
  * Provides common functionality for Rupy service implementations.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public abstract class BaseService extends Service
 {
@@ -360,7 +357,7 @@ public abstract class BaseService extends Service
      * Enum to encapsulate knowledge of the
      * MIME types for given file extensions.
      *
-     * @author mwoodman
+     * @author techbrew
      */
     enum ContentType
     {
@@ -413,7 +410,7 @@ public abstract class BaseService extends Service
      * on the Event response. Builder pattern allows for
      * convenient method chaining.
      *
-     * @author mwoodman
+     * @author techbrew
      */
     static class ResponseHeader
     {

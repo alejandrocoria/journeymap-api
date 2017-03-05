@@ -1,8 +1,7 @@
 "use strict";
 /**
- * JourneyMap web client - http://journeymap.info
- * Copyright (C) 2011-2016. Mark Woodman (journeymap.info) All rights reserved.
- * May not be modified or distributed without express written consent.
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 var JourneyMap = (function() {
 	var map;
