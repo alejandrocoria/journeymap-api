@@ -17,7 +17,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.helpers.Strings;
+import org.apache.logging.log4j.util.Strings;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

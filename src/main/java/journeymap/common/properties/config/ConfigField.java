@@ -1,5 +1,6 @@
 package journeymap.common.properties.config;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -485,7 +486,7 @@ public abstract class ConfigField<T>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("on", getDeclaredField())
                 .add("attributes", attributes)
                 .toString();

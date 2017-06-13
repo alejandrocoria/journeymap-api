@@ -9,7 +9,7 @@
 package journeymap.server.nbt;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldSavedData;
+import net.minecraft.world.storage.WorldSavedData;
 
 /**
  * Created by Mysticdrew on 10/22/2014.

@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.properties.Category;
-import org.apache.logging.log4j.core.helpers.Strings;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.List;

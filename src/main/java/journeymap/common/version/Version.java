@@ -10,7 +10,7 @@ package journeymap.common.version;
 
 import com.google.common.base.Joiner;
 import journeymap.common.Journeymap;
-import org.apache.logging.log4j.core.helpers.Strings;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 

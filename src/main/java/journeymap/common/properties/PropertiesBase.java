@@ -8,6 +8,7 @@
 
 package journeymap.common.properties;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
@@ -567,9 +568,9 @@ public abstract class PropertiesBase
         }
     }
 
-    protected Objects.ToStringHelper toStringHelper()
+    protected MoreObjects.ToStringHelper toStringHelper()
     {
-        Objects.ToStringHelper toStringHelper = Objects.toStringHelper(this)
+        MoreObjects.ToStringHelper toStringHelper = MoreObjects.toStringHelper(this)
                 .add("state", currentState)
                 .add("file", getFileName())
                 .add("configVersion", configVersion);
@@ -579,7 +580,7 @@ public abstract class PropertiesBase
     @Override
     public String toString()
     {
-        Objects.ToStringHelper toStringHelper = toStringHelper();
+        MoreObjects.ToStringHelper toStringHelper = toStringHelper();
 
         for (Map.Entry<String, ConfigField<?>> entry : getConfigFields().entrySet())
         {
