@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import journeymap.common.Journeymap;
 
@@ -142,7 +143,7 @@ public abstract class ImageSet
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("imageHolders", imageHolders.entrySet())
                 .toString();
     }

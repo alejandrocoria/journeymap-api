@@ -13,9 +13,9 @@ import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.opengl.GL11;
@@ -32,7 +32,7 @@ public class DrawUtil
     public static double zLevel = 0;
 
     static Tessellator tessellator = Tessellator.getInstance();
-    static VertexBuffer worldrenderer = tessellator.getBuffer();
+    static BufferBuilder worldrenderer = tessellator.getBuffer();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
@@ -97,7 +97,7 @@ public class DrawUtil
             return;
         }
 
-        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
         final double vpad = fontRenderer.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
         final double lineHeight = fontRenderer.FONT_HEIGHT * fontScale;
@@ -152,7 +152,7 @@ public class DrawUtil
         double bgHeight = 0;
         if (bgColor != null && bgAlpha > 0)
         {
-            final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+            final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
             bgWidth = fontRenderer.getStringWidth(text);
             bgHeight = getLabelHeight(fontRenderer, fontShadow);
         }
@@ -177,7 +177,7 @@ public class DrawUtil
             alpha = alpha / 255f;
         }
 
-        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
         final boolean drawRect = (bgColor != null && alpha > 0);
         final double width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;

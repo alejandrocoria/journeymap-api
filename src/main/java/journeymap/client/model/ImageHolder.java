@@ -8,6 +8,7 @@
 
 package journeymap.client.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
@@ -328,7 +329,7 @@ public class ImageHolder implements IThreadedFileIO
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("mapType", mapType)
                 .add("textureId", texture == null ? null : texture.isBound() ? texture.getGlTextureId(false) : -1)
                 .add("dirty", dirty)

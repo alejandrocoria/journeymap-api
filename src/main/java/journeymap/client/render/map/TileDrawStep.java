@@ -8,6 +8,7 @@
 
 package journeymap.client.render.map;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import journeymap.client.cartography.RGB;
 import journeymap.client.io.RegionImageHandler;
@@ -243,7 +244,7 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("rc", regionCoord)
                 .add("type", mapType)
                 .add("high", highQuality)

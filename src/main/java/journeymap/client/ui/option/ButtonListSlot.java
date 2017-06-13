@@ -30,7 +30,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
 {
     static int hgap = 8;
     Minecraft mc = FMLClientHandler.instance().getClient();
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRendererObj;
+    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
     ButtonList buttons = new ButtonList();
     HashMap<Button, SlotMetadata> buttonOptionMetadata = new HashMap<Button, SlotMetadata>();
     CategorySlot parent;
@@ -82,12 +82,20 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     }
 
     @Override
-    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
-    {
-        // ?
+    public void func_192633_a(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_) {
+
     }
+//    @Override
+//    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+//    {
+//        // ?
+//    }
 
     @Override
+    public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_) {
+        drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+    }
+    //    @Override
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         int margin = 0;

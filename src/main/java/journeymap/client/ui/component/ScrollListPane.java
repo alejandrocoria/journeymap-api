@@ -136,7 +136,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiListExten
         boolean selected = this.getSlotIndexFromScreenCoords(mouseX, mouseY) == slotIndex;
 
         ISlot slot = getSlot(slotIndex);
-        slot.drawEntry(slotIndex, x, y, this.getListWidth(), slotHeight, mouseX, mouseY, selected);
+        slot.func_192634_a(slotIndex, x, y, this.getListWidth(), slotHeight, mouseX, mouseY, selected, 0f);
 
         SlotMetadata tooltipMetadata = slot.getCurrentTooltip();
         if (tooltipMetadata != null && !Arrays.equals(tooltipMetadata.getTooltip(), lastTooltip))

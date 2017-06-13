@@ -25,7 +25,7 @@ public class FullMapProperties extends InGameMapProperties
 
         if (isNew && FMLClientHandler.instance().getClient() != null)
         {
-            if (FMLClientHandler.instance().getClient().fontRendererObj.getUnicodeFlag())
+            if (FMLClientHandler.instance().getClient().fontRenderer.getUnicodeFlag())
             {
                 super.fontScale.set(2);
             }

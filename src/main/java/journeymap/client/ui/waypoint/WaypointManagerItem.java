@@ -310,6 +310,20 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     }
 
     @Override
+    public void func_192633_a(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_) {
+
+    }
+//    @Override
+//    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+//    {
+//        // ?
+//    }
+
+    @Override
+    public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_) {
+        drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+    }
+//    @Override
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
     {
         Minecraft mc = manager.getMinecraft();
@@ -341,13 +355,6 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonListRight.layoutHorizontal(x + width - margin, y, false, hgap).draw(mc, mouseX, mouseY);
         buttonListLeft.layoutHorizontal(buttonListRight.getLeftX() - (hgap * 2), y, false, hgap).draw(mc, mouseX, mouseY);
     }
-
-    @Override
-    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
-    {
-        // ?
-    }
-
 
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)

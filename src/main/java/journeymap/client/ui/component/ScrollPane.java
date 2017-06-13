@@ -167,14 +167,14 @@ public class ScrollPane extends GuiSlot
 
     // 1.7
     // @Override
-    protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
-    {
-        drawSlot(index, xPosition, yPosition, l, null, var6, var7);
-    }
+//    protected void drawSlot(int index, int xPosition, int yPosition, int l, Tessellator tessellator, int var6, int var7)
+//    {
+//        drawSlot(index, xPosition, yPosition, l, null, var6, var7);
+//    }
 
     // 1.8
     @Override
-    protected void drawSlot(int index, int xPosition, int yPosition, int l, int var6, int var7)
+    protected void func_192637_a(int index, int xPosition, int yPosition, int l, int var6, int var7, float f)
     {
         if (firstVisibleIndex == -1)
         {

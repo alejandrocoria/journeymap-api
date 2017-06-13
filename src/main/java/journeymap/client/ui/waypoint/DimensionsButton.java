@@ -38,7 +38,7 @@ class DimensionsButton extends Button
         updateLabel();
 
         // Determine width
-        fitWidth(FMLClientHandler.instance().getClient().fontRendererObj);
+        fitWidth(FMLClientHandler.instance().getClient().fontRenderer);
     }
 
     protected void updateLabel()
@@ -63,7 +63,7 @@ class DimensionsButton extends Button
         for (WorldData.DimensionProvider dimensionProvider : dimensionProviders)
         {
             String name = Constants.getString("jm.waypoint.dimension", WorldData.getSafeDimensionName(dimensionProvider));
-            maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRendererObj.getStringWidth(name));
+            maxWidth = Math.max(maxWidth, FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(name));
         }
         return maxWidth + 12;
     }

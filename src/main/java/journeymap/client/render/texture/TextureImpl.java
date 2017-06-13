@@ -8,6 +8,7 @@
 
 package journeymap.client.render.texture;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.task.multi.MapPlayerTask;
@@ -354,7 +355,7 @@ public class TextureImpl extends AbstractTexture
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("glid", glTextureId)
                 .add("description", description)
                 .add("lastImageUpdate", lastImageUpdate)

@@ -88,7 +88,7 @@ public abstract class JmUI extends GuiScreen
 
     public FontRenderer getFontRenderer()
     {
-        return this.fontRendererObj;
+        return this.fontRenderer;
     }
 
     public void sizeDisplay(boolean scaled)
@@ -206,7 +206,7 @@ public abstract class JmUI extends GuiScreen
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                guibutton.drawButton(this.mc, x, y);
+                guibutton.func_191745_a(this.mc, x, y, 0f);
                 if (tooltip == null)
                 {
                     if (guibutton instanceof journeymap.client.ui.component.Button)
