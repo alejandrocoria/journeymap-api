@@ -178,7 +178,7 @@ public class BlockMD implements Comparable<BlockMD>
 
         // Dummy blocks
         AIRBLOCK = new BlockMD(Blocks.AIR.getDefaultState(), "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
-        VOIDBLOCK = new BlockMD(null, "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        VOIDBLOCK = new BlockMD(Blocks.STRUCTURE_VOID.getDefaultState(), "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
 
         // Load all registered block+metas
         Collection<BlockMD> all = getAll();

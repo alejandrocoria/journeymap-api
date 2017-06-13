@@ -81,22 +81,30 @@ public class JMLogger
             }
 
             PatternLayout layout = PatternLayout.createLayout(
-                    "[%d{HH:mm:ss}] [%t/%level] [%C{1}] %msg%n", null,
-                    null, "UTF-8", "true");
+                    "[%d{HH:mm:ss}] [%t/%level] [%C{1}] %msg%n", // pattern
+                    null, // selector
+                    null, // config
+                    null, // regexReplace
+                    null, // charSet
+                    true, // alwaysWriteException
+                    false, // noConsoleAnsi
+                    null, // headerPattern
+                    null // footerPattern
+            );
 
-            fileAppender = RandomAccessFileAppender
-                    .createAppender(
-                            logFile.getAbsolutePath(),// filename
-                            "true",// append
-                            "journeymap-logfile",// name
-                            "true",// immediateFlush
-                            "true",// ignoreExceptions
-                            layout,
-                            null,
-                            "false",// advertise
-                            null,// advertiseURI
-                            null// config
-                    );
+            fileAppender = RandomAccessFileAppender.createAppender(
+                    logFile.getAbsolutePath(),// filename
+                    "treu",// append
+                    "journeymap-logfile",// name
+                    "true",// immediateFlush
+                    null, // bufferSize
+                    "true",// ignoreExceptions
+                    layout,
+                    null,
+                    "false",// advertise
+                    null,// advertiseURI
+                    null// config
+            );
 
             ((org.apache.logging.log4j.core.Logger) logger).addAppender(fileAppender);
             if (!fileAppender.isStarted())

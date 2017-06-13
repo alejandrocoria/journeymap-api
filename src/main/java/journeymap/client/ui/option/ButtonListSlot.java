@@ -126,7 +126,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
 
             for (Button button : buttons)
             {
-                button.drawButton(mc, mouseX, mouseY);
+                button.func_191745_a(mc, mouseX, mouseY, 0f);
                 if (tooltipMetadata == null)
                 {
                     if (button.mouseOver(mouseX, mouseY))

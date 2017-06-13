@@ -1,5 +1,6 @@
 package journeymap.client.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -179,7 +180,7 @@ public class WaypointGroup implements Comparable<WaypointGroup>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("name", name)
                 .add("origin", origin)
                 .toString();

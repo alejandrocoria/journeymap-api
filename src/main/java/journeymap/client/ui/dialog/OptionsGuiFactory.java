@@ -22,6 +22,16 @@ public class OptionsGuiFactory implements IModGuiFactory
 
     }
 
+    @Override
+    public boolean hasConfigGui() {
+        return false;
+    }
+
+    @Override
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        return null;
+    }
+
     /**
      * Return the name of a class extending {@link GuiScreen}. This class will
      * be instantiated when the "config" button is pressed in the mod list. It will

@@ -1,5 +1,6 @@
 package journeymap.client.api.impl;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -324,7 +325,7 @@ class PluginWrapper
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(plugin)
+        return MoreObjects.toStringHelper(plugin)
                 .add("modId", modId)
                 .toString();
     }

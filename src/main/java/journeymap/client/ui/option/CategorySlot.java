@@ -211,7 +211,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setWidth(listWidth);
         button.setPosition(x, y);
         button.setHeight(slotHeight);
-        button.drawButton(mc, mouseX, mouseY);
+        button.func_191745_a(mc, mouseX, mouseY, 0f);
 
         DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, RGB.BLACK_RGB, .2f);
         DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 0, button.getLabelColor(), 1f, 1, true);
