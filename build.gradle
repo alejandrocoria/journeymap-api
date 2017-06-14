@@ -148,7 +148,7 @@ task includeJars(type: Copy) {
 
 /* Jar manifest */
 jar {
-    dependsOn 'processDocs', 'includeJars', 'minifyJs', 'minifyCss'
+    dependsOn 'processDocs', 'includeJars'
     manifest {
         attributes = [
                 "Manifest-Version"      : "1.0",
