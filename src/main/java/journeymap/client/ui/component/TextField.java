@@ -221,7 +221,7 @@ public class TextField extends GuiTextField
         // ReflectionHelper.setPrivateValue(GuiTextField.class, this, y, INDEX_Y);
 
         // 1.8
-        y = y;
+        this.y = y;
     }
 
     public int getWidth()
@@ -239,7 +239,7 @@ public class TextField extends GuiTextField
         // ReflectionHelper.setPrivateValue(GuiTextField.class, this, w, INDEX_WIDTH);
 
         // 1.8
-        width = w;
+        this.width = w;
     }
 
     public int getHeight()
