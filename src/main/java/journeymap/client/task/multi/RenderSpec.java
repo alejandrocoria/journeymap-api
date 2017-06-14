@@ -78,16 +78,16 @@ public class RenderSpec
 
     private static Double blockDistance(ChunkPos playerCoord, ChunkPos coord)
     {
-        //(this.chunkXPos << 4) + 8
-        int x = ((playerCoord.chunkXPos << 4) + 8) - ((coord.chunkXPos << 4) + 8);
-        int z = ((playerCoord.chunkZPos << 4) + 8) - ((coord.chunkZPos << 4) + 8);
+        //(this.x << 4) + 8
+        int x = ((playerCoord.x << 4) + 8) - ((coord.x << 4) + 8);
+        int z = ((playerCoord.z << 4) + 8) - ((coord.z << 4) + 8);
         return Math.sqrt(x * x + z * z);
     }
 
     private static Double chunkDistance(ChunkPos playerCoord, ChunkPos coord)
     {
-        int x = playerCoord.chunkXPos - coord.chunkXPos;
-        int z = playerCoord.chunkZPos - coord.chunkZPos;
+        int x = playerCoord.x - coord.x;
+        int z = playerCoord.z - coord.z;
         return Math.sqrt(x * x + z * z);
     }
 
@@ -101,8 +101,8 @@ public class RenderSpec
         }
         else
         {
-            float x = Math.abs(playerCoord.chunkXPos - coord.chunkXPos);
-            float z = Math.abs(playerCoord.chunkZPos - coord.chunkZPos);
+            float x = Math.abs(playerCoord.x - coord.x);
+            float z = Math.abs(playerCoord.z - coord.z);
             return x <= renderDistance && z <= renderDistance;
         }
     }
@@ -124,7 +124,7 @@ public class RenderSpec
                     ChunkPos coord = new ChunkPos(x, z);
                     if (revealShape == RevealShape.Square || inRange(baseCoord, coord, offset, revealShape))
                     {
-                        multimap.put(offset, new Offset(coord.chunkXPos, coord.chunkZPos));
+                        multimap.put(offset, new Offset(coord.x, coord.z));
                     }
                 }
             }
@@ -150,8 +150,8 @@ public class RenderSpec
     public static RenderSpec getSurfaceSpec()
     {
         if (lastSurfaceRenderSpec == null
-                || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
-                || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
+                || lastSurfaceRenderSpec.lastPlayerCoord.x != minecraft.player.chunkCoordX
+                || lastSurfaceRenderSpec.lastPlayerCoord.z != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.day(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastSurfaceRenderSpec);
@@ -163,8 +163,8 @@ public class RenderSpec
     public static RenderSpec getTopoSpec()
     {
         if (lastTopoRenderSpec == null
-                || lastTopoRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
-                || lastTopoRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
+                || lastTopoRenderSpec.lastPlayerCoord.x != minecraft.player.chunkCoordX
+                || lastTopoRenderSpec.lastPlayerCoord.z != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.topo(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastTopoRenderSpec);
@@ -176,8 +176,8 @@ public class RenderSpec
     public static RenderSpec getUndergroundSpec()
     {
         if (lastUndergroundRenderSpec == null
-                || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.player.chunkCoordX
-                || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.player.chunkCoordZ)
+                || lastUndergroundRenderSpec.lastPlayerCoord.x != minecraft.player.chunkCoordX
+                || lastUndergroundRenderSpec.lastPlayerCoord.z != minecraft.player.chunkCoordZ)
         {
             RenderSpec newSpec = new RenderSpec(minecraft, MapType.underground(DataCache.getPlayer()));
             newSpec.copyLastStatsFrom(lastUndergroundRenderSpec);
@@ -204,7 +204,7 @@ public class RenderSpec
         DataCache dataCache = DataCache.INSTANCE;
 
         // Reset coords if player moved
-        if (lastPlayerCoord == null || lastPlayerCoord.chunkXPos != player.chunkCoordX || lastPlayerCoord.chunkZPos != player.chunkCoordZ)
+        if (lastPlayerCoord == null || lastPlayerCoord.x != player.chunkCoordX || lastPlayerCoord.z != player.chunkCoordZ)
         {
             primaryRenderCoords = null;
             lastSecondaryRenderDistance = primaryRenderDistance;
@@ -447,7 +447,7 @@ public class RenderSpec
 
         ChunkPos from(ChunkPos coord)
         {
-            return new ChunkPos(coord.chunkXPos + x, coord.chunkZPos + z);
+            return new ChunkPos(coord.x + x, coord.z + z);
         }
 
         @Override

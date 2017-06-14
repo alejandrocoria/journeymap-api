@@ -393,8 +393,8 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
             {
                 for (ChunkPos area : dirtyAreas)
                 {
-                    if (area.chunkXPos >= sx1 && area.chunkZPos >= sy1
-                            && area.chunkXPos + 16 <= sx2 && area.chunkZPos + 16 <= sy2)
+                    if (area.x >= sx1 && area.z >= sy1
+                            && area.x + 16 <= sx2 && area.z + 16 <= sy2)
                     {
                         needsScaledUpdate = true;
                         return;

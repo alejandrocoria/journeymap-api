@@ -69,7 +69,7 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
         {
             if (this.dragging)
             {
-                setSliderValue((par2 - (this.xPosition + 4)) / (float) (this.width - 8));
+                setSliderValue((par2 - (this.x + 4)) / (float) (this.width - 8));
             }
 
             int k = this.getHoverState(this.isEnabled());
@@ -79,9 +79,9 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
                 double sliderValue = getSliderValue();
-                GuiUtils.drawContinuousTexturedBox(BUTTON_TEXTURES, this.xPosition + 1 + (int) (sliderValue * (float) (this.width - 10)), this.yPosition + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
-                //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, height);
-                //this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
+                GuiUtils.drawContinuousTexturedBox(BUTTON_TEXTURES, this.x + 1 + (int) (sliderValue * (float) (this.width - 10)), this.y + 1, 0, 66, 8, height - 2, 200, 20, 2, 3, 2, 2, this.zLevel);
+                //this.drawTexturedModalRect(this.x + (int)(this.sliderValue * (float)(this.width - 8)), this.y, 0, 66, 4, height);
+                //this.drawTexturedModalRect(this.x + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.y, 196, 66, 4, height);
 
             }
         }
@@ -99,7 +99,7 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
     {
         if (super.mousePressed(par1Minecraft, par2, par3))
         {
-            setSliderValue((float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8));
+            setSliderValue((float) (par2 - (this.x + 4)) / (float) (this.width - 8));
             this.dragging = true;
             return true;
         }

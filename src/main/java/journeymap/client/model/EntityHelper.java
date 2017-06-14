@@ -58,7 +58,7 @@ public class EntityHelper
         {
             for (Entity entity : allEntities)
             {
-                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersectsWith(entity.getEntityBoundingBox()))
+                if (entity instanceof EntityLivingBase && !entity.isDead && entity.addedToChunk && bb.intersects(entity.getEntityBoundingBox()))
                 {
                     for (Class entityClass : entityClasses)
                     {

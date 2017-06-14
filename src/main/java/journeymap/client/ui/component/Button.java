@@ -176,25 +176,25 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
             minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
             GlStateManager.color(1, 1, 1, 1);
 
-            this.setHovered(mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height);
+            this.setHovered(mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height);
             int hoverState = this.getHoverState(this.isHovered());
 
             if (isDrawFrame())
             {
-                DrawUtil.drawRectangle(xPosition, yPosition, width, 1, smallFrameColorLight, 1f); // Top
-                DrawUtil.drawRectangle(xPosition, yPosition, 1, height, smallFrameColorLight, 1f); // Left
+                DrawUtil.drawRectangle(x, y, width, 1, smallFrameColorLight, 1f); // Top
+                DrawUtil.drawRectangle(x, y, 1, height, smallFrameColorLight, 1f); // Left
 
-                DrawUtil.drawRectangle(xPosition, yPosition + height - 1, width - 1, 1, smallFrameColorDark, 1f); // Bottom
-                DrawUtil.drawRectangle(xPosition + width - 1, yPosition + 1, 1, height - 1, smallFrameColorDark, 1f); // Right
+                DrawUtil.drawRectangle(x, y + height - 1, width - 1, 1, smallFrameColorDark, 1f); // Bottom
+                DrawUtil.drawRectangle(x + width - 1, y + 1, 1, height - 1, smallFrameColorDark, 1f); // Right
             }
 
             if (isDrawBackground())
             {
-                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 1f);
+                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 1f);
             }
             else if (this.isEnabled() && isHovered())
             {
-                DrawUtil.drawRectangle(xPosition + 1, yPosition + 1, width - 2, height - 2, smallBgHoverColor2, .5f);
+                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, smallBgHoverColor2, .5f);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
@@ -243,7 +243,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         if (isDrawButton())
         {
-            DrawUtil.drawRectangle(xPosition, yPosition + height, width, 1, smallFrameColorDark, 1f);
+            DrawUtil.drawRectangle(x, y + height, width, 1, smallFrameColorDark, 1f);
         }
     }
 
@@ -300,9 +300,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             return false;
         }
-        return mouseX >= this.xPosition && mouseY >= this.yPosition
-                && mouseX <= (this.xPosition + this.width)
-                && mouseY <= (this.yPosition + this.height);
+        return mouseX >= this.x && mouseY >= this.y
+                && mouseX <= (this.x + this.width)
+                && mouseY <= (this.y + this.height);
     }
 
     public int getWidth()
@@ -357,42 +357,42 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public int getX()
     {
-        return this.xPosition;
+        return this.x;
     }
 
     public void setX(int x)
     {
-        this.xPosition = x;
+        this.x = x;
     }
 
     public int getY()
     {
-        return this.yPosition;
+        return this.y;
     }
 
     public void setY(int y)
     {
-        this.yPosition = y;
+        this.y = y;
     }
 
     public int getCenterX()
     {
-        return this.xPosition + (this.width / 2);
+        return this.x + (this.width / 2);
     }
 
     public int getMiddleY()
     {
-        return this.yPosition + (this.height / 2);
+        return this.y + (this.height / 2);
     }
 
     public int getBottomY()
     {
-        return this.yPosition + this.height;
+        return this.y + this.height;
     }
 
     public int getRightX()
     {
-        return this.xPosition + this.width;
+        return this.x + this.width;
     }
 
     public void setPosition(int x, int y)

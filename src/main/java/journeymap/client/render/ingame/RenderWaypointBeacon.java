@@ -133,13 +133,13 @@ public class RenderWaypointBeacon
             if (viewDistance > maxRenderDistance)
             {
                 Vec3d delta = waypointVec.subtract(playerVec).normalize();
-                waypointVec = playerVec.addVector(delta.xCoord * maxRenderDistance, delta.yCoord * maxRenderDistance, delta.zCoord * maxRenderDistance);
+                waypointVec = playerVec.addVector(delta.x * maxRenderDistance, delta.y * maxRenderDistance, delta.z * maxRenderDistance);
                 viewDistance = maxRenderDistance;
             }
 
-            double shiftX = (waypointVec.xCoord - renderManager.viewerPosX);
-            double shiftY = (waypointVec.yCoord - renderManager.viewerPosY);
-            double shiftZ = (waypointVec.zCoord - renderManager.viewerPosZ);
+            double shiftX = (waypointVec.x - renderManager.viewerPosX);
+            double shiftY = (waypointVec.y - renderManager.viewerPosY);
+            double shiftZ = (waypointVec.z - renderManager.viewerPosZ);
 
             boolean showStaticBeam = waypointProperties.showStaticBeam.get();
             boolean showRotatingBeam = waypointProperties.showRotatingBeam.get();
@@ -157,7 +157,7 @@ public class RenderWaypointBeacon
                 // 2D algorithm (ignore pitch)
                 int angle = 5;
 
-                double yaw = Math.atan2(renderManager.viewerPosZ - waypointVec.zCoord, renderManager.viewerPosX - waypointVec.xCoord);
+                double yaw = Math.atan2(renderManager.viewerPosZ - waypointVec.z, renderManager.viewerPosX - waypointVec.x);
                 double degrees = Math.toDegrees(yaw) + 90;
                 if (degrees < 0)
                 {

@@ -127,7 +127,7 @@ public class RegionLoader
                             List<ChunkPos> chunkCoords = rc.getChunkCoordsInRegion();
                             for (ChunkPos coord : chunkCoords)
                             {
-                                if (anvilChunkLoader.chunkExists(mc.world, coord.chunkXPos, coord.chunkZPos))
+                                if (anvilChunkLoader.chunkExists(mc.world, coord.x, coord.z))
                                 {
                                     stack.add(rc);
                                     break;

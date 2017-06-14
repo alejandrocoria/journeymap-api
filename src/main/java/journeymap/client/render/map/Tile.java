@@ -58,9 +58,9 @@ public class Tile
         this.theHashCode = theCacheKey.hashCode();
         final int distance = 32 / (int) Math.pow(2, zoom);
         ulChunk = new ChunkPos(tileX * distance, tileZ * distance);
-        lrChunk = new ChunkPos(ulChunk.chunkXPos + distance - 1, ulChunk.chunkZPos + distance - 1);
-        ulBlock = new Point(ulChunk.chunkXPos * 16, ulChunk.chunkZPos * 16);
-        lrBlock = new Point((lrChunk.chunkXPos * 16) + 15, (lrChunk.chunkZPos * 16) + 15);
+        lrChunk = new ChunkPos(ulChunk.x + distance - 1, ulChunk.z + distance - 1);
+        ulBlock = new Point(ulChunk.x * 16, ulChunk.z * 16);
+        lrBlock = new Point((lrChunk.x * 16) + 15, (lrChunk.z * 16) + 15);
         updateRenderType();
     }
 

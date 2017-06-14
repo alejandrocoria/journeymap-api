@@ -97,7 +97,7 @@ public class LayerDelegate
             if (crc != null)
             {
                 ChunkPos chunkCoord = chunkMD.getCoord();
-                RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.chunkXPos, chunkCoord.chunkZPos);
+                RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), gridRenderer.getMapType(), chunkCoord.x, chunkCoord.z);
                 BaseRenderer chunkRenderer = crc.getRenderer(rCoord, gridRenderer.getMapType(), chunkMD);
                 int blockY = chunkRenderer.getBlockHeight(chunkMD, seaLevel);
                 return new BlockPos(seaLevel.getX(), blockY, seaLevel.getZ());

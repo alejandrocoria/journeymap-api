@@ -330,8 +330,8 @@ public abstract class BaseRenderer implements IChunkRenderer
     protected int getOffsetBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY,
                                        final Integer sliceMaxY, BlockCoordIntPair offset, int defaultVal)
     {
-        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
-        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
+        final int blockX = (chunkMd.getCoord().x << 4) + (x + offset.x);
+        final int blockZ = (chunkMd.getCoord().z << 4) + (z + offset.z);
         final ChunkPos targetCoord = new ChunkPos(blockX >> 4, blockZ >> 4);
         ChunkMD targetChunkMd = null;
 
@@ -495,8 +495,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      */
     public ChunkMD getOffsetChunk(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset)
     {
-        final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
-        final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
+        final int blockX = (chunkMd.getCoord().x << 4) + (x + offset.x);
+        final int blockZ = (chunkMd.getCoord().z << 4) + (z + offset.z);
         final ChunkPos targetCoord = new ChunkPos(blockX >> 4, blockZ >> 4);
         if (targetCoord.equals(chunkMd.getCoord()))
         {

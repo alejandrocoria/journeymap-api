@@ -302,8 +302,8 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         // offset is either also  not set, try to manually find out
                         ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
-                        final int newX = ((chunkMd.getCoord().chunkXPos << 4) + (x + offset.x)) & 15;
-                        final int newZ = ((chunkMd.getCoord().chunkZPos << 4) + (z + offset.z)) & 15;
+                        final int newX = ((chunkMd.getCoord().x << 4) + (x + offset.x)) & 15;
+                        final int newZ = ((chunkMd.getCoord().z << 4) + (z + offset.z)) & 15;
 
                         if (targetChunkMd != null)
                         {

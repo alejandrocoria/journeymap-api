@@ -124,8 +124,8 @@ public class RegionImageHandler
     {
         int scale = 1;
         scale = Math.max(scale, 1);
-        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16) / scale);
-        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16) / scale);
+        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.x - startCoord.x + 1) * 16) / scale);
+        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.z - startCoord.z + 1) * 16) / scale);
 
         BufferedImage blank = null;
 
@@ -137,10 +137,10 @@ public class RegionImageHandler
         RegionCoord rc = null;
         BufferedImage regionImage = null;
 
-        final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
-        final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
-        final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
-        final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
+        final int rx1 = RegionCoord.getRegionPos(startCoord.x);
+        final int rx2 = RegionCoord.getRegionPos(endCoord.x);
+        final int rz1 = RegionCoord.getRegionPos(startCoord.z);
+        final int rz2 = RegionCoord.getRegionPos(endCoord.z);
 
         int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 
@@ -157,10 +157,10 @@ public class RegionImageHandler
                     continue;
                 }
 
-                rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
-                rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
-                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
-                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+                rminCx = Math.max(rc.getMinChunkX(), startCoord.x);
+                rminCz = Math.max(rc.getMinChunkZ(), startCoord.z);
+                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.x);
+                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.z);
 
                 int xoffset = rc.getMinChunkX() * 16;
                 int yoffset = rc.getMinChunkZ() * 16;
@@ -169,12 +169,12 @@ public class RegionImageHandler
                 sx2 = sx1 + ((rmaxCx - rminCx + 1) * 16);
                 sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
 
-                xoffset = startCoord.chunkXPos * 16;
-                yoffset = startCoord.chunkZPos * 16;
-                dx1 = (startCoord.chunkXPos * 16) - xoffset;
-                dy1 = (startCoord.chunkZPos * 16) - yoffset;
-                dx2 = dx1 + ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16);
-                dy2 = dy1 + ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16);
+                xoffset = startCoord.x * 16;
+                yoffset = startCoord.z * 16;
+                dx1 = (startCoord.x * 16) - xoffset;
+                dy1 = (startCoord.z * 16) - yoffset;
+                dx2 = dx1 + ((endCoord.x - startCoord.x + 1) * 16);
+                dy2 = dy1 + ((endCoord.z - startCoord.z + 1) * 16);
 
                 g2D.drawImage(regionImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
                 imageDrawn = true;
@@ -239,8 +239,8 @@ public class RegionImageHandler
                                                              int scale, boolean showGrid)
     {
         scale = Math.max(scale, 1);
-        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.chunkXPos - startCoord.chunkXPos + 1) * 16) / scale);
-        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.chunkZPos - startCoord.chunkZPos + 1) * 16) / scale);
+        final int initialWidth = Math.min(Tile.TILESIZE, ((endCoord.x - startCoord.x + 1) * 16) / scale);
+        final int initialHeight = Math.min(Tile.TILESIZE, ((endCoord.z - startCoord.z + 1) * 16) / scale);
 
         BufferedImage blank = null;
 
@@ -250,10 +250,10 @@ public class RegionImageHandler
         RegionCoord rc;
         BufferedImage regionImage;
 
-        final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
-        final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
-        final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
-        final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
+        final int rx1 = RegionCoord.getRegionPos(startCoord.x);
+        final int rx2 = RegionCoord.getRegionPos(endCoord.x);
+        final int rz1 = RegionCoord.getRegionPos(startCoord.z);
+        final int rz2 = RegionCoord.getRegionPos(endCoord.z);
 
         int rminCx, rminCz, rmaxCx, rmaxCz, sx1, sy1, sx2, sy2, dx1, dx2, dy1, dy2;
 
@@ -273,10 +273,10 @@ public class RegionImageHandler
                     regionImage = blank;
                 }
 
-                rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
-                rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
-                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
-                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+                rminCx = Math.max(rc.getMinChunkX(), startCoord.x);
+                rminCz = Math.max(rc.getMinChunkZ(), startCoord.z);
+                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.x);
+                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.z);
 
                 // Get pixel coords of source image
                 sx1 = (rminCx - rc.getMinChunkX()) * 16;
@@ -285,8 +285,8 @@ public class RegionImageHandler
                 sy2 = sy1 + ((rmaxCz - rminCz + 1) * 16);
 
                 // Get pixel coords of destination image
-                dx1 = (rminCx - startCoord.chunkXPos) * 16;
-                dy1 = (rminCz - startCoord.chunkZPos) * 16;
+                dx1 = (rminCx - startCoord.x) * 16;
+                dy1 = (rminCz - startCoord.z) * 16;
                 dx2 = dx1 + (sx2 - sx1);
                 dy2 = dy1 + (sy2 - sy1);
 
@@ -335,10 +335,10 @@ public class RegionImageHandler
     {
         boolean isUnderground = mapType.isUnderground();
 
-        final int rx1 = RegionCoord.getRegionPos(startCoord.chunkXPos);
-        final int rx2 = RegionCoord.getRegionPos(endCoord.chunkXPos);
-        final int rz1 = RegionCoord.getRegionPos(startCoord.chunkZPos);
-        final int rz2 = RegionCoord.getRegionPos(endCoord.chunkZPos);
+        final int rx1 = RegionCoord.getRegionPos(startCoord.x);
+        final int rx2 = RegionCoord.getRegionPos(endCoord.x);
+        final int rz1 = RegionCoord.getRegionPos(startCoord.z);
+        final int rz2 = RegionCoord.getRegionPos(endCoord.z);
 
         List<TileDrawStep> drawSteps = new ArrayList<TileDrawStep>();
 
@@ -350,10 +350,10 @@ public class RegionImageHandler
             for (int rz = rz1; rz <= rz2; rz++)
             {
                 rc = new RegionCoord(worldDir, rx, rz, mapType.dimension);
-                rminCx = Math.max(rc.getMinChunkX(), startCoord.chunkXPos);
-                rminCz = Math.max(rc.getMinChunkZ(), startCoord.chunkZPos);
-                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.chunkXPos);
-                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.chunkZPos);
+                rminCx = Math.max(rc.getMinChunkX(), startCoord.x);
+                rminCz = Math.max(rc.getMinChunkZ(), startCoord.z);
+                rmaxCx = Math.min(rc.getMaxChunkX(), endCoord.x);
+                rmaxCz = Math.min(rc.getMaxChunkZ(), endCoord.z);
 
                 int xoffset = rc.getMinChunkX() * 16;
                 int yoffset = rc.getMinChunkZ() * 16;

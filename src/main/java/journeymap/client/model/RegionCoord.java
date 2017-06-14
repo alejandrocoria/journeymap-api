@@ -169,9 +169,9 @@ public class RegionCoord implements Comparable<RegionCoord>
         final ChunkPos min = getMinChunkCoord();
         final ChunkPos max = getMaxChunkCoord();
 
-        for (int x = min.chunkXPos; x <= max.chunkXPos; x++)
+        for (int x = min.x; x <= max.x; x++)
         {
-            for (int z = min.chunkZPos; z <= max.chunkZPos; z++)
+            for (int z = min.z; z <= max.z; z++)
             {
                 list.add(new ChunkPos(x, z));
             }

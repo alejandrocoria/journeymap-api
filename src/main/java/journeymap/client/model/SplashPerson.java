@@ -99,17 +99,17 @@ public class SplashPerson
 
     public void adjustVector(int screenWidth, int screenHeight)
     {
-        if (button.xPosition <= moveDistance || button.xPosition + button.getWidth() >= screenWidth - moveDistance)
+        if (button.x <= moveDistance || button.x + button.getWidth() >= screenWidth - moveDistance)
         {
             reverseX();
         }
 
-        if (button.yPosition <= moveDistance || button.yPosition + button.getHeight() >= screenHeight - moveDistance)
+        if (button.y <= moveDistance || button.y + button.getHeight() >= screenHeight - moveDistance)
         {
             reverseY();
         }
-        button.xPosition += moveX;
-        button.yPosition += moveY;
+        button.x += moveX;
+        button.y += moveY;
     }
 
     public void avoid(List<SplashPerson> devs)

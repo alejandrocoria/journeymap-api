@@ -65,10 +65,10 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
 
         Chunk chunk = event.getChunk();
         resetRenderTimes(chunk.getPos());
-//        int cx1 = chunk.xPosition - 1;
-//        int cz1 = chunk.zPosition - 1;
-//        int cx2 = chunk.xPosition + 1;
-//        int cz2 = chunk.zPosition + 1;
+//        int cx1 = chunk.x - 1;
+//        int cz1 = chunk.z - 1;
+//        int cx2 = chunk.x + 1;
+//        int cz2 = chunk.z + 1;
 //
 //        for (int chunkXPos = cx1; chunkXPos < cx2; chunkXPos++)
 //        {

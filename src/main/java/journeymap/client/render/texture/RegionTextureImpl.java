@@ -104,10 +104,10 @@ public class RegionTextureImpl extends TextureImpl
                 ByteBuffer chunkBuffer = ByteBuffer.allocateDirect(1024); // 16x16xRGBA
                 for (ChunkPos pos : dirtyChunks)
                 {
-                    BufferedImage chunkImage = getImage().getSubimage(pos.chunkXPos, pos.chunkZPos, 16, 16);
+                    BufferedImage chunkImage = getImage().getSubimage(pos.x, pos.z, 16, 16);
                     loadByteBuffer(chunkImage, chunkBuffer);
 
-                    GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, pos.chunkXPos, pos.chunkZPos, 16, 16, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, chunkBuffer);
+                    GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, pos.x, pos.z, 16, 16, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, chunkBuffer);
 
                     int err;
                     while ((err = GL11.glGetError()) != GL11.GL_NO_ERROR)

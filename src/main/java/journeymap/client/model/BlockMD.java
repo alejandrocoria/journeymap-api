@@ -238,7 +238,7 @@ public class BlockMD implements Comparable<BlockMD>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, blockPos, LogFormatter.toString(e)));
+            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().x, chunkMd.getChunk().z, blockPos, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }

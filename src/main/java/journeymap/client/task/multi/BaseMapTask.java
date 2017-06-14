@@ -116,7 +116,7 @@ public abstract class BaseMapTask implements ITask
                 {
                     try
                     {
-                        RegionCoord rCoord = RegionCoord.fromChunkPos(jmWorldDir, mapType, chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos);
+                        RegionCoord rCoord = RegionCoord.fromChunkPos(jmWorldDir, mapType, chunkMd.getCoord().x, chunkMd.getCoord().z);
                         boolean rendered = renderController.renderChunk(rCoord, mapType, chunkMd);
                         if (rendered)
                         {

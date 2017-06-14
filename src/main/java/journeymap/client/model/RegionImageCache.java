@@ -84,7 +84,7 @@ public enum RegionImageCache
         {
             Minecraft mc = FMLClientHandler.instance().getClient();
             Chunk chunk = chunkMd.getChunk();
-            RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), mapType, chunk.xPosition, chunk.zPosition);
+            RegionCoord rCoord = RegionCoord.fromChunkPos(FileHandler.getJMWorldDir(mc), mapType, chunk.x, chunk.z);
             return getRegionImageSet(rCoord);
         }
         else

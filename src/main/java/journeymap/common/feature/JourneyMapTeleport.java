@@ -47,7 +47,7 @@ public class JourneyMapTeleport
                 return false;
             }
 
-            destinationWorld = mcServer.worldServerForDimension(location.getDim());
+            destinationWorld = mcServer.getWorld(location.getDim());
             if (!entity.isEntityAlive())
             {
                 entity.sendMessage(new TextComponentString("Cannot teleport when dead."));

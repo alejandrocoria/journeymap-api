@@ -422,7 +422,7 @@ public enum DataCache
                 chunkMD = chunkMetadata.getIfPresent(coord);
                 if (chunkMD == null)
                 {
-                    chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.chunkXPos, coord.chunkZPos);
+                    chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.x, coord.z);
                     if (chunkMD != null)
                     {
                         chunkMetadata.put(coord, chunkMD);

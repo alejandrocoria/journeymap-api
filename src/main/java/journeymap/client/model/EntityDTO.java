@@ -105,7 +105,7 @@ public class EntityDTO implements Serializable
                 ScorePlayerTeam team = mc.world.getScoreboard().getPlayersTeam(this.username);
                 if (team != null)
                 {
-                    playerColor = team.getChatFormat().getColorIndex();
+                    playerColor = team.getColor().getColorIndex();
                 }
                 else if (currentPlayer.equals(entity))
                 {

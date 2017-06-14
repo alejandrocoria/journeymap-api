@@ -53,8 +53,8 @@ public class RegionImageSet extends ImageSet
         RegionCoord regionCoord = getRegionCoord();
         BufferedImage regionImage = getHolder(mapType).getImage();
         BufferedImage sub = regionImage.getSubimage(
-                regionCoord.getXOffset(chunkMd.getCoord().chunkXPos),
-                regionCoord.getZOffset(chunkMd.getCoord().chunkZPos),
+                regionCoord.getXOffset(chunkMd.getCoord().x),
+                regionCoord.getZOffset(chunkMd.getCoord().z),
                 16, 16);
 
         ComparableBufferedImage chunk = new ComparableBufferedImage(16, 16, regionImage.getType());
@@ -70,7 +70,7 @@ public class RegionImageSet extends ImageSet
         if (chunkImage.isChanged() || wasBlank)
         {
             RegionCoord regionCoord = getRegionCoord();
-            holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().chunkXPos), regionCoord.getZOffset(chunkMd.getCoord().chunkZPos));
+            holder.partialImageUpdate(chunkImage, regionCoord.getXOffset(chunkMd.getCoord().x), regionCoord.getZOffset(chunkMd.getCoord().z));
         }
         if (wasBlank)
         {

@@ -155,7 +155,7 @@ public class ThemeButton extends BooleanPropertyButton
         }
 
         // Check hover
-        boolean hover = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+        boolean hover = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
         setMouseOver(hover);
 
         // Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
@@ -213,8 +213,8 @@ public class ThemeButton extends BooleanPropertyButton
         GlStateManager.enableBlend();
         //GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + k * magic, this.width / 2, this.height);
-        this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + k * magic, this.width / 2, this.height);
+        this.drawTexturedModalRect(this.x, this.y, 0, 46 + k * magic, this.width / 2, this.height);
+        this.drawTexturedModalRect(this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + k * magic, this.width / 2, this.height);
         this.mouseDragged(minecraft, mouseX, mouseY);
         int l = 14737632;
     }

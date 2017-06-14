@@ -233,22 +233,22 @@ public class ThemeToolbar extends Button
 
     public int getCenterX()
     {
-        return this.xPosition + (this.width / 2);
+        return this.x + (this.width / 2);
     }
 
     public int getMiddleY()
     {
-        return this.yPosition + (this.height / 2);
+        return this.y + (this.height / 2);
     }
 
     public int getBottomY()
     {
-        return this.yPosition + this.height;
+        return this.y + this.height;
     }
 
     public int getRightX()
     {
-        return this.xPosition + this.width;
+        return this.x + this.width;
     }
 
     @Override

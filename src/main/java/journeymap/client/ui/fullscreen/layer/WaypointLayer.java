@@ -83,7 +83,7 @@ public class WaypointLayer implements LayerDelegate.Layer
 
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(new Vec3d(lastCoord.getX(), 1, lastCoord.getZ())))
+            if (!area.contains(new Vec3d(lastCoord.getX(), 1, lastCoord.getZ())))
             {
                 selected = null;
                 lastCoord = blockCoord;
@@ -114,7 +114,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         {
             if (waypoint.isEnable() && waypoint.isInPlayerDimension())
             {
-                if (area.isVecInside(new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
+                if (area.contains(new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
                 {
                     proximal.add(waypoint);
                 }

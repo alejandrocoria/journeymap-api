@@ -35,16 +35,16 @@ public class ChunkLoader
         try
         {
             // Check for the region file on disk first so the loader doesn't create empty region files
-            if (RegionLoader.getRegionFile(mc, coord.chunkXPos, coord.chunkZPos).exists())
+            if (RegionLoader.getRegionFile(mc, coord.x, coord.z).exists())
             {
-                if (loader.chunkExists(mc.world, coord.chunkXPos, coord.chunkZPos))
+                if (loader.chunkExists(mc.world, coord.x, coord.z))
                 {
-                    Chunk chunk = loader.loadChunk(mc.world, coord.chunkXPos, coord.chunkZPos);
+                    Chunk chunk = loader.loadChunk(mc.world, coord.x, coord.z);
                     if (chunk != null)
                     {
                         if (!chunk.isLoaded())
                         {
-                            chunk.setChunkLoaded(true);
+                            chunk.markLoaded(true);
                             //chunk.generateSkylightMap();
                         }
                         return new ChunkMD(chunk, forceRetain);

@@ -76,8 +76,8 @@ public class MapRegionTask extends BaseMapTask
         {
             for (ChunkPos keepAliveOffset : keepAliveOffsets)
             {
-                ChunkPos keepAliveCoord = new ChunkPos(coord.chunkXPos + keepAliveOffset.chunkXPos, coord.chunkZPos + keepAliveOffset.chunkZPos);
-                RegionCoord neighborRCoord = RegionCoord.fromChunkPos(rCoord.worldDir, mapType, keepAliveCoord.chunkXPos, keepAliveCoord.chunkZPos);
+                ChunkPos keepAliveCoord = new ChunkPos(coord.x + keepAliveOffset.x, coord.z + keepAliveOffset.z);
+                RegionCoord neighborRCoord = RegionCoord.fromChunkPos(rCoord.worldDir, mapType, keepAliveCoord.x, keepAliveCoord.z);
                 if (!existingRegions.containsKey(neighborRCoord))
                 {
                     existingRegions.put(neighborRCoord, neighborRCoord.exists());

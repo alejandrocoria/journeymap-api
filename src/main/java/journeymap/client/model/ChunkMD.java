@@ -51,7 +51,7 @@ public class ChunkMD
         {
             throw new IllegalArgumentException("Chunk can't be null");
         }
-        this.coord = new ChunkPos(chunk.xPosition, chunk.zPosition); // avoid GC issue holding onto chunk's coord ref
+        this.coord = new ChunkPos(chunk.x, chunk.z); // avoid GC issue holding onto chunk's coord ref
 
         // Set load time
         setProperty(PROP_LOADED, System.currentTimeMillis());
@@ -269,7 +269,7 @@ public class ChunkMD
 
     public Boolean getHasNoSky()
     {
-        return getWorld().provider.hasNoSky();
+        return !getWorld().provider.isSurfaceWorld();
     }
 
     public boolean canBlockSeeTheSky(int localX, int y, int localZ)
@@ -337,12 +337,12 @@ public class ChunkMD
 
     public int toWorldX(int localX)
     {
-        return (coord.chunkXPos << 4) + localX;
+        return (coord.x << 4) + localX;
     }
 
     public int toWorldZ(int localZ)
     {
-        return (coord.chunkZPos << 4) + localZ;
+        return (coord.z << 4) + localZ;
     }
 
     public BlockDataArrays getBlockData()
