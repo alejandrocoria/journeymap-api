@@ -165,6 +165,24 @@ buttonDeleteMap;
     }
 
     /**
+     * Open the Discord server invite.
+     */
+    public static void discord()
+    {
+        String path = null;
+        try
+        {
+            path = "https://discord.gg/eP8gE69";
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(path));
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
      * Launch the download website in the native OS.
      */
     public static void launchDownloadWebsite()
