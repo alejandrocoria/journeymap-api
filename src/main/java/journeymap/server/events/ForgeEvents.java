@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.server.FMLServerHandler;
@@ -38,7 +39,11 @@ public class ForgeEvents
         if (event.getEntity() instanceof EntityPlayerMP)
         {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
-
+            Boolean hasForge = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
+            if (!hasForge)
+            {
+                return;
+            }
             Journeymap.getLogger().info(((EntityPlayerMP) event.getEntity()).getDisplayNameString() + " joining dimension " + event.getEntity().dimension);
             PermissionProperties prop;
             DimensionProperties dimensionProperties = PropertiesManager.getInstance().getDimProperties(player.dimension);
@@ -91,6 +96,12 @@ public class ForgeEvents
         if (event.player instanceof EntityPlayerMP)
         {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
+            Boolean hasForge = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
+            if (!hasForge)
+            {
+                Journeymap.getLogger().info(player.getName()+ " is connecting with a vanilla client, ignoring journeymap login permissions.");
+                return;
+            }
             if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
             {
                 PacketHandler.sendPlayerWorldID((EntityPlayerMP) event.player);
