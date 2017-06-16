@@ -68,10 +68,8 @@ buttonDonate;
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("Indiemusicbus", "indiemusicbus", "jm.common.splash_patreon"),
-            new SplashPerson("Argonimer", "Argonimer", "jm.common.splash_patreon"),
             new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
-            new SplashPerson("Blitzyuk", "Blitzyuk", "jm.common.splash_patreon")
+            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
     );
 
     private List<SplashPerson> devs = Arrays.asList(

@@ -3,12 +3,12 @@
 {
   "lines": [
     {
-      "label": "Performance improvements!",
-      "action": ""
+      "label": "JourneyMap has a public Discord! (click to join)",
+      "action": "dialog.FullscreenActions#discord"
     },
     {
-      "label": "Need help? Click to visit journeymap.info",
-      "action": "dialog.FullscreenActions#launchWebsite#Home"
+      "label": "Updated Privacy Notices (click to view)",
+      "action": "dialog.FullscreenActions#launchWebsite#Privacy"
     }
   ]
 }
