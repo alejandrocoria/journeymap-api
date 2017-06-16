@@ -180,7 +180,8 @@ public class EntityHelper
 
     public static AxisAlignedBB getBoundingBox(EntityPlayer player, double lateralDistance, double verticalDistance)
     {
-        return new AxisAlignedBB(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
+        return player.getEntityBoundingBox().grow(lateralDistance, verticalDistance, lateralDistance);
+        //return new AxisAlignedBB(player.posX, player.posY, player.posZ, player.posX, player.posY, player.posZ).expand(lateralDistance, verticalDistance, lateralDistance);
     }
 
     /**

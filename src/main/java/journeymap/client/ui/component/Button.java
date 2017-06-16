@@ -154,7 +154,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     }
 
     @Override
-    public void func_191745_a(Minecraft minecraft, int mouseX, int mouseY, float f)
+    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float f)
     {
         if (!isDrawButton())
         {
@@ -168,7 +168,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 //                setEnabled(false);
 //            }
             // Use resource pack texture
-            super.func_191745_a(minecraft, mouseX, mouseY, 0f);
+            super.drawButton(minecraft, mouseX, mouseY, 0f);
         }
         else
         {
@@ -346,7 +346,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public void drawScrollable(Minecraft mc, int mouseX, int mouseY)
     {
-        func_191745_a(mc, mouseX, mouseY, 0f);
+        drawButton(mc, mouseX, mouseY, 0f);
     }
 
     @Override

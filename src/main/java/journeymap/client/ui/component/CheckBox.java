@@ -47,7 +47,7 @@ public class CheckBox extends BooleanPropertyButton
      * Draws this button to the screen.
      */
     @Override
-    public void func_191745_a(Minecraft mc, int mouseX, int mouseY, float f)
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float f)
     {
         if (this.visible)
         {

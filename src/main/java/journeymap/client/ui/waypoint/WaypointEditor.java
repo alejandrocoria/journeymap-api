@@ -194,7 +194,7 @@ public class WaypointEditor extends JmUI
                 }
 
                 dimScrollPane = new ScrollPane(mc, 0, 0, dimButtonList, dimButtonList.get(0).getHeight(), 4);
-                dimScrollPane.func_193651_b(false);
+                dimScrollPane.setShowSelectionBox(false);
             }
 
             if (this.buttonList.isEmpty())
@@ -369,7 +369,7 @@ public class WaypointEditor extends JmUI
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                guibutton.func_191745_a(this.mc, x, y, 0f);
+                guibutton.drawButton(this.mc, x, y, 0f);
             }
 
             if (colorPickTooltip != null && colorPickRect.contains(x, y))

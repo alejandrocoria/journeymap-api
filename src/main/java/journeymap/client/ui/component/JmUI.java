@@ -206,7 +206,7 @@ public abstract class JmUI extends GuiScreen
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                guibutton.func_191745_a(this.mc, x, y, 0f);
+                guibutton.drawButton(this.mc, x, y, 0f);
                 if (tooltip == null)
                 {
                     if (guibutton instanceof journeymap.client.ui.component.Button)

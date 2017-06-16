@@ -147,7 +147,7 @@ public class ThemeButton extends BooleanPropertyButton
     }
 
     @Override
-    public void func_191745_a(Minecraft minecraft, int mouseX, int mouseY, float f)
+    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float f)
     {
         if (!isDrawButton())
         {

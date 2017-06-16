@@ -207,7 +207,7 @@ public class GridEditor extends JmUI
             for (int k = 0; k < this.buttonList.size(); ++k)
             {
                 GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                guibutton.func_191745_a(this.mc, x, y, 0f);
+                guibutton.drawButton(this.mc, x, y, 0f);
             }
 
             drawTitle();

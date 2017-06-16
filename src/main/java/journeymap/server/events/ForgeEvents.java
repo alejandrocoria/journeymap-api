@@ -31,7 +31,7 @@ public class ForgeEvents
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
             Boolean hasForge = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
             if (!hasForge) {
-                Journeymap.getLogger().info(player.getName()+ " is connecting with a vanilla client, ignoring JoinWorldEvent");
+                Journeymap.getLogger().debug(player.getName() + " is connecting with a vanilla client, ignoring JoinWorldEvent");
                 return;
             }
             Journeymap.getLogger().info(((EntityPlayerMP) event.getEntity()).getDisplayNameString() + " joining dimension " + event.getEntity().dimension);

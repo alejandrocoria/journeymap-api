@@ -189,7 +189,7 @@ public class Fullscreen extends JmUI
                 for (int k = 0; k < this.buttonList.size(); ++k)
                 {
                     GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                    guibutton.func_191745_a(this.mc, width, height, 0f);
+                    guibutton.drawButton(this.mc, width, height, 0f);
                     if (tooltip == null)
                     {
                         if (guibutton instanceof Button)

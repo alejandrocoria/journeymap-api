@@ -200,7 +200,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 //    }
 
     @Override
-    public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_) {
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_)
+    {
         drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
     }
 
@@ -211,7 +212,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         button.setWidth(listWidth);
         button.setPosition(x, y);
         button.setHeight(slotHeight);
-        button.func_191745_a(mc, mouseX, mouseY, 0f);
+        button.drawButton(mc, mouseX, mouseY, 0f);
 
         DrawUtil.drawRectangle(button.getX() + 4, button.getMiddleY() - 5, 11, 10, RGB.BLACK_RGB, .2f);
         DrawUtil.drawLabel(selected ? glyphOpen : glyphClosed, button.getX() + 12, button.getMiddleY(), DrawUtil.HAlign.Left, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 0, button.getLabelColor(), 1f, 1, true);

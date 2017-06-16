@@ -92,7 +92,8 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
 //    }
 
     @Override
-    public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_) {
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_)
+    {
         drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
     }
     //    @Override
@@ -126,7 +127,7 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
 
             for (Button button : buttons)
             {
-                button.func_191745_a(mc, mouseX, mouseY, 0f);
+                button.drawButton(mc, mouseX, mouseY, 0f);
                 if (tooltipMetadata == null)
                 {
                     if (button.mouseOver(mouseX, mouseY))
