@@ -8,7 +8,7 @@
 
 package journeymap.client.feature;
 
-import com.google.common.reflect.ClassPath;
+import journeymap.client.feature.impl.Unlimited;
 import journeymap.common.Journeymap;
 import journeymap.server.properties.PermissionProperties;
 
@@ -22,9 +22,6 @@ import java.util.Set;
  */
 public class FeatureManager
 {
-    private static final String NAME_FAIRPLAY = "FairPlay";
-    private static final String IMPL_PACKAGE = "journeymap.client.feature.impl";
-    private static final String CLASS_UNLIMITED = String.format("%s.Unlimited", IMPL_PACKAGE);
     private final PolicySet policySet;
     private final HashMap<Feature, Policy> policyMap = new HashMap<Feature, Policy>();
     private final HashMap<String, EnumSet<Feature>> disableControlCodes = new HashMap<String, EnumSet<Feature>>();
@@ -39,7 +36,7 @@ public class FeatureManager
         disableControlCodes.put("\u00a73\u00a76\u00a73\u00a76\u00a73\u00a76\u00a7e", Feature.radar());
         disableControlCodes.put("\u00a73 \u00a76 \u00a73 \u00a76 \u00a73 \u00a76 \u00a7d", EnumSet.of(Feature.MapCaves));
         disableControlCodes.put("\u00a73\u00a76\u00a73\u00a76\u00a73\u00a76\u00a7d", EnumSet.of(Feature.MapCaves));
-        policySet = locatePolicySet();
+        policySet = new Unlimited();
         reset();
     }
 
@@ -197,79 +194,6 @@ public class FeatureManager
                 controlCodeAltered = false;
             }
         }
-    }
-
-    /**
-     * Finds the FeatureSet via reflection.
-     *
-     * @return
-     */
-    private PolicySet locatePolicySet()
-    {
-        PolicySet fs = null;
-        try
-        {
-            ClassPath cp = ClassPath.from(getClass().getClassLoader());
-            Set<ClassPath.ClassInfo> classInfos = cp.getTopLevelClasses(IMPL_PACKAGE);
-            if (classInfos.size() > 1)
-            {
-                try
-                {
-                    Class fsClass = Class.forName(CLASS_UNLIMITED);
-                    fs = (PolicySet) fsClass.newInstance();
-                }
-                catch (Throwable e)
-                {
-                }
-            }
-
-            if (fs == null)
-            {
-                for (ClassPath.ClassInfo classInfo : classInfos)
-                {
-                    Class aClass = classInfo.load();
-                    if (PolicySet.class.isAssignableFrom(aClass))
-                    {
-                        fs = (PolicySet) aClass.newInstance();
-                        break;
-                    }
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace(System.err);
-        }
-
-        return (fs != null) ? fs : createFairPlay();
-    }
-
-    /**
-     * Generates a FeatureSet that disables all features in multiplayer.
-     *
-     * @return
-     */
-    private PolicySet createFairPlay()
-    {
-        return new PolicySet()
-        {
-            // All features allowed in singleplayer, but none in multiplayer
-            private final Set<Policy> policies = Policy.bulkCreate(true, false);
-            private final String name = NAME_FAIRPLAY;
-
-            @Override
-            public Set<Policy> getPolicies()
-            {
-                return policies;
-            }
-
-            @Override
-            public String getName()
-            {
-                return name;
-            }
-
-        };
     }
 
     /**
