@@ -214,7 +214,7 @@ public class OptionsManager extends JmUI
                                 }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
-                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                         else if (category == ClientCategory.MiniMap2)
@@ -225,14 +225,14 @@ public class OptionsManager extends JmUI
                                 }
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
-                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                         else if (category == ClientCategory.FullMap)
                             {
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
-                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                         else if (category == ClientCategory.Cartography)
@@ -242,7 +242,7 @@ public class OptionsManager extends JmUI
                                         Constants.getString("jm.common.renderstats.title"),
                                         Constants.getString("jm.common.renderstats.tooltip"), 2);
                                 categorySlot.getAllChildMetadata().add(renderStatsSlotMetadata);
-                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                                 break;
                             }
                         else
