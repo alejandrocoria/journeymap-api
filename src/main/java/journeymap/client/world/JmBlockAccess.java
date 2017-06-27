@@ -1,9 +1,9 @@
 package journeymap.client.world;
 
 import journeymap.client.data.DataCache;
-import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -21,25 +21,24 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 /**
  * Created by Mark on 2/12/2017.
  */
+@MethodsReturnNonnullByDefault
 public enum JmBlockAccess implements IBlockAccess
 {
     INSTANCE;
 
-    public int getLightOpacity(BlockMD blockMD, BlockPos blockPos)
-    {
-        return blockMD.getBlockState().getBlock().getLightOpacity(blockMD.getBlockState(), this, blockPos);
-    }
-
+    @Override
     public TileEntity getTileEntity(BlockPos pos)
     {
         return getWorld().getTileEntity(pos);
     }
 
+    @Override
     public int getCombinedLight(BlockPos pos, int min)
     {
         return getWorld().getCombinedLight(pos, min);
     }
 
+    @Override
     public IBlockState getBlockState(BlockPos pos)
     {
         if (!this.isValid(pos))
@@ -57,48 +56,38 @@ public enum JmBlockAccess implements IBlockAccess
         }
     }
 
+    @Override
     public boolean isAirBlock(BlockPos pos)
     {
         return getWorld().isAirBlock(pos);
     }
 
-    // 1.10.2
-    public Biome getBiome(BlockPos pos)
+    @Override
+    public Biome getBiome(final BlockPos pos)
     {
+        Biome biome = null;
+
         ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
         if (chunkMD != null && chunkMD.hasChunk())
         {
             try
             {
                 Chunk chunk = chunkMD.getChunk();
-                Biome biome = chunk.getBiome(pos, getWorld().getBiomeProvider());
-                if (biome == null)
-                {
-                    return null;
-                }
-                return biome;
+                biome = chunk.getBiome(pos, getWorld().getBiomeProvider());
             }
             catch (Throwable throwable)
             {
                 Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-                // 1.10.2
-                return getWorld().getBiome(pos);
             }
         }
-        else
+
+        if (biome == null)
         {
-            // 1.10.2
-            return getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
+            biome = getWorld().getBiomeProvider().getBiome(pos, Biomes.PLAINS);
         }
+
+        return biome;
     }
-
-    // Does not exist in 1.10.2
-//        @Override
-//        public boolean extendedLevelsInChunkCache()
-//        {
-//            return getWorld().extendedLevelsInChunkCache();
-//        }
-
 
     public int getStrongPower(BlockPos pos, EnumFacing direction)
     {

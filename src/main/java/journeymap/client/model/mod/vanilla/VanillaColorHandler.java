@@ -5,11 +5,13 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.ModBlockDelegate;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 
 /**
  * Default color determination for mod blocks.
@@ -126,8 +128,8 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
 //        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
 //                getTint(chunkMD, blockMD, blockPos)), .8f);
 
-        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos),
-                chunkMD.getChunk().getWorld().getBiome(blockPos).getFoliageColorAtPos(blockPos)), .8f);
+        Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
+        return RGB.adjustBrightness(RGB.multiply(getBaseColor(chunkMD, blockMD, blockPos), biome.getFoliageColorAtPos(blockPos)), .8f);
     }
 
     /**
@@ -136,12 +138,8 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     protected Integer getGrassColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
     {
         // Base color is just a grey that gets the tint close to the averaged texture color on screen. - tb
-
-        // Current approach:
-        //return RGB.multiply(0x929292, getTint(chunkMD, blockMD, blockPos));
-
-        // TODO: See if this calls into different results than current approach
-        return RGB.multiply(0x929292, chunkMD.getChunk().getWorld().getBiome(blockPos).getGrassColorAtPos(blockPos));
+        Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
+        return RGB.multiply(0x929292, biome.getGrassColorAtPos(blockPos));
     }
 
     /**
