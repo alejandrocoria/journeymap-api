@@ -310,22 +310,12 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     }
 
     @Override
-    public void func_192633_a(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_) {
+    public void updatePosition(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_) {
 
     }
-//    @Override
-//    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
-//    {
-//        // ?
-//    }
 
     @Override
-    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float p_192634_9_)
-    {
-        drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
-    }
-//    @Override
-    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
         Minecraft mc = manager.getMinecraft();
         this.width = listWidth;

@@ -36,7 +36,6 @@ public class ModBlockDelegate
         handlers = Arrays.asList(
                 new VanillaBlockHandler(),
                 new BiomesOPlenty.BopBlockHandler(),
-                new CarpentersBlocks.CommonHandler(),
                 new TerraFirmaCraft.TfcBlockHandler(),
                 new Miscellaneous.CommonHandler());
     }

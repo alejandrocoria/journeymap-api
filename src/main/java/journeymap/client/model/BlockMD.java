@@ -26,10 +26,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.registry.GameData;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -241,19 +239,6 @@ public class BlockMD implements Comparable<BlockMD>
             Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().x, chunkMd.getChunk().z, blockPos, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
-    }
-
-    /**
-     * Finds BlockMD by block uid + meta
-     */
-    public static BlockMD get(String uid, int meta)
-    {
-        Block block = GameData.getBlockRegistry().getObject(new ResourceLocation(uid));
-        if (block == null)
-        {
-            return null;
-        }
-        return BlockMD.get(block.getStateFromMeta(meta));
     }
 
     /**

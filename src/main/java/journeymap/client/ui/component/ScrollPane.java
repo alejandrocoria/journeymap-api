@@ -165,16 +165,8 @@ public class ScrollPane extends GuiSlot
         GlStateManager.popMatrix();
     }
 
-    // 1.7
-    // @Override
-//    protected void drawSlot(int index, int xPosition, int y, int l, Tessellator tessellator, int var6, int var7)
-//    {
-//        drawSlot(index, xPosition, y, l, null, var6, var7);
-//    }
-
-    // 1.8
     @Override
-    protected void func_192637_a(int index, int xPosition, int y, int l, int var6, int var7, float f)
+    protected void drawSlot(int index, int xPosition, int y, int l, int var6, int var7, float f)
     {
         if (firstVisibleIndex == -1)
         {

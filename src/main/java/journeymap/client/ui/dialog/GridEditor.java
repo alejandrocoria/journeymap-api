@@ -72,7 +72,7 @@ public class GridEditor extends JmUI
 
         this.colorPickImg = TextureCache.resolveImage(colorPicResource);
         this.colorPickTexture = TextureCache.getTexture(colorPicResource);
-        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickImg.getWidth(), colorPickImg.getHeight());
+        this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
 
         this.gridSpecs = Journeymap.getClient().getCoreProperties().gridSpecs.clone();
 
@@ -227,7 +227,7 @@ public class GridEditor extends JmUI
         if (colorPickRect.width != size)
         {
             // Updated scaled image only when necessary
-            Image image = TextureCache.resolveImage(colorPicResource).getScaledInstance(sizeI, sizeI, Image.SCALE_FAST);
+            Image image = colorPickTexture.getImage().getScaledInstance(sizeI, sizeI, Image.SCALE_FAST);
             colorPickImg = new BufferedImage(sizeI, sizeI, BufferedImage.TYPE_INT_RGB);
 
             Graphics g = colorPickImg.createGraphics();
@@ -235,7 +235,7 @@ public class GridEditor extends JmUI
             g.dispose();
         }
         colorPickRect.setRect(x, y, size, size);
-        float scale = size / colorPickImg.getWidth();
+        float scale = size / colorPickTexture.getWidth();
         DrawUtil.drawImage(colorPickTexture, x, y, false, scale, 0);
 
         GridSpec activeSpec = gridSpecs.getSpec(activeMapType);

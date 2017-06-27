@@ -16,6 +16,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
+import com.google.gson.annotations.Until;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.io.FileHandler;
@@ -25,6 +26,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import org.apache.logging.log4j.util.Strings;
@@ -48,7 +50,7 @@ public class ColorPalette
     public static final String VARIABLE = "var colorpalette=";
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
-    public static final double VERSION = 5.3;
+    public static final double VERSION = 5.4;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
 
     @Since(3)
@@ -464,6 +466,8 @@ public class ColorPalette
         Float alpha;
 
         @Since(5.2)
+        @Until(5.4)
+        @Deprecated
         Integer meta;
 
         @Since(5.2)
@@ -479,7 +483,7 @@ public class ColorPalette
             this.name = blockMD.getName();
             this.color = RGB.toHexString(color);
             this.alpha = blockMD.getAlpha();
-            this.meta = blockMD.getMeta();
+            //this.meta = blockMD.getMeta();
         }
 
         /**
@@ -586,10 +590,16 @@ public class ColorPalette
                 throw new IllegalArgumentException("BlockColor object must be inflated before use.");
             }
 
-            BlockMD blockMD = BlockMD.get(this.uid, this.meta);
+            BlockMD blockMD = null;
+
+            Block block = Block.REGISTRY.getObject(new ResourceLocation(this.uid));
+            if(block!=null)
+            {
+                blockMD = BlockMD.get(block.getDefaultState());
+            }
             if (blockMD == null)
             {
-                Journeymap.getLogger().warn(String.format("Block referenced in Color Palette is not registered: %s:%s ", uid, meta));
+                Journeymap.getLogger().warn(String.format("Block referenced in Color Palette is not registered: %s ", uid));
                 return;
             }
 
@@ -611,7 +621,7 @@ public class ColorPalette
 
         boolean isInflated()
         {
-            return (this.uid != null && this.meta != null && this.alpha != null && this.color != null);
+            return (this.uid != null && this.alpha != null && this.color != null);
         }
 
         @Override
@@ -620,7 +630,6 @@ public class ColorPalette
             Ordering ordering = Ordering.natural().nullsLast();
             return ComparisonChain.start()
                     .compare(this.uid, that.uid, ordering)
-                    .compare(this.meta, that.meta, ordering)
                     .compare(this.name, that.name, ordering)
                     .compare(this.color, that.color, ordering)
                     .compare(this.alpha, that.alpha, ordering)
