@@ -281,7 +281,8 @@ public class ChunkMD
      */
     public int getLightOpacity(BlockMD blockMD, int localX, int y, int localZ)
     {
-        return JmBlockAccess.INSTANCE.getLightOpacity(blockMD, getBlockPos(localX, y, localZ));
+        BlockPos pos = getBlockPos(localX, y, localZ);
+        return blockMD.getBlockState().getBlock().getLightOpacity(blockMD.getBlockState(), JmBlockAccess.INSTANCE, pos);
     }
 
     /**
