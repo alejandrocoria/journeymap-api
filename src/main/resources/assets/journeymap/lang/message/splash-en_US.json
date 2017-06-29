@@ -7,7 +7,7 @@
       "action": "dialog.FullscreenActions#discord"
     },
     {
-      "label": "Updated Privacy Notices (click to view)",
+      "label": "New mob icons for polar bears, husks, and more!",
       "action": "dialog.FullscreenActions#launchWebsite#Privacy"
     }
   ]
