@@ -46,7 +46,8 @@ public class Splash extends JmUI
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
             new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon"),
-            new SplashPerson("_TheEndless_", "The Endless", "jm.common.splash_patreon")
+            new SplashPerson("_TheEndless_", "The Endless", "jm.common.splash_patreon"),
+            new SplashPerson("Yukimaia", "Yuki", "jm.common.splash_icons")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
