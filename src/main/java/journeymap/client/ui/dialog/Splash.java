@@ -1,6 +1,9 @@
 /*
- * JourneyMap Mod <journeymap.info> for Minecraft
- * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+ * JourneyMap : A mod for Minecraft
+ *
+ * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
+ * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
+ * without express written permission by Mark Woodman <mwoodman@techbrew.net>
  */
 
 package journeymap.client.ui.dialog;
@@ -30,46 +33,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * The type Splash.
- */
 public class Splash extends JmUI
 {
-    /**
-     * The Patreon logo.
-     */
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
-    /**
-     * The Button close.
-     */
-    Button buttonClose, /**
- * The Button options.
- */
-buttonOptions, /**
- * The Button donate.
- */
-buttonDonate;
-    /**
-     * The People buttons.
-     */
+    Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
-    /**
-     * The Dev buttons.
-     */
     ButtonList devButtons;
-    /**
-     * The Bottom buttons.
-     */
     ButtonList bottomButtons;
-    /**
-     * The Info buttons.
-     */
     ButtonList infoButtons;
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
-            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
+            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon"),
+            new SplashPerson("_TheEndless_", "The Endless", "jm.common.splash_patreon"),
+            new SplashPerson("Yukimaia", "Yuki", "jm.common.splash_icons")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
@@ -80,11 +58,6 @@ buttonDonate;
     private SplashInfo info;
     private TextureImpl brickTex;
 
-    /**
-     * Instantiates a new Splash.
-     *
-     * @param returnDisplay the return display
-     */
     public Splash(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.splash_title", Journeymap.JM_VERSION), returnDisplay);
@@ -300,14 +273,6 @@ buttonDonate;
         DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
     }
 
-    /**
-     * Draw person int.
-     *
-     * @param by         the by
-     * @param lineHeight the line height
-     * @param person     the person
-     * @return the int
-     */
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
     {
         float scale = 1;
@@ -403,16 +368,8 @@ buttonDonate;
      */
     class SplashInfoButton extends Button
     {
-        /**
-         * The Info line.
-         */
         final SplashInfo.Line infoLine;
 
-        /**
-         * Instantiates a new Splash info button.
-         *
-         * @param infoLine the info line
-         */
         public SplashInfoButton(SplashInfo.Line infoLine)
         {
             super(infoLine.label);
