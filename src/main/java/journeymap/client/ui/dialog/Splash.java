@@ -30,28 +30,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * The type Splash.
- */
 public class Splash extends JmUI
 {
-    /**
-     * The Patreon logo.
-     */
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
-    /**
-     * The Button close.
-     */
-    Button buttonClose, /**
- * The Button options.
- */
-buttonOptions, /**
- * The Button donate.
- */
-buttonDonate;
-    /**
-     * The People buttons.
-     */
+    Button buttonClose, buttonOptions, buttonDonate;
     ButtonList peopleButtons;
     /**
      * The Dev buttons.
@@ -70,6 +52,13 @@ buttonDonate;
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
             new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
+    new
+
+    SplashPerson("_TheEndless_","The Endless","jm.common.splash_patreon"),
+
+    new
+
+    SplashPerson("Yukimaia","Yuki","jm.common.splash_icons")
     );
 
     private List<SplashPerson> devs = Arrays.asList(
@@ -300,14 +289,6 @@ buttonDonate;
         DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
     }
 
-    /**
-     * Draw person int.
-     *
-     * @param by         the by
-     * @param lineHeight the line height
-     * @param person     the person
-     * @return the int
-     */
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
     {
         float scale = 1;
@@ -403,16 +384,8 @@ buttonDonate;
      */
     class SplashInfoButton extends Button
     {
-        /**
-         * The Info line.
-         */
         final SplashInfo.Line infoLine;
 
-        /**
-         * Instantiates a new Splash info button.
-         *
-         * @param infoLine the info line
-         */
         public SplashInfoButton(SplashInfo.Line infoLine)
         {
             super(infoLine.label);
