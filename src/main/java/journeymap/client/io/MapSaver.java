@@ -9,6 +9,7 @@
 package journeymap.client.io;
 
 import journeymap.client.Constants;
+import journeymap.client.data.DataCache;
 import journeymap.client.data.WorldData;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
@@ -135,7 +136,7 @@ public class MapSaver
             final String date = dateFormat.format(new Date());
             final boolean isUnderground = mapType.isUnderground();
             final StringBuilder sb = new StringBuilder(date).append("_");
-            sb.append(WorldData.getWorldName(mc, false)).append("_");
+            sb.append(DataCache.INSTANCE.getWorld(false).getWorldName(mc, false)).append("_");
             sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.world.provider))).append("_");
             if (isUnderground)
             {

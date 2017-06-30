@@ -205,84 +205,15 @@ public class FileHandler
         {
 
             worldDirectory = getJMWorldDirForWorldId(minecraft, worldId);
-
-            if (worldDirectory!=null && worldDirectory.exists())
+            if (worldDirectory == null)
             {
-                return worldDirectory;
+                worldDirectory = FileHandler.getJMWorldDirForWorldId(minecraft, null);
             }
 
-            File defaultWorldDirectory = FileHandler.getJMWorldDirForWorldId(minecraft, null);
-
-            if (worldId != null && defaultWorldDirectory.exists() && !worldDirectory.exists())
+            if (worldDirectory != null && !worldDirectory.exists())
             {
-                Journeymap.getLogger().log(Level.INFO, "Moving default directory to " + worldDirectory);
-                try
-                {
-                    migrateLegacyFolderName(defaultWorldDirectory, worldDirectory);
-                    return worldDirectory;
-                }
-                catch (Exception e)
-                {
-                    Journeymap.getLogger().log(Level.ERROR, LogFormatter.toString(e));
-                }
+                worldDirectory.mkdirs();
             }
-
-            if (!minecraft.isSingleplayer())
-            {
-                String legacyWorldName;
-                File legacyWorldDir;
-
-                boolean migrated = false;
-
-                // Older use of MP server's socket IP/hostname
-                legacyWorldName = WorldData.getLegacyServerName() + "_0";
-                legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                if (legacyWorldDir.exists()
-                        && !legacyWorldDir.getName().equals(defaultWorldDirectory.getName())
-                        && !legacyWorldDir.getName().equals(worldDirectory.getName()))
-                {
-                    migrateLegacyFolderName(legacyWorldDir, worldDirectory);
-                    migrated = true;
-                }
-
-                if (worldId != null)
-                {
-                    // Newer URL-encoded use of MP server entry provided by user, with world id
-                    legacyWorldName = WorldData.getWorldName(minecraft, true) + "_" + worldId;
-                    legacyWorldDir = new File(MinecraftDirectory, Constants.MP_DATA_DIR + legacyWorldName);
-                    if (legacyWorldDir.exists()
-                            && !legacyWorldDir.getName().equals(worldDirectory.getName()))
-                    {
-                        migrateLegacyFolderName(legacyWorldDir, worldDirectory);
-                        migrated = true;
-                    }
-                }
-            }
-            else
-            {
-                File legacyWorldDir = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, true));
-                if (!legacyWorldDir.getName().equals(worldDirectory.getName()))
-                {
-                    if (legacyWorldDir.exists() && worldDirectory.exists())
-                    {
-                        JMLogger.logOnce(String.format("Found two directories that might be in conflict. Using:  %s , Ignoring: %s", worldDirectory, legacyWorldDir), null);
-                    }
-                }
-
-                if (legacyWorldDir.exists() && !worldDirectory.exists() && !legacyWorldDir.getName().equals(worldDirectory.getName()))
-                {
-                    migrateLegacyFolderName(legacyWorldDir, worldDirectory);
-                }
-            }
-
-            if (!worldDirectory.exists())
-            {
-                if (!(worldId != null && worldDirectory.getName().equals(defaultWorldDirectory.getName())))
-                {
-                    worldDirectory.mkdirs();
-                }
-            }
-
         }
         catch (Exception e)
         {
@@ -311,11 +242,11 @@ public class FileHandler
                     worldId = worldId.replaceAll("\\W+", "~");
                 }
                 String suffix = (worldId != null) ? ("_" + worldId) : "";
-                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft, false) + suffix); 
+                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft) + suffix);
             }
             else
             {
-                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft, false));
+                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft));
             }
         }
         catch (Exception e)
@@ -324,43 +255,6 @@ public class FileHandler
         }
 
         return testWorldDirectory;
-    }
-
-    private static void migrateLegacyFolderName(File legacyWorldDir, File worldDir)
-    {
-        if (legacyWorldDir.getPath().equals(worldDir.getPath()))
-        {
-            return;
-        }
-
-        boolean success = false;
-        try
-        {
-            success = legacyWorldDir.renameTo(worldDir);
-            if (!success)
-            {
-                throw new IllegalStateException("Need to rename legacy folder, but not able to");
-            }
-            Journeymap.getLogger().info(String.format("Migrated legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()));
-        }
-        catch (Exception e)
-        {
-            JMLogger.logOnce(String.format("Failed to migrate legacy folder from %s to %s", legacyWorldDir.getName(), worldDir.getName()), e);
-
-            String tempName = worldDir.getName() + "__OLD";
-            try
-            {
-                success = legacyWorldDir.renameTo(new File(legacyWorldDir.getParentFile(), tempName));
-            }
-            catch (Exception e2)
-            {
-                success = false;
-            }
-            if (!success)
-            {
-                JMLogger.logOnce(String.format("Failed to even rename legacy folder from %s to %s", legacyWorldDir.getName(), tempName), e);
-            }
-        }
     }
 
     public static File getWaypointDir()

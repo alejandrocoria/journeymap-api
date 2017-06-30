@@ -11,7 +11,6 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.realmsclient.dto.RealmsServer;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -36,10 +35,8 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.URLEncoder;
 import java.util.*;
 
 
@@ -92,20 +89,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
                     if (netHandlerGui instanceof GuiScreenRealmsProxy)
                     {
+                        serverName = "Realms";
                         RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).getProxy();
                         if (realmsScreen instanceof RealmsMainScreen)
                         {
                             RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
                             long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
-                            List<RealmsServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
-                            for (RealmsServer mcoServer : mcoServers)
-                            {
-                                if (mcoServer.id == selectedServerId)
-                                {
-                                    serverName = mcoServer.name;
-                                    break;
-                                }
-                            }
+                            serverName = "Realm_" + selectedServerId;
                         }
                     }
                 }
@@ -171,26 +161,29 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return "server";
     }
 
+    public static String getWorldName(Minecraft mc)
+    {
+        return DataCache.INSTANCE.getWorld(false).getWorldName(mc, false);
+    }
+
     /**
      * Get the current world name.
      *
      * @param mc
      * @return
      */
-    public static String getWorldName(Minecraft mc, boolean useLegacyName)
+    public String getWorldName(Minecraft mc, boolean force)
     {
+        if (!force && !Strings.isNullOrEmpty(name))
+        {
+            return name;
+        }
+
         // Get the name
         String worldName = null;
         if (mc.isSingleplayer())
         {
-            if (useLegacyName)
-            {
-                worldName = mc.getIntegratedServer().getWorldName();
-            }
-            else
-            {
-                return mc.getIntegratedServer().getFolderName();
-            }
+            worldName = mc.getIntegratedServer().getFolderName();
         }
         else
         {
@@ -199,7 +192,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
             if (serverName == null)
             {
-                return "offline";
+                worldName = "offline";
             }
 
             if (!"MpServer".equals(worldName))
@@ -212,33 +205,15 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
         }
 
-        if (useLegacyName)
-        {
-            worldName = getLegacyUrlEncodedWorldName(worldName);
-        }
-        else
-        {
-            worldName = worldName.trim();
-        }
+        worldName = worldName.trim();
 
-        if (Strings.isNullOrEmpty(worldName.trim()))
+        if (Strings.isNullOrEmpty(worldName))
         {
             worldName = "unnamed";
         }
 
-        return worldName;
-    }
-
-    private static String getLegacyUrlEncodedWorldName(String worldName)
-    {
-        try
-        {
-            return URLEncoder.encode(worldName, "UTF-8").replace("+", " ");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return worldName;
-        }
+        this.name = worldName;
+        return this.name;
     }
 
     public static List<DimensionProvider> getDimensionProviders(List<Integer> requiredDimensionList)
@@ -370,7 +345,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
-        name = getWorldName(mc, false);
+        name = getWorldName(mc, true);
         dimension = mc.world.provider.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
@@ -391,7 +366,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public long getTTL()
     {
-        return 1000;
+        return 300000;
     }
 
     /**
