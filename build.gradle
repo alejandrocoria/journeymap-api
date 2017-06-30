@@ -176,7 +176,8 @@ task solderZip(type: Zip, dependsOn: 'jar') {
 
 artifacts {
     archives jar
-    archives solderZip
+    // TODO:  Re-enable solder support or abandon trying
+    //archives solderZip
 }
 
 reobf {
