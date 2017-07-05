@@ -15,10 +15,12 @@ import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.geom.Point2D;
@@ -65,6 +67,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
      */
     FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
+    boolean isSinglePlayer;
+
     /**
      * Instantiates a new Block info layer.
      */
@@ -72,6 +76,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     {
         blockInfoStep = new BlockInfoStep();
         drawStepList.add(blockInfoStep);
+        isSinglePlayer = FMLClientHandler.instance().getClient().isSingleplayer();
     }
 
     @Override
@@ -88,6 +93,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             // Get block under mouse
             ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(blockPos);
             String info = "";
+
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 BlockMD blockMD = chunkMD.getBlockMD(blockPos.up());
@@ -96,13 +102,14 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                     blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
 
-                String biome = chunkMD.getWorld().getBiomeForCoordsBody(blockPos).getBiomeName();
+                Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
+                ;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockPos.getX(),
                         blockPos.getZ(),
                         blockPos.getY(),
-                        (blockPos.getY() >> 4)) + " " + biome;
+                        (blockPos.getY() >> 4)) + " " + biome.getBiomeName();
 
                 if (!blockMD.isAir())
                 {
@@ -117,6 +124,14 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             else
             {
                 info = Constants.getString("jm.common.location_xz_verbose", blockPos.getX(), blockPos.getZ());
+                if (isSinglePlayer)
+                {
+                    Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos, null);
+                    if (biome != null)
+                    {
+                        info += " " + biome.getBiomeName();
+                    }
+                }
             }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
