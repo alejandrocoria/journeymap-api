@@ -490,7 +490,7 @@ public class BlockMD implements Comparable<BlockMD>
     {
         if (this.color == null)
         {
-            this.color = this.blockColorHandler.getTextureColor(this);
+            this.color = getBlockColorHandler().getTextureColor(this);
             return true;
         }
         return false;
@@ -504,6 +504,11 @@ public class BlockMD implements Comparable<BlockMD>
     public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
     {
         this.blockColorHandler = blockColorHandler;
+    }
+
+    public ModBlockDelegate.IModBlockColorHandler getBlockColorHandler()
+    {
+        return blockColorHandler;
     }
 
     /**

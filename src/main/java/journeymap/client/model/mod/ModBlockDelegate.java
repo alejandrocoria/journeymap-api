@@ -10,10 +10,12 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,8 +35,9 @@ public class ModBlockDelegate
         handlers = Arrays.asList(
                 new VanillaBlockHandler(),
                 new BiomesOPlenty.BopBlockHandler(),
-                new CarpentersBlocks.CommonHandler(),
+                new Chisel.ChiselBlockHandler(),
                 new TerraFirmaCraft.TfcBlockHandler(),
+                new Mekanism.MekanismBlockHandler(),
                 new Miscellaneous.CommonHandler());
     }
 
@@ -163,5 +166,7 @@ public class ModBlockDelegate
          * @return the texture color
          */
         public Integer getTextureColor(BlockMD blockMD);
+
+        Collection<TextureAtlasSprite> getSprites(BlockMD blockMD);
     }
 }

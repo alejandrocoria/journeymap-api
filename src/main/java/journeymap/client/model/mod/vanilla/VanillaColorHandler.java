@@ -14,9 +14,12 @@ import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.BlockFlower;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+
+import java.util.Collection;
 
 /**
  * Default color determination for mod blocks.
@@ -32,6 +35,12 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     public Integer getTextureColor(BlockMD blockMD)
     {
         return ColorHelper.INSTANCE.getTextureColor(blockMD);
+    }
+
+    @Override
+    public Collection<TextureAtlasSprite> getSprites(BlockMD blockMD)
+    {
+        return ColorHelper.INSTANCE.getSprites(blockMD);
     }
 
     /**

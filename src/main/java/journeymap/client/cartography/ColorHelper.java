@@ -5,6 +5,7 @@
 
 package journeymap.client.cartography;
 
+import com.google.common.base.Joiner;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -16,7 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -26,16 +26,20 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Singleton that encapsulates color-related functions that have changed frequently since 1.7.10.
@@ -159,21 +163,124 @@ public enum ColorHelper
     {
         try
         {
-            setBlockColor(blockMD, getDirectIcon(blockMD));
+            // Invisible or Air?
+            IBlockState blockState = blockMD.getBlockState();
+            if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE
+                    || Material.AIR.equals(blockState.getMaterial()))
+            {
+                setBlockColorToAir(blockMD);
+                return blockMD.getColor();
+            }
+
+            Collection<TextureAtlasSprite> sprites = blockMD.getBlockColorHandler().getSprites(blockMD);
+            if (!sprites.isEmpty())
+            {
+                // Collate name
+                List<String> names = sprites.stream().map(TextureAtlasSprite::getIconName).collect(Collectors.toList());
+                Collections.sort(names);
+                String name = Joiner.on(",").join(names);
+                blockMD.setIconName(name);
+
+                float[] rgba = null;
+                if (iconColorCache.containsKey(name))
+                {
+                    rgba = iconColorCache.get(name);
+                }
+                else
+                {
+                    rgba = getAverageColor(blockMD, sprites);
+                    if (rgba != null)
+                    {
+                        iconColorCache.put(name, rgba);
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format("Cached color %s for %s", RGB.toHexString(RGB.toInteger(rgba)), name));
+                        }
+                    }
+                }
+
+                if (rgba != null)
+                {
+                    blockMD.setColor(RGB.toInteger(rgba));
+                    return blockMD.getColor();
+                }
+            }
+
+            if (blockState.getBlock() instanceof ITileEntityProvider)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
+                }
+                blockMD.addFlags(BlockMD.Flag.TileEntity);
+                setBlockColorToAir(blockMD);
+            }
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("ColorHelper.setBlockColor(): Using MaterialMapColor for: %s", blockMD));
+                }
+                setBlockColorToMaterial(blockMD);
+            }
             return blockMD.getColor();
         }
-        catch (Throwable t)
+        catch (Throwable e1)
         {
-            failed.add(blockMD);
-            if (blockMD.getUid().startsWith("minecraft"))
+            if (logger.isDebugEnabled())
             {
-                logger.warn(String.format("Error getting block color for %s. Cause: %s", blockMD, LogFormatter.toPartialString(t)));
+                logger.error("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
             }
-            return null;
+            setBlockColorToMaterial(blockMD);
+            return blockMD.getColor();
         }
     }
 
-    private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
+    private float[] getAverageColor(BlockMD blockMD, Collection<TextureAtlasSprite> sprites)
+    {
+        List<BufferedImage> images = getImages(blockMD, sprites);
+
+        if (images.isEmpty())
+        {
+            return null;
+        }
+
+        int a, r, g, b, count, alpha;
+        a = r = g = b = count = 0;
+        for (BufferedImage image : images)
+        {
+            try
+            {
+                int[] argbInts = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+                for (int argb : argbInts)
+                {
+                    alpha = (argb >> 24) & 0xFF;
+                    if (alpha > 0)
+                    {
+                        count++;
+                        a += alpha;
+                        r += (argb >> 16) & 0xFF;
+                        g += (argb >> 8) & 0xFF;
+                        b += (argb) & 0xFF;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                continue;
+            }
+        }
+
+        if (count > 0)
+        {
+            int rgb = RGB.toInteger(r / count, g / count, b / count);
+            return RGB.floats(rgb, a / count);
+        }
+        return null;
+    }
+
+
+    public Collection<TextureAtlasSprite> getSprites(BlockMD blockMD)
     {
         IBlockState blockState = blockMD.getBlockState();
         Block block = blockState.getBlock();
@@ -192,7 +299,7 @@ public enum ColorHelper
         {
             ResourceLocation loc = ((IFluidBlock) block).getFluid().getStill();
             TextureAtlasSprite tas = FMLClientHandler.instance().getClient().getTextureMapBlocks().getAtlasSprite(loc.toString());
-            return tas;
+            return Collections.singletonList(tas);
         }
 
         if (blockState.getMaterial() == Material.GRASS)
@@ -200,74 +307,109 @@ public enum ColorHelper
             blockMD.addFlags(BlockMD.Flag.Grass);
         }
 
-        ArrayList<EnumFacing> facings = new ArrayList<>(2);
-        // If the block is directional, try to grab the sprite for EnumFacing.UP, NORTH, etc.
-        for (Map.Entry<IProperty<?>, Comparable<?>> entry : blockState.getProperties().entrySet())
-        {
-            if (entry.getKey() instanceof PropertyDirection)
-            {
-                facings.addAll(spriteFacings);
-                facings.retainAll(entry.getKey().getAllowedValues());
-                break;
-            }
-        }
-        return getFirstFoundSprite(blockState, facings);
+        return getSprites(blockState);
     }
 
-    private TextureAtlasSprite getFirstFoundSprite(IBlockState blockState, ArrayList<EnumFacing> facing)
+    private Collection<TextureAtlasSprite> getSprites(IBlockState blockState)
     {
+        HashMap<String, TextureAtlasSprite> sprites = new HashMap<>();
         BlockModelShapes bms = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes();
-        for(EnumFacing face : facing)
+        IBakedModel model = bms.getModelForState(blockState);
+        if (model != null)
         {
-            try
+            PropertyDirection propertyDirection = PropertyDirection.create("facing");
+            if (blockState.getPropertyNames().contains(propertyDirection))
             {
-                IBakedModel model = bms.getModelForState(blockState);
-                if (model == null)
-                {
-                    continue;
-                }
-                List<BakedQuad> quads = null;
+                // Works for directional blocks only
+                blockState = blockState.withProperty(propertyDirection, EnumFacing.UP);
+            }
+            else
+            {
+                blockState = blockState;
+            }
 
+            for (EnumFacing face : Arrays.asList(EnumFacing.UP, null))
+            {
                 try
                 {
-                    quads = model.getQuads(blockState, face, 0);
-                }
-                catch (Exception e)
-                {
-                    JMLogger.logOnce("Error calling " + model.getClass().getName() + ".getQuads()", e);
-                    break;
-                }
+                    List<BakedQuad> quads = new ArrayList<>(0);
 
-                if (!quads.isEmpty())
-                {
-                    TextureAtlasSprite sprite = quads.get(0).getSprite();
-                    if (new ResourceLocation(sprite.getIconName()).equals(TextureMap.LOCATION_MISSING_TEXTURE))
+                    BlockRenderLayer originalLayer = MinecraftForgeClient.getRenderLayer();
+                    try
                     {
-                        continue;
+                        for (BlockRenderLayer layer : BlockRenderLayer.values())
+                        {
+                            ForgeHooksClient.setRenderLayer(layer);
+                            try
+                            {
+                                List<BakedQuad> faceInLayerQuads = model.getQuads(blockState, face, 0);
+                                if (faceInLayerQuads != null && !faceInLayerQuads.isEmpty())
+                                {
+                                    quads.addAll(faceInLayerQuads);
+                                }
+                                else
+                                {
+                                    blockState = blockState;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                JMLogger.logOnce(String.format("Error calling %s.getQuads(IBlockState, %s, 0) in BlockRenderLayer %s",
+                                        model.getClass().getName(), face, layer), e);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        ForgeHooksClient.setRenderLayer(originalLayer);
+                    }
+
+                    if (!quads.isEmpty())
+                    {
+                        for (BakedQuad quad : quads)
+                        {
+                            TextureAtlasSprite sprite = quad.getSprite();
+                            if (!sprites.containsKey(sprite.getIconName()))
+                            {
+                                ResourceLocation resourceLocation = new ResourceLocation(sprite.getIconName());
+                                if (resourceLocation.equals(TextureMap.LOCATION_MISSING_TEXTURE))
+                                {
+                                    continue;
+                                }
+
+                                sprites.put(sprite.getIconName(), sprite);
+                            }
+                        }
+                    }
+
+                    if (!sprites.isEmpty())
+                    {
+                        break;
                     }
                     else
                     {
-                        if (Journeymap.getLogger().isDebugEnabled())
-                        {
-                            Journeymap.getLogger().info("Using face %s for block color in %s", face, blockState);
-                        }
-                        return sprite;
+                        continue;
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Journeymap.getLogger().error(String.format("Error getting EnumFacing.%s for %s:\n%s\n\t%s\n\t%s",
-                        face, blockState, e, e.getStackTrace()[0], e.getStackTrace()[1]));
-                break;
+                catch (Exception e)
+                {
+                    Journeymap.getLogger().error(String.format("Error getting EnumFacing.%s for %s:\n%s\n\t%s\n\t%s",
+                            face, blockState, e, e.getStackTrace()[0], e.getStackTrace()[1]));
+                    break;
+                }
             }
         }
 
-        if(Journeymap.getLogger().isDebugEnabled())
+        if (sprites.isEmpty())
         {
-            Journeymap.getLogger().debug("Using particle texture for block color in %s", blockState);
+            TextureAtlasSprite sprite = bms.getTexture(blockState);
+            if (!sprite.getIconName().startsWith("minecraft:"))
+            {
+                Journeymap.getLogger().warn(String.format("Falling back to particle texture for block color in %s", blockState));
+            }
+            sprites.put(sprite.getIconName(), sprite);
         }
-        return bms.getTexture(blockState);
+        return sprites.values();
     }
 
 
@@ -301,154 +443,46 @@ public enum ColorHelper
         }
     }
 
-    private boolean setBlockColor(BlockMD blockMD, BufferedImage textureImg, String pass)
+    private List<BufferedImage> getImages(BlockMD blockMD, Collection<TextureAtlasSprite> sprites)
     {
-        try
+        List<BufferedImage> images = new ArrayList<>(sprites.size());
+        for (TextureAtlasSprite icon : sprites)
         {
-            // Bail if the texture's not usable
-            if (textureImg == null || textureImg.getWidth() == 0)
-            {
-                Journeymap.getLogger().warn(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Null/empty texture for %s", blockMD));
-                return false;
-            }
-
-            // Get average rgba values from texture
-            float[] rgba = getAverageColor(blockMD, textureImg);
-            if (setBlockColor(blockMD, rgba, pass))
-            {
-                iconColorCache.put(blockMD.getIconName(), rgba);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch (Exception e)
-        {
-            logger.error(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Error for %s", blockMD));
-            logger.error(LogFormatter.toPartialString(e));
-            return false;
-        }
-    }
-
-    private boolean setBlockColor(BlockMD blockMD, float[] rgba, String pass)
-    {
-        try
-        {
-            if (rgba.length < 4)
-            {
-                Journeymap.getLogger().debug(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Couldn't derive RGBA from %s", blockMD));
-                return false;
-            }
-
-            // Set color
-            int color = RGB.toInteger(rgba);
-            float blockAlpha;
-
-            if (blockMD.hasTransparency())
-            {
-                // Use preset alpha
-                blockAlpha = blockMD.getAlpha();
-            }
-            else
-            {
-                blockAlpha = rgba[3];
-            }
-
-            blockMD.setColor(color);
-            blockMD.setAlpha(blockAlpha);
-
-            return true;
-        }
-        catch (Exception e)
-        {
-            logger.error(String.format("ColorHelper.setBlockColor(pass=" + pass + "): Error for %s", blockMD));
-            logger.error(LogFormatter.toPartialString(e));
-            return false;
-        }
-    }
-
-    private void setBlockColor(BlockMD blockMD, TextureAtlasSprite icon)
-    {
-        try
-        {
-            // No icon?
-            if (icon == null)
-            {
-                if (blockMD.getBlockState().getBlock() instanceof ITileEntityProvider)
-                {
-                    logger.debug("Ignoring TitleEntity without standard block texture: " + blockMD);
-                    blockMD.addFlags(BlockMD.Flag.TileEntity);
-                    setBlockColorToAir(blockMD);
-                }
-                else
-                {
-                    setBlockColorToError(blockMD);
-                }
-                return;
-            }
-
-            // Set icon name
             final String iconName = icon.getIconName();
-            blockMD.setIconName(iconName);
-
-            // Check for cached color
-            if (iconColorCache.containsKey(iconName))
+            try
             {
-                float[] rgba = iconColorCache.get(iconName);
-                if (setBlockColor(blockMD, rgba, "cache"))
+                ResourceLocation resourceLocation = new ResourceLocation(iconName);
+
+                // Missing texture? Skip
+                if (resourceLocation.equals(TextureMap.LOCATION_MISSING_TEXTURE))
                 {
-                    return;
+                    continue;
                 }
-                else
+
+                // Plan A: Get image from texture data
+                BufferedImage image = getImageFromFrameTextureData(icon);
+                if (image == null || image.getWidth() == 0)
                 {
-                    iconColorCache.remove(iconName);
+                    // Plan B: Get image from texture's source PNG
+                    image = getImageFromResourceLocation(icon);
                 }
-            }
+                if (image == null || image.getWidth() == 0)
+                {
+                    continue;
+                }
 
-            // Invisible?
-            if (blockMD.getBlockState().getRenderType() == EnumBlockRenderType.INVISIBLE)
+                images.add(image);
+            }
+            catch (Throwable e1)
             {
-                setBlockColorToAir(blockMD);
-                return;
+                if (logger.isDebugEnabled())
+                {
+                    logger.error("Error getting image for " + iconName + ": " + LogFormatter.toString(e1));
+                }
+                continue;
             }
-
-            // Air?
-            if (Material.AIR.equals(blockMD.getBlockState().getMaterial()))
-            {
-                setBlockColorToAir(blockMD);
-                return;
-            }
-
-            // Missing texture? Use material map color.
-            if (new ResourceLocation(iconName).equals(TextureMap.LOCATION_MISSING_TEXTURE))
-            {
-                setBlockColorToMaterial(blockMD);
-                return;
-            }
-
-            // Plan A: Get image from texture data
-            if (setBlockColor(blockMD, getImageFromFrameTextureData(icon), "frameTextureData"))
-            {
-                return;
-            }
-
-            // Plan B: Get image from texture's source PNG
-            if (setBlockColor(blockMD, getImageFromResourceLocation(icon), "resourceLocation"))
-            {
-                return;
-            }
-
-            // Plan C: Use Material's map color
-            logger.debug(String.format("ColorHelper.setBlockColor(): Texture unusable. Using MaterialMapColor instead for: %s", blockMD));
-            setBlockColorToMaterial(blockMD);
         }
-        catch (Throwable e1)
-        {
-            logger.debug("Error deriving color for " + blockMD + ": " + LogFormatter.toString(e1));
-            setBlockColorToMaterial(blockMD);
-        }
+        return images;
     }
 
     /**
@@ -458,14 +492,17 @@ public enum ColorHelper
     {
         try
         {
-            final int[] rgb = tas.getFrameTextureData(0)[0];
-            if (rgb.length > 0)
+            if (tas.getFrameCount() > 0)
             {
-                int width = tas.getIconWidth();
-                int height = tas.getIconHeight();
-                BufferedImage textureImg = new BufferedImage(width, height, 2);
-                textureImg.setRGB(0, 0, width, height, rgb, 0, width);
-                return textureImg;
+                final int[] rgb = tas.getFrameTextureData(0)[0];
+                if (rgb.length > 0)
+                {
+                    int width = tas.getIconWidth();
+                    int height = tas.getIconHeight();
+                    BufferedImage textureImg = new BufferedImage(width, height, 2);
+                    textureImg.setRGB(0, 0, width, height, rgb, 0, width);
+                    return textureImg;
+                }
             }
         }
         catch (Throwable t)
@@ -491,89 +528,5 @@ public enum ColorHelper
             Journeymap.getLogger().debug(String.format("ColorHelper.getColorForIcon(): Unable to use texture file for %s: %s", tas.getIconName(), t.getMessage()));
         }
         return null;
-    }
-
-    /**
-     * Average r/g/b/a values from BufferedImage
-     */
-    private float[] getAverageColor(BlockMD blockMD, BufferedImage textureImg)
-    {
-        int count = 0;
-        int argb, alpha;
-        int a = 0, r = 0, g = 0, b = 0;
-        int x = 0, y = 0;
-        int xStart, yStart, xStop, yStop;
-
-        xStart = yStart = 0;
-        xStop = textureImg.getWidth();
-        yStop = textureImg.getHeight();
-
-        // Average r/g/b/a
-        try
-        {
-            boolean unusable = true;
-
-            outer:
-            for (x = xStart; x < xStop; x++)
-            {
-                for (y = yStart; y < yStop; y++)
-                {
-                    try
-                    {
-                        argb = textureImg.getRGB(x, y);
-                    }
-                    catch (ArrayIndexOutOfBoundsException e)
-                    {
-                        logger.warn("Bad index at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
-                        continue; // Bugfix for some texturepacks that may not be reporting correct size?
-                    }
-                    catch (Throwable e)
-                    {
-                        logger.debug("Couldn't get RGB from BlocksTexture at " + x + "," + y + " for " + blockMD + ": " + e.getMessage());
-                        break outer;
-                    }
-                    alpha = (argb >> 24) & 0xFF;
-                    if (alpha > 0)
-                    {
-                        count++;
-                        a += alpha;
-                        r += (argb >> 16) & 0xFF;
-                        g += (argb >> 8) & 0xFF;
-                        b += (argb) & 0xFF;
-                    }
-                }
-            }
-
-            if (count > 0)
-            {
-                if (a > 0)
-                {
-                    a = a / count;
-                }
-                if (r > 0)
-                {
-                    r = r / count;
-                }
-                if (g > 0)
-                {
-                    g = g / count;
-                }
-                if (b > 0)
-                {
-                    b = b / count;
-                }
-                return RGB.floats(RGB.toInteger(r, g, b), a);
-            }
-            else
-            {
-                logger.debug("Texture was completely transparent for " + blockMD);
-            }
-        }
-        catch (Throwable t)
-        {
-            Journeymap.getLogger().error(String.format("ColorHelper.getAverageColor(): Error getting average color: %s", t.getMessage()));
-        }
-
-        return new float[0];
     }
 }
