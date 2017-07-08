@@ -4,7 +4,6 @@ import journeymap.client.data.DataCache;
 import journeymap.client.model.ChunkMD;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
@@ -67,21 +66,32 @@ public enum JmBlockAccess implements IBlockAccess
     @Override
     public Biome getBiome(final BlockPos pos)
     {
-        return getBiome(pos, Biomes.DEFAULT);
+        return getBiome(pos, Biomes.PLAINS);
     }
 
     @Nullable
     public Biome getBiome(final BlockPos pos, Biome defaultBiome)
     {
         ChunkMD chunkMD = getChunkMDFromBlockCoords(pos);
+
         if (chunkMD != null && chunkMD.hasChunk())
         {
-            return chunkMD.getWorld().getBiome(pos);
+            Biome biome = chunkMD.getBiome(pos);
+            if (biome != null)
+            {
+                return biome;
+            }
+            else
+            {
+                // Problem
+                biome = defaultBiome;
+            }
         }
 
-        if (Minecraft.getMinecraft().isSingleplayer())
+        // This should only happen when BlockInfoLayer has the mouse over an unloaded chunk.
+        if (FMLClientHandler.instance().getClient().isSingleplayer())
         {
-            MinecraftServer server = Minecraft.getMinecraft().getIntegratedServer();
+            MinecraftServer server = FMLClientHandler.instance().getClient().getIntegratedServer();
             if (server != null)
             {
                 return server.getEntityWorld().getBiomeProvider().getBiome(pos);
@@ -124,7 +134,7 @@ public enum JmBlockAccess implements IBlockAccess
     @Nullable
     private ChunkMD getChunkMDFromBlockCoords(BlockPos pos)
     {
-        return DataCache.INSTANCE.getChunkMD(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
+        return DataCache.INSTANCE.getChunkMD(new ChunkPos(pos));
     }
 
 }

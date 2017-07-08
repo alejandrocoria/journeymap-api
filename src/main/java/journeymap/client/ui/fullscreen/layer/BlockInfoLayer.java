@@ -6,7 +6,7 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -97,13 +97,12 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 BlockMD blockMD = chunkMD.getBlockMD(blockPos.up());
-                if (blockMD == null || blockMD.isAir())
+                if (blockMD == null || blockMD.isIgnore())
                 {
                     blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
 
                 Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
-                ;
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockPos.getX(),
@@ -111,14 +110,9 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                         blockPos.getY(),
                         (blockPos.getY() >> 4)) + " " + biome.getBiomeName();
 
-                if (!blockMD.isAir())
+                if (!blockMD.isIgnore())
                 {
                     info = blockMD.getName() + " @ " + info;
-
-//                    if (Journeymap.JM_VERSION.patch.equals("dev"))
-//                    {
-//                        info = RGB.toHexString(blockMD.getColor(chunkMD, blockPos)) + "  " + info;
-//                    }
                 }
             }
             else
@@ -133,6 +127,12 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                     }
                 }
             }
+
+//            if (Journeymap.JM_VERSION.patch.equals("dev"))
+//            {
+//                info = RGB.toHexString(BiomeColorHelper.getWaterColorAtPos(JmBlockAccess.INSTANCE, blockPos)) + " " + info;
+//                info += " " + new ChunkPos(blockPos);
+//            }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
             blockInfoStep.update(info, gridRenderer.getWidth() / 2, gridRenderer.getHeight() - infoHeight);

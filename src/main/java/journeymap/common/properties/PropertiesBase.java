@@ -37,70 +37,49 @@ import java.util.*;
 public abstract class PropertiesBase
 {
     /**
-     * The constant UTF8.
+     * Charset for GSON
      */
-// GSON charset
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
     /**
-     * The enum State.
+     * Properties State.
      */
-// State enum for debugging
     protected enum State
     {
-        /**
-         * New state.
-         */
-        New, /**
-     * Initialized state.
-     */
-    Initialized, /**
-     * First loaded state.
-     */
-    FirstLoaded, /**
-     * File loaded state.
-     */
-    FileLoaded, /**
-     * Valid state.
-     */
-    Valid, /**
-     * Invalid state.
-     */
-    Invalid, /**
-     * Saved ok state.
-     */
-    SavedOk, /**
-     * Saved error state.
-     */
-    SavedError
+        New,
+        Initialized,
+        FirstLoaded,
+        FileLoaded,
+        Valid,
+        Invalid,
+        SavedOk,
+        SavedError
     }
 
     /**
-     * The Config version.
+     * Version used to create config.
      */
-// Version used to create config
     protected Version configVersion = null;
 
     /**
-     * The Categories.
+     * Set of all Categories used in fields
      */
-// Set of all Categories used in fields
     protected CategorySet categories = new CategorySet();
 
     /**
-     * The Source file.
+     * Current file reference
      */
-// Current file reference
     protected transient File sourceFile = null;
 
-    // Reflection-generated map of all ConfigFields
-    private transient Map<String, ConfigField<?>> configFields;
+    /**
+     * Current state, just used for debugging.
+     */
+    protected transient State currentState;
 
     /**
-     * The Current state.
+     * Reflection-generated map of all ConfigFields
      */
-// Current state, just used for debugging.
-    protected transient State currentState;
+    private transient Map<String, ConfigField<?>> configFields;
 
     /**
      * Default constructor.

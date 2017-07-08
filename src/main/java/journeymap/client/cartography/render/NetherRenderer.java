@@ -7,7 +7,8 @@ package journeymap.client.cartography.render;
 
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
+import journeymap.client.model.BlockFlag;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapType;
@@ -75,9 +76,9 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
                     break;
                 }
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMDAbove.isIgnore() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockFlag.OpenToSky))
                 {
-                    if (!blockMD.isAir() && !blockMD.hasTransparency() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMD.isIgnore() && !blockMD.hasTransparency() && !blockMD.hasFlag(BlockFlag.OpenToSky))
                     {
                         break;
                     }

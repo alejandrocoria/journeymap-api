@@ -6,8 +6,8 @@
 package journeymap.client.service;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
-import journeymap.client.cartography.ColorPalette;
+import journeymap.client.cartography.color.ColorManager;
+import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
@@ -149,7 +149,7 @@ public class FileService extends BaseService
             // Handle colorpalette reques
             if (path.startsWith(COLOR_PALETTE_JSON))
             {
-                ColorPalette colorPalette = ColorManager.instance().getCurrentPalette();
+                ColorPalette colorPalette = ColorManager.INSTANCE.getCurrentPalette();
                 if (colorPalette != null)
                 {
                     File jsonFile = colorPalette.getOrigin();
@@ -162,7 +162,7 @@ public class FileService extends BaseService
             }
             else if (path.startsWith(COLOR_PALETTE_HTML))
             {
-                ColorPalette colorPalette = ColorManager.instance().getCurrentPalette();
+                ColorPalette colorPalette = ColorManager.INSTANCE.getCurrentPalette();
                 if (colorPalette != null)
                 {
                     File htmlFile = colorPalette.getOriginHtml(true, false);

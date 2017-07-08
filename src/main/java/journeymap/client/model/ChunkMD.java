@@ -12,10 +12,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraftforge.fml.client.FMLClientHandler;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class ChunkMD
         // https://github.com/OpenMods/OpenBlocks/blob/master/src/main/java/openblocks/common/item/ItemSlimalyzer.java#L44
         properties.put(PROP_IS_SLIME_CHUNK, chunk.getRandomWithSeed(987234911L).nextInt(10) == 0);
 
-        this.chunkReference = new WeakReference<Chunk>(chunk);
+        this.chunkReference = new WeakReference<>(chunk);
         if (forceRetain)
         {
             retainedChunk = chunk;
@@ -123,6 +124,34 @@ public class ChunkMD
     }
 
     /**
+     * Gets Biome, returns null if not provided
+     *
+     * @return null if not provided
+     */
+    @Nullable
+    public Biome getBiome(BlockPos pos)
+    {
+        Chunk chunk = getChunk();
+        byte[] blockBiomeArray = chunk.getBiomeArray();
+        int i = pos.getX() & 15;
+        int j = pos.getZ() & 15;
+        int k = blockBiomeArray[j << 4 | i] & 255;
+
+        if (k == 255)
+        {
+            Biome biome = chunk.getWorld().getBiomeProvider().getBiome(pos, null);
+            if (biome == null)
+            {
+                return null;
+            }
+            k = Biome.getIdForBiome(biome);
+            blockBiomeArray[j << 4 | i] = (byte) (k & 255);
+        }
+
+        return Biome.getBiome(k);
+    }
+
+    /**
      * Added to do a safety check on the world height value
      *
      * @param localX the local x
@@ -144,38 +173,16 @@ public class ChunkMD
     }
 
     /**
-     * Get the top block ignoring transparent roof blocks, air. etc.
+     * Return a BlockMD at the position using chunk-local x and z
      *
      * @param localX the local x
-     * @param y      the y
+     * @param y  the y
      * @param localZ the local z
      * @return the top block md
      */
-    public final BlockMD getTopBlockMD(final int localX, int y, final int localZ)
+    public final BlockMD getBlockMD(final int localX, int y, final int localZ)
     {
-        BlockMD topBlockMd = null;
-
-        do
-        {
-            topBlockMd = BlockMD.getBlockMD(this, getBlockPos(localX, y, localZ));
-
-            // Null check
-            if (topBlockMd == null)
-            {
-                break;
-            }
-
-            if (topBlockMd.isTransparentRoof() || topBlockMd.isAir() || topBlockMd.getAlpha() == 0)
-            {
-                y--;
-            }
-            else
-            {
-                break;
-            }
-        } while (y >= 0);
-
-        return topBlockMd;
+        return BlockMD.getBlockMD(this, getBlockPos(localX, y, localZ));
     }
 
     /**
@@ -203,7 +210,7 @@ public class ChunkMD
                 {
                     y--;
                 }
-                else if (blockMD.isAir() || blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                else if (blockMD.isIgnore() || blockMD.hasFlag(BlockFlag.OpenToSky))
                 {
                     y--;
                 }
@@ -233,7 +240,8 @@ public class ChunkMD
     public boolean hasChunk()
     {
         Chunk chunk = chunkReference.get();
-        return chunk != null && !(chunk instanceof EmptyChunk) && chunk.isLoaded();
+        boolean result = (chunk != null && !(chunk instanceof EmptyChunk) && chunk.isLoaded());
+        return result;
     }
 
     /**
@@ -373,7 +381,8 @@ public class ChunkMD
      */
     public World getWorld()
     {
-        return FMLClientHandler.instance().getClient().world;
+        return getChunk().getWorld();
+        //return FMLClientHandler.instance().getClient().world;
     }
 
     /**
@@ -392,7 +401,7 @@ public class ChunkMD
      *
      * @return the has no sky
      */
-    public Boolean getHasNoSky()
+    public Boolean hasNoSky()
     {
         return getWorld().provider.hasNoSky();
     }
@@ -611,6 +620,11 @@ public class ChunkMD
     public void stopChunkRetention()
     {
         this.retainedChunk = null;
+    }
+
+    public boolean hasRetainedChunk()
+    {
+        return this.retainedChunk!=null;
     }
 
     @Override

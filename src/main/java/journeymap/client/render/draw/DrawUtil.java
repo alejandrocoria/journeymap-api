@@ -7,7 +7,7 @@ package journeymap.client.render.draw;
 
 
 import journeymap.client.api.model.ShapeProperties;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.render.texture.TextureImpl;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;

@@ -7,7 +7,7 @@ package journeymap.client.ui.component;
 
 
 import journeymap.client.api.impl.ClientAPI;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;

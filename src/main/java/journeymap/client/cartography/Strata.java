@@ -5,10 +5,12 @@
 
 package journeymap.client.cartography;
 
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Stack;
 
@@ -33,10 +35,10 @@ public class Strata
     private boolean mapCaveLighting = Journeymap.getClient().getCoreProperties().mapCaveLighting.get();
     private Integer topY = null;
     private Integer bottomY = null;
-    private Integer topWaterY = null;
-    private Integer bottomWaterY = null;
+    private Integer topFluidY = null;
+    private Integer bottomFluidY = null;
     private Integer maxLightLevel = null;
-    private Integer waterColor = null;
+    private Integer fluidColor = null;
     private Integer renderDayColor = null;
     private Integer renderNightColor = null;
     private Integer renderCaveColor = null;
@@ -90,10 +92,10 @@ public class Strata
     {
         setTopY(null);
         setBottomY(null);
-        setTopWaterY(null);
-        setBottomWaterY(null);
+        setTopFluidY(null);
+        setBottomFluidY(null);
         setMaxLightLevel(null);
-        setWaterColor(null);
+        setFluidColor(null);
         setRenderDayColor(null);
         setRenderNightColor(null);
         setRenderCaveColor(null);
@@ -168,14 +170,15 @@ public class Strata
             setLightAttenuation(getLightAttenuation() + stratum.getLightOpacity());
             setBlocksFound(true);
 
-            // Update Strata's water data
-            if (blockMD.isWater())
+            // Update Strata's fluid data
+            if (blockMD.isWater() || blockMD.isFluid())
             {
-                setTopWaterY((getTopWaterY() == null) ? y : Math.max(getTopWaterY(), y));
-                setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
-                if (getWaterColor() == null)
+                setTopFluidY((getTopFluidY() == null) ? y : Math.max(getTopFluidY(), y));
+                setBottomFluidY((getBottomFluidY() == null) ? y : Math.min(getBottomFluidY(), y));
+                if (getFluidColor() == null)
                 {
-                    setWaterColor(blockMD.getColor(chunkMd, chunkMd.getBlockPos(localX, y, localZ)));
+                    BlockPos blockPos = chunkMd.getBlockPos(localX, y, localZ);
+                    setFluidColor(blockMD.getBlockColor(chunkMd, blockPos));
                 }
             }
 
@@ -196,10 +199,10 @@ public class Strata
      * Next up stratum.
      *
      * @param renderer          the renderer
-     * @param ignoreMiddleWater the ignore middle water
+     * @param ignoreMiddleFluid the ignore middle fluid
      * @return the stratum
      */
-    public Stratum nextUp(IChunkRenderer renderer, boolean ignoreMiddleWater)
+    public Stratum nextUp(IChunkRenderer renderer, boolean ignoreMiddleFluid)
     {
         Stratum stratum = null;
         try
@@ -212,14 +215,14 @@ public class Strata
 
             setLightAttenuation(Math.max(0, getLightAttenuation() - stratum.getLightOpacity()));
 
-            // Skip middle water blocks
-            if (ignoreMiddleWater && stratum.isWater() && isWaterAbove(stratum) && !stack.isEmpty())
+            // Skip middle fluid blocks
+            if (ignoreMiddleFluid && stratum.isFluid() && isFluidAbove(stratum) && !stack.isEmpty())
             {
                 release(stratum);
                 return nextUp(renderer, true);
             }
 
-            renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
+            renderer.setStratumColors(stratum, getLightAttenuation(), getFluidColor(), isFluidAbove(stratum), isUnderground(), isMapCaveLighting());
             return stratum;
         }
         catch (RuntimeException t)
@@ -249,24 +252,24 @@ public class Strata
     }
 
     /**
-     * Has water boolean.
+     * Has fluid boolean.
      *
      * @return the boolean
      */
-    boolean hasWater()
+    boolean hasFluid()
     {
-        return getTopWaterY() != null;
+        return getTopFluidY() != null;
     }
 
     /**
-     * Is water above boolean.
+     * Is fluid above.
      *
      * @param stratum the stratum
      * @return the boolean
      */
-    boolean isWaterAbove(Stratum stratum)
+    boolean isFluidAbove(Stratum stratum)
     {
-        return getTopWaterY() != null && getTopWaterY() > stratum.getY();
+        return getTopFluidY() != null && getTopFluidY() > stratum.getY();
     }
 
     @Override
@@ -281,10 +284,10 @@ public class Strata
                 ", stack=" + stack.size() +
                 ", topY=" + getTopY() +
                 ", bottomY=" + getBottomY() +
-                ", topWaterY=" + getTopWaterY() +
-                ", bottomWaterY=" + getBottomWaterY() +
+                ", topFluidY=" + getTopFluidY() +
+                ", bottomFluidY=" + getBottomFluidY() +
                 ", maxLightLevel=" + getMaxLightLevel() +
-                ", waterColor=" + RGB.toString(getWaterColor()) +
+                ", fluidColor=" + RGB.toString(getFluidColor()) +
                 ", renderDayColor=" + RGB.toString(getRenderDayColor()) +
                 ", renderNightColor=" + RGB.toString(getRenderNightColor()) +
                 ", lightAttenuation=" + getLightAttenuation() +
@@ -352,43 +355,43 @@ public class Strata
     }
 
     /**
-     * Gets top water y.
+     * Gets top fluid y.
      *
-     * @return the top water y
+     * @return the top fluid y
      */
-    public Integer getTopWaterY()
+    public Integer getTopFluidY()
     {
-        return topWaterY;
+        return topFluidY;
     }
 
     /**
-     * Sets top water y.
+     * Sets top fluid y.
      *
-     * @param topWaterY the top water y
+     * @param topFluidY the top fluid y
      */
-    public void setTopWaterY(Integer topWaterY)
+    public void setTopFluidY(Integer topFluidY)
     {
-        this.topWaterY = topWaterY;
+        this.topFluidY = topFluidY;
     }
 
     /**
-     * Gets bottom water y.
+     * Gets bottom fluid y.
      *
-     * @return the bottom water y
+     * @return the bottom fluid y
      */
-    public Integer getBottomWaterY()
+    public Integer getBottomFluidY()
     {
-        return bottomWaterY;
+        return bottomFluidY;
     }
 
     /**
-     * Sets bottom water y.
+     * Sets bottom fluid y.
      *
-     * @param bottomWaterY the bottom water y
+     * @param bottomFluidY the bottom fluid y
      */
-    public void setBottomWaterY(Integer bottomWaterY)
+    public void setBottomFluidY(Integer bottomFluidY)
     {
-        this.bottomWaterY = bottomWaterY;
+        this.bottomFluidY = bottomFluidY;
     }
 
     /**
@@ -412,23 +415,23 @@ public class Strata
     }
 
     /**
-     * Gets water color.
+     * Gets fluid color.
      *
-     * @return the water color
+     * @return the fluid color
      */
-    public Integer getWaterColor()
+    public Integer getFluidColor()
     {
-        return waterColor;
+        return fluidColor;
     }
 
     /**
-     * Sets water color.
+     * Sets fluid color.
      *
-     * @param waterColor the water color
+     * @param fluidColor the fluid color
      */
-    public void setWaterColor(Integer waterColor)
+    public void setFluidColor(Integer fluidColor)
     {
-        this.waterColor = waterColor;
+        this.fluidColor = fluidColor;
     }
 
     /**

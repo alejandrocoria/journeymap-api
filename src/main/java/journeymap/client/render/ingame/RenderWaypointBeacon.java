@@ -6,7 +6,7 @@
 package journeymap.client.render.ingame;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;

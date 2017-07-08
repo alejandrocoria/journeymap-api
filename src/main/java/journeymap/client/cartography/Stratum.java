@@ -29,7 +29,7 @@ public class Stratum
     private int localZ;
     private int lightLevel;
     private int lightOpacity;
-    private boolean isWater;
+    private boolean isFluid;
     private Integer dayColor;
     private Integer nightColor;
     private Integer caveColor;
@@ -69,7 +69,7 @@ public class Stratum
             this.setX(localX);
             this.setY(y);
             this.setZ(localZ);
-            this.setWater(blockMD.isWater());
+            this.setFluid(blockMD.isFluid() || blockMD.isFluid());
             if (blockMD.isLava())
             {
                 this.setLightLevel(14);
@@ -141,7 +141,7 @@ public class Stratum
                             ", lightLevel=" + getLightLevel() +
                             ", worldAmbientLight=" + getWorldAmbientLight() +
                             ", lightOpacity=" + getLightOpacity() +
-                            ", isWater=" + isWater() +
+                            ", isFluid=" + isFluid() +
                             ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
                             ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
                             ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())));
@@ -173,7 +173,7 @@ public class Stratum
         if (chunkMd != null)
         {
             this.worldAmbientLight = chunkMd.getWorld().getSunBrightness(1f) * 15;
-            this.worldHasNoSky = chunkMd.getHasNoSky();
+            this.worldHasNoSky = chunkMd.hasNoSky();
         }
         else
         {
@@ -189,6 +189,10 @@ public class Stratum
      */
     public BlockMD getBlockMD()
     {
+        if (blockMD.isFluid())
+        {
+            int xx = 0;
+        }
         return blockMD;
     }
 
@@ -323,23 +327,23 @@ public class Stratum
     }
 
     /**
-     * Is water boolean.
+     * Is fluid boolean.
      *
      * @return the boolean
      */
-    public boolean isWater()
+    public boolean isFluid()
     {
-        return isWater;
+        return isFluid;
     }
 
     /**
-     * Sets water.
+     * Sets isFluid.
      *
-     * @param isWater the is water
+     * @param isFluid isFluid
      */
-    public void setWater(boolean isWater)
+    public void setFluid(boolean isFluid)
     {
-        this.isWater = isWater;
+        this.isFluid = isFluid;
     }
 
     /**
@@ -435,7 +439,7 @@ public class Stratum
         this.setX(0);
         this.setY(-1);
         this.setZ(0);
-        this.setWater(false);
+        this.setFluid(false);
         this.setLightLevel(-1);
         this.setLightOpacity(-1);
         setDayColor(null);

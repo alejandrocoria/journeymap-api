@@ -4,7 +4,7 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 ## Requirements
 
-* Java 1.7 JDK
+* Java 1.8 JDK
 * IntelliJ IDEA
 
 ## Environment Setup

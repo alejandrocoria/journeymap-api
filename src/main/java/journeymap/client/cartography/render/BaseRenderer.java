@@ -7,8 +7,8 @@ package journeymap.client.cartography.render;
 
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
@@ -38,10 +38,7 @@ public abstract class BaseRenderer implements IChunkRenderer
      * The constant COLOR_BLACK.
      */
     public static final int COLOR_BLACK = Color.black.getRGB();
-    /**
-     * The constant COLOR_VOID.
-     */
-    public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
+
     /**
      * The constant badBlockCount.
      */
@@ -51,6 +48,7 @@ public abstract class BaseRenderer implements IChunkRenderer
      * The constant DEFAULT_FOG.
      */
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
+
     /**
      * The Data cache.
      */
@@ -76,18 +74,6 @@ public abstract class BaseRenderer implements IChunkRenderer
      * The Map antialiasing.
      */
     protected boolean mapAntialiasing;
-    /**
-     * The Map crops.
-     */
-    protected boolean mapCrops;
-    /**
-     * The Map plants.
-     */
-    protected boolean mapPlants;
-    /**
-     * The Map plant shadows.
-     */
-    protected boolean mapPlantShadows;
     /**
      * The Ambient color.
      */
@@ -157,10 +143,6 @@ public abstract class BaseRenderer implements IChunkRenderer
      */
     protected float tweakWaterColorBlend; // Range 0-1
     /**
-     * The Tweak darken water color multiplier.
-     */
-    protected int tweakDarkenWaterColorMultiplier; // Range: int rg
-    /**
      * The Tweak surface ambient color.
      */
     protected int tweakSurfaceAmbientColor; // Range: int rgb
@@ -203,8 +185,7 @@ public abstract class BaseRenderer implements IChunkRenderer
         this.tweakBrightenLightsourceBlock = 1.2f;
         this.tweakBlendShallowWater = .15f;
         this.tweakMinimumDarkenNightWater = .25f;
-        this.tweakWaterColorBlend = .66f;
-        this.tweakDarkenWaterColorMultiplier = 0x7A90BF;
+        this.tweakWaterColorBlend = .50f;
         this.tweakSurfaceAmbientColor = 0x00001A;
         this.tweakCaveAmbientColor = 0x000000;
         this.tweakNetherAmbientColor = 0x330808;
@@ -244,9 +225,6 @@ public abstract class BaseRenderer implements IChunkRenderer
             mapTransparency = coreProperties.mapTransparency.get();
             mapAntialiasing = coreProperties.mapAntialiasing.get();
             mapCaveLighting = coreProperties.mapCaveLighting.get();
-            mapPlants = coreProperties.mapPlants.get();
-            mapPlantShadows = coreProperties.mapPlantShadows.get();
-            mapCrops = coreProperties.mapCrops.get();
 
             // Subclasses should override
             this.ambientColor = new float[]{0, 0, 0};
@@ -296,16 +274,7 @@ public abstract class BaseRenderer implements IChunkRenderer
             nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
         }
 
-        int basicColor;
-        if (stratum.isWater())
-        {
-            basicColor = waterColor;
-        }
-        else
-        {
-            ChunkMD chunkMD = stratum.getChunkMd();
-            basicColor = stratum.getBlockMD().getColor(chunkMD, stratum.getBlockPos());
-        }
+        int basicColor = stratum.getBlockMD().getBlockColor(stratum.getChunkMd(), stratum.getBlockPos());
 
         Block block = stratum.getBlockMD().getBlockState().getBlock();
         if (block == Blocks.GLOWSTONE || block == Blocks.LIT_REDSTONE_LAMP)
@@ -316,7 +285,8 @@ public abstract class BaseRenderer implements IChunkRenderer
         if ((waterAbove) && waterColor != null)
         {
             // Blend day color with watercolor above, adjustBrightness for daylight filtered down
-            int adjustedWaterColor = RGB.multiply(waterColor, tweakDarkenWaterColorMultiplier);
+            // int adjustedWaterColor = RGB.multiply(waterColor, tweakDarkenWaterColorMultiplier);
+            int adjustedWaterColor = waterColor;
             int adjustedBasicColor = RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff));
             stratum.setDayColor(RGB.blendWith(adjustedBasicColor, adjustedWaterColor, tweakWaterColorBlend));
 
@@ -567,13 +537,12 @@ public abstract class BaseRenderer implements IChunkRenderer
      * Gets slope.
      *
      * @param chunkMd the chunk md
-     * @param blockMD the block md
      * @param x       the x
      * @param vSlice  the v slice
      * @param z       the z
      * @return the slope
      */
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z)
+    protected float getSlope(final ChunkMD chunkMd, int x, Integer vSlice, int z)
     {
         Float[][] slopes = getSlopes(chunkMd, vSlice);
 
@@ -681,7 +650,7 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the integer [ ] [ ]
      */
-    protected final Integer[][] getWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    protected final Integer[][] getFluidHeights(ChunkMD chunkMd, Integer vSlice)
     {
         return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
@@ -719,7 +688,7 @@ public abstract class BaseRenderer implements IChunkRenderer
 //        if(ignoreNoShadowBlocks)
 //        {
 //            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
+//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isIgnore() || (ignoreWater && (blockMD.isFluid())))
 //            {
 //                y--;
 //                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
@@ -804,11 +773,11 @@ public abstract class BaseRenderer implements IChunkRenderer
      */
     public void paintVoidBlock(BufferedImage image, final int x, final int z)
     {
-        paintBlock(image, x, z, COLOR_VOID);
+        paintBlock(image, x, z, RGB.toInteger(getAmbientColor()));
     }
 
     /**
-     * Paint the void.
+     * I see a red door and I want to paint it black.
      *
      * @param image the image
      * @param x     the x
@@ -820,7 +789,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     }
 
     /**
-     * It's a problem
+     * It's a problem.  This is really just here for debugging.
      *
      * @param image the image
      * @param x     the x
@@ -830,7 +799,7 @@ public abstract class BaseRenderer implements IChunkRenderer
     public void paintBadBlock(BufferedImage image, final int x, final int y, final int z)
     {
         long count = badBlockCount.incrementAndGet();
-        if (count == 1 || count % 10240 == 0)
+        if (count == 1 || count % 2046 == 0)
         {
             Journeymap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count

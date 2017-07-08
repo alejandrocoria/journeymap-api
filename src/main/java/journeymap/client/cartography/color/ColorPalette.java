@@ -3,15 +3,11 @@
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
-package journeymap.client.cartography;
+package journeymap.client.cartography.color;
 
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Table;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
@@ -20,17 +16,23 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
-import org.apache.logging.log4j.core.helpers.Strings;
+import net.minecraftforge.fml.common.registry.GameData;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * Provides serialization of cache colors to/from file.
@@ -69,11 +71,15 @@ public class ColorPalette
     /**
      * The constant VERSION.
      */
-    public static final double VERSION = 5.3;
-    /**
-     * The constant GSON.
-     */
-    public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
+    public static final double VERSION = 5.49;
+
+    private static final Logger logger = Journeymap.getLogger();
+
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(HashBasedTable.class, new Serializer())
+            .registerTypeAdapter(HashBasedTable.class, new Deserializer())
+            //.setPrettyPrinting()
+            .create();
 
     /**
      * The Version.
@@ -120,16 +126,25 @@ public class ColorPalette
     /**
      * The Block colors.
      */
-    @Since(5.2)
-    ArrayList<BlockColor> blockColors = new ArrayList<BlockColor>(0);
+    @Since(5.49)
+    HashBasedTable<String, String, BlockStateColor> table;
 
+    /**
+     * Source file
+     */
     private transient File origin;
+
+    /**
+     * Whether changes have occurred but have not been persisted.
+     */
+    private transient boolean dirty;
 
     /**
      * Default constructor for GSON.
      */
     ColorPalette()
     {
+        table = HashBasedTable.create(GameData.getBlockStateIDMap().size(), 16);
     }
 
     /**
@@ -150,8 +165,7 @@ public class ColorPalette
         lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
         lines.add(Constants.getString("jm.config.file_header_5", HELP_PAGE));
         this.description = lines.toArray(new String[4]);
-
-        this.blockColors = deriveBlockColors();
+        table = HashBasedTable.create(GameData.getBlockStateIDMap().size(), 16);
     }
 
     /**
@@ -172,7 +186,7 @@ public class ColorPalette
             {
                 if (palette.version < VERSION)
                 {
-                    Journeymap.getLogger().warn(String.format("Existing world color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
+                    logger.warn(String.format("Existing world color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
                 }
                 else
                 {
@@ -187,7 +201,7 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
             if (palette != null && palette.version != VERSION)
             {
-                Journeymap.getLogger().warn(String.format("Existing color palette is unusable. Required version: %s.  Found version: %s", VERSION, palette.version));
+                logger.warn(String.format("Existing color palette is unusable. Required version: %s.  Found version: %s", VERSION, palette.version));
                 standardPaletteFile.renameTo(new File(standardPaletteFile.getParentFile(), standardPaletteFile.getName() + ".v" + palette.version));
                 palette = null;
             }
@@ -196,7 +210,7 @@ public class ColorPalette
             {
                 if (palette.isPermanent())
                 {
-                    Journeymap.getLogger().info("Existing color palette is set to be permanent.");
+                    logger.info("Existing color palette is set to be permanent.");
                     return palette;
                 }
 
@@ -204,19 +218,19 @@ public class ColorPalette
                 {
                     if (modNames.equals(palette.modNames))
                     {
-                        Journeymap.getLogger().info("Existing color palette's resource packs and mod names match current loadout.");
+                        logger.debug("Existing color palette's resource packs and mod names match current loadout.");
                         return palette;
                     }
                     else
                     {
-                        Journeymap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
-                        Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
+                        logger.warn("Existing color palette's mods no longer match current loadout.");
+                        logger.info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
                     }
                 }
                 else
                 {
-                    Journeymap.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
-                    Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
+                    logger.warn("Existing color palette's resource packs no longer match current loadout.");
+                    logger.info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
                 }
             }
         }
@@ -245,12 +259,12 @@ public class ColorPalette
             palette.setPermanent(permanent);
             palette.writeToFile(standard);
             long elapsed = System.currentTimeMillis() - start;
-            Journeymap.getLogger().info(String.format("Color palette file generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            logger.info(String.format("Color palette file generated for %d blockstates in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
             return palette;
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
+            logger.error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
         }
         return null;
     }
@@ -303,7 +317,7 @@ public class ColorPalette
             }
             catch (Exception e2)
             {
-                Journeymap.getLogger().error("Couldn't rename bad palette file: " + e2);
+                logger.error("Couldn't rename bad palette file: " + e2);
             }
             return null;
         }
@@ -319,74 +333,102 @@ public class ColorPalette
     }
 
     /**
-     * Generate a list of BlockColors and their nested variants.
+     * Whether BlockStateColor is in the palette for the BlockMD.
+     * @return true if exists.
      */
-    private ArrayList<BlockColor> deriveBlockColors()
+    boolean hasBlockStateColor(final BlockMD blockMD)
     {
-        Table<Block, Integer, BlockMD> blockColorTable = HashBasedTable.create(512, 16);
+        BlockMD canonical = blockMD.getCanonicalState();
+        return table.contains(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical));
+    }
 
-        // Use table to sort/organize by Block, then color
-        for (BlockMD blockMD : BlockMD.getAll())
+
+    /**
+     * Get the BlockStateColor from the palette, create one if missing.
+     *
+     * @param blockMD         block
+     * @param createIfMissing true to create
+     * @return null if not created, including if no color was derived during creation attempt
+     */
+    @Nullable
+    private BlockStateColor getBlockStateColor(final BlockMD blockMD, boolean createIfMissing)
+    {
+        BlockMD canonical = blockMD.getCanonicalState();
+
+        BlockStateColor blockStateColor = table.get(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical));
+
+        if (blockStateColor == null && createIfMissing)
         {
-            if (blockMD.isAir())
+            if (canonical.hasColor())
             {
-                continue;
-            }
-
-            if (blockMD.hasFlag(BlockMD.Flag.Error))
-            {
-                Journeymap.getLogger().debug("Block with Error flag won't be saved to color palette: " + blockMD);
-                continue;
-            }
-
-            if (Strings.isEmpty(blockMD.getUid()))
-            {
-                Journeymap.getLogger().debug("Block without uid won't be saved to color palette: " + blockMD);
-                continue;
-            }
-
-            Integer color = blockMD.getColor();
-            if (color == null)
-            {
-                Journeymap.getLogger().debug("Block without color won't be saved to color palette: " + blockMD);
-                continue;
-            }
-
-            Block block = blockMD.getBlock();
-            if (block == null)
-            {
-                Journeymap.getLogger().debug("Bad block won't be saved to color palette: " + blockMD);
-                continue;
-            }
-
-            blockColorTable.put(blockMD.getBlock(), color, blockMD);
-        }
-
-        // Build a list of BlockColor objects with variants nested by color
-        ArrayList<BlockColor> list = new ArrayList<BlockColor>(512);
-        for (Block block : blockColorTable.rowKeySet())
-        {
-            BlockColor blockColors = null;
-            for (Map.Entry<Integer, BlockMD> entry : blockColorTable.row(block).entrySet())
-            {
-                if (blockColors == null)
-                {
-                    blockColors = new BlockColor(entry.getValue(), entry.getKey());
-                    list.add(blockColors);
-                }
-                else
-                {
-                    blockColors.addVariant(entry.getValue(), entry.getKey());
-                }
-            }
-            if (blockColors != null)
-            {
-                blockColors.sort();
+                blockStateColor = new BlockStateColor(canonical);
+                table.put(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical), blockStateColor);
+                dirty = true;
             }
         }
+        return blockStateColor;
+    }
 
-        Collections.sort(list);
-        return list;
+
+    /**
+     * Update BlockMD colors from the palette
+     *
+     * @param blockMD
+     * @return true if color applied.
+     */
+    public boolean applyColor(BlockMD blockMD, boolean createIfMissing)
+    {
+        boolean preExisting = hasBlockStateColor(blockMD);
+        BlockStateColor blockStateColor = getBlockStateColor(blockMD, createIfMissing);
+        if (blockStateColor == null)
+        {
+            return false;
+        }
+        else if (preExisting)
+        {
+            if (blockMD.hasTransparency())
+            {
+                blockMD.setAlpha((blockStateColor.alpha != null) ? blockStateColor.alpha : 1f);
+            }
+            int color = RGB.hexToInt(blockStateColor.color);
+            blockMD.setColor(color);
+        }
+        return true;
+    }
+
+    /**
+     * Update BlockMD colors from the palette
+     *
+     * @param blockMDs
+     */
+    public int applyColors(Collection<BlockMD> blockMDs, boolean createIfMissing)
+    {
+        int hit = 0;
+        int miss = 0;
+
+        for (BlockMD blockMD : blockMDs)
+        {
+            if (applyColor(blockMD, createIfMissing))
+            {
+                hit++;
+            }
+            else
+            {
+                miss++;
+            }
+        }
+
+        if (miss> 0)
+        {
+            logger.debug(miss + " blockstates didn't have a color in the palette");
+        }
+
+        return hit;
+    }
+
+    public void writeToFile()
+    {
+        writeToFile(isStandard());
     }
 
     /**
@@ -401,6 +443,7 @@ public class ColorPalette
             palleteFile = standard ? getStandardPaletteFile() : getWorldPaletteFile();
             Files.write(VARIABLE + GSON.toJson(this), palleteFile, UTF8);
             this.origin = palleteFile;
+            this.dirty = false;
 
             // Write HTML
             getOriginHtml(true, true);
@@ -408,21 +451,11 @@ public class ColorPalette
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't save color palette file %s: %s", palleteFile, LogFormatter.toString(e)));
+            logger.error(String.format("Can't save color palette file %s: %s", palleteFile, LogFormatter.toString(e)));
             return false;
         }
     }
 
-    /**
-     * Update BlockMD colors from the current list of blockColors
-     */
-    void updateColors()
-    {
-        for (BlockColor blockColor : blockColors)
-        {
-            blockColor.inflate().updateBlockMD();
-        }
-    }
 
     /**
      * Get the file this instance came from.
@@ -472,7 +505,7 @@ public class ColorPalette
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Can't get colorpalette.html: " + t);
+            logger.error("Can't write colorpalette.html: " + t);
         }
         return null;
     }
@@ -508,18 +541,28 @@ public class ColorPalette
     }
 
     /**
+     * Palette version
+     *
+     * @return version
+     */
+    public double getVersion()
+    {
+        return version;
+    }
+
+    public boolean isDirty()
+    {
+        return dirty;
+    }
+
+    /**
      * Size int.
      *
      * @return the int
      */
     public int size()
     {
-        int size = 0;
-        for (BlockColor blockColor : blockColors)
-        {
-            size += blockColor.size();
-        }
-        return size;
+        return table.size();
     }
 
     @Override
@@ -529,254 +572,92 @@ public class ColorPalette
     }
 
     /**
-     * The type Block color.
+     * Custom serializer for the palette file.
      */
-    class BlockColor implements Comparable<BlockColor>
+    private static class Serializer implements JsonSerializer<HashBasedTable<String, String, BlockStateColor>>
     {
-        /**
-         * The Uid.
-         */
-        @Since(5.2)
-        String uid;
-
-        /**
-         * The Name.
-         */
-        @Since(5.2)
-        String name;
-
-        /**
-         * The Color.
-         */
-        @Since(5.2)
-        String color;
-
-        /**
-         * The Alpha.
-         */
-        @Since(5.2)
-        Float alpha;
-
-        /**
-         * The Meta.
-         */
-        @Since(5.2)
-        Integer meta;
-
-        /**
-         * The Variants.
-         */
-        @Since(5.2)
-        ArrayList<BlockColor> variants;
-
-        /**
-         * Instantiates a new Block color.
-         */
-        BlockColor()
-        {
-        }
-
-        /**
-         * Instantiates a new Block color.
-         *
-         * @param blockMD the block md
-         * @param color   the color
-         */
-        BlockColor(BlockMD blockMD, Integer color)
-        {
-            this.uid = blockMD.getUid();
-            this.name = blockMD.getName();
-            this.color = RGB.toHexString(color);
-            this.alpha = blockMD.getAlpha();
-            this.meta = blockMD.getMeta();
-        }
-
-        /**
-         * Add a variant of this BlockColor, ideally with as few deltas as possible.
-         *
-         * @param blockMD the block md
-         * @param color   the color
-         */
-        void addVariant(BlockMD blockMD, Integer color)
-        {
-            if (variants==null)
-            {
-                variants = new ArrayList<BlockColor>();
-            }
-
-            BlockColor variant = new BlockColor(blockMD, color);
-            deflate(variant);
-            variants.add(variant);
-        }
-
-        /**
-         * Nulls any properties the variants have in common with this one.
-         * Makes for more efficient serialization.
-         */
-        void deflate()
-        {
-            if (variants != null)
-            {
-                for (BlockColor variant : variants)
-                {
-                    deflate(variant);
-                }
-            }
-        }
-
-        /**
-         * Nulls any properties the variant has in common with this one.
-         * Makes for more efficient serialization.
-         *
-         * @param variant the variant
-         */
-        void deflate(BlockColor variant)
-        {
-            if (Objects.equals(this.uid, variant.uid))
-            {
-                variant.uid = null;
-            }
-            if (Objects.equals(this.name, variant.name))
-            {
-                variant.name = null;
-            }
-            if (Objects.equals(this.color, variant.color))
-            {
-                variant.color = null;
-            }
-            if (Objects.equals(this.alpha, variant.alpha))
-            {
-                variant.alpha = null;
-            }
-            variant.deflate();
-        }
-
-        /**
-         * Replaces nulls on variants with properties set on this one.
-         *
-         * @return the block color
-         */
-        BlockColor inflate()
-        {
-            if (variants != null)
-            {
-                for (BlockColor variant : variants)
-                {
-                    inflate(variant);
-                }
-            }
-            return this;
-        }
-
-        /**
-         * Replaces nulls on a variant with properties set on this one.
-         *
-         * @param variant the variant
-         */
-        void inflate(BlockColor variant)
-        {
-            if (variant.uid == null)
-            {
-                variant.uid = this.uid;
-            }
-            if (variant.name == null)
-            {
-                variant.name = this.name;
-            }
-            if (variant.color == null)
-            {
-                variant.color = this.color;
-            }
-            if (variant.alpha == null)
-            {
-                variant.alpha = this.alpha;
-            }
-            variant.inflate();
-        }
-
-        /**
-         * Lookup a BlockMD and update the color and alpha.
-         */
-        void updateBlockMD()
-        {
-            if (!isInflated())
-            {
-                throw new IllegalArgumentException("BlockColor object must be inflated before use.");
-            }
-
-            BlockMD blockMD = BlockMD.get(this.uid, this.meta);
-            if (blockMD == null)
-            {
-                Journeymap.getLogger().warn(String.format("Block referenced in Color Palette is not registered: %s:%s ", uid, meta));
-                return;
-            }
-
-            if (blockMD.hasTransparency())
-            {
-                blockMD.setAlpha((alpha != null) ? alpha : 1f);
-            }
-            int color = RGB.hexToInt(this.color);
-            blockMD.setColor(color);
-
-            if (variants != null)
-            {
-                for (BlockColor variant : variants)
-                {
-                    variant.updateBlockMD();
-                }
-            }
-        }
-
-        /**
-         * Is inflated boolean.
-         *
-         * @return the boolean
-         */
-        boolean isInflated()
-        {
-            return (this.uid != null && this.meta != null && this.alpha != null && this.color != null);
-        }
-
         @Override
-        public int compareTo(BlockColor that)
+        public JsonElement serialize(HashBasedTable<String, String, BlockStateColor> src, Type typeOfSrc, JsonSerializationContext context)
         {
-            Ordering ordering = Ordering.natural().nullsLast();
-            return ComparisonChain.start()
-                    .compare(this.uid, that.uid, ordering)
-                    .compare(this.meta, that.meta, ordering)
-                    .compare(this.name, that.name, ordering)
-                    .compare(this.color, that.color, ordering)
-                    .compare(this.alpha, that.alpha, ordering)
-                    .result();
-        }
+            JsonObject jsonTable = new JsonObject();
 
-        /**
-         * Size int.
-         *
-         * @return the int
-         */
-        public int size()
-        {
-            int size = 1;
-            if (variants!=null)
+            for (String blockId : src.rowKeySet().stream().sorted().collect(Collectors.toList()))
             {
-                for (BlockColor variant : variants)
+                String[] resource = blockId.split(":");
+                String mod = resource[0];
+                String block = resource[1];
+                JsonObject jsonMod = null;
+                if (!jsonTable.has(mod))
                 {
-                    size += variant.size();
+                    jsonMod = new JsonObject();
+                    jsonTable.add(mod, jsonMod);
+                }
+                else
+                {
+                    jsonMod = jsonTable.getAsJsonObject(mod);
+                }
+
+                JsonObject jsonBlock = null;
+                if (!jsonMod.has(block))
+                {
+                    jsonBlock = new JsonObject();
+                    jsonMod.add(block, jsonBlock);
+                }
+                else
+                {
+                    jsonBlock = jsonMod.getAsJsonObject(block);
+                }
+
+                for (String stateId : src.row(blockId).keySet().stream().sorted().collect(Collectors.toList()))
+                {
+                    BlockStateColor blockStateColor = src.get(blockId, stateId);
+                    JsonArray bscArray = new JsonArray();
+                    bscArray.add(new JsonPrimitive(blockStateColor.color));
+                    if (blockStateColor.alpha != null && blockStateColor.alpha != 1F)
+                    {
+                        bscArray.add(new JsonPrimitive(blockStateColor.alpha));
+                    }
+                    jsonBlock.add(stateId, bscArray);
                 }
             }
-            return size;
+            return jsonTable;
         }
+    }
 
-        /**
-         * Sort.
-         */
-        public void sort()
+    /**
+     * Custom deserializer to produce a smaller palette file.
+     */
+    private static class Deserializer implements JsonDeserializer<HashBasedTable<String, String, BlockStateColor>>
+    {
+        @Override
+        public HashBasedTable<String, String, BlockStateColor> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
         {
-            if (variants!=null)
+            HashBasedTable<String, String, BlockStateColor> result = HashBasedTable.create(GameData.getBlockStateIDMap().size(), 16);
+            JsonObject jsonTable = json.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> jsonMod : jsonTable.entrySet())
             {
-                Collections.sort(variants);
+                String modId = jsonMod.getKey();
+                for (Map.Entry<String, JsonElement> jsonBlock : jsonMod.getValue().getAsJsonObject().entrySet())
+                {
+                    String blockId = jsonBlock.getKey();
+
+                    for (Map.Entry<String, JsonElement> jsonState : jsonBlock.getValue().getAsJsonObject().entrySet())
+                    {
+                        String blockStateId = jsonState.getKey();
+                        JsonArray bscArray = jsonState.getValue().getAsJsonArray();
+                        String color = bscArray.get(0).getAsString();
+                        float alpha = 1F;
+                        if (bscArray.size() > 1)
+                        {
+                            alpha = bscArray.get(1).getAsFloat();
+                        }
+                        BlockStateColor blockStateColor = new BlockStateColor(color, alpha);
+                        result.put(modId + ":" + blockId, blockStateId, blockStateColor);
+                    }
+                }
             }
+
+            return result;
         }
     }
 }

@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
-package journeymap.client.cartography;
+package journeymap.client.cartography.color;
 
 import com.google.common.base.Strings;
 import journeymap.common.Journeymap;
@@ -185,6 +185,29 @@ public final class RGB
                 ((rgb[0] & 0xFF) << 16) |
                 ((rgb[1] & 0xFF) << 8) |
                 ((rgb[2] & 0xFF));
+    }
+
+    /**
+     * RGBA to RGB
+     *
+     * @param rgba
+     * @return
+     */
+    public static int rgbaToRgb(int rgba)
+    {
+        return toInteger(rgba & 0xFF, (rgba >>> 8) & 0xFF, (rgba >>> 16) & 0xFF);
+    }
+
+    public static int tint(int rgb, int rgbaTint)
+    {
+        int[] tint = ints(rgbaTint);
+        int alpha = (rgbaTint >>> 24) & 0xFF;
+        int[] old = ints(rgb);
+
+        int newR = old[0] + (tint[0] - old[0]) * alpha;
+        int newG = old[1] + (tint[1] - old[1]) * alpha;
+        int newB = old[2] + (tint[2] - old[2]) * alpha;
+        return toInteger(newR, newG, newB);
     }
 
     /**
@@ -513,5 +536,19 @@ public final class RGB
         }
 
         return toInteger(r, g, b);
+    }
+
+    /**
+     * Subtract one rgb from another.
+     *
+     * @param minuend    the original rgb
+     * @param subtrahend the smaller number
+     * @return the filtered rgb
+     */
+    public static Integer subtract(int minuend, int subtrahend)
+    {
+        int[] larger = ints(minuend);
+        int[] smaller = ints(subtrahend);
+        return toInteger(larger[0] - smaller[0], larger[1] - smaller[1], larger[2] - smaller[2]);
     }
 }

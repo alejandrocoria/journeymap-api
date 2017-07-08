@@ -6,11 +6,14 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.ColorManager;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
+import journeymap.client.mod.ModBlockDelegate;
+import journeymap.client.model.BlockMD;
 import journeymap.client.properties.ClientCategory;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.render.draw.DrawUtil;
@@ -281,48 +284,48 @@ minimap2KeysButton;
 
 
                         if (category == ClientCategory.MiniMap1)
+                        {
+                            if (FMLClientHandler.instance().getClient().world != null)
                             {
-                                if (FMLClientHandler.instance().getClient().world != null)
-                                {
-                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
-                                }
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
-                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                                break;
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
                             }
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
+                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                            break;
+                        }
                         else if (category == ClientCategory.MiniMap2)
+                        {
+                            if (FMLClientHandler.instance().getClient().world != null)
                             {
-                                if (FMLClientHandler.instance().getClient().world != null)
-                                {
-                                    categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
-                                }
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
-                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                                break;
+                                categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
                             }
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
+                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                            break;
+                        }
                         else if (category == ClientCategory.FullMap)
-                            {
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                                categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
-                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                                break;
-                            }
+                        {
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
+                            categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
+                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                            break;
+                        }
                         else if (category == ClientCategory.Cartography)
-                            {
-                                cartographyCategorySlot = categorySlot;
-                                renderStatsSlotMetadata = new SlotMetadata(renderStatsButton,
-                                        Constants.getString("jm.common.renderstats.title"),
-                                        Constants.getString("jm.common.renderstats.tooltip"), 2);
-                                categorySlot.getAllChildMetadata().add(renderStatsSlotMetadata);
-                                //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                                break;
-                            }
+                        {
+                            cartographyCategorySlot = categorySlot;
+                            renderStatsSlotMetadata = new SlotMetadata(renderStatsButton,
+                                    Constants.getString("jm.common.renderstats.title"),
+                                    Constants.getString("jm.common.renderstats.tooltip"), 2);
+                            categorySlot.getAllChildMetadata().add(renderStatsSlotMetadata);
+                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                            break;
+                        }
                         else
-                            {
-                                categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                            }
+                        {
+                            categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                        }
 
                     }
                 }
@@ -788,55 +791,57 @@ minimap2KeysButton;
 
             for (Category category : changedCategories)
             {
-
                 if (category == ClientCategory.MiniMap1)
-                    {
-                        DataCache.INSTANCE.resetRadarCaches();
-                        UIManager.INSTANCE.getMiniMap().reset();
-                        continue;
-                    }
+                {
+                    DataCache.INSTANCE.resetRadarCaches();
+                    UIManager.INSTANCE.getMiniMap().reset();
+                    continue;
+                }
                 if (category == ClientCategory.MiniMap2)
-                    {
-                        DataCache.INSTANCE.resetRadarCaches();
-                        continue;
-                    }
+                {
+                    DataCache.INSTANCE.resetRadarCaches();
+                    continue;
+                }
                 if (category == ClientCategory.FullMap)
-                    {
-                        DataCache.INSTANCE.resetRadarCaches();
-                        ThemeFileHandler.getCurrentTheme(true);
-                        continue;
-                    }
+                {
+                    DataCache.INSTANCE.resetRadarCaches();
+                    ThemeFileHandler.getCurrentTheme(true);
+                    continue;
+                }
                 if (category == ClientCategory.WebMap)
-                    {
-                        DataCache.INSTANCE.resetRadarCaches();
-                        WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), true);
-                        continue;
-                    }
+                {
+                    DataCache.INSTANCE.resetRadarCaches();
+                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), true);
+                    continue;
+                }
                 if (category == ClientCategory.Waypoint)
-                    {
-                        WaypointStore.INSTANCE.reset();
-                        continue;
-                    }
+                {
+                    WaypointStore.INSTANCE.reset();
+                    continue;
+                }
                 if (category == ClientCategory.WaypointBeacon)
-                    {
-                        continue;
-                    }
+                {
+                    continue;
+                }
                 if (category == ClientCategory.Cartography)
-                    {
-                        RenderSpec.resetRenderSpecs();
-                        TileDrawStepCache.instance().invalidateAll();
-                        MiniMap.state().requireRefresh();
-                        Fullscreen.state().requireRefresh();
-                        MapPlayerTask.forceNearbyRemap();
-                        continue;
-                    }
+                {
+                    // TODO: move this stuff into SoftResetTask with enums or something for the area of stuff to reset.
+                    ColorManager.INSTANCE.reset();
+                    ModBlockDelegate.INSTANCE.reset();
+                    BlockMD.reset();
+                    RenderSpec.resetRenderSpecs();
+                    TileDrawStepCache.instance().invalidateAll();
+                    MiniMap.state().requireRefresh();
+                    Fullscreen.state().requireRefresh();
+                    MapPlayerTask.forceNearbyRemap();
+                    continue;
+                }
                 if (category == ClientCategory.Advanced)
-                    {
-                        SoftResetTask.queue();
-                        WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), false);
-                        continue;
-                    }
-
+                {
+                    SoftResetTask.queue();
+                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), false);
+                    continue;
+                }
             }
 
             UIManager.INSTANCE.getMiniMap().reset();

@@ -6,9 +6,9 @@
 package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
 import journeymap.client.render.ComparableBufferedImage;
@@ -24,9 +24,6 @@ import java.awt.image.BufferedImage;
  */
 public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 {
-    private static final String PROP_CAVE_SLOPES = "caveSlopes";
-    private static final String PROP_CAVE_HEIGHTS = "caveHeights";
-
     /**
      * The Surface renderer.
      */
@@ -199,7 +196,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     final int ceiling = getBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
 
                     // Oh look, a hole in the world.
-                    if (ceiling < 0)
+                    if (ceiling <= 0)
                     {
                         paintVoidBlock(chunkSliceImage, x, z);
                         chunkOk = true;
@@ -208,7 +205,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     y = Math.min(ceiling, sliceMaxY);
 
-                    buildStrata(strata, sliceMinY, chunkMd, x, y, z);
+                    buildStrata(strata, sliceMinY-1, chunkMd, x, y, z);
 
                     if (strata.isEmpty())
                     {
@@ -261,27 +258,32 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             {
                 blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
 
-                if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                if (!blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.OpenToSky))
                 {
                     strata.setBlocksFound(true);
                     blockAboveMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
-                    if (blockMD.isLava() && (blockAboveMD.isLava() || y < minY))
+                    if (blockMD.isLava() && blockAboveMD.isLava())
                     {
                         // Ignores the myriad tiny one-block pockets of lava in the Nether
                         lavaBlockMD = blockMD;
                     }
-
-                    if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    else if (blockMD.isLava() &&  y < minY)
                     {
-                        if (!chunkMd.canBlockSeeTheSky(x, y + 1, z))
+                        // Ignores the myriad tiny one-block pockets of lava in the Nether
+                        //lavaBlockMD = blockMD;
+                    }
+
+                    if (blockAboveMD.isIgnore() || blockAboveMD.hasFlag(BlockFlag.OpenToSky))
+                    {
+                        if (chunkMd.hasNoSky() || !chunkMd.canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 
                             if (lightLevel > 0)
                             {
                                 strata.push(chunkMd, blockMD, x, y, z, lightLevel);
-                                if (blockMD.getAlpha() == 1f || !mapTransparency)
+                                if (!blockMD.hasTransparency() || !mapTransparency)
                                 {
                                     break;
                                 }
@@ -294,8 +296,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     }
                     else
                     {
-                        x = x;
-                        break;
+                        //break;
                     }
                 }
                 y--;
@@ -366,7 +367,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             // Now add bevel for slope
             if (!(blockMD.hasNoShadow()))
             {
-                float slope = getSlope(chunkMd, blockMD, x, vSlice, z);
+                float slope = getSlope(chunkMd, x, vSlice, z);
                 if (slope != 1f)
                 {
                     strata.setRenderCaveColor(RGB.bevelSlope(strata.getRenderCaveColor(), slope));
@@ -420,7 +421,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 while (y > 0 && y > sliceMinY)
                 {
                     blockMDAbove = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
-                    if (!blockMDAbove.isAir() && !blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMDAbove.isIgnore() && !blockMDAbove.hasFlag(BlockFlag.OpenToSky))
                     {
                         break;
                     }
@@ -441,11 +442,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     y--;
                 }
 
-                inAirPocket = blockMD.isAir();
+                inAirPocket = blockMD.isIgnore();
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMDAbove.isIgnore() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockFlag.OpenToSky))
                 {
-                    if (!blockMD.isAir() || !blockMD.hasTransparency() || !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMD.isIgnore() || !blockMD.hasTransparency() || !blockMD.hasFlag(BlockFlag.OpenToSky))
                     {
                         break;
                     }

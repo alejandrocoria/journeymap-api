@@ -3,6 +3,14 @@
 {
   "lines": [
     {
+      "label": "Improved support for modded blocks",
+      "action": ""
+    },
+    {
+      "label": "New Cartography Options to blend colors",
+      "action": "dialog.OptionsManager#Cartography"
+    },
+    {
       "label": "JourneyMap has a public Discord! (click to join)",
       "action": "dialog.FullscreenActions#discord"
     },

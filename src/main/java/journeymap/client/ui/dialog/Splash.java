@@ -6,7 +6,7 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.io.FileHandler;
 import journeymap.client.model.SplashInfo;
 import journeymap.client.model.SplashPerson;

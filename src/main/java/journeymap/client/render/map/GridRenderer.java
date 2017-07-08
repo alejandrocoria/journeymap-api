@@ -11,7 +11,7 @@ import journeymap.client.api.event.DisplayUpdateEvent;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.impl.ClientEventManager;
 import journeymap.client.api.util.UIState;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.GridSpec;

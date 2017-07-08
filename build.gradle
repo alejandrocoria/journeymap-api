@@ -43,7 +43,15 @@ repositories {
     mavenCentral()
 
     // JourneyMap API snapshots are here
-    maven { url 'https://oss.sonatype.org/content/groups/public/' }
+    maven {
+        name = "journeymap"
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+
+    maven {
+        name = "chisel"
+        url = "http://maven.tterrag.com/"
+    }
 }
 
 configurations {
@@ -57,12 +65,16 @@ configurations.all {
 }
 
 dependencies {
+
     compile "ar.com.hjg:pngj:2.1.0"
     compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
     //runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
     testCompile "junit:junit:4.12"
     includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
     includeInJar "ar.com.hjg:pngj:2.1.0"
+
+    // Put other mods here as needed for debugging/testing
+    compile fileTree(dir: 'lib', include: '*.jar')
 }
 
 minecraft {

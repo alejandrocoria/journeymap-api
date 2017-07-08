@@ -15,6 +15,7 @@ import journeymap.client.model.MapType;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.task.multi.SaveMapTask;
 import journeymap.client.ui.UIManager;
@@ -45,31 +46,16 @@ public class FullscreenActions extends JmUI
      */
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
 
-    /**
-     * The Button automap.
-     */
-    Button buttonAutomap, /**
- * The Button save.
- */
-buttonSave, /**
- * The Button about.
- */
-buttonAbout, /**
- * The Button close.
- */
-buttonClose, /**
- * The Button browser.
- */
-buttonBrowser, /**
- * The Button check.
- */
-buttonCheck, /**
- * The Button donate.
- */
-buttonDonate, /**
- * The Button delete map.
- */
-buttonDeleteMap;
+    Button buttonAutomap;
+    Button buttonSave;
+    Button buttonAbout;
+    Button buttonClose;
+    Button buttonBrowser;
+    Button buttonCheck;
+    Button buttonDonate;
+    Button buttonDeleteMap;
+    Button buttonColorReset;
+
     /**
      * The Button enable mapping.
      */
@@ -212,8 +198,10 @@ buttonDeleteMap;
         buttonBrowser = new Button(Constants.getString("jm.common.use_browser"));
         buttonBrowser.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
 
-        buttonAutomap = new Button(Constants.getString("jm.common.automap_title"));
-        buttonAutomap.setTooltip(Constants.getString("jm.common.automap_text"));
+        boolean automapRunning = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        String stop = automapRunning ? "stop_" : "";
+        buttonAutomap = new Button(Constants.getString("jm.common.automap_" + stop + "title"));
+        buttonAutomap.setTooltip(Constants.getString("jm.common.automap_" + stop + "text"));
         buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && Journeymap.getClient().getCoreProperties().mappingEnabled.get());
 
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
@@ -230,6 +218,9 @@ buttonDeleteMap;
                 Constants.getString("jm.common.enable_mapping_true"),
                 Journeymap.getClient().getCoreProperties().mappingEnabled);
 
+        buttonColorReset = new Button(Constants.getString("jm.common.colorreset_title"));
+        buttonColorReset.setTooltip(Constants.getString("jm.common.colorreset_text"));
+
         buttonList.add(buttonAbout);
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -237,6 +228,7 @@ buttonDeleteMap;
         buttonList.add(buttonDonate);
         buttonList.add(buttonBrowser);
         buttonList.add(buttonDeleteMap);
+        buttonList.add(buttonColorReset);
         buttonList.add(buttonEnableMapping);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
@@ -263,21 +255,20 @@ buttonDeleteMap;
         final int hgap = 4;
         final int vgap = 3;
         final int bx = (this.width) / 2;
-        int by = this.height / 4;
+        int by = this.height / 5;
 
-        buttonAbout.centerHorizontalOn(bx).setY(by);
-        by = buttonAbout.getBottomY() + vgap;
-
-        ButtonList row1 = new ButtonList(buttonAutomap, buttonEnableMapping);
+        ButtonList row1 = new ButtonList(buttonAutomap, buttonColorReset);
         ButtonList row2 = new ButtonList(buttonSave, buttonDeleteMap);
-        ButtonList row3 = new ButtonList(buttonBrowser, buttonCheck);
+        ButtonList row3 = new ButtonList(buttonEnableMapping, buttonBrowser);
+        ButtonList row4 = new ButtonList(buttonAbout, buttonCheck);
 
         row1.layoutCenteredHorizontal(bx, by, true, hgap);
         row2.layoutCenteredHorizontal(bx, row1.getBottomY() + vgap, true, hgap);
         row3.layoutCenteredHorizontal(bx, row2.getBottomY() + vgap, true, hgap);
+        row4.layoutCenteredHorizontal(bx, row3.getBottomY() + vgap, true, hgap);
 
         int patreonX = bx - 8;
-        int patreonY = row2.getBottomY() + 32;
+        int patreonY = row4.getBottomY() + 16;
         DrawUtil.drawImage(patreonLogo, patreonX, patreonY, false, .5f, 0);
 
         buttonDonate.centerHorizontalOn(bx).setY(patreonY + 16);
@@ -313,12 +304,26 @@ buttonDeleteMap;
         }
         if (guibutton == buttonAutomap)
         {
-            UIManager.INSTANCE.open(AutoMapConfirmation.class);
+            if (Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class))
+            {
+                Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, false, null);
+                UIManager.INSTANCE.openFullscreenMap();
+            }
+            else
+            {
+                UIManager.INSTANCE.open(AutoMapConfirmation.class);
+            }
             return;
         }
         if (guibutton == buttonDeleteMap)
         {
             UIManager.INSTANCE.open(DeleteMapConfirmation.class);
+            return;
+        }
+        if (guibutton == buttonColorReset)
+        {
+            Journeymap.getClient().queueMainThreadTask(new EnsureCurrentColorsTask(true, true));
+            UIManager.INSTANCE.openFullscreenMap();
             return;
         }
         if (guibutton == buttonCheck)

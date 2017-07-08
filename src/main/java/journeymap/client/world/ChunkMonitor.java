@@ -40,18 +40,18 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      */
     INSTANCE;
 
-    private World world;
+    private World theWorld;
 
     /**
      * Reset.
      */
     public void reset()
     {
-        if (world != null)
+        if (theWorld != null)
         {
-            world.removeEventListener(ChunkMonitor.INSTANCE);
+            theWorld.removeEventListener(ChunkMonitor.INSTANCE);
         }
-        world = null;
+        theWorld = null;
     }
 
     /**
@@ -77,15 +77,19 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event)
     {
-        if (world == null)
+        if (theWorld == null)
         {
-            world = event.getWorld();
-            world.addEventListener(this);
+            theWorld = event.getWorld();
+            theWorld.addEventListener(this);
             event.getWorld();
         }
 
         Chunk chunk = event.getChunk();
-        resetRenderTimes(chunk.getPos());
+        if (chunk != null && chunk.isLoaded())
+        {
+            DataCache.INSTANCE.addChunkMD(new ChunkMD(chunk));
+        }
+        //resetRenderTimes(chunk.getChunkCoordIntPair());
 //        int cx1 = chunk.xPosition - 1;
 //        int cz1 = chunk.zPosition - 1;
 //        int cx2 = chunk.xPosition + 1;
@@ -126,7 +130,7 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         try
         {
             World world = event.getWorld();
-            if (world == world)
+            if (world == theWorld)
             {
                 reset();
             }

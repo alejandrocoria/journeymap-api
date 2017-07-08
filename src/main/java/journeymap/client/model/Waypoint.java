@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointGroupStore;
@@ -202,7 +202,7 @@ public class Waypoint implements Serializable
         this.setOrigin(modWaypoint.getModId());
         this.displayId = modWaypoint.getId();
         this.setPersistent(modWaypoint.isPersistent());
-        this.setGroupName(modWaypoint.getName());
+        this.setGroupName(modWaypoint.getGroup().getName());
     }
 
     /**

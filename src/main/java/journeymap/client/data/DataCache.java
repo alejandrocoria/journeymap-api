@@ -5,7 +5,10 @@
 
 package journeymap.client.data;
 
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.MapMaker;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.model.*;
@@ -19,6 +22,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -104,17 +108,14 @@ public enum DataCache
      * The Chunk metadata.
      */
     final Cache<ChunkPos, ChunkMD> chunkMetadata;
-    /**
-     * The Chunk metadata removal listener.
-     */
-    final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
+
     /**
      * The Managed caches.
      */
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     //final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
-    private final int defaultConcurrencyLevel = 1;
+    private final int defaultConcurrencyLevel = 2;
 
 
     // Private constructor
@@ -168,10 +169,10 @@ public enum DataCache
         regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        blockMetadata = new MapMaker().weakKeys().initialCapacity(5000).concurrencyLevel(2).makeMap();
+        blockMetadata = new MapMaker().weakKeys().initialCapacity(GameData.getBlockStateIDMap().size()).concurrencyLevel(2).makeMap();
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<>();
-        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build();
+        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
+
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
@@ -206,27 +207,6 @@ public enum DataCache
         }
         return builder;
     }
-
-//    public void addPrivateCache(String name, Cache cache)
-//    {
-//        if (privateCaches.containsValue(name))
-//        {
-//            Journeymap.getLogger().warn("Overriding private cache: " + name);
-//        }
-//        privateCaches.put(cache, name);
-//    }
-//
-//    public Cache getPrivateCache(String name)
-//    {
-//        for (Map.Entry<Cache, String> entry : privateCaches.entrySet())
-//        {
-//            if (entry.getValue().equals(name))
-//            {
-//                return entry.getKey();
-//            }
-//        }
-//        return null;
-//    }
 
     /**
      * Gets all.
@@ -532,6 +512,21 @@ public enum DataCache
     }
 
     /**
+     * Whether there's a BlockMD for the state.
+     */
+    public boolean hasBlockMD(final IBlockState aBlockState)
+    {
+        try
+        {
+            return blockMetadata.containsKey(aBlockState);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    /**
      * Gets block md.
      *
      * @param aBlockState the a block state
@@ -541,12 +536,57 @@ public enum DataCache
     {
         try
         {
-            return blockMetadata.computeIfAbsent(aBlockState, BlockMD::create);
+            return blockMetadata.computeIfAbsent(aBlockState, blockState -> {
+
+                if (BlockMD.AIRBLOCK == null)
+                {
+                    BlockMD.reset();
+                }
+
+                IBlockState defaultBlockState = BlockMD.getDefaultUpFacing(blockState);
+                BlockMD defaultBlockMD = blockMetadata.computeIfAbsent(defaultBlockState, BlockMD::create);
+                if (defaultBlockMD == null)
+                {
+                    // TODO: verify this shouldn't happen.  Null should never be returned
+                    blockMetadata.put(blockState, BlockMD.AIRBLOCK);
+                    return BlockMD.AIRBLOCK;
+                }
+                if (defaultBlockMD.isUseDefaultState())
+                {
+                    blockMetadata.put(blockState, defaultBlockMD);
+                    return defaultBlockMD;
+                }
+
+                IBlockState upBlockState = BlockMD.getUpFacing(blockState, null);
+                if (upBlockState != null)
+                {
+                    BlockMD upBlockMD = blockMetadata.computeIfAbsent(upBlockState, BlockMD::create);
+                    blockMetadata.put(blockState, upBlockMD);
+                    return upBlockMD;
+                }
+
+                return blockMetadata.computeIfAbsent(blockState, BlockMD::create);
+            });
         }
         catch (Exception e)
         {
             return BlockMD.AIRBLOCK;
         }
+    }
+
+    public int getBlockMDCount()
+    {
+        return blockMetadata.size();
+    }
+
+    /**
+     * Use BlockMD.getAll() when in doubt.
+     *
+     * @return
+     */
+    public Set<BlockMD> getLoadedBlockMDs()
+    {
+        return new HashSet<>(blockMetadata.values());
     }
 
     /**
@@ -583,30 +623,29 @@ public enum DataCache
             try
             {
                 chunkMD = chunkMetadata.getIfPresent(coord);
-                if (chunkMD == null)
+                if (chunkMD != null && chunkMD.hasChunk())
                 {
-                    chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.chunkXPos, coord.chunkZPos);
-                    if (chunkMD != null)
-                    {
-                        chunkMetadata.put(coord, chunkMD);
-                    }
+                    return chunkMD;
                 }
-                if (chunkMD != null && !chunkMD.hasChunk())
+
+                chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.chunkXPos, coord.chunkZPos);
+                if (chunkMD != null && chunkMD.hasChunk())
+                {
+                    chunkMetadata.put(coord, chunkMD);
+                    return chunkMD;
+                }
+
+                if (chunkMD != null)
                 {
                     chunkMetadata.invalidate(coord);
-                    chunkMD = null;
                 }
-            }
-            catch (CacheLoader.InvalidCacheLoadException e)
-            {
                 return null;
             }
             catch (Throwable e)
             {
                 Journeymap.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
+                return null;
             }
-
-            return chunkMD;
         }
     }
 
@@ -644,10 +683,7 @@ public enum DataCache
      */
     public void invalidateChunkMDCache()
     {
-        //synchronized (chunkMetadata)
-        {
-            chunkMetadata.invalidateAll();
-        }
+        chunkMetadata.invalidateAll();
     }
 
     /**
@@ -794,55 +830,5 @@ public enum DataCache
         }
 
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
-    }
-
-    /**
-     * The type Proxy removal listener.
-     *
-     * @param <K> the type parameter
-     * @param <V> the type parameter
-     */
-    class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
-    {
-        /**
-         * The Delegates.
-         */
-        final Map<RemovalListener<K, V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K, V>, Void>());
-
-        /**
-         * Add delegate listener.
-         *
-         * @param delegate the delegate
-         */
-        void addDelegateListener(RemovalListener<K, V> delegate)
-        {
-            if (delegates.containsKey(delegate))
-            {
-                Journeymap.getLogger().warn("RemovalListener already added: " + delegate.getClass());
-            }
-            else
-            {
-                delegates.put(delegate, null);
-            }
-        }
-
-        /**
-         * Remove delegate listener.
-         *
-         * @param delegate the delegate
-         */
-        void removeDelegateListener(RemovalListener<K, V> delegate)
-        {
-            delegates.remove(delegate);
-        }
-
-        @Override
-        public void onRemoval(RemovalNotification<K, V> notification)
-        {
-            for (RemovalListener<K, V> delegate : delegates.keySet())
-            {
-                delegate.onRemoval(notification);
-            }
-        }
     }
 }

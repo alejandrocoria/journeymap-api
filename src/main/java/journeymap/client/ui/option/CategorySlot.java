@@ -5,7 +5,7 @@
 
 package journeymap.client.ui.option;
 
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.properties.ClientCategory;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.Button;

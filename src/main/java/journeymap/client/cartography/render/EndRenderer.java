@@ -6,7 +6,7 @@
 package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapType;
 

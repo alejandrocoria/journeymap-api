@@ -6,7 +6,7 @@
 package journeymap.client.render.draw;
 
 import com.google.common.cache.CacheLoader;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureImpl;

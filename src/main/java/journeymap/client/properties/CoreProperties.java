@@ -4,7 +4,7 @@
  */
 package journeymap.client.properties;
 
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
@@ -102,21 +102,37 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
      */
     public final BooleanField mapCaveLighting = new BooleanField(Cartography, "jm.common.map_style_cavelighting", true);
     /**
-     * The Map antialiasing.
+     * Whether to show softer slope shading. Poorly named.
      */
     public final BooleanField mapAntialiasing = new BooleanField(Cartography, "jm.common.map_style_antialiasing", true);
     /**
-     * The Map plant shadows.
+     * Whether plants and crops have shadows.
      */
     public final BooleanField mapPlantShadows = new BooleanField(Cartography, "jm.common.map_style_plantshadows", false);
     /**
-     * The Map plants.
+     * Whether to show plants on the map.
      */
     public final BooleanField mapPlants = new BooleanField(Cartography, "jm.common.map_style_plants", false);
     /**
-     * The Map crops.
+     * Whether to show crops on the map.
      */
     public final BooleanField mapCrops = new BooleanField(Cartography, "jm.common.map_style_crops", true);
+
+    /**
+     * Whether to use blended (averaged by location) grass colors.
+     */
+    public final BooleanField mapBlendGrass = new BooleanField(Cartography, "jm.common.map_style_blendgrass", true);
+
+    /**
+     * Whether to use blended (averaged by location) foliage colors.
+     */
+    public final BooleanField mapBlendFoliage = new BooleanField(Cartography, "jm.common.map_style_blendfoliage", true);
+
+    /**
+     * Whether to use blended (averaged by location) water colors.
+     */
+    public final BooleanField mapBlendWater = new BooleanField(Cartography, "jm.common.map_style_blendwater", false);
+
     /**
      * The Map surface above caves.
      */
@@ -124,12 +140,10 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     /**
      * The Render distance cave max.
      */
-//public final IntegerField renderDistanceCaveMin = new IntegerField(Cartography, "jm.common.renderdistance_cave_min", 1, 32, 3, 101);
     public final IntegerField renderDistanceCaveMax = new IntegerField(Cartography, "jm.common.renderdistance_cave_max", 1, 32, 3, 102);
     /**
      * The Render distance surface max.
      */
-//public final IntegerField renderDistanceSurfaceMin = new IntegerField(Cartography, "jm.common.renderdistance_surface_min", 1, 32, 4, 103);
     public final IntegerField renderDistanceSurfaceMax = new IntegerField(Cartography, "jm.common.renderdistance_surface_max", 1, 32, 7, 104);
     /**
      * The Render delay.
@@ -147,10 +161,12 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
      * The Always map surface.
      */
     public final BooleanField alwaysMapSurface = new BooleanField(Cartography, "jm.common.alwaysmapsurface", false);
+
     /**
      * The Tile high display quality.
      */
-    public final BooleanField tileHighDisplayQuality = new BooleanField(Cartography, "jm.common.tile_display_quality", true);
+    public final BooleanField tileHighDisplayQuality = new BooleanField(Advanced, "jm.common.tile_display_quality", true);
+
     /**
      * The Max animals data.
      */
@@ -233,6 +249,12 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
      * The Color self.
      */
     public final StringField colorSelf = new StringField(Category.Hidden, "jm.common.radar_color_self", null, "#0000ff").pattern(PATTERN_COLOR);
+
+    /**
+     * Verbose color palette
+     */
+    public final BooleanField verboseColorPalette = new BooleanField(Category.Hidden, "", false);
+
 
     private transient HashMap<StringField, Integer> mobColors = new HashMap<>(6);
 
