@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.component;
 
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

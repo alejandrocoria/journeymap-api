@@ -1,17 +1,16 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.cartography;
 
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Stack;
 
@@ -20,17 +19,26 @@ import java.util.Stack;
  */
 public class Strata
 {
+    /**
+     * The Name.
+     */
     final String name;
+    /**
+     * The Initial pool size.
+     */
     final int initialPoolSize;
+    /**
+     * The Pool growth increment.
+     */
     final int poolGrowthIncrement;
     private final boolean underground;
     private boolean mapCaveLighting = Journeymap.getClient().getCoreProperties().mapCaveLighting.get();
     private Integer topY = null;
     private Integer bottomY = null;
-    private Integer topWaterY = null;
-    private Integer bottomWaterY = null;
+    private Integer topFluidY = null;
+    private Integer bottomFluidY = null;
     private Integer maxLightLevel = null;
-    private Integer waterColor = null;
+    private Integer fluidColor = null;
     private Integer renderDayColor = null;
     private Integer renderNightColor = null;
     private Integer renderCaveColor = null;
@@ -39,8 +47,15 @@ public class Strata
     private Stack<Stratum> unusedStack = new Stack<Stratum>();
     private Stack<Stratum> stack = new Stack<Stratum>();
 
-    public Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground)
-    {
+    /**
+     * Instantiates a new Strata.
+     *
+     * @param name                the name
+     * @param initialPoolSize     the initial pool size
+     * @param poolGrowthIncrement the pool growth increment
+     * @param underground         the underground
+     */
+    public Strata(String name, int initialPoolSize, int poolGrowthIncrement, boolean underground) {
         this.name = name;
         this.underground = underground;
         this.initialPoolSize = initialPoolSize;
@@ -69,14 +84,16 @@ public class Strata
         }
     }
 
-    public void reset()
-    {
+    /**
+     * Reset.
+     */
+    public void reset() {
         setTopY(null);
         setBottomY(null);
-        setTopWaterY(null);
-        setBottomWaterY(null);
+        setTopFluidY(null);
+        setBottomFluidY(null);
         setMaxLightLevel(null);
-        setWaterColor(null);
+        setFluidColor(null);
         setRenderDayColor(null);
         setRenderNightColor(null);
         setRenderCaveColor(null);
@@ -85,35 +102,53 @@ public class Strata
 
         mapCaveLighting = Journeymap.getClient().getCoreProperties().mapCaveLighting.get();
 
-        while (!stack.isEmpty())
-        {
+        while (!stack.isEmpty()) {
             release(stack.peek());
         }
     }
 
-    public void release(Stratum stratum)
-    {
-        if (stratum == null)
-        {
+    /**
+     * Release.
+     *
+     * @param stratum the stratum
+     */
+    public void release(Stratum stratum) {
+        if (stratum == null) {
             Journeymap.getLogger().warn("Null stratum in pool.");
             return;
-        }
-        else
-        {
+        } else {
             stratum.clear();
             unusedStack.add(0, stack.pop());
         }
     }
 
-    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z)
-    {
+    /**
+     * Push stratum.
+     *
+     * @param chunkMd the chunk md
+     * @param blockMD the block md
+     * @param x       the x
+     * @param y       the y
+     * @param z       the z
+     * @return the stratum
+     */
+    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int x, int y, int z) {
         return push(chunkMd, blockMD, x, y, z, null);
     }
 
-    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel)
-    {
-        try
-        {
+    /**
+     * Push stratum.
+     *
+     * @param chunkMd    the chunk md
+     * @param blockMD    the block md
+     * @param localX     the local x
+     * @param y          the y
+     * @param localZ     the local z
+     * @param lightLevel the light level
+     * @return the stratum
+     */
+    public Stratum push(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel) {
+        try {
             // Alocate to stack, and set vars on stratum
             Stratum stratum = allocate();
             stratum.set(chunkMd, blockMD, localX, y, localZ, lightLevel);
@@ -125,31 +160,33 @@ public class Strata
             setLightAttenuation(getLightAttenuation() + stratum.getLightOpacity());
             setBlocksFound(true);
 
-            // Update Strata's water data
-            if (blockMD.isWater())
-            {
-                setTopWaterY((getTopWaterY() == null) ? y : Math.max(getTopWaterY(), y));
-                setBottomWaterY((getBottomWaterY() == null) ? y : Math.min(getBottomWaterY(), y));
-                if (getWaterColor() == null)
-                {
-                    setWaterColor(blockMD.getColor(chunkMd, chunkMd.getBlockPos(localX, y, localZ)));
+            // Update Strata's fluid data
+            if (blockMD.isWater() || blockMD.isFluid()) {
+                setTopFluidY((getTopFluidY() == null) ? y : Math.max(getTopFluidY(), y));
+                setBottomFluidY((getBottomFluidY() == null) ? y : Math.min(getBottomFluidY(), y));
+                if (getFluidColor() == null) {
+                    BlockPos blockPos = chunkMd.getBlockPos(localX, y, localZ);
+                    setFluidColor(blockMD.getBlockColor(chunkMd, blockPos));
                 }
             }
 
             return stratum;
-        }
-        catch (ChunkMD.ChunkMissingException e)
-        {
+        } catch (ChunkMD.ChunkMissingException e) {
             throw e;
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             JMLogger.logOnce("Couldn't push Stratum into stack: " + t.getMessage(), t);
             return null;
         }
     }
 
-    public Stratum nextUp(IChunkRenderer renderer, boolean ignoreMiddleWater)
+    /**
+     * Next up stratum.
+     *
+     * @param renderer          the renderer
+     * @param ignoreMiddleFluid the ignore middle fluid
+     * @return the stratum
+     */
+    public Stratum nextUp(IChunkRenderer renderer, boolean ignoreMiddleFluid)
     {
         Stratum stratum = null;
         try
@@ -162,14 +199,14 @@ public class Strata
 
             setLightAttenuation(Math.max(0, getLightAttenuation() - stratum.getLightOpacity()));
 
-            // Skip middle water blocks
-            if (ignoreMiddleWater && stratum.isWater() && isWaterAbove(stratum) && !stack.isEmpty())
+            // Skip middle fluid blocks
+            if (ignoreMiddleFluid && stratum.isFluid() && isFluidAbove(stratum) && !stack.isEmpty())
             {
                 release(stratum);
                 return nextUp(renderer, true);
             }
 
-            renderer.setStratumColors(stratum, getLightAttenuation(), getWaterColor(), isWaterAbove(stratum), isUnderground(), isMapCaveLighting());
+            renderer.setStratumColors(stratum, getLightAttenuation(), getFluidColor(), isFluidAbove(stratum), isUnderground(), isMapCaveLighting());
             return stratum;
         }
         catch (RuntimeException t)
@@ -178,24 +215,43 @@ public class Strata
         }
     }
 
-    int depth()
-    {
+    /**
+     * Depth int.
+     *
+     * @return the int
+     */
+    int depth() {
         return stack.isEmpty() ? 0 : getTopY() - getBottomY() + 1;
     }
 
-    public boolean isEmpty()
-    {
+    /**
+     * Is empty boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isEmpty() {
         return stack.isEmpty();
     }
 
-    boolean hasWater()
+    /**
+     * Has fluid boolean.
+     *
+     * @return the boolean
+     */
+    boolean hasFluid()
     {
-        return getTopWaterY() != null;
+        return getTopFluidY() != null;
     }
 
-    boolean isWaterAbove(Stratum stratum)
+    /**
+     * Is fluid above.
+     *
+     * @param stratum the stratum
+     * @return the boolean
+     */
+    boolean isFluidAbove(Stratum stratum)
     {
-        return getTopWaterY() != null && getTopWaterY() > stratum.getY();
+        return getTopFluidY() != null && getTopFluidY() > stratum.getY();
     }
 
     @Override
@@ -210,133 +266,235 @@ public class Strata
                 ", stack=" + stack.size() +
                 ", topY=" + getTopY() +
                 ", bottomY=" + getBottomY() +
-                ", topWaterY=" + getTopWaterY() +
-                ", bottomWaterY=" + getBottomWaterY() +
+                ", topFluidY=" + getTopFluidY() +
+                ", bottomFluidY=" + getBottomFluidY() +
                 ", maxLightLevel=" + getMaxLightLevel() +
-                ", waterColor=" + RGB.toString(getWaterColor()) +
+                ", fluidColor=" + RGB.toString(getFluidColor()) +
                 ", renderDayColor=" + RGB.toString(getRenderDayColor()) +
                 ", renderNightColor=" + RGB.toString(getRenderNightColor()) +
                 ", lightAttenuation=" + getLightAttenuation() +
                 '}';
     }
 
-    public boolean isMapCaveLighting()
-    {
+    /**
+     * Is map cave lighting boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isMapCaveLighting() {
         return mapCaveLighting;
     }
 
-    public boolean isUnderground()
-    {
+    /**
+     * Is underground boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isUnderground() {
         return underground;
     }
 
-    public Integer getTopY()
-    {
+    /**
+     * Gets top y.
+     *
+     * @return the top y
+     */
+    public Integer getTopY() {
         return topY;
     }
 
-    public void setTopY(Integer topY)
-    {
+    /**
+     * Sets top y.
+     *
+     * @param topY the top y
+     */
+    public void setTopY(Integer topY) {
         this.topY = topY;
     }
 
-    public Integer getBottomY()
-    {
+    /**
+     * Gets bottom y.
+     *
+     * @return the bottom y
+     */
+    public Integer getBottomY() {
         return bottomY;
     }
 
-    public void setBottomY(Integer bottomY)
-    {
+    /**
+     * Sets bottom y.
+     *
+     * @param bottomY the bottom y
+     */
+    public void setBottomY(Integer bottomY) {
         this.bottomY = bottomY;
     }
 
-    public Integer getTopWaterY()
+    /**
+     * Gets top fluid y.
+     *
+     * @return the top fluid y
+     */
+    public Integer getTopFluidY()
     {
-        return topWaterY;
+        return topFluidY;
     }
 
-    public void setTopWaterY(Integer topWaterY)
+    /**
+     * Sets top fluid y.
+     *
+     * @param topFluidY the top fluid y
+     */
+    public void setTopFluidY(Integer topFluidY)
     {
-        this.topWaterY = topWaterY;
+        this.topFluidY = topFluidY;
     }
 
-    public Integer getBottomWaterY()
+    /**
+     * Gets bottom fluid y.
+     *
+     * @return the bottom fluid y
+     */
+    public Integer getBottomFluidY()
     {
-        return bottomWaterY;
+        return bottomFluidY;
     }
 
-    public void setBottomWaterY(Integer bottomWaterY)
+    /**
+     * Sets bottom fluid y.
+     *
+     * @param bottomFluidY the bottom fluid y
+     */
+    public void setBottomFluidY(Integer bottomFluidY)
     {
-        this.bottomWaterY = bottomWaterY;
+        this.bottomFluidY = bottomFluidY;
     }
 
-    public Integer getMaxLightLevel()
-    {
+    /**
+     * Gets max light level.
+     *
+     * @return the max light level
+     */
+    public Integer getMaxLightLevel() {
         return maxLightLevel;
     }
 
-    public void setMaxLightLevel(Integer maxLightLevel)
-    {
+    /**
+     * Sets max light level.
+     *
+     * @param maxLightLevel the max light level
+     */
+    public void setMaxLightLevel(Integer maxLightLevel) {
         this.maxLightLevel = maxLightLevel;
     }
 
-    public Integer getWaterColor()
+    /**
+     * Gets fluid color.
+     *
+     * @return the fluid color
+     */
+    public Integer getFluidColor()
     {
-        return waterColor;
+        return fluidColor;
     }
 
-    public void setWaterColor(Integer waterColor)
+    /**
+     * Sets fluid color.
+     *
+     * @param fluidColor the fluid color
+     */
+    public void setFluidColor(Integer fluidColor)
     {
-        this.waterColor = waterColor;
+        this.fluidColor = fluidColor;
     }
 
-    public Integer getRenderDayColor()
-    {
+    /**
+     * Gets render day color.
+     *
+     * @return the render day color
+     */
+    public Integer getRenderDayColor() {
         return renderDayColor;
     }
 
-    public void setRenderDayColor(Integer renderDayColor)
-    {
+    /**
+     * Sets render day color.
+     *
+     * @param renderDayColor the render day color
+     */
+    public void setRenderDayColor(Integer renderDayColor) {
         this.renderDayColor = renderDayColor;
     }
 
-    public Integer getRenderNightColor()
-    {
+    /**
+     * Gets render night color.
+     *
+     * @return the render night color
+     */
+    public Integer getRenderNightColor() {
         return renderNightColor;
     }
 
-    public void setRenderNightColor(Integer renderNightColor)
-    {
+    /**
+     * Sets render night color.
+     *
+     * @param renderNightColor the render night color
+     */
+    public void setRenderNightColor(Integer renderNightColor) {
         this.renderNightColor = renderNightColor;
     }
 
-    public Integer getRenderCaveColor()
-    {
+    /**
+     * Gets render cave color.
+     *
+     * @return the render cave color
+     */
+    public Integer getRenderCaveColor() {
         return renderCaveColor;
     }
 
-    public void setRenderCaveColor(Integer renderCaveColor)
-    {
+    /**
+     * Sets render cave color.
+     *
+     * @param renderCaveColor the render cave color
+     */
+    public void setRenderCaveColor(Integer renderCaveColor) {
         this.renderCaveColor = renderCaveColor;
     }
 
-    public int getLightAttenuation()
-    {
+    /**
+     * Gets light attenuation.
+     *
+     * @return the light attenuation
+     */
+    public int getLightAttenuation() {
         return lightAttenuation;
     }
 
-    public void setLightAttenuation(int lightAttenuation)
-    {
+    /**
+     * Sets light attenuation.
+     *
+     * @param lightAttenuation the light attenuation
+     */
+    public void setLightAttenuation(int lightAttenuation) {
         this.lightAttenuation = lightAttenuation;
     }
 
-    public boolean isBlocksFound()
-    {
+    /**
+     * Is blocks found boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isBlocksFound() {
         return blocksFound;
     }
 
-    public void setBlocksFound(boolean blocksFound)
-    {
+    /**
+     * Sets blocks found.
+     *
+     * @param blocksFound the blocks found
+     */
+    public void setBlocksFound(boolean blocksFound) {
         this.blocksFound = blocksFound;
     }
 }

@@ -10,7 +10,7 @@ package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawUtil;

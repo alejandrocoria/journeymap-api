@@ -9,7 +9,7 @@ package journeymap.client.properties;
 
 import com.google.common.base.Objects;
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;

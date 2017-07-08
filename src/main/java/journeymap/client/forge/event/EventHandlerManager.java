@@ -8,7 +8,7 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.cartography.ColorManager;
+import journeymap.client.cartography.color.ColorManager;
 import journeymap.client.command.ClientCommandInvoker;
 import journeymap.client.command.CmdChatPosition;
 import journeymap.client.command.CmdEditWaypoint;
@@ -43,8 +43,8 @@ public class EventHandlerManager
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
 
-        // TODO: Why does this need to be forced?
-        ColorManager.instance();
+        // TODO: At one point forcing this to be classloaded was necessary.  Still needed?
+        ColorManager.INSTANCE.getDeclaringClass();
 
         ClientCommandInvoker clientCommandInvoker = new ClientCommandInvoker();
         clientCommandInvoker.register(new CmdChatPosition());

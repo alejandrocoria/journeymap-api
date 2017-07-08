@@ -1,17 +1,14 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.*;
 import journeymap.client.render.ComparableBufferedImage;
@@ -27,18 +24,32 @@ import java.awt.image.BufferedImage;
  */
 public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 {
-    private static final String PROP_CAVE_SLOPES = "caveSlopes";
-    private static final String PROP_CAVE_HEIGHTS = "caveHeights";
-
+    /**
+     * The Surface renderer.
+     */
     protected SurfaceRenderer surfaceRenderer;
+    /**
+     * The Render cave timer.
+     */
     protected StatTimer renderCaveTimer = StatTimer.get("CaveRenderer.render");
+    /**
+     * The Strata.
+     */
     protected Strata strata = new Strata("Cave", 40, 8, true);
+    /**
+     * The Default dim.
+     */
     protected float defaultDim = .2f;
+    /**
+     * The Map surface above caves.
+     */
     protected boolean mapSurfaceAboveCaves;
 
     /**
      * Takes an instance of the surface renderer in order to do a prepass when the surface
      * intersects the slice being mapped.
+     *
+     * @param surfaceRenderer the surface renderer
      */
     public CaveRenderer(SurfaceRenderer surfaceRenderer)
     {
@@ -121,23 +132,26 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         }
     }
 
+    /**
+     * Mask.
+     *
+     * @param chunkSurfaceImage the chunk surface image
+     * @param chunkImage        the chunk image
+     * @param chunkMd           the chunk md
+     * @param x                 the x
+     * @param y                 the y
+     * @param z                 the z
+     */
     protected void mask(final BufferedImage chunkSurfaceImage, final BufferedImage chunkImage,
-                        final ChunkMD chunkMd, final int x, final int y, final int z)
-    {
-        if (chunkSurfaceImage == null || !mapSurfaceAboveCaves)
-        {
+                        final ChunkMD chunkMd, final int x, final int y, final int z) {
+        if (chunkSurfaceImage == null || !mapSurfaceAboveCaves) {
             paintBlackBlock(chunkImage, x, z);
-        }
-        else
-        {
+        } else {
             int surfaceY = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
             int distance = Math.max(0, surfaceY - y);
-            if (distance > 16)
-            {
+            if (distance > 16) {
                 paintBlackBlock(chunkImage, x, z);
-            }
-            else
-            {
+            } else {
                 //float dim = Math.max(defaultDim, 16f / distance);
                 paintDimOverlay(chunkSurfaceImage, chunkImage, x, z, defaultDim);
             }
@@ -146,6 +160,12 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for underground.
+     *
+     * @param chunkSurfaceImage the chunk surface image
+     * @param chunkSliceImage   the chunk slice image
+     * @param chunkMd           the chunk md
+     * @param vSlice            the v slice
+     * @return the boolean
      */
     protected boolean renderUnderground(final BufferedImage chunkSurfaceImage, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final int vSlice)
     {
@@ -169,7 +189,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     final int ceiling = getBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
 
                     // Oh look, a hole in the world.
-                    if (ceiling < 0)
+                    if (ceiling <= 0)
                     {
                         paintVoidBlock(chunkSliceImage, x, z);
                         chunkOk = true;
@@ -178,7 +198,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
                     y = Math.min(ceiling, sliceMaxY);
 
-                    buildStrata(strata, sliceMinY, chunkMd, x, y, z);
+                    buildStrata(strata, sliceMinY - 1, chunkMd, x, y, z);
 
                     if (strata.isEmpty())
                     {
@@ -208,6 +228,13 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Create Strata for caves, using first lit blocks found.
+     *
+     * @param strata  the strata
+     * @param minY    the min y
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param topY    the top y
+     * @param z       the z
      */
     protected void buildStrata(Strata strata, int minY, ChunkMD chunkMd, int x, final int topY, int z)
     {
@@ -224,27 +251,30 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             {
                 blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
 
-                if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                if (!blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.OpenToSky))
                 {
                     strata.setBlocksFound(true);
                     blockAboveMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
 
-                    if (blockMD.isLava() && (blockAboveMD.isLava() || y < minY))
+                    if (blockMD.isLava() && blockAboveMD.isLava())
                     {
                         // Ignores the myriad tiny one-block pockets of lava in the Nether
                         lavaBlockMD = blockMD;
+                    } else if (blockMD.isLava() && y < minY) {
+                        // Ignores the myriad tiny one-block pockets of lava in the Nether
+                        //lavaBlockMD = blockMD;
                     }
 
-                    if (blockAboveMD.isAir() || blockAboveMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (blockAboveMD.isIgnore() || blockAboveMD.hasFlag(BlockFlag.OpenToSky))
                     {
-                        if (!chunkMd.canBlockSeeTheSky(x, y + 1, z))
+                        if (chunkMd.hasNoSky() || !chunkMd.canBlockSeeTheSky(x, y + 1, z))
                         {
                             lightLevel = getSliceLightLevel(chunkMd, x, y, z, true);
 
                             if (lightLevel > 0)
                             {
                                 strata.push(chunkMd, blockMD, x, y, z, lightLevel);
-                                if (blockMD.getAlpha() == 1f || !mapTransparency)
+                                if (!blockMD.hasTransparency() || !mapTransparency)
                                 {
                                     break;
                                 }
@@ -257,8 +287,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     }
                     else
                     {
-                        x = x;
-                        break;
+                        //break;
                     }
                 }
                 y--;
@@ -277,6 +306,15 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Paint the image with the color derived from a BlockStack
+     *
+     * @param strata          the strata
+     * @param chunkSliceImage the chunk slice image
+     * @param chunkMd         the chunk md
+     * @param vSlice          the v slice
+     * @param x               the x
+     * @param y               the y
+     * @param z               the z
+     * @return the boolean
      */
     protected boolean paintStrata(final Strata strata, final BufferedImage chunkSliceImage, final ChunkMD chunkMd, final Integer vSlice, final int x, final int y, final int z)
     {
@@ -320,7 +358,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             // Now add bevel for slope
             if (!(blockMD.hasNoShadow()))
             {
-                float slope = getSlope(chunkMd, blockMD, x, vSlice, z);
+                float slope = getSlope(chunkMd, x, vSlice, z);
                 if (slope != 1f)
                 {
                     strata.setRenderCaveColor(RGB.bevelSlope(strata.getRenderCaveColor(), slope));
@@ -374,7 +412,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 while (y > 0 && y > sliceMinY)
                 {
                     blockMDAbove = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y + 1, z);
-                    if (!blockMDAbove.isAir() && !blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMDAbove.isIgnore() && !blockMDAbove.hasFlag(BlockFlag.OpenToSky))
                     {
                         break;
                     }
@@ -395,11 +433,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     y--;
                 }
 
-                inAirPocket = blockMD.isAir();
+                inAirPocket = blockMD.isIgnore();
 
-                if (blockMDAbove.isAir() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockMD.Flag.OpenToSky))
+                if (blockMDAbove.isIgnore() || blockMDAbove.hasTransparency() || blockMDAbove.hasFlag(BlockFlag.OpenToSky))
                 {
-                    if (!blockMD.isAir() || !blockMD.hasTransparency() || !blockMD.hasFlag(BlockMD.Flag.OpenToSky))
+                    if (!blockMD.isIgnore() || !blockMD.hasTransparency() || !blockMD.hasFlag(BlockFlag.OpenToSky))
                     {
                         break;
                     }
@@ -430,6 +468,13 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Get the light level for the block in the slice.  Can be overridden to provide an ambient light minimum.
+     *
+     * @param chunkMd  the chunk md
+     * @param x        the x
+     * @param y        the y
+     * @param z        the z
+     * @param adjusted the adjusted
+     * @return the slice light level
      */
     protected int getSliceLightLevel(ChunkMD chunkMd, int x, int y, int z, boolean adjusted)
     {

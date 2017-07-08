@@ -1,14 +1,14 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.data;
 
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.MapMaker;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.model.*;
@@ -22,6 +22,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.registries.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -30,34 +31,91 @@ import java.util.concurrent.TimeUnit;
 /**
  * The mother of all cache managers.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public enum DataCache
 {
+    /**
+     * Instance data cache.
+     */
     INSTANCE;
 
+    /**
+     * The All.
+     */
     final LoadingCache<Long, Map> all;
+    /**
+     * The Animals.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> animals;
+    /**
+     * The Mobs.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> mobs;
+    /**
+     * The Players.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> players;
+    /**
+     * The Villagers.
+     */
     final LoadingCache<Class, Map<String, EntityDTO>> villagers;
+    /**
+     * The Waypoints.
+     */
     final LoadingCache<Class, Collection<Waypoint>> waypoints;
+    /**
+     * The Player.
+     */
     final LoadingCache<Class, EntityDTO> player;
+    /**
+     * The World.
+     */
     final LoadingCache<Class, WorldData> world;
+    /**
+     * The Region image sets.
+     */
     final LoadingCache<RegionImageSet.Key, RegionImageSet> regionImageSets;
+    /**
+     * The Messages.
+     */
     final LoadingCache<Class, Map<String, Object>> messages;
+    /**
+     * The Entity draw steps.
+     */
     final LoadingCache<EntityLivingBase, DrawEntityStep> entityDrawSteps;
+    /**
+     * The Waypoint draw steps.
+     */
     final LoadingCache<Waypoint, DrawWayPointStep> waypointDrawSteps;
+    /**
+     * The Entity dt os.
+     */
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
+    /**
+     * The Region coords.
+     */
     final Cache<String, RegionCoord> regionCoords;
+    /**
+     * The Map types.
+     */
     final Cache<String, MapType> mapTypes;
+    /**
+     * The Block metadata.
+     */
     final Map<IBlockState, BlockMD> blockMetadata;
+    /**
+     * The Chunk metadata.
+     */
     final Cache<ChunkPos, ChunkMD> chunkMetadata;
-    final ProxyRemovalListener<ChunkPos, ChunkMD> chunkMetadataRemovalListener;
+
+    /**
+     * The Managed caches.
+     */
     final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
     //final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
     private final int chunkCacheExpireSeconds = 30;
-    private final int defaultConcurrencyLevel = 1;
+    private final int defaultConcurrencyLevel = 2;
 
 
     // Private constructor
@@ -111,10 +169,10 @@ public enum DataCache
         regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        blockMetadata = new MapMaker().weakKeys().initialCapacity(5000).concurrencyLevel(2).makeMap();
+        blockMetadata = new MapMaker().weakKeys().initialCapacity(GameData.getBlockStateIDMap().size()).concurrencyLevel(2).makeMap();
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<>();
-        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build();
+        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
+
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
@@ -124,8 +182,12 @@ public enum DataCache
         managedCaches.put(mapTypes, "MapType");
     }
 
-    public static EntityDTO getPlayer()
-    {
+    /**
+     * Gets player.
+     *
+     * @return the player
+     */
+    public static EntityDTO getPlayer() {
         return INSTANCE.getPlayer(false);
     }
 
@@ -145,27 +207,12 @@ public enum DataCache
         return builder;
     }
 
-//    public void addPrivateCache(String name, Cache cache)
-//    {
-//        if (privateCaches.containsValue(name))
-//        {
-//            Journeymap.getLogger().warn("Overriding private cache: " + name);
-//        }
-//        privateCaches.put(cache, name);
-//    }
-//
-//    public Cache getPrivateCache(String name)
-//    {
-//        for (Map.Entry<Cache, String> entry : privateCaches.entrySet())
-//        {
-//            if (entry.getValue().equals(name))
-//            {
-//                return entry.getKey();
-//            }
-//        }
-//        return null;
-//    }
-
+    /**
+     * Gets all.
+     *
+     * @param since the since
+     * @return the all
+     */
     public Map getAll(long since)
     {
         synchronized (all)
@@ -182,170 +229,177 @@ public enum DataCache
         }
     }
 
-    public Map<String, EntityDTO> getAnimals(boolean forceRefresh)
-    {
-        synchronized (animals)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets animals.
+     *
+     * @param forceRefresh the force refresh
+     * @return the animals
+     */
+    public Map<String, EntityDTO> getAnimals(boolean forceRefresh) {
+        synchronized (animals) {
+            try {
+                if (forceRefresh) {
                     animals.invalidateAll();
                 }
                 return animals.get(AnimalsData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getAnimals: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
     }
 
-    public Map<String, EntityDTO> getMobs(boolean forceRefresh)
-    {
-        synchronized (mobs)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets mobs.
+     *
+     * @param forceRefresh the force refresh
+     * @return the mobs
+     */
+    public Map<String, EntityDTO> getMobs(boolean forceRefresh) {
+        synchronized (mobs) {
+            try {
+                if (forceRefresh) {
                     mobs.invalidateAll();
                 }
                 return mobs.get(MobsData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getMobs: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
     }
 
-    public Map<String, EntityDTO> getPlayers(boolean forceRefresh)
-    {
-        synchronized (players)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets players.
+     *
+     * @param forceRefresh the force refresh
+     * @return the players
+     */
+    public Map<String, EntityDTO> getPlayers(boolean forceRefresh) {
+        synchronized (players) {
+            try {
+                if (forceRefresh) {
                     players.invalidateAll();
                 }
                 return players.get(PlayersData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getPlayers: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
     }
 
-    public EntityDTO getPlayer(boolean forceRefresh)
-    {
-        synchronized (player)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets player.
+     *
+     * @param forceRefresh the force refresh
+     * @return the player
+     */
+    public EntityDTO getPlayer(boolean forceRefresh) {
+        synchronized (player) {
+            try {
+                if (forceRefresh) {
                     player.invalidateAll();
                 }
                 return player.get(PlayerData.class);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Journeymap.getLogger().error("ExecutionException in getPlayer: " + LogFormatter.toString(e));
                 return null;
             }
         }
     }
 
-    public Map<String, EntityDTO> getVillagers(boolean forceRefresh)
-    {
-        synchronized (villagers)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets villagers.
+     *
+     * @param forceRefresh the force refresh
+     * @return the villagers
+     */
+    public Map<String, EntityDTO> getVillagers(boolean forceRefresh) {
+        synchronized (villagers) {
+            try {
+                if (forceRefresh) {
                     villagers.invalidateAll();
                 }
                 return villagers.get(VillagersData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getVillagers: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
     }
 
-    public MapType getMapType(MapType.Name name, Integer vSlice, int dimension)
-    {
+    /**
+     * Gets map type.
+     *
+     * @param name      the name
+     * @param vSlice    the v slice
+     * @param dimension the dimension
+     * @return the map type
+     */
+    public MapType getMapType(MapType.Name name, Integer vSlice, int dimension) {
         // Guarantee surface types don't use a slice
         vSlice = (name != MapType.Name.underground) ? null : vSlice;
 
         MapType mapType = mapTypes.getIfPresent(MapType.toCacheKey(name, vSlice, dimension));
-        if (mapType == null)
-        {
+        if (mapType == null) {
             mapType = new MapType(name, vSlice, dimension);
             mapTypes.put(mapType.toCacheKey(), mapType);
         }
         return mapType;
     }
 
-    public Collection<Waypoint> getWaypoints(boolean forceRefresh)
-    {
-        synchronized (waypoints)
-        {
-            if (WaypointsData.isManagerEnabled())
-            {
+    /**
+     * Gets waypoints.
+     *
+     * @param forceRefresh the force refresh
+     * @return the waypoints
+     */
+    public Collection<Waypoint> getWaypoints(boolean forceRefresh) {
+        synchronized (waypoints) {
+            if (WaypointsData.isManagerEnabled()) {
                 // The store is the cache
                 return WaypointStore.INSTANCE.getAll();
-            }
-            else
-            {
+            } else {
                 return Collections.EMPTY_LIST;
             }
         }
     }
 
-    public Map<String, Object> getMessages(boolean forceRefresh)
-    {
-        synchronized (messages)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets messages.
+     *
+     * @param forceRefresh the force refresh
+     * @return the messages
+     */
+    public Map<String, Object> getMessages(boolean forceRefresh) {
+        synchronized (messages) {
+            try {
+                if (forceRefresh) {
                     messages.invalidateAll();
                 }
                 return messages.get(MessagesData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getMessages: " + LogFormatter.toString(e));
                 return Collections.EMPTY_MAP;
             }
         }
     }
 
-    public WorldData getWorld(boolean forceRefresh)
-    {
-        synchronized (world)
-        {
-            try
-            {
-                if (forceRefresh)
-                {
+    /**
+     * Gets world.
+     *
+     * @param forceRefresh the force refresh
+     * @return the world
+     */
+    public WorldData getWorld(boolean forceRefresh) {
+        synchronized (world) {
+            try {
+                if (forceRefresh) {
                     world.invalidateAll();
                 }
                 return world.get(WorldData.class);
-            }
-            catch (ExecutionException e)
-            {
+            } catch (ExecutionException e) {
                 Journeymap.getLogger().error("ExecutionException in getWorld: " + LogFormatter.toString(e));
                 return new WorldData();
             }
@@ -365,92 +419,163 @@ public enum DataCache
         entityDTOs.invalidateAll();
     }
 
-    public DrawEntityStep getDrawEntityStep(EntityLivingBase entity)
-    {
-        synchronized (entityDrawSteps)
-        {
+    /**
+     * Gets draw entity step.
+     *
+     * @param entity the entity
+     * @return the draw entity step
+     */
+    public DrawEntityStep getDrawEntityStep(EntityLivingBase entity) {
+        synchronized (entityDrawSteps) {
             return entityDrawSteps.getUnchecked(entity);
         }
     }
 
-    public EntityDTO getEntityDTO(EntityLivingBase entity)
-    {
-        synchronized (entityDTOs)
-        {
+    /**
+     * Gets entity dto.
+     *
+     * @param entity the entity
+     * @return the entity dto
+     */
+    public EntityDTO getEntityDTO(EntityLivingBase entity) {
+        synchronized (entityDTOs) {
             return entityDTOs.getUnchecked(entity);
         }
     }
 
-    public DrawWayPointStep getDrawWayPointStep(Waypoint waypoint)
-    {
-        synchronized (waypointDrawSteps)
-        {
+    /**
+     * Gets draw way point step.
+     *
+     * @param waypoint the waypoint
+     * @return the draw way point step
+     */
+    public DrawWayPointStep getDrawWayPointStep(Waypoint waypoint) {
+        synchronized (waypointDrawSteps) {
             return waypointDrawSteps.getUnchecked(waypoint);
         }
     }
 
-    public BlockMD getBlockMD(final IBlockState aBlockState)
-    {
-        try
-        {
-            return blockMetadata.computeIfAbsent(aBlockState, BlockMD::create);
+    /**
+     * Whether there's a BlockMD for the state.
+     */
+    public boolean hasBlockMD(final IBlockState aBlockState) {
+        try {
+            return blockMetadata.containsKey(aBlockState);
+        } catch (Exception e) {
+            return false;
         }
-        catch (Exception e)
-        {
+    }
+
+    /**
+     * Gets block md.
+     *
+     * @param aBlockState the a block state
+     * @return the block md
+     */
+    public BlockMD getBlockMD(final IBlockState aBlockState) {
+        try {
+            return blockMetadata.computeIfAbsent(aBlockState, blockState -> {
+
+                if (BlockMD.AIRBLOCK == null) {
+                    BlockMD.reset();
+                }
+
+                IBlockState defaultBlockState = BlockMD.getDefaultUpFacing(blockState);
+                BlockMD defaultBlockMD = blockMetadata.computeIfAbsent(defaultBlockState, BlockMD::create);
+                if (defaultBlockMD == null) {
+                    // TODO: verify this shouldn't happen.  Null should never be returned
+                    blockMetadata.put(blockState, BlockMD.AIRBLOCK);
+                    return BlockMD.AIRBLOCK;
+                }
+                if (defaultBlockMD.isUseDefaultState()) {
+                    blockMetadata.put(blockState, defaultBlockMD);
+                    return defaultBlockMD;
+                }
+
+                IBlockState upBlockState = BlockMD.getUpFacing(blockState, null);
+                if (upBlockState != null) {
+                    BlockMD upBlockMD = blockMetadata.computeIfAbsent(upBlockState, BlockMD::create);
+                    blockMetadata.put(blockState, upBlockMD);
+                    return upBlockMD;
+                }
+
+                return blockMetadata.computeIfAbsent(blockState, BlockMD::create);
+            });
+        } catch (Exception e) {
             return BlockMD.AIRBLOCK;
         }
     }
 
-    public void resetBlockMetadata()
-    {
+    public int getBlockMDCount() {
+        return blockMetadata.size();
+    }
+
+    /**
+     * Use BlockMD.getAll() when in doubt.
+     *
+     * @return
+     */
+    public Set<BlockMD> getLoadedBlockMDs() {
+        return new HashSet<>(blockMetadata.values());
+    }
+
+    /**
+     * Reset block metadata.
+     */
+    public void resetBlockMetadata() {
         blockMetadata.clear();
     }
 
-    public ChunkMD getChunkMD(BlockPos blockPos)
-    {
+    /**
+     * Gets chunk md.
+     *
+     * @param blockPos the block pos
+     * @return the chunk md
+     */
+    public ChunkMD getChunkMD(BlockPos blockPos) {
         return getChunkMD(new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4));
     }
 
-    public ChunkMD getChunkMD(ChunkPos coord)
-    {
-        synchronized (chunkMetadata)
-        {
+    /**
+     * Gets chunk md.
+     *
+     * @param coord the coord
+     * @return the chunk md
+     */
+    public ChunkMD getChunkMD(ChunkPos coord) {
+        synchronized (chunkMetadata) {
             ChunkMD chunkMD = null;
 
-            try
-            {
+            try {
                 chunkMD = chunkMetadata.getIfPresent(coord);
-                if (chunkMD == null)
-                {
-                    chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.x, coord.z);
-                    if (chunkMD != null)
-                    {
-                        chunkMetadata.put(coord, chunkMD);
-                    }
+                if (chunkMD != null && chunkMD.hasChunk()) {
+                    return chunkMD;
                 }
-                if (chunkMD != null && !chunkMD.hasChunk())
-                {
+
+                chunkMD = ChunkLoader.getChunkMdFromMemory(FMLClientHandler.instance().getClient().world, coord.x, coord.z);
+                if (chunkMD != null && chunkMD.hasChunk()) {
+                    chunkMetadata.put(coord, chunkMD);
+                    return chunkMD;
+                }
+
+                if (chunkMD != null) {
                     chunkMetadata.invalidate(coord);
-                    chunkMD = null;
                 }
-            }
-            catch (CacheLoader.InvalidCacheLoadException e)
-            {
+                return null;
+            } catch (Throwable e) {
+                Journeymap.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
                 return null;
             }
-            catch (Throwable e)
-            {
-                Journeymap.getLogger().warn("Unexpected error getting ChunkMD from cache: " + e);
-            }
-
-            return chunkMD;
         }
     }
 
-    public void addChunkMD(ChunkMD chunkMD)
-    {
-        synchronized (chunkMetadata)
-        {
+    /**
+     * Add chunk md.
+     *
+     * @param chunkMD the chunk md
+     */
+    public void addChunkMD(ChunkMD chunkMD) {
+        synchronized (chunkMetadata) {
             chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
     }
@@ -471,22 +596,21 @@ public enum DataCache
 //        }
 //    }
 
-    public void invalidateChunkMDCache()
-    {
-        //synchronized (chunkMetadata)
-        {
-            chunkMetadata.invalidateAll();
-        }
+    /**
+     * Invalidate chunk md cache.
+     */
+    public void invalidateChunkMDCache() {
+        chunkMetadata.invalidateAll();
     }
 
-    public void stopChunkMDRetention()
-    {
+    /**
+     * Stop chunk md retention.
+     */
+    public void stopChunkMDRetention() {
         //synchronized (chunkMetadata)
         {
-            for (ChunkMD chunkMD : chunkMetadata.asMap().values())
-            {
-                if (chunkMD != null)
-                {
+            for (ChunkMD chunkMD : chunkMetadata.asMap().values()) {
+                if (chunkMD != null) {
                     chunkMD.stopChunkRetention();
                 }
             }
@@ -506,13 +630,21 @@ public enum DataCache
 //        BlockMD.reset();
 //    }
 
-    public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
-    {
+    /**
+     * Gets region image sets.
+     *
+     * @return the region image sets
+     */
+    public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets() {
         return regionImageSets;
     }
 
-    public Cache<String, RegionCoord> getRegionCoords()
-    {
+    /**
+     * Gets region coords.
+     *
+     * @return the region coords
+     */
+    public Cache<String, RegionCoord> getRegionCoords() {
         return regionCoords;
     }
 
@@ -559,16 +691,17 @@ public enum DataCache
 //        }
     }
 
-    public String getDebugHtml()
-    {
+    /**
+     * Gets debug html.
+     *
+     * @return the debug html
+     */
+    public String getDebugHtml() {
         StringBuffer sb = new StringBuffer();
-        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get())
-        {
+        if (Journeymap.getClient().getCoreProperties().recordCacheStats.get()) {
             appendDebugHtml(sb, "Managed Caches", managedCaches);
             //appendDebugHtml(sb, "Private Caches", privateCaches);
-        }
-        else
-        {
+        } else {
             sb.append("<b>Cache stat recording disabled.  Set config/journeymap.core.config 'recordCacheStats' to 1.</b>");
         }
         return sb.toString();
@@ -605,36 +738,5 @@ public enum DataCache
         }
 
         return String.format("%s<b>%20s:</b> Size: %9s, Hits: %9s, Misses: %9s, Loads: %9s, Errors: %9s, Avg Load Time: %1.2fms", LogFormatter.LINEBREAK, label, cache.size(), cacheStats.hitCount(), cacheStats.missCount(), cacheStats.loadCount(), cacheStats.loadExceptionCount(), avgLoadMillis);
-    }
-
-    class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
-    {
-        final Map<RemovalListener<K, V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K, V>, Void>());
-
-        void addDelegateListener(RemovalListener<K, V> delegate)
-        {
-            if (delegates.containsKey(delegate))
-            {
-                Journeymap.getLogger().warn("RemovalListener already added: " + delegate.getClass());
-            }
-            else
-            {
-                delegates.put(delegate, null);
-            }
-        }
-
-        void removeDelegateListener(RemovalListener<K, V> delegate)
-        {
-            delegates.remove(delegate);
-        }
-
-        @Override
-        public void onRemoval(RemovalNotification<K, V> notification)
-        {
-            for (RemovalListener<K, V> delegate : delegates.keySet())
-            {
-                delegate.onRemoval(notification);
-            }
-        }
     }
 }

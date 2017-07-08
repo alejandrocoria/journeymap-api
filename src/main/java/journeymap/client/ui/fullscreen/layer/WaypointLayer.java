@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.fullscreen.layer;
 
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.model.Waypoint;

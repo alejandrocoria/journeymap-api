@@ -11,7 +11,7 @@ package journeymap.client.ui.option;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.ui.component.CheckBox;
 import journeymap.client.ui.component.IntSliderButton;
 import journeymap.client.ui.component.ListPropertyButton;

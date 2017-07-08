@@ -105,7 +105,7 @@ public class MapRegionTask extends BaseMapTask
         for (ChunkPos coord : retainedCoords)
         {
             ChunkMD chunkMD = ChunkLoader.getChunkMD(loader, mc, coord, true);
-            if (chunkMD != null && !chunkMD.getChunk().isEmpty())
+            if (chunkMD != null && chunkMD.hasChunk())
             {
                 DataCache.INSTANCE.addChunkMD(chunkMD);
             }

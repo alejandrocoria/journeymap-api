@@ -8,7 +8,7 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.io.ThemeFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.MiniMapProperties;

@@ -12,7 +12,7 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.impl.IMCHandler;
 import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
-import journeymap.client.cartography.ColorManager;
+import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.event.EventHandlerManager;
@@ -479,7 +479,6 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.reset();
-            ColorManager.instance().ensureCurrent();
 
             multithreadTaskController = new TaskController();
             multithreadTaskController.enableTasks();
@@ -513,6 +512,11 @@ public class JourneymapClient implements CommonProxy
                 logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId),
                         File.separator, mc.world.provider.getDimension()));
                 RegionImageCache.INSTANCE.flushToDiskAsync(true);
+
+                ColorPalette colorPalette = ColorPalette.getActiveColorPalette();
+                if (colorPalette != null) {
+                    colorPalette.writeToFile();
+                }
             }
 
             if (multithreadTaskController != null)

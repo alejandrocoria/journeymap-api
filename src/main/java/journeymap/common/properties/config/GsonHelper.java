@@ -2,7 +2,7 @@ package journeymap.common.properties.config;
 
 import com.google.common.base.Joiner;
 import com.google.gson.*;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.model.GridSpec;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;

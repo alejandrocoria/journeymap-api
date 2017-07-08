@@ -9,12 +9,9 @@
 package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.BlockCoordIntPair;
-import journeymap.client.model.BlockMD;
-import journeymap.client.model.ChunkMD;
-import journeymap.client.model.MapType;
+import journeymap.client.model.*;
 import journeymap.client.properties.TopoProperties;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
@@ -172,14 +169,14 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                     if (mapBathymetry)
                     {
-                        Integer[][] waterHeights = getWaterHeights(chunkMd, null);
+                        Integer[][] waterHeights = getFluidHeights(chunkMd, null);
                         if (waterHeights[z] != null && waterHeights[z][x] != null)
                         {
-                            y = getWaterHeights(chunkMd, null)[z][x];
+                            y = getFluidHeights(chunkMd, null)[z][x];
                         }
                     }
 
-                    topBlockMd = chunkMd.getTopBlockMD(x, y, z);
+                    topBlockMd = chunkMd.getBlockMD(x, y, z);
                     if (topBlockMd == null)
                     {
                         paintBadBlock(chunkImage, x, y, z);
@@ -227,14 +224,15 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 {
                     if (mapBathymetry)
                     {
-                        getWaterHeights(chunkMd, null)[localZ][localX] = y;
+                        getFluidHeights(chunkMd, null)[localZ][localX] = y;
                     }
                     else
                     {
                         break;
                     }
-                }
-                else if (!blockMD.isAir() && !blockMD.hasFlag(BlockMD.Flag.NoTopo))
+                } else if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop)) {
+                    // ignore
+                } else if (!blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.NoTopo))
                 {
                     break;
                 }
@@ -275,7 +273,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                 boolean isWater = false;
 
-                if (blockMD.isWater() || blockMD.isIce() || (mapBathymetry && getWaterHeights(chunkMd, null)[z][x] != null))
+                if (blockMD.isWater() || blockMD.isIce() || (mapBathymetry && getFluidHeights(chunkMd, null)[z][x] != null))
                 {
                     isWater = true;
                     contourInterval = waterContourInterval;
@@ -307,14 +305,14 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
                         if (targetChunkMd != null)
                         {
-                            if (mapBathymetry && (mapBathymetry && getWaterHeights(chunkMd, null)[z][x] == null))
+                            if (mapBathymetry && (mapBathymetry && getFluidHeights(chunkMd, null)[z][x] == null))
                             {
                                 isShore = true;
                             }
                             else
                             {
                                 int ceiling = targetChunkMd.ceiling(newX, newZ);
-                                BlockMD offsetBlock = targetChunkMd.getTopBlockMD(newX, ceiling, newZ);
+                                BlockMD offsetBlock = targetChunkMd.getBlockMD(newX, ceiling, newZ);
                                 if (!offsetBlock.isWater() && !offsetBlock.isIce())
                                 {
                                     isShore = true;
@@ -388,7 +386,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         try
         {
 
-            float slope = getSlope(chunkMd, topBlockMd, x, null, z);
+            float slope = getSlope(chunkMd, x, null, z);
             boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
 
             int color;
@@ -402,7 +400,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 if (topBlockMd.isLava())
                 {
                     // Use standard lava color
-                    color = topBlockMd.getColor();
+                    color = topBlockMd.getTextureColor();
                 }
                 else if (isWater)
                 {

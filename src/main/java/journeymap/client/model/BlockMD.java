@@ -1,37 +1,46 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.model;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import journeymap.client.cartography.ColorHelper;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
-import journeymap.client.model.mod.ModBlockDelegate;
-import journeymap.client.model.mod.vanilla.VanillaColorHandler;
+import journeymap.client.mod.IBlockColorProxy;
+import journeymap.client.mod.IBlockSpritesProxy;
+import journeymap.client.mod.ModBlockDelegate;
 import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.registries.GameData;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Block + meta = BlockMetaData.  Carries color, flags, and other
@@ -39,58 +48,80 @@ import java.util.*;
  */
 public class BlockMD implements Comparable<BlockMD>
 {
-    public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
-    public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
-    public static BlockMD AIRBLOCK;
-    public static BlockMD VOIDBLOCK;
+    /**
+     * Flags for plants and crops.
+     */
+    public static final EnumSet<BlockFlag> FlagsPlantAndCrop = EnumSet.of(BlockFlag.Plant, BlockFlag.Crop);
+
+    /**
+     * Non-error, non-ignore Flags.
+     */
+    public static final EnumSet<BlockFlag> FlagsNormal = EnumSet.complementOf(EnumSet.of(BlockFlag.Error, BlockFlag.Ignore));
+
+    /**
+     * Air stand-in.
+     */
+    public static final BlockMD AIRBLOCK = new BlockMD(Blocks.AIR.getDefaultState(), "minecraft:air", "0", "Air", 0f, EnumSet.of(BlockFlag.Ignore), false);
+    /**
+     * Void stand-io.
+     */
+    public static final BlockMD VOIDBLOCK = new BlockMD(Blocks.AIR.getDefaultState(), "journeymap:void", "0", "Void", 0f, EnumSet.of(BlockFlag.Ignore), false);
+
     private static Logger LOGGER = Journeymap.getLogger();
-    private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
     private final IBlockState blockState;
-    private final String uid;
+    private final String blockId;
+    private final String blockStateId;
     private final String name;
-    private EnumSet<Flag> flags;
-    private int textureSide;
+    private EnumSet<BlockFlag> flags;
     private Integer color;
     private float alpha;
-    private String iconName;
-    private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
-    private ModBlockDelegate.IModBlockHandler modBlockHandler;
+
+    private IBlockSpritesProxy blockSpritesProxy;
+    private IBlockColorProxy blockColorProxy;
+
     private boolean useDefaultState;
 
     private boolean noShadow;
-    private boolean isAir;
+    private boolean isIgnore;
     private boolean isWater;
     private boolean isLava;
+    private boolean isFluid;
+    private boolean isFire;
     private boolean isIce;
     private boolean isFoliage;
     private boolean isGrass;
-    private boolean isTransparentRoof;
     private boolean isPlantOrCrop;
-    private boolean isBiomeColored;
+    private boolean isError;
 
-    public static BlockMD create(@Nonnull IBlockState blockState)
-    {
-        try
-        {
-            if (blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir || blockState.getRenderType()== EnumBlockRenderType.INVISIBLE)
-            {
+    private transient boolean isDefaultState;
+
+    /**
+     * Create block md.
+     *
+     * @param blockState the block state
+     * @return the block md
+     */
+    public static BlockMD create(@Nonnull IBlockState blockState) {
+        try {
+            if (blockState instanceof IExtendedBlockState) {
+                IBlockState clean = ((IExtendedBlockState) blockState).getClean();
+                if (clean != null) {
+                    blockState = clean;
+                }
+            }
+
+            if (blockState == null || blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir || blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
                 return BlockMD.AIRBLOCK;
             }
 
-            if (blockState.getBlock().getRegistryName() == null)
-            {
-                if(LOGGER.isDebugEnabled())
-                {
-                    Journeymap.getLogger().debug("Unregistered block will be treated like air: " + blockState);
-                }
+            if (blockState.getBlock().getRegistryName() == null) {
+                LOGGER.warn("Unregistered block will be treated like air: " + blockState);
                 return BlockMD.AIRBLOCK;
             }
 
             return new BlockMD(blockState);
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
+        } catch (Exception e) {
+            LOGGER.error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
             return BlockMD.AIRBLOCK;
         }
     }
@@ -100,67 +131,104 @@ public class BlockMD implements Comparable<BlockMD>
      */
     private BlockMD(@Nonnull IBlockState blockState)
     {
-        this(blockState, blockState.getBlock().getRegistryName().toString(), BlockMD.getBlockName(blockState), 1F, 1, EnumSet.noneOf(BlockMD.Flag.class));
+        this(blockState, getBlockId(blockState), getBlockStateId(blockState), getBlockName(blockState));
     }
 
     /**
      * Private constructor
      */
-    private BlockMD(@Nonnull IBlockState blockState, String uid, String name, Float alpha, int textureSide, EnumSet<Flag> flags)
+    private BlockMD(@Nonnull IBlockState blockState, String blockId, String blockStateId, String name) {
+        this(blockState, blockId, blockStateId, name, 1F, EnumSet.noneOf(BlockFlag.class), true);
+    }
+
+    /**
+     * Private constructor
+     */
+    private BlockMD(@Nonnull IBlockState blockState, String blockId, String blockStateId, String name, Float alpha, EnumSet<BlockFlag> flags, boolean initDelegates)
     {
         this.blockState = blockState;
-        this.uid = uid;
+        this.blockId = blockId;
+        this.blockStateId = blockStateId;
         this.name = name;
         this.alpha = alpha;
-        this.textureSide = textureSide;
         this.flags = flags;
-        this.blockColorHandler = VanillaColorHandler.INSTANCE;
-        if (blockState != null && blockState.getBlock() != null && uid != null)
+        if (initDelegates)
         {
-            modBlockDelegate.initialize(this);
+            ModBlockDelegate.INSTANCE.initialize(this);
         }
         updateProperties();
     }
 
+    private BlockMD getDefaultUpFacing() {
+        if (isDefaultState) {
+            return this;
+        }
+        BlockMD defaultUpFacing = BlockMD.get(BlockMD.getDefaultUpFacing(blockState));
+        if (defaultUpFacing == this) {
+            this.isDefaultState = true;
+        }
+        return defaultUpFacing;
+    }
+
+    public Set<BlockMD> getValidStateMDs() {
+        return getBlock().getBlockState().getValidStates().stream()
+                .map(BlockMD::get)
+                .collect(Collectors.toSet());
+    }
+
     private void updateProperties()
     {
-
-        isAir = (blockState == null || hasFlag(Flag.HasAir) || blockState.getBlock() instanceof BlockAir);
+        isIgnore = (blockState == null || hasFlag(BlockFlag.Ignore) || blockState.getBlock() instanceof BlockAir || blockState.getRenderType() == EnumBlockRenderType.INVISIBLE);
+        if (isIgnore) {
+            color = RGB.WHITE_ARGB;
+            setAlpha(0f);
+            flags.add(BlockFlag.Ignore);
+            flags.add(BlockFlag.OpenToSky);
+            flags.add(BlockFlag.NoShadow);
+        }
 
         if (blockState != null)
         {
-            isLava = blockState.getBlock() == Blocks.LAVA || blockState.getBlock() == Blocks.FLOWING_LAVA;
-            isIce = blockState.getBlock() == Blocks.ICE;
+            Block block = blockState.getBlock();
+            isLava = block == Blocks.LAVA || block == Blocks.FLOWING_LAVA;
+            isIce = block == Blocks.ICE;
+            isFire = block == Blocks.FIRE;
         }
 
-        isWater = hasFlag(Flag.Water);
-        isTransparentRoof = hasFlag(Flag.TransparentRoof);
-        noShadow = hasFlag(Flag.NoShadow);
-        isFoliage = hasFlag(Flag.Foliage);
-        isGrass = hasFlag(Flag.Grass);
+        useDefaultState = hasFlag(BlockFlag.DefaultState);
+        isFluid = hasFlag(BlockFlag.Fluid);
+        isWater = hasFlag(BlockFlag.Water);
+        noShadow = hasFlag(BlockFlag.NoShadow);
+        isFoliage = hasFlag(BlockFlag.Foliage);
+        isGrass = hasFlag(BlockFlag.Grass);
         isPlantOrCrop = hasAnyFlag(FlagsPlantAndCrop);
-        isBiomeColored = hasAnyFlag(FlagsBiomeColored);
+        isError = hasFlag(BlockFlag.Error);
     }
 
-    public boolean isUseDefaultState()
-    {
-        return useDefaultState;
-    }
-
-    public BlockMD setUseDefaultState(boolean useDefaultState)
-    {
-        this.useDefaultState = useDefaultState;
+    public BlockMD getCanonicalState() {
+        if (isUseDefaultState()) {
+            return getDefaultUpFacing();
+        }
         return this;
     }
 
+    /**
+     * Is use default state boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isUseDefaultState() {
+        return useDefaultState;
+    }
+
+    /**
+     * Gets block.
+     *
+     * @return the block
+     */
     public Block getBlock()
     {
         return blockState.getBlock();
-    }
-
-    public int getMeta()
-    {
-        return blockState.getBlock().getMetaFromState(blockState);
     }
 
     /**
@@ -169,39 +237,68 @@ public class BlockMD implements Comparable<BlockMD>
     public static void reset()
     {
         DataCache.INSTANCE.resetBlockMetadata();
-        ColorHelper.INSTANCE.resetIconColorCache();
+    }
 
-        // Create new delegate
-        modBlockDelegate = new ModBlockDelegate();
+    public static IBlockState getUpFacing(IBlockState blockState, @Nullable IBlockState fallBack) {
+        try {
+            if (blockState.getProperties().containsKey(BlockDirectional.FACING)) {
+                return blockState.withProperty(BlockDirectional.FACING, EnumFacing.UP);
+            }
+            return fallBack;
+        } catch (Exception e) {
+            LOGGER.error("Couldn't get EnumFacing.UP variant on " + blockState);
+        }
+        return fallBack;
+    }
 
-        // Dummy blocks
-        AIRBLOCK = new BlockMD(Blocks.AIR.getDefaultState(), "minecraft:air", "Air", 0f, 1, EnumSet.of(BlockMD.Flag.HasAir));
-        VOIDBLOCK = new BlockMD(Blocks.STRUCTURE_VOID.getDefaultState(), "journeymap:void", "Void", 0f, 1, EnumSet.noneOf(BlockMD.Flag.class));
-
-        // Load all registered block+metas
-        Collection<BlockMD> all = getAll();
-
-        // Final color updates
-        VanillaColorHandler.INSTANCE.setExplicitColors();
+    public static IBlockState getDefaultUpFacing(@Nonnull IBlockState blockState) {
+        IBlockState defaultBlockState = blockState.getBlock().getDefaultState();
+        return getUpFacing(defaultBlockState, defaultBlockState);
     }
 
     /**
      * Get all BlockMDs.
      *
-     * @return
+     * @return all
      */
-    public static Collection<BlockMD> getAll()
+    public static Set<BlockMD> getAll()
     {
-        List<BlockMD> allBlockMDs = new ArrayList<BlockMD>(512);
-        Block.REGISTRY.forEach(block -> {
-            allBlockMDs.addAll(BlockMD.getAllBlockMDs(block));
-        });
-        Collections.sort(allBlockMDs);
-        return allBlockMDs;
+        return StreamSupport.stream(GameData.getBlockStateIDMap().spliterator(), false)
+                .map(BlockMD::get)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Get all BlockMDs that should have colors.
+     *
+     * @return all
+     */
+    public static Set<BlockMD> getAllValid() {
+        return getAll().stream()
+                .filter(blockMD -> !blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.Error))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Get all BlockMDs for vanilla blocks
+     *
+     * @return all
+     */
+    public static Set<BlockMD> getAllMinecraft() {
+        return StreamSupport.stream(GameData.getBlockStateIDMap().spliterator(), false)
+                .filter(blockState1 -> blockState1.getBlock().getRegistryName().getResourceDomain().equals("minecraft"))
+                .map(BlockMD::get)
+                .collect(Collectors.toSet());
     }
 
     /**
      * Retrieves a BlockMD instance corresponding to chunk-local coords.
+     *
+     * @param chunkMd the chunk md
+     * @param localX  the local x
+     * @param y       the y
+     * @param localZ  the local z
+     * @return the block md from chunk local
      */
     public static BlockMD getBlockMDFromChunkLocal(ChunkMD chunkMd, int localX, int y, int localZ)
     {
@@ -210,6 +307,10 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Retrieves a BlockMD instance
+     *
+     * @param chunkMd  the chunk md
+     * @param blockPos the block pos
+     * @return the block md
      */
     public static BlockMD getBlockMD(ChunkMD chunkMd, BlockPos blockPos)
     {
@@ -236,24 +337,54 @@ public class BlockMD implements Comparable<BlockMD>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().x, chunkMd.getChunk().z, blockPos, LogFormatter.toString(e)));
+            LOGGER.error(String.format("Can't get blockId/meta for chunk %s,%s at %s : %s", chunkMd.getChunk().x, chunkMd.getChunk().z, blockPos, LogFormatter.toString(e)));
             return AIRBLOCK;
         }
     }
 
     /**
      * Retrieves/lazy-creates the corresponding BlockMD instance.
+     *
+     * @param blockState the block state
+     * @return the block md
      */
     public static BlockMD get(IBlockState blockState)
     {
         return DataCache.INSTANCE.getBlockMD(blockState);
     }
 
-    public static void debug()
+    /**
+     * Get a Block ID from the state.
+     */
+    public static String getBlockId(BlockMD blockMD)
     {
-        for (BlockMD blockMD : getAll())
+        return getBlockId(blockMD.getBlockState());
+    }
+
+    /**
+     * Get a Block ID from the state.
+     */
+    public static String getBlockId(IBlockState blockState) {
+        return Block.REGISTRY.getNameForObject(blockState.getBlock()).toString();
+    }
+
+    /**
+     * Get a BlockState ID from the state.
+     */
+    public static String getBlockStateId(BlockMD blockMD) {
+        return getBlockStateId(blockMD.getBlockState());
+    }
+
+    /**
+     * Get a BlockState ID from the state.
+     */
+    public static String getBlockStateId(IBlockState blockState) {
+        Collection properties = blockState.getProperties().values();
+        if (properties.isEmpty())
         {
-            Journeymap.getLogger().info(blockMD);
+            return Integer.toString(blockState.getBlock().getMetaFromState(blockState));
+        } else {
+            return Joiner.on(",").join(properties);
         }
     }
 
@@ -281,7 +412,7 @@ public class BlockMD implements Comparable<BlockMD>
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().debug(String.format("Couldn't get display name for %s: %s ", blockState, e));
+            LOGGER.debug(String.format("Couldn't get display name for %s: %s ", blockState, e));
         }
 
         if (Strings.isNullOrEmpty(displayName) || displayName.contains("tile"))
@@ -293,31 +424,19 @@ public class BlockMD implements Comparable<BlockMD>
     }
 
     /**
-     * Get all BlockMD variations for a given block.
-     */
-    public static Collection<BlockMD> getAllBlockMDs(Block block)
-    {
-        List<IBlockState> states = new ArrayList<IBlockState>(block.getBlockState().getValidStates());
-        Collections.sort(states, (o1, o2) -> Integer.compare(o1.getBlock().getMetaFromState(o1), o2.getBlock().getMetaFromState(o2)));
-
-        List<BlockMD> blockMDs = new ArrayList<BlockMD>(states.size());
-        for (IBlockState state : states)
-        {
-            blockMDs.add(BlockMD.get(state));
-        }
-        return blockMDs;
-    }
-
-    /**
      * Set flags on all BlockMD variations of Block.
+     *
+     * @param block the block
+     * @param flags the flags
      */
-    public static void setAllFlags(Block block, BlockMD.Flag... flags)
+    public static void setAllFlags(Block block, BlockFlag... flags)
     {
-        for (BlockMD blockMD : BlockMD.getAllBlockMDs(block))
+        BlockMD defaultBlockMD = BlockMD.get(block.getDefaultState());
+        for (BlockMD blockMD : defaultBlockMD.getValidStateMDs())
         {
             blockMD.addFlags(flags);
         }
-        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + flags);
+        LOGGER.debug(block.getUnlocalizedName() + " flags set: " + flags);
     }
 
     /**
@@ -326,7 +445,7 @@ public class BlockMD implements Comparable<BlockMD>
      * @param checkFlag the flag to check for
      * @return true if found
      */
-    public boolean hasFlag(Flag checkFlag)
+    public boolean hasFlag(BlockFlag checkFlag)
     {
         return flags.contains(checkFlag);
     }
@@ -337,9 +456,9 @@ public class BlockMD implements Comparable<BlockMD>
      * @param checkFlags the flags to check for
      * @return true if found
      */
-    public boolean hasAnyFlag(EnumSet<Flag> checkFlags)
+    public boolean hasAnyFlag(EnumSet<BlockFlag> checkFlags)
     {
-        for (Flag flag : checkFlags)
+        for (BlockFlag flag : checkFlags)
         {
             if (flags.contains(flag))
             {
@@ -351,17 +470,43 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Add flags.
+     *
+     * @param addFlags flags to add
      */
-    public void addFlags(Flag... addFlags)
+    public void addFlags(BlockFlag... addFlags)
     {
         Collections.addAll(this.flags, addFlags);
         updateProperties();
     }
 
     /**
-     * Add flags.
+     * Remove flags.
+     *
+     * @param removeFlags flags to remove
      */
-    public void addFlags(Collection<Flag> addFlags)
+    public void removeFlags(BlockFlag... removeFlags) {
+        for (BlockFlag flag : removeFlags) {
+            this.flags.remove(flag);
+        }
+        updateProperties();
+    }
+
+    /**
+     * Remove flags.
+     *
+     * @param removeFlags flags to remove
+     */
+    public void removeFlags(Collection<BlockFlag> removeFlags) {
+        this.flags.removeAll(removeFlags);
+        updateProperties();
+    }
+
+    /**
+     * Add flags.
+     *
+     * @param addFlags the add flags
+     */
+    public void addFlags(Collection<BlockFlag> addFlags)
     {
         this.flags.addAll(addFlags);
         updateProperties();
@@ -369,46 +514,86 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Gets block color using world coordinates.
+     *
+     * @param chunkMD  the chunk md
+     * @param blockPos the block pos
+     * @return the color
      */
-    public int getColor(ChunkMD chunkMD, BlockPos blockPos)
+    public int getBlockColor(ChunkMD chunkMD, BlockPos blockPos)
     {
-        return blockColorHandler.getBlockColor(chunkMD, this, blockPos);
+        return blockColorProxy.getBlockColor(chunkMD, this, blockPos);
     }
 
-    public Integer getColor()
+    /**
+     * Gets color.
+     *
+     * @return the color
+     */
+    public int getTextureColor()
     {
-        ensureColor();
+        if (color == null && !isError) {
+            this.color = blockColorProxy.deriveBlockColor(this);
+        }
         return this.color;
     }
 
-    public void setColor(Integer baseColor)
+    /**
+     * Clears the color.
+     */
+    public void clearColor() {
+        this.color = null;
+    }
+
+    /**
+     * Sets color.
+     *
+     * @param baseColor the base color
+     */
+    public int setColor(int baseColor)
     {
         this.color = baseColor;
+        return baseColor;
     }
 
-    public boolean ensureColor()
-    {
-        if (this.color == null)
-        {
-            this.color = this.blockColorHandler.getTextureColor(this);
-            return true;
-        }
-        return false;
+    /**
+     * Whether a color is set.
+     *
+     * @return
+     */
+    public boolean hasColor() {
+        return this.color != null;
     }
 
-    public void setBlockColorHandler(ModBlockDelegate.IModBlockColorHandler blockColorHandler)
-    {
-        this.blockColorHandler = blockColorHandler;
+    /**
+     * Sets blockSprites proxy.
+     *
+     * @param blockSpritesProxy the blockSprites proxy
+     */
+    public void setBlockSpritesProxy(IBlockSpritesProxy blockSpritesProxy) {
+        this.blockSpritesProxy = blockSpritesProxy;
     }
 
-    public String getIconName()
-    {
-        return iconName == null ? "" : iconName;
+    /**
+     * Returns blockSprites proxy.
+     */
+    public IBlockSpritesProxy getBlockSpritesProxy() {
+        return blockSpritesProxy;
     }
 
-    public void setIconName(String iconName)
-    {
-        this.iconName = iconName;
+    /**
+     * Sets block color proxy.
+     *
+     * @param blockColorProxy the block color handler
+     */
+    public void setBlockColorProxy(IBlockColorProxy blockColorProxy) {
+        this.blockColorProxy = blockColorProxy;
+    }
+
+    /**
+     * Returns block color proxy.
+     */
+    public IBlockColorProxy getBlockColorProxy() {
+        return blockColorProxy;
     }
 
     /**
@@ -429,20 +614,18 @@ public class BlockMD implements Comparable<BlockMD>
     public void setAlpha(float alpha)
     {
         this.alpha = alpha;
-        if (alpha < 1f)
-        {
-            this.flags.add(Flag.Transparency);
+        if (alpha < 1f) {
+            this.flags.add(BlockFlag.Transparency);
         }
-        else
-        {
-            this.flags.remove(Flag.Transparency);
+        else {
+            this.flags.remove(BlockFlag.Transparency);
         }
     }
 
     /**
      * Whether it should be used for beveled slope coloration.
      *
-     * @return
+     * @return boolean
      */
     public boolean hasNoShadow()
     {
@@ -479,9 +662,8 @@ public class BlockMD implements Comparable<BlockMD>
      *
      * @return the boolean
      */
-    public boolean isAir()
-    {
-        return isAir;
+    public boolean isIgnore() {
+        return isIgnore;
     }
 
     /**
@@ -505,13 +687,12 @@ public class BlockMD implements Comparable<BlockMD>
     }
 
     /**
-     * Is transparent roof.
+     * Is fluid.
      *
      * @return the boolean
      */
-    public boolean isTransparentRoof()
-    {
-        return isTransparentRoof;
+    public boolean isFluid() {
+        return isFluid;
     }
 
     /**
@@ -519,10 +700,20 @@ public class BlockMD implements Comparable<BlockMD>
      *
      * @return the boolean
      */
-    public boolean isLava()
-    {
+    public boolean isLava() {
         return isLava;
     }
+
+
+    /**
+     * Is lava.
+     *
+     * @return the boolean
+     */
+    public boolean isFire() {
+        return isFire;
+    }
+
 
     /**
      * Is foliage.
@@ -555,60 +746,34 @@ public class BlockMD implements Comparable<BlockMD>
     }
 
     /**
-     * Gets UID
+     * Gets block state ID
      *
-     * @return
+     * @return uid
      */
-    public String getUid()
-    {
-        return uid;
+    public String getBlockId() {
+        return blockId;
     }
 
+    public String getBlockStateId() {
+        return blockStateId;
+    }
+
+    public String getBlockDomain() {
+        return getBlock().getRegistryName().getResourceDomain();
+    }
 
     /**
      * Gets flags
      *
-     * @return
+     * @return flags
      */
-    public EnumSet<Flag> getFlags()
+    public EnumSet<BlockFlag> getFlags()
     {
         return flags;
     }
 
-    /**
-     * Is biome colored.
-     *
-     * @return the boolean
-     */
-    public boolean isBiomeColored()
-    {
-        return isBiomeColored;
-    }
-
-    /**
-     * Gets handler for special mod blocks.
-     */
-    public ModBlockDelegate.IModBlockHandler getModBlockHandler()
-    {
-        return modBlockHandler;
-    }
-
-    /**
-     * Sets handler for special mod blocks.
-     *
-     * @param modBlockHandler
-     */
-    public void setModBlockHandler(ModBlockDelegate.IModBlockHandler modBlockHandler)
-    {
-        this.modBlockHandler = modBlockHandler;
-        if (modBlockHandler == null)
-        {
-            flags.remove(Flag.SpecialHandling);
-        }
-        else
-        {
-            flags.add(Flag.SpecialHandling);
-        }
+    public boolean isVanillaBlock() {
+        return getBlockDomain().equals("minecraft");
     }
 
     @Override
@@ -618,24 +783,23 @@ public class BlockMD implements Comparable<BlockMD>
         {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
+        if (!(o instanceof BlockMD))
         {
             return false;
         }
-
-        return blockState.equals(((BlockMD) o).blockState);
+        BlockMD blockMD = (BlockMD) o;
+        return Objects.equal(getBlockId(), blockMD.getBlockId()) &&
+                Objects.equal(getBlockStateId(), blockMD.getBlockStateId());
     }
 
     @Override
-    public int hashCode()
-    {
-        return uid.hashCode();
+    public int hashCode() {
+        return Objects.hashCode(getBlockId(), getBlockStateId());
     }
 
     @Override
-    public String toString()
-    {
-        return String.format("BlockMD [%s:%s] (%s)", uid, blockState, Joiner.on(",").join(flags));
+    public String toString() {
+        return String.format("BlockMD [%s] (%s)", blockState, Joiner.on(",").join(flags));
     }
 
     @Override
@@ -643,97 +807,9 @@ public class BlockMD implements Comparable<BlockMD>
     {
         Ordering ordering = Ordering.natural().nullsLast();
         return ComparisonChain.start()
-                .compare(this.uid, that.uid, ordering)
-                .compare(this.getMeta(), that.getMeta(), ordering)
-                .compare(this.name, that.name, ordering)
-                .compare(this.color, that.color, ordering)
-                .compare(this.alpha, that.alpha, ordering)
+                .compare(this.blockId, that.blockId, ordering)
+                .compare(this.blockStateId, that.blockStateId, ordering)
                 .result();
     }
 
-    /**
-     * Flags indicating special behaviors of Blocks.
-     */
-    public enum Flag
-    {
-        /**
-         * Block should be treated like air.
-         */
-        HasAir,
-
-        /**
-         * Block color is custom + determined by biome.
-         */
-        CustomBiomeColor,
-
-        /**
-         * Block color is determined by biome foliage multiplier
-         */
-        Foliage,
-
-        /**
-         * Block color is determined by biome grass multiplier
-         */
-        Grass,
-
-        /**
-         * Block color is determined by biome water multiplier
-         */
-        Water,
-
-        /**
-         * Block doesn't count as overhead cover.
-         */
-        OpenToSky,
-
-        /**
-         * Block shouldn't cast a shadow.
-         */
-        NoShadow,
-
-        /**
-         * Block isn't opaque.
-         */
-        Transparency,
-
-        /**
-         * Block was processed with errors.
-         */
-        Error,
-
-        /**
-         * Block is transparent and is ignored by Minecraft's chunk heights.
-         */
-        TransparentRoof,
-
-        /**
-         * Block is a non-crop plant
-         */
-        Plant,
-
-        /**
-         * Block is a crop
-         */
-        Crop,
-
-        /**
-         * Block is a tile entity
-         */
-        TileEntity,
-
-        /**
-         * Block has special handling considerations
-         */
-        SpecialHandling,
-
-        /**
-         * Block should be ignored in topological maps
-         */
-        NoTopo,
-
-        /**
-         * Block produces error when calling getColorMultiplier();
-         */
-        TintError;
-    }
 }

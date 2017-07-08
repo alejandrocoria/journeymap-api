@@ -1,17 +1,14 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.cartography.render;
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Strata;
 import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
@@ -25,23 +22,38 @@ import org.apache.logging.log4j.Level;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * The type Surface renderer.
+ */
 public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 {
+    /**
+     * The Render surface timer.
+     */
     protected StatTimer renderSurfaceTimer = StatTimer.get("SurfaceRenderer.renderSurface");
+    /**
+     * The Render surface prepass timer.
+     */
     protected StatTimer renderSurfacePrepassTimer = StatTimer.get("SurfaceRenderer.renderSurface.CavePrepass");
+    /**
+     * The Strata.
+     */
     protected Strata strata = new Strata("Surface", 40, 8, false);
+    /**
+     * The Max depth.
+     */
     protected float maxDepth = 8;
 
-    public SurfaceRenderer()
-    {
+    /**
+     * Instantiates a new Surface renderer.
+     */
+    public SurfaceRenderer() {
         updateOptions(null, null);
     }
 
     @Override
-    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
-    {
-        if (super.updateOptions(chunkMd, mapType))
-        {
+    protected boolean updateOptions(ChunkMD chunkMd, MapType mapType) {
+        if (super.updateOptions(chunkMd, mapType)) {
             this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
             return true;
         }
@@ -49,8 +61,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos)
-    {
+    public int getBlockHeight(ChunkMD chunkMd, BlockPos blockPos) {
         Integer y = getBlockHeight(chunkMd, blockPos.getX() & 15, null, blockPos.getZ() & 15, null, null);
         return (y == null) ? blockPos.getY() : y;
     }
@@ -59,48 +70,51 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
      * Render blocks in the chunk for the standard world, day only
      */
     @Override
-    public boolean render(final ComparableBufferedImage dayChunkImage, final ChunkMD chunkMd, final Integer ignored)
-    {
+    public boolean render(final ComparableBufferedImage dayChunkImage, final ChunkMD chunkMd, final Integer ignored) {
         return render(dayChunkImage, null, chunkMd, null, false);
     }
 
     /**
      * Render blocks in the chunk for the standard world
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @return the boolean
      */
-    public boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd)
-    {
+    public boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd) {
         return render(dayChunkImage, nightChunkImage, chunkMd, null, false);
     }
 
     /**
      * Render blocks in the chunk for the standard world.
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param vSlice          the v slice
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
-    public synchronized boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
-    {
+    public synchronized boolean render(final ComparableBufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass) {
         StatTimer timer = cavePrePass ? renderSurfacePrepassTimer : renderSurfaceTimer;
 
-        try
-        {
+        try {
             timer.start();
 
             updateOptions(chunkMd, MapType.from(MapType.Name.surface, null, chunkMd.getDimension()));
 
             // Initialize ChunkSub slopes if needed
-            if (!hasSlopes(chunkMd, vSlice))
-            {
+            if (!hasSlopes(chunkMd, vSlice)) {
                 populateSlopes(chunkMd, vSlice, getSlopes(chunkMd, vSlice));
             }
 
             // Render the chunk image
             return renderSurface(dayChunkImage, nightChunkImage, chunkMd, vSlice, cavePrePass);
-        }
-        catch (Throwable e)
-        {
+        } catch (Throwable e) {
             e.printStackTrace();
             return false;
-        }
-        finally
-        {
+        } finally {
             strata.reset();
             timer.stop();
         }
@@ -109,36 +123,43 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Render blocks in the chunk for the surface.
+     *
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param vSlice          the v slice
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
-    protected boolean renderSurface(final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass)
-    {
+    protected boolean renderSurface(final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final Integer vSlice, final boolean cavePrePass) {
         boolean chunkOk = false;
 
-        try
-        {
+        try {
             int sliceMaxY = 0;
 
-            if (cavePrePass)
-            {
+            if (cavePrePass) {
                 int[] sliceBounds = getVSliceBounds(chunkMd, vSlice);
                 sliceMaxY = sliceBounds[1];
             }
 
-            for (int x = 0; x < 16; x++)
-            {
+            int upperY, lowerY;
+            boolean showSlope;
+
+            for (int x = 0; x < 16; x++) {
                 blockLoop:
-                for (int z = 0; z < 16; z++)
-                {
+                for (int z = 0; z < 16; z++) {
                     strata.reset();
-                    BlockMD topBlockMd = null;
 
-                    int standardY = Math.max(0, getBlockHeight(chunkMd, x, null, z, null, null));
+                    // Minecraft's heightmap
+                    upperY = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
 
-                    if (standardY == 0)
-                    {
+                    // Height of top mappable block
+                    lowerY = Math.max(0, getBlockHeight(chunkMd, x, null, z, null, null));
+
+                    // Void check
+                    if (upperY == 0 || lowerY == 0) {
                         paintVoidBlock(dayChunkImage, x, z);
-                        if (!cavePrePass && nightChunkImage != null)
-                        {
+                        if (!cavePrePass && nightChunkImage != null) {
                             paintVoidBlock(nightChunkImage, x, z);
                         }
                         chunkOk = true;
@@ -146,96 +167,32 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
                     }
 
                     // Should be painted only by cave renderer
-                    if (cavePrePass && (standardY > sliceMaxY && (standardY - sliceMaxY) > maxDepth))
-                    {
+                    if (cavePrePass && (upperY > sliceMaxY && (upperY - sliceMaxY) > maxDepth)) {
                         chunkOk = true;
                         paintBlackBlock(dayChunkImage, x, z);
                         continue;
                     }
 
-                    int roofY = 0;
-                    int y = standardY;
+                    showSlope = !chunkMd.getBlockMD(x, lowerY, z).hasNoShadow();
 
-                    // TODO: Re-evaluate whether this section is necessary now that
-                    // precipHeight is always used
-                    roofY = Math.max(0, chunkMd.getPrecipitationHeight(x, z));
-                    if (standardY < roofY)
-                    {
-                        // Is transparent roof above standard height?
-                        int checkY = roofY;
-                        while (checkY > standardY)
-                        {
-                            topBlockMd = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, checkY, z);
-                            if (topBlockMd.isTransparentRoof())
-                            {
-                                y = Math.max(standardY, checkY);
-                                break;
-                            }
-                            else
-                            {
-                                checkY--;
-                            }
-                        }
-                    }
-
-                    if (roofY == 0 || standardY == 0)
-                    {
-                        paintVoidBlock(dayChunkImage, x, z);
-                        if (!cavePrePass && nightChunkImage != null)
-                        {
-                            paintVoidBlock(nightChunkImage, x, z);
-                        }
-                        chunkOk = true;
-                        continue blockLoop;
-                    }
-
-                    // Bathymetry - need to use water height instead of standardY, so we get the color blend
-                    if (mapBathymetry)
-                    {
-                        Integer[][] waterHeights = getWaterHeights(chunkMd, null);
+                    if (mapBathymetry) {
+                        Integer[][] waterHeights = getFluidHeights(chunkMd, null);
                         Integer waterHeight = waterHeights[z][x];
-                        if (waterHeight == null)
-                        {
-                            waterHeights[z][x] = standardY;
-                        }
-                        else
-                        {
-                            standardY = waterHeight;
-                        }
-                    }
-
-                    topBlockMd = chunkMd.getTopBlockMD(x, standardY, z);
-
-                    if (topBlockMd == null)
-                    {
-                        paintBadBlock(dayChunkImage, x, standardY, z);
-                        paintBadBlock(nightChunkImage, x, standardY, z);
-                        continue blockLoop;
-                    }
-
-                    // Plants/crops/double-tall need to check one or two blocks up
-                    if (mapPlants || mapCrops)
-                    {
-                        BlockMD temp = chunkMd.getTopBlockMD(x, standardY + 1, z);
-                        if ((mapPlants && temp.hasFlag(BlockMD.Flag.Plant)) || (mapCrops && temp.hasFlag(BlockMD.Flag.Crop)))
-                        {
-                            standardY += 1;
+                        if (waterHeight != null) {
+                            upperY = waterHeight;
+                            //showSlope = false;
                         }
                     }
 
                     // Start using BlockColors stack
-                    buildStrata(strata, roofY, chunkMd, x, standardY, z);
+                    buildStrata(strata, upperY, chunkMd, x, lowerY, z);
 
-                    chunkOk = paintStrata(strata, dayChunkImage, nightChunkImage, chunkMd, topBlockMd, vSlice, x, y, z, cavePrePass) || chunkOk;
+                    chunkOk = paintStrata(strata, dayChunkImage, nightChunkImage, chunkMd, x, z, showSlope, cavePrePass) || chunkOk;
                 }
             }
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             Journeymap.getLogger().log(Level.WARN, LogFormatter.toString(t));
-        }
-        finally
-        {
+        } finally {
             strata.reset();
         }
         return chunkOk;
@@ -243,42 +200,38 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Get the height of the block at the coordinates + offsets.  Uses chunkMd.slopes.
+     *
+     * @param chunkMd    the chunk md
+     * @param x          the x
+     * @param z          the z
+     * @param offset     the offset
+     * @param defaultVal the default val
+     * @return the surface block height
      */
-    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal)
-    {
+    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset, int defaultVal) {
         ChunkMD targetChunkMd = getOffsetChunk(chunkMd, x, z, offset);
         final int newX = ((chunkMd.getCoord().x << 4) + (x + offset.x)) & 15;
         final int newZ = ((chunkMd.getCoord().z << 4) + (z + offset.z)) & 15;
 
-        if (targetChunkMd != null)
-        {
+        if (targetChunkMd != null) {
             Integer height = getBlockHeight(targetChunkMd, newX, null, newZ, null, null);
-            if (height == null)
-            {
+            if (height == null) {
                 return defaultVal;
-            }
-            else
-            {
+            } else {
                 return height;
             }
-        }
-        else
-        {
+        } else {
             return defaultVal;
         }
     }
 
     /**
-     * Added because getHeight() sometimes returns an air block.
-     * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
-     * blocks that shouldn't be used as the top block.
+     * Returns the height which should be used for calculating slope.
      */
     @Override
-    public Integer getBlockHeight(final ChunkMD chunkMd, int localX, Integer vSlice, int localZ, Integer sliceMinY, Integer sliceMaxY)
-    {
+    public Integer getBlockHeight(final ChunkMD chunkMd, int localX, Integer vSlice, int localZ, Integer sliceMinY, Integer sliceMaxY) {
         Integer[][] heights = getHeights(chunkMd, null);
-        if (heights == null)
-        {
+        if (heights == null) {
             // Not in cache anymore
             return null;
         }
@@ -286,8 +239,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
         y = heights[localX][localZ];
 
-        if (y != null)
-        {
+        if (y != null) {
             // Already set
             return y;
         }
@@ -295,85 +247,54 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
         // Find the height.
         y = Math.max(0, chunkMd.getPrecipitationHeight(localX, localZ));
 
-        if (y == 0)
-        {
+        if (y == 0) {
             return 0;
         }
 
         BlockMD blockMD;
-        boolean propUnsetWaterHeight = true;
+        boolean setFluidHeight = true;
 
-        try
-        {
-            while (y > 0)
-            {
+        try {
+            while (y > 0) {
                 blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, localX, y, localZ);
 
-                if (blockMD.isAir())
-                {
+                if (blockMD.isIgnore()) {
                     y--;
                     continue;
                 }
-                else if (blockMD.isWater())
-                {
-                    if (!mapBathymetry)
-                    {
+
+                if (blockMD.isWater() || blockMD.isFluid()) {
+                    if (!mapBathymetry) {
                         break;
                     }
-                    else if (propUnsetWaterHeight)
-                    {
-                        getWaterHeights(chunkMd, null)[localZ][localX] = y;
-                        propUnsetWaterHeight = false;
+                    if (setFluidHeight) {
+                        getFluidHeights(chunkMd, null)[localZ][localX] = y;
+                        setFluidHeight = false;
                     }
                     y--;
                     continue;
                 }
-                else if (blockMD.hasFlag(BlockMD.Flag.Plant))
-                {
-                    if (!mapPlants)
-                    {
-                        y--;
-                        continue;
-                    }
 
-                    if (!mapPlantShadows || !blockMD.hasNoShadow())
-                    {
-                        y--;
-                    }
+                if (blockMD.hasTransparency() && mapTransparency) {
+                    y--;
+                    continue;
+                }
 
+                if (blockMD.isLava()) {
                     break;
                 }
-                else if (blockMD.hasFlag(BlockMD.Flag.Crop))
-                {
-                    if (!mapCrops)
-                    {
-                        y--;
-                        continue;
-                    }
 
-                    if (!mapPlantShadows || !blockMD.hasNoShadow())
-                    {
-                        y--;
-                    }
-
-                    break;
-
-                }
-                else if (!blockMD.isLava() && blockMD.hasNoShadow())
-                {
+                if (blockMD.hasNoShadow()) {
                     y--;
                 }
 
                 break;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Journeymap.getLogger().warn(String.format("Couldn't get safe surface block height for %s coords %s,%s: %s",
                     chunkMd, localX, localZ, LogFormatter.toString(e)));
         }
 
-        //why is height 4 set on a chunk to the left?
         y = Math.max(0, y);
 
         heights[localX][localZ] = y;
@@ -383,89 +304,90 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
 
     /**
      * Create a BlockStack.
+     *
+     * @param strata  the strata
+     * @param upperY   the roof y
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param lowerY       the y
+     * @param z       the z
      */
-    protected void buildStrata(Strata strata, int roofY, ChunkMD chunkMd, int x, int y, int z)
-    {
+    protected void buildStrata(Strata strata, int upperY, ChunkMD chunkMd, int x, int lowerY, int z) {
         BlockMD blockMD;
 
-        // If under glass, add to color stack
-        if (roofY > y)
-        {
-            while (roofY > y)
-            {
-                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, roofY, z);
-                if (!blockMD.isAir())
-                {
-                    if (blockMD.isTransparentRoof())
-                    {
-                        strata.push(chunkMd, blockMD, x, roofY, z);
-                        if (!mapTransparency)
-                        {
-                            break;
-                        }
-                    }
-                }
-                roofY--;
-            }
-        }
-
-        if (mapTransparency || strata.isEmpty())
-        {
-            while (y >= 0)
-            {
-                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
-
-                if (!blockMD.isAir())
-                {
-                    strata.push(chunkMd, blockMD, x, y, z);
-
-                    if (blockMD.getAlpha() == 1f || !mapTransparency)
-                    {
+        while (upperY > lowerY) {
+            blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, upperY, z);
+            if (!blockMD.isIgnore()) {
+                if (blockMD.hasTransparency()) {
+                    strata.push(chunkMd, blockMD, x, upperY, z);
+                    if (!mapTransparency) {
                         break;
                     }
                 }
-                y--;
+                // TODO - use nonshadowheight in this method
+                if (blockMD.hasNoShadow()) {
+                    lowerY = upperY;
+                    break;
+                }
+            }
+            upperY--;
+        }
+
+        if (mapTransparency || strata.isEmpty()) {
+            while (lowerY >= 0) {
+                if (upperY - lowerY >= maxDepth) {
+                    break;
+                }
+                blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, lowerY, z);
+
+                if (!blockMD.isIgnore()) {
+                    strata.push(chunkMd, blockMD, x, lowerY, z);
+
+                    if (!blockMD.hasTransparency() || !mapTransparency) {
+                        break;
+                    }
+                }
+                lowerY--;
             }
         }
     }
 
     /**
      * Paint the image with the color derived from a BlockStack
+     *
+     * @param strata          the strata
+     * @param dayChunkImage   the day chunk image
+     * @param nightChunkImage the night chunk image
+     * @param chunkMd         the chunk md
+     * @param x               the x
+     * @param z               the z
+     * @param cavePrePass     the cave pre pass
+     * @return the boolean
      */
-    protected boolean paintStrata(final Strata strata, final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final BlockMD topBlockMd, final Integer vSlice, final int x, final int y, final int z, final boolean cavePrePass)
-    {
-        if (strata.isEmpty())
-        {
-            if (dayChunkImage != null)
-            {
+    protected boolean paintStrata(final Strata strata, final BufferedImage dayChunkImage, final BufferedImage nightChunkImage, final ChunkMD chunkMd, final int x, final int z, final boolean showSlope, final boolean cavePrePass) {
+        int y = strata.getTopY();
+        if (strata.isEmpty()) {
+            if (dayChunkImage != null) {
                 paintBadBlock(dayChunkImage, x, y, z);
             }
-            if (nightChunkImage != null)
-            {
+            if (nightChunkImage != null) {
                 paintBadBlock(nightChunkImage, x, y, z);
             }
             return false;
         }
 
-        try
-        {
+        try {
             Stratum stratum;
-            while (!strata.isEmpty())
-            {
+            while (!strata.isEmpty()) {
                 stratum = strata.nextUp(this, true);
-                if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null)
-                {
+                if (strata.getRenderDayColor() == null || strata.getRenderNightColor() == null) {
                     strata.setRenderDayColor(stratum.getDayColor());
-                    if (!cavePrePass)
-                    {
+                    if (!cavePrePass) {
                         strata.setRenderNightColor(stratum.getNightColor());
                     }
-                }
-                else
-                {
+                } else {
                     strata.setRenderDayColor(RGB.blendWith(strata.getRenderDayColor(), stratum.getDayColor(), stratum.getBlockMD().getAlpha()));
-                    if (!cavePrePass)
-                    {
+                    if (!cavePrePass) {
                         strata.setRenderNightColor(RGB.blendWith(strata.getRenderNightColor(), stratum.getNightColor(), stratum.getBlockMD().getAlpha()));
                     }
                 }
@@ -475,45 +397,36 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
             } // end color stack
 
             // Shouldn't happen
-            if (strata.getRenderDayColor() == null)
-            {
+            if (strata.getRenderDayColor() == null) {
                 paintBadBlock(dayChunkImage, x, y, z);
                 paintBadBlock(nightChunkImage, x, y, z);
                 return false;
             }
 
-            if (nightChunkImage != null)
-            {
+            if (nightChunkImage != null) {
                 // Shouldn't happen
-                if (strata.getRenderNightColor() == null)
-                {
+                if (strata.getRenderNightColor() == null) {
                     paintBadBlock(nightChunkImage, x, y, z);
                     return false;
                 }
             }
 
-            // Now add bevel for slope
-            if ((topBlockMd.isWater() && mapBathymetry) || !topBlockMd.hasNoShadow())
-            {
-                float slope = getSlope(chunkMd, topBlockMd, x, null, z);
-                if (slope != 1f)
-                {
+
+            if (showSlope) {
+                float slope = getSlope(chunkMd, x, null, z);
+                if (slope != 1f) {
                     strata.setRenderDayColor(RGB.bevelSlope(strata.getRenderDayColor(), slope));
-                    if (!cavePrePass)
-                    {
+                    if (!cavePrePass) {
                         strata.setRenderNightColor(RGB.bevelSlope(strata.getRenderNightColor(), slope));
                     }
                 }
             }
 
             paintBlock(dayChunkImage, x, z, strata.getRenderDayColor());
-            if (nightChunkImage != null)
-            {
+            if (nightChunkImage != null) {
                 paintBlock(nightChunkImage, x, z, strata.getRenderNightColor());
             }
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             throw e;
         }
 

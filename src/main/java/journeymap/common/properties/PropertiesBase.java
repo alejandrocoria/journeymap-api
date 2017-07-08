@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.common.properties;
@@ -40,29 +37,50 @@ import java.util.*;
  */
 public abstract class PropertiesBase
 {
-    // GSON charset
+    /**
+     * Charset for GSON
+     */
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
-    // State enum for debugging
+    /**
+     * Properties State.
+     */
     protected enum State
     {
-        New, Initialized, FirstLoaded, FileLoaded, Valid, Invalid, SavedOk, SavedError
+        New,
+        Initialized,
+        FirstLoaded,
+        FileLoaded,
+        Valid,
+        Invalid,
+        SavedOk,
+        SavedError
     }
 
-    // Version used to create config
+    /**
+     * Version used to create config.
+     */
     protected Version configVersion = null;
 
-    // Set of all Categories used in fields
+    /**
+     * Set of all Categories used in fields
+     */
     protected CategorySet categories = new CategorySet();
 
-    // Current file reference
+    /**
+     * Current file reference
+     */
     protected transient File sourceFile = null;
 
-    // Reflection-generated map of all ConfigFields
-    private transient Map<String, ConfigField<?>> configFields;
-
-    // Current state, just used for debugging.
+    /**
+     * Current state, just used for debugging.
+     */
     protected transient State currentState;
+
+    /**
+     * Reflection-generated map of all ConfigFields
+     */
+    private transient Map<String, ConfigField<?>> configFields;
 
     /**
      * Default constructor.
@@ -103,8 +121,11 @@ public abstract class PropertiesBase
     /**
      * Gets a Json representation of this object.
      *
-     * @param verbose whether to serialize all field attributes. Useful if config is going between client/server.
-     * @return json
+     * @param <T>             the type parameter
+     * @param jsonString      the json string
+     * @param propertiesClass the properties class
+     * @param verbose         whether to serialize all field attributes. Useful if config is going between client/server.
+     * @return json t
      */
     public <T extends PropertiesBase> T fromJsonString(String jsonString, Class<T> propertiesClass, boolean verbose)
     {
@@ -114,28 +135,28 @@ public abstract class PropertiesBase
     /**
      * Name used in property file
      *
-     * @return name
+     * @return name name
      */
     public abstract String getName();
 
     /**
      * Gets the property file.
      *
-     * @return file
+     * @return file file
      */
     public abstract File getFile();
 
     /**
      * Gets an array of headers to prepend to the property file when saved.
      *
-     * @return strings
+     * @return strings string [ ]
      */
     public abstract String[] getHeaders();
 
     /**
      * Gets the filename for the instance.
      *
-     * @return filename
+     * @return filename file name
      */
     public abstract String getFileName();
 
@@ -163,9 +184,9 @@ public abstract class PropertiesBase
     /**
      * Returns an instance with values loaded from file, or itself if the load failed.
      *
+     * @param <T>        properties type
      * @param configFile file to load config from
      * @param verbose    whether to deserialize all field attributes.
-     * @param <T>        properties type
      * @return loaded instance
      */
     public <T extends PropertiesBase> T load(File configFile, boolean verbose)
@@ -230,8 +251,8 @@ public abstract class PropertiesBase
      * Copies values from another instance into this one.
      * Override this to include non-ConfigField members if necessary.
      *
-     * @param otherInstance other
      * @param <T>           properties type
+     * @param otherInstance other
      */
     public <T extends PropertiesBase> void updateFrom(T otherInstance)
     {
@@ -369,7 +390,7 @@ public abstract class PropertiesBase
      * Gets a Json representation of this object.
      *
      * @param verbose whether to serialize all field attributes. Useful if config is going between client/server.
-     * @return json
+     * @return json string
      */
     public String toJsonString(boolean verbose)
     {
@@ -419,6 +440,8 @@ public abstract class PropertiesBase
     /**
      * Map (keyed by field name) of all ConfigFields defined on the class via reflection.
      * If the owning class isn't set yet, it's done so here.
+     *
+     * @return the config fields
      */
     public Map<String, ConfigField<?>> getConfigFields()
     {
@@ -554,6 +577,8 @@ public abstract class PropertiesBase
 
     /**
      * If the file exists, returns the lastModified timestamp.
+     *
+     * @return the long
      */
     public long lastModified()
     {
@@ -568,6 +593,11 @@ public abstract class PropertiesBase
         }
     }
 
+    /**
+     * To string helper objects . to string helper.
+     *
+     * @return the objects . to string helper
+     */
     protected MoreObjects.ToStringHelper toStringHelper()
     {
         MoreObjects.ToStringHelper toStringHelper = MoreObjects.toStringHelper(this)
@@ -621,7 +651,7 @@ public abstract class PropertiesBase
     /**
      * Logs the message with the properties name and current state
      *
-     * @param message
+     * @param message the message
      */
     protected void info(String message)
     {
@@ -631,7 +661,7 @@ public abstract class PropertiesBase
     /**
      * Logs the message with the properties name and current state
      *
-     * @param message
+     * @param message the message
      */
     protected void warn(String message)
     {
@@ -641,7 +671,7 @@ public abstract class PropertiesBase
     /**
      * Logs the message with the properties name and current state
      *
-     * @param message
+     * @param message the message
      */
     protected void error(String message)
     {
@@ -651,7 +681,8 @@ public abstract class PropertiesBase
     /**
      * Logs the message with the properties name and current state
      *
-     * @param message
+     * @param message   the message
+     * @param throwable the throwable
      */
     protected void error(String message, Throwable throwable)
     {

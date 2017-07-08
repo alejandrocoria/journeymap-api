@@ -9,7 +9,7 @@
 package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.WorldData;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;

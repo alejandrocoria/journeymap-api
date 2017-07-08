@@ -1,7 +1,7 @@
 package journeymap.client.task.multi;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.cartography.ColorManager;
+import journeymap.client.cartography.color.ColorManager;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;
@@ -20,7 +20,7 @@ public class InitColorManagerTask implements ITask
     @Override
     public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
-        ColorManager.instance().ensureCurrent();
+        ColorManager.INSTANCE.ensureCurrent(false);
     }
 
     public static class Manager implements ITaskManager

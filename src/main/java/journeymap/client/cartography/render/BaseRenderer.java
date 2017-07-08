@@ -1,17 +1,14 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.cartography.render;
 
 
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.BlockMD;
@@ -33,49 +30,133 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Base class for methods reusable across renderers.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public abstract class BaseRenderer implements IChunkRenderer
 {
+    /**
+     * The constant COLOR_BLACK.
+     */
     public static final int COLOR_BLACK = Color.black.getRGB();
-    public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
+
+    /**
+     * The constant badBlockCount.
+     */
     public static volatile AtomicLong badBlockCount = new AtomicLong(0);
 
+    /**
+     * The constant DEFAULT_FOG.
+     */
     protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
+
+    /**
+     * The Data cache.
+     */
     protected final DataCache dataCache = DataCache.INSTANCE;
+    /**
+     * The Core properties.
+     */
     protected CoreProperties coreProperties;
-    // Updated in updateOptions()
+    /**
+     * The Map bathymetry.
+     */
+// Updated in updateOptions()
     protected boolean mapBathymetry;
+    /**
+     * The Map transparency.
+     */
     protected boolean mapTransparency;
+    /**
+     * The Map cave lighting.
+     */
     protected boolean mapCaveLighting;
+    /**
+     * The Map antialiasing.
+     */
     protected boolean mapAntialiasing;
-    protected boolean mapCrops;
-    protected boolean mapPlants;
-    protected boolean mapPlantShadows;
+    /**
+     * The Ambient color.
+     */
     protected float[] ambientColor;
+    /**
+     * The Last prop file update.
+     */
     protected long lastPropFileUpdate;
 
+    /**
+     * The Primary slope offsets.
+     */
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<>(3);
+    /**
+     * The Secondary slope offsets.
+     */
     protected ArrayList<BlockCoordIntPair> secondarySlopeOffsets = new ArrayList<>(4);
 
-    // Need to go in properties
+    /**
+     * The Shading slope min.
+     */
+// Need to go in properties
     protected float shadingSlopeMin; // Range: 0-1
+    /**
+     * The Shading slope max.
+     */
     protected float shadingSlopeMax; // Range: 0-?
+    /**
+     * The Shading primary downslope multiplier.
+     */
     protected float shadingPrimaryDownslopeMultiplier; // Range: 0-1
+    /**
+     * The Shading primary upslope multiplier.
+     */
     protected float shadingPrimaryUpslopeMultiplier; // Range: 1-?
+    /**
+     * The Shading secondary downslope multiplier.
+     */
     protected float shadingSecondaryDownslopeMultiplier; // Range: 0-1
+    /**
+     * The Shading secondary upslope multiplier.
+     */
     protected float shadingSecondaryUpslopeMultiplier; // Range: 1-?
 
+    /**
+     * The Tweak moonlight level.
+     */
     protected float tweakMoonlightLevel; // Range: 0 - 15
+    /**
+     * The Tweak brighten daylight diff.
+     */
     protected float tweakBrightenDaylightDiff; // Range: 0-1
+    /**
+     * The Tweak brighten lightsource block.
+     */
     protected float tweakBrightenLightsourceBlock; // Range: 0 - 1.5
+    /**
+     * The Tweak blend shallow water.
+     */
     protected float tweakBlendShallowWater; // Range: 0 - 1
+    /**
+     * The Tweak minimum darken night water.
+     */
     protected float tweakMinimumDarkenNightWater; // Range: 0 - 1
+    /**
+     * The Tweak water color blend.
+     */
     protected float tweakWaterColorBlend; // Range 0-1
-    protected int tweakDarkenWaterColorMultiplier; // Range: int rg
+    /**
+     * The Tweak surface ambient color.
+     */
     protected int tweakSurfaceAmbientColor; // Range: int rgb
+    /**
+     * The Tweak cave ambient color.
+     */
     protected int tweakCaveAmbientColor; // Range: int rgb
+    /**
+     * The Tweak nether ambient color.
+     */
     protected int tweakNetherAmbientColor; // Range: int rgb
+    /**
+     * The Tweak end ambient color.
+     */
     protected int tweakEndAmbientColor; // Range: int rgb
 
     private static final String PROP_SLOPES = "slopes";
@@ -84,8 +165,10 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     private MapType currentMapType;
 
-    public BaseRenderer()
-    {
+    /**
+     * Instantiates a new Base renderer.
+     */
+    public BaseRenderer() {
         updateOptions(null, null);
 
         // TODO: Put in properties
@@ -101,8 +184,7 @@ public abstract class BaseRenderer implements IChunkRenderer
         this.tweakBrightenLightsourceBlock = 1.2f;
         this.tweakBlendShallowWater = .15f;
         this.tweakMinimumDarkenNightWater = .25f;
-        this.tweakWaterColorBlend = .66f;
-        this.tweakDarkenWaterColorMultiplier = 0x7A90BF;
+        this.tweakWaterColorBlend = .50f;
         this.tweakSurfaceAmbientColor = 0x00001A;
         this.tweakCaveAmbientColor = 0x000000;
         this.tweakNetherAmbientColor = 0x330808;
@@ -122,6 +204,10 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Ensures mapping options are up-to-date.
+     *
+     * @param chunkMd the chunk md
+     * @param mapType the map type
+     * @return the boolean
      */
     protected boolean updateOptions(ChunkMD chunkMd, MapType mapType)
     {
@@ -138,9 +224,6 @@ public abstract class BaseRenderer implements IChunkRenderer
             mapTransparency = coreProperties.mapTransparency.get();
             mapAntialiasing = coreProperties.mapAntialiasing.get();
             mapCaveLighting = coreProperties.mapCaveLighting.get();
-            mapPlants = coreProperties.mapPlants.get();
-            mapPlantShadows = coreProperties.mapPlantShadows.get();
-            mapCrops = coreProperties.mapCrops.get();
 
             // Subclasses should override
             this.ambientColor = new float[]{0, 0, 0};
@@ -190,16 +273,7 @@ public abstract class BaseRenderer implements IChunkRenderer
             nightLightDiff = Math.max(tweakMoonlightLevel, Math.max(stratum.getLightLevel(), tweakMoonlightLevel - lightAttenuation)) / 15f;
         }
 
-        int basicColor;
-        if (stratum.isWater())
-        {
-            basicColor = waterColor;
-        }
-        else
-        {
-            ChunkMD chunkMD = stratum.getChunkMd();
-            basicColor = stratum.getBlockMD().getColor(chunkMD, stratum.getBlockPos());
-        }
+        int basicColor = stratum.getBlockMD().getBlockColor(stratum.getChunkMd(), stratum.getBlockPos());
 
         Block block = stratum.getBlockMD().getBlockState().getBlock();
         if (block == Blocks.GLOWSTONE || block == Blocks.LIT_REDSTONE_LAMP)
@@ -210,7 +284,8 @@ public abstract class BaseRenderer implements IChunkRenderer
         if ((waterAbove) && waterColor != null)
         {
             // Blend day color with watercolor above, adjustBrightness for daylight filtered down
-            int adjustedWaterColor = RGB.multiply(waterColor, tweakDarkenWaterColorMultiplier);
+            // int adjustedWaterColor = RGB.multiply(waterColor, tweakDarkenWaterColorMultiplier);
+            int adjustedWaterColor = waterColor;
             int adjustedBasicColor = RGB.adjustBrightness(basicColor, Math.max(daylightDiff, nightLightDiff));
             stratum.setDayColor(RGB.blendWith(adjustedBasicColor, adjustedWaterColor, tweakWaterColorBlend));
 
@@ -248,6 +323,11 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Initialize surface slopes in chunk.  This is the black magic
      * that serves as the stand-in for true bump-mapping.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @param slopes  the slopes
+     * @return the float [ ] [ ]
      */
     protected Float[][] populateSlopes(final ChunkMD chunkMd, Integer vSlice, Float[][] slopes)
     {
@@ -311,21 +391,51 @@ public abstract class BaseRenderer implements IChunkRenderer
         return slopes;
 
     }
-    
+
+    /**
+     * Gets current map type.
+     *
+     * @return the current map type
+     */
     protected MapType getCurrentMapType()
     {
         return this.currentMapType;
     }
 
+    /**
+     * Gets block height.
+     *
+     * @param chunkMd  the chunk md
+     * @param blockPos the block pos
+     * @return the block height
+     */
     public abstract int getBlockHeight(final ChunkMD chunkMd, BlockPos blockPos);
 
     /**
      * Get block height on surface or within slice.  Should lazy-populate sliceHeights. Can return null.
+     *
+     * @param chunkMd   the chunk md
+     * @param x         the x
+     * @param vSlice    the v slice
+     * @param z         the z
+     * @param sliceMinY the slice min y
+     * @param sliceMaxY the slice max y
+     * @return the block height
      */
     protected abstract Integer getBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY, final Integer sliceMaxY);
 
     /**
      * Get the height of the block at the coordinates + offsets.
+     *
+     * @param chunkMd    the chunk md
+     * @param x          the x
+     * @param vSlice     the v slice
+     * @param z          the z
+     * @param sliceMinY  the slice min y
+     * @param sliceMaxY  the slice max y
+     * @param offset     the offset
+     * @param defaultVal the default val
+     * @return the offset block height
      */
     protected int getOffsetBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final Integer sliceMinY,
                                        final Integer sliceMaxY, BlockCoordIntPair offset, int defaultVal)
@@ -354,11 +464,23 @@ public abstract class BaseRenderer implements IChunkRenderer
         }
     }
 
+    /**
+     * Calculate slope float.
+     *
+     * @param chunkMd   the chunk md
+     * @param offsets   the offsets
+     * @param x         the x
+     * @param y         the y
+     * @param z         the z
+     * @param isSurface the is surface
+     * @param vSlice    the v slice
+     * @param sliceMinY the slice min y
+     * @param sliceMaxY the slice max y
+     * @return the float
+     */
     protected float calculateSlope(final ChunkMD chunkMd, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface,
-                                   Integer vSlice, int sliceMinY, int sliceMaxY)
-    {
-        if (y <= 0)
-        {
+                                   Integer vSlice, int sliceMinY, int sliceMaxY) {
+        if (y <= 0) {
             // Flat
             return 1f;
         }
@@ -368,14 +490,12 @@ public abstract class BaseRenderer implements IChunkRenderer
         int defaultHeight = y;
 
         float offsetHeight;
-        for (BlockCoordIntPair offset : offsets)
-        {
+        for (BlockCoordIntPair offset : offsets) {
             offsetHeight = getOffsetBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset, defaultHeight);
             slopeSum += ((y * 1f) / offsetHeight);
         }
         Float slope = slopeSum / offsets.size();
-        if (slope.isNaN())
-        {
+        if (slope.isNaN()) {
             slope = 1f;
         }
 
@@ -383,25 +503,38 @@ public abstract class BaseRenderer implements IChunkRenderer
     }
 
 
-    protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice)
-    {
-        if (vSlice == null)
-        {
+    /**
+     * Get v slice bounds int [ ].
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the int [ ]
+     */
+    protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice) {
+        if (vSlice == null) {
             return null;
         }
 
         final int sliceMinY = Math.max((vSlice << 4), 0);
         final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
         int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.getWorld().getActualHeight());
-        if (sliceMinY >= sliceMaxY)
-        {
+        if (sliceMinY >= sliceMaxY) {
             sliceMaxY = sliceMinY + 2;
         }
 
         return new int[]{sliceMinY, sliceMaxY};
     }
 
-    protected float getSlope(final ChunkMD chunkMd, final BlockMD blockMD, int x, Integer vSlice, int z)
+    /**
+     * Gets slope.
+     *
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param vSlice  the v slice
+     * @param z       the z
+     * @return the slope
+     */
+    protected float getSlope(final ChunkMD chunkMd, int x, Integer vSlice, int z)
     {
         Float[][] slopes = getSlopes(chunkMd, vSlice);
 
@@ -420,53 +553,111 @@ public abstract class BaseRenderer implements IChunkRenderer
         return slope;
     }
 
-    protected final String getKey(String propName, Integer vSlice)
-    {
+    /**
+     * Gets key.
+     *
+     * @param propName the prop name
+     * @param vSlice   the v slice
+     * @return the key
+     */
+    protected final String getKey(String propName, Integer vSlice) {
         return vSlice == null ? propName : propName + vSlice;
     }
 
-    protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Get heights integer [ ] [ ].
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the integer [ ] [ ]
+     */
+    protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice) {
         return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_HEIGHTS, vSlice));
     }
 
-    protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Has heights boolean.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the boolean
+     */
+    protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice) {
         return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_HEIGHTS, vSlice));
     }
 
-    protected final void resetHeights(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Reset heights.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     */
+    protected final void resetHeights(ChunkMD chunkMd, Integer vSlice) {
         chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_HEIGHTS, vSlice));
     }
 
-    protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Get slopes float [ ] [ ].
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the float [ ] [ ]
+     */
+    protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice) {
         return chunkMd.getBlockDataFloats(getCurrentMapType()).get(getKey(PROP_SLOPES, vSlice));
     }
 
-    protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Has slopes boolean.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the boolean
+     */
+    protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice) {
         return chunkMd.getBlockDataFloats(getCurrentMapType()).has(getKey(PROP_SLOPES, vSlice));
     }
 
-    protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Reset slopes.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     */
+    protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice) {
         chunkMd.getBlockDataFloats(getCurrentMapType()).clear(getKey(PROP_SLOPES, vSlice));
     }
 
-    protected final Integer[][] getWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    /**
+     * Get water heights integer [ ] [ ].
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the integer [ ] [ ]
+     */
+    protected final Integer[][] getFluidHeights(ChunkMD chunkMd, Integer vSlice)
     {
         return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
-    protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Has water heights boolean.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     * @return the boolean
+     */
+    protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice) {
         return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
-    protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice)
-    {
+    /**
+     * Reset water heights.
+     *
+     * @param chunkMd the chunk md
+     * @param vSlice  the v slice
+     */
+    protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice) {
         chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
@@ -480,7 +671,7 @@ public abstract class BaseRenderer implements IChunkRenderer
 //        if(ignoreNoShadowBlocks)
 //        {
 //            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
+//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isIgnore() || (ignoreWater && (blockMD.isFluid())))
 //            {
 //                y--;
 //                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
@@ -491,6 +682,11 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Get chunk using coord offsets.
+     *
+     * @param chunkMd the chunk md
+     * @param x       the x
+     * @param z       the z
+     * @param offset  the offset
      * @return null if chunk not in memory
      */
     public ChunkMD getOffsetChunk(final ChunkMD chunkMd, int x, int z, BlockCoordIntPair offset)
@@ -510,6 +706,11 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Darken the existing color.
+     *
+     * @param image the image
+     * @param x     the x
+     * @param z     the z
+     * @param alpha the alpha
      */
     public void paintDimOverlay(BufferedImage image, int x, int z, float alpha)
     {
@@ -519,6 +720,12 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Darken the existing color.
+     *
+     * @param sourceImage the source image
+     * @param targetImage the target image
+     * @param x           the x
+     * @param z           the z
+     * @param alpha       the alpha
      */
     public void paintDimOverlay(BufferedImage sourceImage, BufferedImage targetImage, int x, int z, float alpha)
     {
@@ -528,6 +735,11 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Paint the block.
+     *
+     * @param image the image
+     * @param x     the x
+     * @param z     the z
+     * @param color the color
      */
     public void paintBlock(BufferedImage image, final int x, final int z, final int color)
     {
@@ -537,14 +749,22 @@ public abstract class BaseRenderer implements IChunkRenderer
 
     /**
      * Paint the void.
+     *
+     * @param image the image
+     * @param x     the x
+     * @param z     the z
      */
     public void paintVoidBlock(BufferedImage image, final int x, final int z)
     {
-        paintBlock(image, x, z, COLOR_VOID);
+        paintBlock(image, x, z, RGB.toInteger(getAmbientColor()));
     }
 
     /**
-     * Paint the void.
+     * I see a red door and I want to paint it black.
+     *
+     * @param image the image
+     * @param x     the x
+     * @param z     the z
      */
     public void paintBlackBlock(BufferedImage image, final int x, final int z)
     {
@@ -552,12 +772,17 @@ public abstract class BaseRenderer implements IChunkRenderer
     }
 
     /**
-     * It's a problem
+     * It's a problem.  This is really just here for debugging.
+     *
+     * @param image the image
+     * @param x     the x
+     * @param y     the y
+     * @param z     the z
      */
     public void paintBadBlock(BufferedImage image, final int x, final int y, final int z)
     {
         long count = badBlockCount.incrementAndGet();
-        if (count == 1 || count % 10240 == 0)
+        if (count == 1 || count % 2046 == 0)
         {
             Journeymap.getLogger().warn(
                     "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count

@@ -1,15 +1,12 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.RGB;
+import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -18,10 +15,12 @@ import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.geom.Point2D;
@@ -35,19 +34,48 @@ import java.util.List;
 public class BlockInfoLayer implements LayerDelegate.Layer
 {
     private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
+    /**
+     * The Location format.
+     */
     LocationFormat locationFormat = new LocationFormat();
+    /**
+     * The Location format keys.
+     */
     LocationFormat.LocationFormatKeys locationFormatKeys;
+    /**
+     * The Last coord.
+     */
     BlockPos lastCoord = null;
+    /**
+     * The Last clicked.
+     */
     long lastClicked = 0;
+    /**
+     * The Last mouse x.
+     */
     int lastMouseX;
+    /**
+     * The Last mouse y.
+     */
     int lastMouseY;
+    /**
+     * The Block info step.
+     */
     BlockInfoStep blockInfoStep;
+    /**
+     * The Font renderer.
+     */
     FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
-    public BlockInfoLayer()
-    {
+    boolean isSinglePlayer;
+
+    /**
+     * Instantiates a new Block info layer.
+     */
+    public BlockInfoLayer() {
         blockInfoStep = new BlockInfoStep();
         drawStepList.add(blockInfoStep);
+        isSinglePlayer = FMLClientHandler.instance().getClient().isSingleplayer();
     }
 
     @Override
@@ -64,36 +92,44 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             // Get block under mouse
             ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(blockPos);
             String info = "";
+
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 BlockMD blockMD = chunkMD.getBlockMD(blockPos.up());
-                if (blockMD == null || blockMD.isAir())
+                if (blockMD == null || blockMD.isIgnore())
                 {
                     blockMD = chunkMD.getBlockMD(blockPos.down());
                 }
 
-                String biome = chunkMD.getWorld().getBiomeForCoordsBody(blockPos).getBiomeName();
+                Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
 
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockPos.getX(),
                         blockPos.getZ(),
                         blockPos.getY(),
-                        (blockPos.getY() >> 4)) + " " + biome;
+                        (blockPos.getY() >> 4)) + " " + biome.getBiomeName();
 
-                if (!blockMD.isAir())
+                if (!blockMD.isIgnore())
                 {
                     info = blockMD.getName() + " @ " + info;
-
-//                    if (Journeymap.JM_VERSION.patch.equals("dev"))
-//                    {
-//                        info = RGB.toHexString(blockMD.getColor(chunkMD, blockPos)) + "  " + info;
-//                    }
                 }
             }
             else
             {
                 info = Constants.getString("jm.common.location_xz_verbose", blockPos.getX(), blockPos.getZ());
+                if (isSinglePlayer) {
+                    Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos, null);
+                    if (biome != null) {
+                        info += " " + biome.getBiomeName();
+                    }
+                }
             }
+
+//            if (Journeymap.JM_VERSION.patch.equals("dev"))
+//            {
+//                info = RGB.toHexString(BiomeColorHelper.getWaterColorAtPos(JmBlockAccess.INSTANCE, blockPos)) + " " + info;
+//                info += " " + new ChunkPos(blockPos);
+//            }
 
             double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
             blockInfoStep.update(info, gridRenderer.getWidth() / 2, gridRenderer.getHeight() - infoHeight);
@@ -123,20 +159,46 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         return true;
     }
 
-    class BlockInfoStep implements DrawStep
-    {
+    /**
+     * The type Block info step.
+     */
+    class BlockInfoStep implements DrawStep {
+        /**
+         * The Bg color.
+         */
         Integer bgColor = RGB.DARK_GRAY_RGB;
+        /**
+         * The Fg color.
+         */
         Integer fgColor = RGB.WHITE_RGB;
+        /**
+         * The Font scale.
+         */
         double fontScale = 1;
+        /**
+         * The Font shadow.
+         */
         boolean fontShadow = false;
+        /**
+         * The Alpha.
+         */
         float alpha = 1;
+        /**
+         * The Ticks.
+         */
         int ticks = 20 * 5;
         private double x;
         private double y;
         private String text;
 
-        void update(String text, double x, double y)
-        {
+        /**
+         * Update.
+         *
+         * @param text the text
+         * @param x    the x
+         * @param y    the y
+         */
+        void update(String text, double x, double y) {
             this.text = text;
             this.x = x;
             this.y = y;
@@ -145,30 +207,24 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         @Override
-        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
-        {
-            if (pass == Pass.Text)
-            {
-                if (ticks-- < 0 && alpha > 0)
-                {
+        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation) {
+            if (pass == Pass.Text) {
+                if (ticks-- < 0 && alpha > 0) {
                     alpha -= .01; // Fade
                 }
-                if (alpha > .1 && text != null)
-                {
+                if (alpha > .1 && text != null) {
                     DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
                 }
             }
         }
 
         @Override
-        public int getDisplayOrder()
-        {
+        public int getDisplayOrder() {
             return 0;
         }
 
         @Override
-        public String getModId()
-        {
+        public String getModId() {
             return Journeymap.MOD_ID;
         }
     }

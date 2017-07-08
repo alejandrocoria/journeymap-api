@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.cartography;
@@ -32,7 +29,7 @@ public class Stratum
     private int localZ;
     private int lightLevel;
     private int lightOpacity;
-    private boolean isWater;
+    private boolean isFluid;
     private Integer dayColor;
     private Integer nightColor;
     private Integer caveColor;
@@ -40,31 +37,38 @@ public class Stratum
     private boolean worldHasNoSky;
     private boolean uninitialized = true;
 
-    Stratum()
-    {
+    /**
+     * Instantiates a new Stratum.
+     */
+    Stratum() {
         this.id = IDGEN.incrementAndGet();
     }
 
-    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel)
-    {
-        if (chunkMd == null || blockMD == null)
-        {
+    /**
+     * Set stratum.
+     *
+     * @param chunkMd    the chunk md
+     * @param blockMD    the block md
+     * @param localX     the local x
+     * @param y          the y
+     * @param localZ     the local z
+     * @param lightLevel the light level
+     * @return the stratum
+     */
+    Stratum set(ChunkMD chunkMd, BlockMD blockMD, int localX, int y, int localZ, Integer lightLevel) {
+        if (chunkMd == null || blockMD == null) {
             throw new IllegalStateException(String.format("Can't have nulls: %s, %s", chunkMd, blockMD));
         }
-        try
-        {
+        try {
             this.setChunkMd(chunkMd);
             this.setBlockMD(blockMD);
             this.setX(localX);
             this.setY(y);
             this.setZ(localZ);
-            this.setWater(blockMD.isWater());
-            if (blockMD.isLava())
-            {
+            this.setFluid(blockMD.isFluid() || blockMD.isFluid());
+            if (blockMD.isLava()) {
                 this.setLightLevel(14);
-            }
-            else
-            {
+            } else {
                 this.setLightLevel((lightLevel != null) ? lightLevel : chunkMd.getSavedLightValue(localX, y + 1, localZ));
             }
             this.setLightOpacity(chunkMd.getLightOpacity(blockMD, localX, y, localZ));
@@ -74,9 +78,7 @@ public class Stratum
             this.uninitialized = false;
 
             // System.out.println("    SET " + this);
-        }
-        catch (RuntimeException t)
-        {
+        } catch (RuntimeException t) {
             throw t;
         }
         return this;
@@ -130,7 +132,7 @@ public class Stratum
                             ", lightLevel=" + getLightLevel() +
                             ", worldAmbientLight=" + getWorldAmbientLight() +
                             ", lightOpacity=" + getLightOpacity() +
-                            ", isWater=" + isWater() +
+                            ", isFluid=" + isFluid() +
                             ", dayColor=" + (getDayColor() == null ? null : new Color(getDayColor())) +
                             ", nightColor=" + (getNightColor() == null ? null : new Color(getNightColor())) +
                             ", caveColor=" + (getCaveColor() == null ? null : new Color(getCaveColor())));
@@ -141,148 +143,256 @@ public class Stratum
         }
     }
 
-    public ChunkMD getChunkMd()
-    {
+    /**
+     * Gets chunk md.
+     *
+     * @return the chunk md
+     */
+    public ChunkMD getChunkMd() {
         return chunkMd;
     }
 
-    public void setChunkMd(ChunkMD chunkMd)
-    {
+    /**
+     * Sets chunk md.
+     *
+     * @param chunkMd the chunk md
+     */
+    public void setChunkMd(ChunkMD chunkMd) {
         this.chunkMd = chunkMd;
-        if (chunkMd != null)
-        {
+        if (chunkMd != null) {
             this.worldAmbientLight = chunkMd.getWorld().getSunBrightness(1f) * 15;
-            this.worldHasNoSky = chunkMd.getHasNoSky();
-        }
-        else
-        {
+            this.worldHasNoSky = chunkMd.hasNoSky();
+        } else {
             this.worldAmbientLight = 15;
             this.worldHasNoSky = false;
         }
     }
 
-    public BlockMD getBlockMD()
-    {
+    /**
+     * Gets block md.
+     *
+     * @return the block md
+     */
+    public BlockMD getBlockMD() {
+        if (blockMD.isFluid()) {
+            int xx = 0;
+        }
         return blockMD;
     }
 
-    public void setBlockMD(BlockMD blockMD)
-    {
+    /**
+     * Sets block md.
+     *
+     * @param blockMD the block md
+     */
+    public void setBlockMD(BlockMD blockMD) {
         this.blockMD = blockMD;
     }
 
-    public float getWorldAmbientLight()
-    {
+    /**
+     * Gets world ambient light.
+     *
+     * @return the world ambient light
+     */
+    public float getWorldAmbientLight() {
         return this.worldAmbientLight;
     }
 
-    public boolean getWorldHasNoSky()
-    {
+    /**
+     * Gets world has no sky.
+     *
+     * @return the world has no sky
+     */
+    public boolean getWorldHasNoSky() {
         return worldHasNoSky;
     }
 
-    public int getX()
-    {
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
+    public int getX() {
         return localX;
     }
 
-    public void setX(int x)
-    {
+    /**
+     * Sets x.
+     *
+     * @param x the x
+     */
+    public void setX(int x) {
         this.localX = x;
     }
 
-    public int getY()
-    {
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
+    public int getY() {
         return y;
     }
 
-    public void setY(int y)
-    {
+    /**
+     * Sets y.
+     *
+     * @param y the y
+     */
+    public void setY(int y) {
         this.y = y;
     }
 
-    public int getZ()
-    {
+    /**
+     * Gets z.
+     *
+     * @return the z
+     */
+    public int getZ() {
         return localZ;
     }
 
-    public void setZ(int z)
-    {
+    /**
+     * Sets z.
+     *
+     * @param z the z
+     */
+    public void setZ(int z) {
         this.localZ = z;
     }
 
-    public int getLightLevel()
-    {
+    /**
+     * Gets light level.
+     *
+     * @return the light level
+     */
+    public int getLightLevel() {
         return lightLevel;
     }
 
-    public void setLightLevel(int lightLevel)
-    {
+    /**
+     * Sets light level.
+     *
+     * @param lightLevel the light level
+     */
+    public void setLightLevel(int lightLevel) {
         this.lightLevel = lightLevel;
     }
 
-    public int getLightOpacity()
-    {
+    /**
+     * Gets light opacity.
+     *
+     * @return the light opacity
+     */
+    public int getLightOpacity() {
         return lightOpacity;
     }
 
-    public void setLightOpacity(int lightOpacity)
-    {
+    /**
+     * Sets light opacity.
+     *
+     * @param lightOpacity the light opacity
+     */
+    public void setLightOpacity(int lightOpacity) {
         this.lightOpacity = lightOpacity;
     }
 
-    public boolean isWater()
+    /**
+     * Is fluid boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isFluid()
     {
-        return isWater;
+        return isFluid;
     }
 
-    public void setWater(boolean isWater)
+    /**
+     * Sets isFluid.
+     *
+     * @param isFluid isFluid
+     */
+    public void setFluid(boolean isFluid)
     {
-        this.isWater = isWater;
+        this.isFluid = isFluid;
     }
 
-    public Integer getDayColor()
-    {
+    /**
+     * Gets day color.
+     *
+     * @return the day color
+     */
+    public Integer getDayColor() {
         return dayColor;
     }
 
-    public void setDayColor(Integer dayColor)
-    {
+    /**
+     * Sets day color.
+     *
+     * @param dayColor the day color
+     */
+    public void setDayColor(Integer dayColor) {
         this.dayColor = dayColor;
     }
 
-    public Integer getNightColor()
-    {
+    /**
+     * Gets night color.
+     *
+     * @return the night color
+     */
+    public Integer getNightColor() {
         return nightColor;
     }
 
-    public void setNightColor(Integer nightColor)
-    {
+    /**
+     * Sets night color.
+     *
+     * @param nightColor the night color
+     */
+    public void setNightColor(Integer nightColor) {
         this.nightColor = nightColor;
     }
 
-    public Integer getCaveColor()
-    {
+    /**
+     * Gets cave color.
+     *
+     * @return the cave color
+     */
+    public Integer getCaveColor() {
         return caveColor;
     }
 
-    public void setCaveColor(Integer caveColor)
-    {
+    /**
+     * Sets cave color.
+     *
+     * @param caveColor the cave color
+     */
+    public void setCaveColor(Integer caveColor) {
         this.caveColor = caveColor;
     }
 
-    public BlockPos getBlockPos()
-    {
+    /**
+     * Gets block pos.
+     *
+     * @return the block pos
+     */
+    public BlockPos getBlockPos() {
         return new BlockPos(chunkMd.getBlockPos(this.localX, y, this.localZ));
     }
 
-    public boolean isUninitialized()
-    {
+    /**
+     * Is uninitialized boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isUninitialized() {
         return this.uninitialized;
     }
 
-    public void clear()
-    {
+    /**
+     * Clear.
+     */
+    public void clear() {
         this.uninitialized = true;
         this.worldAmbientLight = 15f;
         this.worldHasNoSky = false;
@@ -291,7 +401,7 @@ public class Stratum
         this.setX(0);
         this.setY(-1);
         this.setZ(0);
-        this.setWater(false);
+        this.setFluid(false);
         this.setLightLevel(-1);
         this.setLightOpacity(-1);
         setDayColor(null);
