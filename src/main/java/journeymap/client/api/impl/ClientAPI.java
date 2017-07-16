@@ -306,6 +306,30 @@ public enum ClientAPI implements IClientAPI
         list.addAll(lastDrawSteps);
     }
 
+    @Override
+    public void toggleDisplay(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable)
+    {
+        log(String.format("Toggled display in %s:%s:%s:%s", dimension, mapType, mapUI, enable));
+    }
+
+    @Override
+    public void toggleWaypoints(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable)
+    {
+        log(String.format("Toggled waypoints in %s:%s:%s:%s", dimension, mapType, mapUI, enable));
+    }
+
+    @Override
+    public boolean isDisplayEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isWaypointsEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI)
+    {
+        return false;
+    }
+
     private PluginWrapper getPlugin(String modId)
     {
         if (Strings.isEmpty(modId))

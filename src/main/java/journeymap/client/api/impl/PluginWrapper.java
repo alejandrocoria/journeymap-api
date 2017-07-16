@@ -41,7 +41,7 @@ class PluginWrapper
     private final HashMap<Integer, HashBasedTable<String, Overlay, OverlayDrawStep>> dimensionOverlays =
             new HashMap<Integer, HashBasedTable<String, Overlay, OverlayDrawStep>>();
 
-    private final HashBasedTable<String, ModWaypoint, Waypoint> waypoints = HashBasedTable.create();
+    private final HashBasedTable<String, journeymap.client.api.display.Waypoint, Waypoint> waypoints = HashBasedTable.create();
 
     private EnumSet<ClientEvent.Type> subscribedClientEventTypes = EnumSet.noneOf(ClientEvent.Type.class);
 
@@ -83,7 +83,7 @@ class PluginWrapper
      */
     public void show(Displayable displayable) throws Exception
     {
-        String displayId = displayable.getDisplayId();
+        String displayId = displayable.getId();
         switch (displayable.getDisplayType())
         {
             case Polygon:
@@ -99,7 +99,7 @@ class PluginWrapper
                 getOverlays(imageOverlay.getDimension()).put(displayId, imageOverlay, new DrawImageStep(imageOverlay));
                 break;
             case Waypoint:
-                ModWaypoint modWaypoint = (ModWaypoint) displayable;
+                journeymap.client.api.display.Waypoint modWaypoint = (journeymap.client.api.display.Waypoint) displayable;
                 Waypoint waypoint = new Waypoint(modWaypoint);
                 WaypointStore.INSTANCE.save(waypoint);
                 waypoints.put(displayId, modWaypoint, waypoint);
@@ -116,13 +116,13 @@ class PluginWrapper
      */
     public void remove(Displayable displayable)
     {
-        String displayId = displayable.getDisplayId();
+        String displayId = displayable.getId();
         try
         {
             switch (displayable.getDisplayType())
             {
                 case Waypoint:
-                    remove((ModWaypoint) displayable);
+                    remove((journeymap.client.api.display.Waypoint) displayable);
                     break;
                 default:
                     Overlay overlay = (Overlay) displayable;
@@ -145,9 +145,9 @@ class PluginWrapper
      *
      * @param modWaypoint the mod waypoint
      */
-    public void remove(ModWaypoint modWaypoint)
+    public void remove(journeymap.client.api.display.Waypoint modWaypoint)
     {
-        String displayId = modWaypoint.getDisplayId();
+        String displayId = modWaypoint.getId();
         Waypoint waypoint = waypoints.remove(displayId, modWaypoint);
         if (waypoint == null)
         {
@@ -167,8 +167,8 @@ class PluginWrapper
     {
         if (displayType == DisplayType.Waypoint)
         {
-            List<ModWaypoint> list = new ArrayList<ModWaypoint>(waypoints.columnKeySet());
-            for (ModWaypoint modWaypoint : list)
+            List<journeymap.client.api.display.Waypoint> list = new ArrayList<journeymap.client.api.display.Waypoint>(waypoints.columnKeySet());
+            for (journeymap.client.api.display.Waypoint modWaypoint : list)
             {
                 remove(modWaypoint);
             }
@@ -196,8 +196,8 @@ class PluginWrapper
     {
         if (!waypoints.isEmpty())
         {
-            List<ModWaypoint> list = new ArrayList<ModWaypoint>(waypoints.columnKeySet());
-            for (ModWaypoint modWaypoint : list)
+            List<journeymap.client.api.display.Waypoint> list = new ArrayList<journeymap.client.api.display.Waypoint>(waypoints.columnKeySet());
+            for (journeymap.client.api.display.Waypoint modWaypoint : list)
             {
                 remove(modWaypoint);
             }
@@ -218,7 +218,7 @@ class PluginWrapper
      */
     public boolean exists(Displayable displayable)
     {
-        String displayId = displayable.getDisplayId();
+        String displayId = displayable.getId();
         switch (displayable.getDisplayType())
         {
             case Waypoint:

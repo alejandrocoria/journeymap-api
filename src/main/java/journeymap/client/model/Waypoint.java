@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
-import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -189,11 +188,11 @@ public class Waypoint implements Serializable
      *
      * @param modWaypoint the mod waypoint
      */
-    public Waypoint(ModWaypoint modWaypoint)
+    public Waypoint(journeymap.client.api.display.Waypoint modWaypoint)
     {
-        this(modWaypoint.getWaypointName(), modWaypoint.getPoint(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimensions()[0]);
+        this(modWaypoint.getName(), modWaypoint.getPosition(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
 
-        int[] prim = modWaypoint.getDimensions();
+        int[] prim = modWaypoint.getDisplayDimensions();
         ArrayList<Integer> dims = new ArrayList<Integer>(prim.length);
         for (int aPrim : prim)
         {
@@ -201,9 +200,9 @@ public class Waypoint implements Serializable
         }
         this.setDimensions(dims);
         this.setOrigin(modWaypoint.getModId());
-        this.displayId = modWaypoint.getDisplayId();
+        this.displayId = modWaypoint.getId();
         this.setPersistent(modWaypoint.isPersistent());
-        this.setGroupName(modWaypoint.getWaypointGroupName());
+        this.setGroupName(modWaypoint.getName());
     }
 
     /**

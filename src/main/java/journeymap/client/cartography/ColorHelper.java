@@ -318,7 +318,7 @@ public enum ColorHelper
         if (model != null)
         {
             PropertyDirection propertyDirection = PropertyDirection.create("facing");
-            if (blockState.getPropertyNames().contains(propertyDirection))
+            if (blockState.getPropertyKeys().contains(propertyDirection))
             {
                 // Works for directional blocks only
                 blockState = blockState.withProperty(propertyDirection, EnumFacing.UP);
