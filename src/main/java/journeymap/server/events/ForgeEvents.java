@@ -41,7 +41,7 @@ public class ForgeEvents
 
             try
             {
-                /**
+                /*
                  * Cloning since we do not want to modify the permission properties,
                  * We want a brand new copy to send to the client
                  */
@@ -54,7 +54,7 @@ public class ForgeEvents
                     prop = (GlobalProperties) PropertiesManager.getInstance().getGlobalProperties().clone();
                 }
 
-                /**
+                /*
                  * If player is op, set the cave and radar options on the packet to send.
                  * The client only reads radarEnabled and caveMappingEnabled, it ignores the
                  */

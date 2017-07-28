@@ -56,7 +56,8 @@ public class PacketHandler
 
     public static void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)
     {
-        DIMENSION_PERMISSIONS_CHANNEL.sendTo(new DimensionPermissionPacket(property), player);
+        DimensionPermissionPacket prop = new DimensionPermissionPacket(property);
+        DIMENSION_PERMISSIONS_CHANNEL.sendTo(prop, player);
     }
 
     public static void sendAllPlayersWorldID(String worldID)
@@ -66,7 +67,7 @@ public class PacketHandler
 
     public static void sendPlayerWorldID(EntityPlayerMP player)
     {
-        if ((player instanceof EntityPlayerMP) && (player != null))
+        if ((player != null) && (player instanceof EntityPlayerMP))
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
             String worldID = worldSaveHandler.getWorldID();
@@ -89,7 +90,7 @@ public class PacketHandler
 
     public static void sendLoginPacket(EntityPlayerMP player, InitLogin packetData)
     {
-        if ((player instanceof EntityPlayerMP) && (player != null))
+        if ((player != null) && (player instanceof EntityPlayerMP))
         {
             Journeymap.getLogger().info("Sending log in packet.");
             String playerName = player.getName();

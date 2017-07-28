@@ -235,6 +235,8 @@ public class FileHandler
         File testWorldDirectory = null;
         try
         {
+            String worldName = WorldData.getWorldName(minecraft).replaceAll("\\W+", "~");
+
             if (!minecraft.isSingleplayer())
             {
                 if (worldId != null)
@@ -242,11 +244,12 @@ public class FileHandler
                     worldId = worldId.replaceAll("\\W+", "~");
                 }
                 String suffix = (worldId != null) ? ("_" + worldId) : "";
-                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + WorldData.getWorldName(minecraft) + suffix);
+                testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + worldName + suffix);
             }
             else
             {
-                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + WorldData.getWorldName(minecraft));
+
+                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + worldName);
             }
         }
         catch (Exception e)
