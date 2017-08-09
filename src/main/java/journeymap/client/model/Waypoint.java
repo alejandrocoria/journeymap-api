@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.model;
@@ -13,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
-import journeymap.client.api.display.ModWaypoint;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -40,62 +36,131 @@ import java.util.List;
  */
 public class Waypoint implements Serializable
 {
+    /**
+     * The constant VERSION.
+     */
     public static final int VERSION = 3;
+    /**
+     * The constant GSON.
+     */
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
 
+    /**
+     * The constant ICON_NORMAL.
+     */
     protected static final String ICON_NORMAL = "waypoint-normal.png";
+    /**
+     * The constant ICON_DEATH.
+     */
     protected static final String ICON_DEATH = "waypoint-death.png";
 
+    /**
+     * The Id.
+     */
     @Since(1)
     protected String id;
 
+    /**
+     * The Name.
+     */
     @Since(1)
     protected String name;
 
+    /**
+     * The Group name.
+     */
     @Since(3)
     protected String groupName;
 
+    /**
+     * The Display id.
+     */
     @Since(2)
     protected String displayId;
 
+    /**
+     * The Icon.
+     */
     @Since(1)
     protected String icon;
 
+    /**
+     * The X.
+     */
     @Since(1)
     protected int x;
 
+    /**
+     * The Y.
+     */
     @Since(1)
     protected int y;
 
+    /**
+     * The Z.
+     */
     @Since(1)
     protected int z;
 
+    /**
+     * The R.
+     */
     @Since(1)
     protected int r;
 
+    /**
+     * The G.
+     */
     @Since(1)
     protected int g;
 
+    /**
+     * The B.
+     */
     @Since(1)
     protected int b;
 
+    /**
+     * The Enable.
+     */
     @Since(1)
     protected boolean enable;
 
+    /**
+     * The Type.
+     */
     @Since(1)
     protected Type type;
 
+    /**
+     * The Origin.
+     */
     @Since(1)
     protected String origin;
 
+    /**
+     * The Dimensions.
+     */
     @Since(1)
     protected TreeSet<Integer> dimensions;
 
+    /**
+     * The Persistent.
+     */
     @Since(2)
     protected boolean persistent;
 
+    /**
+     * The Group.
+     */
     protected transient WaypointGroup group;
+    /**
+     * The Dirty.
+     */
     protected transient boolean dirty;
+    /**
+     * Minecraft client
+     */
     protected transient Minecraft mc = FMLClientHandler.instance().getClient();
 
     /**
@@ -105,19 +170,28 @@ public class Waypoint implements Serializable
     {
     }
 
-    public Waypoint(Waypoint original)
-    {
+    /**
+     * Instantiates a new Waypoint.
+     *
+     * @param original the original
+     */
+    public Waypoint(Waypoint original) {
         this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
         this.x = original.x;
         this.y = original.y;
         this.z = original.z;
     }
 
-    public Waypoint(ModWaypoint modWaypoint)
+    /**
+     * Instantiates a new Waypoint.
+     *
+     * @param modWaypoint the mod waypoint
+     */
+    public Waypoint(journeymap.client.api.display.Waypoint modWaypoint)
     {
-        this(modWaypoint.getWaypointName(), modWaypoint.getPoint(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimensions()[0]);
+        this(modWaypoint.getName(), modWaypoint.getPosition(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
 
-        int[] prim = modWaypoint.getDimensions();
+        int[] prim = modWaypoint.getDisplayDimensions();
         ArrayList<Integer> dims = new ArrayList<Integer>(prim.length);
         for (int aPrim : prim)
         {
@@ -125,18 +199,39 @@ public class Waypoint implements Serializable
         }
         this.setDimensions(dims);
         this.setOrigin(modWaypoint.getModId());
-        this.displayId = modWaypoint.getDisplayId();
+        this.displayId = modWaypoint.getId();
         this.setPersistent(modWaypoint.isPersistent());
-        this.setGroupName(modWaypoint.getWaypointGroupName());
+        this.setGroupName(modWaypoint.getName());
     }
 
-    public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension)
-    {
+    /**
+     * Instantiates a new Waypoint.
+     *
+     * @param name             the name
+     * @param pos              the pos
+     * @param color            the color
+     * @param type             the type
+     * @param currentDimension the current dimension
+     */
+    public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension) {
         this(name, pos.getX(), pos.getY(), pos.getZ(), true, color.getRed(), color.getGreen(), color.getBlue(), type, Journeymap.MOD_ID, currentDimension, Arrays.asList(currentDimension));
     }
 
     /**
      * Main constructor.
+     *
+     * @param name             the name
+     * @param x                the x
+     * @param y                the y
+     * @param z                the z
+     * @param enable           the enable
+     * @param red              the red
+     * @param green            the green
+     * @param blue             the blue
+     * @param type             the type
+     * @param origin           the origin
+     * @param currentDimension the current dimension
+     * @param dimensions       the dimensions
      */
     public Waypoint(String name, int x, int y, int z, boolean enable, int red, int green, int blue, Type type, String origin, Integer currentDimension, Collection<Integer> dimensions)
     {
@@ -178,24 +273,33 @@ public class Waypoint implements Serializable
         }
     }
 
-    public static Waypoint of(EntityPlayer player)
-    {
+    /**
+     * Of waypoint.
+     *
+     * @param player the player
+     * @return the waypoint
+     */
+    public static Waypoint of(EntityPlayer player) {
         BlockPos blockPos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
         return at(blockPos, Type.Normal, FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
 
-    public static Waypoint at(BlockPos blockPos, Type type, int dimension)
-    {
+    /**
+     * At waypoint.
+     *
+     * @param blockPos  the block pos
+     * @param type      the type
+     * @param dimension the dimension
+     * @return the waypoint
+     */
+    public static Waypoint at(BlockPos blockPos, Type type, int dimension) {
         String name;
-        if (type == Type.Death)
-        {
+        if (type == Type.Death) {
             Date now = new Date();
             name = String.format("%s %s %s", Constants.getString("jm.waypoint.deathpoint"),
                     DateFormat.getTimeInstance().format(now),
                     DateFormat.getDateInstance(DateFormat.SHORT).format(now));
-        }
-        else
-        {
+        } else {
             name = createName(blockPos.getX(), blockPos.getZ());
         }
         Waypoint waypoint = new Waypoint(name, blockPos, Color.white, type, dimension);
@@ -208,13 +312,26 @@ public class Waypoint implements Serializable
         return String.format("%s, %s", x, z);
     }
 
-    public static Waypoint fromString(String json)
-    {
+    /**
+     * From string waypoint.
+     *
+     * @param json the json
+     * @return the waypoint
+     */
+    public static Waypoint fromString(String json) {
         return GSON.fromJson(json, Waypoint.class);
     }
 
-    public Waypoint setLocation(int x, int y, int z, int currentDimension)
-    {
+    /**
+     * Sets location.
+     *
+     * @param x                the x
+     * @param y                the y
+     * @param z                the z
+     * @param currentDimension the current dimension
+     * @return the location
+     */
+    public Waypoint setLocation(int x, int y, int z, int currentDimension) {
         this.x = (currentDimension == -1) ? x * 8 : x;
         this.y = y;
         this.z = (currentDimension == -1) ? z * 8 : z;
@@ -222,53 +339,79 @@ public class Waypoint implements Serializable
         return setDirty();
     }
 
-    public String updateId()
-    {
+    /**
+     * Update id string.
+     *
+     * @return the string
+     */
+    public String updateId() {
         String oldId = this.id;
         this.id = String.format("%s_%s,%s,%s", this.name, this.x, this.y, this.z);
         return oldId;
     }
 
-    public boolean isDeathPoint()
-    {
+    /**
+     * Is death point boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isDeathPoint() {
         return this.type == Type.Death;
     }
 
-    public TextureImpl getTexture()
-    {
+    /**
+     * Gets texture.
+     *
+     * @return the texture
+     */
+    public TextureImpl getTexture() {
         return isDeathPoint() ? TextureCache.getTexture(TextureCache.Deathpoint) : TextureCache.getTexture(TextureCache.Waypoint);
     }
 
-    public ChunkPos getChunkCoordIntPair()
-    {
+    /**
+     * Gets chunk coord int pair.
+     *
+     * @return the chunk coord int pair
+     */
+    public ChunkPos getChunkCoordIntPair() {
         return new ChunkPos(x >> 4, z >> 4);
     }
 
-    public Waypoint setGroup(WaypointGroup group)
-    {
+    /**
+     * Sets group.
+     *
+     * @param group the group
+     * @return the group
+     */
+    public Waypoint setGroup(WaypointGroup group) {
         setOrigin(group.getOrigin());
         this.groupName = group.getName();
         this.group = group;
         return setDirty();
     }
 
-    public Waypoint setGroupName(String groupName)
-    {
+    /**
+     * Sets group name.
+     *
+     * @param groupName the group name
+     * @return the group name
+     */
+    public Waypoint setGroupName(String groupName) {
         WaypointGroup group = WaypointGroupStore.INSTANCE.get(origin, groupName);
         setGroup(group);
         return this;
     }
 
-    public WaypointGroup getGroup()
-    {
-        if (group == null)
-        {
-            if (Strings.isEmpty(origin) || Strings.isEmpty(groupName))
-            {
+    /**
+     * Gets group.
+     *
+     * @return the group
+     */
+    public WaypointGroup getGroup() {
+        if (group == null) {
+            if (Strings.isEmpty(origin) || Strings.isEmpty(groupName)) {
                 setGroup(WaypointGroup.DEFAULT);
-            }
-            else
-            {
+            } else {
                 setGroup(WaypointGroupStore.INSTANCE.get(origin, groupName));
             }
         }
@@ -276,18 +419,31 @@ public class Waypoint implements Serializable
         return this.group;
     }
 
-    public Waypoint setRandomColor()
-    {
+    /**
+     * Sets random color.
+     *
+     * @return the random color
+     */
+    public Waypoint setRandomColor() {
         return setColor(RGB.randomColor());
     }
 
-    public Integer getColor()
-    {
+    /**
+     * Gets color.
+     *
+     * @return the color
+     */
+    public Integer getColor() {
         return RGB.toInteger(r, g, b);
     }
 
-    public Waypoint setColor(Integer color)
-    {
+    /**
+     * Sets color.
+     *
+     * @param color the color
+     * @return the color
+     */
+    public Waypoint setColor(Integer color) {
         int c[] = RGB.ints(color);
         this.r = c[0];
         this.g = c[1];
@@ -295,241 +451,402 @@ public class Waypoint implements Serializable
         return setDirty();
     }
 
-    public Integer getSafeColor()
-    {
-        if (r + g + b >= 100)
-        {
+    /**
+     * Gets safe color.
+     *
+     * @return the safe color
+     */
+    public Integer getSafeColor() {
+        if (r + g + b >= 100) {
             return getColor();
         }
         return RGB.DARK_GRAY_RGB;
     }
 
-    public Collection<Integer> getDimensions()
-    {
+    /**
+     * Gets dimensions.
+     *
+     * @return the dimensions
+     */
+    public Collection<Integer> getDimensions() {
         return this.dimensions;
     }
 
-    public Waypoint setDimensions(Collection<Integer> dims)
-    {
+    /**
+     * Sets dimensions.
+     *
+     * @param dims the dims
+     * @return the dimensions
+     */
+    public Waypoint setDimensions(Collection<Integer> dims) {
         this.dimensions = new TreeSet<Integer>(dims);
         return setDirty();
     }
 
-    public boolean isTeleportReady()
-    {
+    /**
+     * Is teleport ready boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isTeleportReady() {
         return y >= 0 && this.isInPlayerDimension();
     }
 
-    public boolean isInPlayerDimension()
-    {
+    /**
+     * Is in player dimension boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isInPlayerDimension() {
         return dimensions.contains(FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
 
-    public String getId()
-    {
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
+    public String getId() {
         return (displayId != null) ? getGuid() : id;
     }
 
-    public String getGuid()
-    {
+    /**
+     * Gets guid.
+     *
+     * @return the guid
+     */
+    public String getGuid() {
         return origin + ":" + displayId;
     }
 
-    public String getName()
-    {
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName() {
         return name;
     }
 
-    public Waypoint setName(String name)
-    {
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     * @return the name
+     */
+    public Waypoint setName(String name) {
         this.name = name;
         return setDirty();
     }
 
-    public String getIcon()
-    {
+    /**
+     * Gets icon.
+     *
+     * @return the icon
+     */
+    public String getIcon() {
         return icon;
     }
 
-    public Waypoint setIcon(String icon)
-    {
+    /**
+     * Sets icon.
+     *
+     * @param icon the icon
+     * @return the icon
+     */
+    public Waypoint setIcon(String icon) {
         this.icon = icon;
         return setDirty();
     }
 
-    public int getX()
-    {
-        if (mc != null && mc.player != null && mc.player.dimension == -1)
-        {
+    /**
+     * Gets x.
+     *
+     * @return the x
+     */
+    public int getX() {
+        if (mc != null && mc.player != null && mc.player.dimension == -1) {
             return x / 8;
         }
         return x;
     }
 
-    public double getBlockCenteredX()
-    {
+    /**
+     * Gets block centered x.
+     *
+     * @return the block centered x
+     */
+    public double getBlockCenteredX() {
         return getX() + .5d;
     }
 
-    public int getY()
-    {
+    /**
+     * Gets y.
+     *
+     * @return the y
+     */
+    public int getY() {
         return y;
     }
 
-    public double getBlockCenteredY()
-    {
+    /**
+     * Gets block centered y.
+     *
+     * @return the block centered y
+     */
+    public double getBlockCenteredY() {
         return getY() + .5d;
     }
 
-    public int getZ()
-    {
-        if (mc != null && mc.player != null && mc.player.dimension == -1)
-        {
+    /**
+     * Gets z.
+     *
+     * @return the z
+     */
+    public int getZ() {
+        if (mc != null && mc.player != null && mc.player.dimension == -1) {
             return z / 8;
         }
         return z;
     }
 
-    public double getBlockCenteredZ()
-    {
+    /**
+     * Gets block centered z.
+     *
+     * @return the block centered z
+     */
+    public double getBlockCenteredZ() {
         return getZ() + .5d;
     }
 
-    public Vec3d getPosition()
-    {
+    /**
+     * Gets position.
+     *
+     * @return the position
+     */
+    public Vec3d getPosition() {
         return new Vec3d(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
-    public BlockPos getBlockPos()
-    {
+    /**
+     * Gets block pos.
+     *
+     * @return the block pos
+     */
+    public BlockPos getBlockPos() {
         return new BlockPos(getX(), getY(), getZ());
     }
 
-    public int getR()
-    {
+    /**
+     * Gets r.
+     *
+     * @return the r
+     */
+    public int getR() {
         return r;
     }
 
-    public Waypoint setR(int r)
-    {
+    /**
+     * Sets r.
+     *
+     * @param r the r
+     * @return the r
+     */
+    public Waypoint setR(int r) {
         this.r = r;
         return setDirty();
     }
 
-    public int getG()
-    {
+    /**
+     * Gets g.
+     *
+     * @return the g
+     */
+    public int getG() {
         return g;
     }
 
-    public Waypoint setG(int g)
-    {
+    /**
+     * Sets g.
+     *
+     * @param g the g
+     * @return the g
+     */
+    public Waypoint setG(int g) {
         this.g = g;
         return setDirty();
     }
 
-    public int getB()
-    {
+    /**
+     * Gets b.
+     *
+     * @return the b
+     */
+    public int getB() {
         return b;
     }
 
-    public Waypoint setB(int b)
-    {
+    /**
+     * Sets b.
+     *
+     * @param b the b
+     * @return the b
+     */
+    public Waypoint setB(int b) {
         this.b = b;
         return setDirty();
     }
 
-    public boolean isEnable()
-    {
+    /**
+     * Is enable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isEnable() {
         return enable;
     }
 
-    public Waypoint setEnable(boolean enable)
-    {
-        if (enable != this.enable)
-        {
+    /**
+     * Sets enable.
+     *
+     * @param enable the enable
+     * @return the enable
+     */
+    public Waypoint setEnable(boolean enable) {
+        if (enable != this.enable) {
             this.enable = enable;
             setDirty();
         }
         return this;
     }
 
-    public Type getType()
-    {
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
+    public Type getType() {
         return type;
     }
 
-    public Waypoint setType(Type type)
-    {
+    /**
+     * Sets type.
+     *
+     * @param type the type
+     * @return the type
+     */
+    public Waypoint setType(Type type) {
         this.type = type;
         return setDirty();
     }
 
-    public String getOrigin()
-    {
+    /**
+     * Gets origin.
+     *
+     * @return the origin
+     */
+    public String getOrigin() {
         return origin;
     }
 
-    public Waypoint setOrigin(String origin)
-    {
+    /**
+     * Sets origin.
+     *
+     * @param origin the origin
+     * @return the origin
+     */
+    public Waypoint setOrigin(String origin) {
         this.origin = origin;
         return setDirty();
     }
 
-    public String getFileName()
-    {
+    /**
+     * Gets file name.
+     *
+     * @return the file name
+     */
+    public String getFileName() {
         String fileName = id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
-        if (fileName.equals(WaypointGroupStore.FILENAME))
-        {
+        if (fileName.equals(WaypointGroupStore.FILENAME)) {
             fileName = "_" + fileName;
         }
         return fileName;
     }
 
-    public boolean isDirty()
-    {
+    /**
+     * Is dirty boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isDirty() {
         return dirty;
     }
 
-    public Waypoint setDirty()
-    {
+    /**
+     * Sets dirty.
+     *
+     * @return the dirty
+     */
+    public Waypoint setDirty() {
         return setDirty(true);
     }
 
-    public Waypoint setDirty(boolean dirty)
-    {
-        if (isPersistent())
-        {
+    /**
+     * Sets dirty.
+     *
+     * @param dirty the dirty
+     * @return the dirty
+     */
+    public Waypoint setDirty(boolean dirty) {
+        if (isPersistent()) {
             this.dirty = dirty;
         }
         return this;
     }
 
-    public boolean isPersistent()
-    {
+    /**
+     * Is persistent boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isPersistent() {
         return persistent;
     }
 
-    public Waypoint setPersistent(boolean persistent)
-    {
+    /**
+     * Sets persistent.
+     *
+     * @param persistent the persistent
+     * @return the persistent
+     */
+    public Waypoint setPersistent(boolean persistent) {
         this.persistent = persistent;
         this.dirty = persistent;
         return this;
     }
 
-    public String toChatString()
-    {
+    /**
+     * To chat string string.
+     *
+     * @return the string
+     */
+    public String toChatString() {
         boolean useName = !(getName().equals(String.format("%s, %s", getX(), getZ())));
         return toChatString(useName);
     }
 
-    public String toChatString(boolean useName)
-    {
+    /**
+     * To chat string string.
+     *
+     * @param useName the use name
+     * @return the string
+     */
+    public String toChatString(boolean useName) {
         boolean useDim = dimensions.first() != 0;
 
         List<String> parts = new ArrayList<String>();
         List<Object> args = new ArrayList<Object>();
-        if (useName)
-        {
+        if (useName) {
             parts.add("name:\"%s\"");
             args.add(getName().replaceAll("\"", " "));
         }
@@ -539,19 +856,16 @@ public class Waypoint implements Serializable
         args.add(getY());
         args.add(getZ());
 
-        if (useDim)
-        {
+        if (useDim) {
             parts.add("dim:%s");
             args.add(dimensions.first());
         }
 
         String format = "[" + Joiner.on(", ").join(parts) + "]";
         String result = String.format(format, args.toArray());
-        if (WaypointParser.parse(result) == null)
-        {
+        if (WaypointParser.parse(result) == null) {
             Journeymap.getLogger().warn("Couldn't produce parsable chat string from Waypoint: " + this);
-            if (useName)
-            {
+            if (useName) {
                 return toChatString(false);
             }
         }
@@ -640,9 +954,17 @@ public class Waypoint implements Serializable
         return id.hashCode();
     }
 
-    public enum Type
-    {
+    /**
+     * The enum Type.
+     */
+    public enum Type {
+        /**
+         * Normal type.
+         */
         Normal,
+        /**
+         * Death type.
+         */
         Death
     }
 }
