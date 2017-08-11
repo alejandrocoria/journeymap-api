@@ -160,7 +160,7 @@ public class ChatLog
                 try
                 {
                     WebServer webServer = Journeymap.getClient().getJmServer();
-                    String keyName = Constants.getKeyName(Constants.KB_MAP);
+                    String keyName = Constants.KB_FULLSCREEN.getDisplayName();
                     String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                     ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -172,7 +172,7 @@ public class ChatLog
             }
             else
             {
-                String keyName = Constants.getKeyName(Constants.KB_MAP); // Should be KeyCode
+                String keyName = Constants.getKeyName(Constants.KB_FULLSCREEN); // Should be KeyCode
                 ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
             }
 

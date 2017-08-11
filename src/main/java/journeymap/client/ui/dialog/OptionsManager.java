@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.dialog;
@@ -52,40 +49,104 @@ import java.util.*;
  */
 public class OptionsManager extends JmUI
 {
+    /**
+     * The constant openCategories.
+     */
     protected static Set<Category> openCategories = new HashSet<Category>();
 
+    /**
+     * The In game minimap id.
+     */
     protected final int inGameMinimapId;
+    /**
+     * The Initial categories.
+     */
     protected Category[] initialCategories;
+    /**
+     * The Minimap 1 preview button.
+     */
     protected CheckBox minimap1PreviewButton;
+    /**
+     * The Minimap 2 preview button.
+     */
     protected CheckBox minimap2PreviewButton;
-    protected Button minimap1KeysButton, minimap2KeysButton;
-    protected Button fullscreenKeysButton;
+
+    /**
+     * The Button close.
+     */
     protected Button buttonClose;
+    /**
+     * The Button about.
+     */
     protected Button buttonAbout;
+    /**
+     * The Render stats button.
+     */
     protected Button renderStatsButton;
+    /**
+     * The Edit grid minimap 1 button.
+     */
     protected Button editGridMinimap1Button;
+    /**
+     * The Edit grid minimap 2 button.
+     */
     protected Button editGridMinimap2Button;
+    /**
+     * The Edit grid fullscreen button.
+     */
     protected Button editGridFullscreenButton;
+    /**
+     * The Render stats slot metadata.
+     */
     protected SlotMetadata renderStatsSlotMetadata;
+    /**
+     * The Cartography category slot.
+     */
     protected CategorySlot cartographyCategorySlot;
+    /**
+     * The Options list pane.
+     */
     protected ScrollListPane<CategorySlot> optionsListPane;
+    /**
+     * The Toolbars.
+     */
     protected Map<Category, List<SlotMetadata>> toolbars;
+    /**
+     * The Changed categories.
+     */
     protected Set<Category> changedCategories = new HashSet<Category>();
+    /**
+     * The Force minimap update.
+     */
     protected boolean forceMinimapUpdate;
+    /**
+     * The Edit grid buttons.
+     */
     protected ButtonList editGridButtons = new ButtonList();
 
-    public OptionsManager()
-    {
+    /**
+     * Instantiates a new Options manager.
+     */
+    public OptionsManager() {
         this(null);
     }
 
-    public OptionsManager(GuiScreen returnDisplay)
-    {
+    /**
+     * Instantiates a new Options manager.
+     *
+     * @param returnDisplay the return display
+     */
+    public OptionsManager(GuiScreen returnDisplay) {
         this(returnDisplay, openCategories.toArray(new Category[0]));
     }
 
-    public OptionsManager(GuiScreen returnDisplay, Category... initialCategories)
-    {
+    /**
+     * Instantiates a new Options manager.
+     *
+     * @param returnDisplay     the return display
+     * @param initialCategories the initial categories
+     */
+    public OptionsManager(GuiScreen returnDisplay, Category... initialCategories) {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
         this.initialCategories = initialCategories;
         this.inGameMinimapId = Journeymap.getClient().getActiveMinimapId();
@@ -138,33 +199,6 @@ public class OptionsManager extends JmUI
                 }
             }
 
-            if (minimap1KeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap1KeysButton = new Button(name);
-                minimap1KeysButton.setTooltip(tooltip);
-                minimap1KeysButton.setDrawBackground(false);
-            }
-
-            if (minimap2KeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap2KeysButton = new Button(name);
-                minimap2KeysButton.setTooltip(tooltip);
-                minimap2KeysButton.setDrawBackground(false);
-            }
-
-            if (fullscreenKeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                fullscreenKeysButton = new Button(name);
-                fullscreenKeysButton.setTooltip(tooltip);
-                fullscreenKeysButton.setDrawBackground(false);
-            }
-
             if (renderStatsButton == null)
             {
                 renderStatsButton = new LabelButton(150, "jm.common.renderstats", 0, 0, 0);
@@ -214,26 +248,17 @@ public class OptionsManager extends JmUI
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
-                        }
-                        else if (category == ClientCategory.MiniMap2) {
+                        } else if (category == ClientCategory.MiniMap2) {
                             if (FMLClientHandler.instance().getClient().world != null) {
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
-                        }
-                        else if (category == ClientCategory.FullMap) {
+                        } else if (category == ClientCategory.FullMap) {
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
-                        }
-                        else if (category == ClientCategory.Cartography) {
+                        } else if (category == ClientCategory.Cartography) {
                             cartographyCategorySlot = categorySlot;
                             renderStatsSlotMetadata = new SlotMetadata(renderStatsButton,
                                     Constants.getString("jm.common.renderstats.title"),
@@ -241,8 +266,7 @@ public class OptionsManager extends JmUI
                             categorySlot.getAllChildMetadata().add(renderStatsSlotMetadata);
                             //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
-                        }
-                        else {
+                        } else {
                             categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                         }
 
@@ -522,20 +546,6 @@ public class OptionsManager extends JmUI
                 UIManager.INSTANCE.switchMiniMapPreset(2);
                 UIManager.INSTANCE.getMiniMap().resetInitTime();
             }
-
-            if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
-            {
-                optionsListPane.resetLastPressed();
-                UIManager.INSTANCE.openMiniMapHotkeyHelp(this);
-                return;
-            }
-
-            if (slotMetadata.getButton() == fullscreenKeysButton)
-            {
-                optionsListPane.resetLastPressed();
-                UIManager.INSTANCE.openMapHotkeyHelp(this);
-                return;
-            }
         }
 
         CategorySlot categorySlot = (CategorySlot) optionsListPane.getLastPressedParentSlot();
@@ -627,21 +637,20 @@ public class OptionsManager extends JmUI
         }
     }
 
-    protected void resetOptions(Category category)
-    {
+    /**
+     * Reset options.
+     *
+     * @param category the category
+     */
+    protected void resetOptions(Category category) {
         Set<PropertiesBase> updatedProperties = new HashSet<PropertiesBase>();
-        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
-        {
-            if (category.equals(categorySlot.getCategory()))
-            {
-                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
-                {
+        for (CategorySlot categorySlot : optionsListPane.getRootSlots()) {
+            if (category.equals(categorySlot.getCategory())) {
+                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata()) {
                     slotMetadata.resetToDefaultValue();
-                    if (slotMetadata.hasConfigField())
-                    {
+                    if (slotMetadata.hasConfigField()) {
                         PropertiesBase properties = slotMetadata.getProperties();
-                        if (properties != null)
-                        {
+                        if (properties != null) {
                             updatedProperties.add(properties);
                         }
                     }
@@ -650,8 +659,7 @@ public class OptionsManager extends JmUI
             }
         }
 
-        for (PropertiesBase properties : updatedProperties)
-        {
+        for (PropertiesBase properties : updatedProperties) {
             properties.save();
         }
 
@@ -659,22 +667,25 @@ public class OptionsManager extends JmUI
         RenderSpec.resetRenderSpecs();
     }
 
-    protected boolean previewMiniMap()
-    {
+    /**
+     * Preview mini map boolean.
+     *
+     * @return the boolean
+     */
+    protected boolean previewMiniMap() {
         return minimap1PreviewButton.getToggled() || minimap2PreviewButton.getToggled();
     }
 
-    protected void refreshMinimapOptions()
-    {
+    /**
+     * Refresh minimap options.
+     */
+    protected void refreshMinimapOptions() {
         Set<Category> cats = new HashSet<Category>();
         cats.add(ClientCategory.MiniMap1);
         cats.add(ClientCategory.MiniMap2);
-        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
-        {
-            if (cats.contains(categorySlot.getCategory()))
-            {
-                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata())
-                {
+        for (CategorySlot categorySlot : optionsListPane.getRootSlots()) {
+            if (cats.contains(categorySlot.getCategory())) {
+                for (SlotMetadata slotMetadata : categorySlot.getAllChildMetadata()) {
                     slotMetadata.getButton().refresh();
                 }
             }
@@ -763,13 +774,15 @@ public class OptionsManager extends JmUI
         super.closeAndReturn();
     }
 
-    Map<Category, List<SlotMetadata>> getToolbars()
-    {
-        if (toolbars == null)
-        {
+    /**
+     * Gets toolbars.
+     *
+     * @return the toolbars
+     */
+    Map<Category, List<SlotMetadata>> getToolbars() {
+        if (toolbars == null) {
             this.toolbars = new HashMap<Category, List<SlotMetadata>>();
-            for (Category category : ClientCategory.values)
-            {
+            for (Category category : ClientCategory.values) {
                 String name = Constants.getString("jm.config.reset");
                 String tooltip = Constants.getString("jm.config.reset.tooltip");
                 SlotMetadata toolbarSlotMetadata = new SlotMetadata(new ResetButton(category), name, tooltip);
@@ -779,12 +792,21 @@ public class OptionsManager extends JmUI
         return toolbars;
     }
 
-    public static class ResetButton extends Button
-    {
+    /**
+     * The type Reset button.
+     */
+    public static class ResetButton extends Button {
+        /**
+         * The Category.
+         */
         public final Category category;
 
-        public ResetButton(Category category)
-        {
+        /**
+         * Instantiates a new Reset button.
+         *
+         * @param category the category
+         */
+        public ResetButton(Category category) {
             super(Constants.getString("jm.config.reset"));
             this.category = category;
             setTooltip(Constants.getString("jm.config.reset.tooltip"));
@@ -793,12 +815,23 @@ public class OptionsManager extends JmUI
         }
     }
 
-    public static class LabelButton extends Button
-    {
+    /**
+     * The type Label button.
+     */
+    public static class LabelButton extends Button {
+        /**
+         * The H align.
+         */
         DrawUtil.HAlign hAlign = DrawUtil.HAlign.Left;
 
-        public LabelButton(int width, String key, Object... labelArgs)
-        {
+        /**
+         * Instantiates a new Label button.
+         *
+         * @param width     the width
+         * @param key       the key
+         * @param labelArgs the label args
+         */
+        public LabelButton(int width, String key, Object... labelArgs) {
             super(Constants.getString(key, labelArgs));
             setTooltip(Constants.getString(key + ".tooltip"));
             setDrawBackground(false);
@@ -809,39 +842,36 @@ public class OptionsManager extends JmUI
         }
 
         @Override
-        public int getFitWidth(FontRenderer fr)
-        {
+        public int getFitWidth(FontRenderer fr) {
             return width;
         }
 
         @Override
-        public void fitWidth(FontRenderer fr)
-        {
+        public void fitWidth(FontRenderer fr) {
         }
 
-        public void setHAlign(DrawUtil.HAlign hAlign)
-        {
+        /**
+         * Sets h align.
+         *
+         * @param hAlign the h align
+         */
+        public void setHAlign(DrawUtil.HAlign hAlign) {
             this.hAlign = hAlign;
         }
 
         @Override
-        public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float f)
-        {
+        public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks) {
             int labelX;
-            switch (hAlign)
-            {
-                case Left:
-                {
+            switch (hAlign) {
+                case Left: {
                     labelX = this.getRightX();
                     break;
                 }
-                case Right:
-                {
+                case Right: {
                     labelX = this.getX();
                     break;
                 }
-                default:
-                {
+                default: {
                     labelX = this.getCenterX();
                 }
             }

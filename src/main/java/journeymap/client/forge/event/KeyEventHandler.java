@@ -12,7 +12,6 @@ package journeymap.client.forge.event;
 import journeymap.client.Constants;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
-import journeymap.client.render.map.Tile;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
@@ -24,9 +23,6 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import org.lwjgl.input.Keyboard;
-
-import java.util.HashSet;
 
 /**
  * Key even handling + init code for key bindings.
@@ -45,35 +41,11 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
     public static void initKeyBindings()
     {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        HashSet<String> keyDescs = new HashSet<String>();
-        for (KeyBinding existing : minecraft.gameSettings.keyBindings)
-        {
-            try
-            {
-                if (existing != null && existing.getKeyDescription() != null)
-                {
-                    keyDescs.add(existing.getKeyDescription());
-                }
-            }
-            catch (Throwable t)
-            {
-                Journeymap.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
-            }
-        }
-
         for (KeyBinding kb : Constants.initKeybindings())
         {
             try
             {
-                if (!keyDescs.contains(kb.getKeyDescription()))
-                {
-                    ClientRegistry.registerKeyBinding(kb);
-                }
-                else
-                {
-                    Journeymap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
-                }
+                ClientRegistry.registerKeyBinding(kb);
             }
             catch (Throwable t)
             {
@@ -86,34 +58,19 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-
-            if (controlDown && Constants.KB_MAP.isKeyDown())
+            if (Constants.KB_MINIMAP_TOGGLE.isKeyDown())
             {
                 UIManager.INSTANCE.toggleMinimap();
                 return true;
-            }
-            else if (controlDown && Constants.KB_MAP_ZOOMIN.isKeyDown())
-            {
-                Tile.switchTileRenderType();
-                return false;
-            }
-            else if (controlDown && Constants.KB_MAP_ZOOMOUT.isKeyDown())
-            {
-                Tile.switchTileDisplayQuality();
-                return false;
-            }
-            else if (Constants.KB_MAP_ZOOMIN.isKeyDown())
+            } else if (Constants.KB_MINIMAP_ZOOMIN.isKeyDown())
             {
                 MiniMap.state().zoomIn();
                 return false;
-            }
-            else if (Constants.KB_MAP_ZOOMOUT.isKeyDown())
+            } else if (Constants.KB_MINIMAP_ZOOMOUT.isKeyDown())
             {
                 MiniMap.state().zoomOut();
                 return false;
-            }
-            else if (Constants.KB_MAP_DAY.isKeyDown() || Constants.KB_MAP_NIGHT.isKeyDown())
+            } else if (Constants.KB_MINIMAP_TYPE.isKeyDown())
             {
                 MiniMap.state().toggleMapType();
                 return false;
@@ -122,8 +79,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 UIManager.INSTANCE.switchMiniMapPreset();
                 return true;
-            }
-            else if (controlDown && Constants.KB_WAYPOINT.isKeyDown())
+            } else if (Constants.KB_WAYPOINT_MANAGER.isKeyDown())
             {
                 UIManager.INSTANCE.openWaypointManager(null, null);
                 return true;
@@ -131,7 +87,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
 
             if (!minimapOnly)
             {
-                if (Constants.KB_MAP.isKeyDown())
+                if (Constants.KB_FULLSCREEN.isPressed())
                 {
                     if (FMLClientHandler.instance().getClient().currentScreen == null)
                     {
@@ -148,7 +104,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    if (Constants.KB_WAYPOINT.isKeyDown())
+                    if (Constants.KB_CREATE_WAYPOINT.isPressed())
                     {
                         if (FMLClientHandler.instance().getClient().currentScreen == null)
                         {

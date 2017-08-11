@@ -189,7 +189,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     final int ceiling = getBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY);
 
                     // Oh look, a hole in the world.
-                    if (ceiling <= 0)
+                    if (ceiling < 0)
                     {
                         paintVoidBlock(chunkSliceImage, x, z);
                         chunkOk = true;
@@ -284,10 +284,9 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                                 break;
                             }
                         }
-                    }
-                    else
+                    } else if (strata.isEmpty() && y < minY)
                     {
-                        //break;
+                        break;
                     }
                 }
                 y--;
