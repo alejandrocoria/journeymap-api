@@ -13,6 +13,8 @@ import journeymap.common.log.LogFormatter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
@@ -65,42 +67,26 @@ public class Constants
      * The constant RESOURCE_PACKS_DEFAULT.
      */
     public static String RESOURCE_PACKS_DEFAULT = "Default";
-    /**
-     * The constant CONTROL_KEYNAME_COMBO.
-     */
-    public static String CONTROL_KEYNAME_COMBO;
-    /**
-     * The constant KEYBINDING_CATEGORY.
-     */
-    public static String KEYBINDING_CATEGORY;
-    /**
-     * The constant KB_MAP.
-     */
-    public static KeyBinding KB_MAP;
-    /**
-     * The constant KB_MAP_ZOOMIN.
-     */
-    public static KeyBinding KB_MAP_ZOOMIN;
-    /**
-     * The constant KB_MAP_ZOOMOUT.
-     */
-    public static KeyBinding KB_MAP_ZOOMOUT;
-    /**
-     * The constant KB_MAP_DAY.
-     */
-    public static KeyBinding KB_MAP_DAY;
-    /**
-     * The constant KB_MAP_NIGHT.
-     */
-    public static KeyBinding KB_MAP_NIGHT;
-    /**
-     * The constant KB_MINIMAP_PRESET.
-     */
+
+    public static String CATEGORY_ALL;
+    public static String CATEGORY_FULLMAP;
+    
+    public static KeyBinding KB_FULLSCREEN;
+    public static KeyBinding KB_MINIMAP_ZOOMIN;
+    public static KeyBinding KB_MINIMAP_ZOOMOUT;
+    public static KeyBinding KB_MINIMAP_TYPE;
     public static KeyBinding KB_MINIMAP_PRESET;
-    /**
-     * The constant KB_WAYPOINT.
-     */
-    public static KeyBinding KB_WAYPOINT;
+    public static KeyBinding KB_MINIMAP_TOGGLE;
+    public static KeyBinding KB_CREATE_WAYPOINT;
+    public static KeyBinding KB_WAYPOINT_MANAGER;
+    public static KeyBinding KB_FULLMAP_OPTIONS_MANAGER;
+    public static KeyBinding KB_FULLMAP_ACTIONS_MANAGER;
+    public static KeyBinding KB_FULLMAP_PAN_NORTH;
+    public static KeyBinding KB_FULLMAP_PAN_SOUTH;
+    public static KeyBinding KB_FULLMAP_PAN_EAST;
+    public static KeyBinding KB_FULLMAP_PAN_WEST;
+
+    
     private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
     /**
      * The constant ENTITY_ICON_DIR.
@@ -124,16 +110,34 @@ public class Constants
      */
     public static List<KeyBinding> initKeybindings()
     {
-        CONTROL_KEYNAME_COMBO = "Ctrl,";
-        KEYBINDING_CATEGORY = Constants.getString("jm.common.hotkeys_keybinding_category", CONTROL_KEYNAME_COMBO);
-        KB_MAP = new KeyBinding("key.journeymap.map_toggle", Keyboard.KEY_J, KEYBINDING_CATEGORY);
-        KB_MAP_ZOOMIN = new KeyBinding("key.journeymap.zoom_in", Keyboard.KEY_EQUALS, KEYBINDING_CATEGORY);
-        KB_MAP_ZOOMOUT = new KeyBinding("key.journeymap.zoom_out", Keyboard.KEY_MINUS, KEYBINDING_CATEGORY);
-        KB_MAP_DAY = new KeyBinding("key.journeymap.minimap_type", Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
-        KB_MAP_NIGHT = new KeyBinding("key.journeymap.minimap_type", Keyboard.KEY_RBRACKET, KEYBINDING_CATEGORY);
-        KB_MINIMAP_PRESET = new KeyBinding("key.journeymap.minimap_preset", Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
-        KB_WAYPOINT = new KeyBinding("key.journeymap.create_waypoint", Keyboard.KEY_B, KEYBINDING_CATEGORY);
-        return Arrays.asList(KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_DAY, KB_MAP_NIGHT, KB_MINIMAP_PRESET, KB_WAYPOINT);
+        CATEGORY_ALL = Constants.getString("jm.common.hotkeys_keybinding_category");
+        CATEGORY_FULLMAP = Constants.getString("jm.common.hotkeys_keybinding_fullscreen_category");
+
+        // Active in-game and Fullscreen
+        KB_MINIMAP_ZOOMIN = new KeyBinding("key.journeymap.zoom_in", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_EQUALS, CATEGORY_ALL);
+        KB_MINIMAP_ZOOMOUT = new KeyBinding("key.journeymap.zoom_out", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_MINUS, CATEGORY_ALL);
+        KB_MINIMAP_TYPE = new KeyBinding("key.journeymap.minimap_type", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_LBRACKET, CATEGORY_ALL);
+        KB_MINIMAP_PRESET = new KeyBinding("key.journeymap.minimap_preset", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_BACKSLASH, CATEGORY_ALL);
+        KB_CREATE_WAYPOINT = new KeyBinding("key.journeymap.create_waypoint", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_B, CATEGORY_ALL);
+        KB_FULLSCREEN = new KeyBinding("key.journeymap.map_toggle_alt", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_J, CATEGORY_ALL);
+
+        // Active in-game or Fullscreen, but shouldn't be treated as conflicts because they have modifiers.
+        KB_MINIMAP_TOGGLE = new KeyBinding("key.journeymap.minimap_toggle_alt", KeyConflictContext.GUI, KeyModifier.CONTROL, Keyboard.KEY_J, CATEGORY_ALL);
+        KB_WAYPOINT_MANAGER = new KeyBinding("key.journeymap.fullscreen_waypoints", KeyConflictContext.GUI, KeyModifier.CONTROL, Keyboard.KEY_B, CATEGORY_ALL);
+
+        // Active only in Fullscreen
+        KB_FULLMAP_PAN_NORTH = new KeyBinding("key.journeymap.fullscreen.north", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_UP, CATEGORY_FULLMAP);
+        KB_FULLMAP_PAN_SOUTH = new KeyBinding("key.journeymap.fullscreen.south", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_DOWN, CATEGORY_FULLMAP);
+        KB_FULLMAP_PAN_EAST = new KeyBinding("key.journeymap.fullscreen.east", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_RIGHT, CATEGORY_FULLMAP);
+        KB_FULLMAP_PAN_WEST = new KeyBinding("key.journeymap.fullscreen.west", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_LEFT, CATEGORY_FULLMAP);
+        KB_FULLMAP_OPTIONS_MANAGER = new KeyBinding("key.journeymap.fullscreen_options", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_O, CATEGORY_FULLMAP);
+        KB_FULLMAP_ACTIONS_MANAGER = new KeyBinding("key.journeymap.fullscreen_actions", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_A, CATEGORY_FULLMAP);
+
+        return Arrays.asList(
+                KB_FULLSCREEN, KB_MINIMAP_ZOOMIN, KB_MINIMAP_ZOOMOUT, KB_MINIMAP_TYPE, KB_MINIMAP_PRESET, KB_MINIMAP_TOGGLE, KB_CREATE_WAYPOINT,
+                KB_WAYPOINT_MANAGER, KB_FULLMAP_OPTIONS_MANAGER, KB_FULLMAP_ACTIONS_MANAGER, KB_FULLMAP_PAN_NORTH, KB_FULLMAP_PAN_SOUTH,
+                KB_FULLMAP_PAN_EAST, KB_FULLMAP_PAN_WEST
+        );
     }
 
     /**

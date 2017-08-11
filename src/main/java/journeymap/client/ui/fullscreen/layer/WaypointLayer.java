@@ -170,12 +170,6 @@ public class WaypointLayer implements LayerDelegate.Layer
                 UIManager.INSTANCE.openWaypointManager(selected, new Fullscreen()); // TODO: This could be a problem
                 return drawStepList;
             }
-            else
-            {
-                // Create waypoint
-                Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.player.dimension);
-                UIManager.INSTANCE.openWaypointEditor(waypoint, true, new Fullscreen()); // TODO: This could be a problem
-            }
         }
 
         return drawStepList;

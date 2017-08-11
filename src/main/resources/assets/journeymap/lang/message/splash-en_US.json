@@ -3,7 +3,11 @@
 {
   "lines": [
     {
-      "label": "Improved support for modded blocks",
+      "label": "Improved color support for modded blocks",
+      "action": ""
+    },
+    {
+      "label": "New customizable keybindings (Controls)",
       "action": ""
     },
     {
@@ -11,12 +15,8 @@
       "action": "dialog.OptionsManager#Cartography"
     },
     {
-      "label": "JourneyMap has a public Discord! (click to join)",
+      "label": "JourneyMap has a public Discord!",
       "action": "dialog.FullscreenActions#discord"
-    },
-    {
-      "label": "Updated Privacy Notices (click to view)",
-      "action": "dialog.FullscreenActions#launchWebsite#Privacy"
     }
   ]
 }

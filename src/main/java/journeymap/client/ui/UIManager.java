@@ -10,10 +10,12 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.ui.component.JmUI;
-import journeymap.client.ui.dialog.*;
+import journeymap.client.ui.dialog.FullscreenActions;
+import journeymap.client.ui.dialog.GridEditor;
+import journeymap.client.ui.dialog.OptionsManager;
+import journeymap.client.ui.dialog.Splash;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
-import journeymap.client.ui.minimap.MiniMapHotkeysHelp;
 import journeymap.client.ui.waypoint.WaypointEditor;
 import journeymap.client.ui.waypoint.WaypointManager;
 import journeymap.common.Journeymap;
@@ -389,26 +391,6 @@ public enum UIManager
         {
             Journeymap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
-    }
-
-    /**
-     * Open map hotkey help.
-     *
-     * @param returnDisplay the return display
-     */
-    public void openMapHotkeyHelp(JmUI returnDisplay)
-    {
-        open(FullscreenHotkeysHelp.class, returnDisplay);
-    }
-
-    /**
-     * Open mini map hotkey help.
-     *
-     * @param returnDisplay the return display
-     */
-    public void openMiniMapHotkeyHelp(JmUI returnDisplay)
-    {
-        open(MiniMapHotkeysHelp.class, returnDisplay);
     }
 
     /**

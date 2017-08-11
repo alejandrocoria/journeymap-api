@@ -7,6 +7,7 @@ package journeymap.client.ui.fullscreen;
 
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -18,14 +19,14 @@ import java.io.IOException;
 public class MapChat extends GuiChat
 {
     /**
-     * The Hidden.
+     * Whether shown on map
      */
     protected boolean hidden = false;
+
     /**
-     * The Bottom margin.
+     * Used by chat to make old chat lines fade out
      */
-    protected int bottomMargin = 8;
-    private int cursorCounter;
+    protected int cursorCounter;
 
     /**
      * Instantiates a new Map chat.
@@ -65,20 +66,38 @@ public class MapChat extends GuiChat
             return;
         }
         super.updateScreen();
-        cursorCounter++;
     }
 
     /**
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-    public void keyTyped(char par1, int par2) throws IOException
+    public void keyTyped(char typedChar, int keyCode) throws IOException
     {
         if (hidden)
         {
             return;
         }
-        super.keyTyped(par1, par2);
+        if (keyCode == Keyboard.KEY_ESCAPE)
+        {
+            close();
+        }
+        else if (keyCode != Keyboard.KEY_RETURN && keyCode != Keyboard.KEY_NUMPADENTER)
+        {
+            super.keyTyped(typedChar, keyCode);
+        }
+        else
+        {
+            String s = this.inputField.getText().trim();
+
+            if (!s.isEmpty())
+            {
+                this.sendChatMessage(s);
+            }
+
+            this.inputField.setText("");
+            this.mc.ingameGUI.getChatGUI().resetScroll();
+        }
     }
 
     /**
@@ -121,15 +140,15 @@ public class MapChat extends GuiChat
      * Draws the screen and all the components in it.
      */
     @Override
-    public void drawScreen(int par1, int par2, float par3)
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         GlStateManager.pushMatrix();
-        GL11.glTranslatef(0, this.height - 39.5f - bottomMargin, 0.0F);
+        GL11.glTranslatef(0, this.height - 47.5f, 0.0F);
         if (this.mc != null)
         {
             if (this.mc.ingameGUI != null && this.mc.ingameGUI.getChatGUI() != null)
             {
-                this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter);
+                this.mc.ingameGUI.getChatGUI().drawChat(hidden ? this.mc.ingameGUI.getUpdateCounter() : this.cursorCounter++);
             }
         }
         GlStateManager.popMatrix();
@@ -139,7 +158,7 @@ public class MapChat extends GuiChat
             return;
         }
 
-        super.drawScreen(par1, par2, par3);
+        super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     /**

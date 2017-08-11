@@ -107,7 +107,7 @@ public class LayerDelegate
         }
     }
 
-    private BlockPos getBlockPos(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition)
+    public BlockPos getBlockPos(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition)
     {
         BlockPos seaLevel = gridRenderer.getBlockAtPixel(mousePosition);
         ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(seaLevel);

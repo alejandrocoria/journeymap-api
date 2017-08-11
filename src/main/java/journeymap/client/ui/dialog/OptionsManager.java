@@ -70,17 +70,7 @@ public class OptionsManager extends JmUI
      * The Minimap 2 preview button.
      */
     protected CheckBox minimap2PreviewButton;
-    /**
-     * The Minimap 1 keys button.
-     */
-    protected Button minimap1KeysButton, /**
- * The Minimap 2 keys button.
- */
-minimap2KeysButton;
-    /**
-     * The Fullscreen keys button.
-     */
-    protected Button fullscreenKeysButton;
+
     /**
      * The Button close.
      */
@@ -212,33 +202,6 @@ minimap2KeysButton;
                 }
             }
 
-            if (minimap1KeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap1KeysButton = new Button(name);
-                minimap1KeysButton.setTooltip(tooltip);
-                minimap1KeysButton.setDrawBackground(false);
-            }
-
-            if (minimap2KeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                minimap2KeysButton = new Button(name);
-                minimap2KeysButton.setTooltip(tooltip);
-                minimap2KeysButton.setDrawBackground(false);
-            }
-
-            if (fullscreenKeysButton == null)
-            {
-                String name = Constants.getString("jm.common.hotkeys");
-                String tooltip = Constants.getString("jm.common.hotkeys.tooltip");
-                fullscreenKeysButton = new Button(name);
-                fullscreenKeysButton.setTooltip(tooltip);
-                fullscreenKeysButton.setDrawBackground(false);
-            }
-
             if (renderStatsButton == null)
             {
                 renderStatsButton = new LabelButton(150, "jm.common.renderstats", 0, 0, 0);
@@ -290,8 +253,6 @@ minimap2KeysButton;
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1KeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
                         }
                         else if (category == ClientCategory.MiniMap2)
@@ -301,15 +262,11 @@ minimap2KeysButton;
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2KeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
                         }
                         else if (category == ClientCategory.FullMap)
                         {
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            categorySlot.getAllChildMetadata().add(new SlotMetadata(fullscreenKeysButton, 2));
-                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                             break;
                         }
                         else if (category == ClientCategory.Cartography)
@@ -602,20 +559,6 @@ minimap2KeysButton;
                 minimap1PreviewButton.setToggled(false);
                 UIManager.INSTANCE.switchMiniMapPreset(2);
                 UIManager.INSTANCE.getMiniMap().resetInitTime();
-            }
-
-            if (slotMetadata.getButton() == minimap1KeysButton || slotMetadata.getButton() == minimap2KeysButton)
-            {
-                optionsListPane.resetLastPressed();
-                UIManager.INSTANCE.openMiniMapHotkeyHelp(this);
-                return;
-            }
-
-            if (slotMetadata.getButton() == fullscreenKeysButton)
-            {
-                optionsListPane.resetLastPressed();
-                UIManager.INSTANCE.openMapHotkeyHelp(this);
-                return;
             }
         }
 
