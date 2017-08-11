@@ -197,6 +197,10 @@ public final class VanillaBlockHandler implements IModBlockHandler {
             blockMD.setBlockColorProxy(FlowerBlockProxy.INSTANCE);
         }
 
+        if (block instanceof BlockBed) {
+            blockMD.setBlockColorProxy(BedBlockProxy.INSTANCE);
+        }
+
         if (blockMD.isVanillaBlock()) {
             return;
         }
