@@ -338,8 +338,7 @@ public class ColorPalette
      */
     boolean hasBlockStateColor(final BlockMD blockMD)
     {
-        BlockMD canonical = blockMD.getCanonicalState();
-        return table.contains(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical));
+        return table.contains(BlockMD.getBlockId(blockMD), BlockMD.getBlockStateId(blockMD));
     }
 
 
@@ -352,14 +351,12 @@ public class ColorPalette
      */
     @Nullable
     private BlockStateColor getBlockStateColor(final BlockMD blockMD, boolean createIfMissing) {
-        BlockMD canonical = blockMD.getCanonicalState();
-
-        BlockStateColor blockStateColor = table.get(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical));
+        BlockStateColor blockStateColor = table.get(BlockMD.getBlockId(blockMD), BlockMD.getBlockStateId(blockMD));
 
         if (blockStateColor == null && createIfMissing) {
-            if (canonical.hasColor()) {
-                blockStateColor = new BlockStateColor(canonical);
-                table.put(BlockMD.getBlockId(canonical), BlockMD.getBlockStateId(canonical), blockStateColor);
+            if (blockMD.hasColor()) {
+                blockStateColor = new BlockStateColor(blockMD);
+                table.put(BlockMD.getBlockId(blockMD), BlockMD.getBlockStateId(blockMD), blockStateColor);
                 dirty = true;
             }
         }

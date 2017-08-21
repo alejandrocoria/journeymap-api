@@ -9,6 +9,7 @@
 package journeymap.client.log;
 
 import journeymap.client.Constants;
+import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.service.WebServer;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -160,7 +161,7 @@ public class ChatLog
                 try
                 {
                     WebServer webServer = Journeymap.getClient().getJmServer();
-                    String keyName = Constants.KB_FULLSCREEN.getDisplayName();
+                    String keyName = KeyEventHandler.KB_FULLSCREEN.getDisplayName();
                     String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
                     ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
@@ -172,7 +173,7 @@ public class ChatLog
             }
             else
             {
-                String keyName = Constants.getKeyName(Constants.KB_FULLSCREEN); // Should be KeyCode
+                String keyName = KeyEventHandler.KB_FULLSCREEN.getDisplayName(); // Should be KeyCode
                 ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
             }
 

@@ -25,15 +25,6 @@ import java.util.List;
 public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 {
     /**
-     * Reset state so classes can be checked again. Useful
-     * after post-init of all mods.
-     */
-    public static void enableRecheck()
-    {
-        // not currently used
-    }
-
-    /**
      * Whether native waypoint management is enabled.
      *
      * @return

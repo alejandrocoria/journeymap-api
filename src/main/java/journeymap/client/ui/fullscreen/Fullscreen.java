@@ -5,8 +5,6 @@
 
 package journeymap.client.ui.fullscreen;
 
-import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
 import journeymap.client.Constants;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Overlay;
@@ -52,7 +50,6 @@ import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ITabCompleter;
 import net.minecraft.util.math.BlockPos;
@@ -67,9 +64,10 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.*;
-
-import static net.minecraftforge.client.settings.KeyConflictContext.GUI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Displays the map as a full-screen overlay in-game.
@@ -279,12 +277,6 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     List<Overlay> tempOverlays = new ArrayList<Overlay>();
 
     /**
-     * Table of keycodes mapped to keybindings to actions.  Sorted so bindings with modifiers are first.
-     */
-    Table<Integer, KeyBinding, Runnable> keymappings = TreeBasedTable.create(Comparator.naturalOrder(),
-            Comparator.comparingInt((KeyBinding keyBinding) -> keyBinding.getKeyModifier().ordinal()));
-
-    /**
      * Default constructor
      */
     public Fullscreen()
@@ -296,27 +288,6 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
         gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
-
-        // Assign actions to keys
-        setKeymap(Constants.KB_FULLSCREEN, UIManager.INSTANCE::closeAll);
-        setKeymap(Constants.KB_MINIMAP_ZOOMIN, this::zoomIn);
-        setKeymap(Constants.KB_MINIMAP_ZOOMOUT, this::zoomOut);
-        setKeymap(Constants.KB_MINIMAP_TYPE, state::toggleMapType);
-        setKeymap(Constants.KB_CREATE_WAYPOINT, this::createWaypointAtMouse);
-        setKeymap(Constants.KB_FULLMAP_OPTIONS_MANAGER, UIManager.INSTANCE::openOptionsManager);
-        setKeymap(Constants.KB_WAYPOINT_MANAGER, () -> UIManager.INSTANCE.openWaypointManager(null, this));
-        setKeymap(Constants.KB_FULLMAP_ACTIONS_MANAGER, UIManager.INSTANCE::openMapActions);
-        setKeymap(Constants.KB_FULLMAP_PAN_NORTH, () -> moveCanvas(0, -16));
-        setKeymap(Constants.KB_FULLMAP_PAN_WEST, () -> moveCanvas(-16, -0));
-        setKeymap(Constants.KB_FULLMAP_PAN_SOUTH, () -> moveCanvas(0, 16));
-        setKeymap(Constants.KB_FULLMAP_PAN_EAST, () -> moveCanvas(16, 0));
-        setKeymap(mc.gameSettings.keyBindInventory, UIManager.INSTANCE::openInventory);
-        setKeymap(mc.gameSettings.keyBindChat, () -> openChat(""));
-        setKeymap(mc.gameSettings.keyBindCommand, () -> openChat("/"));
-    }
-
-    private void setKeymap(KeyBinding keybinding, Runnable action) {
-        keymappings.put(keybinding.getKeyCode(), keybinding, action);
     }
 
     /**
@@ -370,7 +341,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     }
 
     @Override
-    public void drawScreen(int width, int height, float f)
+    public void drawScreen(int width, int height, float partialTicks)
     {
         try {
             drawBackground(0); // drawBackground
@@ -387,8 +358,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
                 firstLayoutPass = false;
             } else {
                 for (int k = 0; k < this.buttonList.size(); ++k) {
-                    GuiButton guibutton = (GuiButton) this.buttonList.get(k);
-                    guibutton.drawButton(this.mc, width, height, 0);
+                    GuiButton guibutton = this.buttonList.get(k);
+                    guibutton.drawButton(this.mc, width, height, partialTicks);
                     if (tooltip == null) {
                         if (guibutton instanceof Button) {
                             Button button = (Button) guibutton;
@@ -401,7 +372,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             }
 
             if (chat != null) {
-                chat.drawScreen(width, height, f);
+                chat.drawScreen(width, height, partialTicks);
             }
 
             if (tooltip != null && !tooltip.isEmpty()) {
@@ -885,10 +856,22 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         }
     }
 
+    public void toggleMapType() {
+        state.toggleMapType();
+        MapType newType = state.getCurrentMapType();
+        buttonDay.setToggled(newType.isDay(), false);
+        buttonNight.setToggled(newType.isNight(), false);
+        buttonTopo.setToggled(newType.isTopo(), false);
+        if (state.isUnderground()) {
+            buttonCaves.setToggled(newType.isUnderground(), false);
+        }
+        state.requireRefresh();
+    }
+
     /**
      * Zoom in.
      */
-    void zoomIn() {
+    public void zoomIn() {
         if (fullMapProperties.zoomLevel.get() < state.maxZoom) {
             setZoom(fullMapProperties.zoomLevel.get() + 1);
         }
@@ -897,7 +880,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * Zoom out.
      */
-    void zoomOut() {
+    public void zoomOut() {
         if (fullMapProperties.zoomLevel.get() > state.minZoom) {
             setZoom(fullMapProperties.zoomLevel.get() - 1);
         }
@@ -931,38 +914,52 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         }
     }
 
-    void createWaypointAtMouse() {
+    public void createWaypointAtMouse() {
         Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
         BlockPos blockPos = layerDelegate.getBlockPos(mc, gridRenderer, mousePosition);
         Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, mc.player.dimension);
         UIManager.INSTANCE.openWaypointEditor(waypoint, true, this);
     }
 
+    public boolean isChatOpen() {
+        return chat != null && !chat.isHidden();
+    }
+
+    /**
+     * Note: All the keybindings defined by JM are in KeyEventHandler.  This
+     * method is just for mimicing "native" functionality in Minecraft.
+     *
+     * @param c
+     * @param key
+     * @throws IOException
+     */
     @Override
-    public void keyTyped(char c, int i) throws IOException
-    {
-        if (chat != null && !chat.isHidden()) {
-            chat.keyTyped(c, i);
+    public void keyTyped(char c, int key) throws IOException {
+        if (isChatOpen()) {
+            chat.keyTyped(c, key);
             return;
         }
 
-        // Check keymap for assigned action
-        if (keymappings.containsRow(i))
-        {
-            for (Map.Entry<KeyBinding, Runnable> entry : keymappings.row(i).entrySet()) {
-                if (entry.getKey().getKeyModifier().isActive(GUI)) {
-                    entry.getValue().run();
-                    return;
-                }
-            }
-            logger.warn("Missed keystroke: " + i);
+        if (mc.gameSettings.keyBindChat.getKeyCode()==key) {
+            openChat("");
+            return;
+        }
+
+        if (mc.gameSettings.keyBindCommand.getKeyCode() == key) {
+            openChat("/");
+            return;
+        }
+
+        if (mc.gameSettings.keyBindInventory.getKeyCode() == key) {
+            UIManager.INSTANCE.openInventory();
+            return;
         }
 
         // Escape
-        if (Keyboard.KEY_ESCAPE == i) {
+        if (Keyboard.KEY_ESCAPE == key) {
             UIManager.INSTANCE.closeAll();
+            return;
         }
-
     }
 
     @Override
@@ -972,7 +969,6 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         if (chat != null) {
             chat.updateScreen();
         }
-        //layoutButtons();
     }
 
     @Override
@@ -984,7 +980,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * Draw map.
      */
-    void drawMap() {
+    void drawMap()
+    {
         final boolean refreshReady = isRefreshReady();
         final StatTimer timer = refreshReady ? drawMapTimerWithRefresh : drawMapTimer;
         timer.start();
@@ -1069,7 +1066,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @param waypoint the waypoint
      */
-    public void centerOn(Waypoint waypoint) {
+    public void centerOn(Waypoint waypoint)
+    {
         if (waypoint.getDimensions().contains(mc.player.dimension)) {
             state.follow.set(false);
             state.requireRefresh();
@@ -1092,7 +1090,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @param waypoint the waypoint
      */
-    public void addTempMarker(Waypoint waypoint) {
+    public void addTempMarker(Waypoint waypoint)
+    {
         try {
             BlockPos pos = waypoint.getBlockPos();
 
@@ -1171,7 +1170,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @param defaultText the default text
      */
-    void openChat(String defaultText) {
+    public void openChat(String defaultText)
+    {
         if (chat != null) {
             chat.setText(defaultText);
             chat.setHidden(false);
@@ -1206,7 +1206,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @return the boolean
      */
-    boolean isRefreshReady() {
+    boolean isRefreshReady()
+    {
         if (isScrolling) {
             return false;
         } else {
@@ -1220,7 +1221,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      * @param deltaBlockX the delta block x
      * @param deltaBlockz the delta blockz
      */
-    void moveCanvas(int deltaBlockX, int deltaBlockz) {
+    public void moveCanvas(int deltaBlockX, int deltaBlockz)
+    {
         refreshState();
         gridRenderer.move(deltaBlockX, deltaBlockz);
         gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
@@ -1269,7 +1271,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     }
 
     @Override
-    public void setCompletions(String... newCompletions) {
+    public void setCompletions(String... newCompletions)
+    {
         chat.setCompletions(newCompletions);
     }
 }

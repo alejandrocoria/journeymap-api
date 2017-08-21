@@ -20,13 +20,11 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -34,7 +32,6 @@ import net.minecraftforge.registries.GameData;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -79,8 +76,6 @@ public class BlockMD implements Comparable<BlockMD>
     private IBlockSpritesProxy blockSpritesProxy;
     private IBlockColorProxy blockColorProxy;
 
-    private boolean useDefaultState;
-
     private boolean noShadow;
     private boolean isIgnore;
     private boolean isWater;
@@ -92,39 +87,6 @@ public class BlockMD implements Comparable<BlockMD>
     private boolean isGrass;
     private boolean isPlantOrCrop;
     private boolean isError;
-
-    private transient boolean isDefaultState;
-
-    /**
-     * Create block md.
-     *
-     * @param blockState the block state
-     * @return the block md
-     */
-    public static BlockMD create(@Nonnull IBlockState blockState) {
-        try {
-            if (blockState instanceof IExtendedBlockState) {
-                IBlockState clean = ((IExtendedBlockState) blockState).getClean();
-                if (clean != null) {
-                    blockState = clean;
-                }
-            }
-
-            if (blockState == null || blockState.getBlock() == Blocks.AIR || blockState.getBlock() instanceof BlockAir || blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
-                return BlockMD.AIRBLOCK;
-            }
-
-            if (blockState.getBlock().getRegistryName() == null) {
-                LOGGER.warn("Unregistered block will be treated like air: " + blockState);
-                return BlockMD.AIRBLOCK;
-            }
-
-            return new BlockMD(blockState);
-        } catch (Exception e) {
-            LOGGER.error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toString(e)));
-            return BlockMD.AIRBLOCK;
-        }
-    }
 
     /**
      * Private constructor.
@@ -159,17 +121,6 @@ public class BlockMD implements Comparable<BlockMD>
         updateProperties();
     }
 
-    private BlockMD getDefaultUpFacing() {
-        if (isDefaultState) {
-            return this;
-        }
-        BlockMD defaultUpFacing = BlockMD.get(BlockMD.getDefaultUpFacing(blockState));
-        if (defaultUpFacing == this) {
-            this.isDefaultState = true;
-        }
-        return defaultUpFacing;
-    }
-
     public Set<BlockMD> getValidStateMDs() {
         return getBlock().getBlockState().getValidStates().stream()
                 .map(BlockMD::get)
@@ -195,7 +146,7 @@ public class BlockMD implements Comparable<BlockMD>
             isFire = block == Blocks.FIRE;
         }
 
-        useDefaultState = hasFlag(BlockFlag.DefaultState);
+        //useDefaultState = hasFlag(BlockFlag.DefaultState);
         isFluid = hasFlag(BlockFlag.Fluid);
         isWater = hasFlag(BlockFlag.Water);
         noShadow = hasFlag(BlockFlag.NoShadow);
@@ -203,22 +154,6 @@ public class BlockMD implements Comparable<BlockMD>
         isGrass = hasFlag(BlockFlag.Grass);
         isPlantOrCrop = hasAnyFlag(FlagsPlantAndCrop);
         isError = hasFlag(BlockFlag.Error);
-    }
-
-    public BlockMD getCanonicalState() {
-        if (isUseDefaultState()) {
-            return getDefaultUpFacing();
-        }
-        return this;
-    }
-
-    /**
-     * Is use default state boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isUseDefaultState() {
-        return useDefaultState;
     }
 
     /**
@@ -237,23 +172,6 @@ public class BlockMD implements Comparable<BlockMD>
     public static void reset()
     {
         DataCache.INSTANCE.resetBlockMetadata();
-    }
-
-    public static IBlockState getUpFacing(IBlockState blockState, @Nullable IBlockState fallBack) {
-        try {
-            if (blockState.getProperties().containsKey(BlockDirectional.FACING)) {
-                return blockState.withProperty(BlockDirectional.FACING, EnumFacing.UP);
-            }
-            return fallBack;
-        } catch (Exception e) {
-            LOGGER.error("Couldn't get EnumFacing.UP variant on " + blockState);
-        }
-        return fallBack;
-    }
-
-    public static IBlockState getDefaultUpFacing(@Nonnull IBlockState blockState) {
-        IBlockState defaultBlockState = blockState.getBlock().getDefaultState();
-        return getUpFacing(defaultBlockState, defaultBlockState);
     }
 
     /**
@@ -531,8 +449,11 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public int getTextureColor()
     {
-        if (color == null && !isError) {
+        if (color == null && !isError && blockColorProxy != null) {
             this.color = blockColorProxy.deriveBlockColor(this);
+        }
+        if (color == null) {
+            this.color = RGB.BLACK_RGB;
         }
         return this.color;
     }
@@ -557,7 +478,6 @@ public class BlockMD implements Comparable<BlockMD>
 
     /**
      * Whether a color is set.
-     *
      * @return
      */
     public boolean hasColor() {
@@ -616,8 +536,7 @@ public class BlockMD implements Comparable<BlockMD>
         this.alpha = alpha;
         if (alpha < 1f) {
             this.flags.add(BlockFlag.Transparency);
-        }
-        else {
+        } else {
             this.flags.remove(BlockFlag.Transparency);
         }
     }
@@ -644,7 +563,7 @@ public class BlockMD implements Comparable<BlockMD>
      */
     public IBlockState getBlockState()
     {
-        return useDefaultState ? blockState.getBlock().getDefaultState() : blockState;
+        return blockState;
     }
 
     /**
@@ -810,6 +729,38 @@ public class BlockMD implements Comparable<BlockMD>
                 .compare(this.blockId, that.blockId, ordering)
                 .compare(this.blockStateId, that.blockStateId, ordering)
                 .result();
+    }
+
+    /**
+     * The type Simple cache loader.
+     */
+    public static class CacheLoader extends com.google.common.cache.CacheLoader<IBlockState, BlockMD> {
+        @Override
+        public BlockMD load(@Nonnull IBlockState blockState) throws Exception {
+
+            try {
+                if (blockState instanceof IExtendedBlockState) {
+                    IBlockState clean = ((IExtendedBlockState) blockState).getClean();
+                    if (clean != null) {
+                        blockState = clean;
+                    }
+                }
+
+                if (blockState == null || blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
+                    return BlockMD.AIRBLOCK;
+                }
+
+                if (blockState.getBlock().getRegistryName() == null) {
+                    LOGGER.warn("Unregistered block will be treated like air: " + blockState);
+                    return BlockMD.AIRBLOCK;
+                }
+
+                return new BlockMD(blockState);
+            } catch (Exception e) {
+                LOGGER.error(String.format("Can't get BlockMD for %s : %s", blockState, LogFormatter.toPartialString(e)));
+                return BlockMD.AIRBLOCK;
+            }
+        }
     }
 
 }

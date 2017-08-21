@@ -110,7 +110,6 @@ public enum UIManager
         } catch (Throwable e) {
             logger.error("Unexpected error: " + LogFormatter.toString(e));
         }
-        KeyBinding.unPressAllKeys();
     }
 
     /**
@@ -287,9 +286,12 @@ public enum UIManager
     /**
      * Open fullscreen map.
      */
-    public void openFullscreenMap() {
+    public Fullscreen openFullscreenMap() {
+        if (minecraft.currentScreen instanceof Fullscreen) {
+            return (Fullscreen) minecraft.currentScreen;
+        }
         KeyBinding.unPressAllKeys();
-        open(Fullscreen.class);
+        return open(Fullscreen.class);
     }
 
     /**

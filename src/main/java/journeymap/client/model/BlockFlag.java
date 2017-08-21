@@ -10,11 +10,6 @@ public enum BlockFlag {
     Ignore,
 
     /**
-     * Only the default IBlockState is used for mapping.
-     */
-    DefaultState,
-
-    /**
      * Color is determined by biome foliage multiplier
      */
     Foliage,

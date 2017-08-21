@@ -34,10 +34,12 @@ public class RadarDrawStepFactory
     {
         final boolean showAnimals = mapProperties.showAnimals.get();
         final boolean showPets = mapProperties.showPets.get();
+        final boolean showVillagers = mapProperties.showVillagers.get();
         final EntityDisplay mobDisplay = mapProperties.mobDisplay.get();
         final EntityDisplay playerDisplay = mapProperties.playerDisplay.get();
         final boolean showMobHeading = mapProperties.showMobHeading.get();
         final boolean showPlayerHeading = mapProperties.showPlayerHeading.get();
+        final boolean showEntityNames = mapProperties.showEntityNames.get();
         final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
 
         try
@@ -75,6 +77,10 @@ public class RadarDrawStepFactory
                         }
                     }
 
+                    if (!showVillagers && (dto.profession != null || dto.npc)) {
+                        continue;
+                    }
+
                     // Draw entity icon and label
                     DrawEntityStep drawStep = DataCache.INSTANCE.getDrawEntityStep(entityLiving);
 
@@ -83,7 +89,7 @@ public class RadarDrawStepFactory
                     {
                         locatorImg = EntityDisplay.getLocatorTexture(playerDisplay, showPlayerHeading);
                         entityIcon = EntityDisplay.getEntityTexture(playerDisplay, entityLiving.getName());
-                        drawStep.update(playerDisplay, locatorImg, entityIcon, dto.color, showPlayerHeading);
+                        drawStep.update(playerDisplay, locatorImg, entityIcon, dto.color, showPlayerHeading, false);
                         drawStepList.add(drawStep);
                     }
                     else
@@ -98,7 +104,7 @@ public class RadarDrawStepFactory
                             actualDisplay = mobDisplay.isLarge() ? EntityDisplay.LargeDots : EntityDisplay.SmallDots;
                             entityIcon = EntityDisplay.getEntityTexture(actualDisplay, dto.entityIconLocation);
                         }
-                        drawStep.update(actualDisplay, locatorImg, entityIcon, dto.color, showMobHeading);
+                        drawStep.update(actualDisplay, locatorImg, entityIcon, dto.color, showMobHeading, showEntityNames);
                         drawStepList.add(drawStep);
                     }
 

@@ -9,7 +9,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
 import journeymap.client.io.nbt.ChunkLoader;
 import journeymap.client.model.*;
 import journeymap.client.render.draw.DrawEntityStep;
@@ -22,7 +22,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.registries.GameData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -103,7 +102,7 @@ public enum DataCache
     /**
      * The Block metadata.
      */
-    final Map<IBlockState, BlockMD> blockMetadata;
+    final LoadingCache<IBlockState, BlockMD> blockMetadata;
     /**
      * The Chunk metadata.
      */
@@ -169,10 +168,10 @@ public enum DataCache
         regionImageSets = RegionImageCache.INSTANCE.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        blockMetadata = new MapMaker().weakKeys().initialCapacity(GameData.getBlockStateIDMap().size()).concurrencyLevel(2).makeMap();
+        blockMetadata = getCacheBuilder().weakKeys().build(new BlockMD.CacheLoader());
+        managedCaches.put(blockMetadata, "BlockMD");
 
         chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
-
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
@@ -460,54 +459,34 @@ public enum DataCache
      */
     public boolean hasBlockMD(final IBlockState aBlockState) {
         try {
-            return blockMetadata.containsKey(aBlockState);
+            return blockMetadata.getIfPresent(aBlockState) != null;
         } catch (Exception e) {
             return false;
         }
     }
 
     /**
-     * Gets block md.
+     * Gets a BlockMD for the blockstate, creating if needed.
      *
-     * @param aBlockState the a block state
+     * @param blockState the block state
      * @return the block md
      */
-    public BlockMD getBlockMD(final IBlockState aBlockState) {
+    public BlockMD getBlockMD(final IBlockState blockState) {
         try {
-            return blockMetadata.computeIfAbsent(aBlockState, blockState -> {
-
-                if (BlockMD.AIRBLOCK == null) {
-                    BlockMD.reset();
-                }
-
-                IBlockState defaultBlockState = BlockMD.getDefaultUpFacing(blockState);
-                BlockMD defaultBlockMD = blockMetadata.computeIfAbsent(defaultBlockState, BlockMD::create);
-                if (defaultBlockMD == null) {
-                    // TODO: verify this shouldn't happen.  Null should never be returned
-                    blockMetadata.put(blockState, BlockMD.AIRBLOCK);
-                    return BlockMD.AIRBLOCK;
-                }
-                if (defaultBlockMD.isUseDefaultState()) {
-                    blockMetadata.put(blockState, defaultBlockMD);
-                    return defaultBlockMD;
-                }
-
-                IBlockState upBlockState = BlockMD.getUpFacing(blockState, null);
-                if (upBlockState != null) {
-                    BlockMD upBlockMD = blockMetadata.computeIfAbsent(upBlockState, BlockMD::create);
-                    blockMetadata.put(blockState, upBlockMD);
-                    return upBlockMD;
-                }
-
-                return blockMetadata.computeIfAbsent(blockState, BlockMD::create);
-            });
+            return blockMetadata.get(blockState);
         } catch (Exception e) {
+            Journeymap.getLogger().error("Error in getBlockMD() for " + blockState + ": " + e);
             return BlockMD.AIRBLOCK;
         }
     }
 
+    /**
+     * An expensive operation. Don't use it frequently.
+     *
+     * @return
+     */
     public int getBlockMDCount() {
-        return blockMetadata.size();
+        return blockMetadata.asMap().size();
     }
 
     /**
@@ -516,14 +495,14 @@ public enum DataCache
      * @return
      */
     public Set<BlockMD> getLoadedBlockMDs() {
-        return new HashSet<>(blockMetadata.values());
+        return Sets.newHashSet(blockMetadata.asMap().values());
     }
 
     /**
      * Reset block metadata.
      */
     public void resetBlockMetadata() {
-        blockMetadata.clear();
+        blockMetadata.invalidateAll();
     }
 
     /**
@@ -532,7 +511,8 @@ public enum DataCache
      * @param blockPos the block pos
      * @return the chunk md
      */
-    public ChunkMD getChunkMD(BlockPos blockPos) {
+    public ChunkMD getChunkMD(BlockPos blockPos)
+    {
         return getChunkMD(new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4));
     }
 
@@ -599,14 +579,16 @@ public enum DataCache
     /**
      * Invalidate chunk md cache.
      */
-    public void invalidateChunkMDCache() {
+    public void invalidateChunkMDCache()
+    {
         chunkMetadata.invalidateAll();
     }
 
     /**
      * Stop chunk md retention.
      */
-    public void stopChunkMDRetention() {
+    public void stopChunkMDRetention()
+    {
         //synchronized (chunkMetadata)
         {
             for (ChunkMD chunkMD : chunkMetadata.asMap().values()) {
@@ -635,7 +617,8 @@ public enum DataCache
      *
      * @return the region image sets
      */
-    public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets() {
+    public LoadingCache<RegionImageSet.Key, RegionImageSet> getRegionImageSets()
+    {
         return regionImageSets;
     }
 
@@ -644,7 +627,8 @@ public enum DataCache
      *
      * @return the region coords
      */
-    public Cache<String, RegionCoord> getRegionCoords() {
+    public Cache<String, RegionCoord> getRegionCoords()
+    {
         return regionCoords;
     }
 
@@ -696,7 +680,8 @@ public enum DataCache
      *
      * @return the debug html
      */
-    public String getDebugHtml() {
+    public String getDebugHtml()
+    {
         StringBuffer sb = new StringBuffer();
         if (Journeymap.getClient().getCoreProperties().recordCacheStats.get()) {
             appendDebugHtml(sb, "Managed Caches", managedCaches);

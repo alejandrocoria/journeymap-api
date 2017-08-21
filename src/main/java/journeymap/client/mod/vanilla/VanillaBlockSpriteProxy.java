@@ -23,15 +23,29 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
- * Default handler for deriving sprites from block models.
+ * Created by Mark on 7/7/2017.
  */
 public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
+    /*
+    So, the following are problematic:
+    Error calling appeng.client.render.model.AutoRotatingModel.getQuads(IBlockState, null, 0)
+    Error calling mods.railcraft.client.render.models.resource.OutfittedTrackModel$CompositeModel.getQuads(IBlockState, null, 0)
+    Error calling com.infinityraider.infinitylib.render.block.BakedInfBlockModel.getQuads(IBlockState, up, 0)
+        appeng.client.render.spatial.SpatialPylonBakedModel.getQuads(IBlockState, up, 0)
+        jds.bibliocraft.models.ModelMarkerPole.getQuads(IBlockState, null, 0)
+        appeng.client.render.model.GlassBakedModel.getQuads(IBlockState, up, 0)
+        blusunrize.immersiveengineering.client.models.smart.ConnModelReal.getQuads(IBlockState, up, 0)
+
+    These blocks aren't getting the right colors at all:
+
+    embers:​copper​[0]​
+    embers:​gold, lead, silver
+        check tconstruct:​slime_grass​
+        */
+
     private static Logger logger = Journeymap.getLogger();
     BlockModelShapes bms = FMLClientHandler.instance().getClient().getBlockRendererDispatcher().getBlockModelShapes();
 
@@ -48,16 +62,12 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
         }
 
         // Always get the upper portion of a double plant for rendering
-        if (blockState.getProperties().containsKey(BlockDoublePlant.HALF)) {
+        if (blockState.getPropertyKeys().contains(BlockDoublePlant.HALF)) {
             blockState = blockState.withProperty(BlockDoublePlant.HALF, BlockDoublePlant.EnumBlockHalf.UPPER);
         }
 
         HashMap<String, ColoredSprite> map = new HashMap<>();
         try {
-            IBlockState upFacing = BlockMD.getUpFacing(blockMD.getBlockState(), null);
-            if (upFacing != null) {
-                blockState = upFacing;
-            }
 
             IBakedModel model = bms.getModelForState(blockState);
 
@@ -118,21 +128,40 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
     }
 
     public boolean addSprites(HashMap<String, ColoredSprite> sprites, List<BakedQuad> quads) {
-        boolean added = false;
-        if (quads != null) {
-            for (BakedQuad quad : quads) {
-                TextureAtlasSprite sprite = quad.getSprite();
-                if (sprite != null) {
-                    String iconName = quad.getSprite().getIconName();
-                    if (!sprites.containsKey(iconName)) {
-                        ResourceLocation resourceLocation = new ResourceLocation(iconName);
-                        if (resourceLocation.equals(TextureMap.LOCATION_MISSING_TEXTURE)) {
-                            continue;
-                        }
+        if (quads == null || quads.isEmpty()) {
+            return false;
+        }
 
-                        sprites.put(iconName, new ColoredSprite(quad));
-                        added = true;
+        if (quads.size() > 1) {
+            HashSet<BakedQuad> culled = new HashSet<>(quads.size());
+//            for (BakedQuad quad : quads)
+//            {
+//                if (quad.getFace() == EnumFacing.UP)
+//                {
+//                    culled.add(quad);
+//                }
+//            }
+//            if (culled.isEmpty())
+            {
+                // At least this will eliminate dups, which are common
+                culled.addAll(quads);
+            }
+            quads = new ArrayList<>(culled);
+        }
+
+        boolean added = false;
+        for (BakedQuad quad : quads) {
+            TextureAtlasSprite sprite = quad.getSprite();
+            if (sprite != null) {
+                String iconName = quad.getSprite().getIconName();
+                if (!sprites.containsKey(iconName)) {
+                    ResourceLocation resourceLocation = new ResourceLocation(iconName);
+                    if (resourceLocation.equals(TextureMap.LOCATION_MISSING_TEXTURE)) {
+                        continue;
                     }
+
+                    sprites.put(iconName, new ColoredSprite(quad));
+                    added = true;
                 }
             }
         }

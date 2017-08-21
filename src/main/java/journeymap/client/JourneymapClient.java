@@ -14,7 +14,6 @@ import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.data.DataCache;
-import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
@@ -300,9 +299,6 @@ public class JourneymapClient implements CommonProxy
             // Register general event handlers
             EventHandlerManager.registerGeneralHandlers();
             EventHandlerManager.registerGuiHandlers();
-
-            // Resets detection results of Voxel/Rei's
-            WaypointsData.enableRecheck();
 
             // Ensure all icons are ready for use.
             IconSetFileHandler.initialize();

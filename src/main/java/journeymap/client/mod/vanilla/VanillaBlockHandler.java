@@ -83,8 +83,8 @@ public final class VanillaBlockHandler implements IModBlockHandler {
         if (coreProperties.caveIgnoreGlass.get()) {
             setFlags(Material.GLASS, OpenToSky);
         }
-        setFlags(Material.LAVA, 1.0F, NoShadow, DefaultState);
-        setFlags(Material.WATER, .25F, Water, NoShadow, DefaultState);
+        setFlags(Material.LAVA, 1.0F, NoShadow);
+        setFlags(Material.WATER, .25F, Water, NoShadow);
         materialAlphas.put(Material.ICE, .8F);
         materialAlphas.put(Material.PACKED_ICE, .8F);
 
@@ -160,13 +160,8 @@ public final class VanillaBlockHandler implements IModBlockHandler {
 
         // Fluids
         if (block instanceof IFluidBlock) {
-            blockMD.addFlags(Fluid, NoShadow, DefaultState);
+            blockMD.addFlags(Fluid, NoShadow);
             blockMD.setAlpha(.7F);
-        }
-
-        // TODO: needed?
-        if (block instanceof BlockHugeMushroom) {
-            //blockMD.setUseDefaultState(true);
         }
 
         // Double-tall plants will have the upper half ignored
@@ -179,26 +174,8 @@ public final class VanillaBlockHandler implements IModBlockHandler {
             blockMD.addFlags(Crop);
         }
 
-        // Blocks where we really don't care about the blockstate variations
-        if (block instanceof BlockDoor
-                || block instanceof BlockTrapDoor
-                || block instanceof BlockFenceGate
-                || block instanceof BlockLever
-                || block instanceof BlockFire
-                || block instanceof BlockStairs
-                || block instanceof BlockRail
-                || block instanceof BlockSnow
-                || block instanceof BlockVine
-                || block instanceof BlockBasePressurePlate) {
-            blockMD.addFlags(DefaultState);
-        }
-
         if (block instanceof BlockFlower || block instanceof BlockFlowerPot) {
             blockMD.setBlockColorProxy(FlowerBlockProxy.INSTANCE);
-        }
-
-        if (block instanceof BlockBed) {
-            blockMD.setBlockColorProxy(BedBlockProxy.INSTANCE);
         }
 
         if (blockMD.isVanillaBlock()) {

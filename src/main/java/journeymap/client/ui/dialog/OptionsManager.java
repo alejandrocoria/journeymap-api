@@ -601,9 +601,9 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    protected void keyTyped(char c, int i)
+    protected void keyTyped(char c, int key)
     {
-        switch (i)
+        switch (key)
         {
             case Keyboard.KEY_ESCAPE:
             {
@@ -620,20 +620,16 @@ public class OptionsManager extends JmUI
             }
         }
 
-        boolean optionUpdated = optionsListPane.keyTyped(c, i);
+        boolean optionUpdated = optionsListPane.keyTyped(c, key);
         if (optionUpdated && previewMiniMap())
         {
             UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
         }
 
         // Check for any minimap-related keypresses
-        if (previewMiniMap())
+        if (previewMiniMap() && KeyEventHandler.onMinimapPreviewKeyboardEvent(key))
         {
-            boolean pressed = KeyEventHandler.onKeypress(true);
-            if (pressed)
-            {
-                refreshMinimapOptions();
-            }
+            refreshMinimapOptions();
         }
     }
 

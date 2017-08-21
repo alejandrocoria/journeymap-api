@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.render.draw;
@@ -29,22 +26,76 @@ import java.lang.ref.WeakReference;
  */
 public class DrawEntityStep implements DrawStep
 {
+    /**
+     * The Label bg.
+     */
     static final Integer labelBg = RGB.BLACK_RGB;
+    /**
+     * The Label bg alpha.
+     */
     static final int labelBgAlpha = 180;
+    /**
+     * The Label fg.
+     */
     static final Integer labelFg = RGB.WHITE_RGB;
+    /**
+     * The Label fg alpha.
+     */
     static final int labelFgAlpha = 225;
 
+    /**
+     * The Use dots.
+     */
     boolean useDots;
+    /**
+     * The Elevation offset.
+     */
     int elevationOffset;
+    /**
+     * The Color.
+     */
     int color;
+    /**
+     * The Hide sneaks.
+     */
     boolean hideSneaks;
+    /**
+     * The Show heading.
+     */
     boolean showHeading = true;
+
+    /**
+     * Whether to show customName
+     */
+    boolean showName = true;
+
+    /**
+     * The Minecraft.
+     */
     Minecraft minecraft = Minecraft.getMinecraft();
+    /**
+     * The Entity texture.
+     */
     TextureImpl entityTexture;
+    /**
+     * The Locator texture.
+     */
     TextureImpl locatorTexture;
+    /**
+     * The Entity living ref.
+     */
     WeakReference<EntityLivingBase> entityLivingRef;
+    /**
+     * The Custom name.
+     */
     String customName;
+    /**
+     * The Screen position.
+     */
     Point2D screenPosition;
+    /**
+     * The Draw scale.
+     */
     float drawScale = 1f;
 
     private DrawEntityStep(EntityLivingBase entityLiving)
@@ -54,10 +105,19 @@ public class DrawEntityStep implements DrawStep
         hideSneaks = Journeymap.getClient().getCoreProperties().hideSneakingEntities.get();
     }
 
-    public void update(EntityDisplay entityDisplay, TextureImpl locatorTexture, TextureImpl entityTexture, int color, boolean showHeading)
+    /**
+     * Update display values
+     *
+     * @param entityDisplay  the entity display
+     * @param locatorTexture the locator texture
+     * @param entityTexture  the entity texture
+     * @param color          the color
+     * @param showHeading    the show heading
+     */
+    public void update(EntityDisplay entityDisplay, TextureImpl locatorTexture, TextureImpl entityTexture, int color, boolean showHeading, boolean showName)
     {
         EntityLivingBase entityLiving = entityLivingRef.get();
-        if (entityLiving != null)
+        if (showName && entityLiving != null)
         {
             customName = DataCache.INSTANCE.getEntityDTO(entityLiving).customName;
         }
@@ -68,6 +128,7 @@ public class DrawEntityStep implements DrawStep
         this.entityTexture = entityTexture;
         this.drawScale = (entityDisplay == EntityDisplay.SmallIcons) ? .66666666f : 1f;
         this.showHeading = showHeading;
+        this.showName = showName;
     }
 
 
@@ -196,7 +257,7 @@ public class DrawEntityStep implements DrawStep
 
         if (pass == Pass.Text)
         {
-            if (customName != null)
+            if (showName && customName != null)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, labelOffset);
                 DrawUtil.drawCenteredLabel(customName, labelPoint.getX(), labelPoint.getY(), labelBg, labelBgAlpha, RGB.WHITE_RGB, labelFgAlpha, fontScale, rotation);
@@ -239,11 +300,12 @@ public class DrawEntityStep implements DrawStep
         return Journeymap.MOD_ID;
     }
 
-    public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep>
-    {
+    /**
+     * The type Simple cache loader.
+     */
+    public static class SimpleCacheLoader extends CacheLoader<EntityLivingBase, DrawEntityStep> {
         @Override
-        public DrawEntityStep load(EntityLivingBase entityLiving) throws Exception
-        {
+        public DrawEntityStep load(EntityLivingBase entityLiving) throws Exception {
             return new DrawEntityStep(entityLiving);
         }
     }

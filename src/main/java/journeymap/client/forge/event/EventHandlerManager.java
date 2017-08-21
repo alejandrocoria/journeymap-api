@@ -57,7 +57,7 @@ public class EventHandlerManager
     public static void registerGuiHandlers()
     {
         register(new MiniMapOverlayHandler());
-        KeyEventHandler.initKeyBindings();
+
         register(new KeyEventHandler());
     }
 
