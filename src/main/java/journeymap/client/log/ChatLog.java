@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.log;
@@ -33,15 +30,21 @@ import java.util.List;
  */
 public class ChatLog
 {
-    // Announcements
+    /**
+     * The constant announcements.
+     */
+// Announcements
     static final List<TextComponentTranslation> announcements = Collections.synchronizedList(new LinkedList<TextComponentTranslation>());
+    /**
+     * The constant enableAnnounceMod.
+     */
     public static boolean enableAnnounceMod = false;
     private static boolean initialized = false;
 
     /**
      * Announce chat component.
      *
-     * @param chat
+     * @param chat the chat
      */
     public static void queueAnnouncement(ITextComponent chat)
     {
@@ -52,8 +55,8 @@ public class ChatLog
     /**
      * Announce URL with link.
      *
-     * @param message
-     * @param url
+     * @param message the message
+     * @param url     the url
      */
     public static void announceURL(String message, String url)
     {
@@ -67,8 +70,8 @@ public class ChatLog
     /**
      * Announce file with link.
      *
-     * @param message
-     * @param file
+     * @param message the message
+     * @param file    the file
      */
     public static void announceFile(String message, File file)
     {
@@ -101,7 +104,7 @@ public class ChatLog
     /**
      * Queue an announcement to be shown in the UI.
      *
-     * @param text
+     * @param text the text
      */
     public static void announceError(String text)
     {
@@ -113,7 +116,7 @@ public class ChatLog
     /**
      * Show queued announcements in chat and log.
      *
-     * @param mc
+     * @param mc the mc
      */
     public static void showChatAnnouncements(Minecraft mc)
     {
@@ -122,7 +125,10 @@ public class ChatLog
         {
             // Announce mod?
             enableAnnounceMod = Journeymap.getClient().getCoreProperties().announceMod.get();
-            announceMod(false);
+            if (enableAnnounceMod)
+            {
+                announceMod();
+            }
 
             // Check for newer version online
             VersionCheck.getVersionIsCurrent();
@@ -151,20 +157,24 @@ public class ChatLog
         }
     }
 
-    public static void announceMod(boolean forced)
+    /**
+     * Announce mod.
+     *
+     * @param forced the forced
+     */
+    public static void announceMod()
     {
         if (enableAnnounceMod)
         {
-            //ChatLog.announceI18N("jm.common.ready", JourneyMap.MOD_NAME); //$NON-NLS-1$
+            String keyName = KeyEventHandler.INSTANCE.kbFullscreenToggle.getDisplayName();
             if (Journeymap.getClient().getWebMapProperties().enabled.get())
             {
                 try
                 {
                     WebServer webServer = Journeymap.getClient().getJmServer();
-                    String keyName = KeyEventHandler.KB_FULLSCREEN.getDisplayName();
-                    String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
-                    String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
-                    ChatLog.announceURL(message, "http://localhost" + port); //$NON-NLS-1$
+                    String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort());
+                    String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port);
+                    ChatLog.announceURL(message, "http://localhost" + port); 
                 }
                 catch (Throwable t)
                 {
@@ -173,8 +183,7 @@ public class ChatLog
             }
             else
             {
-                String keyName = KeyEventHandler.KB_FULLSCREEN.getDisplayName(); // Should be KeyCode
-                ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); //$NON-NLS-1$
+                ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); 
             }
 
             if (!Journeymap.getClient().getCoreProperties().mappingEnabled.get())
@@ -191,6 +200,11 @@ public class ChatLog
     private static class ErrorChat extends TextComponentString
     {
 
+        /**
+         * Instantiates a new Error chat.
+         *
+         * @param text the text
+         */
         public ErrorChat(String text)
         {
             super(text);

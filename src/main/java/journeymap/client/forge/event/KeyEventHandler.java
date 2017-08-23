@@ -5,9 +5,9 @@
 
 package journeymap.client.forge.event;
 
-
-import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import journeymap.client.Constants;
 import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
@@ -15,9 +15,12 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.dialog.OptionsManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -25,200 +28,461 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Keybinding handler.
+ * Keybinding handler.  Singleton enum to provide access to keybindings in current state.
+ * This class uses a number of workaround to allow users to have keybindings that Minecraft
+ * says conflict, but that don't.  Like J and CTRL-J.
  */
-public class KeyEventHandler implements EventHandlerManager.EventHandler
+@ParametersAreNonnullByDefault
+public enum KeyEventHandler implements EventHandlerManager.EventHandler
 {
-    public static String CATEGORY_ALL;
-    public static String CATEGORY_FULLMAP;
-    public static KeyBinding KB_FULLSCREEN;
-    public static KeyBinding KB_MAP_ZOOMIN;
-    public static KeyBinding KB_MAP_ZOOMOUT;
-    public static KeyBinding KB_MAP_TOGGLE_TYPE;
-    public static KeyBinding KB_MINIMAP_PRESET;
-    public static KeyBinding KB_MINIMAP_TOGGLE;
-    public static KeyBinding KB_CREATE_WAYPOINT;
-    public static KeyBinding KB_WAYPOINT_MANAGER;
-    public static KeyBinding KB_FULLMAP_OPTIONS_MANAGER;
-    public static KeyBinding KB_FULLMAP_ACTIONS_MANAGER;
-    public static KeyBinding KB_FULLMAP_PAN_NORTH;
-    public static KeyBinding KB_FULLMAP_PAN_SOUTH;
-    public static KeyBinding KB_FULLMAP_PAN_EAST;
-    public static KeyBinding KB_FULLMAP_PAN_WEST;
+    INSTANCE;
 
-    private static final Table<Integer, KeyBinding, Runnable> minimapKeymappings = createKeyMappingTable();
-    private static final Table<Integer, KeyBinding, Runnable> gameKeymappings = createKeyMappingTable();
-    private static final Table<Integer, KeyBinding, Runnable> guiKeymappings = createKeyMappingTable();
+    /**
+     * Zoom in current map
+     */
+    public KeyBinding kbMapZoomin;
+
+    /**
+     * Zoom out current map
+     */
+    public KeyBinding kbMapZoomout;
+
+    /**
+     * Toggle current map type
+     */
+    public KeyBinding kbMapToggleType;
+
+    /**
+     * Create a waypoint in game
+     */
+    public KeyBinding kbCreateWaypoint;
+
+    /**
+     * Create a waypoint in fullscreen
+     */
+    public KeyBinding kbFullscreenCreateWaypoint;
+
+    /**
+     * Toggle fullscreen map
+     */
+    public KeyBinding kbFullscreenToggle;
+
+    /**
+     * Open waypoint manager
+     */
+    public KeyBinding kbWaypointManager;
+
+    /**
+     * Show/hide minimap
+     */
+    public KeyBinding kbMinimapToggle;
+
+    /**
+     * Switch minimap preset
+     */
+    public KeyBinding kbMinimapPreset;
+
+    /**
+     * Open Options Manager
+     */
+    public KeyBinding kbFullmapOptionsManager;
+
+    /**
+     * Open Map Actions
+     */
+    public KeyBinding kbFullmapActionsManager;
+
+    /**
+     * Pan fullscreen map north
+     */
+    public KeyBinding kbFullmapPanNorth;
+
+    /**
+     * Pan fullscreen map south
+     */
+    public KeyBinding kbFullmapPanSouth;
+
+    /**
+     * Pan fullscreen map east
+     */
+    public KeyBinding kbFullmapPanEast;
+
+    /**
+     * Pan fullscreen map west
+     */
+    public KeyBinding kbFullmapPanWest;
+
+    /**
+     * Comparator sorts KBA's by KeyModifier order - which means Keybindings with KeyModifier.NONE go last.
+     */
+    private Comparator<KeyBindingAction> kbaComparator = Comparator.comparingInt(KeyBindingAction::order);
+
+    /**
+     * Keybindings and actions for just minimap preview in Options Manager.
+     */
+    private final ListMultimap<Integer, KeyBindingAction> minimapPreviewActions = MultimapBuilder.hashKeys().arrayListValues(2).build();
+
+    /**
+     * Keybindings and actions when in-game.
+     */
+    private final ListMultimap<Integer, KeyBindingAction> inGameActions = MultimapBuilder.hashKeys().arrayListValues(2).build();
+
+    /**
+     * Keybindings and actions when in GUI
+     */
+    private final ListMultimap<Integer, KeyBindingAction> inGuiActions = MultimapBuilder.hashKeys().arrayListValues(2).build();
+
+    /**
+     * Minecraft client.
+     */
     private Minecraft mc = FMLClientHandler.instance().getClient();
 
     /**
-     * Create a table of keycodes mapped to keybindings to actions.  Sorted so bindings with modifiers are first.
-     *
-     * @return table
+     * A keybinding has changed, re-sorting the list to ensure those with
+     * modifiers are checked first.
      */
-    public static Table<Integer, KeyBinding, Runnable> createKeyMappingTable() {
-        return TreeBasedTable.create(Comparator.naturalOrder(),
-                Comparator.comparingInt((KeyBinding keyBinding) -> keyBinding.getKeyModifier().ordinal()));
-    }
+    private boolean sortActionsNeeded = true;
 
-    public KeyEventHandler() {
-        CATEGORY_ALL = Constants.getString("jm.common.hotkeys_keybinding_category");
-        CATEGORY_FULLMAP = Constants.getString("jm.common.hotkeys_keybinding_fullscreen_category");
+    /**
+     * Defines and registers all keybindings and their actions.
+     */
+    KeyEventHandler()
+    {
+        // Zoom in current map
+        kbMapZoomin = register("key.journeymap.zoom_in", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_EQUALS);
+        setAction(minimapPreviewActions, kbMapZoomin, () -> MiniMap.state().zoomIn());
+        setAction(inGuiActions, kbMapZoomin, () -> getFullscreen().zoomIn());
 
-        // Active in-game and Fullscreen
-        KB_MAP_ZOOMIN = register("key.journeymap.zoom_in", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_EQUALS, CATEGORY_ALL);
-        KB_MAP_ZOOMOUT = register("key.journeymap.zoom_out", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_MINUS, CATEGORY_ALL);
-        KB_MAP_TOGGLE_TYPE = register("key.journeymap.minimap_type", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_LBRACKET, CATEGORY_ALL);
-        KB_MINIMAP_PRESET = register("key.journeymap.minimap_preset", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_BACKSLASH, CATEGORY_ALL);
-        KB_CREATE_WAYPOINT = register("key.journeymap.create_waypoint", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_B, CATEGORY_ALL);
-        KB_FULLSCREEN = register("key.journeymap.map_toggle_alt", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_J, CATEGORY_ALL);
+        // Zoom out current map
+        kbMapZoomout = register("key.journeymap.zoom_out", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_MINUS);
+        setAction(minimapPreviewActions, kbMapZoomout, () -> MiniMap.state().zoomOut());
+        setAction(inGuiActions, kbMapZoomout, () -> getFullscreen().zoomOut());
 
-        // Active in-game or Fullscreen, but shouldn't be treated as conflicts because they have modifiers.
-        KB_MINIMAP_TOGGLE = register("key.journeymap.minimap_toggle_alt", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, Keyboard.KEY_J, CATEGORY_ALL);
-        KB_WAYPOINT_MANAGER = register("key.journeymap.fullscreen_waypoints", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, Keyboard.KEY_B, CATEGORY_ALL);
+        // Toggle current map type
+        kbMapToggleType = register("key.journeymap.minimap_type", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_LBRACKET);
+        setAction(minimapPreviewActions, kbMapToggleType, () -> MiniMap.state().toggleMapType());
+        setAction(inGuiActions, kbMapToggleType, () -> getFullscreen().toggleMapType());
 
-        // Active only in Fullscreen
-        KB_FULLMAP_PAN_NORTH = register("key.journeymap.fullscreen.north", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_UP, CATEGORY_FULLMAP);
-        KB_FULLMAP_PAN_SOUTH = register("key.journeymap.fullscreen.south", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_DOWN, CATEGORY_FULLMAP);
-        KB_FULLMAP_PAN_EAST = register("key.journeymap.fullscreen.east", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_RIGHT, CATEGORY_FULLMAP);
-        KB_FULLMAP_PAN_WEST = register("key.journeymap.fullscreen.west", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_LEFT, CATEGORY_FULLMAP);
-        KB_FULLMAP_OPTIONS_MANAGER = register("key.journeymap.fullscreen_options", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_O, CATEGORY_FULLMAP);
-        KB_FULLMAP_ACTIONS_MANAGER = register("key.journeymap.fullscreen_actions", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_A, CATEGORY_FULLMAP);
+        // All minimap preview actions are also used in-game
+        inGameActions.putAll(minimapPreviewActions);
 
-        // Minimap keymappings (in-game and used for minimap preview by options manager)
-        setKeymap(minimapKeymappings, KB_MINIMAP_TOGGLE, UIManager.INSTANCE::toggleMinimap);
-        setKeymap(minimapKeymappings, KB_MAP_ZOOMIN, () -> MiniMap.state().zoomIn());
-        setKeymap(minimapKeymappings, KB_MAP_ZOOMOUT, () -> MiniMap.state().zoomOut());
-        setKeymap(minimapKeymappings, KB_MAP_TOGGLE_TYPE, () -> MiniMap.state().toggleMapType());
-        setKeymap(minimapKeymappings, KB_MINIMAP_PRESET, UIManager.INSTANCE::switchMiniMapPreset);
-
-        // In-game keymappings
-        setKeymap(gameKeymappings, KB_WAYPOINT_MANAGER, () -> UIManager.INSTANCE.openWaypointManager(null, null));
-        setKeymap(gameKeymappings, KB_CREATE_WAYPOINT, () -> {
+        // Create a waypoint in game
+        kbCreateWaypoint = register("key.journeymap.create_waypoint", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_B);
+        setAction(inGameActions, kbCreateWaypoint, () -> {
             UIManager.INSTANCE.openWaypointEditor(Waypoint.of(mc.player), true, null);
         });
-        setKeymap(gameKeymappings, KB_FULLSCREEN, UIManager.INSTANCE::openFullscreenMap);
 
-        // Fullscreen keymappings
-        setKeymap(guiKeymappings, KB_FULLSCREEN, UIManager.INSTANCE::closeAll);
-        setKeymap(guiKeymappings, KB_MAP_ZOOMIN, () -> getFullscreen().zoomIn());
-        setKeymap(guiKeymappings, KB_MAP_ZOOMOUT, () -> getFullscreen().zoomOut());
-        setKeymap(guiKeymappings, KB_MAP_TOGGLE_TYPE, () -> getFullscreen().toggleMapType());
-        setKeymap(guiKeymappings, KB_CREATE_WAYPOINT, () -> getFullscreen().createWaypointAtMouse());
-        setKeymap(guiKeymappings, KB_WAYPOINT_MANAGER, () -> UIManager.INSTANCE.openWaypointManager(null, getFullscreen()));
-        setKeymap(guiKeymappings, KB_FULLMAP_OPTIONS_MANAGER, () -> UIManager.INSTANCE.openOptionsManager(getFullscreen()));
-        setKeymap(guiKeymappings, KB_FULLMAP_ACTIONS_MANAGER, UIManager.INSTANCE::openMapActions);
-        setKeymap(guiKeymappings, KB_FULLMAP_PAN_NORTH, () -> getFullscreen().moveCanvas(0, -16));
-        setKeymap(guiKeymappings, KB_FULLMAP_PAN_WEST, () -> getFullscreen().moveCanvas(-16, -0));
-        setKeymap(guiKeymappings, KB_FULLMAP_PAN_SOUTH, () -> getFullscreen().moveCanvas(0, 16));
-        setKeymap(guiKeymappings, KB_FULLMAP_PAN_EAST, () -> getFullscreen().moveCanvas(16, 0));
+        // Create a waypoint in fullscreen
+        kbFullscreenCreateWaypoint = register("key.journeymap.fullscreen_create_waypoint", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_B);
+        setAction(inGuiActions, kbFullscreenCreateWaypoint, () -> getFullscreen().createWaypointAtMouse());
+
+        // Toggle fullscreen map
+        kbFullscreenToggle = register("key.journeymap.map_toggle_alt", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_J);
+        setAction(inGameActions, kbFullscreenToggle, UIManager.INSTANCE::openFullscreenMap);
+        setAction(inGuiActions, kbFullscreenToggle, UIManager.INSTANCE::closeAll);
+
+        // Open waypoint manager
+        kbWaypointManager = register("key.journeymap.fullscreen_waypoints", KeyConflictContext.UNIVERSAL, KeyModifier.CONTROL, Keyboard.KEY_B);
+        setAction(inGameActions, kbWaypointManager, () -> UIManager.INSTANCE.openWaypointManager(null, null));
+        setAction(inGuiActions, kbWaypointManager, () -> UIManager.INSTANCE.openWaypointManager(null, getFullscreen()));
+
+        // Show/hide minimap
+        kbMinimapToggle = register("key.journeymap.minimap_toggle_alt", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, Keyboard.KEY_J);
+        setAction(inGameActions, kbMinimapToggle, UIManager.INSTANCE::toggleMinimap);
+
+        // Switch minimap preset
+        kbMinimapPreset = register("key.journeymap.minimap_preset", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_BACKSLASH);
+        setAction(inGameActions, kbMinimapPreset, UIManager.INSTANCE::switchMiniMapPreset);
+
+        // Open Options Manager
+        kbFullmapOptionsManager = register("key.journeymap.fullscreen_options", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_O);
+        setAction(inGuiActions, kbFullmapOptionsManager, () -> UIManager.INSTANCE.openOptionsManager(getFullscreen()));
+
+        // Open Map Actions
+        kbFullmapActionsManager = register("key.journeymap.fullscreen_actions", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_A);
+        setAction(inGuiActions, kbFullmapActionsManager, UIManager.INSTANCE::openMapActions);
+
+        // Pan fullscreen map north
+        kbFullmapPanNorth = register("key.journeymap.fullscreen.north", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_UP);
+        setAction(inGuiActions, kbFullmapPanNorth, () -> getFullscreen().moveCanvas(0, -16));
+
+        // Pan fullscreen map south
+        kbFullmapPanSouth = register("key.journeymap.fullscreen.south", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_DOWN);
+        setAction(inGuiActions, kbFullmapPanSouth, () -> getFullscreen().moveCanvas(0, 16));
+
+        // Pan fullscreen map east
+        kbFullmapPanEast = register("key.journeymap.fullscreen.east", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_RIGHT);
+        setAction(inGuiActions, kbFullmapPanEast, () -> getFullscreen().moveCanvas(16, 0));
+
+        // Pan fullscreen map west
+        kbFullmapPanWest = register("key.journeymap.fullscreen.west", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_LEFT);
+        setAction(inGuiActions, kbFullmapPanWest, () -> getFullscreen().moveCanvas(-16, -0));
     }
 
-    private KeyBinding register(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, net.minecraftforge.client.settings.KeyModifier keyModifier, int keyCode, String category) {
-        KeyBinding kb = new KeyBinding(description, keyConflictContext, keyModifier, keyCode, category);
-        try {
+    /**
+     * Associates keybinding to an action in a given list.
+     *
+     * @param multimap   map of keycode to list of keybindings
+     * @param keyBinding key binding
+     * @param action     action
+     */
+    private void setAction(ListMultimap<Integer, KeyBindingAction> multimap, KeyBinding keyBinding, Runnable action)
+    {
+        multimap.put(keyBinding.getKeyCode(), new KeyBindingAction(keyBinding, action));
+    }
+
+    /**
+     * Creates and registers a Keybinding.
+     *
+     * @param description        Keybinding description
+     * @param keyConflictContext context for use
+     * @param keyModifier        key modifier
+     * @param keyCode            key code
+     * @return the keybinding
+     */
+    private KeyBinding register(String description, IKeyConflictContext keyConflictContext, KeyModifier keyModifier, int keyCode)
+    {
+        String category = keyConflictContext == KeyConflictContext.GUI
+                ? Constants.getString("jm.common.hotkeys_keybinding_fullscreen_category")
+                : Constants.getString("jm.common.hotkeys_keybinding_category");
+
+        KeyBinding kb = new UpdateAwareKeyBinding(description, keyConflictContext, keyModifier, keyCode, category);
+        try
+        {
             ClientRegistry.registerKeyBinding(kb);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             ChatLog.announceError("Unexpected error when registering keybinding : " + kb);
         }
         return kb;
     }
 
-    private void setKeymap(Table<Integer, KeyBinding, Runnable> table, KeyBinding keybinding, Runnable action) {
-        table.put(keybinding.getKeyCode(), keybinding, action);
-    }
-
-    private Fullscreen getFullscreen() {
-        return UIManager.INSTANCE.openFullscreenMap();
-    }
 
     /**
-     * On keyboard event in-game
+     * Handle keyboard event in-game.
      *
      * @param event the event
      */
     @SubscribeEvent()
-    public void onGameKeyboardEvent(InputEvent.KeyInputEvent event) {
-        int key = Keyboard.getEventKey();
-        if (Keyboard.isKeyDown(key)) {
-            return;
-        }
-
-        if (onKey(minimapKeymappings, key)) {
-            return;
-        }
-
-        onKey(gameKeymappings, key);
-    }
-
-    @SubscribeEvent()
-    public void onGuiKeyboardEvent(GuiScreenEvent.KeyboardInputEvent.Post event) {
-        int key = Keyboard.getEventKey();
-        if (Keyboard.isKeyDown(key)) {
-            return;
-        }
-
-        if (inOptionsManager()) {
-            // Minimap Preview
-            onKey(minimapKeymappings, key);
-            return;
-        }
-
-        if (inFullscreen() && !getFullscreen().isChatOpen()) {
-            onKey(guiKeymappings, key);
+    public void onGameKeyboardEvent(InputEvent.KeyInputEvent event)
+    {
+        final int key = Keyboard.getEventKey();
+        if (!Keyboard.isKeyDown(key))
+        {
+            onInputEvent(inGameActions, key, true);
         }
     }
 
     /**
-     * Check keybindings for a match.
-     *
-     * @param key keycode
-     * @return true if one of the bindings was used.
+     * Handle keyboard event in GUI.
+     * @param event
      */
-    public static boolean onMinimapPreviewKeyboardEvent(final int key) {
-//        if(!Keyboard.isKeyDown(key))
-//        {
-//            return onKey(minimapKeymappings, key);
-//        }
-        return false;
+    @SubscribeEvent()
+    public void onGuiKeyboardEvent(GuiScreenEvent.KeyboardInputEvent.Post event)
+    {
+        final int key = Keyboard.getEventKey();
+        if (!Keyboard.isKeyDown(key))
+        {
+            if (inFullscreenWithoutChat())
+            {
+                onInputEvent(inGuiActions, key, true);
+            }
+            else if (inMinimapPreview())
+            {
+                if (onInputEvent(minimapPreviewActions, key, false))
+                {
+                    ((OptionsManager) mc.currentScreen).refreshMinimapOptions();
+                }
+            }
+        }
     }
 
     /**
-     * Check keybindings in a mappings table for a match.
+     * Handle keyboard event in GUI.
      *
-     * @param table keymappings
-     * @param key   key code
+     * @param event
+     */
+    @SubscribeEvent()
+    public void onGuiMouseEvent(GuiScreenEvent.MouseInputEvent.Post event)
+    {
+        int key = -100 + Mouse.getEventButton();
+        if (!Mouse.isButtonDown(key))
+        {
+            if (inFullscreenWithoutChat())
+            {
+                onInputEvent(inGuiActions, key, true);
+            }
+            else if (inMinimapPreview())
+            {
+                if (onInputEvent(minimapPreviewActions, key, false))
+                {
+                    ((OptionsManager) mc.currentScreen).refreshMinimapOptions();
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets a list of keybindings appearing in inGuiActions
+     * @return list sorted by Keybinding display order
+     */
+    public List<KeyBinding> getInGuiKeybindings()
+    {
+        List<KeyBinding> list = inGuiActions.values().stream().map(KeyBindingAction::getKeyBinding).collect(Collectors.toList());
+        list.sort(Comparator.comparing((kb) -> Constants.getString(kb.getKeyDescription())));
+        return list;
+    }
+
+    /**
+     * Check keybindings for a match, and trigger the action.
+     * @param multimap keymappings
      * @return true if action triggered
      */
-    private static boolean onKey(Table<Integer, KeyBinding, Runnable> table, final int key) {
-        // Check keymap for assigned action
-        if (table.containsRow(key)) {
-            for (Map.Entry<KeyBinding, Runnable> entry : table.row(key).entrySet()) {
-                if (entry.getKey().isActiveAndMatches(key)) {
-                    entry.getValue().run();
+    private boolean onInputEvent(Multimap<Integer, KeyBindingAction> multimap, int key, boolean useContext)
+    {
+        try
+        {
+            if (sortActionsNeeded)
+            {
+                sortActions();
+            }
+
+            for (KeyBindingAction kba : multimap.get(key))
+            {
+                if (kba.isActive(key, useContext))
+                {
+                    kba.getAction().run();
                     return true;
                 }
             }
         }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("Error checking keybinding", LogFormatter.toPartialString(e));
+        }
         return false;
     }
 
-    private boolean inGame() {
-        return mc.currentScreen == null;
+    private void sortActions()
+    {
+        sortActions(minimapPreviewActions);
+        sortActions(inGameActions);
+        sortActions(inGuiActions);
+        sortActionsNeeded = false;
     }
 
-    private boolean inFullscreen() {
-        return mc.currentScreen instanceof Fullscreen;
+    private void sortActions(ListMultimap<Integer, KeyBindingAction> multimap)
+    {
+        List<KeyBindingAction> copy = new ArrayList<>(multimap.values());
+        multimap.clear();
+        for (KeyBindingAction kba : copy)
+        {
+            multimap.put(kba.getKeyBinding().getKeyCode(), kba);
+        }
+        // TODO: REMOVE BEFORE COMMIT
+        for (Integer key : multimap.keySet())
+        {
+            Journeymap.getLogger().info(multimap.get(key));
+        }
     }
 
-    private boolean inOptionsManager() {
-        return mc.currentScreen instanceof OptionsManager;
+    private Fullscreen getFullscreen()
+    {
+        return UIManager.INSTANCE.openFullscreenMap();
+    }
+
+    private boolean inFullscreenWithoutChat()
+    {
+        return mc.currentScreen instanceof Fullscreen && !((Fullscreen) mc.currentScreen).isChatOpen();
+    }
+
+    private boolean inMinimapPreview()
+    {
+        return mc.currentScreen instanceof OptionsManager && ((OptionsManager) mc.currentScreen).previewMiniMap();
+    }
+
+    /**
+     * Pairs a KeyBinding and a Runnable to execute.
+     */
+    static class KeyBindingAction
+    {
+        KeyBinding keyBinding;
+        Runnable action;
+
+        public KeyBindingAction(KeyBinding keyBinding, Runnable action)
+        {
+            this.keyBinding = keyBinding;
+            this.action = action;
+        }
+
+        boolean isActive(int key, boolean useContext)
+        {
+            if (useContext)
+            {
+                return keyBinding.isActiveAndMatches(key);
+            }
+            else
+            {
+                return keyBinding.getKeyCode() == key && keyBinding.getKeyModifier().isActive();
+            }
+        }
+
+        Runnable getAction()
+        {
+            return action;
+        }
+
+        KeyBinding getKeyBinding()
+        {
+            return keyBinding;
+        }
+
+        int order()
+        {
+            return keyBinding.getKeyModifier().ordinal();
+        }
+
+        @Override
+        public String toString()
+        {
+            return "KeyBindingAction{" + keyBinding.getDisplayName() + " = " + Constants.getString(keyBinding.getKeyDescription()) + '}';
+        }
+    }
+
+    /**
+     * Without a Forge Event to announce keybinding changes, we can't do a one-time sort or key-to-KeyBinding hash.
+     * This lets the user have keybindings like J and CTRL-J co-exist.
+     */
+    class UpdateAwareKeyBinding extends KeyBinding
+    {
+        UpdateAwareKeyBinding(String description, IKeyConflictContext keyConflictContext, KeyModifier keyModifier, int keyCode, String category)
+        {
+            super(description, keyConflictContext, keyModifier, keyCode, category);
+        }
+
+        @Override
+        public void setKeyCode(int keyCode)
+        {
+            super.setKeyCode(keyCode);
+            sortActionsNeeded = true;
+        }
+
+        @Override
+        public void setKeyModifierAndCode(KeyModifier keyModifier, int keyCode)
+        {
+            super.setKeyModifierAndCode(keyModifier, keyCode);
+            sortActionsNeeded = true;
+        }
     }
 
 }
-

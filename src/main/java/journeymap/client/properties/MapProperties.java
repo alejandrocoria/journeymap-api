@@ -29,6 +29,7 @@ public abstract class MapProperties extends ClientPropertiesBase implements Comp
      * The Show grid.
      */
     public final BooleanField showGrid = new BooleanField(Inherit, "jm.common.show_grid", true);
+
     /**
      * The Show caves.
      */

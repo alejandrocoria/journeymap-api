@@ -62,6 +62,12 @@ public class BlockInfoLayer implements LayerDelegate.Layer
      * The Block info step.
      */
     BlockInfoStep blockInfoStep;
+
+    /**
+     * The Font scale.
+     */
+    double fontScale = Journeymap.getClient().getFullMapProperties().fontScale.get();
+
     /**
      * The Font renderer.
      */
@@ -72,7 +78,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     /**
      * Instantiates a new Block info layer.
      */
-    public BlockInfoLayer() {
+    public BlockInfoLayer()
+    {
         blockInfoStep = new BlockInfoStep();
         drawStepList.add(blockInfoStep);
         isSinglePlayer = FMLClientHandler.instance().getClient().isSingleplayer();
@@ -117,9 +124,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             else
             {
                 info = Constants.getString("jm.common.location_xz_verbose", blockPos.getX(), blockPos.getZ());
-                if (isSinglePlayer) {
+                if (isSinglePlayer)
+                {
                     Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos, null);
-                    if (biome != null) {
+                    if (biome != null)
+                    {
                         info += " " + biome.getBiomeName();
                     }
                 }
@@ -131,7 +140,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 //                info += " " + new ChunkPos(blockPos);
 //            }
 
-            double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * getMapFontScale();
+            double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * fontScale;
             blockInfoStep.update(info, gridRenderer.getWidth() / 2, gridRenderer.getHeight() - infoHeight);
         }
         else
@@ -140,11 +149,6 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         return drawStepList;
-    }
-
-    private double getMapFontScale()
-    {
-        return Journeymap.getClient().getFullMapProperties().fontScale.get();
     }
 
     @Override
@@ -162,7 +166,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     /**
      * The type Block info step.
      */
-    class BlockInfoStep implements DrawStep {
+    class BlockInfoStep implements DrawStep
+    {
         /**
          * The Bg color.
          */
@@ -171,10 +176,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
          * The Fg color.
          */
         Integer fgColor = RGB.WHITE_RGB;
-        /**
-         * The Font scale.
-         */
-        double fontScale = 1;
+
         /**
          * The Font shadow.
          */
@@ -198,7 +200,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
          * @param x    the x
          * @param y    the y
          */
-        void update(String text, double x, double y) {
+        void update(String text, double x, double y)
+        {
             this.text = text;
             this.x = x;
             this.y = y;
@@ -207,24 +210,30 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         }
 
         @Override
-        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation) {
-            if (pass == Pass.Text) {
-                if (ticks-- < 0 && alpha > 0) {
+        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
+        {
+            if (pass == Pass.Text)
+            {
+                if (ticks-- < 0 && alpha > 0)
+                {
                     alpha -= .01; // Fade
                 }
-                if (alpha > .1 && text != null) {
-                    DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
+                if (alpha > .1 && text != null)
+                {
+                    DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), fontScale, fontShadow);
                 }
             }
         }
 
         @Override
-        public int getDisplayOrder() {
+        public int getDisplayOrder()
+        {
             return 0;
         }
 
         @Override
-        public String getModId() {
+        public String getModId()
+        {
             return Journeymap.MOD_ID;
         }
     }

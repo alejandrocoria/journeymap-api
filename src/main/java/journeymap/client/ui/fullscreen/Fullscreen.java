@@ -219,6 +219,10 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      */
     ThemeButton buttonGrid;
     /**
+     * The ThemeButton to show keys.
+     */
+    ThemeButton buttonKeys;
+    /**
      * The Map type toolbar.
      */
     ThemeToolbar mapTypeToolbar;
@@ -659,11 +663,13 @@ public class Fullscreen extends JmUI implements ITabCompleter {
                 }
             });
 
+            buttonKeys = new ThemeToggle(theme, "jm.common.show_keys", "keys", fullMapProperties.showKeys);
+
             // Toolbars
             mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonTopo, buttonNight, buttonDay);
             mapTypeToolbar.addAllButtons(this);
 
-            optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid);
+            optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid, buttonKeys);
             optionsToolbar.addAllButtons(this);
 
             menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonTheme, buttonOptions, buttonActions);

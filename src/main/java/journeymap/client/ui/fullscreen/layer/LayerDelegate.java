@@ -40,6 +40,7 @@ public class LayerDelegate
         layers.add(new ModOverlayLayer());
         layers.add(new BlockInfoLayer());
         layers.add(new WaypointLayer());
+        layers.add(new KeybindingInfoLayer());
     }
 
     public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale)

@@ -95,7 +95,7 @@ public class WebServer
         {
             ChatLog.enableAnnounceMod = true;
         }
-        ChatLog.announceMod(forceAnnounce);
+        ChatLog.announceMod();
     }
 
     public static WebServer getInstance()
@@ -108,7 +108,6 @@ public class WebServer
      */
     private void validatePort()
     {
-
         int hardFails = 0;
         int testPort = port;
         final int maxPort = Math.max(MAXPORT, port + 1000);

@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.forge.event;
@@ -22,7 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by mwoodman on 1/29/14.
+ * The type Event handler manager.
+ *
+ * @author techbrew 1/29/14.
  */
 public class EventHandlerManager
 {
@@ -31,17 +30,22 @@ public class EventHandlerManager
     /**
      * Marker interface for now
      */
-    public static interface EventHandler
+    public interface EventHandler
     {
     }
 
-    public static void registerGeneralHandlers()
+    /**
+     * Register general handlers.
+     */
+    public static void registerHandlers()
     {
+        register(KeyEventHandler.INSTANCE);
         register(new ChatEventHandler());
         register(new StateTickHandler());
         register(new WorldEventHandler());
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
+        register(new MiniMapOverlayHandler());
 
         // TODO: At one point forcing this to be classloaded was necessary.  Still needed?
         ColorManager.INSTANCE.getDeclaringClass();
@@ -54,13 +58,10 @@ public class EventHandlerManager
         register(ChunkMonitor.INSTANCE);
     }
 
-    public static void registerGuiHandlers()
-    {
-        register(new MiniMapOverlayHandler());
 
-        register(new KeyEventHandler());
-    }
-
+    /**
+     * Unregister all.
+     */
     public static void unregisterAll()
     {
         ArrayList<Class<? extends EventHandler>> list = new ArrayList<Class<? extends EventHandler>>(handlers.keySet());
@@ -91,6 +92,11 @@ public class EventHandlerManager
         }
     }
 
+    /**
+     * Unregister.
+     *
+     * @param handlerClass the handler class
+     */
     public static void unregister(Class<? extends EventHandler> handlerClass)
     {
         EventHandler handler = handlers.remove(handlerClass);

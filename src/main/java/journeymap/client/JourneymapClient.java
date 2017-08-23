@@ -297,8 +297,7 @@ public class JourneymapClient implements CommonProxy
             queueMainThreadTask(new MappingMonitorTask());
 
             // Register general event handlers
-            EventHandlerManager.registerGeneralHandlers();
-            EventHandlerManager.registerGuiHandlers();
+            EventHandlerManager.registerHandlers();
 
             // Ensure all icons are ready for use.
             IconSetFileHandler.initialize();
