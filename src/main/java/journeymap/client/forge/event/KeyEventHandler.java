@@ -27,6 +27,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -151,6 +152,8 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
      * modifiers are checked first.
      */
     private boolean sortActionsNeeded = true;
+
+    private Logger logger = Journeymap.getLogger();
 
     /**
      * Defines and registers all keybindings and their actions.
@@ -277,7 +280,7 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
     public void onGameKeyboardEvent(InputEvent.KeyInputEvent event)
     {
         final int key = Keyboard.getEventKey();
-        if (!Keyboard.isKeyDown(key))
+        if (Keyboard.isKeyDown(key))
         {
             onInputEvent(inGameActions, key, true);
         }
@@ -291,7 +294,7 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
     public void onGuiKeyboardEvent(GuiScreenEvent.KeyboardInputEvent.Post event)
     {
         final int key = Keyboard.getEventKey();
-        if (!Keyboard.isKeyDown(key))
+        if (Keyboard.isKeyDown(key))
         {
             if (inFullscreenWithoutChat())
             {
@@ -361,6 +364,7 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 if (kba.isActive(key, useContext))
                 {
+                    logger.debug("Firing " + kba);
                     kba.getAction().run();
                     return true;
                 }
@@ -368,7 +372,7 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Error checking keybinding", LogFormatter.toPartialString(e));
+            logger.error("Error checking keybinding", LogFormatter.toPartialString(e));
         }
         return false;
     }
@@ -389,10 +393,10 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         {
             multimap.put(kba.getKeyBinding().getKeyCode(), kba);
         }
-        // TODO: REMOVE BEFORE COMMIT
         for (Integer key : multimap.keySet())
         {
-            Journeymap.getLogger().info(multimap.get(key));
+            multimap.get(key).sort(kbaComparator);
+            Journeymap.getLogger().debug(multimap.get(key));
         }
     }
 

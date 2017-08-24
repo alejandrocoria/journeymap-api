@@ -165,12 +165,20 @@ public class EntityDTO implements Serializable
         ResourceLocation entityIcon = null;
         int playerColor = coreProperties.getColor(coreProperties.colorPlayer);
 
+        ScorePlayerTeam team = null;
+        try
+        {
+            team = mc.world.getScoreboard().getPlayersTeam(entity.getCachedUniqueIdString());
+        }
+        catch (Throwable t)
+        {
+        }
+
         // Player check
         if (entity instanceof EntityPlayer) {
             String name = StringUtils.stripControlCodes(entity.getName());
             this.username = name;
             try {
-                ScorePlayerTeam team = mc.world.getScoreboard().getPlayersTeam(this.username);
                 if (team != null) {
                     playerColor = team.getColor().getColorIndex();
                 } else if (currentPlayer.equals(entity)) {
@@ -276,8 +284,11 @@ public class EntityDTO implements Serializable
 
         // Color
         if (entity instanceof EntityPlayer) {
-            // Player
-            this.color = playerColor;
+            color = playerColor;
+        }
+        else if (team != null)
+        {
+            color = team.getColor().getColorIndex();
         } else if (!Strings.isNullOrEmpty(owner)) {
             // Pet
             color = coreProperties.getColor(coreProperties.colorPet);

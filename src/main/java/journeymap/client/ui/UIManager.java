@@ -186,7 +186,7 @@ public enum UIManager
         logger.debug("Opening UI " + ui.getClass().getSimpleName());
         try {
             minecraft.displayGuiScreen(ui);
-            //miniMap.setVisible(false);
+            KeyBinding.unPressAllKeys();
         } catch (LinkageError e) {
             handleLinkageError(e);
             return null;
@@ -302,7 +302,6 @@ public enum UIManager
     public void openFullscreenMap(Waypoint waypoint) {
         try {
             if (waypoint.isInPlayerDimension()) {
-                KeyBinding.unPressAllKeys();
                 Fullscreen map = open(Fullscreen.class);
                 map.centerOn(waypoint);
             }
