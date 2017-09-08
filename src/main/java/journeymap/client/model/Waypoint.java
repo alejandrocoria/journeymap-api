@@ -189,7 +189,7 @@ public class Waypoint implements Serializable
      */
     public Waypoint(journeymap.client.api.display.Waypoint modWaypoint)
     {
-        this(modWaypoint.getName(), modWaypoint.getPosition(), new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
+        this(modWaypoint.getName(), modWaypoint.getPosition(), modWaypoint.getColor()==null ? Color.WHITE : new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
 
         int[] prim = modWaypoint.getDisplayDimensions();
         ArrayList<Integer> dims = new ArrayList<Integer>(prim.length);
