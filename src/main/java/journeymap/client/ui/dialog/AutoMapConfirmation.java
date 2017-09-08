@@ -30,7 +30,8 @@ public class AutoMapConfirmation extends JmUI
     /**
      * Instantiates a new Auto map confirmation.
      */
-    public AutoMapConfirmation() {
+    public AutoMapConfirmation()
+    {
         super(Constants.getString("jm.common.automap_dialog"));
     }
 
@@ -38,7 +39,8 @@ public class AutoMapConfirmation extends JmUI
      * Adds the buttons (and other controls) to the screen in question.
      */
     @Override
-    public void initGui() {
+    public void initGui()
+    {
         buttonList.clear();
 
         buttonOptions = new Button(Constants.getString("jm.common.options_button"));
@@ -53,9 +55,11 @@ public class AutoMapConfirmation extends JmUI
     }
 
     @Override
-    protected void layoutButtons() {
+    protected void layoutButtons()
+    {
 
-        if (this.buttonList.isEmpty()) {
+        if (this.buttonList.isEmpty())
+        {
             this.initGui();
         }
 
@@ -83,33 +87,45 @@ public class AutoMapConfirmation extends JmUI
     }
 
     @Override
-    protected void actionPerformed(GuiButton guibutton) {
-        if (guibutton == buttonOptions) {
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        if (guibutton == buttonOptions)
+        {
             UIManager.INSTANCE.openOptionsManager(this, ClientCategory.Cartography);
             return;
-        } else if (guibutton != buttonClose) {
+        }
+        else if (guibutton != buttonClose)
+        {
             final boolean enable;
             final Object arg;
-            if (guibutton == buttonAll) {
+            if (guibutton == buttonAll)
+            {
                 enable = true;
                 arg = Boolean.TRUE;
-            } else if (guibutton == buttonMissing) {
+            }
+            else if (guibutton == buttonMissing)
+            {
                 enable = true;
                 arg = Boolean.FALSE;
-            } else {
+            }
+            else
+            {
                 enable = false;
                 arg = null;
             }
 
-            Journeymap.getClient().queueMainThreadTask(new IMainThreadTask() {
+            Journeymap.getClient().queueMainThreadTask(new IMainThreadTask()
+            {
                 @Override
-                public IMainThreadTask perform(Minecraft mc, JourneymapClient jm) {
+                public IMainThreadTask perform(Minecraft mc, JourneymapClient jm)
+                {
                     Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, enable, arg);
                     return null;
                 }
 
                 @Override
-                public String getName() {
+                public String getName()
+                {
                     return "Automap";
                 }
             });
@@ -119,11 +135,13 @@ public class AutoMapConfirmation extends JmUI
     }
 
     @Override
-    protected void keyTyped(char c, int i) {
-        switch (i) {
-            case Keyboard.KEY_ESCAPE: {
-                UIManager.INSTANCE.openMapActions();
-                break;
+    protected void keyTyped(char c, int i)
+    {
+        switch (i)
+        {
+            case Keyboard.KEY_ESCAPE:
+            {
+                closeAndReturn();
             }
         }
     }

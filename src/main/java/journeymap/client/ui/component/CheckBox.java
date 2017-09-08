@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.component;
@@ -20,21 +17,39 @@ import org.lwjgl.input.Keyboard;
  */
 public class CheckBox extends BooleanPropertyButton
 {
+    /**
+     * The Box width.
+     */
     public int boxWidth = 11;
+    /**
+     * The Glyph.
+     */
     String glyph = "\u2714";
 
+    /**
+     * Instantiates a new Check box.
+     *
+     * @param displayString the display string
+     * @param checked       the checked
+     */
     public CheckBox(String displayString, boolean checked)
     {
         this(displayString, null);
         this.toggled = checked;
     }
 
+    /**
+     * Instantiates a new Check box.
+     *
+     * @param displayString the display string
+     * @param field         the field
+     */
     public CheckBox(String displayString, BooleanField field)
     {
         super(displayString, displayString, field);
 
-        this.height = fontRenderer.FONT_HEIGHT + 2;
-        this.width = getFitWidth(fontRenderer);
+        setHeight(fontRenderer.FONT_HEIGHT + 2);
+        setWidth(getFitWidth(fontRenderer));
     }
 
     @Override
@@ -47,7 +62,7 @@ public class CheckBox extends BooleanPropertyButton
      * Draws this button to the screen.
      */
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float f)
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float ticks)
     {
         if (this.visible)
         {
@@ -83,7 +98,7 @@ public class CheckBox extends BooleanPropertyButton
                 this.drawCenteredString(fontRenderer, glyph, this.x + this.boxWidth / 2 + 1, this.y + 1 + yoffset, color);
             }
 
-            this.drawString(fontRenderer, displayString, this.x + this.boxWidth + labelPad, y + 2 + yoffset, color);
+            this.drawString(fontRenderer, displayString, x + this.boxWidth + labelPad, y + 2 + yoffset, color);
         }
     }
 
@@ -92,9 +107,9 @@ public class CheckBox extends BooleanPropertyButton
      * e).
      */
     @Override
-    public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_)
+    public boolean mousePressed(Minecraft p_146116_1_, int mouseX, int mouseY)
     {
-        if (this.isEnabled() && this.visible && p_146116_2_ >= this.x && p_146116_3_ >= this.y && p_146116_2_ < this.x + this.width && p_146116_3_ < this.y + this.height)
+        if (this.isEnabled() && this.visible && mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height)
         {
             toggle();
             return true;

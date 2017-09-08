@@ -168,7 +168,8 @@ public abstract class BaseRenderer implements IChunkRenderer
     /**
      * Instantiates a new Base renderer.
      */
-    public BaseRenderer() {
+    public BaseRenderer()
+    {
         updateOptions(null, null);
 
         // TODO: Put in properties
@@ -479,9 +480,11 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @return the float
      */
     protected float calculateSlope(final ChunkMD chunkMd, final Collection<BlockCoordIntPair> offsets, final int x, final int y, final int z, boolean isSurface,
-                                   Integer vSlice, int sliceMinY, int sliceMaxY) {
-        if (y <= 0) {
-            // Flat
+                                   Integer vSlice, int sliceMinY, int sliceMaxY)
+    {
+        if (y <= 0)
+        {
+            // flat
             return 1f;
         }
 
@@ -490,12 +493,14 @@ public abstract class BaseRenderer implements IChunkRenderer
         int defaultHeight = y;
 
         float offsetHeight;
-        for (BlockCoordIntPair offset : offsets) {
+        for (BlockCoordIntPair offset : offsets)
+        {
             offsetHeight = getOffsetBlockHeight(chunkMd, x, vSlice, z, sliceMinY, sliceMaxY, offset, defaultHeight);
             slopeSum += ((y * 1f) / offsetHeight);
         }
         Float slope = slopeSum / offsets.size();
-        if (slope.isNaN()) {
+        if (slope.isNaN())
+        {
             slope = 1f;
         }
 
@@ -510,15 +515,18 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the int [ ]
      */
-    protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice) {
-        if (vSlice == null) {
+    protected int[] getVSliceBounds(final ChunkMD chunkMd, final Integer vSlice)
+    {
+        if (vSlice == null)
+        {
             return null;
         }
 
         final int sliceMinY = Math.max((vSlice << 4), 0);
         final int hardSliceMaxY = ((vSlice + 1) << 4) - 1;
         int sliceMaxY = Math.min(hardSliceMaxY, chunkMd.getWorld().getActualHeight());
-        if (sliceMinY >= sliceMaxY) {
+        if (sliceMinY >= sliceMaxY)
+        {
             sliceMaxY = sliceMinY + 2;
         }
 
@@ -560,7 +568,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice   the v slice
      * @return the key
      */
-    protected final String getKey(String propName, Integer vSlice) {
+    protected final String getKey(String propName, Integer vSlice)
+    {
         return vSlice == null ? propName : propName + vSlice;
     }
 
@@ -571,7 +580,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the integer [ ] [ ]
      */
-    protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice) {
+    protected final Integer[][] getHeights(ChunkMD chunkMd, Integer vSlice)
+    {
         return chunkMd.getBlockDataInts(getCurrentMapType()).get(getKey(PROP_HEIGHTS, vSlice));
     }
 
@@ -582,7 +592,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the boolean
      */
-    protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice) {
+    protected final boolean hasHeights(ChunkMD chunkMd, Integer vSlice)
+    {
         return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_HEIGHTS, vSlice));
     }
 
@@ -592,7 +603,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param chunkMd the chunk md
      * @param vSlice  the v slice
      */
-    protected final void resetHeights(ChunkMD chunkMd, Integer vSlice) {
+    protected final void resetHeights(ChunkMD chunkMd, Integer vSlice)
+    {
         chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_HEIGHTS, vSlice));
     }
 
@@ -603,7 +615,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the float [ ] [ ]
      */
-    protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice) {
+    protected final Float[][] getSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
         return chunkMd.getBlockDataFloats(getCurrentMapType()).get(getKey(PROP_SLOPES, vSlice));
     }
 
@@ -614,7 +627,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the boolean
      */
-    protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice) {
+    protected final boolean hasSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
         return chunkMd.getBlockDataFloats(getCurrentMapType()).has(getKey(PROP_SLOPES, vSlice));
     }
 
@@ -624,7 +638,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param chunkMd the chunk md
      * @param vSlice  the v slice
      */
-    protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice) {
+    protected final void resetSlopes(ChunkMD chunkMd, Integer vSlice)
+    {
         chunkMd.getBlockDataFloats(getCurrentMapType()).clear(getKey(PROP_SLOPES, vSlice));
     }
 
@@ -647,7 +662,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param vSlice  the v slice
      * @return the boolean
      */
-    protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice) {
+    protected final boolean hasWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    {
         return chunkMd.getBlockDataInts(getCurrentMapType()).has(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 
@@ -657,7 +673,8 @@ public abstract class BaseRenderer implements IChunkRenderer
      * @param chunkMd the chunk md
      * @param vSlice  the v slice
      */
-    protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice) {
+    protected final void resetWaterHeights(ChunkMD chunkMd, Integer vSlice)
+    {
         chunkMd.getBlockDataInts(getCurrentMapType()).clear(getKey(PROP_WATER_HEIGHTS, vSlice));
     }
 

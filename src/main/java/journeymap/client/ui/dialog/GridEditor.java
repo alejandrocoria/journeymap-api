@@ -9,7 +9,7 @@
 package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.model.GridSpec;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.model.MapType;
@@ -29,6 +29,7 @@ import journeymap.common.properties.config.IntegerField;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
@@ -110,7 +111,7 @@ public class GridEditor extends JmUI
                 leftChecks = new ButtonList(checkDay, checkNight, checkUnderground);
 
                 // Left Buttons
-                Theme theme = ThemeFileHandler.getCurrentTheme();
+                Theme theme = ThemeLoader.getCurrentTheme();
                 buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
                 buttonDay.setToggled(activeMapType == MapType.day(0), false);
 
@@ -267,7 +268,7 @@ public class GridEditor extends JmUI
         }
 
         GridSpec gridSpec = gridSpecs.getSpec(activeMapType);
-        gridSpec.beginTexture(GL12.GL_CLAMP_TO_EDGE, 1f);
+        gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, gridSpec.alpha);
         DrawUtil.drawBoundTexture(0, 0, x, y, 0, .25, .25, x + tileSize, y + tileSize);
         gridSpec.finishTexture();
     }
@@ -325,7 +326,10 @@ public class GridEditor extends JmUI
         try
         {
             super.mouseClicked(mouseX, mouseY, mouseButton);
-            checkColorPicker(mouseX, mouseY);
+            if (mouseButton == 0)
+            {
+                checkColorPicker(mouseX, mouseY);
+            }
         }
         catch (Throwable t)
         {

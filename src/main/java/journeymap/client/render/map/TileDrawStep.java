@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.ChunkPos;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -39,7 +40,7 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
     private static final Logger logger = Journeymap.getLogger();
     private static final RegionImageCache regionImageCache = RegionImageCache.INSTANCE;
 
-    private final boolean debug = logger.isDebugEnabled();
+    private boolean debug = false;
     private final RegionCoord regionCoord;
     private final MapType mapType;
     private final Integer zoom;
@@ -162,15 +163,11 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
         }
-        else
-        {
-            int i = 2;
-        }
 
         // Grid
         if (gridSpec != null)
         {
-            gridSpec.beginTexture(textureWrap, alpha);
+            gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, gridSpec.alpha);
             DrawUtil.drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
             gridSpec.finishTexture();
         }

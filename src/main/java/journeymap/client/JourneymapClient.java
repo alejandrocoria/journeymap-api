@@ -17,7 +17,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
@@ -303,7 +303,7 @@ public class JourneymapClient implements CommonProxy
             IconSetFileHandler.initialize();
 
             // Ensure all themes are ready for use
-            ThemeFileHandler.initialize(true);
+            ThemeLoader.initialize(true);
 
             // Webserver
             WebServer.setEnabled(webMapProperties.enabled.get(), false);
@@ -436,6 +436,23 @@ public class JourneymapClient implements CommonProxy
         if (multithreadTaskController != null)
         {
             return multithreadTaskController.isTaskManagerEnabled(managerClass);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Whether a task is running on the main thread.
+     *
+     * @return
+     */
+    public boolean isMainThreadTaskActive()
+    {
+        if (mainThreadTaskController != null)
+        {
+            return mainThreadTaskController.isActive();
         }
         else
         {

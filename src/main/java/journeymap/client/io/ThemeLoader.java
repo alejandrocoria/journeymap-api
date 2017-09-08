@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.io;
@@ -28,24 +25,36 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by Mark on 8/29/2014.
+ * @author techbrew 8/29/2014.
  */
-public class ThemeFileHandler
+public class ThemeLoader
 {
-    public static final String THEME_FILE_SUFFIX = ".theme.json";
+    /**
+     * The constant THEME_FILE_SUFFIX.
+     */
+    public static final String THEME_FILE_SUFFIX = ".theme2.json";
+
+    /**
+     * The constant DEFAULT_THEME_FILE.
+     */
     public static final String DEFAULT_THEME_FILE = "default.theme.config";
 
+    /**
+     * The constant GSON.
+     */
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().setVersion(Theme.VERSION).create();
 
     private static transient Theme currentTheme = null;
 
+    /**
+     * Initialize.
+     *
+     * @param preLoadCurrentTheme the pre load current theme
+     */
     public static void initialize(boolean preLoadCurrentTheme)
     {
         Journeymap.getLogger().trace("Initializing themes ...");
@@ -60,7 +69,7 @@ public class ThemeFileHandler
         }
 
         // Save theme files
-        ThemePresets.getPresets().forEach(ThemeFileHandler::save);
+        ThemePresets.getPresets().forEach(ThemeLoader::save);
 
         // Create a default.theme.json file only if it doesn't already exist
         ensureDefaultThemeFile();
@@ -72,6 +81,11 @@ public class ThemeFileHandler
         }
     }
 
+    /**
+     * Gets theme icon dir.
+     *
+     * @return the theme icon dir
+     */
     public static File getThemeIconDir()
     {
         File dir = new File(FileHandler.getMinecraftDirectory(), Constants.THEME_ICON_DIR);
@@ -82,6 +96,11 @@ public class ThemeFileHandler
         return dir;
     }
 
+    /**
+     * Get theme directories file [ ].
+     *
+     * @return the file [ ]
+     */
     public static File[] getThemeDirectories()
     {
         File parentDir = getThemeIconDir();
@@ -90,12 +109,17 @@ public class ThemeFileHandler
             @Override
             public boolean accept(File pathname)
             {
-                return pathname.isDirectory() && !pathname.getName().equals("Victorian");
+                return pathname.isDirectory();
             }
         });
         return themeDirs;
     }
 
+    /**
+     * Gets themes.
+     *
+     * @return the themes
+     */
     public static List<Theme> getThemes()
     {
         File[] themeDirs = getThemeDirectories();
@@ -136,11 +160,21 @@ public class ThemeFileHandler
                 }
             }
         }
-        Collections.sort(themes);
 
+        if (themes.isEmpty())
+        {
+            themes.addAll(ThemePresets.getPresets());
+        }
+
+        Collections.sort(themes, Comparator.comparing(theme -> theme.name));
         return themes;
     }
 
+    /**
+     * Gets theme names.
+     *
+     * @return the theme names
+     */
     public static List<String> getThemeNames()
     {
         List<Theme> themes = null;
@@ -153,15 +187,14 @@ public class ThemeFileHandler
             themes = ThemePresets.getPresets();
         }
 
-        ArrayList<String> names = new ArrayList<String>(themes.size());
-        for (Theme theme : themes)
-        {
-            names.add(theme.name);
-        }
-        return names;
-
+        return themes.stream().map(theme -> theme.name).collect(Collectors.toList());
     }
 
+    /**
+     * Gets current theme.
+     *
+     * @return the current theme
+     */
     public static Theme getCurrentTheme()
     {
         return getCurrentTheme(false);
@@ -170,7 +203,7 @@ public class ThemeFileHandler
     /**
      * Set the current theme.
      *
-     * @param theme
+     * @param theme the theme
      */
     public synchronized static void setCurrentTheme(Theme theme)
     {
@@ -183,6 +216,12 @@ public class ThemeFileHandler
         UIManager.INSTANCE.getMiniMap().reset();
     }
 
+    /**
+     * Gets current theme.
+     *
+     * @param forceReload the force reload
+     * @return the current theme
+     */
     public synchronized static Theme getCurrentTheme(boolean forceReload)
     {
         if (forceReload)
@@ -190,19 +229,21 @@ public class ThemeFileHandler
             TextureCache.purgeThemeImages(TextureCache.themeImages);
         }
 
-        if (FMLClientHandler.instance().getClient() == null || Journeymap.getClient() == null || Journeymap.getClient().getCoreProperties() == null)
-        {
-            return ThemePresets.THEME_VICTORIAN;
-        }
-
         String themeName = Journeymap.getClient().getCoreProperties().themeName.get();
         if (forceReload || currentTheme == null || !themeName.equals(currentTheme.name))
         {
             currentTheme = getThemeByName(themeName);
+            Journeymap.getClient().getCoreProperties().themeName.set(currentTheme.name);
         }
         return currentTheme;
     }
 
+    /**
+     * Gets theme by name.
+     *
+     * @param themeName the theme name
+     * @return the theme by name
+     */
     public static Theme getThemeByName(String themeName)
     {
         for (Theme theme : getThemes())
@@ -213,9 +254,16 @@ public class ThemeFileHandler
             }
         }
         Journeymap.getLogger().warn(String.format("Theme '%s' not found, reverting to default", themeName));
-        return ThemePresets.THEME_VICTORIAN;
+        return ThemePresets.getDefault();
     }
 
+    /**
+     * Load theme from file theme.
+     *
+     * @param themeFile       the theme file
+     * @param createIfMissing the create if missing
+     * @return the theme
+     */
     public static Theme loadThemeFromFile(File themeFile, boolean createIfMissing)
     {
         try
@@ -225,12 +273,11 @@ public class ThemeFileHandler
                 Charset UTF8 = Charset.forName("UTF-8");
                 String json = Files.toString(themeFile, UTF8);
                 Theme theme = GSON.fromJson(json, Theme.class);
-                if ("Victorian".equals(theme.directory))
+                if (theme.schema < Theme.VERSION)
                 {
-                    // Handle pre-1.11 theme already on disk
-                    theme.directory = ThemePresets.THEME_VICTORIAN.directory;
+                    Journeymap.getLogger().error("Theme file schema is obsolete, cannot be used: " + themeFile);
+                    return null;
                 }
-                return theme;
             }
             else if (createIfMissing)
             {
@@ -255,6 +302,11 @@ public class ThemeFileHandler
         return new File(themeDir, fileName);
     }
 
+    /**
+     * Save.
+     *
+     * @param theme the theme
+     */
     public static void save(Theme theme)
     {
         try
@@ -280,7 +332,7 @@ public class ThemeFileHandler
         {
             try
             {
-                Theme.DefaultPointer defaultPointer = new Theme.DefaultPointer(ThemePresets.THEME_VICTORIAN);
+                Theme.DefaultPointer defaultPointer = new Theme.DefaultPointer(ThemePresets.getDefault());
                 Charset UTF8 = Charset.forName("UTF-8");
                 Files.write(GSON.toJson(defaultPointer), defaultThemeFile, UTF8);
             }
@@ -291,11 +343,16 @@ public class ThemeFileHandler
         }
     }
 
+    /**
+     * Gets default theme.
+     *
+     * @return the default theme
+     */
     public static Theme getDefaultTheme()
     {
         if (FMLClientHandler.instance().getClient() == null)
         {
-            return ThemePresets.THEME_VICTORIAN;
+            return ThemePresets.getDefault();
         }
 
         Theme theme = null;
@@ -304,19 +361,6 @@ public class ThemeFileHandler
         try
         {
             pointer = loadDefaultPointer();
-            if ("Victorian".equals(pointer.directory))
-            {
-                // Handle pre-1.11 theme already on disk
-                File defaultThemeFile = new File(getThemeIconDir(), DEFAULT_THEME_FILE);
-                if (defaultThemeFile.delete())
-                {
-                    pointer = loadDefaultPointer();
-                }
-                else
-                {
-                    pointer.directory = ThemePresets.THEME_VICTORIAN.directory;
-                }
-            }
             pointer.filename = pointer.filename.replace(THEME_FILE_SUFFIX, "");
 
             themeFile = getThemeFile(pointer.directory, pointer.filename);
@@ -333,11 +377,14 @@ public class ThemeFileHandler
             {
                 JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
             }
-            theme = ThemePresets.THEME_VICTORIAN;
+            theme = ThemePresets.getDefault();
         }
         return theme;
     }
 
+    /**
+     * Load next theme.
+     */
     public synchronized static void loadNextTheme()
     {
         List<String> themeNames = getThemeNames();
@@ -371,7 +418,7 @@ public class ThemeFileHandler
             }
             else
             {
-                return new Theme.DefaultPointer(ThemePresets.THEME_VICTORIAN);
+                return new Theme.DefaultPointer(ThemePresets.getDefault());
             }
         }
         catch (Throwable t)
@@ -410,12 +457,15 @@ public class ThemeFileHandler
         Journeymap.getLogger().info("Preloaded theme textures: " + count);
     }
 
+    /**
+     * The type Theme values provider.
+     */
     public static class ThemeValuesProvider implements StringField.ValuesProvider
     {
         @Override
         public List<String> getStrings()
         {
-            return ThemeFileHandler.getThemeNames();
+            return ThemeLoader.getThemeNames();
         }
 
         @Override

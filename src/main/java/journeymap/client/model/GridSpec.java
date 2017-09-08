@@ -71,7 +71,7 @@ public class GridSpec
     /**
      * MUST CALL GlStateManager.color(1, 1, 1, alpha); when done
      */
-    public void beginTexture(int textureWrap, float mapAlpha)
+    public void beginTexture(int textureFilter, int textureWrap, float mapAlpha)
     {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
@@ -79,8 +79,8 @@ public class GridSpec
 
         GlStateManager.bindTexture(getTexture().getGlTextureId());
         GlStateManager.color(red, green, blue, alpha * mapAlpha);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
     }

@@ -9,7 +9,8 @@ import journeymap.client.Constants;
 import journeymap.client.cartography.color.ColorManager;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.forge.event.KeyEventHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.JMLogger;
 import journeymap.client.mod.ModBlockDelegate;
 import journeymap.client.model.BlockMD;
@@ -180,7 +181,7 @@ public class OptionsManager extends JmUI
             if (minimap1PreviewButton == null)
             {
                 String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "1");
-                String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+                String tooltip = Constants.getString("jm.minimap.preview.tooltip", KeyEventHandler.INSTANCE.kbMinimapPreset.getDisplayName());
                 minimap1PreviewButton = new CheckBox(name, false);
                 minimap1PreviewButton.setTooltip(tooltip);
                 if (FMLClientHandler.instance().getClient().world == null)
@@ -192,7 +193,7 @@ public class OptionsManager extends JmUI
             if (minimap2PreviewButton == null)
             {
                 String name = String.format("%s %s", Constants.getString("jm.minimap.preview"), "2");
-                String tooltip = Constants.getString("jm.minimap.preview.tooltip");
+                String tooltip = Constants.getString("jm.minimap.preview.tooltip", KeyEventHandler.INSTANCE.kbMinimapPreset.getDisplayName());
                 minimap2PreviewButton = new CheckBox(name, false);
                 minimap2PreviewButton.setTooltip(tooltip);
                 if (FMLClientHandler.instance().getClient().world == null)
@@ -244,7 +245,6 @@ public class OptionsManager extends JmUI
                         ResetButton resetButton = new ResetButton(category);
                         SlotMetadata resetSlotMetadata = new SlotMetadata(resetButton, 1);
 
-
                         if (category == ClientCategory.MiniMap1)
                         {
                             if (FMLClientHandler.instance().getClient().world != null)
@@ -252,7 +252,7 @@ public class OptionsManager extends JmUI
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap1PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap1Button, 3));
-                            break;
+                            continue;
                         }
                         else if (category == ClientCategory.MiniMap2)
                         {
@@ -261,12 +261,12 @@ public class OptionsManager extends JmUI
                                 categorySlot.getAllChildMetadata().add(new SlotMetadata(minimap2PreviewButton, 4));
                             }
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            break;
+                            continue;
                         }
                         else if (category == ClientCategory.FullMap)
                         {
                             categorySlot.getAllChildMetadata().add(new SlotMetadata(editGridMinimap2Button, 3));
-                            break;
+                            continue;
                         }
                         else if (category == ClientCategory.Cartography)
                         {
@@ -276,11 +276,11 @@ public class OptionsManager extends JmUI
                                     Constants.getString("jm.common.renderstats.tooltip"), 2);
                             categorySlot.getAllChildMetadata().add(renderStatsSlotMetadata);
                             //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
-                            break;
+                            continue;
                         }
                         else
                         {
-                            categorySlot.getAllChildMetadata().add(resetSlotMetadata);
+                            //categorySlot.getAllChildMetadata().add(resetSlotMetadata);
                         }
 
                     }
@@ -531,7 +531,7 @@ public class OptionsManager extends JmUI
             // Theme button: Force update
             if (slotMetadata.getName().equals(Constants.getString("jm.common.ui_theme")))
             {
-                ThemeFileHandler.getCurrentTheme(true);
+                ThemeLoader.getCurrentTheme(true);
                 if (previewMiniMap())
                 {
                     UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);
@@ -737,7 +737,7 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.FullMap)
                 {
                     DataCache.INSTANCE.resetRadarCaches();
-                    ThemeFileHandler.getCurrentTheme(true);
+                    ThemeLoader.getCurrentTheme(true);
                     continue;
                 }
                 if (category == ClientCategory.WebMap)
@@ -868,7 +868,7 @@ public class OptionsManager extends JmUI
             setDrawFrame(false);
             setEnabled(false);
             setLabelColors(RGB.LIGHT_GRAY_RGB, RGB.LIGHT_GRAY_RGB, RGB.LIGHT_GRAY_RGB);
-            this.width = width;
+            setWidth(width);
         }
 
         @Override

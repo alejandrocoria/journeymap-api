@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.render.draw;
@@ -12,6 +9,7 @@ package journeymap.client.render.draw;
 import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.ui.theme.Theme;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -29,21 +27,32 @@ import java.util.List;
  */
 public class DrawUtil
 {
+    /**
+     * The constant zLevel.
+     */
     public static double zLevel = 0;
 
+    /**
+     * The Tessellator.
+     */
     static Tessellator tessellator = Tessellator.getInstance();
+    /**
+     * The Worldrenderer.
+     */
     static BufferBuilder worldrenderer = tessellator.getBuffer();
 
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
-     * @param text
-     * @param x
-     * @param y
-     * @param bgColor
-     * @param color
-     * @param bgAlpha
+     * @param text      the text
+     * @param x         the x
+     * @param y         the y
+     * @param bgColor   the bg color
+     * @param bgAlpha   the bg alpha
+     * @param color     the color
+     * @param alpha     the alpha
+     * @param fontScale the font scale
      */
     public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale)
     {
@@ -53,6 +62,16 @@ public class DrawUtil
     /**
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
+     *
+     * @param text       the text
+     * @param x          the x
+     * @param y          the y
+     * @param bgColor    the bg color
+     * @param bgAlpha    the bg alpha
+     * @param color      the color
+     * @param alpha      the alpha
+     * @param fontScale  the font scale
+     * @param fontShadow the font shadow
      */
     public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow)
     {
@@ -63,13 +82,15 @@ public class DrawUtil
      * Draw a text key, centered on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
      *
-     * @param text
-     * @param x
-     * @param y
-     * @param bgColor
-     * @param color
-     * @param bgAlpha
-     * @param rotation
+     * @param text      the text
+     * @param x         the x
+     * @param y         the y
+     * @param bgColor   the bg color
+     * @param bgAlpha   the bg alpha
+     * @param color     the color
+     * @param alpha     the alpha
+     * @param fontScale the font scale
+     * @param rotation  the rotation
      */
     public static void drawCenteredLabel(final String text, double x, double y, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, double rotation)
     {
@@ -79,12 +100,40 @@ public class DrawUtil
     /**
      * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
+     *
+     * @param text       the text
+     * @param x          the x
+     * @param y          the y
+     * @param hAlign     the h align
+     * @param vAlign     the v align
+     * @param bgColor    the bg color
+     * @param bgAlpha    the bg alpha
+     * @param color      the color
+     * @param alpha      the alpha
+     * @param fontScale  the font scale
+     * @param fontShadow the font shadow
      */
     public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, int color, float alpha, double fontScale, boolean fontShadow)
     {
         drawLabel(text, x, y, hAlign, vAlign, bgColor, bgAlpha, color, alpha, fontScale, fontShadow, 0);
     }
 
+    /**
+     * Draw labels.
+     *
+     * @param lines      the lines
+     * @param x          the x
+     * @param y          the y
+     * @param hAlign     the h align
+     * @param vAlign     the v align
+     * @param bgColor    the bg color
+     * @param bgAlpha    the bg alpha
+     * @param color      the color
+     * @param alpha      the alpha
+     * @param fontScale  the font scale
+     * @param fontShadow the font shadow
+     * @param rotation   the rotation
+     */
     public static void drawLabels(final String[] lines, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
         if (lines.length == 0)
@@ -146,6 +195,27 @@ public class DrawUtil
         }
     }
 
+    public static void drawLabel(final String text, Theme.LabelSpec labelSpec, double x, double y, final HAlign hAlign, final VAlign vAlign, double fontScale, double rotation)
+    {
+        drawLabel(text, x, y, hAlign, vAlign, labelSpec.background.getColor(), labelSpec.background.alpha, labelSpec.foreground.getColor(), labelSpec.foreground.alpha, fontScale, labelSpec.shadow, rotation);
+    }
+
+    /**
+     * Draw label.
+     *
+     * @param text       the text
+     * @param x          the x
+     * @param y          the y
+     * @param hAlign     the h align
+     * @param vAlign     the v align
+     * @param bgColor    the bg color
+     * @param bgAlpha    the bg alpha
+     * @param color      the color
+     * @param alpha      the alpha
+     * @param fontScale  the font scale
+     * @param fontShadow the font shadow
+     * @param rotation   the rotation
+     */
     public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
         double bgWidth = 0;
@@ -163,6 +233,21 @@ public class DrawUtil
     /**
      * Draw a text key, aligned on x,z.  If bgColor not null,
      * a rectangle will be drawn behind the text.
+     *
+     * @param text       the text
+     * @param x          the x
+     * @param y          the y
+     * @param hAlign     the h align
+     * @param vAlign     the v align
+     * @param bgColor    the bg color
+     * @param bgAlpha    the bg alpha
+     * @param bgWidth    the bg width
+     * @param bgHeight   the bg height
+     * @param color      the color
+     * @param alpha      the alpha
+     * @param fontScale  the font scale
+     * @param fontShadow the font shadow
+     * @param rotation   the rotation
      */
     public static void drawLabel(final String text, double x, double y, final HAlign hAlign, final VAlign vAlign, Integer bgColor, float bgAlpha, double bgWidth, double bgHeight, Integer color, float alpha, double fontScale, boolean fontShadow, double rotation)
     {
@@ -171,14 +256,8 @@ public class DrawUtil
             return;
         }
 
-        if (alpha > 1)
-        {
-            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
-            alpha = alpha / 255f;
-        }
-
         final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-        final boolean drawRect = (bgColor != null && alpha > 0);
+        final boolean drawRect = (bgColor != null && bgAlpha > 0);
         final double width = fontRenderer.getStringWidth(text);
         int height = drawRect ? getLabelHeight(fontRenderer, fontShadow) : fontRenderer.FONT_HEIGHT;
 
@@ -262,21 +341,19 @@ public class DrawUtil
             }
 
             // Draw background
-            if (bgColor != null && bgAlpha > 0)
+            if (drawRect)
             {
                 final int hpad = 2;
                 drawRectangle(rectX - hpad - .5, rectY, bgWidth + (2 * hpad), bgHeight, bgColor, bgAlpha);
             }
 
-            // String positioning uses ints
-//            int intTextX = (int) Math.floor(textX);
-//            int intTextY = (int) Math.floor(textY);
-//            double dTextX = textX - intTextX;
-//            double dTextY = textY - intTextY;
+            if (alpha < 1)
+            {
+                color = RGB.toArbg(color, alpha);
+            }
 
-            // Use translation for the double precision
+            // Font renderer really doesn't like mid-pixel text rendering
             GlStateManager.translate(textX - Math.floor(textX), textY - Math.floor(textY), 0);
-
             fontRenderer.drawString(text, textX, textY, color, fontShadow);
 
         }
@@ -286,37 +363,113 @@ public class DrawUtil
         }
     }
 
+    /**
+     * Gets label height.
+     *
+     * @param fr         the fr
+     * @param fontShadow the font shadow
+     * @return the label height
+     */
     public static int getLabelHeight(FontRenderer fr, boolean fontShadow)
     {
         final int vpad = fr.getUnicodeFlag() ? 0 : fontShadow ? 6 : 4;
         return fr.FONT_HEIGHT + vpad;
     }
 
+    /**
+     * Draw image.
+     *
+     * @param texture  the texture
+     * @param x        the x
+     * @param y        the y
+     * @param flip     the flip
+     * @param scale    the scale
+     * @param rotation the rotation
+     */
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
     {
         drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
     }
 
+    /**
+     * Draw image.
+     *
+     * @param texture  the texture
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param flip     the flip
+     * @param scale    the scale
+     * @param rotation the rotation
+     */
     public static void drawImage(TextureImpl texture, float alpha, double x, double y, boolean flip, float scale, double rotation)
     {
         drawQuad(texture, 0xffffff, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
     }
 
+    /**
+     * Draw clamped image.
+     *
+     * @param texture  the texture
+     * @param x        the x
+     * @param y        the y
+     * @param scale    the scale
+     * @param rotation the rotation
+     */
     public static void drawClampedImage(TextureImpl texture, double x, double y, float scale, double rotation)
     {
         drawClampedImage(texture, 0xffffff, 1f, x, y, scale, rotation);
     }
 
+    /**
+     * Draw clamped image.
+     *
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param scale    the scale
+     * @param rotation the rotation
+     */
     public static void drawClampedImage(TextureImpl texture, int color, float alpha, double x, double y, float scale, double rotation)
     {
         drawQuad(texture, color, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
     }
 
+    /**
+     * Draw colored image.
+     *
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param scale    the scale
+     * @param rotation the rotation
+     */
     public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, float scale, double rotation)
     {
         drawQuad(texture, color, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), false, rotation);
     }
 
+    /**
+     * Draw colored sprite.
+     *
+     * @param texture       the texture
+     * @param displayWidth  the display width
+     * @param displayHeight the display height
+     * @param spriteX       the sprite x
+     * @param spriteY       the sprite y
+     * @param spriteWidth   the sprite width
+     * @param spriteHeight  the sprite height
+     * @param color         the color
+     * @param alpha         the alpha
+     * @param x             the x
+     * @param y             the y
+     * @param scale         the scale
+     * @param rotation      the rotation
+     */
     public static void drawColoredSprite(final TextureImpl texture, final double displayWidth, final double displayHeight, final double spriteX, final double spriteY, final double spriteWidth, final double spriteHeight, final Integer color, final float alpha, final double x, final double y, final float scale, final double rotation)
     {
         final double texWidth = texture.getWidth();
@@ -328,21 +481,67 @@ public class DrawUtil
         drawQuad(texture, color, alpha, x, y, displayWidth * scale, displayHeight * scale, minU, minV, maxU, maxV, rotation, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
+    /**
+     * Draw colored image.
+     *
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param rotation the rotation
+     */
     public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, double rotation)
     {
         drawQuad(texture, color, alpha, x, y, texture.getWidth(), texture.getHeight(), false, rotation);
     }
 
+    /**
+     * Draw colored image.
+     *
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param width    the width
+     * @param height   the height
+     * @param rotation the rotation
+     */
     public static void drawColoredImage(TextureImpl texture, int color, float alpha, double x, double y, int width, int height, double rotation)
     {
         drawQuad(texture, color, alpha, x, y, width, height, false, rotation);
     }
 
+    /**
+     * Draw quad.
+     *
+     * @param texture  the texture
+     * @param x        the x
+     * @param y        the y
+     * @param width    the width
+     * @param height   the height
+     * @param flip     the flip
+     * @param rotation the rotation
+     */
     public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
         drawQuad(texture, 0xffffff, 1f, x, y, width, height, 0, 0, 1, 1, rotation, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
     }
 
+    /**
+     * Draw quad.
+     *
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param x        the x
+     * @param y        the y
+     * @param width    the width
+     * @param height   the height
+     * @param flip     the flip
+     * @param rotation the rotation
+     */
     public static void drawQuad(TextureImpl texture, int color, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
         drawQuad(texture, color, alpha, x, y, width, height, 0, 0, 1, 1, rotation, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
@@ -350,20 +549,25 @@ public class DrawUtil
 
 
     /**
-     * @param texture
-     * @param x
-     * @param y
-     * @param minU
-     * @param minV
-     * @param maxU
-     * @param maxV
-     * @param width
-     * @param height
-     * @param color
-     * @param alpha
-     * @param flip
+     * Draw quad.
+     *
+     * @param texture        the texture
+     * @param color          the color
+     * @param alpha          the alpha
+     * @param x              the x
+     * @param y              the y
+     * @param width          the width
+     * @param height         the height
+     * @param minU           the min u
+     * @param minV           the min v
+     * @param maxU           the max u
+     * @param maxV           the max v
+     * @param rotation       the rotation
+     * @param flip           the flip
+     * @param blend          the blend
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
+     * @param clampTexture   the clamp texture
      */
     public static void drawQuad(TextureImpl texture, int color, float alpha, final double x, final double y, final double width, final double height, final double minU, final double minV, final double maxU, final double maxV, double rotation, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
     {
@@ -445,13 +649,18 @@ public class DrawUtil
         }
     }
 
+    /**
+     * Draw rectangle.
+     *
+     * @param x      the x
+     * @param y      the y
+     * @param width  the width
+     * @param height the height
+     * @param color  the color
+     * @param alpha  the alpha
+     */
     public static void drawRectangle(double x, double y, double width, double height, int color, float alpha)
     {
-        if (alpha > 1)
-        {
-            // TODO: There shouldn't be any more cases of this, but a breakpoint here is prudent until I'm sure.
-            alpha = alpha / 255f;
-        }
         // Prep
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
@@ -474,6 +683,14 @@ public class DrawUtil
         GlStateManager.disableBlend();
     }
 
+    /**
+     * Draw polygon.
+     *
+     * @param xOffset         the x offset
+     * @param yOffset         the y offset
+     * @param screenPoints    the screen points
+     * @param shapeProperties the shape properties
+     */
     public static void drawPolygon(double xOffset, double yOffset, List<Point2D.Double> screenPoints, ShapeProperties shapeProperties)
     {
         // Prep
@@ -541,6 +758,15 @@ public class DrawUtil
     /**
      * Draws a rectangle with a vertical gradient between the specified colors.
      * 0, top, this.width, this.height - top, -1072689136, -804253680
+     *
+     * @param x          the x
+     * @param y          the y
+     * @param width      the width
+     * @param height     the height
+     * @param startColor the start color
+     * @param startAlpha the start alpha
+     * @param endColor   the end color
+     * @param endAlpha   the end alpha
      */
     public static void drawGradientRect(double x, double y, double width, double height, int startColor, float startAlpha, int endColor, float endAlpha)
     {
@@ -578,6 +804,19 @@ public class DrawUtil
         GlStateManager.enableBlend();
     }
 
+    /**
+     * Draw bound texture.
+     *
+     * @param startU the start u
+     * @param startV the start v
+     * @param startX the start x
+     * @param startY the start y
+     * @param z      the z
+     * @param endU   the end u
+     * @param endV   the end v
+     * @param endX   the end x
+     * @param endY   the end y
+     */
     public static void drawBoundTexture(double startU, double startV, double startX, double startY, double z, double endU, double endV, double endX, double endY)
     {
         startDrawingQuads(false);
@@ -592,6 +831,13 @@ public class DrawUtil
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
+     *
+     * @param x        the x
+     * @param y        the y
+     * @param heading  the heading
+     * @param texture  the texture
+     * @param scale    the scale
+     * @param rotation the rotation
      */
     public static void drawEntity(double x, double y, double heading, TextureImpl texture, float scale, double rotation)
     {
@@ -601,6 +847,14 @@ public class DrawUtil
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
+     *
+     * @param x        the x
+     * @param y        the y
+     * @param heading  the heading
+     * @param texture  the texture
+     * @param alpha    the alpha
+     * @param scale    the scale
+     * @param rotation the rotation
      */
     public static void drawEntity(double x, double y, double heading, TextureImpl texture, float alpha, float scale, double rotation)
     {
@@ -617,6 +871,14 @@ public class DrawUtil
     /**
      * Draw the entity's location and heading on the overlay image
      * using the provided icon.
+     *
+     * @param x        the x
+     * @param y        the y
+     * @param texture  the texture
+     * @param color    the color
+     * @param alpha    the alpha
+     * @param scale    the scale
+     * @param rotation the rotation
      */
     public static void drawColoredEntity(double x, double y, TextureImpl texture, int color, float alpha, float scale, double rotation)
     {
@@ -630,6 +892,12 @@ public class DrawUtil
         drawColoredImage(texture, color, alpha, drawX, drawY, scale, rotation);
     }
 
+    /**
+     * Size display.
+     *
+     * @param width  the width
+     * @param height the height
+     */
     public static void sizeDisplay(double width, double height)
     {
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -641,11 +909,19 @@ public class DrawUtil
         GlStateManager.translate(0.0F, 0.0F, -2000.0F);
     }
 
+    /**
+     * Draw.
+     */
     public static void draw()
     {
         tessellator.draw();
     }
 
+    /**
+     * Start drawing quads.
+     *
+     * @param useColor the use color
+     */
     public static void startDrawingQuads(boolean useColor)
     {
         // 1.7.10
@@ -667,6 +943,15 @@ public class DrawUtil
         }
     }
 
+    /**
+     * Add vertex with uv.
+     *
+     * @param x the x
+     * @param y the y
+     * @param z the z
+     * @param u the u
+     * @param v the v
+     */
     public static void addVertexWithUV(double x, double y, double z, double u, double v)
     {
         // 1.7.10
@@ -679,6 +964,14 @@ public class DrawUtil
         worldrenderer.pos(x, y, z).tex(u, v).endVertex();
     }
 
+    /**
+     * Add vertex.
+     *
+     * @param x    the x
+     * @param y    the y
+     * @param z    the z
+     * @param rgba the rgba
+     */
     public static void addVertex(double x, double y, double z, int[] rgba)
     {
         // 1.7 and 1.8
@@ -689,6 +982,16 @@ public class DrawUtil
         worldrenderer.pos(x, y, z).tex(1, 1).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
     }
 
+    /**
+     * Add vertex with uv.
+     *
+     * @param x    the x
+     * @param y    the y
+     * @param z    the z
+     * @param u    the u
+     * @param v    the v
+     * @param rgba the rgba
+     */
     public static void addVertexWithUV(double x, double y, double z, double u, double v, int[] rgba)
     {
         // 1.7 and 1.8
@@ -699,13 +1002,37 @@ public class DrawUtil
         worldrenderer.pos(x, y, z).tex(u, v).color(rgba[0], rgba[1], rgba[2], rgba[3]).endVertex();
     }
 
+    /**
+     * The enum H align.
+     */
     public enum HAlign
     {
-        Left, Center, Right
+        /**
+         * Left h align.
+         */
+        Left, /**
+     * Center h align.
+     */
+    Center, /**
+     * Right h align.
+     */
+    Right
     }
 
+    /**
+     * The enum V align.
+     */
     public enum VAlign
     {
-        Above, Middle, Below
+        /**
+         * Above v align.
+         */
+        Above, /**
+     * Middle v align.
+     */
+    Middle, /**
+     * Below v align.
+     */
+    Below
     }
 }

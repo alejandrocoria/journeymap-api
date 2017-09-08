@@ -10,6 +10,8 @@ package journeymap.client.model;
 
 import journeymap.client.api.display.Context;
 import journeymap.client.data.DataCache;
+import journeymap.client.feature.Feature;
+import journeymap.client.feature.FeatureManager;
 
 /**
  * Encapsulate irreducible complexity of map type-related properties.
@@ -178,6 +180,21 @@ public class MapType
     public boolean isTopo()
     {
         return name == Name.topo;
+    }
+
+    /**
+     * Whether the feature of the maptype is allowed is allowed.
+     *
+     * @return
+     */
+    public boolean isAllowed()
+    {
+        if (isUnderground())
+        {
+            return FeatureManager.isAllowed(Feature.MapCaves);
+        }
+
+        return FeatureManager.isAllowed(Feature.MapSurface);
     }
 
     @Override

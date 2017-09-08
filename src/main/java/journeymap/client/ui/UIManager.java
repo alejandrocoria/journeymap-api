@@ -10,7 +10,6 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.ui.component.JmUI;
-import journeymap.client.ui.dialog.FullscreenActions;
 import journeymap.client.ui.dialog.GridEditor;
 import journeymap.client.ui.dialog.OptionsManager;
 import journeymap.client.ui.dialog.Splash;
@@ -334,13 +333,6 @@ public enum UIManager
         } catch (Throwable e) {
             logger.log(Level.ERROR, "Unexpected exception creating MasterOptions with return class: " + LogFormatter.toString(e));
         }
-    }
-
-    /**
-     * Open map actions.
-     */
-    public void openMapActions() {
-        open(FullscreenActions.class);
     }
 
     /**

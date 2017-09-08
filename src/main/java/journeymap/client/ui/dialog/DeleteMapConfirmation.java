@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.dialog;
@@ -16,11 +13,28 @@ import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
+/**
+ * The type Delete map confirmation.
+ */
 public class DeleteMapConfirmation extends JmUI
 {
 
-    Button buttonAll, buttonCurrent, buttonClose;
+    /**
+     * The Button all.
+     */
+    Button buttonAll;
+    /**
+     * The Button current.
+     */
+    Button buttonCurrent;
+    /**
+     * The Button close.
+     */
+    Button buttonClose;
 
+    /**
+     * Instantiates a new Delete map confirmation.
+     */
     public DeleteMapConfirmation()
     {
         super(Constants.getString("jm.common.deletemap_dialog"));
@@ -77,8 +91,7 @@ public class DeleteMapConfirmation extends JmUI
 
         if (guibutton == buttonClose)
         {
-            UIManager.INSTANCE.openMapActions();
-            return;
+            closeAndReturn();
         }
     }
 
@@ -89,8 +102,7 @@ public class DeleteMapConfirmation extends JmUI
         {
             case Keyboard.KEY_ESCAPE:
             {
-                UIManager.INSTANCE.openMapActions();
-                break;
+                closeAndReturn();
             }
         }
     }

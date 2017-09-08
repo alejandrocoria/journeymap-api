@@ -56,10 +56,15 @@ public abstract class BaseMapTask implements ITask
 
     }
 
-
     @Override
     public void performTask(Minecraft mc, JourneymapClient jm, File jmWorldDir, boolean threadLogging) throws InterruptedException
     {
+        if (!mapType.isAllowed())
+        {
+            this.complete(0, true, false);
+            return;
+        }
+
         StatTimer timer = StatTimer.get(getClass().getSimpleName() + ".performTask", 5, elapsedLimit).start();
 
         initTask(mc, jm, jmWorldDir, threadLogging);

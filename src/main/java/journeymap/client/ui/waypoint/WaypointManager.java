@@ -297,10 +297,13 @@ public class WaypointManager extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
-        boolean pressed = itemScrollPane.mouseClicked(mouseX, mouseY, mouseEvent);
-        if (pressed)
+        if (mouseEvent == 0)
         {
-            checkPressedButton();
+            boolean pressed = itemScrollPane.mouseClicked(mouseX, mouseY, mouseEvent);
+            if (pressed)
+            {
+                checkPressedButton();
+            }
         }
     }
 

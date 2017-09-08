@@ -40,16 +40,17 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      */
     INSTANCE;
 
-    private World theWorld;
+    private World world;
 
     /**
      * Reset.
      */
     public void reset() {
-        if (theWorld != null) {
-            theWorld.removeEventListener(ChunkMonitor.INSTANCE);
+        if (world != null)
+        {
+            world.removeEventListener(ChunkMonitor.INSTANCE);
         }
-        theWorld = null;
+        world = null;
     }
 
     /**
@@ -72,9 +73,10 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event) {
-        if (theWorld == null) {
-            theWorld = event.getWorld();
-            theWorld.addEventListener(this);
+        if (world == null)
+        {
+            world = event.getWorld();
+            world.addEventListener(this);
             event.getWorld();
         }
 
@@ -88,11 +90,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
 //        int cx2 = chunk.x + 1;
 //        int cz2 = chunk.z + 1;
 //
-//        for (int chunkXPos = cx1; chunkXPos < cx2; chunkXPos++)
+//        for (int x = cx1; x < cx2; x++)
 //        {
-//            for (int chunkZPos = cz1; chunkZPos < cz2; chunkZPos++)
+//            for (int z = cz1; z < cz2; z++)
 //            {
-//                resetRenderTimes(new ChunkPos(chunkXPos, chunkZPos));
+//                resetRenderTimes(new ChunkPos(x, z));
 //            }
 //        }
     }
@@ -120,7 +122,8 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     public void onWorldUnload(WorldEvent.Unload event) {
         try {
             World world = event.getWorld();
-            if (world == theWorld) {
+            if (world == world)
+            {
                 reset();
             }
         } catch (Exception e) {
@@ -148,9 +151,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         if (cx1 == cx2 && cz1 == cz2) {
             resetRenderTimes(new ChunkPos(cx1, cz1));
         } else {
-            for (int chunkXPos = cx1; chunkXPos < cx2; chunkXPos++) {
-                for (int chunkZPos = cz1; chunkZPos < cz2; chunkZPos++) {
-                    resetRenderTimes(new ChunkPos(chunkXPos, chunkZPos));
+            for (int x = cx1; x < cx2; x++)
+            {
+                for (int z = cz1; z < cz2; z++)
+                {
+                    resetRenderTimes(new ChunkPos(x, z));
                 }
             }
         }

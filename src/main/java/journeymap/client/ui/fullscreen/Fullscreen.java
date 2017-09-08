@@ -13,12 +13,15 @@ import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.model.MapPolygon;
 import journeymap.client.api.model.ShapeProperties;
 import journeymap.client.api.util.UIState;
+import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.MapSaver;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
+import journeymap.client.model.BlockMD;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
@@ -31,11 +34,16 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.task.main.EnsureCurrentColorsTask;
+import journeymap.client.task.multi.MapRegionTask;
+import journeymap.client.task.multi.SaveMapTask;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
+import journeymap.client.ui.dialog.AutoMapConfirmation;
+import journeymap.client.ui.dialog.DeleteMapConfirmation;
 import journeymap.client.ui.dialog.FullscreenActions;
 import journeymap.client.ui.fullscreen.layer.LayerDelegate;
 import journeymap.client.ui.minimap.Shape;
@@ -62,7 +70,9 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +84,8 @@ import java.util.List;
  *
  * @author techbrew
  */
-public class Fullscreen extends JmUI implements ITabCompleter {
+public class Fullscreen extends JmUI implements ITabCompleter
+{
     /**
      * The constant state.
      */
@@ -94,7 +105,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * The Layer delegate.
      */
-    final LayerDelegate layerDelegate = new LayerDelegate();
+    final LayerDelegate layerDelegate;
     /**
      * The Full map properties.
      */
@@ -107,10 +118,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      * The First layout pass.
      */
     boolean firstLayoutPass = true;
-    /**
-     * The Hide options toolbar.
-     */
-    boolean hideOptionsToolbar = false;
+
     /**
      * The Is scrolling.
      */
@@ -178,10 +186,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      * The ThemeButton button options.
      */
     ThemeButton buttonOptions;
-    /**
-     * The ThemeButton button actions.
-     */
-    ThemeButton buttonActions;
+
     /**
      * The ThemeButton button close.
      */
@@ -222,6 +227,15 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      * The ThemeButton to show keys.
      */
     ThemeButton buttonKeys;
+
+    ThemeButton buttonAutomap;
+    ThemeButton buttonSavemap;
+    ThemeButton buttonDeletemap;
+    ThemeButton buttonDisable;
+    ThemeButton buttonResetPalette;
+    ThemeButton buttonBrowser;
+    ThemeButton buttonAbout;
+
     /**
      * The Map type toolbar.
      */
@@ -242,22 +256,12 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      * The Bg color.
      */
     int bgColor = 0x222222;
+
     /**
-     * The Status foreground color.
+     * Label spec for status text
      */
-    int statusForegroundColor;
-    /**
-     * The Status background color.
-     */
-    int statusBackgroundColor;
-    /**
-     * The Status foreground alpha.
-     */
-    float statusForegroundAlpha;
-    /**
-     * The Status background alpha.
-     */
-    float statusBackgroundAlpha;
+    Theme.LabelSpec statusLabelSpec;
+
     /**
      * The Draw screen timer.
      */
@@ -280,6 +284,11 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      */
     List<Overlay> tempOverlays = new ArrayList<Overlay>();
 
+    private List<String> autoMapOnTooltip;
+    private List<String> autoMapOffTooltip;
+    private Rectangle2D.Double optionsToolbarBounds;
+    private Rectangle2D.Double menuToolbarBounds;
+
     /**
      * Default constructor
      */
@@ -287,11 +296,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     {
         super(null);
         mc = FMLClientHandler.instance().getClient();
-        fullMapProperties = Journeymap.getClient().getFullMapProperties();
-        state.refresh(mc, mc.player, fullMapProperties);
-        boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
-        gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
-        gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+        layerDelegate = new LayerDelegate(this);
     }
 
     /**
@@ -309,14 +314,16 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @return the ui state
      */
-    public static synchronized UIState uiState() {
+    public static synchronized UIState uiState()
+    {
         return gridRenderer.getUIState();
     }
 
     /**
      * Reset.
      */
-    public void reset() {
+    public void reset()
+    {
         state.requireRefresh();
         gridRenderer.clear();
         buttonList.clear();
@@ -326,6 +333,9 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     public void initGui()
     {
         fullMapProperties = Journeymap.getClient().getFullMapProperties();
+        state.requireRefresh();
+        state.refresh(mc, mc.player, fullMapProperties);
+
         Keyboard.enableRepeatEvents(true);
 
         // When switching dimensions, reset grid
@@ -345,7 +355,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     }
 
     @Override
-    public void drawScreen(int width, int height, float partialTicks)
+    public void drawScreen(int width, int height, float f)
     {
         try {
             drawBackground(0); // drawBackground
@@ -363,7 +373,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             } else {
                 for (int k = 0; k < this.buttonList.size(); ++k) {
                     GuiButton guibutton = this.buttonList.get(k);
-                    guibutton.drawButton(this.mc, width, height, partialTicks);
+                    guibutton.drawButton(this.mc, width, height, 0f);
                     if (tooltip == null) {
                         if (guibutton instanceof Button) {
                             Button button = (Button) guibutton;
@@ -376,7 +386,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             }
 
             if (chat != null) {
-                chat.drawScreen(width, height, partialTicks);
+                chat.drawScreen(width, height, f);
             }
 
             if (tooltip != null && !tooltip.isEmpty()) {
@@ -435,137 +445,113 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     {
         if (buttonList.isEmpty()) {
             firstLayoutPass = true;
-            hideOptionsToolbar = false;
-            Theme theme = ThemeFileHandler.getCurrentTheme();
+            Theme theme = ThemeLoader.getCurrentTheme();
             MapType mapType = state.getCurrentMapType();
             int id = 0;
 
             // UI Colors
-            bgColor = Theme.getColor(theme.fullscreen.mapBackgroundColor);
-            statusForegroundColor = Theme.getColor(theme.fullscreen.statusLabel.foregroundColor);
-            statusForegroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.foregroundAlpha / 255));
-            statusBackgroundColor = Theme.getColor(theme.fullscreen.statusLabel.backgroundColor);
-            statusBackgroundAlpha = Math.max(0, Math.min(1, theme.fullscreen.statusLabel.backgroundAlpha / 255));
+            bgColor = theme.fullscreen.background.getColor();
+            statusLabelSpec = theme.fullscreen.statusLabel;
+
+            // Maptype buttons
+            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
+            buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
+            buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo");
+            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties.showCaves);
 
             // Maptype toggle listener
-            OnOffButton.ToggleListener mapTypeToggleListener = new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
+            OnOffButton.ToggleListener mapTypeToggleListener = (button, toggled) -> {
+                buttonDay.setToggled(false, false);
+                buttonNight.setToggled(false, false);
+                buttonTopo.setToggled(false, false);
+                if (state.isUnderground())
                 {
-                    buttonDay.setToggled(false, false);
-                    buttonNight.setToggled(false, false);
-                    buttonTopo.setToggled(false, false);
-                    if (state.isUnderground()) {
-                        buttonCaves.setToggled(false, false);
-                    }
-
-                    if (button == buttonDay) {
-                        state.setMapType(MapType.Name.day);
-                    } else if (button == buttonNight) {
-                        state.setMapType(MapType.Name.night);
-                    } else if (button == buttonTopo) {
-                        state.setMapType(MapType.Name.topo);
-                    }
-
-                    button.setToggled(true, false);
-                    state.requireRefresh();
-                    return true;
+                    buttonCaves.setToggled(false, false);
                 }
+
+                if (button == buttonDay)
+                {
+                    state.setMapType(MapType.Name.day);
+                }
+                else if (button == buttonNight)
+                {
+                    state.setMapType(MapType.Name.night);
+                }
+                else if (button == buttonTopo)
+                {
+                    state.setMapType(MapType.Name.topo);
+                }
+
+                button.setToggled(true, false);
+                state.requireRefresh();
+                return true;
             };
 
             // Day Toggle
-            buttonDay = new ThemeToggle(theme, "jm.fullscreen.map_day", "day");
             buttonDay.setToggled(mapType.isDay(), false);
+            buttonDay.setEnabled(state().isSurfaceMappingAllowed());
             buttonDay.addToggleListener(mapTypeToggleListener);
+            buttonDay.setStaysOn(true);
 
             // Night Toggle
-            buttonNight = new ThemeToggle(theme, "jm.fullscreen.map_night", "night");
             buttonNight.setToggled(mapType.isNight(), false);
+            buttonNight.setEnabled(state().isSurfaceMappingAllowed());
             buttonNight.addToggleListener(mapTypeToggleListener);
+            buttonNight.setStaysOn(true);
 
             // Topo Toggle
-            buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo");
             buttonTopo.setDrawButton(coreProperties.mapTopography.get());
+            buttonTopo.setEnabled(state().isSurfaceMappingAllowed());
             buttonTopo.setToggled(mapType.isTopo(), false);
             buttonTopo.addToggleListener(mapTypeToggleListener);
+            buttonTopo.setStaysOn(true);
 
             // Caves Toggle
-            buttonCaves = new ThemeToggle(theme, "jm.fullscreen.map_caves", "caves", fullMapProperties.showCaves);
             buttonCaves.setDrawButton(state.isCaveMappingAllowed());
-            buttonCaves.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    state.requireRefresh();
-                    return true;
-                }
+            buttonCaves.setStaysOn(true);
+            buttonCaves.addToggleListener((button, toggled) -> {
+                state.requireRefresh();
+                return true;
             });
 
             // Follow
             buttonFollow = new ThemeButton(theme, "jm.fullscreen.follow", "follow");
-            buttonFollow.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    toggleFollow();
-                    return true;
-                }
+            buttonFollow.addToggleListener((button, toggled) -> {
+                toggleFollow();
+                return true;
             });
 
             // Zoom In
             buttonZoomIn = new ThemeButton(theme, "jm.fullscreen.zoom_in", "zoomin");
             buttonZoomIn.setEnabled(fullMapProperties.zoomLevel.get() < state.maxZoom);
-            buttonZoomIn.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    zoomIn();
-                    return true;
-                }
+            buttonZoomIn.addToggleListener((button, toggled) -> {
+                zoomIn();
+                return true;
             });
 
             // Zoom Out
             buttonZoomOut = new ThemeButton(theme, "jm.fullscreen.zoom_out", "zoomout");
             buttonZoomOut.setEnabled(fullMapProperties.zoomLevel.get() > state.minZoom);
-            buttonZoomOut.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    zoomOut();
-                    return true;
-                }
+            buttonZoomOut.addToggleListener((button, toggled) -> {
+                zoomOut();
+                return true;
             });
 
             // Waypoints
-            buttonWaypointManager = new ThemeButton(theme, "jm.waypoint.waypoints", "waypoints");
+            buttonWaypointManager = new ThemeButton(theme, "jm.waypoint.waypoints_button", "waypoints");
             buttonWaypointManager.setDrawButton(WaypointsData.isManagerEnabled());
-            buttonWaypointManager.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    UIManager.INSTANCE.openWaypointManager(null, Fullscreen.this);
-                    return true;
-                }
+            buttonWaypointManager.addToggleListener((button, toggled) -> {
+                UIManager.INSTANCE.openWaypointManager(null, Fullscreen.this);
+                return true;
             });
 
             // Waypoints
             buttonTheme = new ThemeButton(theme, "jm.common.ui_theme", "theme");
-            buttonTheme.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    ThemeFileHandler.loadNextTheme();
-                    UIManager.INSTANCE.getMiniMap().reset();
-                    buttonList.clear();
-                    return false;
-                }
+            buttonTheme.addToggleListener((button, toggled) -> {
+                ThemeLoader.loadNextTheme();
+                UIManager.INSTANCE.getMiniMap().reset();
+                buttonList.clear();
+                return false;
             });
 
             String[] tooltips = new String[]{
@@ -575,60 +561,37 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             buttonTheme.setAdditionalTooltips(Arrays.asList(tooltips));
 
             // Options
-            buttonOptions = new ThemeButton(theme, "jm.common.options", "options");
-            buttonOptions.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
+            buttonOptions = new ThemeButton(theme, "jm.common.options_button", "options");
+            buttonOptions.addToggleListener((button, toggled) -> {
+                try
                 {
-                    try {
-                        UIManager.INSTANCE.openOptionsManager();
-                        return true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                }
-            });
-
-            // Actions
-            buttonActions = new ThemeButton(theme, "jm.common.actions", "actions");
-            buttonActions.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    UIManager.INSTANCE.openMapActions();
+                    UIManager.INSTANCE.openOptionsManager();
+                    buttonList.clear();
                     return true;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    return false;
                 }
             });
 
             // Version Check Alert
             String versionAvailable = Constants.getString("jm.common.new_version_available", VersionCheck.getVersionAvailable());
-            buttonAlert = new ThemeToggle(theme, versionAvailable, versionAvailable, "alert");
+            buttonAlert = new ThemeButton(theme, versionAvailable, versionAvailable, false, "alert");
             buttonAlert.setDrawButton(VersionCheck.getVersionIsChecked() && !VersionCheck.getVersionIsCurrent());
             buttonAlert.setToggled(true);
-            buttonAlert.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    FullscreenActions.launchDownloadWebsite();
-                    buttonAlert.setDrawButton(false);
-                    return true;
-                }
+            buttonAlert.addToggleListener((button, toggled) -> {
+                FullscreenActions.launchDownloadWebsite();
+                buttonAlert.setDrawButton(false);
+                return true;
             });
 
             // Close
             buttonClose = new ThemeButton(theme, "jm.common.close", "close");
-            buttonClose.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
-                {
-                    UIManager.INSTANCE.closeAll();
-                    return true;
-                }
+            buttonClose.addToggleListener((button, toggled) -> {
+                UIManager.INSTANCE.closeAll();
+                return true;
             });
 
             buttonMobs = new ThemeToggle(theme, "jm.common.show_mobs", "monsters", fullMapProperties.showMobs);
@@ -648,22 +611,106 @@ public class Fullscreen extends JmUI implements ITabCompleter {
 
             buttonGrid = new ThemeToggle(theme, "jm.common.show_grid", "grid", fullMapProperties.showGrid);
             buttonGrid.setTooltip(TextFormatting.GRAY.toString() + Constants.getString("jm.common.show_grid_shift.tooltip"));
-            buttonGrid.addToggleListener(new OnOffButton.ToggleListener()
-            {
-                @Override
-                public boolean onToggle(OnOffButton button, boolean toggled)
+            buttonGrid.addToggleListener((button, toggled) -> {
+                boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+                if (shiftDown)
                 {
-                    boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-                    if (shiftDown) {
-                        UIManager.INSTANCE.openGridEditor(Fullscreen.this);
-                        buttonGrid.setValue(true);
-                        return false;
-                    }
-                    return true;
+                    UIManager.INSTANCE.openGridEditor(Fullscreen.this);
+                    buttonGrid.setValue(true);
+                    return false;
                 }
+                return true;
             });
 
             buttonKeys = new ThemeToggle(theme, "jm.common.show_keys", "keys", fullMapProperties.showKeys);
+
+            // New actions buttons
+            buttonAbout = new ThemeButton(theme, "jm.common.splash_about", "about");
+            buttonAbout.addToggleListener((button, toggled) -> {
+                UIManager.INSTANCE.openSplash(Fullscreen.this);
+                return true;
+            });
+
+            buttonSavemap = new ThemeButton(theme, "jm.common.save_map", "savemap");
+            buttonSavemap.addToggleListener((button, toggled) -> {
+                buttonSavemap.setEnabled(false);
+                try
+                {
+                    final MapSaver mapSaver = new MapSaver(state.getWorldDir(), mapType);
+                    if (mapSaver.isValid())
+                    {
+                        Journeymap.getClient().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
+                        ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
+                    }
+                }
+                finally
+                {
+                    buttonSavemap.setEnabled(true);
+                }
+                return true;
+            });
+
+            buttonBrowser = new ThemeButton(theme, "jm.common.use_browser", "browser");
+            boolean webMapEnabled = Journeymap.getClient().getWebMapProperties().enabled.get();
+            buttonBrowser.setEnabled(webMapEnabled);
+            buttonBrowser.setDrawButton(webMapEnabled);
+            buttonBrowser.addToggleListener((button, toggled) -> {
+                FullscreenActions.launchLocalhost();
+                return true;
+            });
+
+            boolean automapRunning = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
+            String autoMapOn = Constants.getString("jm.common.automap_stop_title");
+            String autoMapOff = Constants.getString("jm.common.automap_title");
+            autoMapOnTooltip = fontRenderer.listFormattedStringToWidth(TextFormatting.GRAY.toString() + Constants.getString("jm.common.automap_stop_text"), 200);
+            autoMapOffTooltip = fontRenderer.listFormattedStringToWidth(TextFormatting.GRAY.toString() + Constants.getString("jm.common.automap_text"), 200);
+            buttonAutomap = new ThemeToggle(theme, autoMapOn, autoMapOff, "automap");
+            buttonAutomap.setEnabled(FMLClientHandler.instance().getClient().isSingleplayer() && Journeymap.getClient().getCoreProperties().mappingEnabled.get());
+            buttonAutomap.setToggled(automapRunning, false);
+            buttonAutomap.addToggleListener((button, toggled) -> {
+                if (toggled)
+                {
+                    UIManager.INSTANCE.open(AutoMapConfirmation.class);
+                }
+                else
+                {
+                    Journeymap.getClient().toggleTask(MapRegionTask.Manager.class, false, null);
+                    buttonAutomap.setToggled(false, false);
+                    buttonList.clear();
+                }
+                return true;
+            });
+
+            buttonDeletemap = new ThemeButton(theme, "jm.common.deletemap_title", "delete");
+            buttonDeletemap.setAdditionalTooltips(fontRenderer.listFormattedStringToWidth((TextFormatting.GRAY.toString() + Constants.getString("jm.common.deletemap_text")), 200));
+            buttonDeletemap.addToggleListener((button, toggled) -> {
+                UIManager.INSTANCE.open(DeleteMapConfirmation.class);
+                return false;
+            });
+
+            buttonDisable = new ThemeToggle(theme, "jm.common.enable_mapping_false", "disable");
+            buttonDisable.addToggleListener((button, toggled) -> {
+                Journeymap.getClient().getCoreProperties().mappingEnabled.set(!toggled);
+                if (Journeymap.getClient().getCoreProperties().mappingEnabled.get())
+                {
+                    DataCache.INSTANCE.invalidateChunkMDCache();
+                    ChatLog.announceI18N("jm.common.enable_mapping_true_text");
+                }
+                else
+                {
+                    Journeymap.getClient().stopMapping();
+                    BlockMD.reset();
+                    ChatLog.announceI18N("jm.common.enable_mapping_false_text");
+                }
+                return true;
+            });
+
+            buttonResetPalette = new ThemeButton(theme, "jm.common.colorreset_title", "reset");
+            buttonResetPalette.setAdditionalTooltips(fontRenderer.listFormattedStringToWidth(TextFormatting.GRAY.toString() + Constants.getString("jm.common.colorreset_text"), 200));
+            buttonResetPalette.addToggleListener((button, toggled) -> {
+                Journeymap.getClient().queueMainThreadTask(new EnsureCurrentColorsTask(true, true));
+                return false;
+            });
 
             // Toolbars
             mapTypeToolbar = new ThemeToolbar(theme, buttonCaves, buttonTopo, buttonNight, buttonDay);
@@ -671,9 +718,11 @@ public class Fullscreen extends JmUI implements ITabCompleter {
 
             optionsToolbar = new ThemeToolbar(theme, buttonMobs, buttonAnimals, buttonPets, buttonVillagers, buttonPlayers, buttonGrid, buttonKeys);
             optionsToolbar.addAllButtons(this);
+            optionsToolbar.visible = false; // Hide until laid out
 
-            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonTheme, buttonOptions, buttonActions);
+            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonAbout, buttonBrowser, buttonTheme, buttonResetPalette, buttonDeletemap, buttonAutomap, buttonDisable);
             menuToolbar.addAllButtons(this);
+            menuToolbar.visible = false; // Hide until laid out
 
             zoomToolbar = new ThemeToolbar(theme, buttonFollow, buttonZoomIn, buttonZoomOut);
             zoomToolbar.setLayout(ButtonList.Layout.Vertical, ButtonList.Direction.LeftToRight);
@@ -692,13 +741,16 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     protected void layoutButtons()
     {
         // Check to see whether theme button texture ids still valid
-        if (!buttonDay.hasValidTextures()) {
+        if (buttonDay != null && !buttonDay.hasValidTextures())
+        {
             buttonList.clear();
         }
 
         if (buttonList.isEmpty()) {
             initButtons();
         }
+
+        menuToolbar.setDrawToolbar(!isChatOpen());
 
         // Update toggles
         boolean notNether = !(mc.world.provider instanceof WorldProviderHell);
@@ -708,57 +760,77 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         buttonCaves.setEnabled(notNether && state.isUnderground() && state.isCaveMappingAllowed());
         buttonFollow.setEnabled(!state.follow.get());
 
-        int padding = mapTypeToolbar.getToolbarSpec().padding;
+        boolean automapRunning = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
+        boolean mappingEnabled = Journeymap.getClient().getCoreProperties().mappingEnabled.get();
+        buttonDisable.setToggled(!mappingEnabled, false);
 
+        buttonAutomap.setToggled(automapRunning, false);
+        buttonAutomap.setEnabled(mappingEnabled);
+
+        buttonAutomap.setAdditionalTooltips(automapRunning ? autoMapOnTooltip : autoMapOffTooltip);
+
+        boolean webMapEnabled = Journeymap.getClient().getWebMapProperties().enabled.get();
+        buttonBrowser.setEnabled(webMapEnabled && mappingEnabled);
+        buttonBrowser.setDrawButton(webMapEnabled);
+
+        boolean mainThreadActive = Journeymap.getClient().isMainThreadTaskActive();
+        buttonResetPalette.setEnabled(!mainThreadActive && mappingEnabled);
+        buttonDeletemap.setEnabled(!mainThreadActive);
+        buttonDisable.setEnabled(!mainThreadActive);
+
+
+        // Update toolbar layouts
+        int padding = mapTypeToolbar.getToolbarSpec().padding;
         zoomToolbar.layoutCenteredVertical(zoomToolbar.getHMargin(), height / 2, true, padding);
 
         int topY = mapTypeToolbar.getVMargin();
 
         int margin = mapTypeToolbar.getHMargin();
 
-        layoutToolbars(margin, topY, padding, hideOptionsToolbar);
         buttonClose.leftOf(width - zoomToolbar.getHMargin()).below(mapTypeToolbar.getVMargin());
         buttonAlert.leftOf(width - zoomToolbar.getHMargin()).below(buttonClose, padding);
 
-        if (!hideOptionsToolbar) {
-            if (menuToolbar.getRightX() + margin >= buttonClose.getX()) {
-                //optionsToolbar.setDrawToolbar(false);
-                hideOptionsToolbar = true;
-                layoutToolbars(margin, topY, padding, hideOptionsToolbar);
-            }
+        int toolbarsWidth = mapTypeToolbar.getWidth() + optionsToolbar.getWidth() + margin + padding;
+        int startX = (width - toolbarsWidth) / 2;
+
+        mapTypeToolbar.layoutHorizontal(startX + mapTypeToolbar.getWidth(), topY, false, padding);
+
+        Rectangle2D.Double oldBounds = optionsToolbar.getBounds();
+        optionsToolbar.layoutHorizontal(mapTypeToolbar.getRightX() + margin, topY, true, padding);
+        optionsToolbar.visible = true;
+        if (!optionsToolbar.getBounds().equals(oldBounds))
+        {
+            optionsToolbarBounds = null;
         }
 
-        if (hideOptionsToolbar) {
-            buttonAlert.setX(buttonOptions.getX());
-            buttonClose.setX(buttonOptions.getX());
+        oldBounds = menuToolbar.getBounds();
+        menuToolbar.layoutCenteredHorizontal((width / 2), height - menuToolbar.height - menuToolbar.getVMargin(), true, padding);
+        if (!menuToolbar.getBounds().equals(oldBounds))
+        {
+            menuToolbarBounds = null;
         }
-
     }
 
-    /**
-     * Layout toolbars.
-     *
-     * @param margin             the margin
-     * @param topY               the top y
-     * @param padding            the padding
-     * @param hideOptionsToolbar the hide options toolbar
-     */
-    protected void layoutToolbars(int margin, int topY, int padding, boolean hideOptionsToolbar) {
-        if (hideOptionsToolbar) {
-
-            int toolbarsWidth = mapTypeToolbar.getWidth() + optionsToolbar.getWidth() + margin + padding;
-            int startX = (width - toolbarsWidth) / 2;
-
-            mapTypeToolbar.layoutHorizontal(startX + mapTypeToolbar.getWidth(), topY, false, padding);
-            optionsToolbar.layoutHorizontal(mapTypeToolbar.getRightX() + margin, topY, true, padding);
-
-            menuToolbar.layoutCenteredVertical(width - menuToolbar.getWidth(), height / 2, true, padding);
-
-        } else {
-            optionsToolbar.layoutCenteredHorizontal((width / 2), topY, true, padding);
-            mapTypeToolbar.layoutHorizontal(optionsToolbar.getX() - margin, topY, false, padding);
-            menuToolbar.layoutHorizontal(optionsToolbar.getRightX() + margin, topY, true, padding);
+    @Nullable
+    public Rectangle2D.Double getOptionsToolbarBounds()
+    {
+        if (optionsToolbar != null && optionsToolbar.isVisible())
+        {
+            Rectangle2D.Double unscaled = optionsToolbar.getBounds();
+            optionsToolbarBounds = new Rectangle2D.Double(unscaled.x * scaleFactor, unscaled.y * scaleFactor, unscaled.width * scaleFactor, unscaled.height * scaleFactor);
         }
+        return optionsToolbarBounds;
+    }
+
+    @Nullable
+    public Rectangle2D.Double getMenuToolbarBounds()
+    {
+        if (menuToolbar != null && menuToolbar.isVisible())
+        {
+            Rectangle2D.Double unscaled = menuToolbar.getBounds();
+            menuToolbarBounds = new Rectangle2D.Double(unscaled.x * scaleFactor, unscaled.y * scaleFactor, unscaled.width * scaleFactor, unscaled.height * scaleFactor);
+        }
+        return menuToolbarBounds;
     }
 
     @Override
@@ -853,16 +925,16 @@ public class Fullscreen extends JmUI implements ITabCompleter {
                 }
             }
 
-            if (!isScrolling && which == -1) {
-                Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
-                layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
-            }
+            Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
+            layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale(), isScrolling);
+
         } catch (Throwable t) {
             Journeymap.getLogger().error(LogFormatter.toPartialString(t));
         }
     }
 
-    public void toggleMapType() {
+    public void toggleMapType()
+    {
         state.toggleMapType();
         MapType newType = state.getCurrentMapType();
         buttonDay.setToggled(newType.isDay(), false);
@@ -877,7 +949,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * Zoom in.
      */
-    public void zoomIn() {
+    public void zoomIn()
+    {
         if (fullMapProperties.zoomLevel.get() < state.maxZoom) {
             setZoom(fullMapProperties.zoomLevel.get() + 1);
         }
@@ -886,7 +959,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * Zoom out.
      */
-    public void zoomOut() {
+    public void zoomOut()
+    {
         if (fullMapProperties.zoomLevel.get() > state.minZoom) {
             setZoom(fullMapProperties.zoomLevel.get() - 1);
         }
@@ -904,7 +978,8 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     /**
      * Toggle follow.
      */
-    void toggleFollow() {
+    void toggleFollow()
+    {
         setFollow(!state.follow.get());
     }
 
@@ -913,56 +988,66 @@ public class Fullscreen extends JmUI implements ITabCompleter {
      *
      * @param follow the follow
      */
-    void setFollow(Boolean follow) {
+    void setFollow(Boolean follow)
+    {
         state.follow.set(follow);
         if (state.follow.get()) {
             refreshState();
         }
     }
 
-    public void createWaypointAtMouse() {
+    public void createWaypointAtMouse()
+    {
         Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
         BlockPos blockPos = layerDelegate.getBlockPos(mc, gridRenderer, mousePosition);
         Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, mc.player.dimension);
         UIManager.INSTANCE.openWaypointEditor(waypoint, true, this);
     }
 
-    public boolean isChatOpen() {
+    public void chatPositionAtMouse()
+    {
+        Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
+        BlockPos blockPos = layerDelegate.getBlockPos(mc, gridRenderer, mousePosition);
+        Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, state().getDimension());
+        openChat(waypoint.toChatString());
+    }
+
+    public boolean isChatOpen()
+    {
         return chat != null && !chat.isHidden();
     }
 
     /**
      * Note: All the keybindings defined by JM are in KeyEventHandler.  This
      * method is just for mimicing "native" functionality in Minecraft.
-     *
      * @param c
      * @param key
      * @throws IOException
      */
     @Override
-    public void keyTyped(char c, int key) throws IOException {
-        if (isChatOpen()) {
+    public void keyTyped(char c, int key) throws IOException
+    {
+        if (isChatOpen())
+        {
             chat.keyTyped(c, key);
             return;
         }
 
-        if (mc.gameSettings.keyBindChat.getKeyCode()==key) {
+        if (mc.gameSettings.keyBindChat.getKeyCode() == key)
+        {
             openChat("");
             return;
         }
 
-        if (mc.gameSettings.keyBindCommand.getKeyCode() == key) {
+        if (mc.gameSettings.keyBindCommand.getKeyCode() == key)
+        {
             openChat("/");
             return;
         }
 
-        if (mc.gameSettings.keyBindInventory.getKeyCode() == key) {
-            UIManager.INSTANCE.openInventory();
-            return;
-        }
-
         // Escape
-        if (Keyboard.KEY_ESCAPE == key) {
+        if (Keyboard.KEY_ESCAPE == key)
+        {
             UIManager.INSTANCE.closeAll();
             return;
         }
@@ -1042,9 +1127,6 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             }
 
             gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, getMapFontScale(), 0);
-
-            DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
-                    statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
 
             drawLogo();
 
@@ -1130,6 +1212,10 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         StatTimer timer = StatTimer.get("Fullscreen.refreshState");
         timer.start();
 
+        // Clear toolbar bounds
+        menuToolbarBounds = null;
+        optionsToolbarBounds = null;
+
         // Update the state first
         fullMapProperties = Journeymap.getClient().getFullMapProperties();
         state.refresh(mc, player, fullMapProperties);
@@ -1167,8 +1253,7 @@ public class Fullscreen extends JmUI implements ITabCompleter {
 
         // Trigger a mouse move event in the layer delegate so draw steps can update if needed
         Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
-        layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale());
-
+        layerDelegate.onMouseMove(mc, gridRenderer, mousePosition, getMapFontScale(), isScrolling);
     }
 
     /**
@@ -1221,6 +1306,11 @@ public class Fullscreen extends JmUI implements ITabCompleter {
         }
     }
 
+    public int getScreenScaleFactor()
+    {
+        return scaleFactor;
+    }
+
     /**
      * Move canvas.
      *
@@ -1243,8 +1333,11 @@ public class Fullscreen extends JmUI implements ITabCompleter {
             logo = TextureCache.getTexture(TextureCache.Logo);
         }
         DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
+        Theme.Container.Toolbar toolbar = ThemeLoader.getCurrentTheme().container.toolbar;
+        float scale = scaleFactor * 2;
+
         DrawUtil.sizeDisplay(width, height);
+        DrawUtil.drawImage(logo, toolbar.horizontal.margin, toolbar.vertical.margin, false, 1f / scale, 0);
     }
 
     @Override
@@ -1261,13 +1354,13 @@ public class Fullscreen extends JmUI implements ITabCompleter {
     public void setTheme(String name)
     {
         try {
+            // TODO: Why force these properties?
             MiniMapProperties mmp = Journeymap.getClient().getMiniMapProperties(Journeymap.getClient().getActiveMinimapId());
             mmp.shape.set(Shape.Rectangle);
-            mmp.showBiome.set(false);
             mmp.sizePercent.set(20);
             mmp.save();
-            Theme theme = ThemeFileHandler.getThemeByName(name);
-            ThemeFileHandler.setCurrentTheme(theme);
+            Theme theme = ThemeLoader.getThemeByName(name);
+            ThemeLoader.setCurrentTheme(theme);
             UIManager.INSTANCE.getMiniMap().reset();
             ChatLog.announceI18N("jm.common.ui_theme_applied");
             UIManager.INSTANCE.closeAll();

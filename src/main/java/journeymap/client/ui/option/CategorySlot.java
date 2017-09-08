@@ -241,13 +241,17 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-        boolean pressed = button.mousePressed(mc, x, y);
-        if (pressed)
+        if (mouseEvent == 0)
         {
-            selected = !selected;
-            updateButtonLabel();
+            boolean pressed = button.mousePressed(mc, x, y);
+            if (pressed)
+            {
+                selected = !selected;
+                updateButtonLabel();
+            }
+            return pressed;
         }
-        return pressed;
+        return false;
     }
 
     @Override

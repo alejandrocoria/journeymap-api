@@ -5,7 +5,7 @@
 package journeymap.client.properties;
 
 import journeymap.client.cartography.color.RGB;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.JMLogger;
 import journeymap.client.model.GridSpecs;
 import journeymap.client.task.multi.RenderSpec;
@@ -80,7 +80,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
     /**
      * The Theme name.
      */
-    public final StringField themeName = new StringField(FullMap, "jm.common.ui_theme", ThemeFileHandler.ThemeValuesProvider.class);
+    public final StringField themeName = new StringField(FullMap, "jm.common.ui_theme", ThemeLoader.ThemeValuesProvider.class);
     /**
      * The Cave ignore glass.
      */

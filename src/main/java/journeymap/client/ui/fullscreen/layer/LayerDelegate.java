@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.fullscreen.layer;
@@ -16,6 +13,7 @@ import journeymap.client.model.ChunkMD;
 import journeymap.client.model.RegionCoord;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -31,28 +29,46 @@ import java.util.List;
  */
 public class LayerDelegate
 {
+    /**
+     * The Last click.
+     */
     long lastClick = 0;
+    BlockPos lastBlockPos = null;
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();
 
-    public LayerDelegate()
+    /**
+     * Instantiates a new Layer delegate.
+     */
+    public LayerDelegate(Fullscreen fullscreen)
     {
         layers.add(new ModOverlayLayer());
-        layers.add(new BlockInfoLayer());
+        layers.add(new BlockInfoLayer(fullscreen));
         layers.add(new WaypointLayer());
-        layers.add(new KeybindingInfoLayer());
+        layers.add(new KeybindingInfoLayer(fullscreen));
     }
 
-    public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale)
+    /**
+     * On mouse move.
+     *
+     * @param mc            the mc
+     * @param gridRenderer  the grid renderer
+     * @param mousePosition the mouse position
+     * @param fontScale     the font scale
+     */
+    public void onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, float fontScale, boolean isScrolling)
     {
-        BlockPos blockCoord = getBlockPos(mc, gridRenderer, mousePosition);
+        if (lastBlockPos == null || !isScrolling)
+        {
+            lastBlockPos = getBlockPos(mc, gridRenderer, mousePosition);
+        }
 
         drawSteps.clear();
         for (Layer layer : layers)
         {
             try
             {
-                drawSteps.addAll(layer.onMouseMove(mc, gridRenderer, mousePosition, blockCoord, fontScale));
+                drawSteps.addAll(layer.onMouseMove(mc, gridRenderer, mousePosition, lastBlockPos, fontScale, isScrolling));
             }
             catch (Exception e)
             {
@@ -61,9 +77,18 @@ public class LayerDelegate
         }
     }
 
+    /**
+     * On mouse clicked.
+     *
+     * @param mc            the mc
+     * @param gridRenderer  the grid renderer
+     * @param mousePosition the mouse position
+     * @param button        the button
+     * @param fontScale     the font scale
+     */
     public void onMouseClicked(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, int button, float fontScale)
     {
-        BlockPos blockCoord = gridRenderer.getBlockAtPixel(mousePosition);
+        lastBlockPos = gridRenderer.getBlockAtPixel(mousePosition);
 
         // check for double-click
         long sysTime = Minecraft.getSystemTime();
@@ -75,7 +100,7 @@ public class LayerDelegate
         {
             try
             {
-                drawSteps.addAll(layer.onMouseClick(mc, gridRenderer, mousePosition, blockCoord, button, doubleClick, fontScale));
+                drawSteps.addAll(layer.onMouseClick(mc, gridRenderer, mousePosition, lastBlockPos, button, doubleClick, fontScale));
                 if (!layer.propagateClick())
                 {
                     break;
@@ -107,17 +132,52 @@ public class LayerDelegate
         return seaLevel;
     }
 
+    /**
+     * Gets draw steps.
+     *
+     * @return the draw steps
+     */
     public List<DrawStep> getDrawSteps()
     {
         return drawSteps;
     }
 
+    /**
+     * The interface Layer.
+     */
     public interface Layer
     {
-        public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale);
+        /**
+         * On mouse move list.
+         *
+         * @param mc            the mc
+         * @param gridRenderer  the grid renderer
+         * @param mousePosition the mouse position
+         * @param blockCoord    the block coord
+         * @param fontScale     the font scale
+         * @return the list
+         */
+        public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale, boolean isScrolling);
 
+        /**
+         * On mouse click list.
+         *
+         * @param mc            the mc
+         * @param gridRenderer  the grid renderer
+         * @param mousePosition the mouse position
+         * @param blockCoord    the block coord
+         * @param button        the button
+         * @param doubleClick   the double click
+         * @param fontScale     the font scale
+         * @return the list
+         */
         public List<DrawStep> onMouseClick(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, int button, boolean doubleClick, float fontScale);
 
+        /**
+         * Propagate click boolean.
+         *
+         * @return the boolean
+         */
         public boolean propagateClick();
     }
 

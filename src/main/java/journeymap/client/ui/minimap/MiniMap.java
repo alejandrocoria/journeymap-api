@@ -25,7 +25,6 @@ import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
-import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -47,7 +46,6 @@ public class MiniMap
     private static final MapState state = new MapState();
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
-    private static final long labelRefreshRate = 400;
     private final static GridRenderer gridRenderer = new GridRenderer(Context.UI.Minimap, 3);
     private final Minecraft mc = FMLClientHandler.instance().getClient();
     private final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
@@ -59,10 +57,6 @@ public class MiniMap
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
     private DisplayVars dv;
-    private long lastLabelRefresh = 0;
-    private String fpsLabelText;
-    private String locationLabelText;
-    private String biomeLabelText;
 
     private Point2D.Double centerPoint;
     private Rectangle2D.Double centerRect;
@@ -209,10 +203,6 @@ public class MiniMap
 
             // Update labels if needed
             long now = System.currentTimeMillis();
-            if (now - lastLabelRefresh > labelRefreshRate)
-            {
-                updateLabels();
-            }
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
@@ -265,7 +255,6 @@ public class MiniMap
                 gridRenderer.draw(dv.terrainAlpha, 0, 0, miniMapProperties.showGrid.get());
 
                 // Draw entities, etc
-
                 gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.fontScale, rotation);
 
                 // Get center of minimap and rect of minimap
@@ -336,24 +325,16 @@ public class MiniMap
                 endStencil();
 
                 // Draw Frame
-                if (dv.shape == Shape.Circle || rotation == 0)
+                if (!dv.frameRotates && rotation != 0)
                 {
-                    dv.minimapFrame.drawFrame();
-                }
-                else
-                {
-                    /***** END MATRIX: ROTATION *****/
                     stopMapRotation(rotation);
-                    try
-                    {
-                        // Draw Minimap Frame
-                        dv.minimapFrame.drawFrame();
-                    }
-                    finally
-                    {
-                        /***** BEGIN MATRIX: ROTATION *****/
-                        startMapRotation(rotation);
-                    }
+                }
+
+                dv.minimapFrame.drawFrame();
+
+                if (!dv.frameRotates && rotation != 0)
+                {
+                    startMapRotation(rotation);
                 }
 
                 // Draw cardinal compass points
@@ -383,19 +364,8 @@ public class MiniMap
                 GlStateManager.popMatrix();
             }
 
-            // Draw minimap labels
-            if (dv.showFps)
-            {
-                dv.labelFps.draw(fpsLabelText);
-            }
-            if (dv.showLocation)
-            {
-                dv.labelLocation.draw(locationLabelText);
-            }
-            if (dv.showBiome)
-            {
-                dv.labelBiome.draw(biomeLabelText);
-            }
+            // Draw minimap info labels
+            dv.drawInfoLabels(now);
 
             // Return resolution to how it is normally scaled
             DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -665,9 +635,6 @@ public class MiniMap
             this.refreshStateTimer.reset();
         }
 
-        // Update labels
-        updateLabels();
-
         // Set viewport
         double xpad = 0;
         double ypad = 0;
@@ -678,41 +645,17 @@ public class MiniMap
         updateUIState(true);
     }
 
-    private void updateLabels()
+    public String getLocation()
     {
-        try
-        {
-            if (mc.player != null && !mc.player.isDead)
-            {
-                // FPS
-                if (dv.showFps)
-                {
-                    fpsLabelText = String.format("%s fps", Minecraft.getDebugFPS());
-                }
+        final int playerX = MathHelper.floor(mc.player.posX);
+        final int playerZ = MathHelper.floor(mc.player.posZ);
+        final int playerY = MathHelper.floor(mc.player.getEntityBoundingBox().minY);
+        return dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY);
+    }
 
-                // Location key
-                if (dv.showLocation)
-                {
-                    final int playerX = MathHelper.floor(mc.player.posX);
-                    final int playerZ = MathHelper.floor(mc.player.posZ);
-                    final int playerY = MathHelper.floor(mc.player.getEntityBoundingBox().minY);
-                    locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY);
-                }
-
-                // Biome key
-                if (dv.showBiome)
-                {
-                    biomeLabelText = state.getPlayerBiome();
-                }
-            }
-
-            // Update timestamp
-            lastLabelRefresh = System.currentTimeMillis();
-        }
-        catch (Exception e)
-        {
-            Journeymap.getLogger().error("Unexpected error updating minimap labels: " + LogFormatter.toString(e));
-        }
+    public String getBiome()
+    {
+        return state.getPlayerBiome();
     }
 }
 

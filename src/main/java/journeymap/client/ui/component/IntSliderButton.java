@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.component;
@@ -17,21 +14,49 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 
 /**
- * Created by Mark on 9/29/2014.
+ * @author techbrew 9/29/2014.
  */
 public class IntSliderButton extends Button implements IConfigFieldHolder<IntegerField>
 {
+    /**
+     * The Prefix.
+     */
     public String prefix = "";
     /**
      * Is this slider control being dragged.
      */
     public boolean dragging = false;
+    /**
+     * The Min value.
+     */
     public int minValue = 0;
+    /**
+     * The Max value.
+     */
     public int maxValue = 0;
+    /**
+     * The Suffix.
+     */
     public String suffix = "";
+    /**
+     * The Draw string.
+     */
     public boolean drawString = true;
+    /**
+     * The Field.
+     */
     IntegerField field;
 
+    /**
+     * Instantiates a new Int slider button.
+     *
+     * @param field   the field
+     * @param prefix  the prefix
+     * @param suf     the suf
+     * @param minVal  the min val
+     * @param maxVal  the max val
+     * @param drawStr the draw str
+     */
     public IntSliderButton(IntegerField field, String prefix, String suf, int minVal, int maxVal, boolean drawStr)
     {
         super(prefix);
@@ -95,11 +120,11 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
      * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent
      * e).
      */
-    public boolean mousePressed(Minecraft par1Minecraft, int par2, int par3)
+    public boolean mousePressed(Minecraft par1Minecraft, int mouseX, int mouseY)
     {
-        if (super.mousePressed(par1Minecraft, par2, par3))
+        if (super.mousePressed(par1Minecraft, mouseX, mouseY))
         {
-            setSliderValue((float) (par2 - (this.x + 4)) / (float) (this.width - 8));
+            setSliderValue((float) (mouseX - (this.x + 4)) / (float) (this.width - 8));
             this.dragging = true;
             return true;
         }
@@ -109,11 +134,21 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
         }
     }
 
+    /**
+     * Gets slider value.
+     *
+     * @return the slider value
+     */
     public double getSliderValue()
     {
         return (field.get() - minValue * 1d) / (maxValue - minValue);
     }
 
+    /**
+     * Sets slider value.
+     *
+     * @param sliderValue the slider value
+     */
     public void setSliderValue(double sliderValue)
     {
         if (sliderValue < 0.0F)
@@ -179,11 +214,21 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
         return false;
     }
 
+    /**
+     * Gets value.
+     *
+     * @return the value
+     */
     public int getValue()
     {
         return this.field.get();
     }
 
+    /**
+     * Sets value.
+     *
+     * @param value the value
+     */
     public void setValue(int value)
     {
         value = Math.min(value, maxValue);

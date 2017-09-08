@@ -6,24 +6,26 @@
 package journeymap.client.ui.fullscreen.layer;
 
 import journeymap.client.Constants;
-import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.client.ui.theme.Theme;
 import journeymap.client.world.JmBlockAccess;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,47 +49,51 @@ public class BlockInfoLayer implements LayerDelegate.Layer
      */
     BlockPos lastCoord = null;
     /**
-     * The Last clicked.
+     * The Block info step.
      */
-    long lastClicked = 0;
-    /**
-     * The Last mouse x.
-     */
-    int lastMouseX;
-    /**
-     * The Last mouse y.
-     */
-    int lastMouseY;
+    PlayerInfoStep playerInfoStep;
     /**
      * The Block info step.
      */
     BlockInfoStep blockInfoStep;
 
-    /**
-     * The Font scale.
-     */
-    double fontScale = Journeymap.getClient().getFullMapProperties().fontScale.get();
+    private boolean isSinglePlayer;
 
-    /**
-     * The Font renderer.
-     */
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+    private final Fullscreen fullscreen;
 
-    boolean isSinglePlayer;
+    private final Minecraft mc;
 
     /**
      * Instantiates a new Block info layer.
      */
-    public BlockInfoLayer()
+    public BlockInfoLayer(Fullscreen fullscreen)
     {
-        blockInfoStep = new BlockInfoStep();
-        drawStepList.add(blockInfoStep);
-        isSinglePlayer = FMLClientHandler.instance().getClient().isSingleplayer();
+        this.fullscreen = fullscreen;
+        this.blockInfoStep = new BlockInfoStep();
+        this.playerInfoStep = new PlayerInfoStep();
+        this.mc = FMLClientHandler.instance().getClient();
+        this.isSinglePlayer = mc.isSingleplayer();
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockPos, float fontScale)
+    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockPos, float fontScale, boolean isScrolling)
     {
+        Rectangle2D.Double optionsToolbarRect = fullscreen.getOptionsToolbarBounds();
+        Rectangle2D.Double menuToolbarRect = fullscreen.getMenuToolbarBounds();
+
+        if (optionsToolbarRect == null || menuToolbarRect == null)
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        if (drawStepList.isEmpty())
+        {
+            this.drawStepList.add(playerInfoStep);
+            this.drawStepList.add(blockInfoStep);
+        }
+
+        playerInfoStep.update(mc.displayWidth / 2, optionsToolbarRect.getMaxY());
+
         if (!blockPos.equals(lastCoord))
         {
             FullMapProperties fullMapProperties = Journeymap.getClient().getFullMapProperties();
@@ -118,7 +124,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
 
                 if (!blockMD.isIgnore())
                 {
-                    info = blockMD.getName() + " @ " + info;
+                    info = String.format("%s \u25A0 %s", blockMD.getName(), info);
                 }
             }
             else
@@ -134,18 +140,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 }
             }
 
-//            if (Journeymap.JM_VERSION.patch.equals("dev"))
-//            {
-//                info = RGB.toHexString(BiomeColorHelper.getWaterColorAtPos(JmBlockAccess.INSTANCE, blockPos)) + " " + info;
-//                info += " " + new ChunkPos(blockPos);
-//            }
-
-            double infoHeight = DrawUtil.getLabelHeight(fontRenderer, true) * fontScale;
-            blockInfoStep.update(info, gridRenderer.getWidth() / 2, gridRenderer.getHeight() - infoHeight);
-        }
-        else
-        {
-            blockInfoStep.update(blockInfoStep.text, gridRenderer.getWidth() / 2, blockInfoStep.y);
+            blockInfoStep.update(info, gridRenderer.getWidth() / 2, menuToolbarRect.getMinY());
         }
 
         return drawStepList;
@@ -164,6 +159,59 @@ public class BlockInfoLayer implements LayerDelegate.Layer
     }
 
     /**
+     * The player position drawstep.
+     */
+    class PlayerInfoStep implements DrawStep
+    {
+        /**
+         * The Bg color.
+         */
+        private Theme.LabelSpec labelSpec;
+        private String prefix;
+        private double x;
+        private double y;
+
+        /**
+         * Update.
+         *
+         * @param x the x
+         * @param y the y
+         */
+        void update(double x, double y)
+        {
+            Theme theme = ThemeLoader.getCurrentTheme();
+            labelSpec = theme.fullscreen.statusLabel;
+            if (prefix == null)
+            {
+                prefix = mc.player.getName() + " \u25A0 ";
+            }
+            this.x = x;
+            this.y = y + (theme.container.toolbar.horizontal.margin * fullscreen.getScreenScaleFactor());
+        }
+
+        @Override
+        public void draw(Pass pass, double xOffset, double yOffset, GridRenderer gridRenderer, double fontScale, double rotation)
+        {
+            if (pass == Pass.Text)
+            {
+                DrawUtil.drawLabel(prefix + Fullscreen.state().playerLastPos, labelSpec, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, fontScale, 0);
+            }
+        }
+
+        @Override
+        public int getDisplayOrder()
+        {
+            return 0;
+        }
+
+        @Override
+        public String getModId()
+        {
+            return Journeymap.MOD_ID;
+        }
+    }
+
+    /**
      * The type Block info step.
      */
     class BlockInfoStep implements DrawStep
@@ -171,24 +219,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         /**
          * The Bg color.
          */
-        Integer bgColor = RGB.DARK_GRAY_RGB;
-        /**
-         * The Fg color.
-         */
-        Integer fgColor = RGB.WHITE_RGB;
-
-        /**
-         * The Font shadow.
-         */
-        boolean fontShadow = false;
-        /**
-         * The Alpha.
-         */
-        float alpha = 1;
-        /**
-         * The Ticks.
-         */
-        int ticks = 20 * 5;
+        private Theme.LabelSpec labelSpec;
         private double x;
         private double y;
         private String text;
@@ -202,11 +233,11 @@ public class BlockInfoLayer implements LayerDelegate.Layer
          */
         void update(String text, double x, double y)
         {
+            Theme theme = ThemeLoader.getCurrentTheme();
+            labelSpec = theme.fullscreen.statusLabel;
             this.text = text;
             this.x = x;
-            this.y = y;
-            this.alpha = 1f;
-            this.ticks = 20 * 5;
+            this.y = y - (theme.container.toolbar.horizontal.margin * fullscreen.getScreenScaleFactor());
         }
 
         @Override
@@ -214,14 +245,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         {
             if (pass == Pass.Text)
             {
-                if (ticks-- < 0 && alpha > 0)
-                {
-                    alpha -= .01; // Fade
-                }
-                if (alpha > .1 && text != null)
-                {
-                    DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), fontScale, fontShadow);
-                }
+                DrawUtil.drawLabel(text, labelSpec, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, fontScale, 0);
             }
         }
 

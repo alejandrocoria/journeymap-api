@@ -11,7 +11,7 @@ package journeymap.client.task.main;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.client.ui.UIManager;
@@ -49,7 +49,7 @@ public class SoftResetTask implements IMainThreadTask
         UIManager.INSTANCE.reset();
         WaypointStore.INSTANCE.reset();
         MiniMapOverlayHandler.checkEventConfig();
-        ThemeFileHandler.getCurrentTheme(true);
+        ThemeLoader.getCurrentTheme(true);
         MiniMap.state().requireRefresh();
         Fullscreen.state().requireRefresh();
         UIManager.INSTANCE.getMiniMap().updateDisplayVars(true);

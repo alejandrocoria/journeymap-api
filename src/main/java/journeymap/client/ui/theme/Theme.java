@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.theme;
@@ -18,12 +15,18 @@ import java.awt.*;
 /**
  * Theme specification for JourneyMap 5.0
  */
-public class Theme implements Comparable<Theme>
+public class Theme
 {
     /**
      * Current version of this specification
      */
-    public static final int VERSION = 1;
+    public static final double VERSION = 2;
+
+    /**
+     * Theme schema.
+     */
+    @Since(2)
+    public int schema;
 
     /**
      * Theme author.
@@ -77,6 +80,9 @@ public class Theme implements Comparable<Theme>
 
     /**
      * Color to hex string.
+     *
+     * @param color the color
+     * @return the string
      */
     public static String toHexColor(Color color)
     {
@@ -84,9 +90,23 @@ public class Theme implements Comparable<Theme>
     }
 
     /**
-     * Hex string to Color int.
+     * Color to hex string.
+     *
+     * @param rgb the color
+     * @return the string
      */
-    public static int getColor(String hexColor)
+    public static String toHexColor(int rgb)
+    {
+        return toHexColor(new Color(rgb));
+    }
+
+    /**
+     * Hex string to Color int.
+     *
+     * @param hexColor the hex color
+     * @return the color
+     */
+    private static int getColor(String hexColor)
     {
         if (!Strings.isNullOrEmpty(hexColor))
         {
@@ -103,14 +123,6 @@ public class Theme implements Comparable<Theme>
         return RGB.WHITE_RGB;
     }
 
-    /**
-     * Int alpha (0-255) to float (0f-1f)
-     */
-    public static float getAlpha(int alpha)
-    {
-        return RGB.toScaledFloat(alpha);
-    }
-
     @Override
     public String toString()
     {
@@ -122,16 +134,6 @@ public class Theme implements Comparable<Theme>
         {
             return name;
         }
-    }
-
-    @Override
-    public int compareTo(Theme other)
-    {
-        if (Strings.isNullOrEmpty(name))
-        {
-            return Strings.isNullOrEmpty(other.name) ? 0 : 1;
-        }
-        return name.compareTo(other.name);
     }
 
     @Override
@@ -319,26 +321,62 @@ public class Theme implements Comparable<Theme>
             /**
              * Hex color for icons when button is on.
              */
-            @Since(1)
-            public String iconOnColor = "";
+            @Since(2)
+            public ColorSpec iconOn = new ColorSpec();
 
             /**
              * Hex color for icons when button is off.
              */
-            @Since(1)
-            public String iconOffColor = "";
+            @Since(2)
+            public ColorSpec iconOff = new ColorSpec();
 
             /**
-             * Hex color for icons when button is hovered.
+             * Hex color for icons when button is hovered and is on.
              */
-            @Since(1)
-            public String iconHoverColor = "";
+            @Since(2)
+            public ColorSpec iconHoverOn = new ColorSpec();
+
+            /**
+             * Hex color for icons when button is hovered and is off.
+             */
+            @Since(2)
+            public ColorSpec iconHoverOff = new ColorSpec();
 
             /**
              * Hex color for icons when button is disabled.
              */
-            @Since(1)
-            public String iconDisabledColor = "";
+            @Since(2)
+            public ColorSpec iconDisabled = new ColorSpec();
+
+            /**
+             * Hex color for buttons when button is on.
+             */
+            @Since(2)
+            public ColorSpec buttonOn = new ColorSpec();
+
+            /**
+             * Hex color for buttons when button is off.
+             */
+            @Since(2)
+            public ColorSpec buttonOff = new ColorSpec();
+
+            /**
+             * Hex color for buttons when button is hovered and is on.
+             */
+            @Since(2)
+            public ColorSpec buttonHoverOn = new ColorSpec();
+
+            /**
+             * Hex color for buttons when button is hovered and is off.
+             */
+            @Since(2)
+            public ColorSpec buttonHoverOff = new ColorSpec();
+
+            /**
+             * Hex color for buttons when button is disabled.
+             */
+            @Since(2)
+            public ColorSpec buttonDisabled = new ColorSpec();
         }
     }
 
@@ -350,8 +388,8 @@ public class Theme implements Comparable<Theme>
         /**
          * Hex color for map background (behind tiles).
          */
-        @Since(1)
-        public String mapBackgroundColor = "";
+        @Since(2)
+        public ColorSpec background = new ColorSpec();
 
         /**
          * Hex color for background of status text on the bottom of the screen.
@@ -361,9 +399,70 @@ public class Theme implements Comparable<Theme>
     }
 
     /**
+     * Color and alpha.
+     */
+    public static class ColorSpec implements Cloneable
+    {
+        /**
+         * Constructor.
+         */
+        public ColorSpec()
+        {
+        }
+
+        /**
+         * Constructor.
+         */
+        public ColorSpec(String color, float alpha)
+        {
+            this.color = color;
+            this.alpha = alpha;
+        }
+
+        /**
+         * Hex color.
+         * Default is white
+         */
+        @Since(2)
+        public String color = "#ffffff";
+        private transient Integer _color;
+
+        /**
+         * Alpha transparency (0-1).
+         * Default is 1.
+         */
+        @Since(2)
+        public float alpha = 1;
+
+        /**
+         * Get the color as an rgb integer, caching the result.
+         *
+         * @return rgb
+         */
+        public int getColor()
+        {
+            if (_color == null)
+            {
+                _color = Theme.getColor(color);
+            }
+            return _color;
+        }
+
+        @Override
+        public ColorSpec clone()
+        {
+            ColorSpec clone = new ColorSpec();
+            clone.color = this.color;
+            clone.alpha = this.alpha;
+            return clone;
+        }
+
+    }
+
+    /**
      * Image dimensions.
      */
-    public static class ImageSpec
+    public static class ImageSpec extends ColorSpec
     {
         /**
          * Image width.
@@ -377,10 +476,19 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public int height;
 
+        /**
+         * Instantiates a new Image spec.
+         */
         public ImageSpec()
         {
         }
 
+        /**
+         * Instantiates a new Image spec.
+         *
+         * @param width  the width
+         * @param height the height
+         */
         public ImageSpec(int width, int height)
         {
             this.width = width;
@@ -417,48 +525,28 @@ public class Theme implements Comparable<Theme>
             public int margin;
 
             /**
-             * Whether key shown at the top of the minimap (FPS) should
-             * be inside the frame (true), or outside/above it (false)
+             * Label spec for top Info slots
              */
-            @Since(1)
-            public boolean labelTopInside;
+            @Since(2)
+            public LabelSpec labelTop = new LabelSpec();
 
             /**
-             * Margin around top labels in minimap.
+             * Whether info text should be inside the frame (true), or outside/above it (false)
              */
-            @Since(1)
-            public int labelTopMargin;
+            @Since(2)
+            public boolean labelTopInside = false;
 
             /**
-             * Whether labels shown at the bottom of the minimap (location) should
-             * be inside the frame (true), or outside/below it (false)
+             * Label spec for bottom Info slots
              */
-            @Since(1)
-            public boolean labelBottomInside;
+            @Since(2)
+            public LabelSpec labelBottom = new LabelSpec();
 
             /**
-             * Margin around bottom labels in minimap.
+             * Whether info text should be inside the frame (true), or outside/above it (false)
              */
-            @Since(1)
-            public int labelBottomMargin;
-
-            /**
-             * Label spec for showing FPS
-             */
-            @Since(1)
-            public LabelSpec fpsLabel = new LabelSpec();
-
-            /**
-             * Label spec for showing location
-             */
-            @Since(1)
-            public LabelSpec locationLabel = new LabelSpec();
-
-            /**
-             * Label spec for showing location
-             */
-            @Since(1)
-            public LabelSpec biomeLabel = new LabelSpec();
+            @Since(2)
+            public boolean labelBottomInside = false;
 
             /**
              * Label spec for showing compass points
@@ -472,12 +560,6 @@ public class Theme implements Comparable<Theme>
              */
             @Since(1)
             public ImageSpec compassPoint = new ImageSpec();
-
-            /**
-             * Hex color used to draw compass point. Use #ffffff to leave unchanged.
-             */
-            @Since(1)
-            public String compassPointColor = "#ffffff";
 
             /**
              * Number of pixels to pad around a compass point's key. Effects the scaled size of the compass point image.
@@ -494,28 +576,28 @@ public class Theme implements Comparable<Theme>
 
             /**
              * Whether to show the North compass point.
-             * Defaults to true.
+             * Style to true.
              */
             @Since(1)
             public boolean compassShowNorth = true;
 
             /**
              * Whether to show the South compass point.
-             * Defaults to true.
+             * Style to true.
              */
             @Since(1)
             public boolean compassShowSouth = true;
 
             /**
              * Whether to show the East compass point.
-             * Defaults to true.
+             * Style to true.
              */
             @Since(1)
             public boolean compassShowEast = true;
 
             /**
              * Whether to show the West compass point.
-             * Defaults to true.
+             * Style to true.
              */
             @Since(1)
             public boolean compassShowWest = true;
@@ -528,24 +610,16 @@ public class Theme implements Comparable<Theme>
             public double waypointOffset;
 
             /**
-             * Hex color used to draw reticle.
+             * Color and alpha for reticle, except for the heading segment.
              */
-            @Since(1)
-            public String reticleColor = "";
+            @Since(2)
+            public ColorSpec reticle = new ColorSpec();
 
             /**
-             * General alpha transparency (0-255) of reticle.
-             * Default is 128.
+             * Color and alpha for the heading segment of the reticle
              */
-            @Since(1)
-            public int reticleAlpha = 96;
-
-            /**
-             * Alpha transparency (0-255) for the heading segment of reticle.
-             * Default is 150.
-             */
-            @Since(1)
-            public int reticleHeadingAlpha = 112;
+            @Since(2)
+            public ColorSpec reticleHeading = new ColorSpec();
 
             /**
              * General reticle thickness in pixels.
@@ -562,19 +636,24 @@ public class Theme implements Comparable<Theme>
             public double reticleHeadingThickness = 2.5;
 
             /**
-             * Number of pixels to shift the outer endpoint of a reticle segment away from the map center.
-             * Negative values move the end closer to the center.
+             * Number of pixels to shift the outer endpoint of a reticle segment away from the map edge.
              * Use this to adjust how it underlays the minimap frame.
              */
-            @Since(1)
-            public int reticleOffset;
+            @Since(2)
+            public int reticleOffsetOuter = 16;
+
+            /**
+             * Number of pixels to shift the inner endpoint of a reticle segment away from the map center.
+             * Default is 16.
+             */
+            @Since(2)
+            public int reticleOffsetInner = 16;
 
             /**
              * Hex color to apply to frame image. Use #ffffff to keep unchanged.
              */
-            @Since(1)
-            public String frameColor = "";
-
+            @Since(2)
+            public ColorSpec frame = new ColorSpec();
 
             /**
              * Image prefix (optional) for images in /minimap/square
@@ -620,6 +699,13 @@ public class Theme implements Comparable<Theme>
              */
             @Since(1)
             public ImageSpec mask512 = new ImageSpec(512, 512);
+
+            /**
+             * Whether the circle texture should rotate when the map rotates.
+             * Necessary if compass points are integrated into the frame.
+             */
+            @Since(2)
+            public boolean rotates = false;
         }
 
         /**
@@ -687,35 +773,30 @@ public class Theme implements Comparable<Theme>
     /**
      * Class for defining key characteristics.
      */
-    public static class LabelSpec
+    public static class LabelSpec implements Cloneable
     {
         /**
-         * Hex color for key background.
-         * Default is black.
+         * Margin around label
          */
-        @Since(1)
-        public String backgroundColor = toHexColor(Color.black);
+        @Since(2)
+        public int margin = 2;
 
         /**
-         * Alpha transparency (0-255) of key background.
-         * Default is 200.
+         * Color and alpha for label background.
+         * Default background is not shown.
          */
-        @Since(1)
-        public int backgroundAlpha = 200;
+        @Since(2)
+        public ColorSpec background = new ColorSpec("#000000", 0);
 
         /**
-         * Hex color for key foreground.
-         * Default is white.
+         * Color and alpha for label text.
          */
-        @Since(1)
-        public String foregroundColor = toHexColor(Color.white);
+        @Since(2)
+        public ColorSpec foreground = new ColorSpec();
 
-        /**
-         * Alpha transparency (0-255) of key background.
-         * Default is 255.
-         */
-        @Since(1)
-        public int foregroundAlpha = 255;
+
+        @Since(2)
+        public ColorSpec highlight = new ColorSpec();
 
         /**
          * Whether to use font shadow.
@@ -723,6 +804,16 @@ public class Theme implements Comparable<Theme>
          */
         @Since(1)
         public boolean shadow = false;
+
+        public LabelSpec clone()
+        {
+            LabelSpec clone = new LabelSpec();
+            clone.margin = this.margin;
+            clone.background = this.background.clone();
+            clone.foreground = this.foreground.clone();
+            clone.highlight = this.highlight.clone();
+            return clone;
+        }
     }
 
     /**
@@ -749,10 +840,18 @@ public class Theme implements Comparable<Theme>
         @Since(1)
         public String name;
 
+        /**
+         * Instantiates a new Default pointer.
+         */
         protected DefaultPointer()
         {
         }
 
+        /**
+         * Instantiates a new Default pointer.
+         *
+         * @param theme the theme
+         */
         public DefaultPointer(Theme theme)
         {
             this.name = theme.name;

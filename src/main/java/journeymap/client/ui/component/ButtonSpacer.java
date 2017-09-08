@@ -42,7 +42,7 @@ public class ButtonSpacer extends Button
     }
 
     @Override
-    public boolean mousePressed(Minecraft minecraft, int i, int j)
+    public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
     {
         return false;
     }

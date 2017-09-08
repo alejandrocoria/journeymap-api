@@ -134,12 +134,15 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-        for (Button button : buttons)
+        if (mouseEvent == 0)
         {
-            if (button.mousePressed(mc, x, y))
+            for (Button button : buttons)
             {
-                lastPressed = buttonOptionMetadata.get(button);
-                return true;
+                if (button.mousePressed(mc, x, y))
+                {
+                    lastPressed = buttonOptionMetadata.get(button);
+                    return true;
+                }
             }
         }
         return false;

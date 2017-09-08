@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.data;
@@ -11,6 +8,7 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.dto.RealmsServer;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -35,30 +33,76 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.Display;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.URLEncoder;
 import java.util.*;
 
 
 /**
  * Provides world properties
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class WorldData extends CacheLoader<Class, WorldData>
 {
+    private static String DAYTIME = Constants.getString("jm.theme.labelsource.gametime.day");
+    private static String SUNRISE = Constants.getString("jm.theme.labelsource.gametime.sunrise");
+    private static String SUNSET = Constants.getString("jm.theme.labelsource.gametime.sunset");
+    private static String NIGHT = Constants.getString("jm.theme.labelsource.gametime.night");
+
+    /**
+     * The Name.
+     */
     String name;
+    /**
+     * The Dimension.
+     */
     int dimension;
+    /**
+     * The Time.
+     */
     long time;
+    /**
+     * The Hardcore.
+     */
     boolean hardcore;
+    /**
+     * The Single player.
+     */
     boolean singlePlayer;
+    /**
+     * The Features.
+     */
     Map<Feature, Boolean> features;
+    /**
+     * The Jm version.
+     */
     String jm_version;
+    /**
+     * The Latest journeymap version.
+     */
     String latest_journeymap_version;
+    /**
+     * The Mc version.
+     */
     String mc_version;
+    /**
+     * The Mod name.
+     */
     String mod_name = JourneymapClient.MOD_NAME;
+    /**
+     * The Icon set name.
+     */
     String iconSetName;
+    /**
+     * The Icon set names.
+     */
     String[] iconSetNames;
+    /**
+     * The Browser poll.
+     */
     int browser_poll;
 
     /**
@@ -68,6 +112,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
     }
 
+    /**
+     * Is hardcore and multiplayer boolean.
+     *
+     * @return the boolean
+     */
     public static boolean isHardcoreAndMultiplayer()
     {
         WorldData world = DataCache.INSTANCE.getWorld(false);
@@ -89,13 +138,20 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
                     if (netHandlerGui instanceof GuiScreenRealmsProxy)
                     {
-                        serverName = "Realms";
                         RealmsScreen realmsScreen = ((GuiScreenRealmsProxy) netHandlerGui).getProxy();
                         if (realmsScreen instanceof RealmsMainScreen)
                         {
                             RealmsMainScreen mainScreen = (RealmsMainScreen) realmsScreen;
                             long selectedServerId = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "selectedServerId");
-                            serverName = "Realm_" + selectedServerId;
+                            List<RealmsServer> mcoServers = ReflectionHelper.getPrivateValue(RealmsMainScreen.class, mainScreen, "mcoServers");
+                            for (RealmsServer mcoServer : mcoServers)
+                            {
+                                if (mcoServer.id == selectedServerId)
+                                {
+                                    serverName = mcoServer.name;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -139,6 +195,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    /**
+     * Gets legacy server name.
+     *
+     * @return the legacy server name
+     */
     public static String getLegacyServerName()
     {
         try
@@ -161,29 +222,27 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return "server";
     }
 
-    public static String getWorldName(Minecraft mc)
-    {
-        return DataCache.INSTANCE.getWorld(false).getWorldName(mc, false);
-    }
-
     /**
      * Get the current world name.
      *
-     * @param mc
-     * @return
+     * @param mc            the mc
+     * @param useLegacyName the use legacy name
+     * @return world name
      */
-    public String getWorldName(Minecraft mc, boolean force)
+    public static String getWorldName(Minecraft mc, boolean useLegacyName)
     {
-        if (!force && !Strings.isNullOrEmpty(name))
-        {
-            return name;
-        }
-
         // Get the name
         String worldName = null;
         if (mc.isSingleplayer())
         {
-            worldName = mc.getIntegratedServer().getFolderName();
+            if (useLegacyName)
+            {
+                worldName = mc.getIntegratedServer().getWorldName();
+            }
+            else
+            {
+                return mc.getIntegratedServer().getFolderName();
+            }
         }
         else
         {
@@ -192,7 +251,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
             if (serverName == null)
             {
-                worldName = "offline";
+                return "offline";
             }
 
             if (!"MpServer".equals(worldName))
@@ -205,17 +264,41 @@ public class WorldData extends CacheLoader<Class, WorldData>
             }
         }
 
-        worldName = worldName.trim();
+        if (useLegacyName)
+        {
+            worldName = getLegacyUrlEncodedWorldName(worldName);
+        }
+        else
+        {
+            worldName = worldName.trim();
+        }
 
-        if (Strings.isNullOrEmpty(worldName))
+        if (Strings.isNullOrEmpty(worldName.trim()))
         {
             worldName = "unnamed";
         }
 
-        this.name = worldName;
-        return this.name;
+        return worldName;
     }
 
+    private static String getLegacyUrlEncodedWorldName(String worldName)
+    {
+        try
+        {
+            return URLEncoder.encode(worldName, "UTF-8").replace("+", " ");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return worldName;
+        }
+    }
+
+    /**
+     * Gets dimension providers.
+     *
+     * @param requiredDimensionList the required dimension list
+     * @return the dimension providers
+     */
     public static List<DimensionProvider> getDimensionProviders(List<Integer> requiredDimensionList)
     {
         try
@@ -318,6 +401,12 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    /**
+     * Gets safe dimension name.
+     *
+     * @param dimensionProvider the dimension provider
+     * @return the safe dimension name
+     */
     public static String getSafeDimensionName(DimensionProvider dimensionProvider)
     {
         if (dimensionProvider == null || dimensionProvider.getName()==null)
@@ -345,7 +434,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         IntegratedServer server = mc.getIntegratedServer();
         boolean multiplayer = server == null || server.getPublic();
 
-        name = getWorldName(mc, true);
+        name = getWorldName(mc, false);
         dimension = mc.world.provider.getDimension();
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
@@ -362,11 +451,42 @@ public class WorldData extends CacheLoader<Class, WorldData>
     }
 
     /**
+     * 0 is the start of daytime, 12000 is the start of sunset, 13800 is
+     * the start of nighttime, 22200 is the start of sunrise, and 24000 is daytime again.
+     */
+    public static String getGameTime()
+    {
+        long worldTime = (FMLClientHandler.instance().getClient().world.getWorldTime() % 24000L);
+        String label;
+        if (worldTime < 12000)
+        {
+            label = DAYTIME;
+        }
+        else if (worldTime < 13800)
+        {
+            label = SUNSET;
+        }
+        else if (worldTime < 22200)
+        {
+            label = NIGHT;
+        }
+        else
+        {
+            label = SUNRISE;
+        }
+
+        long allSecs = worldTime / 20;
+        return String.format("%02d:%02d %s", (long) Math.floor(allSecs / 60), (long) Math.ceil(allSecs % 60), label);
+    }
+
+    /**
      * Return length of time in millis data should be kept.
+     *
+     * @return the ttl
      */
     public long getTTL()
     {
-        return 300000;
+        return 1000;
     }
 
     /**
@@ -374,7 +494,18 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static interface DimensionProvider
     {
+        /**
+         * Gets dimension.
+         *
+         * @return the dimension
+         */
         int getDimension();
+
+        /**
+         * Gets name.
+         *
+         * @return the name
+         */
         String getName();
     }
 
@@ -383,8 +514,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static class WrappedProvider implements DimensionProvider
     {
+        /**
+         * The World provider.
+         */
         WorldProvider worldProvider;
 
+        /**
+         * Instantiates a new Wrapped provider.
+         *
+         * @param worldProvider the world provider
+         */
         public WrappedProvider(WorldProvider worldProvider)
         {
             this.worldProvider = worldProvider;
@@ -408,8 +547,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     static class DummyProvider implements DimensionProvider
     {
+        /**
+         * The Dim.
+         */
         final int dim;
 
+        /**
+         * Instantiates a new Dummy provider.
+         *
+         * @param dim the dim
+         */
         DummyProvider(int dim)
         {
             this.dim = dim;

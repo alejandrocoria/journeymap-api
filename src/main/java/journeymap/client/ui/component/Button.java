@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.component;
@@ -19,6 +16,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,41 +25,108 @@ import java.util.List;
  */
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
+    /**
+     * The Small frame color light.
+     */
     protected Integer smallFrameColorLight = new Color(160, 160, 160).getRGB();
+    /**
+     * The Small frame color dark.
+     */
     protected Integer smallFrameColorDark = new Color(120, 120, 120).getRGB();
+    /**
+     * The Small bg color.
+     */
     protected Integer smallBgColor = new Color(100, 100, 100).getRGB();
+    /**
+     * The Small bg hover color.
+     */
     protected Integer smallBgHoverColor = new Color(125, 135, 190).getRGB();
+    /**
+     * The Small bg hover color 2.
+     */
     protected Integer smallBgHoverColor2 = new Color(100, 100, 100).getRGB();
 
+    /**
+     * The Label color.
+     */
     protected Integer labelColor;
+    /**
+     * The Hover label color.
+     */
     protected Integer hoverLabelColor;
+    /**
+     * The Disabled label color.
+     */
     protected Integer disabledLabelColor;
 
+    /**
+     * The Disabled bg color.
+     */
     protected Integer disabledBgColor = Color.darkGray.getRGB();
 
-    //protected boolean enabled;
+    /**
+     * The Draw frame.
+     */
     protected boolean drawFrame;
+    /**
+     * The Draw background.
+     */
     protected boolean drawBackground;
+    /**
+     * The Draw label shadow.
+     */
     protected boolean drawLabelShadow = true;
+    /**
+     * The Show disabled hover text.
+     */
     protected boolean showDisabledHoverText;
+    /**
+     * The Default style.
+     */
     protected boolean defaultStyle = true;
+    /**
+     * The Width pad.
+     */
     protected int WIDTH_PAD = 12;
+    /**
+     * The Tooltip.
+     */
     protected String[] tooltip;
 
-    FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+    /**
+     * The Font renderer.
+     */
+    protected FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
+    protected Rectangle2D.Double bounds;
+
+    /**
+     * Instantiates a new Button.
+     *
+     * @param label the label
+     */
     public Button(String label)
     {
         this(0, 0, label);
         resetLabelColors();
     }
 
+    /**
+     * Instantiates a new Button.
+     *
+     * @param width  the width
+     * @param height the height
+     * @param label  the label
+     */
     public Button(int width, int height, String label)
     {
         super(0, 0, 0, width, height, label);
         finishInit();
     }
 
+    /**
+     * Reset label colors.
+     */
     public void resetLabelColors()
     {
         labelColor = new Color(14737632).getRGB();
@@ -69,6 +134,9 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         disabledLabelColor = Color.lightGray.getRGB();
     }
 
+    /**
+     * Finish init.
+     */
     protected void finishInit()
     {
         this.setEnabled(true);
@@ -77,18 +145,27 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.setDrawBackground(true);
         if (height == 0)
         {
-            height = 20;
+            setHeight(20);
         }
         if (width == 0)
         {
-            width = 200;
+            setWidth(200);
         }
+        updateBounds();
     }
 
+    /**
+     * Update label.
+     */
     protected void updateLabel()
     {
     }
 
+    /**
+     * Is active boolean.
+     *
+     * @return the boolean
+     */
     public boolean isActive()
     {
         return isEnabled();
@@ -100,9 +177,14 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return max + WIDTH_PAD + (fr.getBidiFlag() ? ((int) Math.ceil(max * .25)) : 0);
     }
 
+    /**
+     * Fit width.
+     *
+     * @param fr the fr
+     */
     public void fitWidth(FontRenderer fr)
     {
-        this.width = getFitWidth(fr);
+        setWidth(getFitWidth(fr));
     }
 
     public void drawPartialScrollable(Minecraft minecraft, int x, int y, int width, int height)
@@ -113,6 +195,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.drawTexturedModalRect(x + width / 2, y, 200 - width / 2, 46 + k * 20, width / 2, height);
     }
 
+    /**
+     * Show disabled on hover.
+     *
+     * @param show the show
+     */
     public void showDisabledOnHover(boolean show)
     {
         showDisabledHoverText = show;
@@ -120,55 +207,39 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean isMouseOver()
     {
-        // 1.7
-        //return field_146123_n;
-
-        // 1.8
         return super.isMouseOver();
     }
 
+    /**
+     * Sets mouse over.
+     *
+     * @param hover the hover
+     */
     public void setMouseOver(boolean hover)
     {
-        // 1.7.10
-        // field_146123_n = hover;
-
-        // 1.8
         this.setHovered(hover);
     }
 
     @Override
-    // 1.7
-    //public void func_146113_a(SoundHandler soundHandler)
-    // 1.8
     public void playPressSound(SoundHandler soundHandler)
     {
-        // Play button click
         if (isEnabled())
         {
-            // 1.7
-            //super.func_146113_a(soundHandler);
-
-            // 1.8
             super.playPressSound(soundHandler);
         }
     }
 
     @Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float f)
+    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks)
     {
-        if (!isDrawButton())
+        if (!isVisible())
         {
             return;
         }
 
         if (defaultStyle)
         {
-//            if (!isEnabled())
-//            {
-//                setEnabled(false);
-//            }
-            // Use resource pack texture
-            super.drawButton(minecraft, mouseX, mouseY, 0f);
+            super.drawButton(minecraft, mouseX, mouseY, ticks);
         }
         else
         {
@@ -234,14 +305,17 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     /**
      * Renders the specified text to the screen, center-aligned.
      */
-    public void drawCenteredString(FontRenderer p_73732_1_, String p_73732_2_, int p_73732_3_, int p_73732_4_, int p_73732_5_)
+    public void drawCenteredString(FontRenderer fontRenderer, String text, float x, float y, int color)
     {
-        p_73732_1_.drawStringWithShadow(p_73732_2_, p_73732_3_ - p_73732_1_.getStringWidth(p_73732_2_) / 2, p_73732_4_, p_73732_5_);
+        fontRenderer.drawStringWithShadow(text, x - fontRenderer.getStringWidth(text) / 2, y, color);
     }
 
+    /**
+     * Draw underline.
+     */
     public void drawUnderline()
     {
-        if (isDrawButton())
+        if (isVisible())
         {
             DrawUtil.drawRectangle(x, y + height, width, 1, smallFrameColorDark, 1f);
         }
@@ -255,12 +329,16 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     }
 
     @Override
-    public boolean mousePressed(Minecraft minecraft, int i, int j)
+    public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
     {
-        boolean pressed = isEnabled() && isDrawButton() && i >= getX() && j >= getY() && i < getX() + getWidth() && j < getY() + getHeight();
-        return pressed;
+        return isEnabled() && isVisible() && mouseOver(mouseX, mouseY);
     }
 
+    /**
+     * Gets unformatted tooltip.
+     *
+     * @return the unformatted tooltip
+     */
     public String getUnformattedTooltip()
     {
         if (tooltip != null && tooltip.length > 0)
@@ -270,6 +348,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return null;
     }
 
+    /**
+     * Gets tooltip.
+     *
+     * @return the tooltip
+     */
     public List<String> getTooltip()
     {
         ArrayList<String> list = new ArrayList<String>();
@@ -289,20 +372,41 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return list;
     }
 
+    /**
+     * Sets tooltip.
+     *
+     * @param tooltip the tooltip
+     */
     public void setTooltip(String... tooltip)
     {
         this.tooltip = tooltip;
     }
 
+    /**
+     * Mouse over boolean.
+     *
+     * @param mouseX the mouse x
+     * @param mouseY the mouse y
+     * @return the boolean
+     */
     public boolean mouseOver(int mouseX, int mouseY)
     {
-        if (!visible)
+        return isVisible() && getBounds().contains(mouseX, mouseY);
+    }
+
+    protected Rectangle2D.Double updateBounds()
+    {
+        this.bounds = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
+        return this.bounds;
+    }
+
+    public Rectangle2D.Double getBounds()
+    {
+        if (this.bounds == null)
         {
-            return false;
+            return updateBounds();
         }
-        return mouseX >= this.x && mouseY >= this.y
-                && mouseX <= (this.x + this.width)
-                && mouseY <= (this.y + this.height);
+        return bounds;
     }
 
     public int getWidth()
@@ -312,7 +416,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setWidth(int width)
     {
-        this.width = width;
+        if (this.width != width)
+        {
+            this.width = width;
+            bounds = null;
+        }
     }
 
     @Override
@@ -326,15 +434,29 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return height;
     }
 
+    /**
+     * Sets height.
+     *
+     * @param height the height
+     */
     public void setHeight(int height)
     {
-        this.height = height;
-        if (height != 20)
+        if (this.height != height)
         {
-            defaultStyle = false;
+            this.height = height;
+            bounds = null;
+            if (height != 20)
+            {
+                defaultStyle = false;
+            }
         }
     }
 
+    /**
+     * Sets text only.
+     *
+     * @param fr the fr
+     */
     public void setTextOnly(FontRenderer fr)
     {
         setHeight(fr.FONT_HEIGHT + 1);
@@ -346,7 +468,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public void drawScrollable(Minecraft mc, int mouseX, int mouseY)
     {
-        drawButton(mc, mouseX, mouseY, 0f);
+        drawButton(mc, mouseX, mouseY, 0);
     }
 
     @Override
@@ -360,9 +482,18 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this.x;
     }
 
+    /**
+     * Sets x.
+     *
+     * @param x the x
+     */
     public void setX(int x)
     {
-        this.x = x;
+        if (this.x != x)
+        {
+            this.x = x;
+            bounds = null;
+        }
     }
 
     public int getY()
@@ -370,26 +501,56 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this.y;
     }
 
+    /**
+     * Sets y.
+     *
+     * @param y the y
+     */
     public void setY(int y)
     {
-        this.y = y;
+        if (this.y != y)
+        {
+            this.y = y;
+            bounds = null;
+        }
     }
 
+
+    /**
+     * Gets center x.
+     *
+     * @return the center x
+     */
     public int getCenterX()
     {
         return this.x + (this.width / 2);
     }
 
+    /**
+     * Gets middle y.
+     *
+     * @return the middle y
+     */
     public int getMiddleY()
     {
         return this.y + (this.height / 2);
     }
 
+    /**
+     * Gets bottom y.
+     *
+     * @return the bottom y
+     */
     public int getBottomY()
     {
         return this.y + this.height;
     }
 
+    /**
+     * Gets right x.
+     *
+     * @return the right x
+     */
     public int getRightX()
     {
         return this.x + this.width;
@@ -401,72 +562,153 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         setY(y);
     }
 
+    /**
+     * Left of button.
+     *
+     * @param x the x
+     * @return the button
+     */
     public Button leftOf(int x)
     {
         this.setX(x - getWidth());
         return this;
     }
 
+    /**
+     * Right of button.
+     *
+     * @param x the x
+     * @return the button
+     */
     public Button rightOf(int x)
     {
         this.setX(x);
         return this;
     }
 
+    /**
+     * Center horizontal on button.
+     *
+     * @param x the x
+     * @return the button
+     */
     public Button centerHorizontalOn(int x)
     {
         this.setX(x - (width / 2));
         return this;
     }
 
+    /**
+     * Center vertical on button.
+     *
+     * @param y the y
+     * @return the button
+     */
     public Button centerVerticalOn(int y)
     {
         this.setY(y - (height / 2));
         return this;
     }
 
+    /**
+     * Left of button.
+     *
+     * @param other  the other
+     * @param margin the margin
+     * @return the button
+     */
     public Button leftOf(Button other, int margin)
     {
         this.setX(other.getX() - getWidth() - margin);
         return this;
     }
 
+    /**
+     * Right of button.
+     *
+     * @param other  the other
+     * @param margin the margin
+     * @return the button
+     */
     public Button rightOf(Button other, int margin)
     {
         this.setX(other.getX() + other.getWidth() + margin);
         return this;
     }
 
+    /**
+     * Above button.
+     *
+     * @param other  the other
+     * @param margin the margin
+     * @return the button
+     */
     public Button above(Button other, int margin)
     {
         this.setY(other.getY() - this.getHeight() - margin);
         return this;
     }
 
+    /**
+     * Above button.
+     *
+     * @param y the y
+     * @return the button
+     */
     public Button above(int y)
     {
         this.setY(y - this.getHeight());
         return this;
     }
 
+    /**
+     * Below button.
+     *
+     * @param other  the other
+     * @param margin the margin
+     * @return the button
+     */
     public Button below(Button other, int margin)
     {
         this.setY(other.getY() + other.getHeight() + margin);
         return this;
     }
 
+    /**
+     * Below button.
+     *
+     * @param list   the list
+     * @param margin the margin
+     * @return the button
+     */
     public Button below(ButtonList list, int margin)
     {
         this.setY(list.getBottomY() + margin);
         return this;
     }
 
+    /**
+     * Below button.
+     *
+     * @param y the y
+     * @return the button
+     */
     public Button below(int y)
     {
         this.setY(y);
         return this;
     }
 
+    /**
+     * Align to button.
+     *
+     * @param other  the other
+     * @param hAlign the h align
+     * @param hgap   the hgap
+     * @param vAlign the v align
+     * @param vgap   the vgap
+     * @return the button
+     */
     public Button alignTo(Button other, DrawUtil.HAlign hAlign, int hgap, DrawUtil.VAlign vAlign, int vgap)
     {
         int x = getX();
@@ -515,61 +757,128 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         return this;
     }
 
+    /**
+     * Is enabled boolean.
+     *
+     * @return the boolean
+     */
     public boolean isEnabled()
     {
         return super.enabled;
     }
 
+    /**
+     * Sets enabled.
+     *
+     * @param enabled the enabled
+     */
     public void setEnabled(boolean enabled)
     {
         super.enabled = enabled;
     }
 
-    public boolean isDrawButton()
+    /**
+     * Is draw button boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isVisible()
     {
         return visible;
     }
 
+    /**
+     * Sets draw button.
+     *
+     * @param drawButton the draw button
+     */
     public void setDrawButton(boolean drawButton)
     {
-        this.visible = drawButton;
+        if (drawButton != visible)
+        {
+            this.visible = drawButton;
+        }
     }
 
+    /**
+     * Is draw frame boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDrawFrame()
     {
         return drawFrame;
     }
 
+    /**
+     * Sets draw frame.
+     *
+     * @param drawFrame the draw frame
+     */
     public void setDrawFrame(boolean drawFrame)
     {
         this.drawFrame = drawFrame;
     }
 
+    /**
+     * Is draw background boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDrawBackground()
     {
         return drawBackground;
     }
 
+    /**
+     * Sets draw background.
+     *
+     * @param drawBackground the draw background
+     */
     public void setDrawBackground(boolean drawBackground)
     {
         this.drawBackground = drawBackground;
     }
 
+    /**
+     * Is default style boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDefaultStyle()
     {
         return defaultStyle;
     }
 
+    /**
+     * Sets default style.
+     *
+     * @param defaultStyle the default style
+     */
     public void setDefaultStyle(boolean defaultStyle)
     {
         this.defaultStyle = defaultStyle;
     }
 
+    /**
+     * Key typed boolean.
+     *
+     * @param c the c
+     * @param i the
+     * @return the boolean
+     */
     public boolean keyTyped(char c, int i)
     {
         return false;
     }
 
+    /**
+     * Sets background colors.
+     *
+     * @param smallBgColor       the small bg color
+     * @param smallBgHoverColor  the small bg hover color
+     * @param smallBgHoverColor2 the small bg hover color 2
+     */
     public void setBackgroundColors(Integer smallBgColor, Integer smallBgHoverColor, Integer smallBgHoverColor2)
     {
         this.smallBgColor = smallBgColor;
@@ -577,11 +886,23 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         this.smallBgHoverColor2 = smallBgHoverColor2;
     }
 
+    /**
+     * Sets draw label shadow.
+     *
+     * @param draw the draw
+     */
     public void setDrawLabelShadow(boolean draw)
     {
         this.drawLabelShadow = draw;
     }
 
+    /**
+     * Sets label colors.
+     *
+     * @param labelColor         the label color
+     * @param hoverLabelColor    the hover label color
+     * @param disabledLabelColor the disabled label color
+     */
     public void setLabelColors(Integer labelColor, Integer hoverLabelColor, Integer disabledLabelColor)
     {
         this.labelColor = labelColor;
@@ -596,20 +917,38 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
+    /**
+     * Refresh.
+     */
     public void refresh()
     {
     }
 
+    /**
+     * Gets label color.
+     *
+     * @return the label color
+     */
     public Integer getLabelColor()
     {
         return labelColor;
     }
 
+    /**
+     * Is hovered boolean.
+     *
+     * @return the boolean
+     */
     public boolean isHovered()
     {
         return super.hovered;
     }
 
+    /**
+     * Sets hovered.
+     *
+     * @param hovered the hovered
+     */
     public void setHovered(boolean hovered)
     {
         super.hovered = hovered;

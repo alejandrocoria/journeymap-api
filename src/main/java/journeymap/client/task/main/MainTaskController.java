@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.task.main;
@@ -15,7 +12,6 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -28,10 +24,18 @@ public class MainTaskController
     private final ConcurrentLinkedQueue<IMainThreadTask> currentQueue = Queues.newConcurrentLinkedQueue();
     private final ConcurrentLinkedQueue<IMainThreadTask> deferredQueue = Queues.newConcurrentLinkedQueue();
 
+    /**
+     * Instantiates a new Main task controller.
+     */
     public MainTaskController()
     {
     }
 
+    /**
+     * Add task.
+     *
+     * @param task the task
+     */
     public void addTask(IMainThreadTask task)
     {
         synchronized (currentQueue)
@@ -40,6 +44,22 @@ public class MainTaskController
         }
     }
 
+    public boolean isActive()
+    {
+        if (currentQueue.isEmpty())
+        {
+            return false;
+        }
+        if (currentQueue.size() == 1 && currentQueue.peek() instanceof MappingMonitorTask)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Perform tasks.
+     */
     public void performTasks()
     {
         try

@@ -23,9 +23,10 @@ public class MiniMapPropertiesTest extends ClientPropertiesBaseTest<MiniMapPrope
         randomize(p.enabled);
         randomize(p.shape);
         randomize(p.position);
-        randomize(p.showFps);
-        randomize(p.showBiome);
-        randomize(p.showLocation);
+        // TODO: randomize infoslots
+//        randomize(p.showFps);
+//        randomize(p.showBiome);
+//        randomize(p.showLocation);
         randomize(p.sizePercent);
         randomize(p.frameAlpha);
         randomize(p.terrainAlpha);

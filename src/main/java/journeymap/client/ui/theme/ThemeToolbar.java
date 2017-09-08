@@ -184,11 +184,15 @@ public class ThemeToolbar extends Button
             float scale = 1f;
 
             // Draw Begin
-            if (toolbarSpec.begin.width != textureBegin.getWidth())
+            if (toolbarSpec.begin.width > 0 && toolbarSpec.begin.height > 0)
             {
-                scale = (1f * toolbarSpec.begin.width / textureBegin.getWidth());
+                if (toolbarSpec.begin.width != textureBegin.getWidth())
+                {
+                    // TODO: This should be done only once, and stretch instead of scale.
+                    scale = (1f * toolbarSpec.begin.width / textureBegin.getWidth());
+                }
+                DrawUtil.drawClampedImage(textureBegin, this.toolbarSpec.begin.getColor(), this.toolbarSpec.begin.alpha, drawX, drawY, scale, 0);
             }
-            DrawUtil.drawClampedImage(textureBegin, drawX, drawY, scale, 0);
 
             if (isHorizontal)
             {
@@ -203,13 +207,15 @@ public class ThemeToolbar extends Button
             scale = 1f;
             if (toolbarSpec.inner.width != textureInner.getWidth())
             {
+                // TODO: This should be done only once, and stretch instead of scale.
                 scale = (1f * toolbarSpec.inner.width / textureInner.getWidth());
             }
+
             for (Button button : buttonList)
             {
-                if (button.isDrawButton())
+                if (button.isVisible())
                 {
-                    DrawUtil.drawClampedImage(textureInner, drawX, drawY, scale, 0);
+                    DrawUtil.drawClampedImage(textureInner, this.toolbarSpec.inner.getColor(), this.toolbarSpec.inner.alpha, drawX, drawY, scale, 0);
                     if (isHorizontal)
                     {
                         drawX += toolbarSpec.inner.width;
@@ -222,12 +228,16 @@ public class ThemeToolbar extends Button
             }
 
             // Draw End
-            scale = 1f;
-            if (toolbarSpec.end.width != textureEnd.getWidth())
+            if (toolbarSpec.end.width > 0 && toolbarSpec.end.height > 0)
             {
-                scale = (1f * toolbarSpec.end.width / textureEnd.getWidth());
+                scale = 1f;
+                if (toolbarSpec.end.width != textureEnd.getWidth())
+                {
+                    // TODO: This should be done only once, and stretch instead of scale.
+                    scale = (1f * toolbarSpec.end.width / textureEnd.getWidth());
+                }
+                DrawUtil.drawClampedImage(textureEnd, this.toolbarSpec.end.getColor(), this.toolbarSpec.end.alpha, drawX, drawY, scale, 0);
             }
-            DrawUtil.drawClampedImage(textureEnd, drawX, drawY, scale, 0);
         }
     }
 

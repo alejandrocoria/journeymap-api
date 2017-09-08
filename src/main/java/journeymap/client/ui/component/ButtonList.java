@@ -68,7 +68,7 @@ public class ButtonList extends ArrayList<Button>
         int visible = 0;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 if (buttonWidth > 0)
                 {
@@ -100,7 +100,7 @@ public class ButtonList extends ArrayList<Button>
         int visible = 0;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 total += button.getHeight();
                 visible++;
@@ -119,7 +119,7 @@ public class ButtonList extends ArrayList<Button>
         int left = Integer.MAX_VALUE;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 left = Math.min(left, button.getX());
             }
@@ -136,7 +136,7 @@ public class ButtonList extends ArrayList<Button>
         int top = Integer.MAX_VALUE;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 top = Math.min(top, button.getY());
             }
@@ -153,7 +153,7 @@ public class ButtonList extends ArrayList<Button>
         int bottom = Integer.MIN_VALUE;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 bottom = Math.max(bottom, button.getY() + button.getHeight());
             }
@@ -170,7 +170,7 @@ public class ButtonList extends ArrayList<Button>
         int right = 0;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 right = Math.max(right, button.getX() + button.getWidth());
             }
@@ -424,7 +424,7 @@ public class ButtonList extends ArrayList<Button>
         int maxWidth = 0;
         for (Button button : this)
         {
-            if (button.isDrawButton())
+            if (button.isVisible())
             {
                 button.fitWidth(fr);
                 maxWidth = Math.max(maxWidth, button.getWidth());

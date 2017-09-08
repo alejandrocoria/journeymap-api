@@ -9,8 +9,8 @@
 package journeymap.client.ui.theme;
 
 import journeymap.client.Constants;
-import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.properties.config.BooleanField;
+import net.minecraft.client.Minecraft;
 
 /**
  * Toggle-type button for Theme
@@ -37,6 +37,16 @@ public class ThemeToggle extends ThemeButton
     }
 
     @Override
+    public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
+    {
+        if (toggled && staysOn)
+        {
+            return false;
+        }
+        return super.mousePressed(minecraft, mouseX, mouseY);
+    }
+
+    @Override
     protected String getPathPattern()
     {
         return "control/%stoggle_%s.png";
@@ -46,19 +56,5 @@ public class ThemeToggle extends ThemeButton
     protected Theme.Control.ButtonSpec getButtonSpec(Theme theme)
     {
         return theme.control.toggle;
-    }
-
-    @Override
-    protected TextureImpl getActiveTexture(boolean isMouseOver)
-    {
-        if (isEnabled())
-        {
-            TextureImpl activeTexture = this.toggled ? textureOn : textureOff;
-            return activeTexture;
-        }
-        else
-        {
-            return textureDisabled;
-        }
     }
 }

@@ -1,15 +1,12 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.minimap;
 
 import journeymap.client.cartography.color.RGB;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.render.draw.DrawUtil;
@@ -18,12 +15,16 @@ import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeCompassPoints;
+import journeymap.client.ui.theme.ThemeLabelSource;
 import journeymap.client.ui.theme.ThemeMinimapFrame;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.Tuple;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Display variables for the Minimap.
@@ -35,50 +36,145 @@ import java.awt.geom.Point2D;
  */
 public class DisplayVars
 {
+    /**
+     * The Position.
+     */
     final Position position;
+    /**
+     * The Shape.
+     */
     final Shape shape;
+    /**
+     * The Orientation.
+     */
     final Orientation orientation;
+    /**
+     * The Font scale.
+     */
     final double fontScale;
+    /**
+     * The Display width.
+     */
     final int displayWidth;
+    /**
+     * The Display height.
+     */
     final int displayHeight;
+    /**
+     * The Terrain alpha.
+     */
     final float terrainAlpha;
+    /**
+     * The Scaled resolution.
+     */
     final ScaledResolution scaledResolution;
-    final int minimapWidth, minimapHeight;
-    final int textureX, textureY;
-    final int translateX, translateY;
+    /**
+     * The Minimap width.
+     */
+    final int minimapWidth;
+    /**
+     * The Minimap height.
+     */
+    final int minimapHeight;
+
+    /**
+     * The Texture x.
+     */
+    final int textureX;
+    /**
+     * The Texture y.
+     */
+    final int textureY;
+
+    /**
+     * The Translate x.
+     */
+    final int translateX;
+
+    /**
+     * The Translate y.
+     */
+    final int translateY;
+
+    /**
+     * The Reticle segment length.
+     */
     final double reticleSegmentLength;
-    final int fpsLabelHeight;
-    final int locationLabelHeight;
+
+    /**
+     * The Center point.
+     */
     final Point2D.Double centerPoint;
-    final boolean showFps;
-    final boolean showBiome;
-    final boolean showLocation;
+
+    /**
+     * The Show compass.
+     */
     final boolean showCompass;
+    /**
+     * The Show reticle.
+     */
     final boolean showReticle;
-    final LabelVars labelFps, labelLocation, labelBiome, labelDebug1, labelDebug2;
+
+    /**
+     * LabelVars and their text suppliers
+     */
+    final List<Tuple<LabelVars, ThemeLabelSource>> labels = new ArrayList<>(4);
+
+    /**
+     * The Theme.
+     */
     final Theme theme;
+    /**
+     * The Minimap frame.
+     */
     final ThemeMinimapFrame minimapFrame;
+    /**
+     * The Minimap compass points.
+     */
     final ThemeCompassPoints minimapCompassPoints;
+    /**
+     * The Minimap spec.
+     */
     final Theme.Minimap.MinimapSpec minimapSpec;
+    /**
+     * The Location format keys.
+     */
     final LocationFormat.LocationFormatKeys locationFormatKeys;
+    /**
+     * The Location format verbose.
+     */
     final boolean locationFormatVerbose;
-    int marginX, marginY;
+    /**
+     * Whether the frame rotates when the map does.
+     */
+    final boolean frameRotates;
+    /**
+     * The Margin x.
+     */
+    int marginX;
+    /**
+     * The Margin y.
+     */
+    int marginY;
+    /**
+     * The Map type status.
+     */
     MapTypeStatus mapTypeStatus;
+    /**
+     * The Map preset status.
+     */
     MapPresetStatus mapPresetStatus;
 
     /**
      * Constructor.
      *
      * @param mc                Minecraft
-     * @param miniMapProperties
+     * @param miniMapProperties the mini map properties
      */
     DisplayVars(Minecraft mc, final MiniMapProperties miniMapProperties)
     {
         // Immutable member and local vars
         this.scaledResolution = new ScaledResolution(mc);
-        this.showFps = miniMapProperties.showFps.get();
-        this.showBiome = miniMapProperties.showBiome.get();
-        this.showLocation = miniMapProperties.showLocation.get();
         this.showCompass = miniMapProperties.showCompass.get();
         this.showReticle = miniMapProperties.showReticle.get();
         this.position = miniMapProperties.position.get();
@@ -88,7 +184,7 @@ public class DisplayVars
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         this.locationFormatKeys = new LocationFormat().getFormatKeys(miniMapProperties.locationFormat.get());
         this.locationFormatVerbose = miniMapProperties.locationFormatVerbose.get();
-        this.theme = ThemeFileHandler.getCurrentTheme();
+        this.theme = ThemeLoader.getCurrentTheme();
 
         // Assign shape
         switch (miniMapProperties.shape.get())
@@ -131,10 +227,11 @@ public class DisplayVars
         }
 
         this.fontScale = miniMapProperties.fontScale.get();
-
         FontRenderer fontRenderer = mc.fontRenderer;
-        fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
-        locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
+
+        // Calculate areas reserved for info labels
+        int topInfoLabelsHeight = getInfoLabelAreaHeight(fontRenderer, minimapSpec.labelTop, miniMapProperties.info1Label.get(), miniMapProperties.info2Label.get());
+        int bottomInfoLabelsHeight = getInfoLabelAreaHeight(fontRenderer, minimapSpec.labelBottom, miniMapProperties.info3Label.get(), miniMapProperties.info4Label.get());
 
         int compassFontScale = miniMapProperties.compassFontScale.get();
         int compassLabelHeight = 0;
@@ -164,77 +261,62 @@ public class DisplayVars
                 compassPointMargin = compassLabelHeight;
             }
             marginX = (int) Math.max(marginX, Math.ceil(compassPointMargin));
+            // TODO: Why height/2?
             marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight / 2);
         }
-
-        DrawUtil.HAlign debugLabelAlign;
-        int debugLabelX;
 
         // Assign position
         switch (position)
         {
             case BottomRight:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside)
                 {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
+                    marginY += bottomInfoLabelsHeight;
                 }
 
                 textureX = mc.displayWidth - minimapWidth - marginX;
                 textureY = mc.displayHeight - (minimapHeight) - marginY;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
                 translateY = (mc.displayHeight / 2) - halfHeight - marginY;
-                debugLabelAlign = DrawUtil.HAlign.Left;
-                debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
             case TopLeft:
             {
-                if (!minimapSpec.labelTopInside && showFps)
+                if (!minimapSpec.labelTopInside)
                 {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                    marginY = Math.max(marginY, topInfoLabelsHeight + (2 * minimapSpec.margin));
                 }
 
                 textureX = marginX;
                 textureY = marginY;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
                 translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
-                debugLabelAlign = DrawUtil.HAlign.Right;
-                debugLabelX = marginX;
                 break;
             }
             case BottomLeft:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside)
                 {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
+                    marginY += bottomInfoLabelsHeight;
                 }
 
                 textureX = marginX;
                 textureY = mc.displayHeight - (minimapHeight) - marginY;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
                 translateY = (mc.displayHeight / 2) - halfHeight - marginY;
-                debugLabelAlign = DrawUtil.HAlign.Right;
-                debugLabelX = marginX;
                 break;
             }
             case TopCenter:
             {
-                if (!minimapSpec.labelTopInside && showFps)
+                if (!minimapSpec.labelTopInside)
                 {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                    marginY = Math.max(marginY, topInfoLabelsHeight + (2 * minimapSpec.margin));
                 }
                 textureX = (mc.displayWidth - minimapWidth) / 2;
                 textureY = marginY;
                 translateX = 0;
                 translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
-                debugLabelAlign = DrawUtil.HAlign.Center;
-                debugLabelX = (int) Math.floor(textureX + (minimapWidth / 2));
                 break;
             }
             case Center:
@@ -243,24 +325,20 @@ public class DisplayVars
                 textureY = (mc.displayHeight - minimapHeight) / 2;
                 translateX = 0;
                 translateY = 0;
-                debugLabelAlign = DrawUtil.HAlign.Center;
-                debugLabelX = (int) Math.floor(textureX + (minimapWidth / 2));
                 break;
             }
             case TopRight:
             default:
             {
-                if (!minimapSpec.labelTopInside && showFps)
+                if (!minimapSpec.labelTopInside)
                 {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+                    marginY = Math.max(marginY, topInfoLabelsHeight + (2 * minimapSpec.margin));
                 }
 
                 textureX = mc.displayWidth - minimapWidth - marginX;
                 textureY = marginY;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
                 translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
-                debugLabelAlign = DrawUtil.HAlign.Left;
-                debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
         }
@@ -275,63 +353,86 @@ public class DisplayVars
         this.minimapCompassPoints = new ThemeCompassPoints(textureX, textureY, halfWidth, halfHeight, minimapSpec,
                 miniMapProperties, this.minimapFrame.getCompassPoint(), compassLabelHeight);
 
-        // Set up key positions
-        double centerX = Math.floor(textureX + (minimapWidth / 2));
-        double topY = textureY;
-        double bottomY = textureY + minimapHeight;
-
-        if (showFps)
+        if (shape == Shape.Circle)
         {
-            int topMargin = Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin);
-            int yOffsetFps = minimapSpec.labelTopInside ? minimapSpec.labelTopMargin : -topMargin;
-            DrawUtil.VAlign valignFps = minimapSpec.labelTopInside ? DrawUtil.VAlign.Below : DrawUtil.VAlign.Above;
-            labelFps = new LabelVars(this, centerX, topY + yOffsetFps, DrawUtil.HAlign.Center, valignFps, fontScale, minimapSpec.fpsLabel);
+            this.frameRotates = ((Theme.Minimap.MinimapCircle) minimapSpec).rotates;
         }
         else
         {
-            labelFps = null;
+            this.frameRotates = false;
         }
 
-        int labelMargin = minimapSpec.labelBottomMargin;
-        int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
-
-        if (showLocation)
+        // Setup top info area labels
+        final int centerX = (int) Math.floor(textureX + (minimapWidth / 2));
+        if (topInfoLabelsHeight > 0)
         {
-            DrawUtil.VAlign vAlign = minimapSpec.labelBottomInside ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-            labelLocation = new LabelVars(this, centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.locationLabel);
-            if (showBiome)
+            int startY = minimapSpec.labelTopInside ? (textureY + minimapSpec.margin) : textureY - minimapSpec.margin - topInfoLabelsHeight;
+            positionLabels(fontRenderer, centerX, startY, minimapSpec.labelTop, miniMapProperties.info1Label.get(), miniMapProperties.info2Label.get());
+        }
+
+        // Set up bottom info labels
+        if (bottomInfoLabelsHeight > 0)
+        {
+            int startY = textureY + minimapHeight;
+            //startY += minimapSpec.labelBottom.inside ? (-minimapSpec.margin) : minimapSpec.margin;
+            startY += minimapSpec.labelBottomInside ? (-minimapSpec.margin - bottomInfoLabelsHeight) : minimapSpec.margin;
+            positionLabels(fontRenderer, centerX, startY, minimapSpec.labelBottom, miniMapProperties.info3Label.get(), miniMapProperties.info4Label.get());
+        }
+
+        // Reset cache timers on info sources
+        ThemeLabelSource.resetCaches();
+    }
+
+    private int getInfoLabelAreaHeight(FontRenderer fontRenderer, Theme.LabelSpec labelSpec, ThemeLabelSource... themeLabelSources)
+    {
+        int labelHeight = getInfoLabelHeight(fontRenderer, labelSpec);
+        int areaHeight = 0;
+        for (ThemeLabelSource themeLabelSource : themeLabelSources)
+        {
+            areaHeight += themeLabelSource.isShown() ? labelHeight : 0;
+        }
+        return areaHeight;
+    }
+
+    private int getInfoLabelHeight(FontRenderer fontRenderer, Theme.LabelSpec labelSpec)
+    {
+        return (int) ((DrawUtil.getLabelHeight(fontRenderer, labelSpec.shadow) + labelSpec.margin) * this.fontScale);
+    }
+
+    private void positionLabels(FontRenderer fontRenderer, int centerX, int startY, Theme.LabelSpec labelSpec, ThemeLabelSource... themeLabelSources)
+    {
+        final int labelHeight = getInfoLabelHeight(fontRenderer, labelSpec);
+        int labelY = startY;
+
+        for (ThemeLabelSource themeLabelSource : themeLabelSources)
+        {
+            if (themeLabelSource.isShown())
             {
-                yOffset += locationLabelHeight;
+                LabelVars labelVars = new LabelVars(this, centerX, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, fontScale, labelSpec);
+                Tuple<LabelVars, ThemeLabelSource> tuple = new Tuple<>(labelVars, themeLabelSource);
+                labels.add(tuple);
+                labelY += labelHeight;
             }
         }
-        else
-        {
-            labelLocation = null;
-        }
+    }
 
-        if (showBiome)
+    /**
+     * Draw labels and their sourced text.
+     */
+    public void drawInfoLabels(long currentTimeMillis)
+    {
+        for (Tuple<LabelVars, ThemeLabelSource> label : labels)
         {
-            DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-            labelBiome = new LabelVars(this, centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.biomeLabel);
+            label.getFirst().draw(label.getSecond().getLabelText(currentTimeMillis));
         }
-        else
-        {
-            labelBiome = null;
-        }
-
-        DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
-        yOffset += locationLabelHeight;
-        labelDebug1 = new LabelVars(this, debugLabelX, bottomY + yOffset, debugLabelAlign, vAlign, fontScale, new Theme.LabelSpec());
-        yOffset += locationLabelHeight;
-        labelDebug2 = new LabelVars(this, debugLabelX, bottomY + yOffset, debugLabelAlign, vAlign, fontScale, new Theme.LabelSpec());
     }
 
     /**
      * Get or create a MapPresetStatus instance
      *
-     * @param mapType
-     * @param miniMapId
-     * @return
+     * @param mapType   the map type
+     * @param miniMapId the mini map id
+     * @return map preset status
      */
     MapPresetStatus getMapPresetStatus(MapType mapType, int miniMapId)
     {
@@ -342,6 +443,12 @@ public class DisplayVars
         return mapPresetStatus;
     }
 
+    /**
+     * Gets map type status.
+     *
+     * @param mapType the map type
+     * @return the map type status
+     */
     MapTypeStatus getMapTypeStatus(MapType mapType)
     {
         if (this.mapTypeStatus == null || !mapType.equals(this.mapTypeStatus.mapType))
@@ -362,6 +469,12 @@ public class DisplayVars
         private String name;
         private Integer color;
 
+        /**
+         * Instantiates a new Map preset status.
+         *
+         * @param mapType   the map type
+         * @param miniMapId the mini map id
+         */
         MapPresetStatus(MapType mapType, int miniMapId)
         {
             this.miniMapId = miniMapId;
@@ -370,6 +483,13 @@ public class DisplayVars
             this.name = Integer.toString(miniMapId);
         }
 
+        /**
+         * Draw.
+         *
+         * @param mapCenter the map center
+         * @param alpha     the alpha
+         * @param rotation  the rotation
+         */
         void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             DrawUtil.drawLabel(name, mapCenter.getX(), mapCenter.getY() + 8, DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, color, alpha, scale, true, rotation);
@@ -392,6 +512,11 @@ public class DisplayVars
         private float bgScale;
         private float scaleHeightOffset;
 
+        /**
+         * Instantiates a new Map type status.
+         *
+         * @param mapType the map type
+         */
         MapTypeStatus(MapType mapType)
         {
             this.mapType = mapType;
@@ -403,6 +528,13 @@ public class DisplayVars
             scaleHeightOffset = ((tex.getHeight() * bgScale) - tex.getHeight()) / 2;
         }
 
+        /**
+         * Draw.
+         *
+         * @param mapCenter the map center
+         * @param alpha     the alpha
+         * @param rotation  the rotation
+         */
         void draw(Point2D.Double mapCenter, float alpha, double rotation)
         {
             x = mapCenter.getX() - (tex.getWidth() / 2);

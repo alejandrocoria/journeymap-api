@@ -73,6 +73,11 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
     public KeyBinding kbFullscreenCreateWaypoint;
 
     /**
+     * Put a waypoint into chat
+     */
+    public KeyBinding kbFullscreenChatPosition;
+
+    /**
      * Toggle fullscreen map
      */
     public KeyBinding kbFullscreenToggle;
@@ -96,11 +101,6 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
      * Open Options Manager
      */
     public KeyBinding kbFullmapOptionsManager;
-
-    /**
-     * Open Map Actions
-     */
-    public KeyBinding kbFullmapActionsManager;
 
     /**
      * Pan fullscreen map north
@@ -175,6 +175,10 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         setAction(minimapPreviewActions, kbMapToggleType, () -> MiniMap.state().toggleMapType());
         setAction(inGuiActions, kbMapToggleType, () -> getFullscreen().toggleMapType());
 
+        // Switch minimap preset
+        kbMinimapPreset = register("key.journeymap.minimap_preset", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_BACKSLASH);
+        setAction(minimapPreviewActions, kbMinimapPreset, UIManager.INSTANCE::switchMiniMapPreset);
+
         // All minimap preview actions are also used in-game
         inGameActions.putAll(minimapPreviewActions);
 
@@ -187,6 +191,10 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         // Create a waypoint in fullscreen
         kbFullscreenCreateWaypoint = register("key.journeymap.fullscreen_create_waypoint", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_B);
         setAction(inGuiActions, kbFullscreenCreateWaypoint, () -> getFullscreen().createWaypointAtMouse());
+
+        // Create a waypoint in fullscreen
+        kbFullscreenChatPosition = register("key.journeymap.fullscreen_chat_position", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_C);
+        setAction(inGuiActions, kbFullscreenChatPosition, () -> getFullscreen().chatPositionAtMouse());
 
         // Toggle fullscreen map
         kbFullscreenToggle = register("key.journeymap.map_toggle_alt", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, Keyboard.KEY_J);
@@ -202,17 +210,9 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         kbMinimapToggle = register("key.journeymap.minimap_toggle_alt", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, Keyboard.KEY_J);
         setAction(inGameActions, kbMinimapToggle, UIManager.INSTANCE::toggleMinimap);
 
-        // Switch minimap preset
-        kbMinimapPreset = register("key.journeymap.minimap_preset", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_BACKSLASH);
-        setAction(inGameActions, kbMinimapPreset, UIManager.INSTANCE::switchMiniMapPreset);
-
         // Open Options Manager
         kbFullmapOptionsManager = register("key.journeymap.fullscreen_options", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_O);
         setAction(inGuiActions, kbFullmapOptionsManager, () -> UIManager.INSTANCE.openOptionsManager(getFullscreen()));
-
-        // Open Map Actions
-        kbFullmapActionsManager = register("key.journeymap.fullscreen_actions", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_A);
-        setAction(inGuiActions, kbFullmapActionsManager, UIManager.INSTANCE::openMapActions);
 
         // Pan fullscreen map north
         kbFullmapPanNorth = register("key.journeymap.fullscreen.north", KeyConflictContext.GUI, KeyModifier.NONE, Keyboard.KEY_UP);

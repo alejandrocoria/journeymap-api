@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.theme;
@@ -17,35 +14,79 @@ import journeymap.client.ui.component.BooleanPropertyButton;
 import journeymap.common.properties.config.BooleanField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
 /**
- * Created by Mark on 8/30/2014.
+ * @author techbrew 8/30/2014.
  */
 public class ThemeButton extends BooleanPropertyButton
 {
+    /**
+     * The Theme.
+     */
     protected Theme theme;
+    /**
+     * The Button spec.
+     */
     protected Theme.Control.ButtonSpec buttonSpec;
+    /**
+     * The Texture on.
+     */
     protected TextureImpl textureOn;
+    /**
+     * The Texture hover.
+     */
     protected TextureImpl textureHover;
+    /**
+     * The Texture off.
+     */
     protected TextureImpl textureOff;
+    /**
+     * The Texture disabled.
+     */
     protected TextureImpl textureDisabled;
+    /**
+     * The Texture icon.
+     */
     protected TextureImpl textureIcon;
-    protected Integer iconOnColor;
-    protected Integer iconOffColor;
-    protected Integer iconHoverColor;
-    protected Integer iconDisabledColor;
+
+    /**
+     * The Icon name.
+     */
     protected String iconName;
+    /**
+     * The Additional tooltips.
+     */
     protected List<String> additionalTooltips;
 
+    /**
+     * Once on, can't be directly turned off by clicking.
+     */
+    protected boolean staysOn;
+
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param rawLabel the raw label
+     * @param iconName the icon name
+     */
     public ThemeButton(Theme theme, String rawLabel, String iconName)
     {
         this(theme, Constants.getString(rawLabel), Constants.getString(rawLabel), false, iconName);
     }
 
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param toggled  the toggled
+     * @param iconName the icon name
+     */
     public ThemeButton(Theme theme, String labelOn, String labelOff, boolean toggled, String iconName)
     {
         super(labelOn, labelOff, null);
@@ -54,6 +95,15 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
+    /**
+     * Instantiates a new Theme button.
+     *
+     * @param theme    the theme
+     * @param labelOn  the label on
+     * @param labelOff the label off
+     * @param iconName the icon name
+     * @param field    the field
+     */
     protected ThemeButton(Theme theme, String labelOn, String labelOff, String iconName, BooleanField field)
     {
         super(labelOn, labelOff, field);
@@ -61,6 +111,29 @@ public class ThemeButton extends BooleanPropertyButton
         updateTheme(theme);
     }
 
+    /**
+     * Whether it can be toggled by directly clicking.
+     */
+    public boolean isStaysOn()
+    {
+        return staysOn;
+    }
+
+    /**
+     * Sets whether it can be toggled by directly clicking.
+     *
+     * @param staysOn if can't be clicked off
+     */
+    public void setStaysOn(boolean staysOn)
+    {
+        this.staysOn = staysOn;
+    }
+
+    /**
+     * Update theme.
+     *
+     * @param theme the theme
+     */
     public void updateTheme(Theme theme)
     {
         this.theme = theme;
@@ -83,11 +156,6 @@ public class ThemeButton extends BooleanPropertyButton
             textureDisabled = null;
         }
 
-        iconOnColor = Theme.getColor(buttonSpec.iconOnColor);
-        iconOffColor = Theme.getColor(buttonSpec.iconOffColor);
-        iconHoverColor = Theme.getColor(buttonSpec.iconHoverColor);
-        iconDisabledColor = Theme.getColor(buttonSpec.iconDisabledColor);
-
         textureIcon = TextureCache.getThemeTexture(theme, String.format("icon/%s.png", iconName));
 
         setWidth(buttonSpec.width);
@@ -95,6 +163,11 @@ public class ThemeButton extends BooleanPropertyButton
         setToggled(false, false);
     }
 
+    /**
+     * Has valid textures boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasValidTextures()
     {
         if (buttonSpec.useThemeImages)
@@ -108,48 +181,94 @@ public class ThemeButton extends BooleanPropertyButton
         }
     }
 
+    /**
+     * Gets path pattern.
+     *
+     * @return the path pattern
+     */
     protected String getPathPattern()
     {
         return "control/%sbutton_%s.png";
     }
 
+    /**
+     * Gets button spec.
+     *
+     * @param theme the theme
+     * @return the button spec
+     */
     protected Theme.Control.ButtonSpec getButtonSpec(Theme theme)
     {
         return theme.control.button;
     }
 
+    /**
+     * Gets active texture.
+     *
+     * @param isMouseOver the is mouse over
+     * @return the active texture
+     */
     protected TextureImpl getActiveTexture(boolean isMouseOver)
-    {
-        if (isEnabled())
-        {
-            TextureImpl activeTexture = isMouseOver ? Mouse.isButtonDown(0) ? textureOn : textureHover : textureOff;
-            return activeTexture;
-        }
-        else
-        {
-            return textureDisabled;
-        }
-    }
-
-    protected Integer getIconColor(boolean isMouseOver)
     {
         if (!isEnabled())
         {
-            return iconDisabledColor;
+            return textureDisabled;
+        }
+
+//        if (isMouseOver)
+//        {
+//            return textureHover;
+//        }
+
+        return toggled ? textureOn : textureOff;
+    }
+
+    /**
+     * Gets icon colorspec for current state.
+     *
+     * @param isMouseOver the is mouse over
+     * @return the icon color
+     */
+    protected Theme.ColorSpec getIconColor(boolean isMouseOver)
+    {
+        if (!isEnabled())
+        {
+            return buttonSpec.iconDisabled;
         }
 
         if (isMouseOver)
         {
-            return iconHoverColor;
+            return toggled ? buttonSpec.iconHoverOn : buttonSpec.iconHoverOff;
         }
 
-        return toggled ? iconOnColor : iconOffColor;
+        return toggled ? buttonSpec.iconOn : buttonSpec.iconOff;
     }
 
-    @Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float f)
+    /**
+     * Gets button colorspec for current state.
+     *
+     * @param isMouseOver the is mouse over
+     * @return the icon color
+     */
+    protected Theme.ColorSpec getButtonColor(boolean isMouseOver)
     {
-        if (!isDrawButton())
+        if (!isEnabled())
+        {
+            return buttonSpec.buttonDisabled;
+        }
+
+        if (isMouseOver)
+        {
+            return toggled ? buttonSpec.buttonHoverOn : buttonSpec.buttonHoverOff;
+        }
+
+        return toggled ? buttonSpec.buttonOn : buttonSpec.buttonOff;
+    }
+    
+    @Override
+    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks)
+    {
+        if (!isVisible())
         {
             return;
         }
@@ -163,20 +282,22 @@ public class ThemeButton extends BooleanPropertyButton
         boolean isMouseOver = (hoverState == 2);
 
         TextureImpl activeTexture = getActiveTexture(isMouseOver);
+        Theme.ColorSpec iconColorSpec = getIconColor(isMouseOver);
 
         int drawX = getX();
         int drawY = getY();
 
         if (buttonSpec.useThemeImages)
         {
+            Theme.ColorSpec buttonColorSpec = getButtonColor(isMouseOver);
             float buttonScale = 1f;
             if (buttonSpec.width != activeTexture.getWidth())
             {
+                // TODO: strech and cache this instead
                 buttonScale = (1f * buttonSpec.width / activeTexture.getWidth());
             }
-
             // Theme Button Background
-            DrawUtil.drawImage(activeTexture, drawX, drawY, false, buttonScale, 0);
+            DrawUtil.drawColoredImage(activeTexture, buttonColorSpec.getColor(), buttonColorSpec.alpha, drawX, drawY, buttonScale, 0);
         }
         else
         {
@@ -188,22 +309,26 @@ public class ThemeButton extends BooleanPropertyButton
         float iconScale = 1f;
         if (theme.icon.width != textureIcon.getWidth())
         {
+            // TODO: strech and cache this instead
             iconScale = (1f * theme.icon.width / textureIcon.getWidth());
         }
 
-        //drawX += (((width - textureIcon.width)/2));
-        //drawY += (((height - textureIcon.height)/2));
-        //DrawUtil.drawImage(textureIcon, drawX, drawY, false, scale, 0);
-
         if (!buttonSpec.useThemeImages)
         {
-            DrawUtil.drawColoredImage(textureIcon, RGB.BLACK_RGB, 1f, drawX + .5, drawY + .5, iconScale, 0);
+            // Shadow the icon
+            DrawUtil.drawColoredImage(textureIcon, RGB.BLACK_RGB, iconColorSpec.alpha, drawX + .5, drawY + .5, iconScale, 0);
         }
 
-        Integer iconColor = getIconColor(isMouseOver);
-        DrawUtil.drawColoredImage(textureIcon, iconColor, 1f, drawX, drawY, iconScale, 0);
+        DrawUtil.drawColoredImage(textureIcon, iconColorSpec.getColor(), iconColorSpec.alpha, drawX, drawY, iconScale, 0);
     }
 
+    /**
+     * Draw native button.
+     *
+     * @param minecraft the minecraft
+     * @param mouseX    the mouse x
+     * @param mouseY    the mouse y
+     */
     public void drawNativeButton(Minecraft minecraft, int mouseX, int mouseY)
     {
         int magic = 20;
@@ -219,6 +344,11 @@ public class ThemeButton extends BooleanPropertyButton
         int l = 14737632;
     }
 
+    /**
+     * Sets additional tooltips.
+     *
+     * @param additionalTooltips the additional tooltips
+     */
     public void setAdditionalTooltips(List<String> additionalTooltips)
     {
         this.additionalTooltips = additionalTooltips;

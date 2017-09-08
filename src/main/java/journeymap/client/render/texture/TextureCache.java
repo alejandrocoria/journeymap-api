@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.render.texture;
@@ -11,7 +8,7 @@ package journeymap.client.render.texture;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.ui.theme.Theme;
 import journeymap.common.Journeymap;
@@ -42,43 +39,137 @@ import java.util.concurrent.*;
 
 /**
  * Texture management
- * @author mwoodman
+ *
+ * @author techbrew
  */
 public class TextureCache
 {
-    // BufferedImages should be retained
+    /**
+     * The constant GridCheckers.
+     */
+// BufferedImages should be retained
     public static final ResourceLocation GridCheckers = uiImage("grid-checkers.png");
+    /**
+     * The constant GridDots.
+     */
     public static final ResourceLocation GridDots = uiImage("grid-dots.png");
+    /**
+     * The constant GridSquares.
+     */
     public static final ResourceLocation GridSquares = uiImage("grid.png");
+    /**
+     * The constant ColorPicker.
+     */
     public static final ResourceLocation ColorPicker = uiImage("colorpick.png");
+    /**
+     * The constant ColorPicker2.
+     */
     public static final ResourceLocation ColorPicker2 = uiImage("colorpick2.png");
+    /**
+     * The constant TileSampleDay.
+     */
     public static final ResourceLocation TileSampleDay = uiImage("tile-sample-day.png");
+    /**
+     * The constant TileSampleNight.
+     */
     public static final ResourceLocation TileSampleNight = uiImage("tile-sample-night.png");
+    /**
+     * The constant TileSampleUnderground.
+     */
     public static final ResourceLocation TileSampleUnderground = uiImage("tile-sample-underground.png");
+    /**
+     * The constant UnknownEntity.
+     */
     public static final ResourceLocation UnknownEntity = uiImage("unknown.png");
 
-    // BufferedImages don't need be retained
+    /**
+     * The constant Brick.
+     */
+// BufferedImages don't need be retained
     public static final ResourceLocation Brick = uiImage("brick.png");
+    /**
+     * The constant Deathpoint.
+     */
     public static final ResourceLocation Deathpoint = uiImage("waypoint-death.png");
+    /**
+     * The constant MobDot.
+     */
     public static final ResourceLocation MobDot = uiImage("marker-dot-16.png");
+    /**
+     * The constant MobDot_Large.
+     */
     public static final ResourceLocation MobDot_Large = uiImage("marker-dot-32.png");
+    /**
+     * The constant MobDotArrow.
+     */
     public static final ResourceLocation MobDotArrow = uiImage("marker-dot-arrow-16.png");
+    /**
+     * The constant MobDotArrow_Large.
+     */
     public static final ResourceLocation MobDotArrow_Large = uiImage("marker-dot-arrow-32.png");
+    /**
+     * The constant MobDotChevron.
+     */
     public static final ResourceLocation MobDotChevron = uiImage("marker-chevron-16.png");
+    /**
+     * The constant MobDotChevron_Large.
+     */
     public static final ResourceLocation MobDotChevron_Large = uiImage("marker-chevron-32.png");
+    /**
+     * The constant MobIconArrow.
+     */
     public static final ResourceLocation MobIconArrow = uiImage("marker-icon-arrow-16.png");
+    /**
+     * The constant MobIconArrow_Large.
+     */
     public static final ResourceLocation MobIconArrow_Large = uiImage("marker-icon-arrow-32.png");
+    /**
+     * The constant PlayerArrow.
+     */
     public static final ResourceLocation PlayerArrow = uiImage("marker-player-16.png");
+    /**
+     * The constant PlayerArrowBG.
+     */
     public static final ResourceLocation PlayerArrowBG = uiImage("marker-player-bg-16.png");
+    /**
+     * The constant PlayerArrow_Large.
+     */
     public static final ResourceLocation PlayerArrow_Large = uiImage("marker-player-32.png");
+    /**
+     * The constant PlayerArrowBG_Large.
+     */
     public static final ResourceLocation PlayerArrowBG_Large = uiImage("marker-player-bg-32.png");
-    public static final ResourceLocation Logo = uiImage("ico/journeymap60.png");
+    /**
+     * The constant Logo.
+     */
+    public static final ResourceLocation Logo = uiImage("ico/journeymap.png");
+    /**
+     * The constant MinimapSquare128.
+     */
     public static final ResourceLocation MinimapSquare128 = uiImage("minimap/minimap-square-128.png");
+    /**
+     * The constant MinimapSquare256.
+     */
     public static final ResourceLocation MinimapSquare256 = uiImage("minimap/minimap-square-256.png");
+    /**
+     * The constant MinimapSquare512.
+     */
     public static final ResourceLocation MinimapSquare512 = uiImage("minimap/minimap-square-512.png");
+    /**
+     * The constant Patreon.
+     */
     public static final ResourceLocation Patreon = uiImage("patreon.png");
+    /**
+     * The constant Waypoint.
+     */
     public static final ResourceLocation Waypoint = uiImage("waypoint.png");
+    /**
+     * The constant WaypointEdit.
+     */
     public static final ResourceLocation WaypointEdit = uiImage("waypoint-edit.png");
+    /**
+     * The constant WaypointOffscreen.
+     */
     public static final ResourceLocation WaypointOffscreen = uiImage("waypoint-offscreen.png");
 
     private static ResourceLocation uiImage(String fileName)
@@ -86,8 +177,14 @@ public class TextureCache
         return new ResourceLocation(Journeymap.MOD_ID, "ui/img/" + fileName);
     }
 
-    // Keeps the textures referenced here from being garbage collected, since ResourceLocationTexture's cache uses weak values.
+    /**
+     * The constant playerSkins.
+     */
+// Keeps the textures referenced here from being garbage collected, since ResourceLocationTexture's cache uses weak values.
     public static final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<>());
+    /**
+     * The constant themeImages.
+     */
     public static final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<>());
 
     private static ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
@@ -95,6 +192,12 @@ public class TextureCache
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
 
+    /**
+     * Gets texture.
+     *
+     * @param location the location
+     * @return the texture
+     */
     public static TextureImpl getTexture(ResourceLocation location)
     {
         if (location == null)
@@ -116,11 +219,21 @@ public class TextureCache
         return (TextureImpl) textureObject;
     }
 
+    /**
+     * Schedule texture task future.
+     *
+     * @param <T>         the type parameter
+     * @param textureTask the texture task
+     * @return the future
+     */
     public static <T extends TextureImpl> Future<T> scheduleTextureTask(Callable<T> textureTask)
     {
         return texExec.submit(textureTask);
     }
 
+    /**
+     * Reset.
+     */
     public static void reset()
     {
         playerSkins.clear();
@@ -135,6 +248,11 @@ public class TextureCache
                 TileSampleNight, TileSampleUnderground, UnknownEntity).stream().map(TextureCache::getTexture);
     }
 
+    /**
+     * Purge theme images.
+     *
+     * @param themeImages the theme images
+     */
     public static void purgeThemeImages(Map<String, TextureImpl> themeImages)
     {
         synchronized (themeImages)
@@ -148,7 +266,7 @@ public class TextureCache
      * Gets a buffered image from the resource location
      *
      * @param location location
-     * @return image
+     * @return image buffered image
      */
     public static BufferedImage resolveImage(ResourceLocation location)
     {
@@ -193,11 +311,30 @@ public class TextureCache
         }
     }
 
+    /**
+     * Gets theme texture.
+     *
+     * @param theme    the theme
+     * @param iconPath the icon path
+     * @return the theme texture
+     */
     public static TextureImpl getThemeTexture(Theme theme, String iconPath)
     {
         return getSizedThemeTexture(theme, iconPath, 0, 0, false, 1f, false);
     }
 
+    /**
+     * Gets sized theme texture.
+     *
+     * @param theme       the theme
+     * @param iconPath    the icon path
+     * @param width       the width
+     * @param height      the height
+     * @param resize      the resize
+     * @param alpha       the alpha
+     * @param retainImage the retain image
+     * @return the sized theme texture
+     */
     public static TextureImpl getSizedThemeTexture(Theme theme, String iconPath, int width, int height, boolean resize, float alpha, boolean retainImage)
     {
         String texName = String.format("%s/%s", theme.directory, iconPath);
@@ -206,7 +343,7 @@ public class TextureCache
             TextureImpl tex = themeImages.get(texName);
             if (tex == null || (tex.retainImage != retainImage) || (!tex.hasImage() && tex.retainImage) || (resize && (width != tex.width || height != tex.height)) || tex.alpha != alpha)
             {
-                File parentDir = ThemeFileHandler.getThemeIconDir();
+                File parentDir = ThemeLoader.getThemeIconDir();
                 BufferedImage img = FileHandler.getIconFromFile(parentDir, theme.directory, iconPath);
                 if (img == null)
                 {
@@ -250,6 +387,16 @@ public class TextureCache
         }
     }
 
+    /**
+     * Gets scaled copy.
+     *
+     * @param texName  the tex name
+     * @param original the original
+     * @param width    the width
+     * @param height   the height
+     * @param alpha    the alpha
+     * @return the scaled copy
+     */
     public static TextureImpl getScaledCopy(String texName, TextureImpl original, int width, int height, float alpha)
     {
         synchronized (themeImages)
@@ -293,6 +440,9 @@ public class TextureCache
     /**
      * Get the head portion of a player's skin, scaled to 24x24 pixels.
      * TODO use skinmanager
+     *
+     * @param username the username
+     * @return the player skin
      */
     public static TextureImpl getPlayerSkin(final String username)
     {
@@ -343,6 +493,9 @@ public class TextureCache
 
     /**
      * Blocks.  Use this in a thread.
+     *
+     * @param username the username
+     * @return the buffered image
      */
     public static BufferedImage downloadSkin(String username)
     {

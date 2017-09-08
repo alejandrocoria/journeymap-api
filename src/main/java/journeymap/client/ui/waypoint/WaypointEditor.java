@@ -478,17 +478,21 @@ public class WaypointEditor extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        for (GuiTextField field : fieldList)
-        {
-            field.mouseClicked(mouseX, mouseY, mouseButton);
-        }
 
-        checkColorPicker(mouseX, mouseY);
-
-        Button button = dimScrollPane.mouseClicked(mouseX, mouseY, mouseButton);
-        if (button != null)
+        if (mouseButton == 0)
         {
-            actionPerformed(button);
+            for (GuiTextField field : fieldList)
+            {
+                field.mouseClicked(mouseX, mouseY, mouseButton);
+            }
+
+            checkColorPicker(mouseX, mouseY);
+
+            Button button = dimScrollPane.mouseClicked(mouseX, mouseY, mouseButton);
+            if (button != null)
+            {
+                actionPerformed(button);
+            }
         }
     }
 

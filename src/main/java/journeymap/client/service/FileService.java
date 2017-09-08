@@ -12,7 +12,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.color.ColorManager;
 import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.io.FileHandler;
-import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.JMLogger;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -178,12 +178,13 @@ public class FileService extends BaseService
             else if (path.startsWith(ICON_THEME_PATH_PREFIX))
             {
                 String themeIconPath = path.split(ICON_THEME_PATH_PREFIX)[1].replace('/', File.separatorChar);
-                File themeDir = new File(ThemeFileHandler.getThemeIconDir(), ThemePresets.THEME_VICTORIAN.directory);
+                File themeDir = new File(ThemeLoader.getThemeIconDir(), ThemePresets.getDefault().directory);
                 File iconFile = new File(themeDir, themeIconPath);
                 if (!iconFile.exists())
                 {
                     // Fallback to jar asset
-                    String setName = themeIconPath.split("\\" + File.separator)[0];
+                    String delim = "\\" + File.separator;
+                    String setName = themeIconPath.split(delim)[0];
                     String iconPath = themeIconPath.substring(themeIconPath.indexOf(File.separatorChar) + 1);
 
                     if (event != null)

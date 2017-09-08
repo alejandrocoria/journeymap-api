@@ -377,15 +377,9 @@ public class Splash extends JmUI
         }
 
         @Override
-        public boolean mouseOver(int mouseX, int mouseY)
+        public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
         {
-            return super.mouseOver(mouseX, mouseY);
-        }
-
-        @Override
-        public boolean mousePressed(Minecraft minecraft, int i, int j)
-        {
-            boolean pressed = super.mousePressed(minecraft, i, j);
+            boolean pressed = super.mousePressed(minecraft, mouseX, mouseY);
             if (pressed)
             {
                 infoLine.invokeAction(Splash.this);

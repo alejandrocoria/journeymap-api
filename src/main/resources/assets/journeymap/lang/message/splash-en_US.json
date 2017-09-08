@@ -3,8 +3,8 @@
 {
   "lines": [
     {
-      "label": "Improved color support for modded blocks",
-      "action": ""
+      "label": "New UI themes and Fullscreen Map layout",
+      "action": "dialog.OptionsManager"
     },
     {
       "label": "New customizable keybindings (Controls)",

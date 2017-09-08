@@ -67,18 +67,19 @@ public class MapPlayerTask extends BaseMapTask
 
     public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityDTO player)
     {
+        final boolean surfaceAllowed = FeatureManager.isAllowed(Feature.MapSurface);
         final boolean cavesAllowed = FeatureManager.isAllowed(Feature.MapCaves);
+        if (!surfaceAllowed && !cavesAllowed)
+        {
+            return null;
+        }
+
         final EntityLivingBase playerEntity = player.entityLivingRef.get();
         if (playerEntity == null)
         {
             return null;
         }
         boolean underground = player.underground;
-
-        if (underground && !cavesAllowed)
-        {
-            return null;
-        }
 
         MapType mapType;
         if (underground)
@@ -96,7 +97,7 @@ public class MapPlayerTask extends BaseMapTask
 
         if (underground)
         {
-            if (Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
+            if (surfaceAllowed && Journeymap.getClient().getCoreProperties().alwaysMapSurface.get())
             {
                 tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, MapType.day(player), new ArrayList<ChunkPos>()));
             }
@@ -109,7 +110,7 @@ public class MapPlayerTask extends BaseMapTask
             }
         }
 
-        if (!underground && Journeymap.getClient().getCoreProperties().mapTopography.get())
+        if (Journeymap.getClient().getCoreProperties().mapTopography.get())
         {
             tasks.add(new MapPlayerTask(chunkRenderController, playerEntity.world, MapType.topo(player), new ArrayList<ChunkPos>()));
         }

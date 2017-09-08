@@ -62,7 +62,7 @@ public class ModOverlayLayer implements LayerDelegate.Layer
     }
 
     @Override
-    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale)
+    public List<DrawStep> onMouseMove(Minecraft mc, GridRenderer gridRenderer, Point2D.Double mousePosition, BlockPos blockCoord, float fontScale, boolean isScrolling)
     {
         ensureCurrent(mc, gridRenderer, mousePosition, blockCoord);
 

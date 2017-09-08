@@ -201,7 +201,10 @@ public class Waypoint implements Serializable
         this.setOrigin(modWaypoint.getModId());
         this.displayId = modWaypoint.getId();
         this.setPersistent(modWaypoint.isPersistent());
-        this.setGroupName(modWaypoint.getGroup().getName());
+        if (modWaypoint.getGroup() != null)
+        {
+            this.setGroupName(modWaypoint.getGroup().getName());
+        }
     }
 
     /**

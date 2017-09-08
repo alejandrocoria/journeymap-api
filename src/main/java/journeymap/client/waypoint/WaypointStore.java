@@ -118,9 +118,14 @@ public enum WaypointStore
     public void remove(Waypoint waypoint)
     {
         cache.invalidate(waypoint.getId());
-        File waypointFile = null;
-        waypointFile = new File(FileHandler.getWaypointDir(), waypoint.getFileName());
-        remove(waypointFile);
+        if (waypoint.isPersistent())
+        {
+            File waypointFile = new File(FileHandler.getWaypointDir(), waypoint.getFileName());
+            if (waypointFile.exists())
+            {
+                remove(waypointFile);
+            }
+        }
     }
 
     private void remove(File waypointFile)

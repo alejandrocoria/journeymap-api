@@ -152,6 +152,25 @@ public final class RGB
     }
 
     /**
+     * Create an arbg int.
+     *
+     * @param rgbInt the rgb
+     * @param alpha  alpha
+     * @return the int
+     */
+    public static int toArbg(int rgbInt, float alpha)
+    {
+        // rgba
+        int[] rgba = ints(rgbInt, alpha);
+
+        return (((rgba[3]) & 0xFF) << 24) |
+                (((rgba[0]) & 0xFF) << 16) |
+                (((rgba[2]) & 0xFF) << 8) |
+                (((rgba[1]) & 0xFF));
+    }
+
+
+    /**
      * To integer int.
      *
      * @param r the r

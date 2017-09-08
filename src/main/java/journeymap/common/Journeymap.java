@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.common;
@@ -35,23 +32,55 @@ import java.util.Map;
         dependencies = "required-after:Forge@[${@FORGEVERSION@},)")
 public class Journeymap
 {
+    /**
+     * The constant MOD_ID.
+     */
     public static final String MOD_ID = "journeymap";
+    /**
+     * The constant SHORT_MOD_NAME.
+     */
     public static final String SHORT_MOD_NAME = "JourneyMap";
-    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 4, 8, "dev"));
+    /**
+     * The constant JM_VERSION.
+     */
+    public static final Version JM_VERSION = Version.from("@MAJOR@", "@MINOR@", "@MICRO@", "@PATCH@", new Version(5, 5, 0, "dev"));
+    /**
+     * The constant FORGE_VERSION.
+     */
     public static final String FORGE_VERSION = "@FORGEVERSION@";
+    /**
+     * The constant MC_VERSION.
+     */
     public static final String MC_VERSION = "@MCVERSION@";
+    /**
+     * The constant WEBSITE_URL.
+     */
     public static final String WEBSITE_URL = "http://journeymap.info/";
+    /**
+     * The constant DOWNLOAD_URL.
+     */
     public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";
+    /**
+     * The constant VERSION_URL.
+     */
     public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap-32274.json";
 
+    /**
+     * The constant instance.
+     */
     @Mod.Instance(Journeymap.MOD_ID)
     public static Journeymap instance;
 
+    /**
+     * The constant proxy.
+     */
     @SidedProxy(clientSide = "journeymap.client.JourneymapClient", serverSide = "journeymap.server.JourneymapServer")
     public static CommonProxy proxy;
 
     /**
      * Get the common logger.
+     *
+     * @return the logger
      */
     public static Logger getLogger()
     {
@@ -60,6 +89,10 @@ public class Journeymap
 
     /**
      * Whether this side will accept being connected to the other side.
+     *
+     * @param modList the mod list
+     * @param side    the side
+     * @return the boolean
      */
     @NetworkCheckHandler
     public boolean checkModLists(Map<String, String> modList, Side side)
@@ -77,8 +110,8 @@ public class Journeymap
     /**
      * Pre-initialize the sided proxy.
      *
-     * @param event
-     * @throws Throwable
+     * @param event the event
+     * @throws Throwable the throwable
      */
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event) throws Throwable
@@ -89,8 +122,8 @@ public class Journeymap
     /**
      * Initialize the sided proxy.
      *
-     * @param event
-     * @throws Throwable
+     * @param event the event
+     * @throws Throwable the throwable
      */
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
@@ -101,8 +134,8 @@ public class Journeymap
     /**
      * Post-initialize the sided proxy.
      *
-     * @param event
-     * @throws Throwable
+     * @param event the event
+     * @throws Throwable the throwable
      */
     @Mod.EventHandler
     public void postInitialize(FMLPostInitializationEvent event) throws Throwable
@@ -111,16 +144,26 @@ public class Journeymap
 
     }
 
+    /**
+     * Server starting event.
+     *
+     * @param event the event
+     */
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
 //        if (event.getServer().getEntityWorld().isRemote)
 //        {
-            PropertiesManager.getInstance();
+        PropertiesManager.getInstance();
 //        }
         event.registerServerCommand(new CommandJTP());
     }
 
+    /**
+     * Server started event.
+     *
+     * @param event the event
+     */
     @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
@@ -128,12 +171,22 @@ public class Journeymap
 
     }
 
+    /**
+     * Gets client.
+     *
+     * @return the client
+     */
     @SideOnly(Side.CLIENT)
     public static JourneymapClient getClient()
     {
         return (JourneymapClient) proxy;
     }
 
+    /**
+     * Gets server.
+     *
+     * @return the server
+     */
     @SideOnly(Side.SERVER)
     public static JourneymapServer getServer()
     {
