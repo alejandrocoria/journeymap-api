@@ -22,21 +22,20 @@
 </ul>
 <p><strong>CHANGELOG (${date}):</strong></p>
 <ul>
-    <li>UI Theme system refactored. New Biome-inspired UI themes: Desert, End City, Forest, Nether Fort, Ocean.</li>
-    <li>Fullscreen map has new "Chat Position" keybinding. The block position under the mouse will be put into chat.
-    </li>
-    <li>Fullscreen map toolbars and layout have changed. The "Actions" button and dialog have been replaced with buttons
-        for each action.
-    </li>
+    <li>Updated to JourneyMap API 1.4 release.</li>
+    <li>Bugfix: Waypoints created through API produced exception if a color wasn't set.</li>
+</ul>
+<p><strong>CHANGELOG b4:</strong></p>
+<ul>
+    <li>UI Theme system refactored. New Biome-inspired UI themes: DesertTemple, EndCity, ForestMansion, NetherFortress, OceanMonument, Stronghold, and an updated version of Purist</li>
+    <li>Fullscreen map has new "Chat Position" keybinding. The block position under the mouse will be put into chat.</li>
+    <li>Fullscreen map toolbars and layout have changed.  The "Actions" button and dialog have been replaced with buttons for each action.</li>
     <li>Old Victorian theme removed and is no longer supported.</li>
     <li>"Show Keys" panel in Fullscreen map fades out when the mouse is over it.</li>
-    <li>New Minimap Options: Customize the information shown above/below with 4 "Info Slots". Each slot can be one of:
-        FPS, Game Time, System Time, Location, Biome.
-    </li>
+    <li>New Minimap Options: Customize the information shown above/below with 4 "Info Slots". Each slot can be one of: FPS, Game Time, System Time, Location, Biome.</li>
     <li>Bugfix: Options Manager missing reset buttons and Minimap Preset 2 preview button</li>
     <li>Bugfix: Waypoints added via the JourneyMap API would produce NPE if no group was set</li>
-    <li>Bugfix: Temporary (non-persistent) Waypoints added via the JourneyMap API would produce log spam when removed
-    </li>
+    <li>Bugfix: Temporary (non-persistent) Waypoints added via the JourneyMap API would produce log spam when removed</li>
     <li>Bugfix: Minimap option "Frame Opacity" was ignored</li>
     <li>Bugfix: Grid opacity setting was ignored</li>
     <li>Theme-related bugfixes</li>
@@ -58,7 +57,6 @@
 <p><strong>CHANGELOG b1:</strong></p>
 <ul>
     <li>Major overhaul of color palette generation to support modded blocks.</li>
-    <li>Support for colored beds in World of Color update (1.12)</li>
     <li>New Cartography options: Blend Grass, Blend Foliage, Blend Water.</li>
     <li>Added customizable keybindings for In-Game Controls and Fullscreen Map Controls</li>
     <li>Fullscreen Map shows biome name under mouse in Singleplayer, even for unloaded chunks</li>
