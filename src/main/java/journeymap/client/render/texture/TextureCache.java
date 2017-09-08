@@ -160,6 +160,10 @@ public class TextureCache
      */
     public static final ResourceLocation Patreon = uiImage("patreon.png");
     /**
+     * The constant Patreon.
+     */
+    public static final ResourceLocation Discord = uiImage("discord.png");
+    /**
      * The constant Waypoint.
      */
     public static final ResourceLocation Waypoint = uiImage("waypoint.png");

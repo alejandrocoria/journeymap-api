@@ -3,6 +3,8 @@ package journeymap.client.ui.theme.impl;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemePresets;
 
+import java.util.Arrays;
+
 /**
  * Provides basic Theme setup with common defaults, and uses a Style to abstract a color palette from how the colors are applied.
  */
@@ -43,8 +45,21 @@ public class FlatTheme extends Theme
         style.iconSize = 20;
         style.toolbarPadding = 0;
         Theme theme = new FlatTheme("Purist", "techbrew", style);
-        theme.minimap.circle.margin = 2;
-        theme.minimap.square.margin = 4;
+
+        for (Minimap.MinimapSpec minimapSpec : Arrays.asList(theme.minimap.circle, theme.minimap.square))
+        {
+            minimapSpec.margin = 6;
+            minimapSpec.reticle.color = "#222222";
+            minimapSpec.reticleHeading.color = "#222222";
+            minimapSpec.labelTop.foreground.color = "#cccccc";
+            minimapSpec.labelTop.background.color = "#55555";
+            minimapSpec.labelBottom.foreground.color = "#cccccc";
+            minimapSpec.labelBottom.background.color = "#55555";
+            minimapSpec.compassLabel.foreground.color = "#cccccc";
+            minimapSpec.compassLabel.background.color = "#222222";
+            minimapSpec.compassLabel.background.alpha = .5f;
+        }
+
         return theme;
     }
 
@@ -87,7 +102,8 @@ public class FlatTheme extends Theme
         String darker = "#760000";
         String darkest = "#3b0000";
 
-        return createFlatTheme("NetherFortress", light, medium, dark, darker, darkest);
+        Theme theme = createFlatTheme("NetherFortress", light, medium, dark, darker, darkest);
+        return theme;
     }
 
     /**
@@ -116,11 +132,24 @@ public class FlatTheme extends Theme
         theme.control.toggle.iconHoverOn.color = medium;
         theme.control.toggle.iconHoverOff.color = medium;
         theme.control.toggle.iconOn.color = medium;
-        theme.control.toggle.buttonDisabled.color = "#555555";
-        theme.control.toggle.iconDisabled.color = "#555555";
+
+        theme.control.toggle.iconOff.color = "#555555";
 
         theme.fullscreen.statusLabel.background.color = darker;
-        theme.fullscreen.statusLabel.foreground.color = dark;
+        theme.fullscreen.statusLabel.foreground.color = medium;
+
+        String white = "#ffffff";
+        String black = "#000000";
+        for (Minimap.MinimapSpec minimapSpec : Arrays.asList(theme.minimap.circle, theme.minimap.square))
+        {
+            minimapSpec.labelTop.foreground.color = white;
+            minimapSpec.labelTop.background.color = black;
+            minimapSpec.labelBottom.foreground.color = white;
+            minimapSpec.labelBottom.background.color = black;
+            minimapSpec.compassLabel.foreground.color = white;
+            minimapSpec.compassLabel.background.color = black;
+        }
+        
         return theme;
     }
 
@@ -135,7 +164,9 @@ public class FlatTheme extends Theme
         String darker = "#212a87";
         String darkest = "#0e1239";
 
-        return createFlatTheme("OceanMonument", light, medium, dark, darker, darkest);
+        Theme theme = createFlatTheme("OceanMonument", light, medium, dark, darker, darkest);
+        theme.control.toggle.iconDisabled.color = "#555555";
+        return theme;
     }
 
     /**
@@ -186,9 +217,16 @@ public class FlatTheme extends Theme
 
         style.minimapTexPrefix = "flat_";
         style.buttonTexPrefix = "flat_";
+
         Theme theme = new FlatTheme(themeName, "techbrew", style);
-        theme.minimap.circle.margin = 2;
-        theme.minimap.square.margin = 4;
+
+        theme.minimap.circle.margin = 6;
+        theme.minimap.square.margin = 6;
+        theme.minimap.circle.reticle.color = dark;
+        theme.minimap.circle.reticleHeading.color = dark;
+        theme.minimap.square.reticle.color = dark;
+        theme.minimap.square.reticleHeading.color = dark;
+
         return theme;
     }
 

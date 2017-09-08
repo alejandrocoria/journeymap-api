@@ -7,9 +7,13 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.ui.UIManager;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiControls;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -47,7 +51,7 @@ public class FullscreenActions
      */
     public static void launchPatreon()
     {
-        String url = "http://patreon.com/techbrew";
+        String url = Journeymap.PATREON_URL;
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -74,6 +78,14 @@ public class FullscreenActions
         {
             Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
+    }
+
+    public static void openKeybindings()
+    {
+        UIManager.INSTANCE.closeAll();
+        Fullscreen fullscreen = UIManager.INSTANCE.openFullscreenMap();
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.displayGuiScreen(new GuiControls(fullscreen, mc.gameSettings));
     }
 
     /**

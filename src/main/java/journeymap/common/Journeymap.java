@@ -57,13 +57,17 @@ public class Journeymap
      */
     public static final String WEBSITE_URL = "http://journeymap.info/";
     /**
+     * URL for Patreon
+     */
+    public static final String PATREON_URL = "http://patreon.com/techbrew";
+    /**
      * The constant DOWNLOAD_URL.
      */
-    public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";
+    public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap/files/";
     /**
      * The constant VERSION_URL.
      */
-    public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap-32274.json";
+    public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap.json";
 
     /**
      * The constant instance.

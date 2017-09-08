@@ -36,9 +36,12 @@ import java.util.List;
 public class Splash extends JmUI
 {
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
-    Button buttonClose, buttonOptions, buttonDonate;
+    protected TextureImpl discordLogo = TextureCache.getTexture(TextureCache.Discord);
+    Button buttonClose, buttonOptions, buttonPatreon, buttonDiscord, buttonWebsite, buttonDownload;
     ButtonList peopleButtons;
     ButtonList devButtons;
+    ButtonList logoButtons;
+    ButtonList linkButtons;
     ButtonList bottomButtons;
     ButtonList infoButtons;
 
@@ -90,6 +93,8 @@ public class Splash extends JmUI
                 devs = new ArrayList<SplashPerson>(devs);
                 devs.add(new SplashPerson.Fake("", "", TextureCache.getTexture(TextureCache.ColorPicker2)));
             }
+
+            return;
         }
 
         this.buttonList.clear();
@@ -125,16 +130,11 @@ public class Splash extends JmUI
         infoButtons.equalizeWidths(fr);
         buttonList.addAll(infoButtons);
 
-        buttonDonate = new Button("");
-        buttonDonate.setDefaultStyle(false);
-        buttonDonate.setDrawBackground(false);
-        buttonDonate.setDrawFrame(false);
-        buttonDonate.setTooltip(Constants.getString("jm.webmap.donate_text"));
-
+        // Bottom Buttons
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonOptions = new Button(Constants.getString("jm.common.options_button"));
 
-        bottomButtons = new ButtonList(buttonOptions, buttonDonate);
+        bottomButtons = new ButtonList(buttonOptions);
 
         // Show the close button if not in Forge mod Config mode with no game running
         if (mc.world != null)
@@ -142,11 +142,48 @@ public class Splash extends JmUI
             bottomButtons.add(buttonClose);
         }
 
-        bottomButtons.equalizeWidths(getFontRenderer());
+        bottomButtons.equalizeWidths(fr);
         bottomButtons.setWidths(Math.max(100, buttonOptions.getWidth()));
-        buttonDonate.setWidth(50);
         buttonList.addAll(bottomButtons);
 
+        // Link Buttons
+        buttonWebsite = new Button("http://journeymap.info");
+        buttonWebsite.setTooltip(Constants.getString("jm.common.website"));
+
+        buttonDownload = new Button(Constants.getString("jm.common.download"));
+        buttonDownload.setTooltip(Constants.getString("jm.common.download.tooltip"));
+
+        linkButtons = new ButtonList(buttonWebsite, buttonDownload);
+        linkButtons.equalizeWidths(fr);
+        buttonList.addAll(linkButtons);
+
+        int commonWidth = Math.max(bottomButtons.getWidth(0) / bottomButtons.size(), linkButtons.getWidth(0) / linkButtons.size());
+        bottomButtons.setWidths(commonWidth);
+        linkButtons.setWidths(commonWidth);
+
+        // Logo Buttons
+        buttonPatreon = new Button("");
+        buttonPatreon.setDefaultStyle(false);
+        buttonPatreon.setDrawBackground(false);
+        buttonPatreon.setDrawFrame(false);
+        buttonPatreon.setTooltip(Constants.getString("jm.common.patreon"), Constants.getString("jm.common.patreon.tooltip"));
+        buttonPatreon.setWidth(patreonLogo.getWidth() / scaleFactor);
+        buttonPatreon.setHeight(patreonLogo.getHeight() / scaleFactor);
+
+        buttonDiscord = new Button("");
+        buttonDiscord.setDefaultStyle(false);
+        buttonDiscord.setDrawBackground(false);
+        buttonDiscord.setDrawFrame(false);
+        buttonDiscord.setTooltip(Constants.getString("jm.common.discord"), Constants.getString("jm.common.discord.tooltip"));
+        buttonDiscord.setWidth(discordLogo.getWidth() / scaleFactor);
+        buttonDiscord.setHeight(discordLogo.getHeight() / scaleFactor);
+
+        logoButtons = new ButtonList(buttonDiscord, buttonPatreon);
+        logoButtons.setLayout(ButtonList.Layout.Horizontal, ButtonList.Direction.LeftToRight);
+        logoButtons.setHeights(Math.max(discordLogo.getHeight(), patreonLogo.getHeight()) / scaleFactor);
+        logoButtons.setWidths(Math.max(discordLogo.getWidth(), patreonLogo.getWidth()) / scaleFactor);
+
+        buttonList.addAll(logoButtons);
     }
 
     /**
@@ -266,11 +303,21 @@ public class Splash extends JmUI
 
         }
 
+
+        int rowHeight = buttonOptions.height + vgap;
+
         bx = (this.width) / 2;
-        by = this.height - 25;
+        by = this.height - rowHeight - vgap;
 
         bottomButtons.layoutCenteredHorizontal(bx, by, true, hgap);
-        DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
+        by -= rowHeight;
+
+        linkButtons.layoutCenteredHorizontal(bx, by, true, hgap);
+        by -= (vgap + logoButtons.getHeight());
+
+        logoButtons.layoutCenteredHorizontal(bx, by, true, hgap + 2);
+        DrawUtil.drawImage(patreonLogo, buttonPatreon.getX(), buttonPatreon.getY(), false, 1f / scaleFactor, 0);
+        DrawUtil.drawImage(discordLogo, buttonDiscord.getX(), buttonDiscord.getY(), false, 1f / scaleFactor, 0);
     }
 
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
@@ -334,9 +381,25 @@ public class Splash extends JmUI
         {
             closeAndReturn();
         }
-        if (guibutton == buttonDonate)
+        if (guibutton == buttonDiscord)
+        {
+            FullscreenActions.discord();
+            return;
+        }
+        if (guibutton == buttonPatreon)
         {
             FullscreenActions.launchPatreon();
+            return;
+        }
+        if (guibutton == buttonWebsite)
+        {
+            FullscreenActions.launchWebsite("");
+            return;
+        }
+        if (guibutton == buttonDownload)
+        {
+            FullscreenActions.launchDownloadWebsite();
+            return;
         }
         if (guibutton == buttonOptions)
         {

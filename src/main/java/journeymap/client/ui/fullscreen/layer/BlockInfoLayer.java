@@ -174,8 +174,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         /**
          * Update.
          *
-         * @param x the x
-         * @param y the y
+         * @param x    the x
+         * @param y    the y
          */
         void update(double x, double y)
         {

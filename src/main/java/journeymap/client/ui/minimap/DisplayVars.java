@@ -82,7 +82,7 @@ public class DisplayVars
      */
     final int textureX;
     /**
-     * The Texture y.
+     *  The Texture y.
      */
     final int textureY;
 
@@ -93,7 +93,7 @@ public class DisplayVars
 
     /**
      * The Translate y.
-     */
+     * */
     final int translateY;
 
     /**

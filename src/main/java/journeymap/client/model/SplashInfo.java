@@ -56,16 +56,17 @@ public class SplashInfo
             {
                 return;
             }
-            String[] parts = this.action.split("#");
-            String className = parts[0];
-            String action = null;
-            if (parts.length > 0)
-            {
-                action = parts[1];
-            }
 
             try
             {
+                String[] parts = this.action.split("#");
+                String className = parts[0];
+                String action = null;
+                if (parts.length > 1)
+                {
+                    action = parts[1];
+                }
+
                 Class<? extends JmUI> uiClass = (Class<? extends JmUI>) Class.forName("journeymap.client.ui." + className);
 
                 if (uiClass.equals(OptionsManager.class) && action != null)
@@ -80,17 +81,25 @@ public class SplashInfo
                     Method actionMethod;
                     try
                     {
-                        JmUI ui = UIManager.INSTANCE.open(uiClass, returnUi);
+                        Object instance = null;
+                        if (JmUI.class.isAssignableFrom(uiClass))
+                        {
+                            instance = UIManager.INSTANCE.open(uiClass, returnUi);
+                        }
+                        else
+                        {
+                            instance = uiClass.newInstance();
+                        }
 
                         if (arg == null)
                         {
                             actionMethod = uiClass.getMethod(action);
-                            actionMethod.invoke(ui);
+                            actionMethod.invoke(instance);
                         }
                         else
                         {
                             actionMethod = uiClass.getMethod(action, String.class);
-                            actionMethod.invoke(ui, arg);
+                            actionMethod.invoke(instance, arg);
                         }
                         return;
                     }
@@ -100,7 +109,10 @@ public class SplashInfo
                     }
                 }
 
-                UIManager.INSTANCE.open(uiClass, returnUi);
+                if (JmUI.class.isAssignableFrom(uiClass))
+                {
+                    UIManager.INSTANCE.open(uiClass, returnUi);
+                }
             }
             catch (Throwable t)
             {

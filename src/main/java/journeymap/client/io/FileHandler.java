@@ -235,7 +235,7 @@ public class FileHandler
         File testWorldDirectory = null;
         try
         {
-            String worldName = WorldData.getWorldName(minecraft).replaceAll("[^\\w\\s]+", "~");
+            String worldName = WorldData.getWorldName(minecraft, false).replaceAll("[^\\w\\s]+", "~");
 
             if (!minecraft.isSingleplayer())
             {

@@ -229,6 +229,18 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
+    /**
+     * Backwards-compatibility with 1.11, etc.
+     *
+     * @param mc
+     * @param mouseX
+     * @param mouseY
+     */
+    public void drawButton(Minecraft mc, int mouseX, int mouseY)
+    {
+        drawButton(mc, mouseX, mouseY, mc.getRenderPartialTicks());
+    }
+
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks)
     {

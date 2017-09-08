@@ -373,7 +373,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
             } else {
                 for (int k = 0; k < this.buttonList.size(); ++k) {
                     GuiButton guibutton = this.buttonList.get(k);
-                    guibutton.drawButton(this.mc, width, height, 0f);
+                    guibutton.drawButton(this.mc, width, height, 0);
                     if (tooltip == null) {
                         if (guibutton instanceof Button) {
                             Button button = (Button) guibutton;

@@ -45,7 +45,8 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     /**
      * Reset.
      */
-    public void reset() {
+    public void reset()
+    {
         if (world != null)
         {
             world.removeEventListener(ChunkMonitor.INSTANCE);
@@ -58,9 +59,11 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      *
      * @param pos the pos
      */
-    public void resetRenderTimes(ChunkPos pos) {
+    public void resetRenderTimes(ChunkPos pos)
+    {
         ChunkMD chunkMD = DataCache.INSTANCE.getChunkMD(pos);
-        if (chunkMD != null) {
+        if (chunkMD != null)
+        {
             chunkMD.resetRenderTimes();
         }
     }
@@ -72,7 +75,8 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onChunkLoad(ChunkEvent.Load event) {
+    public void onChunkLoad(ChunkEvent.Load event)
+    {
         if (world == null)
         {
             world = event.getWorld();
@@ -81,20 +85,21 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
         }
 
         Chunk chunk = event.getChunk();
-        if (chunk != null && chunk.isLoaded()) {
+        if (chunk != null && chunk.isLoaded())
+        {
             DataCache.INSTANCE.addChunkMD(new ChunkMD(chunk));
         }
         //resetRenderTimes(chunk.getChunkCoordIntPair());
-//        int cx1 = chunk.x - 1;
-//        int cz1 = chunk.z - 1;
-//        int cx2 = chunk.x + 1;
-//        int cz2 = chunk.z + 1;
+//        int cx1 = chunk.xPosition - 1;
+//        int cz1 = chunk.zPosition - 1;
+//        int cx2 = chunk.xPosition + 1;
+//        int cz2 = chunk.zPosition + 1;
 //
-//        for (int x = cx1; x < cx2; x++)
+//        for (int chunkXPos = cx1; chunkXPos < cx2; chunkXPos++)
 //        {
-//            for (int z = cz1; z < cz2; z++)
+//            for (int chunkZPos = cz1; chunkZPos < cz2; chunkZPos++)
 //            {
-//                resetRenderTimes(new ChunkPos(x, z));
+//                resetRenderTimes(new ChunkPos(chunkXPos, chunkZPos));
 //            }
 //        }
     }
@@ -106,7 +111,8 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onChunkUnload(ChunkEvent.Unload event) {
+    public void onChunkUnload(ChunkEvent.Unload event)
+    {
         //ChunkPos pos = event.getChunk().getChunkCoordIntPair();
         //readyChunks.invalidate(pos);
         //DataCache.INSTANCE.invalidateChunkMD(pos);
@@ -119,43 +125,53 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
      */
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event) {
-        try {
+    public void onWorldUnload(WorldEvent.Unload event)
+    {
+        try
+        {
             World world = event.getWorld();
             if (world == world)
             {
                 reset();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Journeymap.getLogger().error("Error handling WorldEvent.Unload", e);
         }
     }
 
     @Override
-    public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
+    public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags)
+    {
         resetRenderTimes(new ChunkPos(pos));
     }
 
     @Override
-    public void notifyLightSet(BlockPos pos) {
+    public void notifyLightSet(BlockPos pos)
+    {
         resetRenderTimes(new ChunkPos(pos));
     }
 
     @Override
-    public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
+    public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2)
+    {
         int cx1 = x1 >> 4;
         int cz1 = z1 >> 4;
         int cx2 = x2 >> 4;
         int cz2 = z2 >> 4;
 
-        if (cx1 == cx2 && cz1 == cz2) {
+        if (cx1 == cx2 && cz1 == cz2)
+        {
             resetRenderTimes(new ChunkPos(cx1, cz1));
-        } else {
-            for (int x = cx1; x < cx2; x++)
+        }
+        else
+        {
+            for (int chunkXPos = cx1; chunkXPos < cx2; chunkXPos++)
             {
-                for (int z = cz1; z < cz2; z++)
+                for (int chunkZPos = cz1; chunkZPos < cz2; chunkZPos++)
                 {
-                    resetRenderTimes(new ChunkPos(x, z));
+                    resetRenderTimes(new ChunkPos(chunkXPos, chunkZPos));
                 }
             }
         }
@@ -163,44 +179,55 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     }
 
     @Override
-    public void playSoundToAllNearExcept(@Nullable EntityPlayer player, SoundEvent soundIn, SoundCategory category, double x, double y, double z, float volume, float pitch) {
+    public void playSoundToAllNearExcept(@Nullable EntityPlayer player, SoundEvent soundIn, SoundCategory category, double x, double y, double z, float volume, float pitch)
+    {
     }
 
     @Override
-    public void playRecord(SoundEvent soundIn, BlockPos pos) {
+    public void playRecord(SoundEvent soundIn, BlockPos pos)
+    {
     }
 
     @Override
-    public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters) {
+    public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters)
+    {
     }
 
     @Override
-    public void spawnParticle(int p_190570_1_, boolean p_190570_2_, boolean p_190570_3_, double p_190570_4_, double p_190570_6_, double p_190570_8_, double p_190570_10_, double p_190570_12_, double p_190570_14_, int... p_190570_16_) {
+    public void spawnParticle(int p_190570_1_, boolean p_190570_2_, boolean p_190570_3_, double p_190570_4_, double p_190570_6_, double p_190570_8_, double p_190570_10_, double p_190570_12_, double p_190570_14_, int... p_190570_16_)
+    {
     }
 
     @Override
-    public void onEntityAdded(Entity entityIn) {
+    public void onEntityAdded(Entity entityIn)
+    {
     }
 
     @Override
-    public void onEntityRemoved(Entity entityIn) {
+    public void onEntityRemoved(Entity entityIn)
+    {
     }
 
     @Override
-    public void broadcastSound(int soundID, BlockPos pos, int data) {
+    public void broadcastSound(int soundID, BlockPos pos, int data)
+    {
     }
 
     @Override
-    public void playEvent(EntityPlayer player, int type, BlockPos blockPosIn, int data) {
+    public void playEvent(EntityPlayer player, int type, BlockPos blockPosIn, int data)
+    {
     }
 
     @Override
-    public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {
+    public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress)
+    {
     }
 
-    private static class TimestampLoader extends CacheLoader<ChunkPos, Long> {
+    private static class TimestampLoader extends CacheLoader<ChunkPos, Long>
+    {
         @Override
-        public Long load(ChunkPos key) throws Exception {
+        public Long load(ChunkPos key) throws Exception
+        {
             return System.currentTimeMillis();
         }
     }

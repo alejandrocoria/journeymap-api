@@ -4,11 +4,11 @@
   "lines": [
     {
       "label": "New UI themes and Fullscreen Map layout",
-      "action": "dialog.OptionsManager"
+      "action": "dialog.Fullscreen"
     },
     {
       "label": "New customizable keybindings (Controls)",
-      "action": ""
+      "action": "dialog.FullscreenActions#openKeybindings"
     },
     {
       "label": "New Cartography Options to blend colors",
