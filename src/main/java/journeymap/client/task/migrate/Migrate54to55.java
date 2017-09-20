@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.task.migrate;
@@ -28,28 +25,38 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Migration from 5.1.x to 5.2
+ * Migration from 5.4.x to 5.5
  */
-public class Migrate5_3 implements MigrationTask
+public class Migrate54to55 implements MigrationTask
 {
-    // GSON charset
+    /**
+     * GSON charset
+     */
     protected static final Charset UTF8 = Charset.forName("UTF-8");
 
-    // Gson for file persistence
+    /**
+     * Gson for file persistence
+     */
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
+    /**
+     * The Logger.
+     */
     Logger logger = LogManager.getLogger(Journeymap.MOD_ID);
 
-    public Migrate5_3()
+    /**
+     * Constructor.
+     */
+    public Migrate54to55()
     {
     }
 
     @Override
     public boolean isActive(Version currentVersion)
     {
-        if (currentVersion.toMajorMinorString().equals("5.3"))
+        if (currentVersion.toMajorMinorString().equals("5.5"))
         {
             if (Journeymap.getClient().getCoreProperties() == null)
             {
@@ -81,14 +88,14 @@ public class Migrate5_3 implements MigrationTask
     {
         try
         {
-            String path5_2 = Joiner.on(File.separator).join(Constants.JOURNEYMAP_DIR, "config", "5.2");
-            File legacyConfigDir = new File(FileHandler.MinecraftDirectory, path5_2);
+            String path5_4 = Joiner.on(File.separator).join(Constants.JOURNEYMAP_DIR, "config", "5.4");
+            File legacyConfigDir = new File(FileHandler.MinecraftDirectory, path5_4);
             if (!legacyConfigDir.canRead())
             {
                 return true;
             }
 
-            logger.info("Migrating configs from 5.2 to 5.3");
+            logger.info("Migrating configs from 5.4 to 5.5");
 
             List<? extends PropertiesBase> propertiesList = Arrays.asList(
                     Journeymap.getClient().getCoreProperties(),
@@ -116,7 +123,7 @@ public class Migrate5_3 implements MigrationTask
                 }
             }
 
-            Journeymap.getClient().getCoreProperties().optionsManagerViewed.set("5.2");
+            Journeymap.getClient().getCoreProperties().optionsManagerViewed.set("5.4");
 
             return true;
         }
