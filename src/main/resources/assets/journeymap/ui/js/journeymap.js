@@ -8,7 +8,7 @@ var JourneyMap = (function() {
 	var map;
 	var mapOverlay;
 
-    var mapType;
+    var mapType = "day";
 	var centerOnPlayer = true;
 	var showCaves = true;	
 	var showAnimals = false;
@@ -79,7 +79,7 @@ var JourneyMap = (function() {
 	
 	var dialogTemplate = [
 		'<div class="dialog">',
-		'<img src="/img/ico/journeymap144.png">',
+		'<img src="/img/ico/journeymap.png">',
 		'<div></div>',
 		'</div>'
 	].join('');	
@@ -582,7 +582,8 @@ var JourneyMap = (function() {
 			showInfoMessage(msg, 2000);
 		}).success(function(data){
 			console.log('automap result: ', data);
-			var msg = getMessage('save_filename', data.filename);
+			var msg = getMessage('save_filename');
+			msg = msg.replace('%1$s', data.filename);
 			showInfoMessage(msg, 2000);
 		});	
 	}
@@ -696,7 +697,7 @@ var JourneyMap = (function() {
 				console.log(">>> " + "Error: Can't set mapType: " + mapType);
 		}
 		
-		if(typeChanged && playerUnderground === false) {		
+		if(typeChanged && (showCaves==false || playerUnderground === false)) {
 			if (debug) console.log("setMapType(" + mapType + ")");
 			refreshMap();
 		}
@@ -1461,6 +1462,9 @@ var JourneyMap = (function() {
     };
 	
 	var getMapStateUrl = function() {
+	    if(!mapType) {
+	        toggleMapType();
+	    }
 		var actualMapType = (JM.world.features.MapCaves === true && playerUnderground === true && showCaves === true) ? "underground" : mapType;
 		var dimension = (JM.player.dimension);
 		var depth = (JM.player && JM.player.chunkCoordY != undefined) ? JM.player.chunkCoordY : 4;

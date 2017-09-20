@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.model;
@@ -24,32 +21,66 @@ import java.util.ArrayList;
  */
 public class SplashInfo
 {
+    /**
+     * The Lines.
+     */
     public ArrayList<Line> lines = new ArrayList<Line>();
 
+    /**
+     * Instantiates a new AboutDialog info.
+     */
     public SplashInfo()
     {
     }
 
+    /**
+     * The type Line.
+     */
     public static class Line
     {
+        /**
+         * The Label.
+         */
         public String label;
+        /**
+         * The Action.
+         */
         public String action;
 
+        /**
+         * Instantiates a new Line.
+         */
         public Line()
         {
         }
 
+        /**
+         * Instantiates a new Line.
+         *
+         * @param label  the label
+         * @param action the action
+         */
         public Line(String label, String action)
         {
             this.label = label;
             this.action = action;
         }
 
+        /**
+         * Has action boolean.
+         *
+         * @return the boolean
+         */
         public boolean hasAction()
         {
             return action != null && action.trim().length() > 0;
         }
 
+        /**
+         * Invoke action.
+         *
+         * @param returnUi the return ui
+         */
         public void invokeAction(JmUI returnUi)
         {
             if (!hasAction())
@@ -82,7 +113,7 @@ public class SplashInfo
                     try
                     {
                         Object instance = null;
-                        if (JmUI.class.isAssignableFrom(uiClass))
+                        if(JmUI.class.isAssignableFrom(uiClass))
                         {
                             instance = UIManager.INSTANCE.open(uiClass, returnUi);
                         }
@@ -109,7 +140,7 @@ public class SplashInfo
                     }
                 }
 
-                if (JmUI.class.isAssignableFrom(uiClass))
+                if(JmUI.class.isAssignableFrom(uiClass))
                 {
                     UIManager.INSTANCE.open(uiClass, returnUi);
                 }

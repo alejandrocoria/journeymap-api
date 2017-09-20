@@ -26,14 +26,14 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.input.Mouse;
 
-import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Splash extends JmUI
+public class AboutDialog extends JmUI
 {
     protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
     protected TextureImpl discordLogo = TextureCache.getTexture(TextureCache.Discord);
@@ -44,11 +44,12 @@ public class Splash extends JmUI
     ButtonList linkButtons;
     ButtonList bottomButtons;
     ButtonList infoButtons;
+    private long lastPeopleMove;
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
-            new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon"),
+            new SplashPerson("TECH_GEEK10", "TECH_GEEK10", "jm.common.splash_patreon"),
             new SplashPerson("_TheEndless_", "The Endless", "jm.common.splash_patreon"),
             new SplashPerson("eladjenkins", "eladjenkins", "jm.common.splash_patreon")
     );
@@ -59,14 +60,10 @@ public class Splash extends JmUI
     );
 
     private SplashInfo info;
-    private TextureImpl brickTex;
 
-    public Splash(JmUI returnDisplay)
+    public AboutDialog(JmUI returnDisplay)
     {
         super(Constants.getString("jm.common.splash_title", Journeymap.JM_VERSION), returnDisplay);
-
-        // Get brick texture
-        brickTex = TextureCache.getTexture(TextureCache.Brick);
     }
 
     /**
@@ -99,19 +96,29 @@ public class Splash extends JmUI
 
         this.buttonList.clear();
         FontRenderer fr = getFontRenderer();
-        int minWidth = 0;
+
+        devButtons = new ButtonList();
+        for (SplashPerson dev : devs)
+        {
+            // Button is just used for layout, not displayed as a button
+            Button button = new Button(dev.name);
+            devButtons.add(button);
+            dev.setButton(button);
+        }
+        devButtons.setWidths(20);
+        devButtons.setHeights(20);
+        devButtons.layoutDistributedHorizontal(0, headerHeight, width, true);
 
         peopleButtons = new ButtonList();
-        devButtons = new ButtonList();
-
-        for (SplashPerson person : people)
+        for (SplashPerson peep : people)
         {
-            Button button = new Button(person.name);// Just used for layout, not display
+            Button button = new Button(peep.name);// Just used for layout, not display
             peopleButtons.add(button);
-            person.setButton(button);
-            minWidth = Math.max(minWidth, person.getWidth(fr));
+            peep.setButton(button);
         }
-        peopleButtons.setWidths(minWidth);
+        peopleButtons.setWidths(20);
+        peopleButtons.setHeights(20);
+        peopleButtons.layoutDistributedHorizontal(0, height-65, width, true);
 
         infoButtons = new ButtonList();
         for (SplashInfo.Line line : info.lines)
@@ -132,7 +139,23 @@ public class Splash extends JmUI
 
         // Bottom Buttons
         buttonClose = new Button(Constants.getString("jm.common.close"));
+        buttonClose.addClickListener(button -> {
+            closeAndReturn();
+            return true;
+        });
+
         buttonOptions = new Button(Constants.getString("jm.common.options_button"));
+        buttonOptions.addClickListener(button -> {
+            if (returnDisplay != null && returnDisplay instanceof OptionsManager)
+            {
+                closeAndReturn();
+            }
+            else
+            {
+                UIManager.INSTANCE.openOptionsManager(this);
+            }
+            return true;
+        });
 
         bottomButtons = new ButtonList(buttonOptions);
 
@@ -149,15 +172,23 @@ public class Splash extends JmUI
         // Link Buttons
         buttonWebsite = new Button("http://journeymap.info");
         buttonWebsite.setTooltip(Constants.getString("jm.common.website"));
+        buttonWebsite.addClickListener(button -> {
+            FullscreenActions.launchWebsite("");
+            return true;
+        });
 
         buttonDownload = new Button(Constants.getString("jm.common.download"));
         buttonDownload.setTooltip(Constants.getString("jm.common.download.tooltip"));
+        buttonDownload.addClickListener(button -> {
+            FullscreenActions.launchDownloadWebsite();
+            return true;
+        });
 
         linkButtons = new ButtonList(buttonWebsite, buttonDownload);
         linkButtons.equalizeWidths(fr);
         buttonList.addAll(linkButtons);
 
-        int commonWidth = Math.max(bottomButtons.getWidth(0) / bottomButtons.size(), linkButtons.getWidth(0) / linkButtons.size());
+        int commonWidth = Math.max(bottomButtons.getWidth(0)/bottomButtons.size(), linkButtons.getWidth(0)/linkButtons.size());
         bottomButtons.setWidths(commonWidth);
         linkButtons.setWidths(commonWidth);
 
@@ -167,21 +198,29 @@ public class Splash extends JmUI
         buttonPatreon.setDrawBackground(false);
         buttonPatreon.setDrawFrame(false);
         buttonPatreon.setTooltip(Constants.getString("jm.common.patreon"), Constants.getString("jm.common.patreon.tooltip"));
-        buttonPatreon.setWidth(patreonLogo.getWidth() / scaleFactor);
-        buttonPatreon.setHeight(patreonLogo.getHeight() / scaleFactor);
+        buttonPatreon.setWidth(patreonLogo.getWidth()/scaleFactor);
+        buttonPatreon.setHeight(patreonLogo.getHeight()/scaleFactor);
+        buttonPatreon.addClickListener(button -> {
+            FullscreenActions.launchPatreon();
+            return true;
+        });
 
         buttonDiscord = new Button("");
         buttonDiscord.setDefaultStyle(false);
         buttonDiscord.setDrawBackground(false);
         buttonDiscord.setDrawFrame(false);
         buttonDiscord.setTooltip(Constants.getString("jm.common.discord"), Constants.getString("jm.common.discord.tooltip"));
-        buttonDiscord.setWidth(discordLogo.getWidth() / scaleFactor);
-        buttonDiscord.setHeight(discordLogo.getHeight() / scaleFactor);
+        buttonDiscord.setWidth(discordLogo.getWidth()/scaleFactor);
+        buttonDiscord.setHeight(discordLogo.getHeight()/scaleFactor);
+        buttonDiscord.addClickListener(button -> {
+            FullscreenActions.discord();
+            return true;
+        });
 
         logoButtons = new ButtonList(buttonDiscord, buttonPatreon);
         logoButtons.setLayout(ButtonList.Layout.Horizontal, ButtonList.Direction.LeftToRight);
-        logoButtons.setHeights(Math.max(discordLogo.getHeight(), patreonLogo.getHeight()) / scaleFactor);
-        logoButtons.setWidths(Math.max(discordLogo.getWidth(), patreonLogo.getWidth()) / scaleFactor);
+        logoButtons.setHeights(Math.max(discordLogo.getHeight(), patreonLogo.getHeight())/scaleFactor);
+        logoButtons.setWidths(Math.max(discordLogo.getWidth(), patreonLogo.getWidth())/scaleFactor);
 
         buttonList.addAll(logoButtons);
     }
@@ -197,44 +236,69 @@ public class Splash extends JmUI
             initGui();
         }
 
+        final int mx = (Mouse.getEventX() * width) / mc.displayWidth;
+        final int my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
+
         final int hgap = 4;
         final int vgap = 4;
-        int bx = width / 2;
-        int by = 45;
-
         FontRenderer fr = getFontRenderer();
+
+        int estimatedInfoHeight = infoButtons.getHeight(vgap);
+        int estimatedButtonsHeight = ((buttonClose.getHeight() + vgap) * 3) + vgap;
+        int centerHeight = this.height - this.headerHeight - estimatedButtonsHeight;
         int lineHeight = (int) (fr.FONT_HEIGHT * 1.4);
+        int bx = width / 2;
+        int by = 0;
 
-        int estimatedInfoHeight = 60 + (fr.FONT_HEIGHT + 5) * infoButtons.size();
-        by = ((this.height + this.headerHeight - estimatedInfoHeight) / 2);
-
-        int estimatedWallHeight = 90;
-        int gap = 0;
-
-        if (estimatedInfoHeight + estimatedWallHeight + 25 < this.height - this.headerHeight)
+        boolean movePeople = System.currentTimeMillis()-lastPeopleMove>20;
+        if(movePeople)
         {
-            int empty = (this.height + this.headerHeight - estimatedInfoHeight - estimatedWallHeight);
-            by = Math.max(45, empty / 3);
-            gap = by / 4;
+            lastPeopleMove = System.currentTimeMillis();
         }
 
-        // Wandering devs
+        // Devs
+        Rectangle2D.Double screenBounds = new Rectangle2D.Double(0, 0, width, height);
         if (!devButtons.isEmpty())
         {
-            int temp = by;
             for (SplashPerson dev : devs)
             {
-                temp = drawPerson(temp, lineHeight, dev);
-                dev.avoid(devs);
-                dev.adjustVector(this.width, this.height);
+                if(dev.getButton().mouseOver(mx, my))
+                {
+                    dev.randomizeVector();
+                }
+                drawPerson(by, lineHeight, dev);
+                if(movePeople)
+                {
+                    dev.avoid(devs);
+                    dev.adjustVector(screenBounds);
+                }
             }
         }
 
-        // Begin What's New
+        // Patrons, etc.
+        if (!peopleButtons.isEmpty())
+        {
+            for (SplashPerson peep : people)
+            {
+                if(peep.getButton().mouseOver(mx, my))
+                {
+                    peep.randomizeVector();
+                }
+                drawPerson(by, lineHeight, peep);
+                if(movePeople)
+                {
+                    peep.avoid(devs);
+                    peep.adjustVector(screenBounds);
+                }
+            }
+        }
+
+        // Begin Info (What's New)
         if (!infoButtons.isEmpty())
         {
-            int topY = by;
+            by = this.headerHeight + ((centerHeight-estimatedInfoHeight)/2);
 
+            int topY = by;
             by += (lineHeight * 1.5);
             infoButtons.layoutCenteredVertical(bx - (infoButtons.get(0).getWidth() / 2), by + (infoButtons.getHeight(0) / 2), true, 0);
 
@@ -246,78 +310,22 @@ public class Splash extends JmUI
             DrawUtil.drawGradientRect(listX, listY, listWidth, listHeight, RGB.DARK_GRAY_RGB, 1f, RGB.BLACK_RGB, 1f);
             DrawUtil.drawLabel(Constants.getString("jm.common.splash_whatisnew"), bx, topY,
                     DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, RGB.CYAN_RGB, 1f, 1, true);
-
-            by = listY + listHeight + 10;
         }
 
-        by += gap;
-
-        // Begin Wall of Fame
-        if (by + estimatedWallHeight < this.height - 25)
-        {
-            int titleY = by;
-
-            by += (lineHeight * 2);
-            int listY = by - 30;
-            int listHeight = 100;
-
-            peopleButtons.layoutCenteredHorizontal(bx, by, true, 10);
-            int listX = peopleButtons.getLeftX() - 10;
-            int listWidth = peopleButtons.getRightX() + 10 - listX;
-
-
-            DrawUtil.drawGradientRect(listX - 1, listY - 1, listWidth + 2, listHeight + 2, RGB.LIGHT_GRAY_RGB, .8f, RGB.LIGHT_GRAY_RGB, .8f);
-
-            brickTex.bindTexture();
-            GlStateManager.bindTexture(brickTex.getGlTextureId());
-            GlStateManager.color(1, 1, 1, 1);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST); // GL11.GL_LINEAR_MIPMAP_NEAREST
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // GL11.GL_NEAREST
-
-            DrawUtil.drawBoundTexture(0, 0, listX, listY, 0, 8, 2, listX + listWidth, listY + listHeight);
-
-            DrawUtil.drawLabel(Constants.getString("jm.common.splash_walloffame"), bx, titleY,
-                    DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, 0, Color.cyan.getRGB(), 1f, 1, true);
-
-
-            if (devButtons.isEmpty())
-            {
-                for (SplashPerson dev : devs)
-                {
-                    Button button = new Button(dev.name);// Just used for layout, not display
-                    devButtons.add(button);
-                    dev.setButton(button);
-                }
-                devButtons.equalizeWidths(fr);
-                devButtons.layoutCenteredHorizontal(bx, by, true, 10);
-            }
-//            int rowWidth = peopleButtons.getWidth(hgap);
-//
-//            Button topLeft = people.getTexture(0).getButton();
-//            Button bottomRight = people.getTexture(people.size() - 1).getButton();
-
-            for (SplashPerson person : people)
-            {
-                by = drawPerson(by, lineHeight, person);
-            }
-
-        }
-
-
+        // Bottom buttons
         int rowHeight = buttonOptions.height + vgap;
-
-        bx = (this.width) / 2;
         by = this.height - rowHeight - vgap;
 
         bottomButtons.layoutCenteredHorizontal(bx, by, true, hgap);
-        by -= rowHeight;
+        by-= rowHeight;
 
         linkButtons.layoutCenteredHorizontal(bx, by, true, hgap);
-        by -= (vgap + logoButtons.getHeight());
+        by-= (vgap + logoButtons.getHeight());
 
         logoButtons.layoutCenteredHorizontal(bx, by, true, hgap + 2);
-        DrawUtil.drawImage(patreonLogo, buttonPatreon.getX(), buttonPatreon.getY(), false, 1f / scaleFactor, 0);
-        DrawUtil.drawImage(discordLogo, buttonDiscord.getX(), buttonDiscord.getY(), false, 1f / scaleFactor, 0);
+        DrawUtil.drawImage(patreonLogo, buttonPatreon.getX(), buttonPatreon.getY(), false, 1f/scaleFactor, 0);
+        DrawUtil.drawImage(discordLogo, buttonDiscord.getX(), buttonDiscord.getY(), false, 1f/scaleFactor, 0);
+
     }
 
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
@@ -375,43 +383,7 @@ public class Splash extends JmUI
 
     @Override
     protected void actionPerformed(GuiButton guibutton)
-    { // actionPerformed
-
-        if (guibutton == buttonClose)
-        {
-            closeAndReturn();
-        }
-        if (guibutton == buttonDiscord)
-        {
-            FullscreenActions.discord();
-            return;
-        }
-        if (guibutton == buttonPatreon)
-        {
-            FullscreenActions.launchPatreon();
-            return;
-        }
-        if (guibutton == buttonWebsite)
-        {
-            FullscreenActions.launchWebsite("");
-            return;
-        }
-        if (guibutton == buttonDownload)
-        {
-            FullscreenActions.launchDownloadWebsite();
-            return;
-        }
-        if (guibutton == buttonOptions)
-        {
-            if (returnDisplay != null && returnDisplay instanceof OptionsManager)
-            {
-                closeAndReturn();
-            }
-            else
-            {
-                UIManager.INSTANCE.openOptionsManager(this);
-            }
-        }
+    {
     }
 
     @Override
@@ -442,12 +414,12 @@ public class Splash extends JmUI
         @Override
         public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
         {
-            boolean pressed = super.mousePressed(minecraft, mouseX, mouseY);
+            boolean pressed = super.mousePressed(minecraft, mouseX, mouseY, false);
             if (pressed)
             {
-                infoLine.invokeAction(Splash.this);
+                infoLine.invokeAction(AboutDialog.this);
             }
-            return pressed;
+            return checkClickListeners();
         }
     }
 

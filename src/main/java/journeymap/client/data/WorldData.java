@@ -479,6 +479,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return String.format("%02d:%02d %s", (long) Math.floor(allSecs / 60), (long) Math.ceil(allSecs % 60), label);
     }
 
+    public static boolean isDay(long worldTime)
+    {
+        return (worldTime % 24000L) < 13800;
+    }
+
+    public static boolean isNight(long worldTime)
+    {
+        return (worldTime % 24000L) >= 13800;
+    }
+
     /**
      * Return length of time in millis data should be kept.
      *

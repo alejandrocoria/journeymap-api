@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.model;
@@ -19,19 +16,48 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Mark on 5/8/2016.
+ * @author techbrew 5/8/2016.
  */
 public class SplashPerson
 {
+    /**
+     * The Name.
+     */
     public final String name;
+    /**
+     * The Ign.
+     */
     public final String ign;
+    /**
+     * The Title.
+     */
     public final String title;
+    /**
+     * The Button.
+     */
     public Button button;
+    /**
+     * The Width.
+     */
     public int width;
-    public int moveX;
-    public int moveY;
-    private int moveDistance = 1;
+    /**
+     * The Move x.
+     */
+    public double moveX;
+    /**
+     * The Move y.
+     */
+    public double moveY;
+    private double moveDistance = 1;
+    private Random r = new Random();
 
+    /**
+     * Instantiates a new AboutDialog person.
+     *
+     * @param ign      the ign
+     * @param name     the name
+     * @param titleKey the title key
+     */
     public SplashPerson(String ign, String name, String titleKey)
     {
         this.ign = ign;
@@ -46,22 +72,43 @@ public class SplashPerson
         }
     }
 
+    /**
+     * Gets button.
+     *
+     * @return the button
+     */
     public Button getButton()
     {
         return button;
     }
 
+    /**
+     * Sets button.
+     *
+     * @param button the button
+     */
     public void setButton(Button button)
     {
         this.button = button;
         randomizeVector();
     }
 
+    /**
+     * Gets skin.
+     *
+     * @return the skin
+     */
     public TextureImpl getSkin()
     {
         return TextureCache.getPlayerSkin(ign);
     }
 
+    /**
+     * Gets width.
+     *
+     * @param fr the fr
+     * @return the width
+     */
     public int getWidth(FontRenderer fr)
     {
         width = fr.getStringWidth(title);
@@ -73,76 +120,113 @@ public class SplashPerson
         return width;
     }
 
+    /**
+     * Sets width.
+     *
+     * @param minWidth the min width
+     */
     public void setWidth(int minWidth)
     {
         this.width = minWidth;
     }
 
+    /**
+     * Randomize vector.
+     */
     public void randomizeVector()
     {
-        this.moveDistance = new Random().nextInt(2) + 1;
-        this.moveX = new Random().nextBoolean() ? moveDistance : -moveDistance;
-        this.moveY = new Random().nextBoolean() ? moveDistance : -moveDistance;
+        this.moveDistance = r.nextDouble() + .5;
+        this.moveX = r.nextBoolean() ? moveDistance : -moveDistance;
+        this.moveDistance = r.nextDouble() + .5;
+        this.moveY = r.nextBoolean() ? moveDistance : -moveDistance;
     }
 
-    private void reverseX()
+    /**
+     * Adjust vector.
+     *
+     * @param screenBounds
+     */
+    public void adjustVector(Rectangle2D.Double screenBounds)
     {
-        this.moveDistance = new Random().nextInt(2) + 1;
-        this.moveX = (moveX < 0) ? moveDistance : -moveDistance;
-    }
-
-    private void reverseY()
-    {
-        this.moveDistance = new Random().nextInt(2) + 1;
-        this.moveY = (moveY < 0) ? moveDistance : -moveDistance;
-    }
-
-    public void adjustVector(int screenWidth, int screenHeight)
-    {
-        if (button.x <= moveDistance || button.x + button.getWidth() >= screenWidth - moveDistance)
+        Rectangle2D.Double buttonBounds = button.getBounds();
+        if(!screenBounds.contains(buttonBounds))
         {
-            reverseX();
+            int xMargin = button.getWidth();
+            int yMargin = button.getHeight();
+            if (buttonBounds.getMinX() <= xMargin)
+            {
+                this.moveX = moveDistance;
+            }
+            else if (buttonBounds.getMaxX() >= screenBounds.getWidth() - xMargin)
+            {
+                this.moveX = -moveDistance;
+            }
+
+            if (buttonBounds.getMinY() <= yMargin)
+            {
+                this.moveY = moveDistance;
+            }
+            else if (buttonBounds.getMaxY() >= screenBounds.getHeight() - yMargin)
+            {
+                this.moveY = -moveDistance;
+            }
         }
 
-        if (button.y <= moveDistance || button.y + button.getHeight() >= screenHeight - moveDistance)
-        {
-            reverseY();
-        }
-        button.x += moveX;
-        button.y += moveY;
+        continueVector();
     }
 
-    public void avoid(List<SplashPerson> devs)
+    public void continueVector()
     {
-        for (SplashPerson dev : devs)
+        button.setX((int) Math.round(button.x + moveX));
+        button.setY((int) Math.round(button.y + moveY));
+    }
+
+    /**
+     * Avoid.
+     *
+     * @param others the devs
+     */
+    public void avoid(List<SplashPerson> others)
+    {
+        for (SplashPerson other : others)
         {
-            if (this == dev)
+            if (this == other)
             {
                 continue;
             }
 
-            Rectangle2D thisBounds = new Rectangle2D.Double(button.getX(), button.getY(), button.width, button.height);
-            Rectangle2D thatBounds = new Rectangle2D.Double(dev.button.getX(), dev.button.getY(), dev.button.width, dev.button.height);
-            if (thisBounds.intersects(thatBounds))
+            if (this.getDistance(other)<=button.getWidth())
             {
-                this.moveDistance *= 2;
-                if (new Random().nextBoolean())
-                {
-                    reverseX();
-                }
-                else
-                {
-                    reverseY();
-                }
+                randomizeVector();
                 break;
             }
         }
     }
 
+    /**
+     * Returns the squared distance to the other.
+     */
+    public double getDistance(SplashPerson other)
+    {
+        double px = this.button.getCenterX() - other.button.getCenterX();
+        double py = this.button.getMiddleY() - other.button.getMiddleY();
+        return Math.sqrt(px * px + py * py);
+    }
+
+    /**
+     * The type Fake.
+     */
     public static class Fake extends SplashPerson
     {
         private TextureImpl texture;
 
+        /**
+         * Instantiates a new Fake.
+         *
+         * @param name    the name
+         * @param title   the title
+         * @param texture the texture
+         */
         public Fake(String name, String title, TextureImpl texture)
         {
             super(name, title, null);

@@ -49,6 +49,7 @@ public class MapRegionTask extends BaseMapTask
     private static final int MAX_RUNTIME = 30000;
     private static final Logger logger = Journeymap.getLogger();
     private static volatile long lastTaskCompleted;
+    public static MapType MAP_TYPE;
 
     final PolygonOverlay regionOverlay;
     final RegionCoord rCoord;
@@ -285,16 +286,11 @@ public class MapRegionTask extends BaseMapTask
             {
                 try
                 {
-                    MapType mapType;
-                    if (underground)
+                    MapType mapType = MAP_TYPE;
+                    if(mapType == null)
                     {
-                        mapType = MapType.underground(player);
+                        mapType = Fullscreen.state().getMapType();
                     }
-                    else
-                    {
-                        mapType = Fullscreen.state().getMapType(false);
-                    }
-
                     Boolean mapAll = params == null ? false : (Boolean) params;
 
                     regionLoader = new RegionLoader(minecraft, mapType, mapAll);

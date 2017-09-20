@@ -587,7 +587,7 @@ public class ButtonList extends ArrayList<Button>
     {
         for (Button button : this)
         {
-            button.drawButton(minecraft, mouseX, mouseY);
+            button.drawButton(minecraft, mouseX, mouseY, 0f);
         }
         return this;
     }

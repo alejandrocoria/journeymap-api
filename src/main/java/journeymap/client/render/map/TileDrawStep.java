@@ -167,7 +167,7 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
         // Grid
         if (gridSpec != null)
         {
-            gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, gridSpec.alpha);
+            gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, alpha);
             DrawUtil.drawBoundTexture(sx1 / size, sy1 / size, startX, startY, z, sx2 / size, sy2 / size, endX, endY);
             gridSpec.finishTexture();
         }

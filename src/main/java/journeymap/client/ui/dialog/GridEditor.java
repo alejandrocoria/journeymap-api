@@ -268,7 +268,7 @@ public class GridEditor extends JmUI
         }
 
         GridSpec gridSpec = gridSpecs.getSpec(activeMapType);
-        gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, gridSpec.alpha);
+        gridSpec.beginTexture(GL11.GL_NEAREST, GL12.GL_CLAMP_TO_EDGE, 1f);
         DrawUtil.drawBoundTexture(0, 0, x, y, 0, .25, .25, x + tileSize, y + tileSize);
         gridSpec.finishTexture();
     }

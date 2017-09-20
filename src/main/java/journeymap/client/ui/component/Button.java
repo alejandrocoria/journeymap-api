@@ -7,6 +7,8 @@ package journeymap.client.ui.component;
 
 import journeymap.client.Constants;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
@@ -19,6 +21,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * A glom of extra functionality to try to make buttons less sucky to use.
@@ -26,25 +29,25 @@ import java.util.List;
 public class Button extends GuiButton implements ScrollPane.Scrollable
 {
     /**
-     * The Small frame color light.
+     * The custom frame color light.
      */
-    protected Integer smallFrameColorLight = new Color(160, 160, 160).getRGB();
+    protected Integer customFrameColorLight = new Color(160, 160, 160).getRGB();
     /**
-     * The Small frame color dark.
+     * The custom frame color dark.
      */
-    protected Integer smallFrameColorDark = new Color(120, 120, 120).getRGB();
+    protected Integer customFrameColorDark = new Color(120, 120, 120).getRGB();
     /**
-     * The Small bg color.
+     * The custom bg color.
      */
-    protected Integer smallBgColor = new Color(100, 100, 100).getRGB();
+    protected Integer customBgColor = new Color(100, 100, 100).getRGB();
     /**
-     * The Small bg hover color.
+     * The custom bg hover color.
      */
-    protected Integer smallBgHoverColor = new Color(125, 135, 190).getRGB();
+    protected Integer customBgHoverColor = new Color(125, 135, 190).getRGB();
     /**
-     * The Small bg hover color 2.
+     * The custom bg hover color 2.
      */
-    protected Integer smallBgHoverColor2 = new Color(100, 100, 100).getRGB();
+    protected Integer customBgHoverColor2 = new Color(100, 100, 100).getRGB();
 
     /**
      * The Label color.
@@ -99,6 +102,8 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 
     protected Rectangle2D.Double bounds;
+
+    protected ArrayList<Function<Button, Boolean>> clickListeners = new ArrayList<>(0);
 
     /**
      * Instantiates a new Button.
@@ -229,20 +234,8 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
-    /**
-     * Backwards-compatibility with 1.11, etc.
-     *
-     * @param mc
-     * @param mouseX
-     * @param mouseY
-     */
-    public void drawButton(Minecraft mc, int mouseX, int mouseY)
-    {
-        drawButton(mc, mouseX, mouseY, mc.getRenderPartialTicks());
-    }
-
     @Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks)
+    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float partialTicks)
     {
         if (!isVisible())
         {
@@ -251,11 +244,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
         if (defaultStyle)
         {
-            super.drawButton(minecraft, mouseX, mouseY, ticks);
+            super.drawButton(minecraft, mouseX, mouseY, partialTicks);
         }
         else
         {
-            // Use small button colors
+            // Use custom button colors
             minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
             GlStateManager.color(1, 1, 1, 1);
 
@@ -264,20 +257,20 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
             if (isDrawFrame())
             {
-                DrawUtil.drawRectangle(x, y, width, 1, smallFrameColorLight, 1f); // Top
-                DrawUtil.drawRectangle(x, y, 1, height, smallFrameColorLight, 1f); // Left
+                DrawUtil.drawRectangle(x, y, width, 1, customFrameColorLight, 1f); // Top
+                DrawUtil.drawRectangle(x, y, 1, height, customFrameColorLight, 1f); // Left
 
-                DrawUtil.drawRectangle(x, y + height - 1, width - 1, 1, smallFrameColorDark, 1f); // Bottom
-                DrawUtil.drawRectangle(x + width - 1, y + 1, 1, height - 1, smallFrameColorDark, 1f); // Right
+                DrawUtil.drawRectangle(x, y + height - 1, width - 1, 1, customFrameColorDark, 1f); // Bottom
+                DrawUtil.drawRectangle(x + width - 1, y + 1, 1, height - 1, customFrameColorDark, 1f); // Right
             }
 
             if (isDrawBackground())
             {
-                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, hoverState == 2 ? smallBgHoverColor : smallBgColor, 1f);
+                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, hoverState == 2 ? customBgHoverColor : customBgColor, 1f);
             }
             else if (this.isEnabled() && isHovered())
             {
-                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, smallBgHoverColor2, .5f);
+                DrawUtil.drawRectangle(x + 1, y + 1, width - 2, height - 2, customBgHoverColor2, .5f);
             }
 
             this.mouseDragged(minecraft, mouseX, mouseY);
@@ -329,7 +322,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         if (isVisible())
         {
-            DrawUtil.drawRectangle(x, y + height, width, 1, smallFrameColorDark, 1f);
+            DrawUtil.drawRectangle(x, y + height, width, 1, customFrameColorDark, 1f);
         }
     }
 
@@ -343,7 +336,37 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
     {
-        return isEnabled() && isVisible() && mouseOver(mouseX, mouseY);
+        return mousePressed(minecraft, mouseX, mouseY, true);
+    }
+
+    public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY, boolean checkClickListeners)
+    {
+        boolean clicked = isEnabled() && isVisible() && mouseOver(mouseX, mouseY);
+        return clicked && checkClickListeners();
+    }
+
+    public boolean checkClickListeners()
+    {
+        boolean clicked = true;
+        if(!clickListeners.isEmpty())
+        {
+            try
+            {
+                for (Function<Button, Boolean> listener : clickListeners)
+                {
+                    if (!listener.apply(this))
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (Throwable t)
+            {
+                Journeymap.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
+                clicked = false;
+            }
+        }
+        return clicked;
     }
 
     /**
@@ -414,7 +437,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public Rectangle2D.Double getBounds()
     {
-        if (this.bounds == null)
+        if(this.bounds==null)
         {
             return updateBounds();
         }
@@ -428,7 +451,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setWidth(int width)
     {
-        if (this.width != width)
+        if(this.width!=width)
         {
             this.width = width;
             bounds = null;
@@ -453,7 +476,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setHeight(int height)
     {
-        if (this.height != height)
+        if(this.height!=height)
         {
             this.height = height;
             bounds = null;
@@ -480,7 +503,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     @Override
     public void drawScrollable(Minecraft mc, int mouseX, int mouseY)
     {
-        drawButton(mc, mouseX, mouseY, 0);
+        drawButton(mc, mouseX, mouseY, 0f);
     }
 
     @Override
@@ -501,7 +524,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setX(int x)
     {
-        if (this.x != x)
+        if(this.x!=x)
         {
             this.x = x;
             bounds = null;
@@ -520,7 +543,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setY(int y)
     {
-        if (this.y != y)
+        if(this.y!=y)
         {
             this.y = y;
             bounds = null;
@@ -806,7 +829,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setDrawButton(boolean drawButton)
     {
-        if (drawButton != visible)
+        if(drawButton!=visible)
         {
             this.visible = drawButton;
         }
@@ -887,15 +910,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     /**
      * Sets background colors.
      *
-     * @param smallBgColor       the small bg color
-     * @param smallBgHoverColor  the small bg hover color
-     * @param smallBgHoverColor2 the small bg hover color 2
+     * @param customBgColor       the custom bg color
+     * @param customBgHoverColor  the custom bg hover color
+     * @param customBgHoverColor2 the custom bg hover color 2
      */
-    public void setBackgroundColors(Integer smallBgColor, Integer smallBgHoverColor, Integer smallBgHoverColor2)
+    public void setBackgroundColors(Integer customBgColor, Integer customBgHoverColor, Integer customBgHoverColor2)
     {
-        this.smallBgColor = smallBgColor;
-        this.smallBgHoverColor = smallBgHoverColor;
-        this.smallBgHoverColor2 = smallBgHoverColor2;
+        this.customBgColor = customBgColor;
+        this.customBgHoverColor = customBgHoverColor;
+        this.customBgHoverColor2 = customBgHoverColor2;
     }
 
     /**
@@ -965,4 +988,15 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     {
         super.hovered = hovered;
     }
+
+    /**
+     * Add listener to be notified when button is used
+     *
+     * @param listener the toggle listener
+     */
+    public void addClickListener(Function<Button, Boolean> listener)
+    {
+        this.clickListeners.add(listener);
+    }
+
 }

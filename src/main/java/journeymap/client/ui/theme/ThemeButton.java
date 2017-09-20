@@ -202,6 +202,11 @@ public class ThemeButton extends BooleanPropertyButton
         return theme.control.button;
     }
 
+    public Theme.Control.ButtonSpec getButtonSpec()
+    {
+        return buttonSpec;
+    }
+
     /**
      * Gets active texture.
      *

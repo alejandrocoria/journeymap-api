@@ -218,7 +218,7 @@ public class CoreProperties extends ClientPropertiesBase implements Comparable<C
      */
     public final StringField optionsManagerViewed = new StringField(Category.Hidden, "", null);
     /**
-     * The Splash viewed.
+     * The AboutDialog viewed.
      */
     public final StringField splashViewed = new StringField(Category.Hidden, "", null);
     /**

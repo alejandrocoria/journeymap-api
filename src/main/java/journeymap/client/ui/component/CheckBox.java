@@ -112,7 +112,7 @@ public class CheckBox extends BooleanPropertyButton
         if (this.isEnabled() && this.visible && mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height)
         {
             toggle();
-            return true;
+            return checkClickListeners();
         }
 
         return false;

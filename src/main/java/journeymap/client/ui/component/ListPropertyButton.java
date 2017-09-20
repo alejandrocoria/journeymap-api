@@ -77,10 +77,10 @@ public class ListPropertyButton<T> extends Button implements IConfigFieldHolder<
     @Override
     public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
     {
-        if (super.mousePressed(minecraft, mouseX, mouseY))
+        if (super.mousePressed(minecraft, mouseX, mouseY, false))
         {
             nextOption();
-            return true;
+            return checkClickListeners();
         }
         return false;
     }

@@ -104,15 +104,14 @@ public class ActionService extends BaseService
         Minecraft minecraft = FMLClientHandler.instance().getClient();
         World world = minecraft.world;
 
-
         try
         {
-
             // Ensure world dir available
             File worldDir = FileHandler.getJMWorldDir(minecraft);
             if (!worldDir.exists() || !worldDir.isDirectory())
             {
                 String error = "World unknown: " + (worldDir.getAbsolutePath());
+                throwEventException(500, error, event, true);
             }
 
             Integer vSlice = getParameter(query, "depth", (Integer) null); //$NON-NLS-1$
@@ -133,6 +132,7 @@ public class ActionService extends BaseService
             {
                 vSlice = null;
             }
+            mapType = MapType.from(mapTypeName, vSlice, dimension);
 
             // Validate cave mapping allowed
             // Check for hardcore

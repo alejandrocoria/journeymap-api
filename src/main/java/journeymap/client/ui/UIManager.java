@@ -10,9 +10,9 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.MiniMapProperties;
 import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.dialog.AboutDialog;
 import journeymap.client.ui.dialog.GridEditor;
 import journeymap.client.ui.dialog.OptionsManager;
-import journeymap.client.ui.dialog.Splash;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.ui.waypoint.WaypointEditor;
@@ -341,7 +341,7 @@ public enum UIManager
      * @param returnDisplay the return display
      */
     public void openSplash(JmUI returnDisplay) {
-        open(Splash.class, returnDisplay);
+        open(AboutDialog.class, returnDisplay);
     }
 
     /**

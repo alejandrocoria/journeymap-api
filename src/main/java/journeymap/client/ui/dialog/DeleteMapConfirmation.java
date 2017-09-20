@@ -7,7 +7,6 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.task.main.DeleteMapTask;
-import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.JmUI;
 import net.minecraft.client.gui.GuiButton;
@@ -24,10 +23,9 @@ public class DeleteMapConfirmation extends JmUI
      */
     Button buttonAll;
     /**
-     * The Button current.
+     * the Button current.
      */
-    Button buttonCurrent;
-    /**
+    Button buttonCurrent; /**
      * The Button close.
      */
     Button buttonClose;
@@ -37,7 +35,15 @@ public class DeleteMapConfirmation extends JmUI
      */
     public DeleteMapConfirmation()
     {
-        super(Constants.getString("jm.common.deletemap_dialog"));
+        this(null);
+    }
+
+    /**
+     * Instantiates a new Delete map confirmation.
+     */
+    public DeleteMapConfirmation(JmUI returnDisplay)
+    {
+        super(Constants.getString("jm.common.deletemap_dialog"), returnDisplay);
     }
 
     /**
@@ -85,8 +91,7 @@ public class DeleteMapConfirmation extends JmUI
         if (guibutton == buttonAll || guibutton == buttonCurrent)
         {
             DeleteMapTask.queue(guibutton == buttonAll);
-            UIManager.INSTANCE.openFullscreenMap();
-            return;
+            closeAndReturn();
         }
 
         if (guibutton == buttonClose)

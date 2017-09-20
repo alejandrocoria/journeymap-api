@@ -31,7 +31,7 @@ public abstract class MapProperties extends ClientPropertiesBase implements Comp
     public final BooleanField showGrid = new BooleanField(Inherit, "jm.common.show_grid", true);
 
     /**
-     * The Show caves.
+     * Whether to auto-switch to caves
      */
     public final BooleanField showCaves = new BooleanField(Inherit, "jm.common.show_caves", true);
 
@@ -43,7 +43,8 @@ public abstract class MapProperties extends ClientPropertiesBase implements Comp
     /**
      * The Preferred map type.
      */
-    public final EnumField<MapType.Name> preferredMapType = new EnumField<MapType.Name>(Hidden, "", MapType.Name.day);
+    public final EnumField<MapType.Name> preferredMapType = new EnumField<>(Hidden, "", MapType.Name.day);
+
     /**
      * The Zoom level.
      */

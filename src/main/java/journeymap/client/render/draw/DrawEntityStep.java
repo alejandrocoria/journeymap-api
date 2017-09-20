@@ -89,6 +89,12 @@ public class DrawEntityStep implements DrawStep
      * The Custom name.
      */
     String customName;
+
+    /**
+     * Formatted playerName
+     */
+    String playerTeamName;
+
     /**
      * The Screen position.
      */
@@ -129,6 +135,19 @@ public class DrawEntityStep implements DrawStep
         this.drawScale = (entityDisplay == EntityDisplay.SmallIcons) ? .66666666f : 1f;
         this.showHeading = showHeading;
         this.showName = showName;
+
+        if (entityLiving instanceof EntityPlayer)
+        {
+            Team team = entityLiving.getTeam();
+            if(team!=null)
+            {
+                playerTeamName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), entityLiving.getName());
+            }
+            else
+            {
+                playerTeamName = null;
+            }
+        }
     }
 
 
@@ -210,11 +229,10 @@ public class DrawEntityStep implements DrawStep
                         // marker-chevron
                         DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, flip ? -rotation + 180 : -rotation);
                     }
-
                 }
                 else
                 {
-                    DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, heading);
+                    DrawUtil.drawColoredEntity(drawX, drawY, entityTexture, color, alpha, drawScale, -rotation);
                 }
             }
         }
@@ -222,17 +240,15 @@ public class DrawEntityStep implements DrawStep
         if (pass == Pass.Text)
         {
             int labelOffset = entityTexture == null ? 0 : rotation == 0 ? -entityTexture.getHeight() / 2 : entityTexture.getHeight() / 2;
-            Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
+            Point2D labelPoint = gridRenderer.shiftWindowPosition((int) drawX, (int) drawY, 0, -labelOffset);
 
-            Team team = entityLiving.getTeam();
-            if (team == null || !(entityLiving instanceof EntityPlayer))
+            if(playerTeamName!=null)
             {
-                DrawUtil.drawLabel(entityLiving.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.GREEN_RGB, 1f, fontScale, false, rotation);
+                DrawUtil.drawLabel(playerTeamName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, RGB.WHITE_RGB, 1f, fontScale, false, rotation);
             }
             else
             {
-                String playerName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), entityLiving.getName());
-                DrawUtil.drawLabel(playerName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .8f, RGB.WHITE_RGB, 1f, fontScale, false, rotation);
+                DrawUtil.drawLabel(entityLiving.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, RGB.GREEN_RGB, 1f, fontScale, false, rotation);
             }
         }
     }

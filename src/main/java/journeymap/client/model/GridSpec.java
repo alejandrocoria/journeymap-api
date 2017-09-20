@@ -78,7 +78,7 @@ public class GridSpec
         GlStateManager.enableTexture2D();
 
         GlStateManager.bindTexture(getTexture().getGlTextureId());
-        GlStateManager.color(red, green, blue, alpha * mapAlpha);
+        GlStateManager.color(red, green, blue, alpha*mapAlpha);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, textureFilter);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, textureFilter);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);

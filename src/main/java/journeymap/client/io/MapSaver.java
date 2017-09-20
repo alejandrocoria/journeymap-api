@@ -140,7 +140,7 @@ public class MapSaver
             sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.world.provider))).append("_");
             if (isUnderground)
             {
-                sb.append("slice").append(mapType.dimension);
+                sb.append(mapType.vSlice);
             }
             else
             {

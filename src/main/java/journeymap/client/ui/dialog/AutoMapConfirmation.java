@@ -14,6 +14,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -32,7 +33,15 @@ public class AutoMapConfirmation extends JmUI
      */
     public AutoMapConfirmation()
     {
-        super(Constants.getString("jm.common.automap_dialog"));
+       this(null);
+    }
+
+    /**
+     * Instantiates a new Auto map confirmation.
+     */
+    public AutoMapConfirmation(JmUI returnDisplay)
+    {
+        super(Constants.getString("jm.common.automap_dialog"), returnDisplay);
     }
 
     /**
@@ -114,6 +123,8 @@ public class AutoMapConfirmation extends JmUI
                 arg = null;
             }
 
+            MapRegionTask.MAP_TYPE = Fullscreen.state().getMapType();
+
             Journeymap.getClient().queueMainThreadTask(new IMainThreadTask()
             {
                 @Override
@@ -131,7 +142,7 @@ public class AutoMapConfirmation extends JmUI
             });
         }
 
-        UIManager.INSTANCE.openFullscreenMap();
+        closeAndReturn();
     }
 
     @Override

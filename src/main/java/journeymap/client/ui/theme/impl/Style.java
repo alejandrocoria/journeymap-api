@@ -1,6 +1,7 @@
 package journeymap.client.ui.theme.impl;
 
 import journeymap.client.ui.theme.Theme;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Properties holder to abstract as many style-related values
@@ -14,9 +15,9 @@ class Style
     Colors text = new Colors();
     String minimapTexPrefix = "";
     String buttonTexPrefix = "";
-    String tooltipOnStyle = "§f";
-    String tooltipOffStyle = "§f";
-    String tooltipDisabledStyle = "§8§o";
+    String tooltipOnStyle = TextFormatting.AQUA.toString();
+    String tooltipOffStyle = TextFormatting.GRAY.toString();
+    String tooltipDisabledStyle = TextFormatting.DARK_GRAY.toString();
     int iconSize = 24;
     Theme.ColorSpec frameColorSpec = new Theme.ColorSpec();
     Theme.ColorSpec toolbarColorSpec = new Theme.ColorSpec();

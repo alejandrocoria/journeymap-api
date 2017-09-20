@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.ui.minimap;
@@ -11,11 +8,11 @@ package journeymap.client.ui.minimap;
 import journeymap.client.api.display.Context;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
-import journeymap.client.feature.Feature;
-import journeymap.client.feature.FeatureManager;
+import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
+import journeymap.client.model.EntityDTO;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
@@ -39,7 +36,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * Displays the map as a minimap overlay in-game.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class MiniMap
 {
@@ -62,9 +59,14 @@ public class MiniMap
     private Rectangle2D.Double centerRect;
 
     private long initTime;
+    private long lastAutoDayNightTime = -1;
+
+    private Boolean lastPlayerUnderground;
 
     /**
      * Default constructor
+     *
+     * @param miniMapProperties the mini map properties
      */
     public MiniMap(MiniMapProperties miniMapProperties)
     {
@@ -72,16 +74,31 @@ public class MiniMap
         setMiniMapProperties(miniMapProperties);
     }
 
+    /**
+     * State map state.
+     *
+     * @return the map state
+     */
     public static synchronized MapState state()
     {
         return state;
     }
 
+    /**
+     * Ui state ui state.
+     *
+     * @return the ui state
+     */
     public static synchronized UIState uiState()
     {
         return gridRenderer.getUIState();
     }
 
+    /**
+     * Update ui state.
+     *
+     * @param isActive the is active
+     */
     public static void updateUIState(boolean isActive)
     {
         if (FMLClientHandler.instance().getClient().world != null)
@@ -99,10 +116,10 @@ public class MiniMap
             return;
         }
 
-        boolean showCaves = shouldShowCaves();
+        //boolean showCaves = shouldShowCaves();
         state.refresh(mc, mc.player, miniMapProperties);
 
-        MapType mapType = state.getMapType(showCaves);
+        MapType mapType = state.getMapType();
 
         int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
         gridRenderer.setGridSize(gridSize);
@@ -110,14 +127,22 @@ public class MiniMap
         gridRenderer.center(state.getWorldDir(), mapType, mc.player.posX, mc.player.posZ, miniMapProperties.zoomLevel.get());
 
         boolean highQuality = Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get();
-        gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
+        gridRenderer.updateTiles(state.getMapType(), state.getZoom(), highQuality, mc.displayWidth, mc.displayHeight, true, 0, 0);
     }
 
+    /**
+     * Reset init time.
+     */
     public void resetInitTime()
     {
         initTime = System.currentTimeMillis();
     }
 
+    /**
+     * Sets mini map properties.
+     *
+     * @param miniMapProperties the mini map properties
+     */
     public void setMiniMapProperties(MiniMapProperties miniMapProperties)
     {
         this.miniMapProperties = miniMapProperties;
@@ -125,6 +150,11 @@ public class MiniMap
         reset();
     }
 
+    /**
+     * Gets current minimap properties.
+     *
+     * @return the current minimap properties
+     */
     public MiniMapProperties getCurrentMinimapProperties()
     {
         return miniMapProperties;
@@ -138,13 +168,10 @@ public class MiniMap
         drawMap(false);
     }
 
-    private boolean shouldShowCaves()
-    {
-        return FeatureManager.isAllowed(Feature.MapCaves) && miniMapProperties.showCaves.get();
-    }
-
     /**
      * Called in the render loop.
+     *
+     * @param preview the preview
      */
     public void drawMap(boolean preview)
     {
@@ -170,7 +197,8 @@ public class MiniMap
             if (doStateRefresh)
             {
                 timer = refreshStateTimer.start();
-                gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
+                autoDayNight();
+                gridRenderer.setContext(state.getWorldDir(), state.getMapType());
                 if (!preview)
                 {
                     state.refresh(mc, mc.player, miniMapProperties);
@@ -183,11 +211,11 @@ public class MiniMap
             }
 
             // Update the grid
-            boolean moved = gridRenderer.center(state.getWorldDir(), state.getCurrentMapType(), mc.player.posX, mc.player.posZ, miniMapProperties.zoomLevel.get());
+            boolean moved = gridRenderer.center(state.getWorldDir(), state.getMapType(), mc.player.posX, mc.player.posZ, miniMapProperties.zoomLevel.get());
             if (moved || doStateRefresh)
             {
-                boolean showCaves = shouldShowCaves();
-                gridRenderer.updateTiles(state.getMapType(showCaves), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
+                //boolean showCaves = shouldShowCaves();
+                gridRenderer.updateTiles(state.getMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, doStateRefresh || preview, 0, 0);
             }
 
             // Refresh state
@@ -304,7 +332,7 @@ public class MiniMap
                     GlStateManager.translate(dv.translateX, dv.translateY, 0);
                     float alpha = Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime))) / 255f;
                     Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
-                    dv.getMapTypeStatus(state.getCurrentMapType()).draw(windowCenter, alpha, 0);
+                    dv.getMapTypeStatus(state.getMapType()).draw(windowCenter, alpha, 0);
                     GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
                     startMapRotation(rotation);
                 }
@@ -316,7 +344,7 @@ public class MiniMap
                     GlStateManager.translate(dv.translateX, dv.translateY, 0);
                     float alpha = Math.min(255, Math.max(0, 1100 - (now - initTime))) / 255f;
                     Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
-                    dv.getMapPresetStatus(state.getCurrentMapType(), miniMapProperties.getId()).draw(windowCenter, alpha, 0);
+                    dv.getMapPresetStatus(state.getMapType(), miniMapProperties.getId()).draw(windowCenter, alpha, 0);
                     GlStateManager.translate(-dv.translateX, -dv.translateY, 0);
                     startMapRotation(rotation);
                 }
@@ -325,14 +353,14 @@ public class MiniMap
                 endStencil();
 
                 // Draw Frame
-                if (!dv.frameRotates && rotation != 0)
+                if(!dv.frameRotates && rotation!=0)
                 {
                     stopMapRotation(rotation);
                 }
 
                 dv.minimapFrame.drawFrame();
 
-                if (!dv.frameRotates && rotation != 0)
+                if(!dv.frameRotates && rotation!=0)
                 {
                     startMapRotation(rotation);
                 }
@@ -360,7 +388,7 @@ public class MiniMap
             }
             finally
             {
-                /***** END MATRIX: ROTATION *****/
+                /* END MATRIX: ROTATION */
                 GlStateManager.popMatrix();
             }
 
@@ -567,9 +595,66 @@ public class MiniMap
         }
     }
 
+    private void autoDayNight()
+    {
+        if(mc.world!=null)
+        {
+            // Switch to caves/surface if needed
+            boolean wasInCaves = false;
+            if (miniMapProperties.showCaves.get())
+            {
+                EntityDTO player = DataCache.getPlayer();
+                boolean neverChecked = (lastPlayerUnderground == null);
+                boolean playerUnderground = player.underground;
+                if(neverChecked || playerUnderground != lastPlayerUnderground)
+                {
+                    lastPlayerUnderground = playerUnderground;
+                    if(playerUnderground)
+                    {
+                        state.setMapType(MapType.underground(player));
+                    }
+                    else
+                    {
+                        state.setMapType(MapType.from(miniMapProperties.preferredMapType.get(), player));
+                        wasInCaves = true;
+                    }
+                }
+
+                if(playerUnderground && state.getMapType().vSlice != player.chunkCoordY)
+                {
+                    state.setMapType(MapType.underground(player));
+                }
+            }
+
+            // Switch to day/night if needed
+            if (miniMapProperties.showDayNight.get() && (wasInCaves || state.getMapType().isDayOrNight()))
+            {
+                final long NIGHT = 13800;
+                long worldTime = mc.world.getWorldTime() % 24000L;
+                boolean neverChecked = (lastAutoDayNightTime==-1);
+                if(worldTime>=NIGHT && (neverChecked || lastAutoDayNightTime<NIGHT))
+                {
+                    lastAutoDayNightTime = worldTime;
+                    state.setMapType(MapType.night(mc.world.provider.getDimension()));
+                }
+                else if(worldTime<NIGHT && (neverChecked || lastAutoDayNightTime>=NIGHT))
+                {
+                    lastAutoDayNightTime = worldTime;
+                    state.setMapType(MapType.day(mc.world.provider.getDimension()));
+                }
+            }
+
+            //
+        }
+    }
+
+    /**
+     * Reset.
+     */
     public void reset()
     {
         initTime = System.currentTimeMillis();
+        lastAutoDayNightTime = -1;
         initGridRenderer();
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();
@@ -590,6 +675,11 @@ public class MiniMap
     }
 
 
+    /**
+     * Update display vars.
+     *
+     * @param force the force
+     */
     public void updateDisplayVars(boolean force)
     {
         if (dv != null)
@@ -598,6 +688,13 @@ public class MiniMap
         }
     }
 
+    /**
+     * Update display vars.
+     *
+     * @param shape    the shape
+     * @param position the position
+     * @param force    the force
+     */
     public void updateDisplayVars(Shape shape, Position position, boolean force)
     {
         if (dv != null
@@ -657,5 +754,7 @@ public class MiniMap
     {
         return state.getPlayerBiome();
     }
+
+
 }
 

@@ -7,7 +7,6 @@ package journeymap.client.render.texture;
 
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
-import journeymap.client.io.RegionImageHandler;
 import journeymap.client.io.ThemeLoader;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.ui.theme.Theme;
@@ -20,7 +19,6 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,8 +27,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,11 +78,6 @@ public class TextureCache
      */
     public static final ResourceLocation UnknownEntity = uiImage("unknown.png");
 
-    /**
-     * The constant Brick.
-     */
-// BufferedImages don't need be retained
-    public static final ResourceLocation Brick = uiImage("brick.png");
     /**
      * The constant Deathpoint.
      */
@@ -242,7 +233,7 @@ public class TextureCache
     {
         playerSkins.clear();
 
-        Arrays.asList(Brick, ColorPicker, ColorPicker2, Deathpoint, GridCheckers, GridDots, GridSquares, Logo,
+        Arrays.asList(ColorPicker, ColorPicker2, Deathpoint, GridCheckers, GridDots, GridSquares, Logo,
                 MinimapSquare128, MinimapSquare256, MinimapSquare512, MobDot, MobDot_Large, MobDotArrow,
                 MobDotArrow_Large, MobDotChevron, MobDotChevron_Large, MobIconArrow_Large, Patreon, PlayerArrow,
                 PlayerArrow_Large, PlayerArrowBG, PlayerArrowBG, TileSampleDay, TileSampleNight, TileSampleUnderground,
@@ -470,90 +461,19 @@ public class TextureCache
         final TextureImpl playerSkinTex = tex;
 
         // Load it async
-        texExec.submit(new Callable<Void>()
-        {
-            @Override
-            public Void call() throws Exception
+        texExec.submit((Callable<Void>) () -> {
+            BufferedImage img = IgnSkin.downloadSkin(username);
+            if (img != null)
             {
-                BufferedImage img = downloadSkin(username);
-                if (img != null)
-                {
-                    final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
-                    final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
-                    g.drawImage(img, 0, 0, 24, 24, null);
-                    g.dispose();
-                    playerSkinTex.setImage(scaledImage, true);
-                }
-                else
-                {
-                    Journeymap.getLogger().warn("Couldn't get a skin at all for " + username);
-                }
-                return null;
-            }
-        });
-
-        return playerSkinTex;
-    }
-
-    /**
-     * Blocks.  Use this in a thread.
-     *
-     * @param username the username
-     * @return the buffered image
-     */
-    public static BufferedImage downloadSkin(String username)
-    {
-        BufferedImage img = null;
-        HttpURLConnection conn = null;
-        try
-        {
-            String skinPath = String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringUtils.stripControlCodes(username));
-            img = downloadImage(new URL(skinPath));
-            if (img == null)
-            {
-                img = downloadImage(new URL("http://skins.minecraft.net/MinecraftSkins/Herobrine.png"));
-            }
-        }
-        catch (Throwable e)
-        {
-            Journeymap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
-        }
-        return img;
-    }
-
-    private static BufferedImage downloadImage(URL imageURL)
-    {
-        BufferedImage img = null;
-        HttpURLConnection conn = null;
-        try
-        {
-            conn = (HttpURLConnection) imageURL.openConnection(Minecraft.getMinecraft().getProxy());
-            HttpURLConnection.setFollowRedirects(true);
-            conn.setInstanceFollowRedirects(true);
-            conn.setDoInput(true);
-            conn.setDoOutput(false);
-            conn.connect();
-            if (conn.getResponseCode() / 100 == 2) // can't getTexture input stream before response code available
-            {
-                img = ImageIO.read(conn.getInputStream()).getSubimage(8, 8, 8, 8);
+                playerSkinTex.setImage(img, true);
             }
             else
             {
-                Journeymap.getLogger().warn("Bad Response getting image: " + imageURL + " : " + conn.getResponseCode());
+                Journeymap.getLogger().warn("Couldn't get a skin at all for " + username);
             }
-        }
-        catch (Throwable e)
-        {
-            Journeymap.getLogger().warn("Error getting skin image: " + imageURL + " : " + e.getMessage());
-        }
-        finally
-        {
-            if (conn != null)
-            {
-                conn.disconnect();
-            }
-        }
+            return null;
+        });
 
-        return img;
+        return playerSkinTex;
     }
 }

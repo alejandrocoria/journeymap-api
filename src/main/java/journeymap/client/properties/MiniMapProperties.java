@@ -37,6 +37,11 @@ public class MiniMapProperties extends InGameMapProperties
     public final EnumField<Position> position = new EnumField<Position>(Inherit, "jm.minimap.position", Position.TopRight);
 
     /**
+     * Whether to auto-switch between day and night.
+     */
+    public final BooleanField showDayNight = new BooleanField(Inherit, "jm.common.show_day_night", true);
+
+    /**
      * Info Slot 1
      */
     public final EnumField<ThemeLabelSource> info1Label = new EnumField<>(Inherit, "jm.minimap.info1_label.button", ThemeLabelSource.Blank);

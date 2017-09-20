@@ -53,6 +53,18 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
      * @param field   the field
      * @param prefix  the prefix
      * @param suf     the suf
+     */
+    public IntSliderButton(IntegerField field, String prefix, String suf)
+    {
+        this(field, prefix, suf, field.getMinValue(), field.getMaxValue(), true);
+    }
+
+    /**
+     * Instantiates a new Int slider button.
+     *
+     * @param field   the field
+     * @param prefix  the prefix
+     * @param suf     the suf
      * @param minVal  the min val
      * @param maxVal  the max val
      * @param drawStr the draw str
@@ -120,13 +132,13 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
      * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent
      * e).
      */
-    public boolean mousePressed(Minecraft par1Minecraft, int mouseX, int mouseY)
+    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
     {
-        if (super.mousePressed(par1Minecraft, mouseX, mouseY))
+        if (super.mousePressed(mc, mouseX, mouseY, false))
         {
             setSliderValue((float) (mouseX - (this.x + 4)) / (float) (this.width - 8));
             this.dragging = true;
-            return true;
+            return checkClickListeners();
         }
         else
         {
@@ -185,6 +197,7 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
         {
             this.dragging = false;
             field.save();
+            checkClickListeners();
         }
     }
 

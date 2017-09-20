@@ -1,4 +1,9 @@
-### JourneyMap 5.2.0 Resource Bundle - en_US
+#
+# JourneyMap Mod <journeymap.info> for Minecraft
+# Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+#
+
+### JourneyMap 5.5.0 Resource Bundle - en_US
 ### Notes for translators:
 ### Do not translate or alter the codes used for color changes (§b, §e, §f, etc.)
 ### Positional parameters (%1$s, %2$s, %3$s, etc.) may be reordered to suit your language's sentence structure
@@ -41,11 +46,11 @@ jm.colorpalette.mods=Mods
 jm.colorpalette.resource_packs=Resource Packs
 jm.common.actions=Actions
 jm.common.alwaysmapcaves=Always Map Caves
-jm.common.alwaysmapcaves.tooltip=Always map the caves in your vertical chunk (slice), even when on the Overworld surface. Disabling this will improve performance.
+jm.common.alwaysmapcaves.tooltip=Always map the caves in your vertical chunk, even when on the Overworld surface. Disabling this will improve performance.
 jm.common.alwaysmapsurface=Always Map Surface
 jm.common.alwaysmapsurface.tooltip=Always map the Overworld surface, even when underground. Disabling this will improve performance.
 jm.common.automap_complete=Auto-mapping of surface has stopped.
-jm.common.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.common.automap_complete_underground=Auto-mapping of vertical chunk %1$s has stopped.
 jm.common.automap_dialog=Auto-Map
 jm.common.automap_dialog_summary_1=Note: Disable these Cartography options for faster results:
 jm.common.automap_dialog_summary_2='Blend Foliage', 'Blend Grass', and 'Blend Water'.
@@ -53,7 +58,7 @@ jm.common.automap_dialog_all=All
 jm.common.automap_dialog_missing=Missing
 jm.common.automap_dialog_text=Automatically map all regions or just missing regions?
 jm.common.automap_status=Auto-mapping surface (%1$s).
-jm.common.automap_status_underground=Auto-mapping slice %1$s (%2$s).
+jm.common.automap_status_underground=Auto-mapping vertical chunk %1$s (%2$s).
 jm.common.automap_text=Automatically map explored regions (single-player)
 jm.common.automap_title=Auto-Map...
 jm.common.automap_region_start=Auto-Mapping
@@ -111,7 +116,7 @@ jm.common.hotkeys.tooltip=View the Hot Keys which can be used with this map
 jm.common.hotkeys_keybinding_category=JourneyMap
 jm.common.hotkeys_keybinding_fullscreen_category=JourneyMap Fullscreen Map
 jm.common.location_format=Location
-jm.common.location_format.tooltip=Format of how location coordinates are displayed. Note: 'v' stands for vertical slice (or vertical chunk).
+jm.common.location_format.tooltip=Format of how location coordinates are displayed. Note: 'v' stands for vertical chunk.
 jm.common.location_format_verbose=Verbose Location
 jm.common.location_format_verbose.tooltip=Location shows coordinate names (x,y,z) with the numbers
 jm.common.location_xyvz_label=x, y (v), z
@@ -214,7 +219,9 @@ jm.common.show_animals=Show Animals
 jm.common.show_animals.tooltip=Nearby passive mobs are shown on the map
 jm.common.show_buttons=Show Buttons
 jm.common.show_caves=Show Caves
-jm.common.show_caves.tooltip=Show cave maps when underground or indoors
+jm.common.show_caves.tooltip=Switch to Cave map when underground or indoors
+jm.common.show_day_night=Show Day/Night
+jm.common.show_day_night.tooltip=Switch to Day or Night map automatically
 jm.common.show_entity_names=Show Entity Names
 jm.common.show_entity_names.tooltip=Show names of pets, NPCs, etc. on the map
 jm.common.show_grid=Show Grid
@@ -298,6 +305,9 @@ jm.fullscreen.hotkeys_title=Fullscreen Map Hot Keys
 jm.fullscreen.hotkeys_waypoint=Create/Edit Waypoint
 jm.fullscreen.hotkeys_west=Pan West (16 Blocks)
 jm.fullscreen.map_caves=Caves
+jm.fullscreen.map_cave_layers=Cave Layers
+jm.fullscreen.map_cave_layers.button=Vertical Chunk :
+jm.fullscreen.map_cave_layers.button.tooltip=y:%1$s - y:%2$s
 jm.fullscreen.map_day=Day
 jm.fullscreen.map_night=Night
 jm.fullscreen.map_topo=Topography
@@ -478,11 +488,12 @@ jm.waypoint.waypoints_button=Waypoints...
 jm.waypoint.x=X
 jm.waypoint.y=Y
 jm.waypoint.z=Z
+jm.webmap.actions_title=Actions
 jm.webmap.animals_menu_item_text=Animals
 jm.webmap.animals_menu_item_title=Show nearby animals
 jm.webmap.automap_already_started=Auto-mapping already in progress.
 jm.webmap.automap_complete=Auto-mapping has stopped.
-jm.webmap.automap_complete_underground=Auto-mapping of slice %1$s has stopped.
+jm.webmap.automap_complete_underground=Auto-mapping of vertical chunk %1$s has stopped.
 jm.webmap.automap_dialog_all=All
 jm.webmap.automap_dialog_close=Close
 jm.webmap.automap_dialog_missing=Missing
@@ -528,7 +539,7 @@ jm.webmap.save_button_text=Save Map
 jm.webmap.save_button_title=Save the explored map to file
 jm.webmap.save_filename=Saving map to screenshots: %1$s
 jm.webmap.show_menu_text=Show...
-jm.webmap.slice_text=Vertical Slice:
+jm.webmap.slice_text=Vertical Chunk:
 jm.webmap.title=Web Map
 jm.webmap.topo_button_text=Top
 jm.webmap.topo_button_title=A topographical map of the world

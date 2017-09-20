@@ -183,6 +183,15 @@ public class MapType
     }
 
     /**
+     * Whether the maptype is day or night.
+     * @return
+     */
+    public boolean isDayOrNight()
+    {
+        return name == Name.day || name == Name.night;
+    }
+
+    /**
      * Whether the feature of the maptype is allowed is allowed.
      *
      * @return
