@@ -993,17 +993,27 @@ public class Fullscreen extends JmUI implements ITabCompleter
         updateMapType(state.toggleMapType());
     }
 
+    /**
+     * Set a new MapType and ensure buttons correctly show the state.
+     * @param newType
+     */
     private void updateMapType(MapType newType)
     {
+        if(!newType.isAllowed())
+        {
+            newType = state.getMapType();
+        }
+
         state.setMapType(newType);
         buttonDay.setToggled(newType.isDay(), false);
         buttonNight.setToggled(newType.isNight(), false);
         buttonTopo.setToggled(newType.isTopo(), false);
         buttonLayers.setToggled(newType.isUnderground(), false);
-        if(newType.isUnderground())
+        if (newType.isUnderground())
         {
             sliderCaveLayer.setValue(newType.vSlice);
         }
+
         state.requireRefresh();
     }
 
@@ -1400,8 +1410,10 @@ public class Fullscreen extends JmUI implements ITabCompleter
 
     public void showCaveLayers()
     {
-        buttonCaves.setToggled(true);
-        sliderCaveLayer.visible = true;
+        if(!state.isUnderground())
+        {
+            updateMapType(MapType.underground(3, state.getDimension()));
+        }
     }
 
     @Override

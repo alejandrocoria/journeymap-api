@@ -5,8 +5,6 @@
 
 package journeymap.client.ui.dialog;
 
-import journeymap.client.render.texture.TextureCache;
-import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
@@ -25,10 +23,22 @@ import java.net.URLEncoder;
  */
 public class FullscreenActions
 {
+
     /**
-     * The Patreon logo.
+     * Open Fullscreen
      */
-    protected TextureImpl patreonLogo = TextureCache.getTexture(TextureCache.Patreon);
+    public static void open()
+    {
+        UIManager.INSTANCE.openFullscreenMap();
+    }
+
+    /**
+     * Open Fullscreen
+     */
+    public static void showCaveLayers()
+    {
+        UIManager.INSTANCE.openFullscreenMap().showCaveLayers();
+    }
 
     /**
      * Launch localhost.

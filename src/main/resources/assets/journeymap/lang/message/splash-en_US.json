@@ -4,11 +4,11 @@
   "lines": [
     {
       "label": "New UI themes & Fullscreen Map layout",
-      "action": "Fullscreen"
+      "action": "dialog.FullscreenActions#open"
     },
     {
       "label": "Switch between Cave layers in Fullscreen Map",
-      "action": "Fullscreen#showCaveLayers"
+      "action": "dialog.FullscreenActions#showCaveLayers"
     },
     {
       "label": "New Minimap Option: Show Day/Night",
