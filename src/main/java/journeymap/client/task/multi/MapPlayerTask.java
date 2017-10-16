@@ -1,9 +1,6 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.task.multi;
@@ -34,6 +31,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The type Map player task.
+ */
 public class MapPlayerTask extends BaseMapTask
 {
     private static int MAX_STALE_MILLISECONDS = 30000;
@@ -57,6 +57,9 @@ public class MapPlayerTask extends BaseMapTask
         super(chunkRenderController, world, mapType, chunkCoords, false, true, 10000);
     }
 
+    /**
+     * Force nearby remap.
+     */
     public static void forceNearbyRemap()
     {
         synchronized (MapPlayerTask.class)
@@ -65,6 +68,13 @@ public class MapPlayerTask extends BaseMapTask
         }
     }
 
+    /**
+     * Create map player task batch.
+     *
+     * @param chunkRenderController the chunk render controller
+     * @param player                the player
+     * @return the map player task batch
+     */
     public static MapPlayerTaskBatch create(ChunkRenderController chunkRenderController, final EntityDTO player)
     {
         final boolean surfaceAllowed = FeatureManager.isAllowed(Feature.MapSurface);
@@ -118,6 +128,11 @@ public class MapPlayerTask extends BaseMapTask
         return new MapPlayerTaskBatch(tasks);
     }
 
+    /**
+     * Get debug stats string [ ].
+     *
+     * @return the string [ ]
+     */
     public static String[] getDebugStats()
     {
         try
@@ -150,6 +165,12 @@ public class MapPlayerTask extends BaseMapTask
         }
     }
 
+    /**
+     * Add temp debug message.
+     *
+     * @param key     the key
+     * @param message the message
+     */
     public static void addTempDebugMessage(String key, String message)
     {
         if (Minecraft.getMinecraft().gameSettings.showLagometer)
@@ -158,11 +179,21 @@ public class MapPlayerTask extends BaseMapTask
         }
     }
 
+    /**
+     * Remove temp debug message.
+     *
+     * @param key the key
+     */
     public static void removeTempDebugMessage(String key)
     {
         tempDebugLines.invalidate(key);
     }
 
+    /**
+     * Gets simple stats.
+     *
+     * @return the simple stats
+     */
     public static String getSimpleStats()
     {
         int primaryRenderSize = 0;
@@ -199,6 +230,11 @@ public class MapPlayerTask extends BaseMapTask
                 decFormat.format(lastTaskAvgChunkTime));
     }
 
+    /**
+     * Gets task completed.
+     *
+     * @return the task completed
+     */
     public static long getlastTaskCompleted()
     {
         return lastTaskCompleted;
@@ -234,6 +270,11 @@ public class MapPlayerTask extends BaseMapTask
             if (chunkMD == null || !chunkMD.hasChunk() || (now - chunkMD.getLastRendered(mapType)) < 30000)
             {
                 // Remove it
+                return true;
+            }
+            else if (chunkMD.getDimension() != mapType.dimension)
+            {
+                // Theoretically this can happen because of a chunkloader, so remove it
                 return true;
             }
             else
@@ -284,12 +325,18 @@ public class MapPlayerTask extends BaseMapTask
     /**
      * ITaskManager for MapPlayerTasks
      *
-     * @author mwoodman
+     * @author techbrew
      */
     public static class Manager implements ITaskManager
     {
+        /**
+         * The Map task delay.
+         */
         final int mapTaskDelay = Journeymap.getClient().getCoreProperties().renderDelay.get() * 1000;
 
+        /**
+         * The Enabled.
+         */
         boolean enabled;
 
         @Override
@@ -341,8 +388,16 @@ public class MapPlayerTask extends BaseMapTask
 
     }
 
+    /**
+     * The type Map player task batch.
+     */
     public static class MapPlayerTaskBatch extends TaskBatch
     {
+        /**
+         * Instantiates a new Map player task batch.
+         *
+         * @param tasks the tasks
+         */
         public MapPlayerTaskBatch(List<ITask> tasks)
         {
             super(tasks);
