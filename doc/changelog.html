@@ -20,39 +20,7 @@
     </li>
     <li>Implements <a href="https://bitbucket.org/TeamJM/journeymap-api">JourneyMap API v${apiversion}</a></li>
 </ul>
-<p><strong>CHANGELOG (includes beta versions) (${date}):</strong></p>
+<p><strong>CHANGELOG (${date}):</strong></p>
 <ul>
-    <li>Major overhaul of color palette generation to support modded blocks.</li>
-    <li>Added customizable keybindings for In-Game Controls and Fullscreen Map Controls</li>
-    <li>UI Theme system refactored. New Biome-inspired UI themes: DesertTemple, EndCity, ForestMansion, NetherFortress, OceanMonument, Stronghold, and an updated version of Purist. Old Victorian theme removed and is no longer supported.</li>
-    <li>New Fullscreen map Feature: "Cave Layers" let you choose which vertical chunk of caves to view.</li>
-    <li>Fullscreen map shows biome name under mouse in Singleplayer, even for unloaded chunks</li>
-    <li>Fullscreen map has a new "Show Keys" button to let you see applicable keybindings.</li>
-    <li>Fullscreen map toolbars and layout have changed.  The "Actions" button and dialog have been replaced with buttons for each action.</li>
-    <li>Fullscreen map has new "Chat Position" keybinding. The block position under the mouse will be put into chat.</li>
-    <li>Fullscreen map keybindings now support mouse Button 2 and Button 3. (Like: Right-click to create waypoint.)</li>
-    <li>New Minimap Options: Customize the information shown above/below with 4 "Info Slots". Each slot can be one of: FPS, Game Time, System Time, Location, Biome.</li>
-    <li>New Minimap Option: "Show Day/Night" will automatically switch between Day or Night maps depending on the world time.</li>
-    <li>New Minimap Option: "Show Entity Names" lets you toggle name labels for pets, NPCs, etc.</li>
-    <li>New Cartography options: Blend Grass, Blend Foliage, Blend Water.</li>
-    <li>Support for modded mobs which implement INpc. They are now grouped with villagers on mob radar.</li>
-    <li>Improved Auto-Map dialog</li>
-    <li>About Screen layout changed. Patrons no longer stuck to a wall.</li>
-    <li>Configs from JourneyMap 5.4.x will be migrated to 5.5.0</li>
-    <li>Updated to JourneyMap API 1.4 release.</li>
-    <li>Bugfix: Save Map button was missing in Fullscreen Map</li>
-    <li>Bugfix: Save Map button was broken in Web Map</li>
-    <li>Bugfix: Player heads were missing skin overlays (hats, etc.)</li>
-    <li>Bugfix: Grid opacity was broken.</li>
-    <li>Bugfix: Waypoints created through API produced an exception if a color wasn't set.</li>
-    <li>Bugfix: Options Manager missing reset buttons and Minimap Preset 2 preview button</li>
-    <li>Bugfix: Waypoints added via the JourneyMap API would produce NPE if no group was set</li>
-    <li>Bugfix: Temporary (non-persistent) Waypoints added via the JourneyMap API would produce log spam when removed</li>
-    <li>Bugfix: Minimap option "Frame Opacity" was ignored</li>
-    <li>Bugfix: Grid opacity setting was ignored</li>
-    <li>Bugfix: Auto-Map wasn't using correct Biome to color grass and foliage.</li>
-    <li>Bugfix: Duplicate Reset buttons in Options Manager.</li>
-    <li>Bugfix: Fix for illegal characters in world names.</li>
-    <li>Bugfix: Fullscreen Map chat didn't support tab completion.</li>
-    <li>Bugfix: Removed duplicate keybinding (left bracket, right bracket)</li>
+    <li>Bugfix: StackOverflowError when opening Fullscreen Map after changing dimensions</li>
 </ul>

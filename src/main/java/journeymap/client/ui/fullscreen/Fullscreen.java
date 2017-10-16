@@ -1303,7 +1303,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
         MapType mapType = state.getMapType();
 
         if (mapType.dimension != mc.player.dimension) {
-            setFollow(true);
+            state.follow.set(true);
         }
 
         gridRenderer.setContext(state.getWorldDir(), mapType);
