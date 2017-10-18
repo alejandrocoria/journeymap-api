@@ -620,7 +620,8 @@ public class MiniMap
                     }
                 }
 
-                if(playerUnderground && state.getMapType().vSlice != player.chunkCoordY)
+                MapType currentMapType = state.getMapType();
+                if (playerUnderground && currentMapType.isUnderground() && currentMapType.vSlice != player.chunkCoordY)
                 {
                     state.setMapType(MapType.underground(player));
                 }

@@ -7,6 +7,7 @@ package journeymap.client.model;
 
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.data.DataCache;
 import journeymap.client.feature.Feature;
@@ -31,6 +32,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -70,11 +72,10 @@ public class MapState
     private long lastRefresh = 0;
     private long lastMapTypeChange = 0;
 
-    private boolean underground = false;
-
     private IntegerField lastSlice = new IntegerField(Hidden, "", 0, 15, 4);
     private boolean surfaceMappingAllowed = false;
     private boolean caveMappingAllowed = false;
+    private boolean topoMappingAllowed = false;
     private List<DrawStep> drawStepList = new ArrayList<DrawStep>();
     private List<DrawWayPointStep> drawWaypointStepList = new ArrayList<DrawWayPointStep>();
     private String playerBiome = "";
@@ -101,6 +102,11 @@ public class MapState
      */
     public void refresh(Minecraft mc, EntityPlayer player, InGameMapProperties mapProperties)
     {
+        if (mc.world == null || mc.world.provider == null)
+        {
+            return;
+        }
+
         try
         {
             refreshTimer.start();
@@ -109,8 +115,10 @@ public class MapState
             {
                 lastMapType = getMapType();
             }
-            this.surfaceMappingAllowed = FeatureManager.isAllowed(Feature.MapSurface);
-            this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves);
+            boolean isSurfaceWorld = mc.world.provider.isSurfaceWorld();
+            this.surfaceMappingAllowed = FeatureManager.isAllowed(Feature.MapSurface) && isSurfaceWorld;
+            this.caveMappingAllowed = FeatureManager.isAllowed(Feature.MapCaves) && mapProperties.showCaves.get();
+            this.topoMappingAllowed = FeatureManager.isAllowed(Feature.MapTopo) && isSurfaceWorld && Journeymap.getClient().getCoreProperties().mapTopography.get();
             this.worldDir = FileHandler.getJMWorldDir(mc);
 
             if(mc.world!=null && mc.world.getActualHeight()!=256 && lastSlice.getMaxValue()!=15)
@@ -122,7 +130,6 @@ public class MapState
                 lastSlice.set(currentSlice);
             }
 
-            this.underground = (caveMappingAllowed && lastMapType.isUnderground());
             lastPlayerChunkX = player.chunkCoordX;
             lastPlayerChunkZ = player.chunkCoordZ;
             highQuality = Journeymap.getClient().getCoreProperties().tileHighDisplayQuality.get();
@@ -163,51 +170,72 @@ public class MapState
      *
      * @param mapTypeName the map type name
      */
-    public void setMapType(MapType.Name mapTypeName)
+    public MapType setMapType(MapType.Name mapTypeName)
     {
-        setMapType(MapType.from(mapTypeName, DataCache.getPlayer()));
+        return setMapType(MapType.from(mapTypeName, DataCache.getPlayer()));
     }
 
     /**
-     * Toggle map type.
+     * Toggle map type to next viable type
      */
     public MapType toggleMapType()
     {
-        EntityDTO player = DataCache.getPlayer();
-        MapType currentMapType = getMapType();
+        MapType.Name next = getNextMapType(getMapType().name);
+        return setMapType(next);
+    }
+
+    /**
+     * Provides the next MapType viable for the current world and permissions.
+     *
+     * @param name MapType.Name
+     */
+    public MapType.Name getNextMapType(MapType.Name name)
+    {
+        final EntityDTO player = DataCache.getPlayer();
         final EntityLivingBase playerEntity = player.entityLivingRef.get();
         if (playerEntity == null)
         {
-            return currentMapType;
+            return name;
         }
 
-        boolean mapTopo = Journeymap.getClient().getCoreProperties().mapTopography.get();
+        List<MapType.Name> types = new ArrayList<>(4);
 
-        if (currentMapType.isUnderground())
+        if (this.surfaceMappingAllowed)
         {
-            setMapType(MapType.day(player));
+            types.add(MapType.Name.day);
+            types.add(MapType.Name.night);
         }
-        else if (currentMapType.isDay())
+
+        if (caveMappingAllowed && (player.underground || name == MapType.Name.underground))
         {
-            setMapType(MapType.night(player));
+            types.add(MapType.Name.underground);
         }
-        else if (currentMapType.isNight() && mapTopo)
+
+        if (topoMappingAllowed)
         {
-            setMapType(MapType.topo(player));
+            types.add(MapType.Name.topo);
         }
-        else if (currentMapType.isNight() || currentMapType.isTopo())
+
+        if (name == MapType.Name.none && !types.isEmpty())
         {
-            if (underground && caveMappingAllowed)
+            return types.get(0);
+        }
+
+        if (types.contains(name))
+        {
+            Iterator<MapType.Name> cyclingIterator = Iterables.cycle(types).iterator();
+            while (cyclingIterator.hasNext())
             {
-                lastMapProperties.showCaves.set(true);
-                setMapType(MapType.underground(player));
-            }
-            else
-            {
-                setMapType(MapType.day(player));
+                MapType.Name current = cyclingIterator.next();
+                if (current == name)
+                {
+                    return cyclingIterator.next();
+                }
             }
         }
-        return currentMapType;
+
+        // If all else fails
+        return name;
     }
 
     /**
@@ -215,7 +243,7 @@ public class MapState
      *
      * @param mapType the map type
      */
-    public void setMapType(MapType mapType)
+    public MapType setMapType(MapType mapType)
     {
         if(mapType.isAllowed())
         {
@@ -231,6 +259,7 @@ public class MapState
             setLastMapTypeChange(mapType);
             requireRefresh();
         }
+        return getMapType();
     }
 
     /**
@@ -247,10 +276,19 @@ public class MapState
             try
             {
                 mapType = MapType.from(lastMapProperties.preferredMapType.get(), DataCache.getPlayer());
+                if (mapType.isUnderground() && !DataCache.getPlayer().underground)
+                {
+                    mapType = MapType.day(DataCache.getPlayer());
+                }
             }
             catch (Exception e)
             {
                 mapType = MapType.day(DataCache.getPlayer());
+            }
+
+            if (!mapType.isAllowed())
+            {
+                mapType = MapType.none();
             }
         }
 
@@ -288,7 +326,7 @@ public class MapState
      */
     public boolean isUnderground()
     {
-        return underground;
+        return getMapType().isUnderground();
     }
 
     /**
@@ -496,14 +534,15 @@ public class MapState
             return true;
         }
 
-        if (this.underground != player.underground)
+        if (caveMappingAllowed)
         {
-            return true;
-        }
-
-        if (this.getMapType().vSlice != null && (!player.underground || this.getMapType().vSlice != player.chunkCoordY))
-        {
-            return true;
+            if (player.underground)
+            {
+                if (getMapType() != MapType.underground(player))
+                {
+                    return true;
+                }
+            }
         }
 
         int diffX = Math.abs(lastPlayerChunkX - player.chunkCoordX);

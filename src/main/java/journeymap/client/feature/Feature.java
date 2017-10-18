@@ -29,7 +29,11 @@ public enum Feature
      */
     RadarVillagers,
     /**
-     * Whether surface mapping is allowed.
+     * Whether topo mapping is allowed.
+     */
+    MapTopo,
+    /**
+     * Whether cave mapping is allowed.
      */
     MapSurface,
     /**
