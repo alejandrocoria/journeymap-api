@@ -50,14 +50,14 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ITabCompleter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.WorldProviderHell;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -380,7 +380,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
             } else {
                 for (int k = 0; k < this.buttonList.size(); ++k) {
                     GuiButton guibutton = this.buttonList.get(k);
-                    guibutton.drawButton(this.mc, width, height, 0f);
+                    guibutton.drawButton(this.mc, width, height, f);
                     if (tooltip == null) {
                         if (guibutton instanceof Button) {
                             Button button = (Button) guibutton;
@@ -467,40 +467,53 @@ public class Fullscreen extends JmUI implements ITabCompleter
 
             // Day Toggle
             buttonDay.setToggled(mapType.isDay(), false);
-            buttonDay.setEnabled(state().isSurfaceMappingAllowed());
             buttonDay.setStaysOn(true);
             buttonDay.addToggleListener((button, toggled) -> {
-                updateMapType(MapType.day(state.getDimension()));
-                return true;
+                if (button.enabled)
+                {
+                    updateMapType(MapType.day(state.getDimension()));
+                }
+                return button.enabled;
             });
 
             // Night Toggle
             buttonNight.setToggled(mapType.isNight(), false);
-            buttonNight.setEnabled(state().isSurfaceMappingAllowed());
+
             buttonNight.setStaysOn(true);
             buttonNight.addToggleListener((button, toggled) -> {
-                updateMapType(MapType.night(state.getDimension()));
-                return true;
+                if (button.enabled)
+                {
+                    updateMapType(MapType.night(state.getDimension()));
+                }
+                return button.enabled;
             });
 
             // Topo Toggle
             buttonTopo.setDrawButton(coreProperties.mapTopography.get());
-            buttonTopo.setEnabled(state().isSurfaceMappingAllowed());
+
             buttonTopo.setToggled(mapType.isTopo(), false);
             buttonTopo.setStaysOn(true);
             buttonTopo.addToggleListener((button, toggled) -> {
-                updateMapType(MapType.topo(state.getDimension()));
-                return true;
+                if (button.enabled)
+                {
+                    updateMapType(MapType.topo(state.getDimension()));
+                }
+                return button.enabled;
             });
 
             // Cave Layers Toggle
-            buttonLayers.setEnabled(state().isCaveMappingAllowed());
+            buttonLayers.setEnabled(FeatureManager.isAllowed(Feature.MapCaves));
             buttonLayers.setToggled(mapType.isUnderground(), false);
             buttonLayers.setStaysOn(true);
             buttonLayers.addToggleListener((button, toggled) -> {
-                updateMapType(MapType.underground(DataCache.getPlayer()));
-                return true;
+                if (button.enabled)
+                {
+                    updateMapType(MapType.underground(DataCache.getPlayer()));
+                }
+                return button.enabled;
             });
+
+            FontRenderer fontRenderer = getFontRenderer();
 
             // Cave Layers Slider
             sliderCaveLayer = new IntSliderButton(state.getLastSlice(), Constants.getString("jm.fullscreen.map_cave_layers.button") + " ", "");
@@ -772,11 +785,11 @@ public class Fullscreen extends JmUI implements ITabCompleter
         menuToolbar.setDrawToolbar(!isChatOpen());
 
         // Update toggles
-        boolean notNether = !(mc.world.provider instanceof WorldProviderHell);
-        buttonDay.setEnabled(notNether);
-        buttonNight.setEnabled(notNether);
-        buttonTopo.setEnabled(notNether);
-        buttonCaves.setEnabled(notNether);
+        buttonDay.setEnabled(state.isSurfaceMappingAllowed());
+        buttonNight.setEnabled(state.isSurfaceMappingAllowed());
+        buttonTopo.setEnabled(state.isTopoMappingAllowed());
+        buttonCaves.setEnabled(state.isCaveMappingAllowed());
+
         buttonFollow.setEnabled(!state.follow.get());
 
         boolean automapRunning = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
@@ -1058,7 +1071,10 @@ public class Fullscreen extends JmUI implements ITabCompleter
             if(mc.player!=null)
             {
                 sliderCaveLayer.setValue(mc.player.chunkCoordY);
-                sliderCaveLayer.checkClickListeners();
+                if (state.getMapType().isUnderground())
+                {
+                    sliderCaveLayer.checkClickListeners();
+                }
             }
         }
     }
@@ -1071,7 +1087,9 @@ public class Fullscreen extends JmUI implements ITabCompleter
     void setFollow(Boolean follow)
     {
         state.follow.set(follow);
-        if (state.follow.get()) {
+        if (follow)
+        {
+            state.resetMapType();
             refreshState();
         }
     }
@@ -1088,7 +1106,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
     {
         Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());
         BlockPos blockPos = layerDelegate.getBlockPos(mc, gridRenderer, mousePosition);
-        Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, state().getDimension());
+        Waypoint waypoint = Waypoint.at(blockPos, Waypoint.Type.Normal, state.getDimension());
         openChat(waypoint.toChatString());
     }
 
@@ -1284,7 +1302,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
     void refreshState()
     {
         // Check player status
-        EntityPlayer player = mc.player;
+        EntityPlayerSP player = mc.player;
         if (player == null) {
             logger.warn("Could not get player");
             return;
@@ -1292,46 +1310,51 @@ public class Fullscreen extends JmUI implements ITabCompleter
 
         StatTimer timer = StatTimer.get("Fullscreen.refreshState");
         timer.start();
+        try
+        {
 
-        // Clear toolbar bounds
-        menuToolbarBounds = null;
-        optionsToolbarBounds = null;
+            // Clear toolbar bounds
+            menuToolbarBounds = null;
+            optionsToolbarBounds = null;
 
-        // Update the state first
-        fullMapProperties = Journeymap.getClient().getFullMapProperties();
-        state.refresh(mc, player, fullMapProperties);
-        MapType mapType = state.getMapType();
+            // Update the state first
+            fullMapProperties = Journeymap.getClient().getFullMapProperties();
+            state.refresh(mc, player, fullMapProperties);
+            MapType mapType = state.getMapType();
 
-        if (mapType.dimension != mc.player.dimension) {
-            state.follow.set(true);
+            gridRenderer.setContext(state.getWorldDir(), mapType);
+
+            // Center core renderer
+            if (state.follow.get())
+            {
+                gridRenderer.center(state.getWorldDir(), mapType, mc.player.posX, mc.player.posZ, fullMapProperties.zoomLevel.get());
+            }
+            else
+            {
+                gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+            }
+
+            // Update tiles
+            gridRenderer.updateTiles(mapType, state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
+
+            // Build list of drawSteps
+            state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, false);
+
+            // Update player pos
+            LocationFormat.LocationFormatKeys locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
+            state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
+                    MathHelper.floor(mc.player.posX),
+                    MathHelper.floor(mc.player.posZ),
+                    MathHelper.floor(mc.player.getEntityBoundingBox().minY),
+                    mc.player.chunkCoordY) + " " + state.getPlayerBiome();
+
+            // Reset timer
+            state.updateLastRefresh();
         }
-
-        gridRenderer.setContext(state.getWorldDir(), mapType);
-
-        // Center core renderer
-        if (state.follow.get()) {
-            gridRenderer.center(state.getWorldDir(), mapType, mc.player.posX, mc.player.posZ, fullMapProperties.zoomLevel.get());
-        } else {
-            gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+        finally
+        {
+            timer.stop();
         }
-
-        // Update tiles
-        gridRenderer.updateTiles(mapType, state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, true, 0, 0);
-
-        // Build list of drawSteps
-        state.generateDrawSteps(mc, gridRenderer, waypointRenderer, radarRenderer, fullMapProperties, false);
-
-        // Update player pos
-        LocationFormat.LocationFormatKeys locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
-        state.playerLastPos = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
-                MathHelper.floor(mc.player.posX),
-                MathHelper.floor(mc.player.posZ),
-                MathHelper.floor(mc.player.getEntityBoundingBox().minY),
-                mc.player.chunkCoordY) + " " + state.getPlayerBiome();
-
-        // Reset timer
-        state.updateLastRefresh();
-        timer.stop();
 
         // Trigger a mouse move event in the layer delegate so draw steps can update if needed
         Point2D.Double mousePosition = new Point2D.Double(Mouse.getEventX(), gridRenderer.getHeight() - Mouse.getEventY());

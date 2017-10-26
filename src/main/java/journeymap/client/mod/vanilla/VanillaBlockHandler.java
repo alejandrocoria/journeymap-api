@@ -19,7 +19,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.fluids.IFluidBlock;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,8 +54,6 @@ public final class VanillaBlockHandler implements IModBlockHandler {
      * The Block class alphas.
      */
     HashMap<Class<?>, Float> blockClassAlphas = new HashMap<>();
-
-    private static Logger logger = Journeymap.getLogger();
 
     private boolean mapPlants;
     private boolean mapPlantShadows;
@@ -162,6 +159,17 @@ public final class VanillaBlockHandler implements IModBlockHandler {
         if (block instanceof IFluidBlock) {
             blockMD.addFlags(Fluid, NoShadow);
             blockMD.setAlpha(.7F);
+        }
+
+        // If material is glass, but not actually transparent, then remove the flags used on glass.
+        if (material == Material.GLASS)
+        {
+            if (block instanceof BlockGlowstone || block instanceof BlockSeaLantern || block instanceof BlockBeacon)
+            {
+                blockMD.removeFlags(OpenToSky, Transparency);
+                blockMD.setAlpha(1F);
+            }
+
         }
 
         // Double-tall plants will have the upper half ignored

@@ -26,17 +26,18 @@ public class ChunkRenderController
 {
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final BaseRenderer netherRenderer;
-    private final BaseRenderer endRenderer;
+    private final SurfaceRenderer endSurfaceRenderer;
+    private final BaseRenderer endCaveRenderer;
     private final BaseRenderer topoRenderer;
     private final BaseRenderer overWorldCaveRenderer;
 
     public ChunkRenderController()
     {
+        overWorldSurfaceRenderer = new SurfaceRenderer();
+        overWorldCaveRenderer = new CaveRenderer(overWorldSurfaceRenderer);
         netherRenderer = new NetherRenderer();
-        endRenderer = new EndRenderer();
-        SurfaceRenderer surfaceRenderer = new SurfaceRenderer();
-        overWorldSurfaceRenderer = surfaceRenderer;
-        overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
+        endSurfaceRenderer = new EndSurfaceRenderer();
+        endCaveRenderer = new EndCaveRenderer(endSurfaceRenderer);
         topoRenderer = new TopoRenderer();
     }
 
@@ -61,7 +62,7 @@ public class ChunkRenderController
                         }
                         case 1:
                         {
-                            return endRenderer;
+                            return endCaveRenderer;
                         }
                         default:
                         {
@@ -109,7 +110,7 @@ public class ChunkRenderController
                         }
                         case 1:
                         {
-                            renderOkay = endRenderer.render(chunkSliceImage, chunkMd, mapType.vSlice);
+                            renderOkay = endCaveRenderer.render(chunkSliceImage, chunkMd, mapType.vSlice);
                             break;
                         }
                         default:

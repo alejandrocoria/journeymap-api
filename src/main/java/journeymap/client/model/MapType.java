@@ -261,9 +261,10 @@ public class MapType
         return theCacheKey;
     }
 
+    @Override
     public String toString()
     {
-        return name.name();
+        return theCacheKey;
     }
 
     /**

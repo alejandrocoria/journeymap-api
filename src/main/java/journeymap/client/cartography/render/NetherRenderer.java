@@ -118,18 +118,7 @@ public class NetherRenderer extends CaveRenderer implements IChunkRenderer
             return 0;
         }
 
-        int actualLight = chunkMd.getSavedLightValue(x, y + 1, z);
-
-        if (actualLight > 0)
-        {
-            return actualLight;
-        }
-        else
-        {
-            //System.out.print(y + "  ");
-            return Math.max(adjusted ? 2 : 0, actualLight);
-        }
-
+        return mapCaveLighting ? Math.max(adjusted ? 2 : 0, chunkMd.getSavedLightValue(x, y + 1, z)) : 15;
     }
 
     @Override

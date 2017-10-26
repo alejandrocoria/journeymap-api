@@ -143,15 +143,30 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
      * @param z                 the z
      */
     protected void mask(final BufferedImage chunkSurfaceImage, final BufferedImage chunkImage,
-                        final ChunkMD chunkMd, final int x, final int y, final int z) {
-        if (chunkSurfaceImage == null || !mapSurfaceAboveCaves) {
+                        final ChunkMD chunkMd, final int x, final int y, final int z)
+    {
+        if (chunkSurfaceImage == null || !mapSurfaceAboveCaves)
+        {
             paintBlackBlock(chunkImage, x, z);
-        } else {
+        }
+        else
+        {
             int surfaceY = Math.max(0, chunkMd.getChunk().getHeightValue(x, z));
             int distance = Math.max(0, surfaceY - y);
-            if (distance > 16) {
-                paintBlackBlock(chunkImage, x, z);
-            } else {
+            if (distance > 16)
+            {
+                int minY = getBlockHeight(chunkMd, new BlockPos(x, y - 1, z));
+                if (y > 0 && minY > 0)
+                {
+                    paintBlackBlock(chunkImage, x, z);
+                }
+                else
+                {
+                    paintVoidBlock(chunkImage, x, z);
+                }
+            }
+            else
+            {
                 //float dim = Math.max(defaultDim, 16f / distance);
                 paintDimOverlay(chunkSurfaceImage, chunkImage, x, z, defaultDim);
             }
@@ -247,7 +262,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
             int lightLevel;
             int y = getBlockHeight(chunkMd, x, topY >> 4, z, minY, topY);
 
-            while (y > 0)
+            while (y >= 0)
             {
                 blockMD = BlockMD.getBlockMDFromChunkLocal(chunkMd, x, y, z);
 
@@ -260,10 +275,12 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         // Ignores the myriad tiny one-block pockets of lava in the Nether
                         lavaBlockMD = blockMD;
-                    } else if (blockMD.isLava() && y < minY) {
-                        // Ignores the myriad tiny one-block pockets of lava in the Nether
-                        //lavaBlockMD = blockMD;
                     }
+                    //else if (blockMD.isLava() && y < minY)
+                    //{
+                    // Ignores the myriad tiny one-block pockets of lava in the Nether
+                    //lavaBlockMD = blockMD;
+                    //}
 
                     if (blockAboveMD.isIgnore() || blockAboveMD.hasFlag(BlockFlag.OpenToSky))
                     {
@@ -284,7 +301,8 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                                 break;
                             }
                         }
-                    } else if (strata.isEmpty() && y < minY)
+                    }
+                    else if (strata.isEmpty() && y < minY)
                     {
                         break;
                     }
