@@ -12,7 +12,6 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.network.PacketHandler;
 import journeymap.server.events.ForgeEvents;
-import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
@@ -34,6 +33,10 @@ public class JourneymapServer implements CommonProxy
 {
     private Logger logger;
     public static boolean DEV_MODE = false;
+    private static final int MINIMUM_CLIENT_VERSION_MAJOR = 5;
+    private static final int MINIMUM_CLIENT_VERSION_MINOR = 5;
+    private static final int MINIMUM_CLIENT_VERSION_MACRO = 2;
+
 
     /**
      * Constructor.
@@ -95,7 +98,7 @@ public class JourneymapServer implements CommonProxy
         for (String s : modList.keySet())
         {
             //logger.info("MOD Key: " + s + " MOD Value: " + modList.get(s));
-            if ("journeymap".equalsIgnoreCase(s))
+            if (s.toLowerCase().startsWith("journeymap"))
             {
                 if (modList.get(s).contains("@"))
                 {
@@ -105,14 +108,30 @@ public class JourneymapServer implements CommonProxy
                     return true;
                 }
                 String[] version = modList.get(s).split("-")[1].split("\\.");
+
                 int major = Integer.parseInt(version[0]);
                 int minor = Integer.parseInt(version[1]);
-
-                if (major >= 5 && minor >= 3)
+                try
                 {
-                    return true;
+                    int macro = Integer.parseInt(version[2]);
+                    if (MINIMUM_CLIENT_VERSION_MAJOR >= major
+                            && MINIMUM_CLIENT_VERSION_MINOR >= minor
+                            && MINIMUM_CLIENT_VERSION_MACRO >= macro)
+                    {
+                        return true;
+                    }
                 }
-                logger.info("Version Mismatch need 5.3.0 or higher. Current version attempt -> " + modList.get(s));
+                catch (Exception e)
+                {
+                    // The macro is not an int, in some beta state. Expected Exception.
+                    if (MINIMUM_CLIENT_VERSION_MAJOR >= major && MINIMUM_CLIENT_VERSION_MINOR >= minor)
+                    {
+                        return true;
+                    }
+                }
+
+
+                logger.info("Version Mismatch need " + MINIMUM_CLIENT_VERSION_MAJOR + "." + MINIMUM_CLIENT_VERSION_MINOR + "." + MINIMUM_CLIENT_VERSION_MACRO + " or higher. Current version attempt -> " + modList.get(s));
                 return false;
             }
         }
