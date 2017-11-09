@@ -35,7 +35,7 @@ public class JourneymapServer implements CommonProxy
     public static boolean DEV_MODE = false;
     private static final int MINIMUM_CLIENT_VERSION_MAJOR = 5;
     private static final int MINIMUM_CLIENT_VERSION_MINOR = 5;
-    private static final int MINIMUM_CLIENT_VERSION_MACRO = 2;
+    private static final int MINIMUM_CLIENT_VERSION_MACRO = 3;
 
 
     /**
@@ -114,9 +114,9 @@ public class JourneymapServer implements CommonProxy
                 try
                 {
                     int macro = Integer.parseInt(version[2]);
-                    if (MINIMUM_CLIENT_VERSION_MAJOR >= major
-                            && MINIMUM_CLIENT_VERSION_MINOR >= minor
-                            && MINIMUM_CLIENT_VERSION_MACRO >= macro)
+                    if (MINIMUM_CLIENT_VERSION_MAJOR <= major
+                            && MINIMUM_CLIENT_VERSION_MINOR <= minor
+                            && MINIMUM_CLIENT_VERSION_MACRO <= macro)
                     {
                         return true;
                     }
@@ -124,7 +124,7 @@ public class JourneymapServer implements CommonProxy
                 catch (Exception e)
                 {
                     // The macro is not an int, in some beta state. Expected Exception.
-                    if (MINIMUM_CLIENT_VERSION_MAJOR >= major && MINIMUM_CLIENT_VERSION_MINOR >= minor)
+                    if (MINIMUM_CLIENT_VERSION_MAJOR <= major && MINIMUM_CLIENT_VERSION_MINOR <= minor)
                     {
                         return true;
                     }
