@@ -39,6 +39,10 @@ public class DimensionProperties extends PermissionProperties
         GlobalProperties gProp = PropertiesManager.getInstance().getGlobalProperties();
         this.opCaveMappingEnabled.set(gProp.opCaveMappingEnabled.get());
         this.caveMappingEnabled.set(gProp.caveMappingEnabled.get());
+        this.opSurfaceMappingEnabled.set(gProp.opSurfaceMappingEnabled.get());
+        this.surfaceMappingEnabled.set(gProp.surfaceMappingEnabled.get());
+        this.opTopoMappingEnabled.set(gProp.opTopoMappingEnabled.get());
+        this.topoMappingEnabled.set(gProp.topoMappingEnabled.get());
         this.opRadarEnabled.set(gProp.opRadarEnabled.get());
         this.radarEnabled.set(gProp.radarEnabled.get());
         this.playerRadarEnabled.set(gProp.playerRadarEnabled.get());

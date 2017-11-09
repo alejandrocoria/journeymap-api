@@ -70,7 +70,7 @@ public class DimensionPermissionPacket implements IMessage
         public IMessage onMessage(DimensionPermissionPacket message, MessageContext ctx)
         {
             PermissionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
-            FeatureManager.instance().disableDimensionFeature(prop);
+            FeatureManager.INSTANCE.updateDimensionFeatures(prop);
             Journeymap.getClient().setServerEnabled(true);
             return null;
         }

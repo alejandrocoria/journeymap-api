@@ -297,7 +297,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
         super(null);
         mc = FMLClientHandler.instance().getClient();
         layerDelegate = new LayerDelegate(this);
-        if(Journeymap.getClient().getFullMapProperties().showCaves.get() && DataCache.getPlayer().underground)
+        if (Journeymap.getClient().getFullMapProperties().showCaves.get() && DataCache.getPlayer().underground && state.follow.get())
         {
             state.setMapType(MapType.underground(DataCache.getPlayer()));
         }
@@ -785,10 +785,19 @@ public class Fullscreen extends JmUI implements ITabCompleter
         menuToolbar.setDrawToolbar(!isChatOpen());
 
         // Update toggles
+        MapType mapType = state.getMapType();
+
         buttonDay.setEnabled(state.isSurfaceMappingAllowed());
+        buttonDay.setToggled(buttonDay.enabled && mapType.isDay());
+
         buttonNight.setEnabled(state.isSurfaceMappingAllowed());
+        buttonNight.setToggled(buttonNight.enabled && mapType.isNight());
+
         buttonTopo.setEnabled(state.isTopoMappingAllowed());
+        buttonTopo.setToggled(buttonTopo.enabled && mapType.isTopo());
+
         buttonCaves.setEnabled(state.isCaveMappingAllowed());
+        buttonCaves.setToggled(buttonCaves.enabled && mapType.isUnderground());
 
         buttonFollow.setEnabled(!state.follow.get());
 

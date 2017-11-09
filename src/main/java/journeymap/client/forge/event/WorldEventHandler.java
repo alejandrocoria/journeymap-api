@@ -33,7 +33,7 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
             if (DataCache.getPlayer().dimension == world.provider.getDimension())
             {
                 Journeymap.getClient().stopMapping();
-                FeatureManager.instance().reset();
+                FeatureManager.INSTANCE.reset();
             }
         }
         catch (Exception e)

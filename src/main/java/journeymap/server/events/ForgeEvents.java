@@ -1,7 +1,6 @@
 package journeymap.server.events;
 
 import journeymap.common.Journeymap;
-import journeymap.common.feature.JourneyMapTeleport;
 import journeymap.common.network.PacketHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.DimensionProperties;
@@ -62,6 +61,8 @@ public class ForgeEvents
                 {
                     prop.radarEnabled.set(prop.opRadarEnabled.get());
                     prop.caveMappingEnabled.set(prop.opCaveMappingEnabled.get());
+                    prop.surfaceMappingEnabled.set(prop.opSurfaceMappingEnabled.get());
+                    prop.topoMappingEnabled.set(prop.opTopoMappingEnabled.get());
                 }
 
                 PacketHandler.sendDimensionPacketToPlayer(player, prop);

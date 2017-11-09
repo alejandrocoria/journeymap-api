@@ -1,15 +1,12 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.io;
 
+import com.google.common.base.Joiner;
 import journeymap.client.Constants;
-import journeymap.client.data.DataCache;
 import journeymap.client.data.WorldData;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
@@ -33,20 +30,43 @@ import java.util.regex.Pattern;
 /**
  * Merges all region files into a single image
  *
- * @author Mark
+ * @author techbrew
  */
 public class MapSaver
 {
-
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
+    /**
+     * The World dir.
+     */
     final File worldDir;
+    /**
+     * The Map type.
+     */
     final MapType mapType;
+    /**
+     * The Save file.
+     */
     File saveFile;
+    /**
+     * The Output columns.
+     */
     int outputColumns;
+    /**
+     * The Output rows.
+     */
     int outputRows;
+    /**
+     * The Files.
+     */
     ArrayList<File> files;
 
+    /**
+     * Instantiates a new Map saver.
+     *
+     * @param worldDir the world dir
+     * @param mapType  the map type
+     */
     public MapSaver(File worldDir, MapType mapType)
     {
         super();
@@ -58,6 +78,8 @@ public class MapSaver
 
     /**
      * Use pngj to assemble region files.
+     *
+     * @return the file
      */
     public File saveMap()
     {
@@ -107,11 +129,21 @@ public class MapSaver
         return saveFile;
     }
 
+    /**
+     * Gets save file name.
+     *
+     * @return the save file name
+     */
     public String getSaveFileName()
     {
         return saveFile.getName();
     }
 
+    /**
+     * Is valid boolean.
+     *
+     * @return the boolean
+     */
     public boolean isValid()
     {
         return files != null && files.size() > 0;
@@ -134,19 +166,9 @@ public class MapSaver
             // Build save file name
             final Minecraft mc = FMLClientHandler.instance().getClient();
             final String date = dateFormat.format(new Date());
-            final boolean isUnderground = mapType.isUnderground();
-            final StringBuilder sb = new StringBuilder(date).append("_");
-            sb.append(DataCache.INSTANCE.getWorld(false).getWorldName(mc, false)).append("_");
-            sb.append(WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.world.provider))).append("_");
-            if (isUnderground)
-            {
-                sb.append(mapType.vSlice);
-            }
-            else
-            {
-                sb.append(mapType);
-            }
-            sb.append(".png");
+            final String worldName = WorldData.getWorldName(mc, false);
+            final String dimName = WorldData.getSafeDimensionName(new WorldData.WrappedProvider(mc.world.provider));
+            final String fileName = Joiner.on("_").skipNulls().join(date, worldName, dimName, mapType.name, mapType.vSlice) + ".png";
 
             // Ensure screenshots directory
             File screenshotsDir = new File(FileHandler.getMinecraftDirectory(), "screenshots");
@@ -156,7 +178,7 @@ public class MapSaver
             }
 
             // Create result file
-            saveFile = new File(screenshotsDir, sb.toString());
+            saveFile = new File(screenshotsDir, fileName);
 
             // Ensure latest regions are flushed to disk synchronously before continuing
             RegionImageCache.INSTANCE.flushToDisk(false);
