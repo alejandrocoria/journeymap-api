@@ -67,7 +67,7 @@ public class Journeymap
     /**
      * The constant VERSION_URL.
      */
-    public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap.json";
+    public static final String VERSION_URL = "https://api.cfwidget.com/minecraft/mc-mods/journeymap";
 
     /**
      * The constant instance.
