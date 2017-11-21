@@ -18,12 +18,11 @@
  *
  */
 
-package journeymap.client.api.util;
+package journeymap.common.api.util;
 
 import com.google.common.base.Strings;
-import journeymap.client.api.ClientPlugin;
-import journeymap.client.api.IClientAPI;
-import journeymap.client.api.IClientPlugin;
+import journeymap.common.api.IJmAPI;
+import journeymap.common.api.IJmPlugin;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -34,21 +33,26 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 
 /**
- * Enum singleton used by JourneyMap to load and initialize plugins.  A plugin class must be annotated with
- * the {@link ClientPlugin} annotation and also implement the {@link IClientPlugin} interface.
+ * Helper class used by JourneyMap to load and initialize plugins.
+ * @param <A> Annotation used for plugin discovery
+ * @param <I> Plugin interface
  */
 @ParametersAreNonnullByDefault
-public enum PluginHelper
+public abstract class PluginHelper<A,I extends IJmPlugin>
 {
-    INSTANCE;
+    public final static Logger LOGGER = LogManager.getLogger(IJmAPI.API_OWNER);
+    private final Class<A> pluginAnnotationClass;
+    private final Class<I> pluginInterfaceClass;
 
-    public final static Logger LOGGER = LogManager.getLogger("journeymap");
-    public final static String PLUGIN_ANNOTATION_NAME = ClientPlugin.class.getCanonicalName();
-    public final static String PLUGIN_INTERFACE_NAME = IClientPlugin.class.getSimpleName();
-
-    protected Map<String, IClientPlugin> plugins = null;
+    protected Map<String, I> plugins = null;
     protected boolean initialized;
 
+    protected PluginHelper(Class<A> pluginAnnotationClass, Class<I> pluginInterfaceClass)
+    {
+        this.pluginAnnotationClass = pluginAnnotationClass;
+        this.pluginInterfaceClass = pluginInterfaceClass;
+    }
+    
     /**
      * Called by JourneyMap during it's preInitialization phase to find plugin classes
      * included in other mods and then instantiate them.
@@ -59,28 +63,30 @@ public enum PluginHelper
      * @param event preInit
      * @return map of instantiated plugins, keyed by modId
      */
-    public Map<String, IClientPlugin> preInitPlugins(FMLPreInitializationEvent event)
+    public Map<String, I> preInitPlugins(FMLPreInitializationEvent event)
     {
         if (plugins == null)
         {
             ASMDataTable asmDataTable = event.getAsmData();
-            HashMap<String, IClientPlugin> discovered = new HashMap<String, IClientPlugin>();
-            Set<ASMDataTable.ASMData> asmDataSet = asmDataTable.getAll(PLUGIN_ANNOTATION_NAME);
+            HashMap<String, I> discovered = new HashMap<>();
+            Set<ASMDataTable.ASMData> asmDataSet = asmDataTable.getAll(pluginAnnotationClass.getCanonicalName());
 
+            String pluginAnnotationName = pluginAnnotationClass.getCanonicalName();
+            String pluginInterfaceName = pluginInterfaceClass.getSimpleName();
             for (ASMDataTable.ASMData asmData : asmDataSet)
             {
                 String className = asmData.getClassName();
                 try
                 {
                     Class<?> pluginClass = Class.forName(className);
-                    if (IClientPlugin.class.isAssignableFrom(pluginClass))
+                    if (pluginInterfaceClass.isAssignableFrom(pluginClass))
                     {
-                        Class<? extends IClientPlugin> interfaceImplClass = pluginClass.asSubclass(IClientPlugin.class);
-                        IClientPlugin instance = interfaceImplClass.newInstance();
+                        Class<I> interfaceImplClass = (Class<I>) pluginClass.asSubclass(pluginInterfaceClass);
+                        I instance = (I) interfaceImplClass.newInstance();
                         String modId = instance.getModId();
                         if (Strings.isNullOrEmpty(modId))
                         {
-                            throw new Exception("IClientPlugin.getModId() must return a non-empty, non-null value");
+                            throw new Exception("IPlugin.getModId() must return a non-empty, non-null value");
                         }
                         if (discovered.containsKey(modId))
                         {
@@ -88,18 +94,18 @@ public enum PluginHelper
                             throw new Exception(String.format("Multiple plugins trying to use the same modId: %s and %s", interfaceImplClass, otherPluginClass));
                         }
                         discovered.put(modId, instance);
-                        LOGGER.info(String.format("Found @%s: %s", PLUGIN_ANNOTATION_NAME, className));
+                        LOGGER.info(String.format("Found @%s: %s", pluginAnnotationName, className));
                     }
                     else
                     {
                         LOGGER.error(String.format("Found @%s: %s, but it doesn't implement %s",
-                                PLUGIN_ANNOTATION_NAME, className, PLUGIN_INTERFACE_NAME));
+                                pluginAnnotationName, className, pluginInterfaceName));
                     }
                 }
                 catch (Exception e)
                 {
                     LOGGER.error(String.format("Found @%s: %s, but failed to instantiate it: %s",
-                            PLUGIN_ANNOTATION_NAME, className, e.getMessage()), e);
+                            pluginAnnotationName, className, e.getMessage()), e);
                 }
             }
 
@@ -115,16 +121,16 @@ public enum PluginHelper
     }
 
     /**
-     * Called by JourneyMap during its initialization phase.  Can only be called once per runtime.
+     * Called by JourneyMap during its initialization phase.  Can only be called once per runtime per side.
      * <p>
      * Mods which are testing integration can also call this in a dev environment
      * and pass in a stub implementation, but must never do so in production code.
      *
      * @param event init event
-     * @param clientAPI Client API implementation
+     * @param jmApi JourneyMap API implementation
      * @return list of initialized plugins, null if plugin discovery never occurred
      */
-    public Map<String, IClientPlugin> initPlugins(FMLInitializationEvent event, IClientAPI clientAPI)
+    public Map<String, I> initPlugins(FMLInitializationEvent event, IJmAPI jmApi)
     {
         if (plugins == null)
         {
@@ -133,21 +139,21 @@ public enum PluginHelper
         }
         else if (!initialized)
         {
-            LOGGER.info(String.format("Initializing plugins with Client API: %s", clientAPI.getClass().getName()));
+            LOGGER.info(String.format("Initializing plugins with %s", jmApi.getClass().getName()));
 
-            HashMap<String, IClientPlugin> discovered = new HashMap<String, IClientPlugin>(plugins);
-            Iterator<IClientPlugin> iter = discovered.values().iterator();
+            HashMap<String, I> discovered = new HashMap<>(plugins);
+            Iterator<I> iter = discovered.values().iterator();
             while (iter.hasNext())
             {
-                IClientPlugin plugin = iter.next();
+                I plugin = iter.next();
                 try
                 {
-                    plugin.initialize(clientAPI);
-                    LOGGER.info(String.format("Initialized %s: %s", PLUGIN_INTERFACE_NAME, plugin.getClass().getName()));
+                    plugin.initialize(jmApi);
+                    LOGGER.info(String.format("Initialized %s: %s", pluginInterfaceClass.getSimpleName(), plugin.getClass().getName()));
                 }
                 catch (Exception e)
                 {
-                    LOGGER.error("Failed to initialize IClientPlugin: " + plugin.getClass().getName(), e);
+                    LOGGER.error("Failed to initialize I: " + plugin.getClass().getName(), e);
                     iter.remove();
                 }
             }
@@ -170,7 +176,7 @@ public enum PluginHelper
      *
      * @return null if {@link #preInitPlugins(FMLPreInitializationEvent)} hasn't been called yet
      */
-    public Map<String, IClientPlugin> getPlugins()
+    public Map<String, I> getPlugins()
     {
         return plugins;
     }
