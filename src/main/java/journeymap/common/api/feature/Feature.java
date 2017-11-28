@@ -104,6 +104,10 @@ public interface Feature
          */
         WaypointBeacon(false, true),
         /**
+         * Waypoint Manager
+         */
+        WaypointManager(false, false),
+        /**
          * The Webmap UI (via web browser).
          */
         Webmap(true, false);
