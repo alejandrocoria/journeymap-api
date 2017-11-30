@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Stub implementation of the IServerAPI. Doesn't actually do anything except log statements.
@@ -43,21 +43,21 @@ enum MockServerAPI implements journeymap.server.api.IServerAPI
     private final static Logger LOGGER = LogManager.getLogger("journeymap-stub");
 
     @Override
-    public void toggleDisplays(EntityPlayerMP player, int dimension, Set<Feature.Display> displays, boolean enable)
+    public void setPlayerFeatures(String modId, UUID playerID, int dimension, Map<Enum<? extends Feature>, Boolean> featureMap)
     {
-        log(String.format("Mock toggled displays (%s) for %s in dim %s: %s", enable, player, dimension, Joiner.on(",").join(displays)));
+        log(String.format("Mock setPlayerFeatures for %s in dim %s", playerID, dimension));
     }
 
     @Override
-    public void toggleMapTypes(EntityPlayerMP player, int dimension, Set<Feature.MapType> mapTypes, boolean enable)
+    public Map<Enum<? extends Feature>, Boolean> getPlayerFeatures(UUID playerID, int dimension)
     {
-        log(String.format("Mock toggled mapTypes (%s) for %s in dim %s: %s", enable, player, dimension, Joiner.on(",").join(mapTypes)));
+        return new HashMap<>();
     }
 
     @Override
-    public void toggleRadars(EntityPlayerMP player, int dimension, Set<Feature.Radar> radars, boolean enable)
+    public Map<Enum<? extends Feature>, Boolean> getServerFeatures(int dimension, boolean isOp)
     {
-        log(String.format("Mock toggled radars (%s) for %s in dim %s: %s", enable, player, dimension, Joiner.on(",").join(radars)));
+        return new HashMap<>();
     }
 
     /**
