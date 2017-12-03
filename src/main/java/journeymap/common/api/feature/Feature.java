@@ -26,6 +26,12 @@ package journeymap.common.api.feature;
 public interface Feature
 {
     /**
+     * Whether the feature is allowed by default.
+     * @return true if allowed
+     */
+    boolean isAllowedDefault();
+
+    /**
      * Player actions.
      */
     public enum Action implements Feature
@@ -33,7 +39,19 @@ public interface Feature
         /**
          * Player can teleport via /jtp
          */
-        Teleport;
+        Teleport(false);
+
+        private boolean allowedDefault;
+
+        private Action(boolean allowedDefault)
+        {
+            this.allowedDefault = allowedDefault;
+        }
+
+        public boolean isAllowedDefault()
+        {
+            return allowedDefault;
+        }
     }
 
     /**
@@ -91,6 +109,11 @@ public interface Feature
         {
             return inGame;
         }
+
+        public boolean isAllowedDefault()
+        {
+            return true;
+        }
     }
 
     /**
@@ -118,6 +141,11 @@ public interface Feature
          * Biome map generation.
          */
         Biome;
+
+        public boolean isAllowedDefault()
+        {
+            return true;
+        }
     }
 
     /**
@@ -149,5 +177,10 @@ public interface Feature
          * Waypoints. Not technically an entity, but it's okay, really.
          */
         Waypoint;
+
+        public boolean isAllowedDefault()
+        {
+            return true;
+        }
     }
 }
