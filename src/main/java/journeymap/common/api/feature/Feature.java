@@ -20,66 +20,20 @@
 package journeymap.common.api.feature;
 
 /**
- * High-level JourneyMap features.
+ * High-level JourneyMap features bundled in a marker interface,
+ * grouped into categories by enum.
  */
 public interface Feature
 {
     /**
-     * Display of entities overlaid on the player's Feature.Display (where applicable).
+     * Player actions.
      */
-    public enum Radar implements Feature
+    public enum Action implements Feature
     {
         /**
-         * Hostile mobs.
+         * Player can teleport via /jtp
          */
-        HostileMob,
-        /**
-         * Villagers, INpc, IMerchants.
-         */
-        NPC,
-        /**
-         * Passive mobs (animals).
-         */
-        PassiveMob,
-        /**
-         * Players.
-         */
-        Player,
-        /**
-         * Minecarts and Boats.
-         */
-        Vehicle,
-        /**
-         * Waypoints. Not technically an entity, but it's okay, really.
-         */
-        Waypoint;
-    }
-
-    /**
-     * Types of maps generated in the client as the player explores.
-     */
-    public enum MapType implements Feature
-    {
-        /**
-         * Surface in daylight map generation.
-         */
-        Day,
-        /**
-         * Surface at night map generation.
-         */
-        Night,
-        /**
-         * Underground (cave) map generation.
-         */
-        Underground,
-        /**
-         * Topographical (contour) map generation.
-         */
-        Topo,
-        /**
-         * Biome map generation.
-         */
-        Biome;
+        Teleport;
     }
 
     /**
@@ -137,5 +91,63 @@ public interface Feature
         {
             return inGame;
         }
+    }
+
+    /**
+     * Types of maps generated in the client as the player explores.
+     */
+    public enum MapType implements Feature
+    {
+        /**
+         * Surface in daylight map generation.
+         */
+        Day,
+        /**
+         * Surface at night map generation.
+         */
+        Night,
+        /**
+         * Underground (cave) map generation.
+         */
+        Underground,
+        /**
+         * Topographical (contour) map generation.
+         */
+        Topo,
+        /**
+         * Biome map generation.
+         */
+        Biome;
+    }
+
+    /**
+     * Client display of entities within a Feature.Display (where applicable).
+     */
+    public enum Radar implements Feature
+    {
+        /**
+         * Hostile mobs.
+         */
+        HostileMob,
+        /**
+         * Villagers, INpc, IMerchants.
+         */
+        NPC,
+        /**
+         * Passive mobs (animals).
+         */
+        PassiveMob,
+        /**
+         * Players.
+         */
+        Player,
+        /**
+         * Minecarts and Boats.
+         */
+        Vehicle,
+        /**
+         * Waypoints. Not technically an entity, but it's okay, really.
+         */
+        Waypoint;
     }
 }
