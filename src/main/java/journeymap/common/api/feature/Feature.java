@@ -19,12 +19,27 @@
  */
 package journeymap.common.api.feature;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * High-level JourneyMap features bundled in a marker interface,
  * grouped into categories by enum.
  */
 public interface Feature
 {
+    /**
+     * All supported feature enums in a list
+     */
+    List<Enum<? extends Feature>> ALL = Stream.of(
+            Arrays.stream(Action.values()),
+            Arrays.stream(Display.values()),
+            Arrays.stream(MapType.values()),
+            Arrays.stream(Radar.values()))
+            .flatMap((v)->v).collect(Collectors.toList());
+
     /**
      * Whether the feature is allowed by default.
      * @return true if allowed
