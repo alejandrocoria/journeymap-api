@@ -33,7 +33,7 @@ public interface Feature
     /**
      * All supported feature enums in a list
      */
-    List<Enum<? extends Feature>> ALL = Stream.of(
+    List<Feature> ALL = Stream.of(
             Arrays.stream(Action.values()),
             Arrays.stream(Display.values()),
             Arrays.stream(MapType.values()),
