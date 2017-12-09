@@ -44,7 +44,7 @@ public interface IServerAPI extends IJmAPI
      * @param dimension   The dimension.
      * @param featureMap  A map of features with booleans indicating whether they are enabled/disabled.
      */
-    void setPlayerFeatures(String modId, UUID playerID, int dimension, Map<Enum<? extends Feature>, Boolean> featureMap);
+    void setPlayerFeatures(String modId, UUID playerID, int dimension, Map<Feature, Boolean> featureMap);
 
     /**
      * Get the current map of features for a player in a specific dimension.
@@ -52,7 +52,7 @@ public interface IServerAPI extends IJmAPI
      * @param dimension   The dimension.
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
-    Map<Enum<? extends Feature>, Boolean> getPlayerFeatures(UUID playerID, int dimension);
+    Map<Feature, Boolean> getPlayerFeatures(UUID playerID, int dimension);
 
     /**
      * Get the default server-configured features for the dimension.
@@ -60,6 +60,6 @@ public interface IServerAPI extends IJmAPI
      * @param isOp if true, features for Ops, otherwise for normal players.
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
-    Map<Enum<? extends Feature>, Boolean> getServerFeatures(int dimension, boolean isOp);
+    Map<Feature, Boolean> getServerFeatures(int dimension, boolean isOp);
 
 }
