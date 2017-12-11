@@ -31,22 +31,6 @@ import java.util.stream.Stream;
 public interface Feature
 {
     /**
-     * All supported feature enums in a list
-     */
-    List<Feature> ALL = Stream.of(
-            Arrays.stream(Action.values()),
-            Arrays.stream(Display.values()),
-            Arrays.stream(MapType.values()),
-            Arrays.stream(Radar.values()))
-            .flatMap((v)->v).collect(Collectors.toList());
-
-    /**
-     * Whether the feature is allowed by default.
-     * @return true if allowed
-     */
-    boolean isAllowedDefault();
-
-    /**
      * Player actions.
      */
     public enum Action implements Feature
@@ -56,6 +40,7 @@ public interface Feature
          */
         Teleport(false);
 
+        // Whether the action allowed by default
         private boolean allowedDefault;
 
         private Action(boolean allowedDefault)
@@ -124,11 +109,6 @@ public interface Feature
         {
             return inGame;
         }
-
-        public boolean isAllowedDefault()
-        {
-            return true;
-        }
     }
 
     /**
@@ -156,11 +136,6 @@ public interface Feature
          * Biome map generation.
          */
         Biome;
-
-        public boolean isAllowedDefault()
-        {
-            return true;
-        }
     }
 
     /**
@@ -192,10 +167,53 @@ public interface Feature
          * Waypoints. Not technically an entity, but it's okay, really.
          */
         Waypoint;
+    }
 
-        public boolean isAllowedDefault()
-        {
-            return true;
-        }
+    String name();
+
+    /**
+     * All supported feature enums in a list
+     */
+    List<Feature> ALL = Stream.of(
+            Arrays.stream(Action.values()),
+            Arrays.stream(Display.values()),
+            Arrays.stream(MapType.values()),
+            Arrays.stream(Radar.values()))
+            .flatMap((v)->v).collect(Collectors.toList());
+
+    /**
+     * Whether the Feature is allowed by default.
+     * @return true if allowed
+     */
+    default boolean isAllowedDefault()
+    {
+        return true;
+    }
+
+    /**
+     * Get the i18n key for the category of the Feature.
+     * @return the key
+     */
+    default String getFeatureCategoryKey()
+    {
+        return String.format("jm.common.feature.%s", getClass().getSimpleName().toLowerCase());
+    }
+
+    /**
+     * Get the i18n key for the Feature.
+     * @return the key
+     */
+    default String getFeatureKey()
+    {
+        return String.format("%s.%s", getFeatureCategoryKey(), name().toLowerCase());
+    }
+
+    /**
+     * Get the i18n key for the Feature tooltip.
+     * @return the key
+     */
+    default String getFeatureTooltipKey()
+    {
+        return String.format("%s.tooltip", getFeatureKey());
     }
 }
