@@ -191,12 +191,20 @@ public interface Feature
     }
 
     /**
+     * Get the Feature type (enum class name).
+     */
+    default String getFeatureType()
+    {
+        return getClass().getSimpleName();
+    }
+
+    /**
      * Get the i18n key for the category of the Feature.
      * @return the key
      */
     default String getFeatureCategoryKey()
     {
-        return String.format("jm.common.feature.%s", getClass().getSimpleName().toLowerCase());
+        return String.format("jm.common.feature.%s", getFeatureType().toLowerCase());
     }
 
     /**
