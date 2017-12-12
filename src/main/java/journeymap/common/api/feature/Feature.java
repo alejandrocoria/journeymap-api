@@ -172,16 +172,6 @@ public interface Feature
     String name();
 
     /**
-     * All supported feature enums in a list
-     */
-    List<Feature> ALL = Stream.of(
-            Arrays.stream(Action.values()),
-            Arrays.stream(Display.values()),
-            Arrays.stream(MapType.values()),
-            Arrays.stream(Radar.values()))
-            .flatMap((v)->v).collect(Collectors.toList());
-
-    /**
      * Whether the Feature is allowed by default.
      * @return true if allowed
      */
