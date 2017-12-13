@@ -1,7 +1,7 @@
 package journeymap.client.api.util;
 
 import com.google.common.base.Objects;
-import journeymap.client.api.display.Context;
+import journeymap.common.api.feature.Feature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +17,7 @@ public final class UIState
     /**
      * The UI to which this state applies.
      */
-    public final Context.UI ui;
+    public final Feature.Display ui;
 
     /**
      * Whether the UI is active or not. If false, other values reflect the
@@ -41,7 +41,7 @@ public final class UIState
      * The current map type of the UI. If active==false and the display
      * has never been used, this will default to Context.MapType.Day.
      */
-    public final Context.MapType mapType;
+    public final Feature.MapType mapType;
 
     /**
      * The block position at the center of the UI. If active==false and the display
@@ -81,8 +81,8 @@ public final class UIState
      * @param mapCenter   The block position at the center of the UI.
      * @param blockBounds The area of blocks displayed in the UI.
      */
-    public UIState(Context.UI ui, boolean active, int dimension, int zoom,
-                   @Nullable Context.MapType mapType,
+    public UIState(Feature.Display ui, boolean active, int dimension, int zoom,
+                   @Nullable Feature.MapType mapType,
                    @Nullable BlockPos mapCenter,
                    @Nullable Integer chunkY,
                    @Nullable AxisAlignedBB blockBounds,
@@ -106,10 +106,10 @@ public final class UIState
      * @param ui the ui
      * @return a UIState
      */
-    public static UIState newInactive(Context.UI ui, Minecraft minecraft)
+    public static UIState newInactive(Feature.Display ui, Minecraft minecraft)
     {
         BlockPos center = minecraft.world == null ? new BlockPos(0, 68, 0) : minecraft.world.getSpawnPoint();
-        return new UIState(ui, false, 0, 0, Context.MapType.Day, center, null, null, null);
+        return new UIState(ui, false, 0, 0, Feature.MapType.Day, center, null, null, null);
     }
 
     /**

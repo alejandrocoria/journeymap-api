@@ -23,6 +23,7 @@ package journeymap.client.api.display;
 import com.google.common.base.Objects;
 import journeymap.client.api.model.TextProperties;
 import journeymap.client.api.util.UIState;
+import journeymap.common.api.feature.Feature;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -41,8 +42,8 @@ public abstract class Overlay extends Displayable
     protected int minZoom = 0;
     protected int maxZoom = 8;
     protected int displayOrder;
-    protected EnumSet<Context.UI> activeUIs = EnumSet.of(Context.UI.Any);
-    protected EnumSet<Context.MapType> activeMapTypes = EnumSet.of(Context.MapType.Any);
+    protected EnumSet<Feature.Display> activeUIs = EnumSet.allOf(Feature.Display.class);
+    protected EnumSet<Feature.MapType> activeMapTypes = EnumSet.allOf(Feature.MapType.class);
     protected TextProperties textProperties = new TextProperties();
     protected IOverlayListener overlayListener;
     protected boolean needsRerender = true;
@@ -242,7 +243,7 @@ public abstract class Overlay extends Displayable
      *
      * @return enumset
      */
-    public EnumSet<Context.UI> getActiveUIs()
+    public EnumSet<Feature.Display> getActiveUIs()
     {
         return activeUIs;
     }
@@ -253,13 +254,10 @@ public abstract class Overlay extends Displayable
      * @param activeUIs active UIs
      * @return this
      */
-    public Overlay setActiveUIs(EnumSet<Context.UI> activeUIs)
+    public Overlay setActiveUIs(EnumSet<Feature.Display> activeUIs)
     {
-        if (activeUIs.contains(Context.UI.Any))
-        {
-            activeUIs = EnumSet.of(Context.UI.Any);
-        }
-        this.activeUIs = activeUIs;
+        this.activeUIs = EnumSet.noneOf(Feature.Display.class);
+        this.activeUIs.addAll(activeUIs);
         return this;
     }
 
@@ -268,7 +266,7 @@ public abstract class Overlay extends Displayable
      *
      * @return enumset
      */
-    public EnumSet<Context.MapType> getActiveMapTypes()
+    public EnumSet<Feature.MapType> getActiveMapTypes()
     {
         return activeMapTypes;
     }
@@ -279,13 +277,10 @@ public abstract class Overlay extends Displayable
      * @param activeMapTypes active types
      * @return this
      */
-    public Overlay setActiveMapTypes(EnumSet<Context.MapType> activeMapTypes)
+    public Overlay setActiveMapTypes(EnumSet<Feature.MapType> activeMapTypes)
     {
-        if (activeMapTypes.contains(Context.MapType.Any))
-        {
-            activeMapTypes = EnumSet.of(Context.MapType.Any);
-        }
-        this.activeMapTypes = activeMapTypes;
+        this.activeMapTypes = EnumSet.noneOf(Feature.MapType.class);
+        this.activeMapTypes.addAll(activeMapTypes);
         return this;
     }
 
@@ -298,8 +293,8 @@ public abstract class Overlay extends Displayable
     public boolean isActiveIn(UIState uiState)
     {
         return ((uiState.active && this.dimension == uiState.dimension)
-                && (activeUIs.contains(Context.UI.Any) || activeUIs.contains(uiState.ui))
-                && (activeMapTypes.contains(Context.MapType.Any) || activeMapTypes.contains(uiState.mapType))
+                && activeUIs.contains(uiState.ui)
+                && activeMapTypes.contains(uiState.mapType)
                 && (this.minZoom <= uiState.zoom && this.maxZoom >= uiState.zoom));
     }
 

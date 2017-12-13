@@ -21,6 +21,7 @@
 package journeymap.client.api;
 
 import journeymap.client.api.event.ClientEvent;
+import journeymap.common.api.IJmPlugin;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
@@ -31,7 +32,7 @@ import java.util.EnumSet;
  * Implementation classes must have a no-arg constructor and also have the {@link ClientPlugin} annotation.
  */
 @ParametersAreNonnullByDefault
-public interface IClientPlugin
+public interface IClientPlugin extends IJmPlugin<IClientAPI>
 {
     /**
      * Called by JourneyMap during the init phase of Forge mod loading.  Your implementation
