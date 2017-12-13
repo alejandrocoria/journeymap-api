@@ -24,11 +24,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.LinkedHashMultimap;
-import journeymap.client.api.display.Context;
 import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.UIState;
+import journeymap.common.api.feature.Feature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -72,15 +72,10 @@ enum MockClientAPI implements journeymap.client.api.IClientAPI
 
 
     @Override
-    public UIState getUIState(Context.UI ui)
+    public UIState getUIState(Feature.Display ui)
     {
-        if (ui == Context.UI.Any)
-        {
-            return null;
-        }
-
         return new UIState(ui, true, 0, 1,
-                Context.MapType.Day,
+                Feature.MapType.Day,
                 new BlockPos(128, 0, 128), null,
                 new AxisAlignedBB(new BlockPos(0, 0, 0), new BlockPos(256, 256, 256)),
                 new Rectangle2D.Double(0, 0, 1240, 960));
@@ -137,7 +132,7 @@ enum MockClientAPI implements journeymap.client.api.IClientAPI
     }
 
     @Override
-    public void requestMapTile(String modId, int dimension, Context.MapType mapType, ChunkPos startChunk, ChunkPos endChunk,
+    public void requestMapTile(String modId, int dimension, Feature.MapType mapType, ChunkPos startChunk, ChunkPos endChunk,
                                @Nullable Integer chunkY, int zoom, boolean showGrid, final Consumer<BufferedImage> callback)
     {
         // Determine chunks for coordinates at zoom level
@@ -151,27 +146,18 @@ enum MockClientAPI implements journeymap.client.api.IClientAPI
     }
 
     @Override
-    public void toggleDisplay(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable)
-    {
-        log(String.format("Toggled display in %s:%s:%s:%s", dimension, mapType, mapUI, enable));
+    public boolean isDisplayEnabled(int dimension, Feature.Display display) {
+        return true;
     }
 
     @Override
-    public void toggleWaypoints(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable)
-    {
-        log(String.format("Toggled waypoints in %s:%s:%s:%s", dimension, mapType, mapUI, enable));
+    public boolean isMapTypeEnabled(int dimension, Feature.MapType mapType) {
+        return true;
     }
 
     @Override
-    public boolean isDisplayEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isWaypointsEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI)
-    {
-        return false;
+    public boolean isRadarEnabled(int dimension, Feature.Radar radar) {
+        return true;
     }
 
     /**

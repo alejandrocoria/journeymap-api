@@ -1,6 +1,12 @@
 [JourneyMap API](https://bitbucket.org/TeamJM/journeymap-api) Changelog
 ======================================================
 
+**API v1.9-2.0, v1.9.4-2.0, v1.10.2-2.0, v1.11.2-2.0, v1.12-2.0**
+
+* Implemented in JourneyMap 5.5.3
+* Java 8 required
+* Server-side API added, Client-side API refactored
+
 **API v1.9-1.4, v1.9.4-1.4, v1.10.2-1.4. v1.11.2-1.4, v1.12-1.4**
 
 * Implemented in JourneyMap 5.5.0

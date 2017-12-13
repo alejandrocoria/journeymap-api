@@ -20,11 +20,12 @@
 
 package journeymap.client.api;
 
-import journeymap.client.api.display.Context;
 import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.UIState;
+import journeymap.common.api.IJmAPI;
+import journeymap.common.api.feature.Feature;
 import net.minecraft.util.math.ChunkPos;
 
 import javax.annotation.Nullable;
@@ -34,10 +35,10 @@ import java.util.EnumSet;
 import java.util.function.Consumer;
 
 /**
- * Definition for the JourneyMap Client API.
+ * Definition for the JourneyMap Client API.  The runtime implementation is contained in the JourneyMap mod itself.
  */
 @ParametersAreNonnullByDefault
-public interface IClientAPI
+public interface IClientAPI extends IJmAPI
 {
     String API_OWNER = "journeymap";
     String API_VERSION = "@API_VERSION@";
@@ -45,12 +46,12 @@ public interface IClientAPI
     /**
      * Returns the current UIState of the UI specified.
      *
-     * Note: Context.UI.Any is not a meaningful parameter value here and will just return null.
+     * Note: Feature.UI.Any is not a meaningful parameter value here and will just return null.
      * @param ui   Should be one of: Fullscreen, Minimap, or Webmap
      * @return the current UIState of the UI specified.
      */
     @Nullable
-    UIState getUIState(Context.UI ui);
+    UIState getUIState(Feature.Display ui);
 
     /**
      * Subscribes to all of the eventTypes specified. Use EnumSet.noneOf(ClientEvent.Type)
@@ -142,55 +143,34 @@ public interface IClientAPI
      * @param showGrid   Whether to include to include the chunk grid overlay
      * @param callback   A callback function which will provide a BufferedImage when/if available.  If it returns null, then no image available.
      */
-    void requestMapTile(String modId, int dimension, Context.MapType mapType, ChunkPos startChunk, ChunkPos endChunk,
+    void requestMapTile(String modId, int dimension, Feature.MapType mapType, ChunkPos startChunk, ChunkPos endChunk,
                         @Nullable Integer chunkY, int zoom, boolean showGrid, final Consumer<BufferedImage> callback);
+    
+    /**
+     * Whether a Display feature is currently enabled in a specific dimension for the player.
+     *
+     * @param dimension The dimension.
+     * @param display   The Display feature.
+     * @return true if enabled, false if not
+     */
+    boolean isDisplayEnabled(int dimension, Feature.Display display);
 
     /**
-     * Note:  This method IS NOT SUPPORTED for most mods. Talk to Techbrew if you need to use this function.
-     * <p>
-     * This call can be used to enable or disable map types and UIs in a specific dimension or all dimensions.
+     * Whether a MapType feature is currently enabled in a specific dimension for the player.
      *
-     * @param dimension The dimension. Use null for all dimensions.
-     * @param mapType   The map type
-     * @param mapUI     The map UI
-     * @param enable    True to enable, false to disable.
+     * @param dimension The dimension.
+     * @param mapType   The MapType feature.
+     * @return true if enabled, false if not
      */
-    void toggleDisplay(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable);
+    boolean isMapTypeEnabled(int dimension, Feature.MapType mapType);
 
     /**
-     * Note:  This method IS NOT SUPPORTED for most mods. Talk to Techbrew if you need to use this function.
-     * <p>
-     * This call can be used to enable or disable the use of waypoints in a specific dimension or all dimensions.
+     * Whether a Radar feature is currently enabled in a specific dimension for the player.
      *
-     * @param dimension The dimension. Use null for all dimensions.
-     * @param mapType   The map type
-     * @param mapUI     The map UI
-     * @param enable    True to enable, false to disable.
+     * @param dimension The dimension.
+     * @param radar   The Radar feature.
+     * @return true if enabled, false if not
      */
-    void toggleWaypoints(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI, boolean enable);
-
-    /**
-     * Note:  This method IS NOT SUPPORTED for most mods. Talk to Techbrew if you need to use this function.
-     * <p>
-     * This call can be used to check if a map type and UI are enabled in a specific dimension or all dimensions.
-     *
-     * @param dimension The dimension. Use null for all dimensions.
-     * @param mapType   The map type
-     * @param mapUI     The map UI
-     * @return true if enabled
-     */
-    boolean isDisplayEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI);
-
-    /**
-     * Note:  This method IS NOT SUPPORTED for most mods. Talk to Techbrew if you need to use this function.
-     * <p>
-     * This call can be used to check if waypoints are enabled in a specific dimension or all dimensions.
-     *
-     * @param dimension The dimension. Use null for all dimensions.
-     * @param mapType   The map type
-     * @param mapUI     The map UI
-     * @return true if enabled
-     */
-    boolean isWaypointsEnabled(@Nullable Integer dimension, Context.MapType mapType, Context.UI mapUI);
+    boolean isRadarEnabled(int dimension, Feature.Radar radar);
 
 }
