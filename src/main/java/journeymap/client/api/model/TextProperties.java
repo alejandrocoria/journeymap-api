@@ -21,9 +21,9 @@
 package journeymap.client.api.model;
 
 import com.google.common.base.MoreObjects;
-import journeymap.client.api.display.Context;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.util.UIState;
+import journeymap.common.api.feature.Feature;
 
 import java.util.EnumSet;
 
@@ -34,8 +34,8 @@ import java.util.EnumSet;
  */
 public class TextProperties
 {
-    protected EnumSet<Context.UI> activeUIs = EnumSet.of(Context.UI.Any);
-    protected EnumSet<Context.MapType> activeMapTypes = EnumSet.of(Context.MapType.Any);
+    protected EnumSet<Feature.Display> activeUIs = EnumSet.allOf(Feature.Display.class);
+    protected EnumSet<Feature.MapType> activeMapTypes = EnumSet.allOf(Feature.MapType.class);
     protected float scale = 1;
     protected int color = 0xffffff;
     protected int backgroundColor = 0x000000;
@@ -188,7 +188,7 @@ public class TextProperties
      * For example, this can be specified to have labels only displayed in the fullscreen map, but not the minimap.
      * @return enumset
      */
-    public EnumSet<Context.UI> getActiveUIs()
+    public EnumSet<Feature.Display> getActiveUIs()
     {
         return activeUIs;
     }
@@ -201,13 +201,10 @@ public class TextProperties
      * @param activeUIs active UIs
      * @return this
      */
-    public TextProperties setActiveUIs(EnumSet<Context.UI> activeUIs)
+    public TextProperties setActiveUIs(EnumSet<Feature.Display> activeUIs)
     {
-        if (activeUIs.contains(Context.UI.Any))
-        {
-            activeUIs = EnumSet.of(Context.UI.Any);
-        }
-        this.activeUIs = activeUIs;
+        this.activeUIs = EnumSet.noneOf(Feature.Display.class);
+        this.activeUIs.addAll(activeUIs);
         return this;
     }
 
@@ -216,7 +213,7 @@ public class TextProperties
      *
      * @return enumset
      */
-    public EnumSet<Context.MapType> getActiveMapTypes()
+    public EnumSet<Feature.MapType> getActiveMapTypes()
     {
         return activeMapTypes;
     }
@@ -227,13 +224,10 @@ public class TextProperties
      * @param activeMapTypes active types
      * @return this
      */
-    public TextProperties setActiveMapTypes(EnumSet<Context.MapType> activeMapTypes)
+    public TextProperties setActiveMapTypes(EnumSet<Feature.MapType> activeMapTypes)
     {
-        if (activeMapTypes.contains(Context.MapType.Any))
-        {
-            activeMapTypes = EnumSet.of(Context.MapType.Any);
-        }
-        this.activeMapTypes = activeMapTypes;
+        this.activeMapTypes = EnumSet.noneOf(Feature.MapType.class);
+        this.activeMapTypes.addAll(activeMapTypes);
         return this;
     }
 
@@ -246,8 +240,8 @@ public class TextProperties
     public boolean isActiveIn(UIState uiState)
     {
         return uiState.active
-                && (activeUIs.contains(Context.UI.Any) || activeUIs.contains(uiState.ui))
-                && (activeMapTypes.contains(Context.MapType.Any) || activeMapTypes.contains(uiState.mapType))
+                && (activeUIs.contains(uiState.ui))
+                && (activeMapTypes.contains(uiState.mapType))
                 && (this.minZoom <= uiState.zoom && this.maxZoom >= uiState.zoom);
     }
 
