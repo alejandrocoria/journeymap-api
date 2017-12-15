@@ -41,7 +41,7 @@ public interface IServerAPI extends IJmAPI
      *
      * Note: JourneyMap Server subscribes to EntityJoinWorldEvent on Priority.LOWEST and will respond by sending a packet
      * to the client with the player's feature permissions.  If your mod calls {@link #setPlayerFeatures(String, UUID,
-     * int, Map, boolean)} in response to an EntityJoinWorldEvent, you should subscribe on a higher priority than LOWEST
+     * int, Map)} in response to an EntityJoinWorldEvent, you should subscribe on a higher priority than LOWEST
      * to ensure your changes are made before the packet is sent.
      *
      * @param modId       Mod ID making the change
