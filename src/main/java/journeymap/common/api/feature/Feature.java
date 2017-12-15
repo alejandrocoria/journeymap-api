@@ -31,26 +31,37 @@ public interface Feature
     public enum Action implements Feature
     {
         /**
-         * Player can teleport via /jtp
+         * Player can teleport via /jtp.
+         * Disabled by default for players.
+         * Enabled by default for Ops.
          */
-        Teleport(false);
+        Teleport(false, true);
 
-        // Whether the action allowed by default
-        private boolean allowedDefault;
+        private boolean playerDefault;
+        private boolean opDefault;
 
-        private Action(boolean allowedDefault)
+        private Action(boolean playerDefault, boolean opDefault)
         {
-            this.allowedDefault = allowedDefault;
+            this.playerDefault = playerDefault;
+            this.opDefault = opDefault;
         }
 
-        public boolean isAllowedDefault()
+        @Override
+        public boolean isAllowedForPlayerByDefault()
         {
-            return allowedDefault;
+            return playerDefault;
+        }
+
+        @Override
+        public boolean isAllowedForOpByDefault()
+        {
+            return opDefault;
         }
     }
 
     /**
      * Display interfaces in the client.
+     * All enabled by default.
      */
     public enum Display implements Feature
     {
@@ -108,6 +119,7 @@ public interface Feature
 
     /**
      * Types of maps generated in the client as the player explores.
+     * All enabled by default.
      */
     public enum MapType implements Feature
     {
@@ -135,6 +147,7 @@ public interface Feature
 
     /**
      * Client display of entities within a Feature.Display (where applicable).
+     * All enabled by default.
      */
     public enum Radar implements Feature
     {
@@ -167,10 +180,19 @@ public interface Feature
     String name();
 
     /**
-     * Whether the Feature is allowed by default.
+     * Whether the Feature is allowed by default for players.
      * @return true if allowed
      */
-    default boolean isAllowedDefault()
+    default boolean isAllowedForPlayerByDefault()
+    {
+        return true;
+    }
+
+    /**
+     * Whether the Feature is allowed by default for Ops.
+     * @return true if allowed
+     */
+    default boolean isAllowedForOpByDefault()
     {
         return true;
     }
