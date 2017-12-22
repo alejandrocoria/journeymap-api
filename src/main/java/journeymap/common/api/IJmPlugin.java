@@ -20,10 +20,6 @@
 
 package journeymap.common.api;
 
-import journeymap.client.api.IClientAPI;
-import journeymap.server.api.IServerAPI;
-import journeymap.server.api.ServerPlugin;
-
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -37,6 +33,7 @@ public interface IJmPlugin<I extends IJmAPI>
 {
     /**
      * Used by JourneyMap to associate mod id with a plugin instance.
+     * @return mod id
      */
     String getModId();
 

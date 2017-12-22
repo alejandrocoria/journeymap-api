@@ -19,11 +19,6 @@
  */
 package journeymap.common.api.feature;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * High-level JourneyMap features bundled in a marker interface,
  * grouped into categories by enum.
@@ -105,7 +100,7 @@ public interface Feature
 
         /**
          * Whether display shows map tiles.
-         * @return
+         * @return true if is a map
          */
         public boolean isMap()
         {
@@ -114,7 +109,7 @@ public interface Feature
 
         /**
          * Whether display appears in-game.
-         * @return
+         * @return true if in-game
          */
         public boolean isInGame()
         {
@@ -204,6 +199,7 @@ public interface Feature
 
     /**
      * Get the Feature type (enum class name).
+     * @return type name
      */
     default String getFeatureType()
     {

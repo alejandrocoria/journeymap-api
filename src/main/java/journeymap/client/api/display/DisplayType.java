@@ -47,6 +47,7 @@ public enum DisplayType
      *
      * @param implClass the displayable class
      * @throws IllegalArgumentException if it's not a valid implementation class
+     * @return DisplayType
      */
     public static DisplayType of(Class<? extends Displayable> implClass)
     {

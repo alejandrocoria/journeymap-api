@@ -21,14 +21,15 @@
 package journeymap.client.api.display;
 
 import com.google.common.base.Objects;
-import com.google.common.primitives.Ints;
 import com.google.gson.annotations.Since;
 import journeymap.client.api.model.WaypointBase;
+import journeymap.common.api.util.CachedDimPosition;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Definition for a waypoint that is offered to a player.
@@ -41,31 +42,44 @@ import java.util.Arrays;
  */
 public class Waypoint extends WaypointBase<Waypoint>
 {
-    public static final double VERSION = 1.4;
+    public static final double VERSION = 1.5;
 
-    protected final transient CachedDimPosition cachedDimPosition = new CachedDimPosition();
     @Since(1.4)
     protected final double version = VERSION;
+
     @Since(1.4)
     protected int dim;
+
     @Since(1.4)
     protected BlockPos pos;
+
     @Since(1.4)
     protected WaypointGroup group;
-    @Since(1.4)
-    protected boolean persistent = true;
+
     @Since(1.4)
     protected boolean editable = true;
+
+    private transient boolean persistent = true;
+
+    private transient final CachedDimPosition dimPositions;
+
+    private Waypoint()
+    {
+        this.dimPositions = new CachedDimPosition(this::getInternalPosition);
+    }
 
     /**
      * Constructor.
      *
      * @param modId Your mod id
      * @param name  Waypoint name
+     * @param dimension the dimension of the waypoint
+     * @param position the position in the dimension
      */
     public Waypoint(String modId, String name, int dimension, BlockPos position)
     {
         super(modId, name);
+        this.dimPositions = new CachedDimPosition(this::getInternalPosition);
         setPosition(dimension, position);
     }
 
@@ -75,15 +89,19 @@ public class Waypoint extends WaypointBase<Waypoint>
      * @param modId Your mod id
      * @param id    Unique id scoped to mod
      * @param name  Waypoint name
+     * @param dimension the dimension of the waypoint
+     * @param position the position in the dimension
      */
     public Waypoint(String modId, String id, String name, int dimension, BlockPos position)
     {
         super(modId, id, name);
+        this.dimPositions = new CachedDimPosition(this::getInternalPosition);
         setPosition(dimension, position);
     }
 
     /**
      * (Optional) Group or category name for the waypoint.
+     * @return the group
      */
     public final WaypointGroup getGroup()
     {
@@ -109,6 +127,7 @@ public class Waypoint extends WaypointBase<Waypoint>
 
     /**
      * Waypoint location.
+     * @return the position
      */
     public final BlockPos getPosition()
     {
@@ -118,11 +137,12 @@ public class Waypoint extends WaypointBase<Waypoint>
     /**
      * Gets block position within the specified dimension
      *
+     * @param targetDimension dimension
      * @return the block pos
      */
     public BlockPos getPosition(int targetDimension)
     {
-        return cachedDimPosition.getPosition(targetDimension);
+        return dimPositions.getPosition(targetDimension);
     }
 
     /**
@@ -151,6 +171,7 @@ public class Waypoint extends WaypointBase<Waypoint>
     /**
      * Sets the waypoint location.
      *
+     * @param dimension the dimension
      * @param position the BlockPos
      * @return this
      */
@@ -162,29 +183,28 @@ public class Waypoint extends WaypointBase<Waypoint>
         }
         this.dim = dimension;
         this.pos = position;
-        this.cachedDimPosition.reset();
+        this.dimPositions.reset();
         return setDirty();
     }
 
     /**
-     * Gets Vec3D position relative to dimension.
-     * Caches the result.
-     *
+     * Gets Vec3D position relative to dimension. Caches the result.
+     * @param dimension the dimension
      * @return the position
      */
     public Vec3d getVec(int dimension)
     {
-        return this.cachedDimPosition.getVec(dimension);
+        return this.dimPositions.getVec(dimension);
     }
 
     /**
      * Gets block-centered position as a Vec3D
-     *
+     * @param dimension the dimension
      * @return the position
      */
     public Vec3d getCenteredVec(int dimension)
     {
-        return this.cachedDimPosition.getCenteredVec(dimension);
+        return this.dimPositions.getCenteredVec(dimension);
     }
 
     /**
@@ -237,17 +257,6 @@ public class Waypoint extends WaypointBase<Waypoint>
         return setDirty();
     }
 
-    /**
-     * Safe to teleport?
-     *
-     * @return true if yes
-     */
-    public final boolean isTeleportReady(int targetDimension)
-    {
-        BlockPos pos = getPosition(targetDimension);
-        return pos != null && pos.getY() >= 0;
-    }
-
     @Override
     protected WaypointGroup getDelegate()
     {
@@ -266,14 +275,13 @@ public class Waypoint extends WaypointBase<Waypoint>
      * specified.
      */
     @Override
-    public int[] getDisplayDimensions()
+    public Set<Integer> getDisplayDimensions()
     {
-        int[] dims = super.getDisplayDimensions();
-        if (dims == null)
+        if (displayDims == null && !hasDelegate())
         {
             setDisplayDimensions(dim);
         }
-        return displayDims;
+        return super.getDisplayDimensions();
     }
 
     @Override
@@ -306,7 +314,7 @@ public class Waypoint extends WaypointBase<Waypoint>
                 Objects.equal(getName(), that.getName()) &&
                 Objects.equal(getPosition(), that.getPosition()) &&
                 Objects.equal(getIcon(), that.getIcon()) &&
-                Arrays.equals(getDisplayDimensions(), that.getDisplayDimensions());
+                Arrays.equals(getDisplayDimensions().toArray(), that.getDisplayDimensions().toArray());
     }
 
     @Override
@@ -326,85 +334,11 @@ public class Waypoint extends WaypointBase<Waypoint>
                 .add("icon", icon)
                 .add("color", color)
                 .add("bgColor", bgColor)
-                .add("displayDims", displayDims == null ? null : Ints.asList(displayDims))
+                .add("displayDims", displayDims)
                 .add("editable", editable)
                 .add("persistent", persistent)
                 .add("dirty", dirty)
                 .toString();
     }
 
-    /**
-     * Caches frequently-used positions/vectors within a dimension,
-     * rather than calculating them on every use.
-     */
-    class CachedDimPosition
-    {
-        Integer cachedDim;
-        BlockPos cachedPos;
-        Vec3d cachedVec;
-        Vec3d cachedCenteredVec;
-
-        CachedDimPosition()
-        {
-        }
-
-        /**
-         * Reset cached values.
-         */
-        CachedDimPosition reset()
-        {
-            cachedDim = null;
-            cachedPos = null;
-            cachedVec = null;
-            cachedCenteredVec = null;
-            return this;
-        }
-
-        /**
-         * Ensure cached values are relative to the requested dimension.
-         */
-        private CachedDimPosition ensure(int dimension)
-        {
-            if (this.cachedDim != dimension)
-            {
-                this.cachedDim = dimension;
-                this.cachedPos = Waypoint.this.getInternalPosition(dimension);
-                this.cachedVec = new Vec3d(this.cachedPos.getX(), this.cachedPos.getY(), this.cachedPos.getZ());
-                this.cachedCenteredVec = this.cachedVec.addVector(.5, .5, .5);
-            }
-            return this;
-        }
-
-        /**
-         * Gets position relative to dimension.
-         *
-         * @param dimension targetDimension
-         * @return position
-         */
-        public BlockPos getPosition(int dimension)
-        {
-            return ensure(dimension).cachedPos;
-        }
-
-        /**
-         * Gets Vec3D position relative to dimension.
-         *
-         * @param dimension targetDimension
-         * @return position
-         */
-        public Vec3d getVec(int dimension)
-        {
-            return ensure(dimension).cachedVec;
-        }
-
-        /**
-         * Gets block-centered position as a Vec3D
-         *
-         * @return the position
-         */
-        public Vec3d getCenteredVec(int dimension)
-        {
-            return ensure(dimension).cachedCenteredVec;
-        }
-    }
 }

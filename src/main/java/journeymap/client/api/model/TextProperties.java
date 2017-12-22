@@ -306,7 +306,7 @@ public class TextProperties
      * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
      * it's icon is placed.)
      *
-     * @param offsetX
+     * @param offsetX pixels
      * @return this
      */
     public TextProperties setOffsetX(int offsetX)
@@ -332,7 +332,7 @@ public class TextProperties
      * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
      * it's icon is placed.)
      *
-     * @param offsetY
+     * @param offsetY pixels
      * @return this
      */
     public TextProperties setOffsetY(int offsetY)

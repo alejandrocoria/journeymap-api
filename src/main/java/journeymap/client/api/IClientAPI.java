@@ -20,20 +20,18 @@
 
 package journeymap.client.api;
 
-import journeymap.common.api.IJmAPI;
 import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.util.UIState;
+import journeymap.common.api.IJmAPI;
 import journeymap.common.api.feature.Feature;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -114,6 +112,7 @@ public interface IClientAPI extends IJmAPI
      * Always returns false if the display type is not accepted by the player.
      *
      * @param displayable the object
+     * @return true if exists in API
      * @see #playerAccepts(String, DisplayType)
      */
     boolean exists(Displayable displayable);

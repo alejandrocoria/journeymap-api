@@ -25,10 +25,9 @@ import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.display.IWaypointDisplay;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Internal use only.  Mods should not extend this class.
@@ -48,10 +47,17 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     protected MapImage icon;
 
     @Since(1.4)
-    protected int[] displayDims;
+    protected HashSet<Integer> displayDims;
 
     @Since(1.4)
     protected transient boolean dirty;
+
+    /**
+     * Empty constructor for GSON
+     */
+    protected WaypointBase()
+    {
+    }
 
     /**
      * Constructor.
@@ -94,6 +100,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
 
     /**
      * Waypoint name.
+     * @return name
      */
     public final String getName()
     {
@@ -175,7 +182,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      * @param bgColor the color
      * @return this
      */
-    public final T setBackgroundColor(int bgColor)
+    public final T setBackgroundColor(Integer bgColor)
     {
         this.bgColor = clampRGB(bgColor);
         return setDirty();
@@ -194,26 +201,57 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     }
 
     /**
-     * Dimensions where this should be displayed.
+     * Dimensions where this should be displayed. Altering the result
+     * will have no affect on the waypoint.
+     * @return a set, possibly empty.
      */
-    public int[] getDisplayDimensions()
+    public Set<Integer> getDisplayDimensions()
     {
-        if (displayDims == null && hasDelegate())
+        if (displayDims == null)
         {
-            return getDelegate().getDisplayDimensions();
+            if(hasDelegate())
+            {
+                return getDelegate().getDisplayDimensions();
+            }
+            else
+            {
+                return Collections.emptySet();
+            }
         }
-        return displayDims;
+        return new HashSet<>(displayDims);
     }
 
     /**
-     * Sets the displayDims in which this should appear.
+     * Sets the dimensions in which this waypoint should be displayed.
      *
-     * @param dimensions the displayDims
+     * @param dimensions the dimensions
      * @return this
      */
-    public final T setDisplayDimensions(int... dimensions)
+    public final T setDisplayDimensions(Integer... dimensions)
     {
-        this.displayDims = dimensions;
+        return setDisplayDimensions(Arrays.asList(dimensions));
+    }
+
+    /**
+     * Sets the dimensions in which this waypoint should be displayed.
+     *
+     * @param dimensions the dimensions
+     * @return this
+     */
+    public final T setDisplayDimensions(Collection<Integer> dimensions)
+    {
+        HashSet<Integer> temp = null;
+        if(dimensions!=null && dimensions.size()>0)
+        {
+            temp = new HashSet<>(dimensions.size());
+            dimensions.stream().filter(java.util.Objects::nonNull).forEach(temp::add);
+            if(temp.size()==0)
+            {
+                temp = null;
+            }
+
+        }
+        this.displayDims = temp;
         return setDirty();
     }
 
@@ -237,13 +275,14 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public void setDisplayed(int dimension, boolean displayed)
     {
-        if (displayed && !isDisplayed(dimension))
+        Set<Integer> dimSet = getDisplayDimensions();
+        if (displayed && dimSet.add(dimension))
         {
-            setDisplayDimensions(ArrayUtils.add(getDisplayDimensions(), dimension));
+            setDisplayDimensions(dimSet);
         }
-        else if (!displayed && isDisplayed(dimension))
+        else if (!displayed && dimSet.remove(dimension))
         {
-            setDisplayDimensions(ArrayUtils.removeElement(getDisplayDimensions(), dimension));
+            setDisplayDimensions(dimSet);
         }
     }
 
@@ -255,7 +294,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public final boolean isDisplayed(int dimension)
     {
-        return Arrays.binarySearch(getDisplayDimensions(), dimension) > -1;
+        return getDisplayDimensions().contains(dimension);
     }
 
     /**
@@ -299,7 +338,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     /**
      * Whether needs to be saved.
      *
-     * @return
+     * @return is dirty
      */
     public boolean isDirty()
     {
@@ -396,6 +435,6 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
                 Objects.equal(getIcon(), that.getIcon()) &&
                 Objects.equal(getColor(), that.getColor()) &&
                 Objects.equal(getBackgroundColor(), that.getBackgroundColor()) &&
-                Arrays.equals(getDisplayDimensions(), that.getDisplayDimensions());
+                Arrays.equals(getDisplayDimensions().toArray(), that.getDisplayDimensions().toArray());
     }
 }

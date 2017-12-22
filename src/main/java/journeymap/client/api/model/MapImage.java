@@ -355,7 +355,7 @@ public final class MapImage
     /**
      * Sets the image width in pixels when rendered, allowing the image
      * to be scaled if needed.
-     *
+     * @param displayWidth pixels
      * @return this
      */
     public MapImage setDisplayWidth(double displayWidth)
@@ -379,6 +379,7 @@ public final class MapImage
      * Sets the image height in pixels when rendered, allowing the image
      * to be scaled if needed.
      *
+     * @param displayHeight pixels
      * @return this
      */
     public MapImage setDisplayHeight(double displayHeight)
