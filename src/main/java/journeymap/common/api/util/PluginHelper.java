@@ -24,8 +24,6 @@ import com.google.common.base.Strings;
 import journeymap.common.api.IJmAPI;
 import journeymap.common.api.IJmPlugin;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,14 +58,13 @@ public abstract class PluginHelper<A,I extends IJmPlugin>
      * Mods which are testing integration can also call this in a dev environment
      * and pass in a stub implementation, but must never do so in production code.
      *
-     * @param event preInit
+     * @param asmDataTable asmDataTable
      * @return map of instantiated plugins, keyed by modId
      */
-    public Map<String, I> preInitPlugins(FMLPreInitializationEvent event)
+    public Map<String, I> preInitPlugins(ASMDataTable asmDataTable)
     {
         if (plugins == null)
         {
-            ASMDataTable asmDataTable = event.getAsmData();
             HashMap<String, I> discovered = new HashMap<>();
             Set<ASMDataTable.ASMData> asmDataSet = asmDataTable.getAll(pluginAnnotationClass.getCanonicalName());
 
@@ -126,11 +123,10 @@ public abstract class PluginHelper<A,I extends IJmPlugin>
      * Mods which are testing integration can also call this in a dev environment
      * and pass in a stub implementation, but must never do so in production code.
      *
-     * @param event init event
      * @param jmApi JourneyMap API implementation
      * @return list of initialized plugins, null if plugin discovery never occurred
      */
-    public Map<String, I> initPlugins(FMLInitializationEvent event, IJmAPI jmApi)
+    public Map<String, I> initPlugins(IJmAPI jmApi)
     {
         if (plugins == null)
         {
@@ -174,7 +170,7 @@ public abstract class PluginHelper<A,I extends IJmPlugin>
     /**
      * Get the map of plugins, keyed by modId.
      *
-     * @return null if {@link #preInitPlugins(FMLPreInitializationEvent)} hasn't been called yet
+     * @return null if {@link #preInitPlugins(ASMDataTable)} hasn't been called yet
      */
     public Map<String, I> getPlugins()
     {
