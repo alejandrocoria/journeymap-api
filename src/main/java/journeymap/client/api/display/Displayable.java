@@ -44,10 +44,12 @@ public abstract class Displayable implements Comparable<Displayable>
     @Since(1.1)
     protected final DisplayType displayType;
 
+    private transient String guid;
+
     /**
      * Needed for GSON deserialization.
      */
-    private Displayable()
+    protected Displayable()
     {
         modId = null;
         id = null;
@@ -151,7 +153,11 @@ public abstract class Displayable implements Comparable<Displayable>
      */
     public final String getGuid()
     {
-        return Joiner.on(":").join(modId, displayType, id);
+        if(guid==null)
+        {
+            guid = Joiner.on(":").join(modId, displayType, id);
+        }
+        return guid;
     }
 
     /**
