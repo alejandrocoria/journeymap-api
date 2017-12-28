@@ -80,7 +80,9 @@ public final class UIState
      * @param zoom        The current zoom level of the UI.
      * @param mapType     The current map type of the UI.
      * @param mapCenter   The block position at the center of the UI.
+     * @param chunkY      The chunk Y (vertical slice) for cave maps. Leave null for surface.
      * @param blockBounds The area of blocks displayed in the UI.
+     * @param displayBounds The screen area (pixels) used by the UI.
      */
     public UIState(Feature.Display ui, boolean active, int dimension, int zoom,
                    @Nullable Feature.MapType mapType,
@@ -105,6 +107,7 @@ public final class UIState
      * Convenience factory method to create an inactive UIState.
      *
      * @param ui the ui
+     * @param minecraft Minecraft client
      * @return a UIState
      */
     public static UIState newInactive(Feature.Display ui, Minecraft minecraft)

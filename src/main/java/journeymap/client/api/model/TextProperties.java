@@ -28,156 +28,32 @@ import journeymap.common.api.feature.Feature;
 import java.util.EnumSet;
 
 /**
- * Properties defining the display of text.
+ * Extends MapText to indicate which UIs and MapTypes it may appear in.
  * <p>
  * Setters use the Builder pattern so they can be chained.
  */
-public class TextProperties
+public class TextProperties extends MapText<TextProperties>
 {
     protected EnumSet<Feature.Display> activeUIs = EnumSet.allOf(Feature.Display.class);
     protected EnumSet<Feature.MapType> activeMapTypes = EnumSet.allOf(Feature.MapType.class);
-    protected float scale = 1;
-    protected int color = 0xffffff;
-    protected int backgroundColor = 0x000000;
-    protected float opacity = 1f;
-    protected float backgroundOpacity = .5f;
-    protected boolean fontShadow = true;
-    protected int minZoom = 0;
-    protected int maxZoom = 8;
-    protected int offsetX = 0;
-    protected int offsetY = 0;
 
     /**
-     * Font scale.
-     *
-     * @return 1 scale
+     * Default constructor.
      */
-    public float getScale()
+    public TextProperties()
     {
-        return scale;
+
     }
 
     /**
-     * Sets the font scale. Best results are powers of 2: 1,2,4,8.
-     * Range is 1f - 8f;
-     *
-     * @param scale the scale
-     * @return this
+     * Constructor to copy another instance.
+     * @param other text properties
      */
-    public TextProperties setScale(float scale)
+    public TextProperties(TextProperties other)
     {
-        this.scale = Math.max(1f, Math.min(scale, 8f));
-        return this;
-    }
-
-    /**
-     * Gets the font color.
-     *
-     * @return rgb color
-     */
-    public int getColor()
-    {
-        return color;
-    }
-
-    /**
-     * Sets the font color (rgb).  Range is 0x000000 - 0xffffff.
-     *
-     * @param color rgb
-     * @return this
-     */
-    public TextProperties setColor(int color)
-    {
-        this.color = Displayable.clampRGB(color);
-        return this;
-    }
-
-    /**
-     * Gets background color.
-     *
-     * @return the background color
-     */
-    public int getBackgroundColor()
-    {
-        return backgroundColor;
-    }
-
-    /**
-     * Sets background color.
-     *
-     * @param backgroundColor the background color
-     * @return this
-     */
-    public TextProperties setBackgroundColor(int backgroundColor)
-    {
-        this.backgroundColor = Displayable.clampRGB(backgroundColor);
-        return this;
-    }
-
-    /**
-     * Gets opacity.
-     *
-     * @return the opacity
-     */
-    public float getOpacity()
-    {
-        return opacity;
-    }
-
-    /**
-     * Sets opacity.
-     *
-     * @param opacity the opacity
-     * @return this
-     */
-    public TextProperties setOpacity(float opacity)
-    {
-        this.opacity = Displayable.clampOpacity(opacity);
-        return this;
-    }
-
-    /**
-     * Gets background opacity.
-     *
-     * @return the background opacity
-     */
-    public float getBackgroundOpacity()
-    {
-        return backgroundOpacity;
-    }
-
-    /**
-     * Sets background opacity.  Range is 0f - 1f.
-     *
-     * @param backgroundOpacity the background opacity
-     * @return this
-     */
-    public TextProperties setBackgroundOpacity(float backgroundOpacity)
-    {
-        this.backgroundOpacity = Displayable.clampOpacity(backgroundOpacity);
-        return this;
-    }
-
-    /**
-     * Whether font shadow should be used.
-     *
-     * @return true if shadowed
-     */
-    public boolean hasFontShadow()
-    {
-        return fontShadow;
-    }
-
-    /**
-     * Sets whether font shadow should be used.
-     *
-     * @param fontShadow true if shadow
-     * @return this
-     */
-    public TextProperties setFontShadow(boolean fontShadow)
-    {
-        this.fontShadow = fontShadow;
-        return this;
+        super(other);
+        this.activeUIs = EnumSet.copyOf(other.activeUIs);
+        this.activeMapTypes = EnumSet.copyOf(other.activeMapTypes);
     }
 
     /**
@@ -306,7 +182,7 @@ public class TextProperties
      * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
      * it's icon is placed.)
      *
-     * @param offsetX
+     * @param offsetX pixels
      * @return this
      */
     public TextProperties setOffsetX(int offsetX)
@@ -332,7 +208,7 @@ public class TextProperties
      * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
      * it's icon is placed.)
      *
-     * @param offsetY
+     * @param offsetY pixels
      * @return this
      */
     public TextProperties setOffsetY(int offsetY)
