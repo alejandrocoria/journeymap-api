@@ -1,6 +1,7 @@
 package journeymap.client.api.display;
 
 import journeymap.client.api.model.MapImage;
+import journeymap.client.api.model.MapText;
 
 import java.util.Set;
 
@@ -9,11 +10,9 @@ import java.util.Set;
  */
 public interface IWaypointDisplay
 {
-    Integer getColor();
-
-    Integer getBackgroundColor();
-
     Set<Integer> getDisplayDimensions();
 
     MapImage getIcon();
+
+    MapText getLabel();
 }

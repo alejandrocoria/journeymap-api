@@ -39,6 +39,72 @@ import java.awt.image.BufferedImage;
  */
 public final class MapImage
 {
+    /**
+     * Default font color.
+     */
+    public static final int DEFAULT_COLOR = 0xffffff;
+
+    /**
+     * Default font opacity.
+     */
+    public static final float DEFAULT_OPACITY = 1.0f;
+
+
+    /**
+     * Default sprite x
+     */
+    public static final int DEFAUlT_TEXTURE_X = 0;
+
+    /**
+     * Default sprite y
+     */
+    public static final int DEFAUlT_TEXTURE_Y = 0;
+
+    /**
+     * Default texture width
+     */
+    public static final int DEFAULT_TEXTURE_WIDTH = 1;
+
+    /**
+     * Default rotation
+     */
+    public static final int DEFAULT_ROTATION = 0;
+
+    /**
+     * Default texture height
+     */
+    public static final int DEFAULT_TEXTURE_HEIGHT = 1;
+
+    /**
+     * Default background color.
+     */
+    public static final int DEFAULT_BACKGROUND_COLOR = 0x000000;
+
+    /**
+     * Default background opacity.
+     */
+    public static final float DEFAULT_BACKGROUND_OPACITY = 0.7f;
+
+    /**
+     * Default sprite x
+     */
+    public static final int DEFAUlT_ANCHOR_X = 0;
+
+    /**
+     * Default sprite y
+     */
+    public static final int DEFAUlT_ANCHOR_Y = 0;
+
+    /**
+     * Default display width
+     */
+    public static final int DEFAULT_DISPLAY_WIDTH = 0;
+
+    /**
+     * Default display height
+     */
+    public static final int DEFAULT_DISPLAY_HEIGHT = 0;
+
     @Since(1.1)
     private transient BufferedImage image;
 
@@ -77,6 +143,14 @@ public final class MapImage
 
     @Since(1.1)
     private Double anchorY;
+
+    /**
+     * Constructor.
+     */
+    public MapImage()
+    {
+    }
+
     /**
      * Constructor.
      * <p>
@@ -158,13 +232,34 @@ public final class MapImage
     }
 
     /**
+     * Constructor to copy another MapImage.
+     * @param other another image
+     */
+    public MapImage(MapImage other)
+    {
+        this.image = other.image;
+        this.imageLocation = other.imageLocation;
+        this.color = other.color;
+        this.opacity = other.opacity;
+        this.textureX = other.textureX;
+        this.textureY = other.textureY;
+        this.textureWidth = other.textureWidth;
+        this.textureHeight = other.textureHeight;
+        this.rotation = other.rotation;
+        this.displayWidth = other.displayWidth;
+        this.displayHeight = other.displayHeight;
+        this.anchorX = other.anchorX;
+        this.anchorY = other.anchorY;
+    }
+
+    /**
      * Gets color.
      *
      * @return the color
      */
     public int getColor()
     {
-        return color;
+        return color==null ? DEFAULT_COLOR : color;
     }
 
     /**
@@ -186,7 +281,7 @@ public final class MapImage
      */
     public float getOpacity()
     {
-        return opacity;
+        return opacity==null ? DEFAULT_OPACITY : opacity;
     }
 
     /**
@@ -207,7 +302,7 @@ public final class MapImage
      */
     public int getTextureX()
     {
-        return textureX;
+        return textureX==null ? DEFAUlT_TEXTURE_X : textureX;
     }
 
     /**
@@ -217,7 +312,7 @@ public final class MapImage
      */
     public int getTextureY()
     {
-        return textureY;
+        return textureY==null ? DEFAUlT_TEXTURE_Y : textureY;
     }
 
     /**
@@ -249,7 +344,7 @@ public final class MapImage
      */
     public double getAnchorY()
     {
-        return anchorY;
+        return anchorY==null ? DEFAUlT_ANCHOR_Y : anchorY;
     }
 
     /**
@@ -270,8 +365,8 @@ public final class MapImage
      */
     public MapImage centerAnchors()
     {
-        setAnchorX(this.displayWidth / 2.0);
-        setAnchorY(this.displayHeight / 2.0);
+        setAnchorX(getDisplayWidth() / 2.0);
+        setAnchorY(getDisplayHeight() / 2.0);
         return this;
     }
 
@@ -282,7 +377,7 @@ public final class MapImage
      */
     public int getTextureWidth()
     {
-        return textureWidth;
+        return textureWidth==null ? DEFAULT_TEXTURE_WIDTH : textureWidth;
     }
 
     /**
@@ -292,7 +387,7 @@ public final class MapImage
      */
     public int getTextureHeight()
     {
-        return textureHeight;
+        return textureHeight==null ? DEFAULT_TEXTURE_HEIGHT : textureHeight;
     }
 
     /**
@@ -325,7 +420,7 @@ public final class MapImage
      */
     public int getRotation()
     {
-        return rotation;
+        return rotation==null ? DEFAULT_ROTATION : rotation;
     }
 
     /**
@@ -349,7 +444,7 @@ public final class MapImage
      */
     public double getDisplayWidth()
     {
-        return displayWidth;
+        return displayWidth==null ? DEFAULT_DISPLAY_WIDTH : displayWidth;
     }
 
     /**
@@ -372,7 +467,7 @@ public final class MapImage
      */
     public double getDisplayHeight()
     {
-        return displayHeight;
+        return displayHeight==null ? DEFAULT_DISPLAY_HEIGHT : displayHeight;
     }
 
     /**

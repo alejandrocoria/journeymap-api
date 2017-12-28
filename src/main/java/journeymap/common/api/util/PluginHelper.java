@@ -160,8 +160,7 @@ public abstract class PluginHelper<A,I extends IJmPlugin>
         }
         else
         {
-            // Exception used just to show a trace back to whoever shouldn't have called this.
-            LOGGER.warn("Plugins already initialized!", new IllegalStateException());
+            LOGGER.info("Plugins already initialized.");
         }
 
         return plugins;

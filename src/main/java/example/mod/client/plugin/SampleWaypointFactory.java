@@ -45,12 +45,13 @@ class SampleWaypointFactory
         {
             // Icon for waypoint
             MapImage bedIcon = new MapImage(new ResourceLocation("examplemod:images/bed.png"), 32, 32)
+                    .setColor(0xffffff)
                     .setAnchorX(16)
                     .setAnchorY(32);
 
             // Waypoint itself
             bedWaypoint = new Waypoint(ExampleMod.MODID, "bed_" + dimension, "Bed", dimension, bedLocation)
-                    .setColor(0x00ffff)
+                    .setLabelColor(0x00ffff)
                     .setIcon(bedIcon);
 
             // Add or update

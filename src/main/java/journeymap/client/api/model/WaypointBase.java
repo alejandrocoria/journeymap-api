@@ -38,13 +38,10 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     protected String name;
 
     @Since(1.4)
-    protected Integer color;
-
-    @Since(1.4)
-    protected Integer bgColor;
-
-    @Since(1.4)
     protected MapImage icon;
+
+    @Since(1.6)
+    protected MapText label;
 
     @Since(1.4)
     protected HashSet<Integer> displayDims;
@@ -124,79 +121,109 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     }
 
     /**
-     * Color for label.
+     * Gets the text specifications for the waypoint label.
      *
      * @return rgb int
      */
-    public final Integer getColor()
+    public final MapText getLabel()
     {
-        if (color == null && hasDelegate())
+        if (label == null)
         {
-            return getDelegate().getColor();
+            if(hasDelegate())
+            {
+                return getDelegate().getLabel();
+            }
         }
-        return color;
+        return label;
     }
 
     /**
-     * Sets the rgb color (between 0x000000 - 0xffffff) of the name.
-     *
-     * @param color the color
-     * @return this
+     * Gets the icon color or returns default
+     * @param defaultRgb default color
+     * @return icon color if icon specified, defaultRgb otherwise.
      */
-    public final T setColor(int color)
+    public final int getOrDefaultIconColor(int defaultRgb)
     {
-        this.color = clampRGB(color);
+        MapImage icon = getIcon();
+        return icon==null ? defaultRgb : icon.getColor();
+    }
+
+    /**
+     * Sets the waypoint icon color
+     * @param rgb int
+     * @return self
+     */
+    public final T setIconColor(int rgb)
+    {
+        MapImage mapImage = getIcon();
+        if(mapImage==null)
+        {
+            mapImage = new MapImage();
+            setIcon(mapImage);
+        }
+        mapImage.setColor(rgb);
         return setDirty();
     }
 
     /**
-     * Clears color on this to ensure
+     * Gets the label color or returns default
+     * @param defaultRgb default color
+     * @return label color if label specified, defaultRgb otherwise.
+     */
+    public final int getOrDefaultLabelColor(int defaultRgb)
+    {
+        MapText label = getLabel();
+        return label==null ? defaultRgb : label.getColor();
+    }
+
+    /**
+     * Sets the waypoint label color
+     * @param rgb int
+     * @return self
+     */
+    public final T setLabelColor(int rgb)
+    {
+        MapText mapText = getLabel();
+        if(mapText==null)
+        {
+            mapText = new MapText();
+            setLabel(mapText);
+        }
+        mapText.setColor(rgb);
+        return setDirty();
+    }
+
+    /**
+     * Sets basic text specifications for the waypoint label.
+     * @param color font color
+     * @param opacity font opacity
+     * @return self
+     */
+    public final T setLabel(int color, float opacity)
+    {
+        return setLabel(new MapText().setColor(color).setOpacity(opacity));
+    }
+
+    /**
+     * Text specifications for the waypoint label.
+     * @param label the label
+     * @return self
+     */
+    public final T setLabel(MapText label)
+    {
+        this.label = label;
+        return setDirty();
+    }
+
+    /**
+     * Clears label on this to ensure
      * delegate provides it on subsequent calls.
      *
      * @return this
      */
-    public final T clearColor()
+    public final T clearLabel()
     {
-        this.color = null;
-        return setDirty();
-    }
-
-    /**
-     * Background color for label.
-     *
-     * @return rgb int
-     */
-    public final Integer getBackgroundColor()
-    {
-        if (bgColor == null && hasDelegate())
-        {
-            return getDelegate().getBackgroundColor();
-        }
-        return bgColor;
-    }
-
-
-    /**
-     * Sets the rgb color (between 0x000000 - 0xffffff) of the name's background.
-     *
-     * @param bgColor the color
-     * @return this
-     */
-    public final T setBackgroundColor(Integer bgColor)
-    {
-        this.bgColor = clampRGB(bgColor);
-        return setDirty();
-    }
-
-    /**
-     * Clears backgroundColor on this to ensure
-     * delegate provides it on subsequent calls.
-     *
-     * @return this
-     */
-    public final T clearBackgroundColor()
-    {
-        this.bgColor = null;
+        this.label = null;
         return setDirty();
     }
 
@@ -388,7 +415,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public boolean hasColor()
     {
-        return color != null;
+        return getLabel() != null;
     }
 
     /**
@@ -400,7 +427,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public boolean hasBackgroundColor()
     {
-        return bgColor != null;
+        return getLabel() != null;
     }
 
     /**
@@ -431,10 +458,9 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
             return false;
         }
         WaypointBase<?> that = (WaypointBase<?>) o;
-        return Objects.equal(getName(), that.getName()) &&
+        return Objects.equal(getGuid(), that.getGuid()) &&
                 Objects.equal(getIcon(), that.getIcon()) &&
-                Objects.equal(getColor(), that.getColor()) &&
-                Objects.equal(getBackgroundColor(), that.getBackgroundColor()) &&
+                Objects.equal(getLabel(), that.getLabel()) &&
                 Arrays.equals(getDisplayDimensions().toArray(), that.getDisplayDimensions().toArray());
     }
 }

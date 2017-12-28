@@ -22,6 +22,8 @@ package journeymap.client.api.display;
 
 import com.google.common.base.Objects;
 import com.google.gson.annotations.Since;
+import journeymap.client.api.model.MapImage;
+import journeymap.client.api.model.MapText;
 import journeymap.client.api.model.WaypointBase;
 import journeymap.common.api.util.CachedDimPosition;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +31,7 @@ import net.minecraft.util.math.Vec3d;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -42,7 +45,7 @@ import java.util.Set;
  */
 public class Waypoint extends WaypointBase<Waypoint>
 {
-    public static final double VERSION = 1.5;
+    public static final double VERSION = 1.6;
 
     @Since(1.4)
     protected final double version = VERSION;
@@ -97,6 +100,45 @@ public class Waypoint extends WaypointBase<Waypoint>
         super(modId, id, name);
         this.dimPositions = new CachedDimPosition(this::getInternalPosition);
         setPosition(dimension, position);
+    }
+
+    /**
+     * Constructor to copy another Waypoint.
+     * Does not copy the id.
+     * @param other waypoint
+     */
+    public Waypoint(Waypoint other)
+    {
+        super(other.getModId(), other.getName());
+        this.dimPositions = new CachedDimPosition(this::getInternalPosition);
+        updateFrom(other);
+    }
+
+    /**
+     * Copies values from other waypoint to this one, except for modid and id.
+     * @param other waypoint
+     * @return self
+     */
+    public Waypoint updateFrom(Waypoint other)
+    {
+        this.setName(other.getName());
+        this.dim = other.dim;
+        this.pos = other.pos;
+        this.group = other.group;
+        this.editable = other.editable;
+        this.persistent = other.persistent;
+        this.displayDims = new HashSet<>(other.getDisplayDimensions());
+        MapImage icon = other.getIcon();
+        if(icon!=null)
+        {
+            this.icon = new MapImage(icon);
+        }
+        MapText label = other.getLabel();
+        if(label!=null)
+        {
+            this.label = new MapText(label);
+        }
+        return this;
     }
 
     /**
@@ -309,8 +351,7 @@ public class Waypoint extends WaypointBase<Waypoint>
         return isPersistent() == that.isPersistent() &&
                 isEditable() == that.isEditable() &&
                 Objects.equal(getDimension(), that.getDimension()) &&
-                Objects.equal(getColor(), that.getColor()) &&
-                Objects.equal(getBackgroundColor(), that.getBackgroundColor()) &&
+                Objects.equal(getLabel(), that.getLabel()) &&
                 Objects.equal(getName(), that.getName()) &&
                 Objects.equal(getPosition(), that.getPosition()) &&
                 Objects.equal(getIcon(), that.getIcon()) &&
@@ -332,8 +373,7 @@ public class Waypoint extends WaypointBase<Waypoint>
                 .add("pos", pos)
                 .add("group", group)
                 .add("icon", icon)
-                .add("color", color)
-                .add("bgColor", bgColor)
+                .add("label", label)
                 .add("displayDims", displayDims)
                 .add("editable", editable)
                 .add("persistent", persistent)
