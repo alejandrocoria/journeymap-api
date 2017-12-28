@@ -112,6 +112,7 @@ public interface IClientAPI extends IJmAPI
      * Always returns false if the display type is not accepted by the player.
      *
      * @param displayable the object
+     * @return true if exists in API
      * @see #playerAccepts(String, DisplayType)
      */
     boolean exists(Displayable displayable);

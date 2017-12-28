@@ -33,6 +33,7 @@ public interface IJmPlugin<I extends IJmAPI>
 {
     /**
      * Used by JourneyMap to associate mod id with a plugin instance.
+     * @return mod id
      */
     String getModId();
 
