@@ -25,10 +25,9 @@ import com.google.common.base.Strings;
 import com.google.gson.annotations.Since;
 import journeymap.client.api.display.Displayable;
 import journeymap.client.api.display.IWaypointDisplay;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Internal use only.  Mods should not extend this class.
@@ -39,19 +38,23 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     protected String name;
 
     @Since(1.4)
-    protected Integer color;
-
-    @Since(1.4)
-    protected Integer bgColor;
-
-    @Since(1.4)
     protected MapImage icon;
 
+    @Since(1.6)
+    protected MapText label;
+
     @Since(1.4)
-    protected int[] displayDims;
+    protected HashSet<Integer> displayDims;
 
     @Since(1.4)
     protected transient boolean dirty;
+
+    /**
+     * Empty constructor for GSON
+     */
+    protected WaypointBase()
+    {
+    }
 
     /**
      * Constructor.
@@ -94,6 +97,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
 
     /**
      * Waypoint name.
+     * @return name
      */
     public final String getName()
     {
@@ -117,103 +121,164 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     }
 
     /**
-     * Color for label.
+     * Gets the text specifications for the waypoint label.
      *
      * @return rgb int
      */
-    public final Integer getColor()
+    public final MapText getLabel()
     {
-        if (color == null && hasDelegate())
+        if (label == null)
         {
-            return getDelegate().getColor();
+            if(hasDelegate())
+            {
+                return getDelegate().getLabel();
+            }
         }
-        return color;
+        return label;
     }
 
     /**
-     * Sets the rgb color (between 0x000000 - 0xffffff) of the name.
-     *
-     * @param color the color
-     * @return this
+     * Gets the icon color or returns default
+     * @param defaultRgb default color
+     * @return icon color if icon specified, defaultRgb otherwise.
      */
-    public final T setColor(int color)
+    public final int getOrDefaultIconColor(int defaultRgb)
     {
-        this.color = clampRGB(color);
+        MapImage icon = getIcon();
+        return icon==null ? defaultRgb : icon.getColor();
+    }
+
+    /**
+     * Sets the waypoint icon color
+     * @param rgb int
+     * @return self
+     */
+    public final T setIconColor(int rgb)
+    {
+        MapImage mapImage = getIcon();
+        if(mapImage==null)
+        {
+            mapImage = new MapImage();
+            setIcon(mapImage);
+        }
+        mapImage.setColor(rgb);
         return setDirty();
     }
 
     /**
-     * Clears color on this to ensure
+     * Gets the label color or returns default
+     * @param defaultRgb default color
+     * @return label color if label specified, defaultRgb otherwise.
+     */
+    public final int getOrDefaultLabelColor(int defaultRgb)
+    {
+        MapText label = getLabel();
+        return label==null ? defaultRgb : label.getColor();
+    }
+
+    /**
+     * Sets the waypoint label color
+     * @param rgb int
+     * @return self
+     */
+    public final T setLabelColor(int rgb)
+    {
+        MapText mapText = getLabel();
+        if(mapText==null)
+        {
+            mapText = new MapText();
+            setLabel(mapText);
+        }
+        mapText.setColor(rgb);
+        return setDirty();
+    }
+
+    /**
+     * Sets basic text specifications for the waypoint label.
+     * @param color font color
+     * @param opacity font opacity
+     * @return self
+     */
+    public final T setLabel(int color, float opacity)
+    {
+        return setLabel(new MapText().setColor(color).setOpacity(opacity));
+    }
+
+    /**
+     * Text specifications for the waypoint label.
+     * @param label the label
+     * @return self
+     */
+    public final T setLabel(MapText label)
+    {
+        this.label = label;
+        return setDirty();
+    }
+
+    /**
+     * Clears label on this to ensure
      * delegate provides it on subsequent calls.
      *
      * @return this
      */
-    public final T clearColor()
+    public final T clearLabel()
     {
-        this.color = null;
+        this.label = null;
         return setDirty();
     }
 
     /**
-     * Background color for label.
-     *
-     * @return rgb int
+     * Dimensions where this should be displayed. Altering the result
+     * will have no affect on the waypoint.
+     * @return a set, possibly empty.
      */
-    public final Integer getBackgroundColor()
+    public Set<Integer> getDisplayDimensions()
     {
-        if (bgColor == null && hasDelegate())
+        if (displayDims == null)
         {
-            return getDelegate().getBackgroundColor();
+            if(hasDelegate())
+            {
+                return getDelegate().getDisplayDimensions();
+            }
+            else
+            {
+                return Collections.emptySet();
+            }
         }
-        return bgColor;
+        return new HashSet<>(displayDims);
     }
 
-
     /**
-     * Sets the rgb color (between 0x000000 - 0xffffff) of the name's background.
+     * Sets the dimensions in which this waypoint should be displayed.
      *
-     * @param bgColor the color
+     * @param dimensions the dimensions
      * @return this
      */
-    public final T setBackgroundColor(int bgColor)
+    public final T setDisplayDimensions(Integer... dimensions)
     {
-        this.bgColor = clampRGB(bgColor);
-        return setDirty();
+        return setDisplayDimensions(Arrays.asList(dimensions));
     }
 
     /**
-     * Clears backgroundColor on this to ensure
-     * delegate provides it on subsequent calls.
+     * Sets the dimensions in which this waypoint should be displayed.
      *
+     * @param dimensions the dimensions
      * @return this
      */
-    public final T clearBackgroundColor()
+    public final T setDisplayDimensions(Collection<Integer> dimensions)
     {
-        this.bgColor = null;
-        return setDirty();
-    }
-
-    /**
-     * Dimensions where this should be displayed.
-     */
-    public int[] getDisplayDimensions()
-    {
-        if (displayDims == null && hasDelegate())
+        HashSet<Integer> temp = null;
+        if(dimensions!=null && dimensions.size()>0)
         {
-            return getDelegate().getDisplayDimensions();
-        }
-        return displayDims;
-    }
+            temp = new HashSet<>(dimensions.size());
+            dimensions.stream().filter(java.util.Objects::nonNull).forEach(temp::add);
+            if(temp.size()==0)
+            {
+                temp = null;
+            }
 
-    /**
-     * Sets the displayDims in which this should appear.
-     *
-     * @param dimensions the displayDims
-     * @return this
-     */
-    public final T setDisplayDimensions(int... dimensions)
-    {
-        this.displayDims = dimensions;
+        }
+        this.displayDims = temp;
         return setDirty();
     }
 
@@ -237,13 +302,14 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public void setDisplayed(int dimension, boolean displayed)
     {
-        if (displayed && !isDisplayed(dimension))
+        Set<Integer> dimSet = getDisplayDimensions();
+        if (displayed && dimSet.add(dimension))
         {
-            setDisplayDimensions(ArrayUtils.add(getDisplayDimensions(), dimension));
+            setDisplayDimensions(dimSet);
         }
-        else if (!displayed && isDisplayed(dimension))
+        else if (!displayed && dimSet.remove(dimension))
         {
-            setDisplayDimensions(ArrayUtils.removeElement(getDisplayDimensions(), dimension));
+            setDisplayDimensions(dimSet);
         }
     }
 
@@ -255,7 +321,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public final boolean isDisplayed(int dimension)
     {
-        return Arrays.binarySearch(getDisplayDimensions(), dimension) > -1;
+        return getDisplayDimensions().contains(dimension);
     }
 
     /**
@@ -299,7 +365,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
     /**
      * Whether needs to be saved.
      *
-     * @return
+     * @return is dirty
      */
     public boolean isDirty()
     {
@@ -349,7 +415,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public boolean hasColor()
     {
-        return color != null;
+        return getLabel() != null;
     }
 
     /**
@@ -361,7 +427,7 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
      */
     public boolean hasBackgroundColor()
     {
-        return bgColor != null;
+        return getLabel() != null;
     }
 
     /**
@@ -392,10 +458,9 @@ public abstract class WaypointBase<T extends WaypointBase> extends Displayable i
             return false;
         }
         WaypointBase<?> that = (WaypointBase<?>) o;
-        return Objects.equal(getName(), that.getName()) &&
+        return Objects.equal(getGuid(), that.getGuid()) &&
                 Objects.equal(getIcon(), that.getIcon()) &&
-                Objects.equal(getColor(), that.getColor()) &&
-                Objects.equal(getBackgroundColor(), that.getBackgroundColor()) &&
-                Arrays.equals(getDisplayDimensions(), that.getDisplayDimensions());
+                Objects.equal(getLabel(), that.getLabel()) &&
+                Arrays.equals(getDisplayDimensions().toArray(), that.getDisplayDimensions().toArray());
     }
 }

@@ -60,6 +60,7 @@ public final class ImageOverlay extends Overlay
 
     /**
      * Top-left location of the image overlay.
+     * @return NW position
      */
     public BlockPos getNorthWestPoint()
     {
@@ -80,6 +81,7 @@ public final class ImageOverlay extends Overlay
 
     /**
      * Bottom-right location of the image overlay.
+     * @return SE position
      */
     public BlockPos getSouthEastPoint()
     {

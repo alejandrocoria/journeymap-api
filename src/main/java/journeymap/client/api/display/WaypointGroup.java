@@ -99,7 +99,8 @@ public class WaypointGroup extends WaypointBase<WaypointGroup>
             return false;
         }
         WaypointGroup that = (WaypointGroup) o;
-        return order == that.order && Double.compare(that.version, version) == 0;
+        return Objects.equal(this.getGuid(), that.getGuid())
+                && Double.compare(that.version, version) == 0;
     }
 
     @Override

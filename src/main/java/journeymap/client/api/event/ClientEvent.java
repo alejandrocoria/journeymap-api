@@ -47,6 +47,8 @@ public class ClientEvent
 
     /**
      * Constructor.
+     * @param type event
+     * @param dimension dim
      */
     public ClientEvent(Type type, int dimension)
     {

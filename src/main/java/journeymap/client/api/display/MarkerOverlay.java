@@ -58,6 +58,7 @@ public final class MarkerOverlay extends Overlay
 
     /**
      * Location of the marker.
+     * @return position
      */
     public BlockPos getPoint()
     {
