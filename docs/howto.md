@@ -27,7 +27,7 @@ For example:
 #!gradle
 
 // Version of JourneyMap API to use
-journeymap_api_version = 1.12-1.4 // or 1.12-1.4-SNAPSHOT
+journeymap_api_version = 1.12-2.0 // or 1.12-2.0-SNAPSHOT
 
 // Note: None of the blocks below belong in your buildscript block. Put them below it instead.
 repositories {
@@ -76,6 +76,6 @@ III. Write your Plugin
 IV. Test your Plugin
 =============================
 
-1. [Download JourneyMap](http://journeymap.info/Download) 5.1.5 or later and place it in your runtime mods directory (usually `/run/mods`).
-You don't need a "dev" or "deobf" version of JourneyMap; Forge 1.8-11.14.3.1503 or later now handles automatic deobfuscation for you.
+1. [Download JourneyMap](http://journeymap.info/Download) 5.6.0b1 or later and place it in your runtime mods directory (usually `/run/mods`).
+You don't need a "dev" or "deobf" version of JourneyMap; Forge now handles automatic deobfuscation for you.
 2. Run Minecraft in your development environment.  Forge will load JourneyMap and your mod, and the JourneyMap API will activate your plugin.
