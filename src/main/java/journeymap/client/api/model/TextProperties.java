@@ -21,7 +21,6 @@
 package journeymap.client.api.model;
 
 import com.google.common.base.MoreObjects;
-import journeymap.client.api.display.Displayable;
 import journeymap.client.api.util.UIState;
 import journeymap.common.api.feature.Feature;
 
@@ -119,102 +118,6 @@ public class TextProperties extends MapText<TextProperties>
                 && (activeUIs.contains(uiState.ui))
                 && (activeMapTypes.contains(uiState.mapType))
                 && (this.minZoom <= uiState.zoom && this.maxZoom >= uiState.zoom);
-    }
-
-    /**
-     * The minimum zoom level (0 is lowest) where the polygon should be visible.
-     *
-     * @return the min zoom
-     */
-    public int getMinZoom()
-    {
-        return minZoom;
-    }
-
-    /**
-     * Sets the minimum zoom level (0 is lowest) where text should be visible.
-     *
-     * @param minZoom the min zoom
-     * @return this
-     */
-    public TextProperties setMinZoom(int minZoom)
-    {
-        this.minZoom = Math.max(0, minZoom);
-        return this;
-    }
-
-    /**
-     * The maximum zoom level (8 is highest) where text should be visible.
-     *
-     * @return the max zoom
-     */
-    public int getMaxZoom()
-    {
-        return maxZoom;
-    }
-
-    /**
-     * Sets the maximum zoom level (8 is highest) where the polygon should be visible.
-     *
-     * @param maxZoom the max zoom
-     * @return this
-     */
-    public TextProperties setMaxZoom(int maxZoom)
-    {
-        this.maxZoom = Math.min(8, maxZoom);
-        return this;
-    }
-
-    /**
-     * Gets how many horizontal pixels to shift the center of the label from the center of the overlay.
-     * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
-     * it's icon is placed.)
-     *
-     * @return pixels to offset
-     */
-    public int getOffsetX()
-    {
-        return offsetX;
-    }
-
-    /**
-     * Sets how many horizontal pixels to shift the center of the label from the center of the overlay.
-     * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
-     * it's icon is placed.)
-     *
-     * @param offsetX pixels
-     * @return this
-     */
-    public TextProperties setOffsetX(int offsetX)
-    {
-        this.offsetX = offsetX;
-        return this;
-    }
-
-    /**
-     * Gets how many vertical pixels to shift the center of the label from the center of the overlay.
-     * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
-     * it's icon is placed.)
-     *
-     * @return pixels to offset
-     */
-    public int getOffsetY()
-    {
-        return offsetY;
-    }
-
-    /**
-     * Sets how many vertical pixels to shift the center of the label from the center of the overlay.
-     * (For MarkerOverlays, the "center" is directly over MarkerOverlay.getPoint(), regardless of how
-     * it's icon is placed.)
-     *
-     * @param offsetY pixels
-     * @return this
-     */
-    public TextProperties setOffsetY(int offsetY)
-    {
-        this.offsetY = offsetY;
-        return this;
     }
 
     @Override
