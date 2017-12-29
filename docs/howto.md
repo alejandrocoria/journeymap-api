@@ -76,6 +76,6 @@ III. Write your Plugin
 IV. Test your Plugin
 =============================
 
-1. [Download JourneyMap](http://journeymap.info/Download) 5.1.6 or later and place it in your runtime mods directory (usually `/run/mods`).
+1. [Download JourneyMap](http://journeymap.info/Download) 5.6.0b1 or later and place it in your runtime mods directory (usually `/run/mods`).
 You don't need a "dev" or "deobf" version of JourneyMap; Forge now handles automatic deobfuscation for you.
 2. Run Minecraft in your development environment.  Forge will load JourneyMap and your mod, and the JourneyMap API will activate your plugin.
