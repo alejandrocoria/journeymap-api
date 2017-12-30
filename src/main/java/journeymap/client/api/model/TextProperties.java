@@ -41,7 +41,8 @@ public class TextProperties extends MapText<TextProperties>
      */
     public TextProperties()
     {
-
+        this.activeUIs = EnumSet.allOf(Feature.Display.class);
+        this.activeMapTypes = EnumSet.allOf(Feature.MapType.class);
     }
 
     /**
