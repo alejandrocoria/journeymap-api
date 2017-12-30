@@ -52,8 +52,8 @@ public class TextProperties extends MapText<TextProperties>
     public TextProperties(TextProperties other)
     {
         super(other);
-        this.activeUIs = EnumSet.copyOf(other.activeUIs);
-        this.activeMapTypes = EnumSet.copyOf(other.activeMapTypes);
+        setActiveUIs(other.activeUIs);
+        setActiveMapTypes(other.activeMapTypes);
     }
 
     /**
@@ -79,8 +79,7 @@ public class TextProperties extends MapText<TextProperties>
      */
     public TextProperties setActiveUIs(EnumSet<Feature.Display> activeUIs)
     {
-        this.activeUIs = EnumSet.noneOf(Feature.Display.class);
-        this.activeUIs.addAll(activeUIs);
+        this.activeUIs = EnumSet.copyOf(activeUIs);
         return this;
     }
 
@@ -102,8 +101,7 @@ public class TextProperties extends MapText<TextProperties>
      */
     public TextProperties setActiveMapTypes(EnumSet<Feature.MapType> activeMapTypes)
     {
-        this.activeMapTypes = EnumSet.noneOf(Feature.MapType.class);
-        this.activeMapTypes.addAll(activeMapTypes);
+        this.activeMapTypes = EnumSet.copyOf(activeMapTypes);
         return this;
     }
 
