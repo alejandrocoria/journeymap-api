@@ -322,7 +322,7 @@ public final class MapImage
      */
     public double getAnchorX()
     {
-        return anchorX;
+        return anchorX==null ? DEFAUlT_ANCHOR_X : anchorX;
     }
 
     /**
