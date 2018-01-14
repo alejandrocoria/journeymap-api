@@ -22,6 +22,7 @@ package journeymap.server.api;
 
 import journeymap.common.api.IJmAPI;
 import journeymap.common.api.feature.Feature;
+import net.minecraft.world.WorldSettings;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -40,31 +41,32 @@ public interface IServerAPI extends IJmAPI
      * Set features to be enabled/disabled for a player in a specific dimension.
      *
      * Note: JourneyMap Server subscribes to EntityJoinWorldEvent on Priority.LOWEST and will respond by sending a packet
-     * to the client with the player's feature permissions.  If your mod calls {@link #setPlayerFeatures(String, UUID,
-     * int, Map)} in response to an EntityJoinWorldEvent, you should subscribe on a higher priority than LOWEST
-     * to ensure your changes are made before the packet is sent.
+     * to the client with the player's feature permissions.  If your mod calls this in response to an EntityJoinWorldEvent,
+     * you should subscribe on a higher priority than LOWEST to ensure your changes are made before the packet is sent.
      *
      * @param modId       Mod ID making the change
      * @param playerID    The player UUID.
      * @param dimension   The dimension.
+     * @param gameType    The GameType these permissions apply to
      * @param featureMap  A map of features with booleans indicating whether they are enabled/disabled.
      */
-    void setPlayerFeatures(String modId, UUID playerID, int dimension, Map<Feature, Boolean> featureMap);
+    void setPlayerFeatures(String modId, UUID playerID, int dimension, WorldSettings.GameType gameType, Map<Feature, Boolean> featureMap);
 
     /**
      * Get the current map of features for a player in a specific dimension.
      * @param playerID    The player UUID.
      * @param dimension   The dimension.
+     * @param gameType    The GameType these permissions apply to
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
-    Map<Feature, Boolean> getPlayerFeatures(UUID playerID, int dimension);
+    Map<Feature, Boolean> getPlayerFeatures(UUID playerID, int dimension, WorldSettings.GameType gameType);
 
     /**
      * Get the default server-configured features for the dimension.
      * @param dimension the dim
-     * @param isOp if true, features for Ops, otherwise for normal players.
+     * @param gameType  The GameType these permissions apply to
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
-    Map<Feature, Boolean> getServerFeatures(int dimension, boolean isOp);
+    Map<Feature, Boolean> getServerFeatures(int dimension, WorldSettings.GameType gameType);
 
 }

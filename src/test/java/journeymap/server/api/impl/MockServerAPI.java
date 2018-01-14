@@ -20,16 +20,16 @@
 
 package journeymap.server.api.impl;
 
-import com.google.common.base.Joiner;
 import journeymap.common.api.feature.Feature;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.WorldSettings;
 import net.minecraftforge.fml.common.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Stub implementation of the IServerAPI. Doesn't actually do anything except log statements.
@@ -43,7 +43,7 @@ enum MockServerAPI implements journeymap.server.api.IServerAPI
     private final static Logger LOGGER = LogManager.getLogger("journeymap-stub");
 
     @Override
-    public void setPlayerFeatures(String modId, UUID playerID, int dimension, Map<Feature, Boolean> featureMap)
+    public void setPlayerFeatures(String modId, UUID playerID, int dimension, WorldSettings.GameType gameType, Map<Feature, Boolean> featureMap)
     {
         log(String.format("Mock setPlayerFeatures for %s in dim %s", playerID, dimension));
     }
@@ -52,10 +52,11 @@ enum MockServerAPI implements journeymap.server.api.IServerAPI
      * Get the current map of features for a player in a specific dimension.
      * @param playerID    The player UUID.
      * @param dimension   The dimension.
+     * @param gameType    The GameType these permissions apply to
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
     @Override
-    public Map<Feature, Boolean> getPlayerFeatures(UUID playerID, int dimension)
+    public Map<Feature, Boolean> getPlayerFeatures(UUID playerID, int dimension, WorldSettings.GameType gameType)
     {
         return new HashMap<>();
     }
@@ -63,11 +64,11 @@ enum MockServerAPI implements journeymap.server.api.IServerAPI
     /**
      * Get the default server-configured features for the dimension.
      * @param dimension the dim
-     * @param isOp if true, features for Ops, otherwise for normal players.
+     * @param gameType  The GameType these permissions apply to
      * @return A map of features with booleans indicating whether they are enabled/disabled.
      */
     @Override
-    public Map<Feature, Boolean> getServerFeatures(int dimension, boolean isOp)
+    public Map<Feature, Boolean> getServerFeatures(int dimension, WorldSettings.GameType gameType)
     {
         return new HashMap<>();
     }
