@@ -19,6 +19,8 @@
  */
 package journeymap.common.api.feature;
 
+import net.minecraft.world.GameType;
+
 /**
  * High-level JourneyMap features bundled in a marker interface,
  * grouped into categories by enum.
@@ -32,30 +34,17 @@ public interface Feature
     {
         /**
          * Player can teleport via /jtp.
-         * Disabled by default for players.
-         * Enabled by default for Ops.
+         * Allowed by default for Ops and Creative mode.
          */
-        Teleport(false, true);
+        Teleport;
 
-        private boolean playerDefault;
-        private boolean opDefault;
-
-        private Action(boolean playerDefault, boolean opDefault)
+        public boolean getDefaultAllowed(boolean isOp, GameType gameType)
         {
-            this.playerDefault = playerDefault;
-            this.opDefault = opDefault;
-        }
-
-        @Override
-        public boolean isAllowedForPlayerByDefault()
-        {
-            return playerDefault;
-        }
-
-        @Override
-        public boolean isAllowedForOpByDefault()
-        {
-            return opDefault;
+            switch (this)
+            {
+                case Teleport: return isOp || gameType.isCreative();
+            }
+            return false;
         }
     }
 
@@ -180,19 +169,12 @@ public interface Feature
     String name();
 
     /**
-     * Whether the Feature is allowed by default for players.
+     * Whether the Feature is allowed by default given the parameters isOp and gameType.
+     * @param isOp      true if the player is Op, false if not
+     * @param gameType  game type / mode the player is in (survival, creative, etc)
      * @return true if allowed
      */
-    default boolean isAllowedForPlayerByDefault()
-    {
-        return true;
-    }
-
-    /**
-     * Whether the Feature is allowed by default for Ops.
-     * @return true if allowed
-     */
-    default boolean isAllowedForOpByDefault()
+    default boolean getDefaultAllowed(boolean isOp, GameType gameType)
     {
         return true;
     }
