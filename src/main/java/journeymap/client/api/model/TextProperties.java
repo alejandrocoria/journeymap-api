@@ -116,7 +116,7 @@ public class TextProperties extends MapText<TextProperties>
         return uiState.active
                 && (activeUIs.contains(uiState.ui))
                 && (activeMapTypes.contains(uiState.mapType))
-                && (this.minZoom <= uiState.zoom && this.maxZoom >= uiState.zoom);
+                && (getMinZoom() <= uiState.zoom && getMaxZoom() >= uiState.zoom);
     }
 
     @Override
