@@ -3,24 +3,12 @@
 {
   "lines": [
     {
-      "label": "New UI themes & Fullscreen Map layout",
-      "action": "dialog.FullscreenActions#open"
+      "label": "Bugfix: Player icons weren't fetched correctly",
+      "action": ""
     },
     {
-      "label": "Switch between Cave layers in Fullscreen Map",
-      "action": "dialog.FullscreenActions#showCaveLayers"
-    },
-    {
-      "label": "New Minimap Option: Show Day/Night",
-      "action": "dialog.OptionsManager#MiniMap1"
-    },
-    {
-      "label": "New Cartography Options to blend colors",
-      "action": "dialog.OptionsManager#Cartography"
-    },
-    {
-      "label": "New customizable keybindings (Controls)",
-      "action": "dialog.FullscreenActions#openKeybindings"
+      "label": "Built for current Forge Recommended Build",
+      "action": ""
     },
     {
       "label": "JourneyMap has a public Discord!",

@@ -27,10 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -434,12 +431,11 @@ public class TextureCache
 
     /**
      * Get the head portion of a player's skin, scaled to 24x24 pixels.
-     * TODO use skinmanager
      *
      * @param username the username
      * @return the player skin
      */
-    public static TextureImpl getPlayerSkin(final String username)
+    public static TextureImpl getPlayerSkin(final UUID playerId, final String username)
     {
         TextureImpl tex = null;
         synchronized (playerSkins)
@@ -462,7 +458,7 @@ public class TextureCache
 
         // Load it async
         texExec.submit((Callable<Void>) () -> {
-            BufferedImage img = IgnSkin.downloadSkin(username);
+            BufferedImage img = IgnSkin.getFaceImage(playerId, username);
             if (img != null)
             {
                 playerSkinTex.setImage(img, true);

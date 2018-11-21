@@ -48,8 +48,6 @@ public class AboutDialog extends JmUI
 
     private List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
-            new SplashPerson("Davkas", "Davkas", "jm.common.splash_patreon"),
-            new SplashPerson("TECH_GEEK10", "TECH_GEEK10", "jm.common.splash_patreon"),
             new SplashPerson("_TheEndless_", "The Endless", "jm.common.splash_patreon"),
             new SplashPerson("eladjenkins", "eladjenkins", "jm.common.splash_patreon")
     );

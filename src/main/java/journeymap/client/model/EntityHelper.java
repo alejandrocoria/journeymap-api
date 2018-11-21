@@ -302,7 +302,7 @@ public class EntityHelper
         @Override
         public int compare(Entity o1, Entity o2)
         {
-            return Double.compare(o1.getDistanceSqToEntity(player), o2.getDistanceSqToEntity(player));
+            return Double.compare(o1.getDistanceSq(player), o2.getDistanceSq(player));
         }
     }
 
@@ -319,7 +319,7 @@ public class EntityHelper
             {
                 return 0;
             }
-            return Double.compare(e1.getDistanceSqToEntity(player), e2.getDistanceSqToEntity(player));
+            return Double.compare(e1.getDistanceSq(player), e2.getDistanceSq(player));
         }
     }
 

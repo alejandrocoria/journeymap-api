@@ -100,7 +100,7 @@ public class SplashPerson
      */
     public TextureImpl getSkin()
     {
-        return TextureCache.getPlayerSkin(ign);
+        return TextureCache.getPlayerSkin(null, ign);
     }
 
     /**
