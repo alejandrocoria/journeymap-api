@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Factory to produce threads labeled as belonging to JourneyMap
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class JMThreadFactory implements ThreadFactory
 {

@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 /**
  * Serve debug goodness
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class DebugService extends FileService
 {

@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Created by Mysticdrew on 11/19/2016.
+ * Created by Mysticdrew on 11/19/2018.
  */
 public class LoginPacket implements IMessage
 {

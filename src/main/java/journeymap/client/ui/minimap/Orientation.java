@@ -9,7 +9,7 @@ import journeymap.client.Constants;
 import journeymap.client.ui.option.KeyedEnum;
 
 /**
- * Created by Mark on 9/26/2014.
+ * Enum for which orientation the minimap should have
  */
 public enum Orientation implements KeyedEnum
 {

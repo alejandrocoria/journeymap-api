@@ -42,7 +42,7 @@ public class SaveMapTask implements ITask
     /**
      * ITaskManager for MapPlayerTasks
      *
-     * @author mwoodman
+     * @author techbrew
      */
     public static class Manager implements ITaskManager
     {

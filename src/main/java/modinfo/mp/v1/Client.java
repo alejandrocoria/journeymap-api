@@ -17,7 +17,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by mwoodman on 2/17/14.
+ * ModInfo Client model
  */
 public class Client
 {

@@ -12,7 +12,7 @@ import net.minecraft.client.gui.FontRenderer;
 import java.util.ArrayList;
 
 /**
- * Created by Mark on 10/2/2014.
+ * Toggle button
  */
 public class OnOffButton extends Button
 {

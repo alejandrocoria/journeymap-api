@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Provides game-related properties in a Map.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class AllData extends CacheLoader<Long, Map>
 {

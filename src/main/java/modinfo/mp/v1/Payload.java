@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by mwoodman on 2/19/14.
+ * ModInfo Payload model
  */
 public class Payload
 {

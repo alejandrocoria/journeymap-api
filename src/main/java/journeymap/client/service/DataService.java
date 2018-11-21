@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Provide data for the Web UI
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class DataService extends BaseService
 {

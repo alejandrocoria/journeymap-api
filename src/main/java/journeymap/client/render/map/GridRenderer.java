@@ -44,7 +44,7 @@ import java.util.List;
  * Contains a set of 9 tiles organized along compass Point2D.Doubles.
  * Has basic logic to center on a tile and arrange neighboring tiles around it.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class GridRenderer
 {

@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
- * Created by mwoodman on 2/18/14.
+ * ModInfo.
  */
 public class ModInfo
 {

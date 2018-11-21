@@ -17,7 +17,7 @@ import journeymap.common.Journeymap;
 /**
  * Render a chunk in the Nether.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class NetherRenderer extends CaveRenderer implements IChunkRenderer
 {

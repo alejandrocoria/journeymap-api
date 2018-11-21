@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * Created by Mysticdrew on 11/19/2016.
+ * Created by Mysticdrew on 11/19/2018.
  */
 public class InitLogin
 {

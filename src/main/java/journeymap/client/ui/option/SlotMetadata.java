@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Mark on 9/29/2014.
+ * Slot metadata used to render a slot in a ScrollList
  */
 public class SlotMetadata<T> implements Comparable<SlotMetadata>
 {

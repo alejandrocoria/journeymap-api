@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Renders waypoints in the MapOverlay.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class WaypointDrawStepFactory
 {

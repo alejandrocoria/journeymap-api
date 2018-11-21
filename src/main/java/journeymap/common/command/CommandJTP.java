@@ -14,7 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 
 /**
- * Created by Mysticdrew on 9/15/2016.
+ * Created by Mysticdrew on 9/15/2018.
  */
 public class CommandJTP extends CommandBase
 {

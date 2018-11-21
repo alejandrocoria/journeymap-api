@@ -17,7 +17,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.TreeSet;
 
 /**
- * Created by mwoodman on 4/8/2014.
+ * Teleport to a waypoint
  */
 public class CmdTeleportWaypoint
 {

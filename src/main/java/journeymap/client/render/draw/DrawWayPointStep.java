@@ -15,7 +15,7 @@ import journeymap.client.render.texture.TextureImpl;
 import java.awt.geom.Point2D;
 
 /**
- * Created by mwoodman on 12/26/13.
+ * Draw a waypoint.
  */
 public class DrawWayPointStep implements DrawStep
 {

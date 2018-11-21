@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Renders an entity image in the MapOverlay.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class RadarDrawStepFactory
 {

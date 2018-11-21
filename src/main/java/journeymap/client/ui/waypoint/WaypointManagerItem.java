@@ -33,7 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by Mark on 3/15/14.
+ * ScrolllList slot for a waypoint
  */
 public class WaypointManagerItem implements ScrollListPane.ISlot
 {

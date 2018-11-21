@@ -29,7 +29,7 @@ import java.util.zip.ZipEntry;
 /**
  * Provides common functionality for Rupy service implementations.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public abstract class BaseService extends Service
 {
@@ -357,7 +357,7 @@ public abstract class BaseService extends Service
      * Enum to encapsulate knowledge of the
      * MIME types for given file extensions.
      *
-     * @author mwoodman
+     * @author techbrew
      */
     enum ContentType
     {
@@ -410,7 +410,7 @@ public abstract class BaseService extends Service
      * on the Event response. Builder pattern allows for
      * convenient method chaining.
      *
-     * @author mwoodman
+     * @author techbrew
      */
     static class ResponseHeader
     {

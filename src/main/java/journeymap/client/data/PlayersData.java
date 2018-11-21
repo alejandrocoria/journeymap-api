@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Provides game-related properties in a Map.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class PlayersData extends CacheLoader<Class, Map<String, EntityDTO>>
 {

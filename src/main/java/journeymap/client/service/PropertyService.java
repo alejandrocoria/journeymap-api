@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Provide player data
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class PropertyService extends BaseService
 {

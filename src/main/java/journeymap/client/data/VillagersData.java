@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Provides nearby mobs in a Map.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class VillagersData extends CacheLoader<Class, Map<String, EntityDTO>>
 {

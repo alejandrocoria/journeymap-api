@@ -691,7 +691,7 @@ public class Event extends Throwable implements Chain.Link
         {
             try
             {
-                load(Mime.class.getResourceAsStream("mime.txt")); // Mark Woodman : Moved file to package
+                load(Mime.class.getResourceAsStream("mime.txt")); // techbrew : Moved file to package
             }
             catch (Exception e)
             {

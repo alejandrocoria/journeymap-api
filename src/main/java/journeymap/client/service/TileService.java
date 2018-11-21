@@ -25,7 +25,7 @@ import java.io.File;
 /**
  * Provides a map image by combining region files.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class TileService extends FileService
 {

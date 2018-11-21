@@ -17,7 +17,7 @@ import java.util.List;
  * Provides data of what's changed in RegionImageCache in a Map.
  * This provider requires parameters for a valid response.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class ImagesData
 {

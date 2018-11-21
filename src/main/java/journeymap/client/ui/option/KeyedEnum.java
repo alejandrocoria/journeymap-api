@@ -6,7 +6,7 @@
 package journeymap.client.ui.option;
 
 /**
- * Created by Mark on 9/26/2014.
+ * Interface indicating an enum has a key.
  */
 public interface KeyedEnum
 {

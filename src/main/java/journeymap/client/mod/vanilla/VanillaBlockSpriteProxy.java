@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * Created by Mark on 7/7/2017.
+ * IBlockSpritesProxy for problematic vanilla blocks.
  */
 public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
     /*

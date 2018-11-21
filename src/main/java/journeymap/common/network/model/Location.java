@@ -12,7 +12,7 @@ import com.google.gson.GsonBuilder;
 import java.io.Serializable;
 
 /**
- * Created by Mysticdrew on 9/16/2016.
+ * Created by Mysticdrew on 9/16/2018.
  */
 public class Location implements Serializable
 {

@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * CacheLoader for passive mob entities.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class AnimalsData extends CacheLoader<Class, Map<String, EntityDTO>>
 {

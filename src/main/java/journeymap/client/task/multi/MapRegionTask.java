@@ -239,7 +239,7 @@ public class MapRegionTask extends BaseMapTask
     /**
      * Stateful ITaskManager for MapRegionTasks
      *
-     * @author mwoodman
+     * @author techbrew
      */
     public static class Manager implements ITaskManager
     {

@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
 /**
- * Created by Mysticdrew on 5/5/2016.
+ * Created by Mysticdrew on 5/5/2018.
  */
 public class ForgeEvents
 {

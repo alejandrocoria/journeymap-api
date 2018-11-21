@@ -22,7 +22,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 /**
  * Provides game-related properties in a Map.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class PlayerData extends CacheLoader<Class, EntityDTO>
 {

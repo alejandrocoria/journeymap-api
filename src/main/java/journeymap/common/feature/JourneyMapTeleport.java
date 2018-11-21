@@ -24,7 +24,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
- * Created by Mysticdrew on 9/15/2016.
+ * Created by Mysticdrew on 9/15/2018.
  */
 public class JourneyMapTeleport
 {

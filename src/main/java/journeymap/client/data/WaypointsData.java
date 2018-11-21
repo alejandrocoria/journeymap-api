@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Provides waypoint data
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
 {

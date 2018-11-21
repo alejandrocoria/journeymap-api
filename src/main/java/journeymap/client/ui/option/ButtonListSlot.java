@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Mark on 9/29/2014.
+ * ScrollList slot for a button list.
  */
 public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonListSlot>
 {

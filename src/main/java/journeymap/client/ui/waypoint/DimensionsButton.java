@@ -15,7 +15,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.List;
 
 /**
- * Created by Mark on 10/12/2014.
+ * Button for choosing a dimension
  */
 class DimensionsButton extends Button
 {

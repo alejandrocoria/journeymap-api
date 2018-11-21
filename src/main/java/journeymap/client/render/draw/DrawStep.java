@@ -10,7 +10,7 @@ import journeymap.client.render.map.GridRenderer;
 /**
  * Interface for something that needs to be drawn at a pixel coordinate.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public interface DrawStep
 {

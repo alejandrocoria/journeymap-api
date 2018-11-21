@@ -42,7 +42,7 @@ import java.util.zip.ZipInputStream;
  * file-system access when the mod is unzipped or when
  * running from Eclipse during development.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class FileService extends BaseService
 {

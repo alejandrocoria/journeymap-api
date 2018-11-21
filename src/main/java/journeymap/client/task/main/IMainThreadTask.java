@@ -9,7 +9,7 @@ import journeymap.client.JourneymapClient;
 import net.minecraft.client.Minecraft;
 
 /**
- * Created by Mark on 3/21/2016.
+ * Interface for a task that must be performed on the main thread.
  */
 public interface IMainThreadTask
 {

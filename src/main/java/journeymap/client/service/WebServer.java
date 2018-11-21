@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
  * Wraps Rupy Daemon and provides thread management.  Tests webserver_port
  * before starting daemon.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class WebServer
 {

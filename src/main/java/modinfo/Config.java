@@ -14,7 +14,7 @@ import java.io.*;
 import java.util.UUID;
 
 /**
- * Created by mwoodman on 2/20/14.
+ * ModInfo Config model
  */
 public class Config implements Serializable
 {

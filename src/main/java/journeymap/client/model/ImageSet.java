@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * An ImageSet contains one or more ImageHolders
  *
- * @author mwoodman
+ * @author techbrew
  */
 public abstract class ImageSet
 {

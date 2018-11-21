@@ -18,7 +18,7 @@ import java.util.Arrays;
 /**
  * Encapsulates knowledge of PngJ 2.1.0
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class PngjHelper
 {

@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Created by Mysticdrew on 5/16/2016.
+ * Created by Mysticdrew on 5/16/2018.
  */
 public class DimensionPermissionPacket implements IMessage
 {

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Mark on 2/27/2016.
+ * Render Specification for a map layer.
  */
 public class RenderSpec
 {

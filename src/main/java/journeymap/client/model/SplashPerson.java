@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * @author techbrew 5/8/2016.
+ * @author techbrew 5/8/2018.
  */
 public class SplashPerson
 {

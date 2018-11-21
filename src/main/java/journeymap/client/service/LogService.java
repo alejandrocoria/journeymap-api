@@ -14,7 +14,7 @@ import java.io.File;
 /**
  * Serve the journeyMap.log file from disk
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class LogService extends FileService
 {

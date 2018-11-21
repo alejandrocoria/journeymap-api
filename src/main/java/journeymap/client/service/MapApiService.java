@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Redirect to the Google Map API with the TLD specified in WebMapProperties
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class MapApiService extends FileService
 {

@@ -17,7 +17,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.*;
 
 /**
- *
+ * ScrollList slot for a category of controls
  */
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Provides language strings in a Map.
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class MessagesData extends CacheLoader<Class, Map<String, Object>>
 {

@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
- * Created by Mark on 9/7/2014.
+ * Theme values for rendering the minimap frame.
  */
 public class ThemeMinimapFrame
 {

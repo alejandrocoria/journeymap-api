@@ -1,6 +1,6 @@
 JourneyMap ${version} for Minecraft ${mcversion} (${date})
 http://journeymap.info/
-Copyright (C) 2011-2018 Mark Woodman (techbrew).  All Rights Reserved.
+Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
 
 This mod may not be altered, file-hosted, re-packaged, reverse-engineered, or distributed
 in part or in whole without express written permission by Mark Woodman (techbrew).
@@ -11,7 +11,7 @@ been met according to: http://journeymap.info/Modpacks/
 JourneyMap includes and/or makes use of the following software under their respective licenses:
 
     JourneyMap API v${apiversion} (https://bitbucket.org/TeamJM/journeymap-api)
-    Copyright (C) Techbrew. All rights reserved.
+    Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
     End-User License Agreement: https://bitbucket.org/TeamJM/journeymap-api/src/master/docs/license.md
 
     Minecraft (http://minecraft.net)

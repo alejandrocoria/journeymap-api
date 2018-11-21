@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by Mark on 8/30/2014.
+ * Theme values for rendering the fullscreen map toolbar.
  */
 public class ThemeToolbar extends Button
 {

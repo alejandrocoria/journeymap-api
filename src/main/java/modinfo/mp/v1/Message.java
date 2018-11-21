@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 /**
- * Created by mwoodman on 2/18/14.
+ * ModInfo Message model
  */
 public class Message implements Callable<Object>
 {

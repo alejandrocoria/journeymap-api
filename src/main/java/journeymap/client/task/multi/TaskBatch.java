@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by Mark on 7/16/2014.
+ * Batch of tasks.
  */
 public class TaskBatch implements ITask
 {

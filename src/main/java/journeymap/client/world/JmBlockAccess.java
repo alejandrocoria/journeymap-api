@@ -25,7 +25,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import javax.annotation.Nullable;
 
 /**
- * Created by Mark on 2/12/2017.
+ * Implementation of IBlockAccess that uses workarounds for getting biome and block data.
  */
 @MethodsReturnNonnullByDefault
 public enum JmBlockAccess implements IBlockAccess

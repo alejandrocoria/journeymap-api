@@ -15,7 +15,7 @@ import java.io.File;
 /**
  * A RegionImageSet contains one or more ImageHolders for Region images
  *
- * @author mwoodman
+ * @author techbrew
  */
 public class RegionImageSet extends ImageSet
 {
