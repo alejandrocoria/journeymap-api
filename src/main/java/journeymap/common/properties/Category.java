@@ -1,3 +1,8 @@
+/*
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
+ */
+
 package journeymap.common.properties;
 
 import com.google.common.base.Objects;

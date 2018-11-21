@@ -1,15 +1,11 @@
 /*
- * JourneyMap : A mod for Minecraft
- *
- * Copyright (c) 2011-2016 Mark Woodman.  All Rights Reserved.
- * This file may not be altered, file-hosted, re-packaged, or distributed in part or in whole
- * without express written permission by Mark Woodman <mwoodman@techbrew.net>
+ * JourneyMap Mod <journeymap.info> for Minecraft
+ * Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
 package journeymap.client.render.texture;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import journeymap.client.task.main.ExpireTextureTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
