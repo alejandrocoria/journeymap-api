@@ -31,19 +31,10 @@ public class PacketHandler
     public static void init(Side side)
     {
 
-        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.WorldIdListener.class, WorldIDPacket.class, 0, side);
+        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.Listener.class, WorldIDPacket.class, 0, side);
         INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
-
-        if (Side.SERVER == side)
-        {
-
-        }
-
-        if (Side.CLIENT == side)
-        {
-            DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
-        }
+        DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, Side.CLIENT);
     }
 
     public static void teleportPlayer(Location location)

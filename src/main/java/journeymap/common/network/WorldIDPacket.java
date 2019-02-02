@@ -66,7 +66,7 @@ public class WorldIDPacket implements IMessage
         }
     }
 
-    public static class WorldIdListener implements IMessageHandler<WorldIDPacket, IMessage>
+    public static class Listener implements IMessageHandler<WorldIDPacket, IMessage>
     {
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)

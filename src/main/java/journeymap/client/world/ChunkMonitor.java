@@ -77,6 +77,10 @@ public enum ChunkMonitor implements IWorldEventListener, EventHandlerManager.Eve
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event)
     {
+        if (!event.getWorld().isRemote) {
+            return;
+        }
+
         if (world == null)
         {
             world = event.getWorld();

@@ -7,6 +7,7 @@ package journeymap.client.command;
 
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -20,7 +21,7 @@ import java.util.*;
 /**
  * Delegates /jm commands
  */
-public class ClientCommandInvoker implements ICommand
+public class ClientCommandInvoker extends CommandBase
 {
     Map<String, ICommand> commandMap = new HashMap<String, ICommand>();
 
@@ -97,20 +98,7 @@ public class ClientCommandInvoker implements ICommand
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
-        try
-        {
-            ICommand command = getSubCommand(args);
-            if (command != null)
-            {
-                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                return command.getTabCompletions(server, sender, subArgs, pos);
-            }
-        }
-        catch (Throwable t)
-        {
-            Journeymap.getLogger().error("Error in addTabCompletionOptions: " + LogFormatter.toPartialString(t));
-        }
-        return null;
+        return getListOfStringsMatchingLastWord(args, "~");
     }
 
     public ICommand getSubCommand(String[] args)
