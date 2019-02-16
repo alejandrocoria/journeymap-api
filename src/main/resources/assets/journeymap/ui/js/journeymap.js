@@ -1550,9 +1550,12 @@ var JourneyMap = (function() {
 		var me = this;
 
 		zoom = Math.floor(zoom);
-		
-		var tileUrl = "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
-		var tileId = 'x_' + coord.x + '_y_' + coord.y + '_zoom_' + zoom;
+
+		var bound = 360 * Math.pow(2, zoom);
+		var newX = (coord.x > bound/2) ? coord.x - bound : coord.x;
+
+		var tileUrl = "/tile?zoom=" + zoom + "&x=" + newX + "&z=" + coord.y;
+		var tileId = 'x_' + newX + '_y_' + coord.y + '_zoom_' + zoom;
 		
 		var tile = ownerDocument.createElement('div');
 		$(tile).css('width', this.tileSize.height + 'px')

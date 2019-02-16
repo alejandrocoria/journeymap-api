@@ -743,6 +743,7 @@ public class JourneymapClient implements CommonProxy
 
     public void setServerTeleportEnabled(boolean serverTeleportEnabled)
     {
+        Journeymap.getLogger().info("Server Teleport Enabled:" + serverTeleportEnabled);
         this.serverTeleportEnabled = serverTeleportEnabled;
     }
 }

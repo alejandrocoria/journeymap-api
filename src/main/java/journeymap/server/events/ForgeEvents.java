@@ -21,6 +21,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
+import java.util.UUID;
+
 /**
  * Created by Mysticdrew on 5/5/2018.
  */
@@ -34,7 +36,8 @@ public class ForgeEvents
         {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
             Boolean hasForge = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
-            if (!hasForge) {
+            if (!hasForge)
+            {
                 Journeymap.getLogger().debug(player.getName() + " is connecting with a vanilla client, ignoring JoinWorldEvent");
                 return;
             }
@@ -114,7 +117,9 @@ public class ForgeEvents
         String[] ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayerNames();
         for (String opName : ops)
         {
-            if (player.getDisplayNameString().equalsIgnoreCase(opName))
+            // Checking by UUID in case player name changes.
+            UUID opId = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayers().getGameProfileFromName(opName).getId();
+            if (player.getDisplayNameString().equalsIgnoreCase(opName) || player.getUniqueID().equals(opId))
             {
                 return true;
             }

@@ -94,8 +94,8 @@ public class JourneymapServer implements CommonProxy
 
         for (String s : modList.keySet())
         {
-            //logger.info("MOD Key: " + s + " MOD Value: " + modList.get(s));
-            if (s.toLowerCase().startsWith("journeymap"))
+//            logger.info("MOD Key: " + s + " MOD Value: " + modList.get(s));
+            if (s.toLowerCase().equals("journeymap") || s.toLowerCase().equals("journeymap@"))
             {
                 if (modList.get(s).contains("@"))
                 {
