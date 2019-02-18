@@ -185,7 +185,7 @@ public enum ColorManager {
                 }
             }
 
-            if (forceReset || palette == null) {
+            if ((forceReset && !permanent) || palette == null) {
                 palette = ColorPalette.create(standard, permanent);
             }
 
