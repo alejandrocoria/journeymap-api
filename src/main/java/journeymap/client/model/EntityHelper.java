@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableSortedMap;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
+import journeymap.client.mod.impl.Pixelmon;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,11 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -28,7 +33,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EntityHelper
 {
@@ -225,6 +235,19 @@ public class EntityHelper
             {
                 EntityHorse horse = ((EntityHorse) entity);
                 original = new ResourceLocation("minecraft", horse.getVariantTexturePaths()[0]);
+            }
+            else if (Pixelmon.loaded)
+            {
+                // will return null if it is not a pixelmon entity.
+                original = Pixelmon.INSTANCE.getPixelmonResource(entity);
+                if (original == null)
+                {
+                    original = RenderFacade.getEntityTexture(entityRender, entity);
+                }
+                else
+                {
+                    return original;
+                }
             }
             else
             {

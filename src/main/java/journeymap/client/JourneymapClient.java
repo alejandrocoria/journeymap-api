@@ -18,9 +18,15 @@ import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
+import journeymap.client.mod.impl.Pixelmon;
 import journeymap.client.model.RegionImageCache;
 import journeymap.client.network.WorldInfoHandler;
-import journeymap.client.properties.*;
+import journeymap.client.properties.CoreProperties;
+import journeymap.client.properties.FullMapProperties;
+import journeymap.client.properties.MiniMapProperties;
+import journeymap.client.properties.TopoProperties;
+import journeymap.client.properties.WaypointProperties;
+import journeymap.client.properties.WebMapProperties;
 import journeymap.client.render.map.TileDrawStepCache;
 import journeymap.client.service.WebServer;
 import journeymap.client.task.main.IMainThreadTask;
@@ -42,6 +48,7 @@ import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
@@ -312,6 +319,14 @@ public class JourneymapClient implements CommonProxy
             ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, false);
             modInfo.reportAppView();
 
+            // Check if Pixelmon is loaded.
+            String pixelmonModId = "Pixelmon";
+            if (Loader.isModLoaded(pixelmonModId) || Loader.isModLoaded(pixelmonModId.toLowerCase()))
+            {
+                logger.info(pixelmonModId + " is loaded in class path. Initializing icon display.");
+                new Pixelmon(true);
+            }
+
             // threadLogging = getLogger().isTraceEnabled();
         }
         catch (Throwable t)
@@ -523,7 +538,8 @@ public class JourneymapClient implements CommonProxy
                 RegionImageCache.INSTANCE.flushToDiskAsync(true);
 
                 ColorPalette colorPalette = ColorPalette.getActiveColorPalette();
-                if (colorPalette != null) {
+                if (colorPalette != null)
+                {
                     colorPalette.writeToFile();
                 }
             }
