@@ -1552,7 +1552,7 @@ var JourneyMap = (function() {
 		zoom = Math.floor(zoom);
 
 		var bound = 360 * Math.pow(2, zoom);
-		var newX = (coord.x > bound/2) ? coord.x - bound : coord.x;
+		var newX = (coord.x > bound / 2) ? coord.x - bound : coord.x;
 
 		var tileUrl = "/tile?zoom=" + zoom + "&x=" + newX + "&z=" + coord.y;
 		var tileId = 'x_' + newX + '_y_' + coord.y + '_zoom_' + zoom;
@@ -1641,10 +1641,14 @@ var JourneyMap = (function() {
 			var zoom = tileData.zoom;
 			var scale = Math.pow(2,zoom);
 			var coord = tileData.coord;
-			
-			var tileRegion = [parseInt(coord.x / scale), parseInt(coord.y / scale)];
-						
+
+			var bound = 360 * Math.pow(2, zoom);
+			var newX = (coord.x > bound / 2) ? coord.x - bound : coord.x;
+
+			var tileRegion = [parseInt(newX / scale), parseInt(coord.y / scale)];
+
 			JM.images.regions.forEach(function(region) {
+				console.log("tileRegion[0]: "+tileRegion[0] +", region[0]:"+region[0] +", tileRegion[1]:"+ tileRegion[1]+", region[1]:"+region[1])
 				if(tileRegion[0]==region[0] && tileRegion[1]==region[1]) {
 					if (debug) console.log("    tile " + coord + " zoom " + zoom + " in region: ", tileRegion);
 					me.refreshTile(tile);
