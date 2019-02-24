@@ -191,7 +191,7 @@ public class WebServer
         props.put("delay", Integer.toString(5000)); //$NON-NLS-1$ // socket timeout in ms
         props.put("timeout", Integer.toString(0)); //$NON-NLS-1$ // session timeout, 0 to disable sessions
         props.put("threads", Integer.toString(5)); //$NON-NLS-1$
-
+        props.put("live", true);
         // Rupy logging is spammy.  Only enable it if you really need to.
         Level logLevel = Level.toLevel(Journeymap.getClient().getCoreProperties().logLevel.get(), Level.INFO);
         if (logLevel.intLevel() >= (Level.TRACE.intLevel()))
