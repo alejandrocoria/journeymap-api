@@ -679,17 +679,17 @@ var JourneyMap = (function() {
 		if (mapType === "day") {
 			$("#dayNightText").html(getMessage('day_button_text'));
 			$("#dayNightButton").attr("title", getMessage('day_button_title'));
-			$("#dayNightButtonImg").attr('src', '/theme/icon/day.png')
+			$("#dayNightButtonImg").attr('src', 'img/ico/day.png')
 
 		} else if (mapType === "night") {
 			$("#dayNightText").html(getMessage('night_button_text'));
 			$("#dayNightButton").attr("title", getMessage('night_button_title'));
-			$("#dayNightButtonImg").attr('src', '/theme/icon/night.png');
+			$("#dayNightButtonImg").attr('src', 'img/ico/night.png');
 	
 		} else if (mapType === "topo") {
             $("#dayNightText").html(getMessage('topo_button_text'));
             $("#dayNightButton").attr("title", getMessage('topo_button_title'));
-            $("#dayNightButtonImg").attr('src', '/theme/icon/topo.png');
+            $("#dayNightButtonImg").attr('src', 'img/ico/topo.png');
 
         } else {
 			if (debug)
@@ -707,7 +707,7 @@ var JourneyMap = (function() {
 		centerOnPlayer = onPlayer;
 		
 		if(onPlayer) {
-			$("#followButtonImg").attr('src', '/theme/icon/follow.png');
+			$("#followButtonImg").attr('src', 'img/ico/follow.png');
 			if(markers.playerMarker) {
 				map.panTo(markers.playerMarker.getPosition());
 				drawPlayer();
@@ -715,7 +715,7 @@ var JourneyMap = (function() {
 				refreshMap();
 			}	
 		} else {
-			$("#followButtonImg").attr('src', '/theme/icon/follow.png');
+			$("#followButtonImg").attr('src', 'img/ico/follow.png');
 		}
 
 	}
