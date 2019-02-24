@@ -1648,7 +1648,6 @@ var JourneyMap = (function() {
 			var tileRegion = [parseInt(newX / scale), parseInt(coord.y / scale)];
 
 			JM.images.regions.forEach(function(region) {
-				console.log("tileRegion[0]: "+tileRegion[0] +", region[0]:"+region[0] +", tileRegion[1]:"+ tileRegion[1]+", region[1]:"+region[1])
 				if(tileRegion[0]==region[0] && tileRegion[1]==region[1]) {
 					if (debug) console.log("    tile " + coord + " zoom " + zoom + " in region: ", tileRegion);
 					me.refreshTile(tile);
