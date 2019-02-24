@@ -58,11 +58,10 @@ public class Pixelmon
     {
         if (isInstanceOf(entity, "com.pixelmonmod.pixelmon.entities.pixelmon.EntityPixelmon"))
         {
-
             try
             {
+                String name = entity.getName();
                 Object pokemon = entity.getClass().getMethod("getPokemonData").invoke(entity);
-                String name = (String) entity.getClass().getMethod("getName").invoke(entity);
                 int form = (int) pokemon.getClass().getMethod("getForm").invoke(pokemon);
                 Class spriteHelper = Class.forName("com.pixelmonmod.pixelmon.util.helpers.SpriteHelper");
                 String special = (String) spriteHelper.getMethod("getSpriteExtra", String.class, int.class).invoke(spriteHelper, name, form);
