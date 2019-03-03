@@ -5,9 +5,10 @@
 
 package journeymap.client.forge.event;
 
-import journeymap.client.data.DataCache;
 import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,10 +28,14 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
         try
         {
             World world = event.getWorld();
-            if (DataCache.getPlayer().dimension == world.provider.getDimension())
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            if(player!=null)
             {
-                Journeymap.getClient().stopMapping();
-                FeatureManager.INSTANCE.reset();
+                if (player.dimension == world.provider.getDimension())
+                {
+                    Journeymap.getClient().stopMapping();
+                    FeatureManager.INSTANCE.reset();
+                }
             }
         }
         catch (Exception e)
