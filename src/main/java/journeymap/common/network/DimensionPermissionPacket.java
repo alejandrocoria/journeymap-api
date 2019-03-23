@@ -16,8 +16,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import static journeymap.common.network.PacketHandler.sendPermissionsPacket;
-
 
 /**
  * Created by Mysticdrew on 5/16/2018.
@@ -80,7 +78,7 @@ public class DimensionPermissionPacket implements IMessage
         {
             if (ctx.side.isServer())
             {
-                sendPermissionsPacket(ctx.getServerHandler().player);
+                PacketHandler.getInstance().sendPermissionsPacket(ctx.getServerHandler().player);
             }
             else if (ctx.side.isClient())
             {

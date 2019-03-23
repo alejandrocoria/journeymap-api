@@ -58,7 +58,7 @@ public class ForgeEvents
     {
         if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
         {
-            PacketHandler.sendPlayerWorldID((EntityPlayerMP) player);
+            PacketHandler.getInstance().sendPlayerWorldID((EntityPlayerMP) player);
         }
 
         InitLogin init = new InitLogin();
@@ -75,7 +75,7 @@ public class ForgeEvents
         {
             init.setTeleportEnabled(false);
         }
-        PacketHandler.sendLoginPacket(player, init);
+        PacketHandler.getInstance().sendLoginPacket(player, init);
     }
 
 }

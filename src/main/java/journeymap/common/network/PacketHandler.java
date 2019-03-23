@@ -27,6 +27,7 @@ import static journeymap.server.JourneymapServer.isOp;
 
 public class PacketHandler
 {
+    private static PacketHandler INSTANCE;
 
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
@@ -35,34 +36,67 @@ public class PacketHandler
 
     public static void init(Side side)
     {
-
+        INSTANCE = new PacketHandler();
         WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.Listener.class, WorldIDPacket.class, 0, side);
         INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
         DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
     }
 
-    public static void requestPermissions() {
+    public static PacketHandler getInstance()
+    {
+        if (INSTANCE != null)
+        {
+            return INSTANCE;
+        }
+        else
+        {
+            Journeymap.getLogger().error("Packet Handler not initialized before use.");
+            throw new UnsupportedOperationException("Packet Handler not Initialized");
+        }
+    }
+
+    public void requestPermissions()
+    {
         DIMENSION_PERMISSIONS_CHANNEL.sendToServer(new DimensionPermissionPacket());
     }
 
-    public static void teleportPlayer(Location location)
+    public void requestTeleportFromServer(Location location)
     {
         TELEPORT_CHANNEL.sendToServer(new TeleportPacket(location));
     }
 
-    public static void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)
+    private void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)
     {
-        DimensionPermissionPacket prop = new DimensionPermissionPacket(property);
-        DIMENSION_PERMISSIONS_CHANNEL.sendTo(prop, player);
+        if (validClient(player))
+        {
+            DimensionPermissionPacket prop = new DimensionPermissionPacket(property);
+            DIMENSION_PERMISSIONS_CHANNEL.sendTo(prop, player);
+        }
     }
 
-    public static void sendAllPlayersWorldID(String worldID)
+    private void sendWorldIdToPlayer(EntityPlayerMP player, String worldId) throws Exception
+    {
+        if (validClient(player))
+        {
+            WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldId), player);
+        }
+    }
+
+    private void sendLoginPacketToPlayer(EntityPlayerMP player, InitLogin packetData) throws Exception
+    {
+        if (validClient(player))
+        {
+            INIT_LOGIN_CHANNEL.sendTo(new LoginPacket(packetData), player);
+        }
+    }
+
+    public void sendAllPlayersWorldID(String worldID)
     {
         WORLD_INFO_CHANNEL.sendToAll(new WorldIDPacket(worldID));
     }
 
-    public static void sendPlayerWorldID(EntityPlayerMP player)
+    public void sendPlayerWorldID(EntityPlayerMP player)
     {
         if ((player != null) && (player instanceof EntityPlayerMP))
         {
@@ -72,7 +106,7 @@ public class PacketHandler
 
             try
             {
-                WORLD_INFO_CHANNEL.sendTo(new WorldIDPacket(worldID), player);
+                sendWorldIdToPlayer(player, worldID);
             }
             catch (RuntimeException rte)
             {
@@ -85,7 +119,7 @@ public class PacketHandler
         }
     }
 
-    public static void sendLoginPacket(EntityPlayerMP player, InitLogin packetData)
+    public void sendLoginPacket(EntityPlayerMP player, InitLogin packetData)
     {
         if ((player != null) && (player instanceof EntityPlayerMP))
         {
@@ -94,7 +128,7 @@ public class PacketHandler
 
             try
             {
-                INIT_LOGIN_CHANNEL.sendTo(new LoginPacket(packetData), player);
+                sendLoginPacketToPlayer(player, packetData);
             }
             catch (RuntimeException rte)
             {
@@ -107,14 +141,8 @@ public class PacketHandler
         }
     }
 
-    public static void sendPermissionsPacket(EntityPlayerMP player)
+    public void sendPermissionsPacket(EntityPlayerMP player)
     {
-        Boolean hasForge = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
-        if (!hasForge)
-        {
-            Journeymap.getLogger().debug(player.getName() + " is connecting with a vanilla client, ignoring JoinWorldEvent");
-            return;
-        }
         Journeymap.getLogger().info(player.getDisplayNameString() + " joining dimension " + player.dimension);
         PermissionProperties prop;
         DimensionProperties dimensionProperties = PropertiesManager.getInstance().getDimProperties(player.dimension);
@@ -146,11 +174,16 @@ public class PacketHandler
                 prop.topoMappingEnabled.set(prop.opTopoMappingEnabled.get());
             }
 
-            PacketHandler.sendDimensionPacketToPlayer(player, prop);
+            sendDimensionPacketToPlayer(player, prop);
         }
         catch (CloneNotSupportedException e)
         {
             Journeymap.getLogger().error("CloneNotSupportedException: ", e);
         }
+    }
+
+    private boolean validClient(EntityPlayerMP player)
+    {
+        return player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get();
     }
 }

@@ -519,7 +519,7 @@ public class JourneymapClient implements CommonProxy
             // request permissions
             if (serverEnabled)
             {
-                PacketHandler.requestPermissions();
+                PacketHandler.getInstance().requestPermissions();
             }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
             UIManager.INSTANCE.getMiniMap().reset();
