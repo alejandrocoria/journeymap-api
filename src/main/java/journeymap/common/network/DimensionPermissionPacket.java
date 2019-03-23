@@ -16,6 +16,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import static journeymap.common.network.PacketHandler.sendPermissionsPacket;
+
+
 /**
  * Created by Mysticdrew on 5/16/2018.
  */
@@ -28,6 +31,7 @@ public class DimensionPermissionPacket implements IMessage
 
     public DimensionPermissionPacket()
     {
+        prop = "";
     }
 
     public DimensionPermissionPacket(PermissionProperties prop)
@@ -74,9 +78,16 @@ public class DimensionPermissionPacket implements IMessage
         @Override
         public IMessage onMessage(DimensionPermissionPacket message, MessageContext ctx)
         {
-            PermissionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
-            FeatureManager.INSTANCE.updateDimensionFeatures(prop);
-            Journeymap.getClient().setServerEnabled(true);
+            if (ctx.side.isServer())
+            {
+                sendPermissionsPacket(ctx.getServerHandler().player);
+            }
+            else if (ctx.side.isClient())
+            {
+                PermissionProperties prop = new DimensionProperties(0).load(message.getProp(), false);
+                FeatureManager.INSTANCE.updateDimensionFeatures(prop);
+                Journeymap.getClient().setServerEnabled(true);
+            }
             return null;
         }
     }

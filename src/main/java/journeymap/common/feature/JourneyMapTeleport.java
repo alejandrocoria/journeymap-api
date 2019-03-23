@@ -23,6 +23,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import static journeymap.server.JourneymapServer.isOp;
+
 /**
  * Created by Mysticdrew on 9/15/2018.
  */
@@ -142,19 +144,6 @@ public class JourneyMapTeleport
                 && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
         {
             return true;
-        }
-        return false;
-    }
-
-    public static boolean isOp(EntityPlayerMP player)
-    {
-        String[] ops = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOppedPlayerNames();
-        for (String opName : ops)
-        {
-            if (player.getDisplayNameString().equalsIgnoreCase(opName))
-            {
-                return true;
-            }
         }
         return false;
     }

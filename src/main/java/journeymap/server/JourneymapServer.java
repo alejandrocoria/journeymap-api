@@ -19,9 +19,11 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -32,7 +34,7 @@ public class JourneymapServer implements CommonProxy
     private Logger logger;
     public static boolean DEV_MODE = false;
 
-    private static final Version MINIMUM_ACCEPTABLE_VERSION = new Version(5, 5, 2);
+    private static final Version MINIMUM_ACCEPTABLE_VERSION = new Version(5, 5, 5);
 
 
     /**
@@ -138,5 +140,20 @@ public class JourneymapServer implements CommonProxy
         {
             PacketHandler.sendPlayerWorldID(playerEntity);
         }
+    }
+
+    public static boolean isOp(EntityPlayerMP player)
+    {
+        String[] ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayerNames();
+        for (String opName : ops)
+        {
+            // Checking by UUID in case player name changes.
+            UUID opId = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayers().getGameProfileFromName(opName).getId();
+            if (player.getDisplayNameString().equalsIgnoreCase(opName) || player.getUniqueID().equals(opId))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

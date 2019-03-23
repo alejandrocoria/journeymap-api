@@ -516,6 +516,11 @@ public class JourneymapClient implements CommonProxy
                     dimension,
                     memory));
 
+            // request permissions
+            if (serverEnabled)
+            {
+                PacketHandler.requestPermissions();
+            }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
             UIManager.INSTANCE.getMiniMap().reset();
         }

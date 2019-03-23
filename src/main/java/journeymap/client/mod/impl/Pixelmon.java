@@ -1,5 +1,5 @@
 package journeymap.client.mod.impl;
-
+//
 //import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 //import com.pixelmonmod.pixelmon.client.gui.GuiResources;
 //import com.pixelmonmod.pixelmon.entities.pixelmon.EntityPixelmon;
@@ -110,6 +110,4 @@ public class Pixelmon
         }
         return false;
     }
-
-
 }
