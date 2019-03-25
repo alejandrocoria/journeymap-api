@@ -12,10 +12,13 @@ import journeymap.server.JourneymapServer;
 import journeymap.server.feature.PlayerMonitor;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PropertiesManager;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -175,7 +178,8 @@ public class Journeymap
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
         GlobalProperties prop = PropertiesManager.getInstance().getGlobalProperties();
-        if(prop.playerTrackingEnabled.get() || prop.opPlayerTrackingEnabled.get()) {
+        if (prop.playerTrackingEnabled.get() || prop.opPlayerTrackingEnabled.get())
+        {
             PlayerMonitor.init();
         }
     }

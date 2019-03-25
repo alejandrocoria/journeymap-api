@@ -63,6 +63,7 @@ public class PlayerTrackingThread implements Runnable
 
     private PlayersInWorld getPlayerList(EntityPlayerMP entityPlayerMP)
     {
+        int receiverDimension = entityPlayerMP.dimension;
         boolean receiverOp = isOp(entityPlayerMP);
         PlayersInWorld playerWorldList = new PlayersInWorld();
         List<EntityPlayerMP> playerList = null;
@@ -72,7 +73,7 @@ public class PlayerTrackingThread implements Runnable
             for (EntityPlayerMP playerMp : playerList)
             {
                 boolean sneaking = playerMp.isSneaking();
-
+                int dimension = playerMp.dimension;
                 if (receiverOp)
                 {
                     sneaking = false;
@@ -92,7 +93,7 @@ public class PlayerTrackingThread implements Runnable
                 );
 
                 // Don't send the player to them self and don't send sneaking players unless op is receiving.
-                if (!entityPlayerMP.getUniqueID().equals(player.getUuid()) && !sneaking)
+                if (!entityPlayerMP.getUniqueID().equals(player.getUuid()) && !sneaking && receiverDimension == dimension)
                 {
                     playerWorldList.add(player);
                 }
