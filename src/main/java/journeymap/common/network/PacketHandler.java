@@ -12,6 +12,7 @@ package journeymap.common.network;
 import journeymap.common.Journeymap;
 import journeymap.common.network.model.InitLogin;
 import journeymap.common.network.model.Location;
+import journeymap.common.network.model.PlayersInWorld;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
@@ -33,6 +34,7 @@ public class PacketHandler
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper INIT_LOGIN_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(LoginPacket.CHANNEL_NAME);
+    public static final SimpleNetworkWrapper PLAYER_TRACK_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(PlayerTrackPacket.CHANNEL_NAME);
 
     public static void init(Side side)
     {
@@ -41,6 +43,7 @@ public class PacketHandler
         INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
         DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
+        PLAYER_TRACK_CHANNEL.registerMessage(PlayerTrackPacket.Listener.class, PlayerTrackPacket.class, 0, side);
     }
 
     public static PacketHandler getInstance()
@@ -64,6 +67,15 @@ public class PacketHandler
     public void requestTeleportFromServer(Location location)
     {
         TELEPORT_CHANNEL.sendToServer(new TeleportPacket(location));
+    }
+
+    public void sendPlayerPacketToPlayer(EntityPlayerMP player, PlayersInWorld playersInWorld)
+    {
+        if (validClient(player))
+        {
+            PlayerTrackPacket prop = new PlayerTrackPacket(playersInWorld);
+            PLAYER_TRACK_CHANNEL.sendTo(prop, player);
+        }
     }
 
     private void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)

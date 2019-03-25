@@ -43,6 +43,7 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.network.PacketHandler;
+import journeymap.common.network.model.PlayersInWorld;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -61,7 +62,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Client-side, strong-side!
@@ -69,9 +72,12 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
+    public Map<UUID, PlayersInWorld.PlayerWorld> playersOnServer = new HashMap<>();
+
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
     private boolean serverEnabled = false;
+    private boolean playerTrackingEnabled = false;
     private boolean serverTeleportEnabled = false;
 
     // Properties & preferences
@@ -750,6 +756,16 @@ public class JourneymapClient implements CommonProxy
     public boolean isServerEnabled()
     {
         return serverEnabled;
+    }
+
+    public boolean isPlayerTrackingEnabled()
+    {
+        return playerTrackingEnabled;
+    }
+
+    public void setPlayerTrackingEnabled(boolean playerTrackingEnabled)
+    {
+        this.playerTrackingEnabled = playerTrackingEnabled;
     }
 
     public void setServerEnabled(boolean serverEnabled)

@@ -142,6 +142,7 @@ public class JourneymapServer implements CommonProxy
         }
     }
 
+    @SideOnly(Side.SERVER)
     public static boolean isOp(EntityPlayerMP player)
     {
         String[] ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayerNames();

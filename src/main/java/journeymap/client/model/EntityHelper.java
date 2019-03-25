@@ -6,14 +6,18 @@
 package journeymap.client.model;
 
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Lists;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
+import journeymap.common.network.model.PlayersInWorld;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
@@ -34,6 +38,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -148,6 +153,11 @@ public class EntityHelper
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.world.playerEntities);
         allPlayers.remove(mc.player);
 
+        if (Journeymap.getClient().isServerEnabled() && Journeymap.getClient().isPlayerTrackingEnabled())
+        {
+            allPlayers.addAll(getPlayersOnServer(allPlayers));
+        }
+
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();
         if (allPlayers.size() > max)
         {
@@ -168,6 +178,35 @@ public class EntityHelper
         return playerDTOs;
     }
 
+    private static Collection<? extends EntityPlayer> getPlayersOnServer(List<EntityPlayer> allPlayers)
+    {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+        List<EntityPlayer> playerList = Lists.<EntityPlayer>newArrayList();
+        for (NetworkPlayerInfo player : mc.getConnection().getPlayerInfoMap())
+        {
+            // If player is already in list, they are close enough for the client to see so ignore server tracking.
+            boolean playerInList = allPlayers.stream().anyMatch(p -> p.getUniqueID().equals(player.getGameProfile().getId()));
+            if (!player.getGameProfile().getId().equals(mc.player.getUniqueID()) && !playerInList && Journeymap.getClient().playersOnServer.size() > 0)
+            {
+                PlayersInWorld.PlayerWorld playerWorld = Journeymap.getClient().playersOnServer.get(player.getGameProfile().getId());
+                EntityPlayer playerMp = new EntityOtherPlayerMP(mc.world, player.getGameProfile());
+                playerMp.posX = playerWorld.getPosX();
+                playerMp.posY = mc.player.posY; // so it is always visible.
+                playerMp.posZ = playerWorld.getPosZ();
+                playerMp.chunkCoordX = playerWorld.getChunkX();
+                playerMp.chunkCoordY = playerWorld.getChunkY();
+                playerMp.chunkCoordZ = playerWorld.getChunkZ();
+                playerMp.rotationYawHead = playerWorld.getRotationYaw();
+                playerMp.setSneaking(playerWorld.isSneaking()); // should always be false, server does not send sneaking players unless receiver is op, but sneak is set to false in that case.
+                playerMp.setUniqueId(playerWorld.getUuid());
+                playerMp.addedToChunk = true;
+                playerList.add(playerMp);
+            }
+        }
+
+        // add fake players
+        return playerList;
+    }
 
     /**
      * Get a boundingbox to search nearby player.

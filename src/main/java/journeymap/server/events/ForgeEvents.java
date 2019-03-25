@@ -75,6 +75,19 @@ public class ForgeEvents
         {
             init.setTeleportEnabled(false);
         }
+
+        if (PropertiesManager.getInstance().getGlobalProperties().playerTrackingEnabled.get())
+        {
+            init.setTeleportEnabled(true);
+        }
+        else if (PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get())
+        {
+            init.setTeleportEnabled(true);
+        }
+        else
+        {
+            init.setTeleportEnabled(false);
+        }
         PacketHandler.getInstance().sendLoginPacket(player, init);
     }
 

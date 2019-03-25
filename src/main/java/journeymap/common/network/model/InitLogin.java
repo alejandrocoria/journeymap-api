@@ -31,6 +31,11 @@ public class InitLogin
         this.teleportEnabled = teleportEnabled;
     }
 
+    public boolean isPlayerTrackingEnabled()
+    {
+        return teleportEnabled;
+    }
+
     @Override
     public String toString()
     {

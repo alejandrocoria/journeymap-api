@@ -7,7 +7,7 @@ package journeymap.common.network;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;
-import journeymap.common.network.model.InitLogin;
+import journeymap.common.network.model.PlayersInWorld;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -16,20 +16,20 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by Mysticdrew on 11/19/2018.
  */
-public class LoginPacket implements IMessage
+public class PlayerTrackPacket implements IMessage
 {
     // Channel name
-    public static final String CHANNEL_NAME = "jm_init_login";
+    public static final String CHANNEL_NAME = "jm_player_track";
 
     private String packet;
 
-    public LoginPacket()
+    public PlayerTrackPacket()
     {
     }
 
-    public LoginPacket(InitLogin packet)
+    public PlayerTrackPacket(PlayersInWorld packet)
     {
-        this.packet = InitLogin.GSON.toJson(packet);
+        this.packet = PlayersInWorld.GSON.toJson(packet);
     }
 
     public String getPacket()
@@ -66,17 +66,19 @@ public class LoginPacket implements IMessage
         }
     }
 
-    public static class Listener implements IMessageHandler<LoginPacket, IMessage>
+    public static class Listener implements IMessageHandler<PlayerTrackPacket, IMessage>
     {
         @Override
-        public IMessage onMessage(LoginPacket message, MessageContext ctx)
+        public IMessage onMessage(PlayerTrackPacket message, MessageContext ctx)
         {
-            Journeymap.getLogger().info("Login Packet received");
-            InitLogin packet = InitLogin.GSON.fromJson(message.getPacket(), InitLogin.class);
-            Journeymap.getClient().setServerTeleportEnabled(packet.isTeleportEnabled());
-            Journeymap.getClient().setPlayerTrackingEnabled(packet.isPlayerTrackingEnabled());
-            Journeymap.getClient().setServerEnabled(true);
+            PlayersInWorld playersInWorld = PlayersInWorld.GSON.fromJson(message.getPacket(), PlayersInWorld.class);
+            Journeymap.getClient().playersOnServer.clear();
+            for (PlayersInWorld.PlayerWorld player : playersInWorld.get())
+            {
+                Journeymap.getClient().playersOnServer.put(player.getUuid(), player);
+            }
             return null;
         }
     }
 }
+

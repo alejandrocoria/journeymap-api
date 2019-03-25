@@ -9,7 +9,10 @@ import journeymap.client.JourneymapClient;
 import journeymap.common.command.CommandJTP;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
+import journeymap.server.feature.PlayerMonitor;
+import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PropertiesManager;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
@@ -168,11 +171,13 @@ public class Journeymap
      *
      * @param event the event
      */
-    @SideOnly(Side.SERVER)
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
-
+        GlobalProperties prop = PropertiesManager.getInstance().getGlobalProperties();
+        if(prop.playerTrackingEnabled.get() || prop.opPlayerTrackingEnabled.get()) {
+            PlayerMonitor.init();
+        }
     }
 
     /**
