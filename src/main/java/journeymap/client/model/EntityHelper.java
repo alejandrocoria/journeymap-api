@@ -7,13 +7,14 @@ package journeymap.client.model;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.model.PlayersInWorld;
+import journeymap.common.network.WorldPlayers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -44,6 +45,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class EntityHelper
 {
@@ -155,6 +157,7 @@ public class EntityHelper
 
         if (Journeymap.getClient().isServerEnabled() && Journeymap.getClient().isPlayerTrackingEnabled())
         {
+            new WorldPlayers().send();
             allPlayers.addAll(getPlayersOnServer(allPlayers));
         }
 
@@ -182,23 +185,23 @@ public class EntityHelper
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
         List<EntityPlayer> playerList = Lists.<EntityPlayer>newArrayList();
-        for (NetworkPlayerInfo player : mc.getConnection().getPlayerInfoMap())
+        for (NetworkPlayerInfo onlinePlayer : mc.getConnection().getPlayerInfoMap())
         {
             // If player is already in list, they are close enough for the client to see so ignore server tracking.
-            boolean playerInList = allPlayers.stream().anyMatch(p -> p.getUniqueID().equals(player.getGameProfile().getId()));
-            if (!player.getGameProfile().getId().equals(mc.player.getUniqueID()) && !playerInList && Journeymap.getClient().playersOnServer.size() > 0)
+            boolean playerInList = allPlayers.stream().anyMatch(p -> p.getUniqueID().equals(onlinePlayer.getGameProfile().getId()));
+            if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()) && !playerInList && Journeymap.getClient().playersOnServer.size() > 0)
             {
-                PlayersInWorld.PlayerWorld playerWorld = Journeymap.getClient().playersOnServer.get(player.getGameProfile().getId());
-                EntityPlayer playerMp = new EntityOtherPlayerMP(mc.world, player.getGameProfile());
-                playerMp.posX = playerWorld.getPosX();
-                playerMp.posY = mc.player.posY; // so it is always visible.
-                playerMp.posZ = playerWorld.getPosZ();
-                playerMp.chunkCoordX = playerWorld.getChunkX();
-                playerMp.chunkCoordY = playerWorld.getChunkY();
-                playerMp.chunkCoordZ = playerWorld.getChunkZ();
-                playerMp.rotationYawHead = playerWorld.getRotationYaw();
-                playerMp.setSneaking(playerWorld.isSneaking()); // should always be false, server does not send sneaking players unless receiver is op, but sneak is set to false in that case.
-                playerMp.setUniqueId(playerWorld.getUuid());
+                JsonObject player = Journeymap.getClient().playersOnServer.get(onlinePlayer.getGameProfile().getId());
+                EntityPlayer playerMp = new EntityOtherPlayerMP(mc.world, onlinePlayer.getGameProfile());
+                playerMp.posX = player.get("posX").getAsInt();
+                playerMp.posY = player.get("posY").getAsInt();
+                playerMp.posZ = player.get("posZ").getAsInt();
+                playerMp.chunkCoordX = player.get("chunkX").getAsInt();
+                playerMp.chunkCoordY = player.get("chunkY").getAsInt();
+                playerMp.chunkCoordZ = player.get("chunkZ").getAsInt();
+                playerMp.rotationYawHead = player.get("rotation").getAsFloat();
+                playerMp.setSneaking(player.get("sneaking").getAsBoolean());
+                playerMp.setUniqueId(UUID.fromString(player.get("playerId").getAsString()));
                 playerMp.addedToChunk = true;
                 playerList.add(playerMp);
             }

@@ -1,4 +1,4 @@
-package journeymap.common.network.core;
+package journeymap.common.network.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,13 +12,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 
-import static journeymap.common.network.core.NetworkHandler.JOURNEYMAP_NETWORK_CHANNEL;
+import static journeymap.common.network.impl.NetworkHandler.JOURNEYMAP_NETWORK_CHANNEL;
 
+/**
+ * Used primarily for JsonObject based network requests. Can and should be expanded for more data types.
+ */
 public abstract class MessageProcessor
 {
-    private static final String DATA = "data";
-    private static final String MESSAGE_ID = "message_id";
-    static final String CONTAINER_OBJECT = "container_object";
+    static final String DATA_KEY = "data";
+    private static final String MESSAGE_KEY = "message_id";
+    static final String OBJECT_KEY = "container_object";
 
     protected static Gson gson = new GsonBuilder().serializeNulls().create();
 
@@ -31,20 +34,18 @@ public abstract class MessageProcessor
     /**
      * Called when the message is received on the server.
      *
-     * @param message - The Json message.
-     * @param ctx     - The message context.
+     * @param response - The response.
      * @return - The reply is returned and sent to the player's client.
      */
-    protected abstract JsonObject onServer(JsonObject message, MessageContext ctx);
+    protected abstract JsonObject onServer(Response response);
 
     /**
      * Called when the message is received on the client.
      *
-     * @param message - The Json message.
-     * @param ctx     - The message context.
+     * @param response - The response.
      * @return - The reply is returned and sent to the server.
      */
-    protected abstract JsonObject onClient(JsonObject message, MessageContext ctx);
+    protected abstract JsonObject onClient(Response response);
 
     /**
      * Replies the message.
@@ -58,9 +59,9 @@ public abstract class MessageProcessor
     private void reply(JsonObject data)
     {
         this.data = new JsonObject();
-        this.data.addProperty(MESSAGE_ID, getId().toString());
-        this.data.addProperty(CONTAINER_OBJECT, this.clazz);
-        this.data.add(DATA, data);
+        this.data.addProperty(MESSAGE_KEY, getId().toString());
+        this.data.addProperty(OBJECT_KEY, this.clazz);
+        this.data.add(DATA_KEY, data);
         if (side.isServer())
         {
             sendToPlayer((EntityPlayerMP) this.player);
@@ -81,18 +82,18 @@ public abstract class MessageProcessor
     {
         JsonObject reply;
         this.side = ctx.side;
-        this.data = message.get(DATA).getAsJsonObject();
-        this.id = UUID.fromString(message.get(MESSAGE_ID).getAsString());
-        this.clazz = message.get(CONTAINER_OBJECT).getAsString();
+        this.data = message.get(DATA_KEY).getAsJsonObject();
+        this.id = UUID.fromString(message.get(MESSAGE_KEY).getAsString());
+        this.clazz = message.get(OBJECT_KEY).getAsString();
 
         if (side.isServer())
         {
             this.player = ctx.getServerHandler().player;
-            reply = onServer(data, ctx);
+            reply = onServer(new JsonResponse(message, ctx));
         }
         else
         {
-            reply = onClient(data, ctx);
+            reply = onClient(new JsonResponse(message, ctx));
         }
 
         if (reply != null)
@@ -109,9 +110,9 @@ public abstract class MessageProcessor
     public void setRequest(JsonObject requestData)
     {
         this.data = new JsonObject();
-        this.data.addProperty(MESSAGE_ID, getId().toString());
-        this.data.addProperty(CONTAINER_OBJECT, this.getClass().getName());
-        this.data.add(DATA, requestData);
+        this.data.addProperty(MESSAGE_KEY, getId().toString());
+        this.data.addProperty(OBJECT_KEY, this.getClass().getName());
+        this.data.add(DATA_KEY, requestData);
     }
 
     private UUID getId()

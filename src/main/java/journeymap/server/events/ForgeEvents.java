@@ -5,7 +5,7 @@
 
 package journeymap.server.events;
 
-import journeymap.common.network.core.NetworkHandler;
+import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;

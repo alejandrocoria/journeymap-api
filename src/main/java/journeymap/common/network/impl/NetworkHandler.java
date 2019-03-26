@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
-package journeymap.common.network.core;
+package journeymap.common.network.impl;
 
 /**
  * Created by Mysticdrew on 10/8/2014.
@@ -12,12 +12,10 @@ package journeymap.common.network.core;
 import journeymap.common.Journeymap;
 import journeymap.common.network.DimensionPermissionPacket;
 import journeymap.common.network.LoginPacket;
-import journeymap.common.network.PlayerTrackPacket;
 import journeymap.common.network.TeleportPacket;
 import journeymap.common.network.WorldIDPacket;
 import journeymap.common.network.model.InitLogin;
 import journeymap.common.network.model.Location;
-import journeymap.common.network.model.PlayersInWorld;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
@@ -35,12 +33,11 @@ public class NetworkHandler
 {
     private static NetworkHandler INSTANCE;
 
-    public static final SimpleNetworkWrapper JOURNEYMAP_NETWORK_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Message.CHANNEL_NAME);
+    static final SimpleNetworkWrapper JOURNEYMAP_NETWORK_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Message.CHANNEL_NAME);
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper INIT_LOGIN_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(LoginPacket.CHANNEL_NAME);
-    public static final SimpleNetworkWrapper PLAYER_TRACK_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(PlayerTrackPacket.CHANNEL_NAME);
 
     public static void init(Side side)
     {
@@ -50,7 +47,6 @@ public class NetworkHandler
         INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
         DIMENSION_PERMISSIONS_CHANNEL.registerMessage(DimensionPermissionPacket.Listener.class, DimensionPermissionPacket.class, 0, side);
-        PLAYER_TRACK_CHANNEL.registerMessage(PlayerTrackPacket.Listener.class, PlayerTrackPacket.class, 0, side);
     }
 
     public static NetworkHandler getInstance()
@@ -74,15 +70,6 @@ public class NetworkHandler
     public void requestTeleportFromServer(Location location)
     {
         TELEPORT_CHANNEL.sendToServer(new TeleportPacket(location));
-    }
-
-    public void sendPlayerPacketToPlayer(EntityPlayerMP player, PlayersInWorld playersInWorld)
-    {
-        if (validClient(player))
-        {
-            PlayerTrackPacket prop = new PlayerTrackPacket(playersInWorld);
-            PLAYER_TRACK_CHANNEL.sendTo(prop, player);
-        }
     }
 
     private void sendDimensionPacketToPlayer(EntityPlayerMP player, PermissionProperties property)

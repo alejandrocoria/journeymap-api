@@ -1,16 +1,20 @@
-package journeymap.common.network.core;
+package journeymap.common.network.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import org.apache.logging.log4j.Logger;
 
-import static journeymap.common.network.core.MessageProcessor.CONTAINER_OBJECT;
+import static journeymap.common.network.impl.MessageProcessor.OBJECT_KEY;
 
 public class MessageListener implements IMessageHandler<Message, IMessage>
 {
+    Logger logger = Journeymap.getLogger();
+
     @Override
     public IMessage onMessage(Message message, MessageContext ctx)
     {
@@ -18,30 +22,26 @@ public class MessageListener implements IMessageHandler<Message, IMessage>
         try
         {
             JsonObject response = gson.fromJson(message.getMessage(), JsonObject.class);
-            String clazz = response.get(CONTAINER_OBJECT).getAsString();
+            String clazz = response.get(OBJECT_KEY).getAsString();
             Class requestObject = Class.forName(clazz);
             MessageProcessor messageProcessor = (MessageProcessor) requestObject.newInstance();
             messageProcessor.processResponse(response, ctx);
         }
         catch (ClassNotFoundException e)
         {
-            // TODO: Add loggers!
-            e.printStackTrace();
+            logger.warn("Message processor not found: ", e);
         }
         catch (InstantiationException e)
         {
-            // TODO: Add loggers!
-            e.printStackTrace();
+            logger.warn("Unable to initialize message processor: ", e);
         }
         catch (IllegalAccessException e)
         {
-            // TODO: Add loggers!
-            e.printStackTrace();
+            logger.warn("Cannot access message processor: ", e);
         }
         catch (NullPointerException e)
         {
-            // TODO: Add loggers!
-            e.printStackTrace();
+            logger.warn("Null Response: ", e);
         }
         return null;
     }

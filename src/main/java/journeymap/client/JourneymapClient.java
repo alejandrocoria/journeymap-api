@@ -5,6 +5,7 @@
 
 package journeymap.client;
 
+import com.google.gson.JsonObject;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.impl.IMCHandler;
 import journeymap.client.api.util.PluginHelper;
@@ -42,8 +43,7 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
-import journeymap.common.network.core.NetworkHandler;
-import journeymap.common.network.model.PlayersInWorld;
+import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
@@ -72,7 +72,7 @@ import java.util.UUID;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
-    public Map<UUID, PlayersInWorld.PlayerWorld> playersOnServer = new HashMap<>();
+    public Map<UUID, JsonObject> playersOnServer = new HashMap<>();
 
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;

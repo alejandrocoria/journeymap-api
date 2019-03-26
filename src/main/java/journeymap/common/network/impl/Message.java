@@ -1,4 +1,4 @@
-package journeymap.common.network.core;
+package journeymap.common.network.impl;
 
 import io.netty.buffer.ByteBuf;
 import journeymap.common.Journeymap;

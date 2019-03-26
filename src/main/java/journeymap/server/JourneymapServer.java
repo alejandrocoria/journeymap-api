@@ -7,7 +7,7 @@ package journeymap.server;
 
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.network.core.NetworkHandler;
+import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.Version;
 import journeymap.server.events.ForgeEvents;
 import journeymap.server.properties.PropertiesManager;
