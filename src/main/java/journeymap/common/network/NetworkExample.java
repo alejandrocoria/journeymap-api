@@ -8,10 +8,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * This is currently an example of the new networking system.
  * <p>
  * to send a request
- * PlayerLocation pl = new PlayerLocation()
- * pl.setRequest(JsonNode) (setting the request data is optional, if you send without setting the request it sends and empty json node)
- * pl.send() //sends to player
- * pl.sendToPlayer(PlayerEntityMP) // sends to the server
+ * NetworkExample example = new NetworkExample()
+ * example.setRequest(JsonNode) (setting the request data is optional, if you send without setting the request it sends and empty json node)
+ * example.send() //sends to player
+ * example.sendToPlayer(PlayerEntityMP) // sends to the server
  */
 public class NetworkExample extends MessageProcessor
 {
