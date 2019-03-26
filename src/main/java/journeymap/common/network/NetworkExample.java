@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class NetworkExample extends MessageProcessor
 {
+    // Does this action when the message is received on the server.
     @Override
     protected JsonObject onServer(JsonObject message, MessageContext ctx)
     {
@@ -27,6 +28,7 @@ public class NetworkExample extends MessageProcessor
         return null;
     }
 
+    // Does this action when the message is received on the client.
     @Override
     protected JsonObject onClient(JsonObject message, MessageContext ctx)
     {
