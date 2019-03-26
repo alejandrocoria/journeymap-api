@@ -1,6 +1,7 @@
 package journeymap.server.feature;
 
-import journeymap.common.network.PacketHandler;
+import journeymap.common.Journeymap;
+import journeymap.common.network.core.NetworkHandler;
 import journeymap.common.network.model.PlayersInWorld;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.server.FMLServerHandler;
@@ -41,7 +42,7 @@ public class PlayerTrackingThread implements Runnable
                             if (sendToEveryone || (sendToOps && isOp(playerMp)))
                             {
                                 PlayersInWorld playerWorldList = getPlayerList(playerMp);
-                                PacketHandler.getInstance().sendPlayerPacketToPlayer(playerMp, playerWorldList);
+                                NetworkHandler.getInstance().sendPlayerPacketToPlayer(playerMp, playerWorldList);
                             }
 
                         }
@@ -49,6 +50,7 @@ public class PlayerTrackingThread implements Runnable
                 }
                 catch (NullPointerException npe)
                 {
+                    System.out.println("######################################## NULL");
                     // do nothing, server is likely not started yet.
                 }
                 Thread.sleep(updateTime);
@@ -59,6 +61,7 @@ public class PlayerTrackingThread implements Runnable
                 return;
             }
         }
+        Journeymap.getLogger().info("Player Tracker thread has been terminated.");
     }
 
     private PlayersInWorld getPlayerList(EntityPlayerMP entityPlayerMP)

@@ -3,13 +3,18 @@
  * Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
-package journeymap.common.network;
+package journeymap.common.network.core;
 
 /**
  * Created by Mysticdrew on 10/8/2014.
  */
 
 import journeymap.common.Journeymap;
+import journeymap.common.network.DimensionPermissionPacket;
+import journeymap.common.network.LoginPacket;
+import journeymap.common.network.PlayerTrackPacket;
+import journeymap.common.network.TeleportPacket;
+import journeymap.common.network.WorldIDPacket;
 import journeymap.common.network.model.InitLogin;
 import journeymap.common.network.model.Location;
 import journeymap.common.network.model.PlayersInWorld;
@@ -26,10 +31,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import static journeymap.server.JourneymapServer.isOp;
 
 
-public class PacketHandler
+public class NetworkHandler
 {
-    private static PacketHandler INSTANCE;
+    private static NetworkHandler INSTANCE;
 
+    public static final SimpleNetworkWrapper JOURNEYMAP_NETWORK_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Message.CHANNEL_NAME);
     public static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper DIMENSION_PERMISSIONS_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(DimensionPermissionPacket.CHANNEL_NAME);
     public static final SimpleNetworkWrapper TELEPORT_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(TeleportPacket.CHANNEL_NAME);
@@ -38,7 +44,8 @@ public class PacketHandler
 
     public static void init(Side side)
     {
-        INSTANCE = new PacketHandler();
+        INSTANCE = new NetworkHandler();
+        JOURNEYMAP_NETWORK_CHANNEL.registerMessage(MessageListener.class, Message.class, 0, side);
         WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.Listener.class, WorldIDPacket.class, 0, side);
         INIT_LOGIN_CHANNEL.registerMessage(LoginPacket.Listener.class, LoginPacket.class, 0, side);
         TELEPORT_CHANNEL.registerMessage(TeleportPacket.Listener.class, TeleportPacket.class, 0, Side.SERVER);
@@ -46,7 +53,7 @@ public class PacketHandler
         PLAYER_TRACK_CHANNEL.registerMessage(PlayerTrackPacket.Listener.class, PlayerTrackPacket.class, 0, side);
     }
 
-    public static PacketHandler getInstance()
+    public static NetworkHandler getInstance()
     {
         if (INSTANCE != null)
         {

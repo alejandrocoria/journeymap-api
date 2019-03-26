@@ -9,6 +9,7 @@ package journeymap.common.network;
 import io.netty.buffer.ByteBuf;
 import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
+import journeymap.common.network.core.NetworkHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PermissionProperties;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -78,7 +79,7 @@ public class DimensionPermissionPacket implements IMessage
         {
             if (ctx.side.isServer())
             {
-                PacketHandler.getInstance().sendPermissionsPacket(ctx.getServerHandler().player);
+                NetworkHandler.getInstance().sendPermissionsPacket(ctx.getServerHandler().player);
             }
             else if (ctx.side.isClient())
             {

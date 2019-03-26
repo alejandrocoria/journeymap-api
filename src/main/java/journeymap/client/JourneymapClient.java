@@ -42,7 +42,7 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
-import journeymap.common.network.PacketHandler;
+import journeymap.common.network.core.NetworkHandler;
 import journeymap.common.network.model.PlayersInWorld;
 import journeymap.common.version.VersionCheck;
 import modinfo.ModInfo;
@@ -242,7 +242,7 @@ public class JourneymapClient implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
-        PacketHandler.init(Side.CLIENT);
+        NetworkHandler.init(Side.CLIENT);
         StatTimer timer = null;
         try
         {
@@ -525,7 +525,7 @@ public class JourneymapClient implements CommonProxy
             // request permissions
             if (serverEnabled)
             {
-                PacketHandler.getInstance().requestPermissions();
+                NetworkHandler.getInstance().requestPermissions();
             }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
             UIManager.INSTANCE.getMiniMap().reset();

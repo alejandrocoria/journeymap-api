@@ -7,7 +7,7 @@ package journeymap.server;
 
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.network.PacketHandler;
+import journeymap.common.network.core.NetworkHandler;
 import journeymap.common.version.Version;
 import journeymap.server.events.ForgeEvents;
 import journeymap.server.properties.PropertiesManager;
@@ -66,7 +66,7 @@ public class JourneymapServer implements CommonProxy
     public void initialize(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new ForgeEvents());
-        PacketHandler.init(Side.SERVER);
+        NetworkHandler.init(Side.SERVER);
     }
 
     /**
@@ -138,7 +138,7 @@ public class JourneymapServer implements CommonProxy
     {
         if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
         {
-            PacketHandler.getInstance().sendPlayerWorldID(playerEntity);
+            NetworkHandler.getInstance().sendPlayerWorldID(playerEntity);
         }
     }
 

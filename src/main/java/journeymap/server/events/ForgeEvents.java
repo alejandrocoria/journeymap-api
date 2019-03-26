@@ -5,7 +5,7 @@
 
 package journeymap.server.events;
 
-import journeymap.common.network.PacketHandler;
+import journeymap.common.network.core.NetworkHandler;
 import journeymap.common.network.model.InitLogin;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -58,7 +58,7 @@ public class ForgeEvents
     {
         if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
         {
-            PacketHandler.getInstance().sendPlayerWorldID((EntityPlayerMP) player);
+            NetworkHandler.getInstance().sendPlayerWorldID((EntityPlayerMP) player);
         }
 
         InitLogin init = new InitLogin();
@@ -88,7 +88,7 @@ public class ForgeEvents
         {
             init.setTeleportEnabled(false);
         }
-        PacketHandler.getInstance().sendLoginPacket(player, init);
+        NetworkHandler.getInstance().sendLoginPacket(player, init);
     }
 
 }
