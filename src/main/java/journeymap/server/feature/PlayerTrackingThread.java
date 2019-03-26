@@ -50,7 +50,6 @@ public class PlayerTrackingThread implements Runnable
                 }
                 catch (NullPointerException npe)
                 {
-                    System.out.println("######################################## NULL");
                     // do nothing, server is likely not started yet.
                 }
                 Thread.sleep(updateTime);

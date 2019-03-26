@@ -9,9 +9,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * <p>
  * to send a request
  * NetworkExample example = new NetworkExample()
- * example.setRequest(JsonNode) (setting the request data is optional, if you send without setting the request it sends and empty json node)
- * example.send() //sends to player
- * example.sendToPlayer(PlayerEntityMP) // sends to the server
+ * example.setRequest(JsonNode) (setting the request data is optional, if you send without setting the request it sends an empty json node)
+ * example.send() //sends to server
+ * example.sendToPlayer(PlayerEntityMP) // sends to the player's client
  */
 public class NetworkExample extends MessageProcessor
 {
