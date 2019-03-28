@@ -30,7 +30,7 @@ public interface ByteUtils
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes)
         {
-            sb.append(b).append(delimiter);
+            sb.append(b & 0xFF).append(delimiter);
         }
         sb.replace(sb.length() - 1, sb.length(), "");
         return sb.toString();
@@ -64,4 +64,5 @@ public interface ByteUtils
         }
         return bytes;
     }
+
 }
