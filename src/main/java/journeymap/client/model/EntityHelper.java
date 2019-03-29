@@ -155,9 +155,9 @@ public class EntityHelper
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.world.playerEntities);
         allPlayers.remove(mc.player);
 
-        if (Journeymap.getClient().isServerEnabled() && Journeymap.getClient().isPlayerTrackingEnabled())
+        if (Journeymap.getClient().isJourneyMapServerConnection() && Journeymap.getClient().isPlayerTrackingEnabled())
         {
-            new WorldPlayers().send();
+            new WorldPlayers().send(null);
             allPlayers.addAll(getPlayersOnServer(allPlayers));
         }
 
@@ -206,7 +206,6 @@ public class EntityHelper
                 playerList.add(playerMp);
             }
         }
-
         // add fake players
         return playerList;
     }

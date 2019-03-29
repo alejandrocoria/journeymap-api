@@ -6,7 +6,7 @@
 package journeymap.common.command;
 
 import journeymap.common.feature.JourneyMapTeleport;
-import journeymap.common.network.model.Location;
+import journeymap.common.feature.Location;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -16,6 +16,8 @@ import net.minecraft.server.MinecraftServer;
 /**
  * Created by Mysticdrew on 9/15/2018.
  */
+// TODO: Remove for 1.13 update and use the packet instead.
+@Deprecated
 public class CommandJTP extends CommandBase
 {
 
@@ -53,7 +55,7 @@ public class CommandJTP extends CommandBase
             double z = Double.parseDouble(args[2]);
             int dim = Integer.parseInt(args[3]);
             Location location = new Location(x, y, z, dim);
-            JourneyMapTeleport.attemptTeleport(player, location);
+            JourneyMapTeleport.instance().attemptTeleport(player, location);
         }
         catch (NumberFormatException nfe)
         {

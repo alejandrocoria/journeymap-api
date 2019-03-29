@@ -10,7 +10,6 @@ import journeymap.common.Journeymap;
 import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.Version;
 import journeymap.server.events.ForgeEvents;
-import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -131,15 +130,6 @@ public class JourneymapServer implements CommonProxy
     {
         // TODO: Make this configurable
         return false;
-    }
-
-    @Override
-    public void handleWorldIdMessage(String message, EntityPlayerMP playerEntity)
-    {
-        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
-        {
-            NetworkHandler.getInstance().sendPlayerWorldID(playerEntity);
-        }
     }
 
     @SideOnly(Side.SERVER)

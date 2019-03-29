@@ -7,7 +7,6 @@ package journeymap.common.feature;
 
 import com.mojang.authlib.GameProfile;
 import journeymap.common.Journeymap;
-import journeymap.common.network.model.Location;
 import journeymap.server.JourneymapServer;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.Entity;
@@ -30,7 +29,18 @@ import static journeymap.server.JourneymapServer.isOp;
  */
 public class JourneyMapTeleport
 {
-    public static boolean attemptTeleport(Entity entity, Location location)
+    private static final JourneyMapTeleport INSTANCE = new JourneyMapTeleport();
+
+    private JourneyMapTeleport()
+    {
+    }
+
+    public static JourneyMapTeleport instance()
+    {
+        return INSTANCE;
+    }
+
+    public boolean attemptTeleport(Entity entity, Location location)
     {
         MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
         boolean creative = false;
@@ -73,8 +83,8 @@ public class JourneyMapTeleport
                     || cheatMode
                     || isOp((EntityPlayerMP) entity))
             {
-                teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
-                return true;
+
+                return teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
             }
             else
             {
@@ -85,7 +95,7 @@ public class JourneyMapTeleport
         return false;
     }
 
-    private static boolean teleportEntity(MinecraftServer server, World destinationWorld, Entity entity, Location location, float yaw)
+    private boolean teleportEntity(MinecraftServer server, World destinationWorld, Entity entity, Location location, float yaw)
     {
         World startWorld = entity.world;
         boolean changedWorld = startWorld != destinationWorld;
@@ -130,7 +140,7 @@ public class JourneyMapTeleport
         return false;
     }
 
-    private static void transferPlayerToWorld(Entity entity, WorldServer toWorldIn)
+    private void transferPlayerToWorld(Entity entity, WorldServer toWorldIn)
     {
         entity.setLocationAndAngles(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D, entity.rotationYaw, entity.rotationPitch);
         toWorldIn.spawnEntity(entity);
@@ -138,13 +148,10 @@ public class JourneyMapTeleport
         entity.setWorld(toWorldIn);
     }
 
-    private static boolean debugOverride(Entity sender)
+    private boolean debugOverride(Entity sender)
     {
-        if ((JourneymapServer.DEV_MODE)
-                && ("mysticdrew".equalsIgnoreCase(sender.getName()) || "techbrew".equalsIgnoreCase(sender.getName())))
-        {
-            return true;
-        }
-        return false;
+        return (JourneymapServer.DEV_MODE)
+                && ("a4eb5569-bf38-3aef-bc21-2dbd73d30851".equalsIgnoreCase(sender.getUniqueID().toString())
+                || "a2039b6c-5a3d-407d-b49c-091405062b85".equalsIgnoreCase(sender.getUniqueID().toString()));
     }
 }

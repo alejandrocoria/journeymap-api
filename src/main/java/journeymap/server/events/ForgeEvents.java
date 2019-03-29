@@ -5,17 +5,13 @@
 
 package journeymap.server.events;
 
-import journeymap.common.network.impl.NetworkHandler;
-import journeymap.common.network.model.InitLogin;
-import journeymap.server.properties.PropertiesManager;
+import journeymap.common.network.Configuration;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import static journeymap.server.JourneymapServer.isOp;
 
 /**
  * Created by Mysticdrew on 5/5/2018.
@@ -28,7 +24,7 @@ public class ForgeEvents
     {
         if (event.getEntity() instanceof EntityPlayerMP)
         {
-//            sendPermissionsPacket((EntityPlayerMP) event.getEntity());
+
         }
     }
 
@@ -38,7 +34,7 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-//            sendPermissionsPacket((EntityPlayerMP) event.player);
+
         }
     }
 
@@ -48,47 +44,8 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-            sendLoginPacket((EntityPlayerMP) event.player);
-//            sendPermissionsPacket((EntityPlayerMP) event.player);
+            new Configuration().sendToPlayer(null, (EntityPlayerMP) event.player);
         }
-    }
-
-
-    private void sendLoginPacket(EntityPlayerMP player)
-    {
-        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
-        {
-            NetworkHandler.getInstance().sendPlayerWorldID((EntityPlayerMP) player);
-        }
-
-        InitLogin init = new InitLogin();
-
-        if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get())
-        {
-            init.setTeleportEnabled(true);
-        }
-        else if (isOp(player))
-        {
-            init.setTeleportEnabled(true);
-        }
-        else
-        {
-            init.setTeleportEnabled(false);
-        }
-
-        if (PropertiesManager.getInstance().getGlobalProperties().playerTrackingEnabled.get())
-        {
-            init.setTeleportEnabled(true);
-        }
-        else if (PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get())
-        {
-            init.setTeleportEnabled(true);
-        }
-        else
-        {
-            init.setTeleportEnabled(false);
-        }
-        NetworkHandler.getInstance().sendLoginPacket(player, init);
     }
 
 }

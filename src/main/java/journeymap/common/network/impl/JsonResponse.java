@@ -25,7 +25,7 @@ public class JsonResponse implements Response<JsonObject>
     @Override
     public String getAsString()
     {
-        return rawResponse.get(DATA_KEY).getAsString();
+        return rawResponse.get(DATA_KEY).toString();
     }
 
     @Override

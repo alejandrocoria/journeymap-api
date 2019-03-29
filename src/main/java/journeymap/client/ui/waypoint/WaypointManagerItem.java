@@ -80,7 +80,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport"));
         JourneymapClient jm = Journeymap.getClient();
 
-        if (jm.isServerEnabled())
+        if (jm.isJourneyMapServerConnection())
         {
             buttonTeleport.setDrawButton(jm.isServerTeleportEnabled());
             buttonTeleport.setEnabled(jm.isServerTeleportEnabled());

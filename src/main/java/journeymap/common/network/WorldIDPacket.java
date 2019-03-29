@@ -71,8 +71,10 @@ public class WorldIDPacket implements IMessage
         @Override
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
-            Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
-//            Journeymap.getClient().setServerEnabled(true);
+            if (ctx.side.isClient())
+            {
+                Journeymap.getClient().setCurrentWorldId(message.getWorldID());
+            }
             return null;
         }
     }

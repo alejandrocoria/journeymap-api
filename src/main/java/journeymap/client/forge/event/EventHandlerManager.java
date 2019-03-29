@@ -46,6 +46,7 @@ public class EventHandlerManager
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
         register(new MiniMapOverlayHandler());
+        register(new PlayerConnectHandler());
 
         // TODO: At one point forcing this to be classloaded was necessary.  Still needed?
         ColorManager.INSTANCE.getDeclaringClass();

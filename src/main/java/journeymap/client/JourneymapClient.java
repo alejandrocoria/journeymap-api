@@ -12,6 +12,7 @@ import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.data.DataCache;
+import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
@@ -21,7 +22,6 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
 import journeymap.client.model.RegionImageCache;
-import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.MiniMapProperties;
@@ -43,11 +43,13 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
+import journeymap.common.network.Configuration;
 import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.VersionCheck;
+import journeymap.server.properties.DimensionProperties;
+import journeymap.server.properties.PermissionProperties;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -76,7 +78,8 @@ public class JourneymapClient implements CommonProxy
 
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
-    private boolean serverEnabled = false;
+    private boolean journeyMapServerConnection = false;
+    private boolean forgeServerConnection = false;
     private boolean playerTrackingEnabled = false;
     private boolean serverTeleportEnabled = false;
 
@@ -523,9 +526,21 @@ public class JourneymapClient implements CommonProxy
                     memory));
 
             // request permissions
-            if (serverEnabled)
+            if (isJourneyMapServerConnection())
             {
-                NetworkHandler.getInstance().requestPermissions();
+                new Configuration().send(null, response -> {
+                    JsonObject settings = response.getAsJson().get("settings").getAsJsonObject();
+                    if (settings.get("world_id") != null)
+                    {
+                        setCurrentWorldId(settings.get("world_id").getAsString());
+                    }
+                    setServerTeleportEnabled(settings.get("can_teleport").getAsBoolean());
+                    setPlayerTrackingEnabled(settings.get("can_track").getAsBoolean());
+                    setJourneyMapServerConnection(true);
+                    String dimProperties = response.getAsJson().get("dim").getAsString();
+                    PermissionProperties prop = new DimensionProperties(0).load(dimProperties, false);
+                    FeatureManager.INSTANCE.updateDimensionFeatures(prop);
+                });
             }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
             UIManager.INSTANCE.getMiniMap().reset();
@@ -577,7 +592,13 @@ public class JourneymapClient implements CommonProxy
     {
         if (!FMLClientHandler.instance().getClient().isSingleplayer() && currentWorldId == null)
         {
-            WorldInfoHandler.requestWorldID();
+            new Configuration().send(null, response -> {
+                JsonObject settings = response.getAsJson().get("settings").getAsJsonObject();
+                if (settings.get("world_id") != null)
+                {
+                    setCurrentWorldId(settings.get("world_id").getAsString());
+                }
+            });
         }
 
         loadConfigProperties();
@@ -699,18 +720,6 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
-     * Handling of the worldIdPacket message.
-     *
-     * @param worldId
-     * @param playerEntity
-     */
-    @Override
-    public void handleWorldIdMessage(String worldId, EntityPlayerMP playerEntity)
-    {
-        setCurrentWorldId(worldId);
-    }
-
-    /**
      * Get the current world id.  May be null.
      *
      * @return
@@ -753,9 +762,24 @@ public class JourneymapClient implements CommonProxy
         }
     }
 
-    public boolean isServerEnabled()
+    public boolean isForgeServerConnection()
     {
-        return serverEnabled;
+        return forgeServerConnection;
+    }
+
+    public void setForgeServerConnection(boolean forgeServerConnection)
+    {
+        this.forgeServerConnection = forgeServerConnection;
+    }
+
+    public boolean isJourneyMapServerConnection()
+    {
+        return journeyMapServerConnection;
+    }
+
+    public void setJourneyMapServerConnection(boolean journeyMapServerConnection)
+    {
+        this.journeyMapServerConnection = journeyMapServerConnection;
     }
 
     public boolean isPlayerTrackingEnabled()
@@ -768,10 +792,6 @@ public class JourneymapClient implements CommonProxy
         this.playerTrackingEnabled = playerTrackingEnabled;
     }
 
-    public void setServerEnabled(boolean serverEnabled)
-    {
-        this.serverEnabled = serverEnabled;
-    }
 
     public boolean isServerTeleportEnabled()
     {

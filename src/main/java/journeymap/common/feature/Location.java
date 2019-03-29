@@ -3,22 +3,15 @@
  * Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
 
-package journeymap.common.network.model;
+package journeymap.common.feature;
 
 import com.google.common.base.MoreObjects;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.Serializable;
 
 /**
  * Created by Mysticdrew on 9/16/2018.
  */
-public class Location implements Serializable
+public class Location
 {
-
-    public static final Gson GSON = new GsonBuilder().create();
-
 
     private double x;
 
