@@ -13,7 +13,7 @@ import static journeymap.common.network.impl.MessageProcessor.OBJECT_KEY;
 
 public class MessageListener implements IMessageHandler<Message, IMessage>
 {
-    Logger logger = Journeymap.getLogger();
+    private Logger logger = Journeymap.getLogger();
 
     @Override
     public IMessage onMessage(Message message, MessageContext ctx)

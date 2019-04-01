@@ -7,7 +7,6 @@ package journeymap.server;
 
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
-import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.Version;
 import journeymap.server.events.ForgeEvents;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -65,7 +64,6 @@ public class JourneymapServer implements CommonProxy
     public void initialize(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new ForgeEvents());
-        NetworkHandler.init(Side.SERVER);
     }
 
     /**

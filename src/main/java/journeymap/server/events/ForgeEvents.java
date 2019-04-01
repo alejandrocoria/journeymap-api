@@ -24,7 +24,7 @@ public class ForgeEvents
     {
         if (event.getEntity() instanceof EntityPlayerMP)
         {
-
+            // Not needed currently but not quite ready to delete.
         }
     }
 
@@ -34,7 +34,7 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-
+            // Not needed currently but not quite ready to delete.
         }
     }
 
@@ -44,6 +44,7 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
+            // Send a quick ping to the player to notify the server has JM installed.
             new Configuration().sendToPlayer(null, (EntityPlayerMP) event.player);
         }
     }

@@ -44,7 +44,6 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.network.Configuration;
-import journeymap.common.network.impl.NetworkHandler;
 import journeymap.common.version.VersionCheck;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PermissionProperties;
@@ -246,7 +245,6 @@ public class JourneymapClient implements CommonProxy
     @Override
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
-        NetworkHandler.init(Side.CLIENT);
         StatTimer timer = null;
         try
         {
@@ -511,13 +509,15 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.reset();
-            // make sure it only fires once and that snooper settings are enabled before reporting app view.
+
+            // Make sure it only fires once and that snooper settings are enabled before reporting app view.
             if (!modInfoReported && mc.gameSettings.snooperEnabled)
             {
-                // ModInfo with a single ping
+                // ModInfo with a single ping per install.
                 new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, true);
                 modInfoReported = true;
             }
+
             multithreadTaskController = new TaskController();
             multithreadTaskController.enableTasks();
 
