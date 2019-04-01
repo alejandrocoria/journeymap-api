@@ -82,6 +82,7 @@ public class JourneymapClient implements CommonProxy
     private boolean forgeServerConnection = false;
     private boolean playerTrackingEnabled = false;
     private boolean serverTeleportEnabled = false;
+    private boolean modInfoReported = false;
 
     // Properties & preferences
     private volatile CoreProperties coreProperties;
@@ -324,10 +325,6 @@ public class JourneymapClient implements CommonProxy
 
             VersionCheck.getVersionAvailable();
 
-            // ModInfo with a single ping
-            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, false);
-            modInfo.reportAppView();
-
             // Check if Pixelmon is loaded.
             String pixelmonModId = "Pixelmon";
             if (Loader.isModLoaded(pixelmonModId) || Loader.isModLoaded(pixelmonModId.toLowerCase()))
@@ -488,6 +485,8 @@ public class JourneymapClient implements CommonProxy
     {
         synchronized (this)
         {
+
+
             Minecraft mc = FMLClientHandler.instance().getClient();
 
             if (mc == null || mc.world == null || !initialized || !coreProperties.mappingEnabled.get())
@@ -512,7 +511,13 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.reset();
-
+            // make sure it only fires once and that snooper settings are enabled before reporting app view.
+            if (!modInfoReported && mc.gameSettings.snooperEnabled)
+            {
+                // ModInfo with a single ping
+                new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, true);
+                modInfoReported = true;
+            }
             multithreadTaskController = new TaskController();
             multithreadTaskController.enableTasks();
 

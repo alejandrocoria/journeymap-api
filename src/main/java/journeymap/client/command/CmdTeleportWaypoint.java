@@ -89,9 +89,21 @@ public class CmdTeleportWaypoint
             x = (x * 8);
             z = (z * 8);
         }
-        if (Journeymap.getClient().isJourneyMapServerConnection() || FMLClientHandler.instance().getClient().isSingleplayer()) {
+        if (Journeymap.getClient().isJourneyMapServerConnection() || FMLClientHandler.instance().getClient().isSingleplayer())
+        {
+            // This is the logic needed for 1.13+
+//            JsonObject object = new JsonObject();
+//            object.addProperty("x", x);
+//            object.addProperty("y", waypoint.getY());
+//            object.addProperty("z", z);
+//            object.addProperty("dim", dim.first());
+//            new Teleport().send(object);
+
+            // Remove in 1.13+ go to packet system.
             mc.player.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
-        } else {
+        }
+        else
+        {
             mc.player.sendChatMessage(String.format("/tp %s %s %s %s", mc.player.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
         }
     }
