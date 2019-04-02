@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LocationFormat
 {
-    private static String[] locationFormatIds = new String[]{"xzyv", "xyvz", "xzy", "xyz", "xz"};
+    private static String[] locationFormatIds = new String[]{"xzyv", "xyvz", "xzy", "xyz", "xz", "xzyvd", "xyvzd", "xzyd", "xyzd", "xzd", "d"};
     private HashMap<String, LocationFormatKeys> idToFormat = new HashMap<String, LocationFormatKeys>();
 
     public LocationFormat()
@@ -81,15 +81,16 @@ public class LocationFormat
             this.plain_key = String.format("jm.common.location_%s_plain", id);
         }
 
-        public String format(boolean verbose, int x, int z, int y, int vslice)
+        // with dimension
+        public String format(boolean verbose, int x, int z, int y, int vslice, int dim)
         {
             if (verbose)
             {
-                return Constants.getString(verbose_key, x, z, y, vslice);
+                return Constants.getString(verbose_key, x, z, y, vslice, dim);
             }
             else
             {
-                return Constants.getString(plain_key, x, z, y, vslice);
+                return Constants.getString(plain_key, x, z, y, vslice, dim);
             }
         }
     }

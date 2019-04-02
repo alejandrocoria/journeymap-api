@@ -120,7 +120,8 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                         blockPos.getX(),
                         blockPos.getZ(),
                         blockPos.getY(),
-                        (blockPos.getY() >> 4)) + " " + biome.getBiomeName();
+                        (blockPos.getY() >> 4),
+                        chunkMD.getDimension()) + " " + biome.getBiomeName();
 
                 if (!blockMD.isIgnore())
                 {

@@ -16,7 +16,9 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
-import journeymap.client.ui.component.*;
+import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.component.ScrollPane;
 import journeymap.client.ui.component.TextField;
 import journeymap.client.ui.fullscreen.Fullscreen;
@@ -123,7 +125,8 @@ public class WaypointEditor extends JmUI
                     MathHelper.floor(mc.player.posX),
                     MathHelper.floor(mc.player.posZ),
                     MathHelper.floor(mc.player.getEntityBoundingBox().minY),
-                    MathHelper.floor(mc.player.chunkCoordY));
+                    MathHelper.floor(mc.player.chunkCoordY),
+                    MathHelper.floor(mc.player.dimension));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())

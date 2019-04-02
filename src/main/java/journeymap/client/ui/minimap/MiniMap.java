@@ -17,7 +17,11 @@ import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.MiniMapProperties;
-import journeymap.client.render.draw.*;
+import journeymap.client.render.draw.DrawStep;
+import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.render.draw.DrawWayPointStep;
+import journeymap.client.render.draw.RadarDrawStepFactory;
+import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -748,7 +752,8 @@ public class MiniMap
         final int playerX = MathHelper.floor(mc.player.posX);
         final int playerZ = MathHelper.floor(mc.player.posZ);
         final int playerY = MathHelper.floor(mc.player.getEntityBoundingBox().minY);
-        return dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY);
+        final int playerDim = MathHelper.floor(mc.player.dimension);
+        return dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY, playerDim);
     }
 
     public String getBiome()

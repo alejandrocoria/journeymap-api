@@ -21,7 +21,11 @@ import journeymap.client.io.MapSaver;
 import journeymap.client.io.ThemeLoader;
 import journeymap.client.log.ChatLog;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.*;
+import journeymap.client.model.BlockMD;
+import journeymap.client.model.EntityDTO;
+import journeymap.client.model.MapState;
+import journeymap.client.model.MapType;
+import journeymap.client.model.Waypoint;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.MiniMapProperties;
@@ -35,7 +39,11 @@ import journeymap.client.task.main.EnsureCurrentColorsTask;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.task.multi.SaveMapTask;
 import journeymap.client.ui.UIManager;
-import journeymap.client.ui.component.*;
+import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.IntSliderButton;
+import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.dialog.AutoMapConfirmation;
 import journeymap.client.ui.dialog.DeleteMapConfirmation;
 import journeymap.client.ui.dialog.FullscreenActions;
@@ -1355,7 +1363,8 @@ public class Fullscreen extends JmUI implements ITabCompleter
                     MathHelper.floor(mc.player.posX),
                     MathHelper.floor(mc.player.posZ),
                     MathHelper.floor(mc.player.getEntityBoundingBox().minY),
-                    mc.player.chunkCoordY) + " " + state.getPlayerBiome();
+                    mc.player.chunkCoordY,
+                    MathHelper.floor(mc.player.dimension)) + " " + state.getPlayerBiome();
 
             // Reset timer
             state.updateLastRefresh();
