@@ -572,6 +572,7 @@ jm.webmap.worldname_text=World Name:
 jm.webmap.worldtime_text=World Time:
 jm.webmap.zoom_slider_name=Zoom
 
+key.journeymap.toggle_waypoints=Toggle all Waypoints
 key.journeymap.create_waypoint=Create Waypoint
 key.journeymap.day=Show Day Map
 key.journeymap.map_toggle=Fullscreen Map

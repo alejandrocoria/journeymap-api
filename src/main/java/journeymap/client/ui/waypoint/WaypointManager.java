@@ -11,7 +11,11 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.ClientCategory;
 import journeymap.client.ui.UIManager;
-import journeymap.client.ui.component.*;
+import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.component.OnOffButton;
+import journeymap.client.ui.component.ScrollListPane;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.SlotMetadata;
@@ -23,7 +27,12 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Waypoint Manager 2nd Edition
@@ -53,6 +62,7 @@ public class WaypointManager extends JmUI
     private ButtonList bottomButtons;
     private Waypoint focusWaypoint;
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
+    private static boolean toggled = true;
 
     public WaypointManager()
     {
@@ -467,6 +477,17 @@ public class WaypointManager extends JmUI
             }
         }
         return !enable;
+    }
+
+    public static void toggleAllWaypoints()
+    {
+        toggled = !toggled;
+        Collection<Waypoint> waypoints = WaypointStore.INSTANCE.getAll();
+        for (Waypoint waypoint : waypoints)
+        {
+            waypoint.setEnable(toggled);
+            waypoint.setDirty();
+        }
     }
 
     protected void updateItems()

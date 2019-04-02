@@ -15,6 +15,7 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.dialog.OptionsManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import journeymap.client.ui.waypoint.WaypointManager;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -66,6 +67,11 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
      * Create a waypoint in game
      */
     public KeyBinding kbCreateWaypoint;
+
+    /**
+     * Toggles all waypoints on or off.
+     */
+    public KeyBinding kbToggleAllWaypoints;
 
     /**
      * Create a waypoint in fullscreen
@@ -186,6 +192,12 @@ public enum KeyEventHandler implements EventHandlerManager.EventHandler
         kbCreateWaypoint = register("key.journeymap.create_waypoint", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_B);
         setAction(inGameActions, kbCreateWaypoint, () -> {
             UIManager.INSTANCE.openWaypointEditor(Waypoint.of(mc.player), true, null);
+        });
+
+        // Create a waypoint in game
+        kbToggleAllWaypoints = register("key.journeymap.toggle_waypoints", KeyConflictContext.IN_GAME, KeyModifier.NONE, Keyboard.KEY_Z);
+        setAction(inGameActions, kbToggleAllWaypoints, () -> {
+            WaypointManager.toggleAllWaypoints();
         });
 
         // Create a waypoint in fullscreen
