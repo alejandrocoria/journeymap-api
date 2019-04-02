@@ -29,12 +29,25 @@ import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -44,7 +57,7 @@ public class FileHandler
     public static final String DEV_MINECRAFT_DIR = "run/";
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/ui";
-
+    public static final Pattern PATTERN_WITH_UNICODE = Pattern.compile("[^\\w\\s\\p{L}]+", Pattern.UNICODE_CHARACTER_CLASS);
     public static final File MinecraftDirectory = getMinecraftDirectory();
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
@@ -54,7 +67,7 @@ public class FileHandler
     public static File getMinecraftDirectory()
     {
         Minecraft minecraft = FMLClientHandler.instance().getClient();
-        if(minecraft!=null)
+        if (minecraft != null)
         {
             return minecraft.mcDataDir;
         }
@@ -121,7 +134,7 @@ public class FileHandler
             // Normal dimensions handled this way
             if (dimension == -1 || dimension == 1)
             {
-                dimDir = new File(worldDir, "DIM" + dimString); 
+                dimDir = new File(worldDir, "DIM" + dimString);
             }
 
             // Custom dimensions handled this way
@@ -139,7 +152,7 @@ public class FileHandler
 
                 if (dims.length == 0)
                 {
-                    return new File(worldDir, "DIM" + dimString); 
+                    return new File(worldDir, "DIM" + dimString);
                 }
                 else if (dims.length == 1)
                 {
@@ -176,15 +189,7 @@ public class FileHandler
         {
             return null;
         }
-
-        if (!minecraft.isSingleplayer())
-        {
-            return getJMWorldDir(minecraft, Journeymap.getClient().getCurrentWorldId());
-        }
-        else
-        {
-            return getJMWorldDir(minecraft, null);
-        }
+        return getJMWorldDir(minecraft, Journeymap.getClient().getCurrentWorldId());
     }
 
     public static synchronized File getJMWorldDir(Minecraft minecraft, String worldId)
@@ -222,6 +227,8 @@ public class FileHandler
         return worldDirectory;
     }
 
+
+
     public static File getJMWorldDirForWorldId(Minecraft minecraft, String worldId)
     {
         if (minecraft == null || minecraft.world == null)
@@ -232,21 +239,21 @@ public class FileHandler
         File testWorldDirectory = null;
         try
         {
-            String worldName = WorldData.getWorldName(minecraft, false).replaceAll("[^\\w\\s]+", "~");
+            String worldName = WorldData.getWorldName(minecraft, false).replaceAll(PATTERN_WITH_UNICODE.pattern(), "~");
+
+            if (worldId != null)
+            {
+                worldId = worldId.replaceAll("\\W+", "~");
+            }
+            String suffix = (worldId != null) ? ("_" + worldId) : "";
 
             if (!minecraft.isSingleplayer())
             {
-                if (worldId != null)
-                {
-                    worldId = worldId.replaceAll("\\W+", "~");
-                }
-                String suffix = (worldId != null) ? ("_" + worldId) : "";
                 testWorldDirectory = new File(MinecraftDirectory, Constants.MP_DATA_DIR + worldName + suffix);
             }
             else
             {
-
-                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + worldName);
+                testWorldDirectory = new File(MinecraftDirectory, Constants.SP_DATA_DIR + worldName + suffix);
             }
         }
         catch (Exception e)
