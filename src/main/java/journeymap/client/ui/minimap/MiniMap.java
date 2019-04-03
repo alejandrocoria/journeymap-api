@@ -752,8 +752,7 @@ public class MiniMap
         final int playerX = MathHelper.floor(mc.player.posX);
         final int playerZ = MathHelper.floor(mc.player.posZ);
         final int playerY = MathHelper.floor(mc.player.getEntityBoundingBox().minY);
-        final int playerDim = MathHelper.floor(mc.player.dimension);
-        return dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY, playerDim);
+        return dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.player.chunkCoordY);
     }
 
     public String getBiome()

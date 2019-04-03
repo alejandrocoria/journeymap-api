@@ -10,6 +10,8 @@ import journeymap.client.data.DataCache;
 import journeymap.client.io.ThemeLoader;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
+import journeymap.client.model.RegionCoord;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
@@ -115,13 +117,13 @@ public class BlockInfoLayer implements LayerDelegate.Layer
                 }
 
                 Biome biome = JmBlockAccess.INSTANCE.getBiome(blockPos);
-
+                RegionCoord regionCoord = RegionCoord.fromChunkPos(null, MapType.none(), chunkMD.getChunk().x, chunkMD.getChunk().z);
+                String region = "Region: x:" + regionCoord.regionX + " z:" + regionCoord.regionZ;
                 info = locationFormatKeys.format(fullMapProperties.locationFormatVerbose.get(),
                         blockPos.getX(),
                         blockPos.getZ(),
                         blockPos.getY(),
-                        (blockPos.getY() >> 4),
-                        chunkMD.getDimension()) + " " + biome.getBiomeName();
+                        (blockPos.getY() >> 4)) + " " + biome.getBiomeName() + " " + region;
 
                 if (!blockMD.isIgnore())
                 {

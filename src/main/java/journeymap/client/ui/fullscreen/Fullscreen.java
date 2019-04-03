@@ -1363,8 +1363,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
                     MathHelper.floor(mc.player.posX),
                     MathHelper.floor(mc.player.posZ),
                     MathHelper.floor(mc.player.getEntityBoundingBox().minY),
-                    mc.player.chunkCoordY,
-                    MathHelper.floor(mc.player.dimension)) + " " + state.getPlayerBiome();
+                    mc.player.chunkCoordY) + " " + state.getPlayerBiome();
 
             // Reset timer
             state.updateLastRefresh();

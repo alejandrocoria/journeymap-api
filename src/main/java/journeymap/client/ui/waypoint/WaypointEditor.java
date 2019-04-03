@@ -125,8 +125,7 @@ public class WaypointEditor extends JmUI
                     MathHelper.floor(mc.player.posX),
                     MathHelper.floor(mc.player.posZ),
                     MathHelper.floor(mc.player.getEntityBoundingBox().minY),
-                    MathHelper.floor(mc.player.chunkCoordY),
-                    MathHelper.floor(mc.player.dimension));
+                    MathHelper.floor(mc.player.chunkCoordY));
             currentLocation = Constants.getString("jm.waypoint.current_location", " " + pos);
 
             if (this.fieldList.isEmpty())

@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LocationFormat
 {
-    private static String[] locationFormatIds = new String[]{"xzyv", "xyvz", "xzy", "xyz", "xz", "xzyvd", "xyvzd", "xzyd", "xyzd", "xzd", "d"};
+    private static String[] locationFormatIds = new String[]{"xzyv", "xyvz", "xzy", "xyz", "xz"};
     private HashMap<String, LocationFormatKeys> idToFormat = new HashMap<String, LocationFormatKeys>();
 
     public LocationFormat()
@@ -82,15 +82,15 @@ public class LocationFormat
         }
 
         // with dimension
-        public String format(boolean verbose, int x, int z, int y, int vslice, int dim)
+        public String format(boolean verbose, int x, int z, int y, int vslice)
         {
             if (verbose)
             {
-                return Constants.getString(verbose_key, x, z, y, vslice, dim);
+                return Constants.getString(verbose_key, x, z, y, vslice);
             }
             else
             {
-                return Constants.getString(plain_key, x, z, y, vslice, dim);
+                return Constants.getString(plain_key, x, z, y, vslice);
             }
         }
     }

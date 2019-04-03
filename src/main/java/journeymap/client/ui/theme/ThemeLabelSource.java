@@ -7,9 +7,15 @@ package journeymap.client.ui.theme;
 
 import journeymap.client.Constants;
 import journeymap.client.data.WorldData;
+import journeymap.client.model.MapType;
+import journeymap.client.model.RegionCoord;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.option.KeyedEnum;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,6 +33,9 @@ public enum ThemeLabelSource implements KeyedEnum
     RealTime("jm.theme.labelsource.realtime", 0, 1000, ThemeLabelSource::getRealTime),
     Location("jm.theme.labelsource.location", 1000, 1, ThemeLabelSource::getLocation),
     Biome("jm.theme.labelsource.biome", 1000, 1, ThemeLabelSource::getBiome),
+    Dimension("jm.theme.labelsource.dimension", 1000, 1, ThemeLabelSource::getDimension),
+    Region("jm.theme.labelsource.region", 1000, 1, ThemeLabelSource::getRegion),
+    LightLevel("jm.theme.labelsource.lightlevel", 100, 100, ThemeLabelSource::getLightLevel),
     Blank("jm.theme.labelsource.blank", 0, 1, () -> "");
 
     private static DateFormat timeFormat = new SimpleDateFormat("h:mm:ss a");
@@ -123,5 +132,30 @@ public enum ThemeLabelSource implements KeyedEnum
     private static String getBiome()
     {
         return UIManager.INSTANCE.getMiniMap().getBiome();
+    }
+
+    private static String getDimension()
+    {
+        return "Dim: " + Minecraft.getMinecraft().player.dimension;
+    }
+
+    private static String getLightLevel()
+    {
+        BlockPos blockpos = Minecraft.getMinecraft().player.getPosition();
+        World world = Minecraft.getMinecraft().world;
+        Chunk chunk = world.getChunkFromBlockCoords(blockpos);
+        int light = chunk.getLightSubtracted(blockpos, 0);
+        int lightSky = chunk.getLightFor(EnumSkyBlock.SKY, blockpos);
+        int lightBlock = chunk.getLightFor(EnumSkyBlock.BLOCK, blockpos);
+        String lightLevels = String.format("Light: %s (%s sky, %s block)", light, lightSky, lightBlock);
+        return lightLevels;
+    }
+
+    private static String getRegion()
+    {
+        BlockPos blockpos = Minecraft.getMinecraft().player.getPosition();
+        Chunk chunk = Minecraft.getMinecraft().world.getChunkFromBlockCoords(blockpos);
+        RegionCoord regionCoord = RegionCoord.fromChunkPos(null, MapType.none(), chunk.x, chunk.z);
+        return "Region: x:" + regionCoord.regionX + " z:" + regionCoord.regionZ;
     }
 }
