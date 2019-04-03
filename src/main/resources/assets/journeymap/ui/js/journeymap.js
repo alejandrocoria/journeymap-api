@@ -1168,7 +1168,8 @@ var JourneyMap = (function() {
 		// Check current entity position		
 		var pos = blockPosToLatLng(entity.posX, entity.posZ);
 		if(!map.getBounds().contains(pos)) {
-			return; // Don't bother with marker
+			// !map.getBounds().contains(pos) is always returning false so ignore for now.
+			//return; // Don't bother with marker
 		}
 		
 		var id = 'id' + entity.entityId;
@@ -1349,7 +1350,8 @@ var JourneyMap = (function() {
         var pos = blockPosToLatLng(x, z);
 
 		if(!map.getBounds().contains(pos)) {
-			return; // Don't bother with marker
+			// !map.getBounds().contains(pos) is always returning false so ignore for now.
+			//return; // Don't bother with marker
 			// TODO: Put on edge of map as an arrow?
 		}
 
