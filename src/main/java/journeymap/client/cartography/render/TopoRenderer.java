@@ -8,7 +8,11 @@ package journeymap.client.cartography.render;
 import journeymap.client.cartography.IChunkRenderer;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.*;
+import journeymap.client.model.BlockCoordIntPair;
+import journeymap.client.model.BlockFlag;
+import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
+import journeymap.client.model.MapType;
 import journeymap.client.properties.TopoProperties;
 import journeymap.client.render.ComparableBufferedImage;
 import journeymap.common.Journeymap;
@@ -227,9 +231,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     {
                         break;
                     }
-                } else if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop)) {
+                }
+                else if (blockMD.hasAnyFlag(BlockMD.FlagsPlantAndCrop))
+                {
                     // ignore
-                } else if (!blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.NoTopo))
+                }
+                else if (!blockMD.isIgnore() && !blockMD.hasFlag(BlockFlag.NoTopo))
                 {
                     break;
                 }
@@ -386,11 +393,12 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             float slope = getSlope(chunkMd, x, null, z);
             boolean isWater = topBlockMd.isWater() || topBlockMd.isIce();
 
-            int color;
-            if (slope > 1)
+            Integer color;
+            if (slope > 1 && (waterContourColor != null && landContourColor != null))
             {
                 // Contour lines between intervals
                 color = isWater ? waterContourColor : landContourColor;
+
             }
             else
             {
@@ -401,7 +409,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                 }
                 else if (isWater)
                 {
-                    if (getShore(chunkMd)[z][x] == Boolean.TRUE)
+                    if (getShore(chunkMd)[z][x] == Boolean.TRUE && waterContourColor != null)
                     {
                         // water is touching land, use the contour color
                         color = waterContourColor;
@@ -432,7 +440,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
                     color = landPalette[index];
 
                     // Darken downhill of contour line
-                    if (slope < 1)
+                    if (slope < 1 && (waterContourColor != null && landContourColor != null))
                     {
                         color = RGB.adjustBrightness(color, .85f);
                     }
