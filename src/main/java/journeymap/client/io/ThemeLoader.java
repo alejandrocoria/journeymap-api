@@ -25,7 +25,11 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -373,10 +377,11 @@ public class ThemeLoader
 
         if (theme == null)
         {
-            if (pointer != null)
-            {
-                JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
-            }
+            // Is this needed anymore.
+//            if (pointer != null)
+//            {
+//                JMLogger.logOnce(String.format("Default theme not found in %s: %s", themeFile, pointer.name), null);
+//            }
             theme = ThemePresets.getDefault();
         }
         return theme;
