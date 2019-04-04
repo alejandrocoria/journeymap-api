@@ -27,8 +27,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Texture management
@@ -50,6 +58,14 @@ public class TextureCache
      * The constant GridSquares.
      */
     public static final ResourceLocation GridSquares = uiImage("grid.png");
+    /**
+     * The constant GridSquaresWithRegionOutline.
+     */
+    public static final ResourceLocation GridRegionSquares = uiImage("grid-region.png");
+    /**
+     * The constant GridSquaresWithRegionOutline.
+     */
+    public static final ResourceLocation GridRegion = uiImage("region.png");
     /**
      * The constant ColorPicker.
      */
@@ -230,13 +246,13 @@ public class TextureCache
     {
         playerSkins.clear();
 
-        Arrays.asList(ColorPicker, ColorPicker2, Deathpoint, GridCheckers, GridDots, GridSquares, Logo,
+        Arrays.asList(ColorPicker, ColorPicker2, Deathpoint, GridCheckers, GridDots, GridSquares, GridRegionSquares, GridRegion, Logo,
                 MinimapSquare128, MinimapSquare256, MinimapSquare512, MobDot, MobDot_Large, MobDotArrow,
                 MobDotArrow_Large, MobDotChevron, MobDotChevron_Large, MobIconArrow_Large, Patreon, PlayerArrow,
                 PlayerArrow_Large, PlayerArrowBG, PlayerArrowBG, TileSampleDay, TileSampleNight, TileSampleUnderground,
                 UnknownEntity, Waypoint, WaypointEdit, WaypointOffscreen).stream().map(TextureCache::getTexture);
 
-        Arrays.asList(ColorPicker, ColorPicker2, GridCheckers, GridDots, GridSquares, TileSampleDay,
+        Arrays.asList(ColorPicker, ColorPicker2, GridCheckers, GridDots, GridSquares, GridRegion, GridRegionSquares, TileSampleDay,
                 TileSampleNight, TileSampleUnderground, UnknownEntity).stream().map(TextureCache::getTexture);
     }
 

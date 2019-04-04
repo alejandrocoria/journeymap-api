@@ -120,6 +120,8 @@ public class GridSpec
     public enum Style
     {
         Squares("jm.common.grid_style_squares", TextureCache.GridSquares),
+        SquaresWithRegion("jm.common.grid_style_squares_region", TextureCache.GridRegionSquares),
+        GridRegion("jm.common.grid_style_region",TextureCache.GridRegion),
         Dots("jm.common.grid_style_dots", TextureCache.GridDots),
         Checkers("jm.common.grid_style_checkers", TextureCache.GridCheckers);
 
