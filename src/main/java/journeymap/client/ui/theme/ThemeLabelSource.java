@@ -16,10 +16,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.function.Supplier;
 
 /**
@@ -30,6 +34,8 @@ public enum ThemeLabelSource implements KeyedEnum
 {
     FPS("jm.theme.labelsource.fps", 100, 1, ThemeLabelSource::getFps),
     GameTime("jm.theme.labelsource.gametime", 0, 1000, ThemeLabelSource::getGameTime),
+    GameTime12("jm.theme.labelsource.gametime12", 0, 1000, ThemeLabelSource::getGameTime12h),
+    GameTime24("jm.theme.labelsource.gametime24", 0, 1000, ThemeLabelSource::getGameTime24h),
     RealTime("jm.theme.labelsource.realtime", 0, 1000, ThemeLabelSource::getRealTime),
     Location("jm.theme.labelsource.location", 1000, 1, ThemeLabelSource::getLocation),
     Biome("jm.theme.labelsource.biome", 1000, 1, ThemeLabelSource::getBiome),
@@ -117,6 +123,47 @@ public enum ThemeLabelSource implements KeyedEnum
     private static String getGameTime()
     {
         return WorldData.getGameTime();
+    }
+
+    private static String getGameTime12h()
+    {
+        return getTime("h:mm:ss aa");
+    }
+
+    private static String getGameTime24h()
+    {
+        return getTime("HH:mm:ss");
+    }
+
+
+    //: TODO clean up!
+    // This is some pretty ugly code. Needs to be cleaned up!
+    private static String getTime(String format)
+    {
+        long time = (FMLClientHandler.instance().getClient().world.getWorldTime() % 24000L);
+        final int ticksAtMidnight = 18000;
+        final int ticksPerDay = 24000;
+        final int ticksPerHour = 1000;
+        final double ticksPerMinute = 1000d / 60d;
+        final double ticksPerSecond = 1000d / 60d / 60d;
+        final int offset = 6000;
+        time = time - ticksAtMidnight + ticksPerDay + offset;
+        time -= (time / ticksPerDay) * ticksPerDay;
+        final long hours = (time / ticksPerHour);
+        time -= (time / ticksPerHour) * ticksPerHour;
+        final long minutes = (long) Math.floor(time / ticksPerMinute);
+        final double dticks = time - minutes * ticksPerMinute;
+        final long seconds = (long) Math.floor(dticks / ticksPerSecond);
+        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ENGLISH);
+        cal.setLenient(true);
+        cal.set(0, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.add(Calendar.DAY_OF_YEAR, (int) (time / ticksPerDay));
+        cal.add(Calendar.HOUR_OF_DAY, (int) hours);
+        cal.add(Calendar.MINUTE, (int) minutes);
+        cal.add(Calendar.SECOND, (int) seconds);
+        Date date = cal.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
+        return sdf.format(date);
     }
 
     private static String getRealTime()
