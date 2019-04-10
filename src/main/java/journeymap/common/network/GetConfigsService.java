@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
+import journeymap.server.properties.DefaultDimensionProperties;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import static journeymap.common.Constants.ANIMAL_RADAR;
 import static journeymap.common.Constants.CAVE_MAP;
+import static journeymap.common.Constants.DEFAULT_DIM;
 import static journeymap.common.Constants.DIMENSIONS;
 import static journeymap.common.Constants.DIM_ID;
 import static journeymap.common.Constants.DIM_NAME;
@@ -60,38 +62,47 @@ public class GetConfigsService extends MessageProcessor
     {
         JsonObject serverConfigs = new JsonObject();
         JsonArray dimensionConfigs = new JsonArray();
-        JsonObject globalConfigs = new JsonObject();
+        JsonObject globalConfig = new JsonObject();
+        JsonObject defaultDimConfig = new JsonObject();
         Integer[] dimensions = DimensionManager.getStaticDimensionIDs();
         GlobalProperties globalProperties = PropertiesManager.getInstance().getGlobalProperties();
+        DefaultDimensionProperties defaultDimensionProperties = PropertiesManager.getInstance().getDefaultDimensionProperties();
 
-
-        globalConfigs.addProperty(TELEPORT, globalProperties.teleportEnabled.get());
+        // Global Properties.
+        globalConfig.addProperty(TELEPORT, globalProperties.teleportEnabled.get());
         if (!FMLCommonHandler.instance().getSide().isClient())
         {
-            globalConfigs.addProperty(USE_WORLD_ID, globalProperties.useWorldId.get());
-            globalConfigs.addProperty(WORLD_ID, new WorldNbtIDSaveHandler().getWorldID());
+            globalConfig.addProperty(USE_WORLD_ID, globalProperties.useWorldId.get());
+            globalConfig.addProperty(WORLD_ID, new WorldNbtIDSaveHandler().getWorldID());
         }
         else
         {
-            globalConfigs.addProperty(WORLD_ID, "Single Player");
+            globalConfig.addProperty(DIM_NAME, "global");
         }
-        globalConfigs.addProperty(OP_TRACKING, globalProperties.opPlayerTrackingEnabled.get());
-        globalConfigs.addProperty(TRACKING, globalProperties.playerTrackingEnabled.get());
-        globalConfigs.addProperty(TRACKING_TIME, globalProperties.playerTrackingUpdateTime.get());
-        getCommonProperties(globalProperties, globalConfigs);
+        globalConfig.addProperty(OP_TRACKING, globalProperties.opPlayerTrackingEnabled.get());
+        globalConfig.addProperty(TRACKING, globalProperties.playerTrackingEnabled.get());
+        globalConfig.addProperty(TRACKING_TIME, globalProperties.playerTrackingUpdateTime.get());
+        getCommonProperties(globalProperties, globalConfig);
+
+        // Default Dimension properties
+        defaultDimConfig.addProperty(ENABLED, defaultDimensionProperties.enabled.get());
+        defaultDimConfig.addProperty(TELEPORT, defaultDimensionProperties.teleportEnabled.get());
+        defaultDimConfig.addProperty(DIM_NAME, "default");
+        getCommonProperties(defaultDimensionProperties, defaultDimConfig);
 
         for (int d : dimensions)
         {
             JsonObject dim = new JsonObject();
             DimensionProperties dimensionProperties = PropertiesManager.getInstance().getDimProperties(d);
             dim.addProperty(ENABLED, dimensionProperties.enabled.get());
-            dim.addProperty(TELEPORT, true);
+            dim.addProperty(TELEPORT, dimensionProperties.teleportEnabled.get());
             dim.addProperty(DIM_ID, d);
             dim.addProperty(DIM_NAME, DimensionManager.getProviderType(d).getName());
             getCommonProperties(dimensionProperties, dim);
             dimensionConfigs.add(dim);
         }
-        serverConfigs.add(GLOBAL, globalConfigs);
+        serverConfigs.add(GLOBAL, globalConfig);
+        serverConfigs.add(DEFAULT_DIM, defaultDimConfig);
         serverConfigs.add(DIMENSIONS, dimensionConfigs);
         return serverConfigs;
     }

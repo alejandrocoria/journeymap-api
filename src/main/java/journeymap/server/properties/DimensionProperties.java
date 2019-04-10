@@ -41,19 +41,21 @@ public class DimensionProperties extends PermissionProperties
 
     public DimensionProperties build()
     {
-        GlobalProperties gProp = PropertiesManager.getInstance().getGlobalProperties();
-        this.opCaveMappingEnabled.set(gProp.opCaveMappingEnabled.get());
-        this.caveMappingEnabled.set(gProp.caveMappingEnabled.get());
-        this.opSurfaceMappingEnabled.set(gProp.opSurfaceMappingEnabled.get());
-        this.surfaceMappingEnabled.set(gProp.surfaceMappingEnabled.get());
-        this.opTopoMappingEnabled.set(gProp.opTopoMappingEnabled.get());
-        this.topoMappingEnabled.set(gProp.topoMappingEnabled.get());
-        this.opRadarEnabled.set(gProp.opRadarEnabled.get());
-        this.radarEnabled.set(gProp.radarEnabled.get());
-        this.playerRadarEnabled.set(gProp.playerRadarEnabled.get());
-        this.villagerRadarEnabled.set(gProp.villagerRadarEnabled.get());
-        this.animalRadarEnabled.set(gProp.animalRadarEnabled.get());
-        this.mobRadarEnabled.set(gProp.mobRadarEnabled.get());
+        DefaultDimensionProperties defaultProp = PropertiesManager.getInstance().getDefaultDimensionProperties();
+        this.teleportEnabled.set(defaultProp.teleportEnabled.get());
+        this.enabled.set(defaultProp.enabled.get());
+        this.opCaveMappingEnabled.set(defaultProp.opCaveMappingEnabled.get());
+        this.caveMappingEnabled.set(defaultProp.caveMappingEnabled.get());
+        this.opSurfaceMappingEnabled.set(defaultProp.opSurfaceMappingEnabled.get());
+        this.surfaceMappingEnabled.set(defaultProp.surfaceMappingEnabled.get());
+        this.opTopoMappingEnabled.set(defaultProp.opTopoMappingEnabled.get());
+        this.topoMappingEnabled.set(defaultProp.topoMappingEnabled.get());
+        this.opRadarEnabled.set(defaultProp.opRadarEnabled.get());
+        this.radarEnabled.set(defaultProp.radarEnabled.get());
+        this.playerRadarEnabled.set(defaultProp.playerRadarEnabled.get());
+        this.villagerRadarEnabled.set(defaultProp.villagerRadarEnabled.get());
+        this.animalRadarEnabled.set(defaultProp.animalRadarEnabled.get());
+        this.mobRadarEnabled.set(defaultProp.mobRadarEnabled.get());
         this.save();
         return this;
     }

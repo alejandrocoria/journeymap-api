@@ -41,6 +41,7 @@ public class CmdTeleportWaypoint
                 profile = new GameProfile(mc.player.getUniqueID(), mc.player.getName());
                 configurationManager = mcServer.getPlayerList();
 
+                // if on a server that does not have JM on the server.
                 return configurationManager.canSendCommands(profile) || Journeymap.getClient().isTeleportEnabled();
             }
             catch (Exception e)
@@ -66,6 +67,13 @@ public class CmdTeleportWaypoint
             }
         }
 
+        // server connection has JMServer
+        if (Journeymap.getClient().isJourneyMapServerConnection())
+        {
+            return Journeymap.getClient().isTeleportEnabled();
+        }
+
+        // return true because we are on a server with out JM and have no idea if we can tp or not.
         return true;
     }
 
@@ -89,10 +97,10 @@ public class CmdTeleportWaypoint
         {
             // This is the logic needed for 1.13+
 //            JsonObject object = new JsonObject();
-//            object.addProperty("x", x);
-//            object.addProperty("y", waypoint.getY());
-//            object.addProperty("z", z);
-//            object.addProperty("dim", dim.first());
+//            object.addProperty(X, x);
+//            object.addProperty(Y, waypoint.getY());
+//            object.addProperty(Z, z);
+//            object.addProperty(DIM, dim.first());
 //            new Teleport().send(object);
 
             // Remove in 1.13+ go to packet system.

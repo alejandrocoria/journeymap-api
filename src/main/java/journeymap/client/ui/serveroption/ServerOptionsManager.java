@@ -14,6 +14,7 @@ import journeymap.client.ui.component.Label;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.network.GetConfigsService;
+import journeymap.common.network.UpdateConfigsService;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static journeymap.common.Constants.DEFAULT_DIM;
 import static journeymap.common.Constants.DIMENSIONS;
 import static journeymap.common.Constants.GLOBAL;
 import static journeymap.common.Constants.WORLD_ID;
@@ -29,6 +31,7 @@ public class ServerOptionsManager extends JmUI
 {
     private int index = 0;
     private JsonObject global;
+    private JsonObject defaultDimension;
     private Map<Integer, JsonObject> dimensionMap;
     private List<String> dimIndexList;
     private JsonObject activeProperty;
@@ -81,6 +84,12 @@ public class ServerOptionsManager extends JmUI
                     this.labelSelector.setHAlign(DrawUtil.HAlign.Center);
                 }
 
+                if (result.getAsJson().get(DEFAULT_DIM) != null)
+                {
+                    this.dimIndexList.add(DEFAULT_DIM);
+                    this.defaultDimension = result.getAsJson().get(DEFAULT_DIM).getAsJsonObject();
+                }
+
                 if (result.getAsJson().get(DIMENSIONS) != null)
                 {
                     this.dimensionMap = buildDimensionMap(result.getAsJson().getAsJsonArray(DIMENSIONS));
@@ -129,7 +138,14 @@ public class ServerOptionsManager extends JmUI
                 buttonPrevious.setWidth(buttonNext.getWidth());
 
                 topButtons = new ButtonList(buttonPrevious, labelSelector, buttonNext);
-                labelWorldId = new Label(304, "jm.server.edit.label.worldId", global.get(WORLD_ID).getAsString());
+                if (global.get(WORLD_ID) != null)
+                {
+                    labelWorldId = new Label(304, "jm.server.edit.label.worldId", global.get(WORLD_ID).getAsString());
+                }
+                else
+                {
+                    labelWorldId = new Label(40, "SinglePlayer");
+                }
                 labelWorldId.setHAlign(DrawUtil.HAlign.Center);
                 labelWorldId.setWidth(labelWorldId.getFitWidth(getFontRenderer()));
                 buttonSave = new Button(Constants.getString("jm.waypoint.save"));
@@ -242,6 +258,7 @@ public class ServerOptionsManager extends JmUI
         }
         updatedProperties.add(DIMENSIONS, dims);
 
+        new UpdateConfigsService().send(updatedProperties);
         // send to server.
     }
 
@@ -259,6 +276,11 @@ public class ServerOptionsManager extends JmUI
         {
             labelSelector.displayString = "Global";
             this.activeProperty = global;
+        }
+        else if (index == 1)
+        {
+            labelSelector.displayString = "Default Dimension";
+            this.activeProperty = defaultDimension;
         }
         else
         {

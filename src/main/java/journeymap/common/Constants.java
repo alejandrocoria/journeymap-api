@@ -24,9 +24,14 @@ public interface Constants
     String OP_CAVE_MAP = "op_cave";
     String GLOBAL = "global";
     String DIMENSIONS = "dimensions";
+    String DEFAULT_DIM = "default_dimension";
     String DIM_ID = "dimId";
     String DIM_NAME = "dimName";
     String SETTINGS = "settings";
     String DIM = "dim";
+    String X = "x";
+    String Y = "y";
+    String Z = "z";
+
 
 }

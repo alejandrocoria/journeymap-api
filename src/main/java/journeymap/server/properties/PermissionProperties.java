@@ -13,6 +13,10 @@ import journeymap.common.properties.config.BooleanField;
 public abstract class PermissionProperties extends ServerPropertiesBase
 {
     /**
+     * Teleport enabled to, from, inside dimension.
+     */
+    public final BooleanField teleportEnabled = new BooleanField(ServerCategory.General, "Enable Players to teleport", false);
+    /**
      * Op surface mapping enabled.
      */
     public final BooleanField opSurfaceMappingEnabled = new BooleanField(ServerCategory.Surface, "Enable Op surface maps", true);

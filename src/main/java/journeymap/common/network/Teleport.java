@@ -6,6 +6,11 @@ import journeymap.common.feature.Location;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
 
+import static journeymap.common.Constants.DIM;
+import static journeymap.common.Constants.X;
+import static journeymap.common.Constants.Y;
+import static journeymap.common.Constants.Z;
+
 public class Teleport extends MessageProcessor
 {
     @Override
@@ -14,10 +19,10 @@ public class Teleport extends MessageProcessor
         JsonObject jsonObject = response.getAsJson();
 
         Location location = new Location(
-                jsonObject.get("x").getAsDouble(),
-                jsonObject.get("y").getAsDouble(),
-                jsonObject.get("z").getAsDouble(),
-                jsonObject.get("dim").getAsInt()
+                jsonObject.get(X).getAsDouble(),
+                jsonObject.get(Y).getAsDouble(),
+                jsonObject.get(Z).getAsDouble(),
+                jsonObject.get(DIM).getAsInt()
         );
         JourneyMapTeleport.instance().attemptTeleport(response.getContext().getServerHandler().player, location);
         return null;

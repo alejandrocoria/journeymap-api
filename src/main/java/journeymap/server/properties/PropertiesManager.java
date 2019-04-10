@@ -19,6 +19,8 @@ public class PropertiesManager
     private Map<Integer, DimensionProperties> dimensionProperties;
     private GlobalProperties globalProperties;
 
+    private DefaultDimensionProperties defaultDimensionProperties;
+
     public static PropertiesManager getInstance()
     {
         if (INSTANCE == null)
@@ -34,6 +36,8 @@ public class PropertiesManager
         dimensionProperties = new HashMap<>();
         globalProperties = new GlobalProperties();
         globalProperties.load();
+        defaultDimensionProperties = new DefaultDimensionProperties();
+        defaultDimensionProperties.load();
 
         for (Integer dim : DimensionManager.getIDs())
         {
@@ -48,6 +52,11 @@ public class PropertiesManager
             genConfig(dim);
         }
         return dimensionProperties.get(dim);
+    }
+
+    public DefaultDimensionProperties getDefaultDimensionProperties()
+    {
+        return defaultDimensionProperties;
     }
 
     public GlobalProperties getGlobalProperties()

@@ -612,11 +612,10 @@ public class JourneymapClient implements CommonProxy
         if (!FMLClientHandler.instance().getClient().isSingleplayer() && currentWorldId == null)
         {
             new Configuration().send(null, response -> {
-                JsonObject settings = response.getAsJson().get("settings").getAsJsonObject();
-                if (settings.get("world_id") != null)
+                JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
+                if (settings.get(WORLD_ID) != null)
                 {
-                    System.out.println("Getting World Id");
-                    setCurrentWorldId(settings.get("world_id").getAsString());
+                    setCurrentWorldId(settings.get(WORLD_ID).getAsString());
                 }
             });
         }

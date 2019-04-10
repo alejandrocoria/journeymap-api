@@ -12,6 +12,11 @@ import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import static journeymap.common.Constants.DIM;
+import static journeymap.common.Constants.SETTINGS;
+import static journeymap.common.Constants.TELEPORT;
+import static journeymap.common.Constants.TRACKING;
+import static journeymap.common.Constants.WORLD_ID;
 import static journeymap.server.JourneymapServer.isOp;
 
 public class Configuration extends MessageProcessor
@@ -26,12 +31,12 @@ public class Configuration extends MessageProcessor
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
             String worldID = worldSaveHandler.getWorldID();
-            settings.addProperty("world_id", worldID);
+            settings.addProperty(WORLD_ID, worldID);
         }
-        settings.addProperty("can_teleport", canTeleport(player));
-        settings.addProperty("can_track", canPlayerTrack(player));
-        reply.add("settings", settings);
-        reply.addProperty("dim", getDimProperties(player));
+        settings.addProperty(TELEPORT, canTeleport(player));
+        settings.addProperty(TRACKING, canPlayerTrack(player));
+        reply.add(SETTINGS, settings);
+        reply.addProperty(DIM, getDimProperties(player));
         return reply;
     }
 
@@ -76,7 +81,11 @@ public class Configuration extends MessageProcessor
 
     private boolean canTeleport(EntityPlayerMP player)
     {
-        if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get())
+        if (PropertiesManager.getInstance().getDimProperties(player.dimension).enabled.get())
+        {
+            return PropertiesManager.getInstance().getDimProperties(player.dimension).teleportEnabled.get();
+        }
+        else if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get())
         {
             return true;
         }

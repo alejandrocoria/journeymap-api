@@ -8,6 +8,7 @@ package journeymap.common.feature;
 import com.mojang.authlib.GameProfile;
 import journeymap.common.Journeymap;
 import journeymap.server.JourneymapServer;
+import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,7 +58,6 @@ public class JourneyMapTeleport
             creative = ((EntityPlayerMP) entity).capabilities.isCreativeMode;
             cheatMode = mcServer.getPlayerList().canSendCommands(new GameProfile(entity.getUniqueID(), entity.getName()));
 
-
             if (mcServer == null)
             {
                 entity.sendMessage(new TextComponentString("Cannot Find World"));
@@ -77,7 +77,7 @@ public class JourneyMapTeleport
                 return false;
             }
 
-            if (PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get()
+            if (isTeleportAvailable(entity, location)
                     || debugOverride(entity)
                     || creative
                     || cheatMode
@@ -88,12 +88,29 @@ public class JourneyMapTeleport
             }
             else
             {
-                entity.sendMessage(new TextComponentString("Server has disabled JourneyMap teleporting."));
+                entity.sendMessage(new TextComponentString("Server has disabled JourneyMap teleport usage for your current or destination dimension."));
                 return false;
             }
         }
         return false;
     }
+
+    private boolean isTeleportAvailable(Entity entity, Location location)
+    {
+        DimensionProperties destinationProperty = PropertiesManager.getInstance().getDimProperties(location.getDim());
+        DimensionProperties entityLocationProperty = PropertiesManager.getInstance().getDimProperties(entity.dimension);
+        return canDimTeleport(destinationProperty) && canDimTeleport(entityLocationProperty);
+    }
+
+    private boolean canDimTeleport(DimensionProperties properties)
+    {
+        if (properties.enabled.get())
+        {
+            return properties.teleportEnabled.get();
+        }
+        return PropertiesManager.getInstance().getGlobalProperties().teleportEnabled.get();
+    }
+
 
     private boolean teleportEntity(MinecraftServer server, World destinationWorld, Entity entity, Location location, float yaw)
     {
