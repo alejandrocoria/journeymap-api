@@ -5,12 +5,16 @@
 
 package journeymap.server;
 
+import com.mojang.authlib.GameProfile;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.version.Version;
 import journeymap.server.events.ForgeEvents;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -130,9 +134,16 @@ public class JourneymapServer implements CommonProxy
         return false;
     }
 
-    @SideOnly(Side.SERVER)
-    public static boolean isOp(EntityPlayerMP player)
+    public static boolean isOp(EntityPlayer player)
     {
+        if (Side.CLIENT.equals(FMLCommonHandler.instance().getSide()))
+        {
+            MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
+            boolean creative = ((EntityPlayerMP) player).capabilities.isCreativeMode;
+            boolean cheatMode = mcServer.getPlayerList().canSendCommands(new GameProfile(player.getUniqueID(), player.getName()));
+            return creative || cheatMode;
+        }
+
         String[] ops = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayerNames();
         for (String opName : ops)
         {

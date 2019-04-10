@@ -6,7 +6,6 @@
 package journeymap.client.ui.waypoint;
 
 import journeymap.client.Constants;
-import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.model.Waypoint;
@@ -20,7 +19,6 @@ import journeymap.client.ui.component.ScrollListPane;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
-import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -78,18 +76,9 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         buttonFind = new Button(Constants.getString("jm.waypoint.find"));
 
         buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport"));
-        JourneymapClient jm = Journeymap.getClient();
 
-        if (jm.isJourneyMapServerConnection())
-        {
-            buttonTeleport.setDrawButton(jm.isServerTeleportEnabled());
-            buttonTeleport.setEnabled(jm.isServerTeleportEnabled());
-        }
-        else
-        {
-            buttonTeleport.setDrawButton(manager.canUserTeleport);
-            buttonTeleport.setEnabled(manager.canUserTeleport);
-        }
+        buttonTeleport.setDrawButton(manager.canUserTeleport);
+        buttonTeleport.setEnabled(manager.canUserTeleport);
 
         buttonListLeft = new ButtonList(buttonEnable, buttonFind, buttonTeleport);
         buttonListLeft.setHeights(manager.rowHeight);
@@ -307,7 +296,8 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     }
 
     @Override
-    public void updatePosition(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_) {
+    public void updatePosition(int p_192633_1_, int p_192633_2_, int p_192633_3_, float p_192633_4_)
+    {
 
     }
 

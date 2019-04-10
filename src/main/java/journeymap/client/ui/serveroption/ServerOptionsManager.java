@@ -1,0 +1,298 @@
+package journeymap.client.ui.serveroption;
+
+import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import journeymap.client.Constants;
+import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.ui.UIManager;
+import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.component.Label;
+import journeymap.common.Journeymap;
+import journeymap.common.log.LogFormatter;
+import journeymap.common.network.GetConfigsService;
+import net.minecraft.client.gui.GuiButton;
+import org.lwjgl.input.Keyboard;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static journeymap.common.Constants.DIMENSIONS;
+import static journeymap.common.Constants.GLOBAL;
+import static journeymap.common.Constants.WORLD_ID;
+
+public class ServerOptionsManager extends JmUI
+{
+    private int index = 0;
+    private JsonObject global;
+    private Map<Integer, JsonObject> dimensionMap;
+    private List<String> dimIndexList;
+    private JsonObject activeProperty;
+    private ConfigDisplay configDisplay;
+
+
+    private Button buttonNext;
+    private Button buttonPrevious;
+    private ButtonList topButtons;
+    private Label labelSelector;
+    private Label labelWorldId;
+
+
+    private Button buttonClose;
+    private Button buttonSave;
+    private ButtonList bottomButtons;
+
+    private final int hgap = 6;
+    private final int vgap = 6;
+    private int startY;
+    private int centerX;
+    private int topRowLeft;
+    private int tileY;
+
+    public ServerOptionsManager(JmUI returnDisplay)
+    {
+        super("Server Admin", returnDisplay);
+        this.dimIndexList = Lists.newArrayList();
+        Keyboard.enableRepeatEvents(true);
+        getData();
+    }
+
+    @Override
+    public boolean doesGuiPauseGame()
+    {
+        return false;
+    }
+
+    private void getData()
+    {
+        try
+        {
+            new GetConfigsService().send(null, result -> {
+                if (result.getAsJson().get(GLOBAL) != null)
+                {
+                    this.dimIndexList.add(GLOBAL);
+                    this.global = result.getAsJson().get(GLOBAL).getAsJsonObject();
+                    this.activeProperty = global;
+                    this.labelSelector = new Label(150, "Global");
+                    this.labelSelector.setHAlign(DrawUtil.HAlign.Center);
+                }
+
+                if (result.getAsJson().get(DIMENSIONS) != null)
+                {
+                    this.dimensionMap = buildDimensionMap(result.getAsJson().getAsJsonArray(DIMENSIONS));
+                }
+            });
+//        }
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().error("BLeh", e);
+        }
+    }
+
+    private Map<Integer, JsonObject> buildDimensionMap(JsonArray dims)
+    {
+        Map<Integer, JsonObject> dimMap = new HashMap<>();
+
+        for (JsonElement dim : dims)
+        {
+            JsonObject json = dim.getAsJsonObject();
+            if (json.get("dimId") != null)
+            {
+                int dimId = json.get("dimId").getAsInt();
+                this.dimIndexList.add(String.valueOf(dimId));
+                dimMap.put(dimId, json);
+            }
+        }
+
+        return dimMap;
+    }
+
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
+    @Override
+    public void initGui()
+    {
+        try
+        {
+            if (global != null)
+            {
+                buttonList.clear();
+                buttonNext = new Button(">>");
+                buttonNext.setWidth(40);
+                buttonPrevious = new Button("<<");
+                buttonPrevious.setWidth(buttonNext.getWidth());
+
+                topButtons = new ButtonList(buttonPrevious, labelSelector, buttonNext);
+                labelWorldId = new Label(304, "jm.server.edit.label.worldId", global.get(WORLD_ID).getAsString());
+                labelWorldId.setHAlign(DrawUtil.HAlign.Center);
+                labelWorldId.setWidth(labelWorldId.getFitWidth(getFontRenderer()));
+                buttonSave = new Button(Constants.getString("jm.waypoint.save"));
+                buttonClose = new Button(Constants.getString("jm.server.edit.button.close"));
+                bottomButtons = new ButtonList(buttonClose, buttonSave);
+                bottomButtons.equalizeWidths(getFontRenderer());
+
+                configDisplay = new ConfigDisplay(activeProperty, fontRenderer);
+                buttonList.add(labelWorldId);
+                buttonList.addAll(topButtons);
+                buttonList.addAll(configDisplay.getButtons());
+                buttonList.addAll(bottomButtons);
+            }
+        }
+
+        catch (Throwable t)
+        {
+            Journeymap.getLogger().error(LogFormatter.toString(t));
+            UIManager.INSTANCE.closeAll();
+        }
+    }
+
+
+    @Override
+    protected void layoutButtons()
+    {
+        this.startY = Math.max(40, (this.height - 230) / 2);
+        this.centerX = this.width / 2;
+        this.topRowLeft = centerX - (100 / 2);
+        this.tileY = startY + (vgap * 2);
+        // Buttons
+        if (buttonList.isEmpty() && global != null)
+        {
+            initGui();
+        }
+
+        if (global != null && !buttonList.isEmpty())
+        {
+            // WorldId label
+            labelWorldId.setX(centerX - (labelWorldId.getWidth() / 2));
+            labelWorldId.setY(startY - 10);
+
+            if (topButtons == null)
+            {
+                System.out.println("top is null");
+            }
+
+            if (labelWorldId == null)
+            {
+                System.out.println("label is null");
+            }
+            // Top Buttons
+            topButtons.layoutCenteredHorizontal(centerX, labelWorldId.getBottomY(), true, hgap);
+
+            // Draw config
+            configDisplay.draw(centerX, topButtons.getBottomY(), hgap);
+
+            // Bottom Buttons
+            int bottomY = Math.min(tileY + 128 + (vgap * 2), height - 10 - buttonClose.getHeight());
+            bottomButtons.equalizeWidths(getFontRenderer(), hgap, centerX - topRowLeft);
+            bottomButtons.layoutCenteredHorizontal(centerX, bottomY + 20, true, hgap);
+        }
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        try
+        {
+            if (guibutton == buttonSave)
+            {
+                //save
+                save();
+                return;
+            }
+            if (guibutton == buttonClose)
+            {
+                closeAndReturn();
+                return;
+            }
+            if (guibutton == buttonNext)
+            {
+                index++;
+                nextProperty();
+                return;
+            }
+
+            if (guibutton == buttonPrevious)
+            {
+                index--;
+                nextProperty();
+                return;
+            }
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in SeverEditor.actionPerformed: " + LogFormatter.toString(t));
+        }
+    }
+
+    private void save()
+    {
+        JsonObject updatedProperties = new JsonObject();
+        JsonArray dims = new JsonArray();
+        updatedProperties.add(GLOBAL, global);
+
+        for (JsonObject dim : dimensionMap.values())
+        {
+            dims.add(dim);
+        }
+        updatedProperties.add(DIMENSIONS, dims);
+
+        // send to server.
+    }
+
+    private void nextProperty()
+    {
+        if (index < 0)
+        {
+            index = dimIndexList.size() - 1;
+        }
+        else if (index > dimIndexList.size() - 1)
+        {
+            index = 0;
+        }
+        if (index == 0)
+        {
+            labelSelector.displayString = "Global";
+            this.activeProperty = global;
+        }
+        else
+        {
+            String dimName = dimensionMap.get(Integer.valueOf(dimIndexList.get(index))).get("dimName").getAsString();
+            labelSelector.displayString = dimName + " id:" + dimIndexList.get(index);
+            this.activeProperty = dimensionMap.get(Integer.valueOf(dimIndexList.get(index)));
+        }
+
+        this.initGui();
+    }
+
+    @Override
+    public void drawScreen(int x, int y, float par3)
+    {
+        try
+        {
+            super.drawScreen(x, y, par3);
+        }
+        catch (Throwable t)
+        {
+            logger.error("Error in SeverEditor.drawScreen: " + LogFormatter.toString(t));
+        }
+    }
+
+    @Override
+    protected void closeAndReturn()
+    {
+        if (returnDisplay == null)
+        {
+            UIManager.INSTANCE.closeAll();
+        }
+        else
+        {
+            UIManager.INSTANCE.open(returnDisplay);
+        }
+    }
+}

@@ -9,9 +9,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.List;
 
-import static journeymap.client.ui.component.ButtonList.Layout.*;
+import static journeymap.client.ui.component.ButtonList.Layout.CenteredHorizontal;
+import static journeymap.client.ui.component.ButtonList.Layout.CenteredVertical;
+import static journeymap.client.ui.component.ButtonList.Layout.DistributedHorizontal;
+import static journeymap.client.ui.component.ButtonList.Layout.FilledHorizontal;
+import static journeymap.client.ui.component.ButtonList.Layout.Horizontal;
+import static journeymap.client.ui.component.ButtonList.Layout.Vertical;
 
 /**
  * The type Button list.
@@ -313,6 +323,21 @@ public class ButtonList extends ArrayList<Button>
      */
     public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap)
     {
+        return layoutHorizontal(startX, y, leftToRight, hgap, false);
+    }
+
+    /**
+     * Layout horizontal button list.
+     *
+     * @param startX      the start x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @param alignCenter the align center
+     * @return the button list
+     */
+    public ButtonList layoutHorizontal(int startX, final int y, boolean leftToRight, int hgap, boolean alignCenter)
+    {
         this.layout = Layout.Horizontal;
         this.direction = leftToRight ? Direction.LeftToRight : Direction.RightToLeft;
 
@@ -347,6 +372,18 @@ public class ButtonList extends ArrayList<Button>
                 }
             }
             last = button;
+        }
+        // Aligns the buttons along the same center axis.
+        if (alignCenter && !this.isEmpty())
+        {
+            int maxButtonHeight = this.stream().max(Comparator.comparing(Button::getHeight)).get().getHeight();
+            this.forEach(button -> {
+                if (button.getHeight() < maxButtonHeight)
+                {
+                    int buttonHeight = button.getHeight();
+                    button.setY(((maxButtonHeight - buttonHeight) / 2) + button.getY());
+                }
+            });
         }
         this.layout = Layout.Horizontal;
         return this;
@@ -426,9 +463,24 @@ public class ButtonList extends ArrayList<Button>
      */
     public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap)
     {
+        return layoutCenteredHorizontal(centerX, y, leftToRight, hgap, false);
+    }
+
+    /**
+     * Layout centered horizontal button list.
+     *
+     * @param centerX     the center x
+     * @param y           the y
+     * @param leftToRight the left to right
+     * @param hgap        the hgap
+     * @param alignCenter the center align
+     * @return the button list
+     */
+    public ButtonList layoutCenteredHorizontal(final int centerX, final int y, final boolean leftToRight, final int hgap, boolean alignCenter)
+    {
         this.layout = Layout.CenteredHorizontal;
         int width = getWidth(hgap);
-        layoutHorizontal(centerX - (width / 2), y, leftToRight, hgap);
+        layoutHorizontal(centerX - (width / 2), y, leftToRight, hgap, alignCenter);
 
         return this;
     }
@@ -537,6 +589,21 @@ public class ButtonList extends ArrayList<Button>
         for (Button button : this)
         {
             button.setEnabled(enabled);
+        }
+        return this;
+    }
+
+    /**
+     * Sets visible.
+     *
+     * @param visible the enabled
+     * @return the visible
+     */
+    public ButtonList setVisible(boolean visible)
+    {
+        for (Button button : this)
+        {
+            button.setVisible(visible);
         }
         return this;
     }
@@ -762,22 +829,27 @@ public class ButtonList extends ArrayList<Button>
         /**
          * Horizontal layout.
          */
-        Horizontal, /**
-     * Vertical layout.
-     */
-    Vertical, /**
-     * Centered horizontal layout.
-     */
-    CenteredHorizontal, /**
-     * Centered vertical layout.
-     */
-    CenteredVertical, /**
-     * Distributed horizontal layout.
-     */
-    DistributedHorizontal, /**
-     * Filled horizontal layout.
-     */
-    FilledHorizontal;
+        Horizontal,
+        /**
+         * Vertical layout.
+         */
+        Vertical,
+        /**
+         * Centered horizontal layout.
+         */
+        CenteredHorizontal,
+        /**
+         * Centered vertical layout.
+         */
+        CenteredVertical,
+        /**
+         * Distributed horizontal layout.
+         */
+        DistributedHorizontal,
+        /**
+         * Filled horizontal layout.
+         */
+        FilledHorizontal
     }
 
     /**
@@ -788,9 +860,10 @@ public class ButtonList extends ArrayList<Button>
         /**
          * Left to right direction.
          */
-        LeftToRight, /**
-     * Right to left direction.
-     */
-    RightToLeft
+        LeftToRight,
+        /**
+         * Right to left direction.
+         */
+        RightToLeft
     }
 }

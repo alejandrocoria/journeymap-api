@@ -5,6 +5,7 @@
 
 package journeymap.server.nbt;
 
+import journeymap.common.Journeymap;
 import journeymap.server.Constants;
 import net.minecraft.world.World;
 
@@ -15,19 +16,23 @@ import java.util.UUID;
  */
 public class WorldNbtIDSaveHandler
 {
-    private static final String LEGACY_DAT_FILE = "JourneyMapWorldID";
-    private static final String LEGACY_WORLD_ID_KEY = "JourneyMapWorldID";
     private static final String DAT_FILE = "WorldUUID";
     private static final String WORLD_ID_KEY = "world_uuid";
     private NBTWorldSaveDataHandler data;
-    private NBTWorldSaveDataHandler legacyData;
+
     private World world;
 
     public WorldNbtIDSaveHandler()
     {
-        world = Constants.SERVER.getEntityWorld();
-        legacyData = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, LEGACY_DAT_FILE);
-        data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, DAT_FILE);
+        try
+        {
+            world = Constants.SERVER.getEntityWorld();
+            data = (NBTWorldSaveDataHandler) world.getPerWorldStorage().getOrLoadData(NBTWorldSaveDataHandler.class, DAT_FILE);
+        }
+        catch (Exception e)
+        {
+            Journeymap.getLogger().warn("Error in worldID handler", e);
+        }
     }
 
     public String getWorldID()
@@ -35,31 +40,8 @@ public class WorldNbtIDSaveHandler
         return getNBTWorldID();
     }
 
-
-    public void setWorldID(String worldID)
-    {
-        saveWorldID(worldID);
-    }
-
     private String getNBTWorldID()
     {
-
-        // TODO: Remove this migration when we update to MC 1.9+
-        // Migrate old worldID to new system.
-        if (legacyData != null && legacyData.getData().hasKey(LEGACY_WORLD_ID_KEY))
-        {
-            String worldId = legacyData.getData().getString(LEGACY_WORLD_ID_KEY);
-
-            legacyData.getData().removeTag(LEGACY_WORLD_ID_KEY);
-            legacyData.markDirty();
-
-            data = new NBTWorldSaveDataHandler(DAT_FILE);
-            world.getPerWorldStorage().setData(WORLD_ID_KEY, data);
-            saveWorldID(worldId);
-
-            return worldId;
-        }
-
         if (data == null)
         {
             return createNewWorldID();

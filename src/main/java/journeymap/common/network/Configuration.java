@@ -10,6 +10,7 @@ import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import static journeymap.server.JourneymapServer.isOp;
 
@@ -21,7 +22,7 @@ public class Configuration extends MessageProcessor
         EntityPlayerMP player = response.getContext().getServerHandler().player;
         JsonObject reply = new JsonObject();
         JsonObject settings = new JsonObject();
-        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get())
+        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get() && !FMLCommonHandler.instance().getSide().isClient())
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
             String worldID = worldSaveHandler.getWorldID();

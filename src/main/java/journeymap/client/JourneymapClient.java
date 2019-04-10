@@ -67,6 +67,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static journeymap.common.Constants.DIM;
+import static journeymap.common.Constants.SETTINGS;
+import static journeymap.common.Constants.TELEPORT;
+import static journeymap.common.Constants.WORLD_ID;
+
 /**
  * Client-side, strong-side!
  */
@@ -80,7 +85,7 @@ public class JourneymapClient implements CommonProxy
     private boolean journeyMapServerConnection = false;
     private boolean forgeServerConnection = false;
     private boolean playerTrackingEnabled = false;
-    private boolean serverTeleportEnabled = false;
+    private boolean teleportEnabled = false;
     private boolean modInfoReported = false;
 
     // Properties & preferences
@@ -531,20 +536,29 @@ public class JourneymapClient implements CommonProxy
                     memory));
 
             // request permissions
-            if (isJourneyMapServerConnection())
+            if (isJourneyMapServerConnection() || FMLClientHandler.instance().getClient().isSingleplayer())
             {
                 new Configuration().send(null, response -> {
-                    JsonObject settings = response.getAsJson().get("settings").getAsJsonObject();
-                    if (settings.get("world_id") != null)
+                    if (response.getAsJson().get(SETTINGS) != null)
                     {
-                        setCurrentWorldId(settings.get("world_id").getAsString());
+                        JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
+                        if (settings.get(WORLD_ID) != null)
+                        {
+                            setCurrentWorldId(settings.get(WORLD_ID).getAsString());
+                        }
+                        if ((settings.get(TELEPORT) != null))
+                        {
+                            setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
+                        }
+                        if ((settings.get(TELEPORT) != null))
+                        {
+                            setPlayerTrackingEnabled(settings.get(TELEPORT).getAsBoolean());
+                        }
+                        setJourneyMapServerConnection(true);
+                        String dimProperties = response.getAsJson().get(DIM).getAsString();
+                        PermissionProperties prop = new DimensionProperties(0).load(dimProperties, false);
+                        FeatureManager.INSTANCE.updateDimensionFeatures(prop);
                     }
-                    setServerTeleportEnabled(settings.get("can_teleport").getAsBoolean());
-                    setPlayerTrackingEnabled(settings.get("can_track").getAsBoolean());
-                    setJourneyMapServerConnection(true);
-                    String dimProperties = response.getAsJson().get("dim").getAsString();
-                    PermissionProperties prop = new DimensionProperties(0).load(dimProperties, false);
-                    FeatureManager.INSTANCE.updateDimensionFeatures(prop);
                 });
             }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
@@ -601,6 +615,7 @@ public class JourneymapClient implements CommonProxy
                 JsonObject settings = response.getAsJson().get("settings").getAsJsonObject();
                 if (settings.get("world_id") != null)
                 {
+                    System.out.println("Getting World Id");
                     setCurrentWorldId(settings.get("world_id").getAsString());
                 }
             });
@@ -744,26 +759,29 @@ public class JourneymapClient implements CommonProxy
         synchronized (this)
         {
             Minecraft mc = FMLClientHandler.instance().getClient();
-            File currentWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, currentWorldId);
-            File newWorldDirectory = FileHandler.getJMWorldDir(mc, worldId);
-
-            boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
-            boolean directoryUnchanged = currentWorldDirectory != null && newWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
-
-            if (worldIdUnchanged && directoryUnchanged && worldId != null)
+            if (!mc.isSingleplayer())
             {
-                Journeymap.getLogger().info("World UID hasn't changed: " + worldId);
-                return;
-            }
+                File currentWorldDirectory = FileHandler.getJMWorldDirForWorldId(mc, currentWorldId);
+                File newWorldDirectory = FileHandler.getJMWorldDir(mc, worldId);
 
-            boolean wasMapping = isMapping();
-            if (wasMapping)
-            {
-                stopMapping();
-            }
+                boolean worldIdUnchanged = Constants.safeEqual(worldId, currentWorldId);
+                boolean directoryUnchanged = currentWorldDirectory != null && newWorldDirectory != null && currentWorldDirectory.getPath().equals(newWorldDirectory.getPath());
 
-            this.currentWorldId = worldId;
-            Journeymap.getLogger().info("World UID is set to: " + worldId);
+                if (worldIdUnchanged && directoryUnchanged && worldId != null)
+                {
+                    Journeymap.getLogger().info("World UID hasn't changed: " + worldId);
+                    return;
+                }
+
+                boolean wasMapping = isMapping();
+                if (wasMapping)
+                {
+                    stopMapping();
+                }
+
+                this.currentWorldId = worldId;
+                Journeymap.getLogger().info("World UID is set to: " + worldId);
+            }
         }
     }
 
@@ -794,18 +812,22 @@ public class JourneymapClient implements CommonProxy
 
     public void setPlayerTrackingEnabled(boolean playerTrackingEnabled)
     {
+        if (FMLClientHandler.instance().getClient().isSingleplayer())
+        {
+            this.playerTrackingEnabled = false;
+        }
         this.playerTrackingEnabled = playerTrackingEnabled;
     }
 
 
-    public boolean isServerTeleportEnabled()
+    public boolean isTeleportEnabled()
     {
-        return serverTeleportEnabled;
+        return teleportEnabled;
     }
 
-    public void setServerTeleportEnabled(boolean serverTeleportEnabled)
+    public void setTeleportEnabled(boolean teleportEnabled)
     {
-        Journeymap.getLogger().info("Server Teleport Enabled:" + serverTeleportEnabled);
-        this.serverTeleportEnabled = serverTeleportEnabled;
+        Journeymap.getLogger().info("Server Teleport Enabled:" + teleportEnabled);
+        this.teleportEnabled = teleportEnabled;
     }
 }

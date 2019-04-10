@@ -348,7 +348,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean checkClickListeners()
     {
         boolean clicked = true;
-        if(!clickListeners.isEmpty())
+        if (!clickListeners.isEmpty())
         {
             try
             {
@@ -437,7 +437,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public Rectangle2D.Double getBounds()
     {
-        if(this.bounds==null)
+        if (this.bounds == null)
         {
             return updateBounds();
         }
@@ -451,7 +451,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public void setWidth(int width)
     {
-        if(this.width!=width)
+        if (this.width != width)
         {
             this.width = width;
             bounds = null;
@@ -476,7 +476,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setHeight(int height)
     {
-        if(this.height!=height)
+        if (this.height != height)
         {
             this.height = height;
             bounds = null;
@@ -524,7 +524,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setX(int x)
     {
-        if(this.x!=x)
+        if (this.x != x)
         {
             this.x = x;
             bounds = null;
@@ -543,7 +543,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setY(int y)
     {
-        if(this.y!=y)
+        if (this.y != y)
         {
             this.y = y;
             bounds = null;
@@ -823,13 +823,23 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     }
 
     /**
+     * Sets visible.
+     *
+     * @param visible the enabled
+     */
+    public void setVisible(boolean visible)
+    {
+        this.visible = visible;
+    }
+
+    /**
      * Sets draw button.
      *
      * @param drawButton the draw button
      */
     public void setDrawButton(boolean drawButton)
     {
-        if(drawButton!=visible)
+        if (drawButton != visible)
         {
             this.visible = drawButton;
         }

@@ -14,6 +14,8 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.log.JMLogger;
+import journeymap.client.model.MapType;
+import journeymap.client.model.RegionCoord;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
@@ -25,7 +27,11 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.realms.RealmsScreen;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -37,7 +43,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 
 /**
@@ -409,7 +427,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public static String getSafeDimensionName(DimensionProvider dimensionProvider)
     {
-        if (dimensionProvider == null || dimensionProvider.getName()==null)
+        if (dimensionProvider == null || dimensionProvider.getName() == null)
         {
             return null;
         }
@@ -448,6 +466,56 @@ public class WorldData extends CacheLoader<Class, WorldData>
         browser_poll = Math.max(1000, Journeymap.getClient().getCoreProperties().browserPoll.get());
 
         return this;
+    }
+
+    public static String getLightLevel()
+    {
+        BlockPos blockpos = Minecraft.getMinecraft().player.getPosition();
+        World world = Minecraft.getMinecraft().world;
+        Chunk chunk = world.getChunkFromBlockCoords(blockpos);
+        int light = chunk.getLightSubtracted(blockpos, 0);
+        int lightSky = chunk.getLightFor(EnumSkyBlock.SKY, blockpos);
+        int lightBlock = chunk.getLightFor(EnumSkyBlock.BLOCK, blockpos);
+        String lightLevels = String.format("Light: %s (%s sky, %s block)", light, lightSky, lightBlock);
+        return lightLevels;
+    }
+
+    public static String getRegion()
+    {
+        BlockPos blockpos = Minecraft.getMinecraft().player.getPosition();
+        Chunk chunk = Minecraft.getMinecraft().world.getChunkFromBlockCoords(blockpos);
+        RegionCoord regionCoord = RegionCoord.fromChunkPos(null, MapType.none(), chunk.x, chunk.z);
+        return "Region: x:" + regionCoord.regionX + " z:" + regionCoord.regionZ;
+    }
+
+    // TODO: clean up!
+    // This is some pretty ugly code. Needs to be cleaned up!
+    public static String getTime(String format)
+    {
+        long time = (FMLClientHandler.instance().getClient().world.getWorldTime() % 24000L);
+        final int ticksAtMidnight = 18000;
+        final int ticksPerDay = 24000;
+        final int ticksPerHour = 1000;
+        final double ticksPerMinute = 1000d / 60d;
+        final double ticksPerSecond = 1000d / 60d / 60d;
+        final int offset = 6000;
+        time = time - ticksAtMidnight + ticksPerDay + offset;
+        time -= (time / ticksPerDay) * ticksPerDay;
+        final long hours = (time / ticksPerHour);
+        time -= (time / ticksPerHour) * ticksPerHour;
+        final long minutes = (long) Math.floor(time / ticksPerMinute);
+        final double dticks = time - minutes * ticksPerMinute;
+        final long seconds = (long) Math.floor(dticks / ticksPerSecond);
+        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ENGLISH);
+        cal.setLenient(true);
+        cal.set(0, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.add(Calendar.DAY_OF_YEAR, (int) (time / ticksPerDay));
+        cal.add(Calendar.HOUR_OF_DAY, (int) hours);
+        cal.add(Calendar.MINUTE, (int) minutes);
+        cal.add(Calendar.SECOND, (int) seconds);
+        Date date = cal.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
+        return sdf.format(date);
     }
 
     /**

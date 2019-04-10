@@ -169,7 +169,6 @@ public abstract class MessageProcessor
      *
      * @param player - The player.
      */
-    @SideOnly(Side.SERVER)
     public void sendToPlayer(JsonObject requestData, EntityPlayerMP player)
     {
         buildRequest(requestData);
@@ -186,7 +185,6 @@ public abstract class MessageProcessor
      * @param player   - The player.
      * @param callback - The callback.
      */
-    @SideOnly(Side.SERVER)
     public void sendToPlayer(JsonObject requestData, EntityPlayerMP player, AsyncCallback callback)
     {
         buildRequest(requestData);

@@ -26,60 +26,13 @@ public class Pixelmon
         INSTANCE = new Pixelmon();
     }
 
-    // This is the implementation if Pixelmon was a library.
-//    public ResourceLocation getPixelmonResource(Entity entity)
-//    {
-//
-//        if (entity instanceof EntityPixelmon)
-//        {
-//
-//            EntityPixelmon pixelmon = (EntityPixelmon) entity;
-//            Pokemon pokemon = pixelmon.getPokemonData();
-//            String special = SpriteHelper.getSpriteExtra(pixelmon.getName(), pokemon.getForm());
-//            String pokemonId = pixelmon.getSpecies().getNationalPokedexNumber();
-//            ResourceLocation resource;
-//            if (pokemon.isShiny())
-//            {
-//                resource = GuiResources.shinySprite(pokemonId + special);
-//            }
-//            else
-//            {
-//                resource = GuiResources.sprite(pokemonId + special);
-//            }
-//
-//            return resource;
-//        }
-//        return null;
-//    }
-
-
-    // Reflection version, likely a bit slower.
     public ResourceLocation getPixelmonResource(Entity entity)
     {
         if (isInstanceOf(entity, "com.pixelmonmod.pixelmon.entities.pixelmon.EntityPixelmon"))
         {
             try
             {
-                String name = entity.getName();
-                Object pokemon = entity.getClass().getMethod("getPokemonData").invoke(entity);
-                int form = (int) pokemon.getClass().getMethod("getForm").invoke(pokemon);
-                Class spriteHelper = Class.forName("com.pixelmonmod.pixelmon.util.helpers.SpriteHelper");
-                String special = (String) spriteHelper.getMethod("getSpriteExtra", String.class, int.class).invoke(spriteHelper, name, form);
-                Object species = entity.getClass().getMethod("getSpecies").invoke(entity);
-                String pokemonId = (String) species.getClass().getMethod("getNationalPokedexNumber").invoke(species);
-
-                Boolean shiny = (Boolean) pokemon.getClass().getMethod("isShiny").invoke(pokemon);
-                Class guiResources = Class.forName("com.pixelmonmod.pixelmon.client.gui.GuiResources");
-                if (shiny)
-                {
-                    return (ResourceLocation) guiResources.getMethod("shinySprite", String.class).invoke(guiResources, pokemonId + special);
-
-                }
-                else
-                {
-                    return (ResourceLocation) guiResources.getMethod("sprite", String.class).invoke(guiResources, pokemonId + special);
-                }
-
+                return (ResourceLocation) entity.getClass().getMethod("getSprite").invoke(entity);
             }
             catch (Exception e)
             {

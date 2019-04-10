@@ -15,6 +15,7 @@ import journeymap.client.ui.dialog.GridEditor;
 import journeymap.client.ui.dialog.OptionsManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
+import journeymap.client.ui.serveroption.ServerOptionsManager;
 import journeymap.client.ui.waypoint.WaypointEditor;
 import journeymap.client.ui.waypoint.WaypointManager;
 import journeymap.common.Journeymap;
@@ -71,11 +72,15 @@ public enum UIManager
      *
      * @param error the error
      */
-    public static void handleLinkageError(LinkageError error) {
+    public static void handleLinkageError(LinkageError error)
+    {
         Journeymap.getLogger().error(LogFormatter.toString(error));
-        try {
+        try
+        {
             ChatLog.announceError(error.getMessage() + " : JourneyMap is not compatible with this build of Forge!");
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             t.printStackTrace();
         }
     }
@@ -83,12 +88,18 @@ public enum UIManager
     /**
      * Close all.
      */
-    public void closeAll() {
-        try {
+    public void closeAll()
+    {
+        try
+        {
             closeCurrent();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             logger.error("Unexpected error: " + LogFormatter.toString(e));
         }
         minecraft.displayGuiScreen(null);
@@ -98,15 +109,22 @@ public enum UIManager
     /**
      * Close current.
      */
-    public void closeCurrent() {
-        try {
-            if (minecraft.currentScreen != null && minecraft.currentScreen instanceof JmUI) {
+    public void closeCurrent()
+    {
+        try
+        {
+            if (minecraft.currentScreen != null && minecraft.currentScreen instanceof JmUI)
+            {
                 logger.debug("Closing " + minecraft.currentScreen.getClass());
                 ((JmUI) minecraft.currentScreen).close();
             }
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             logger.error("Unexpected error: " + LogFormatter.toString(e));
         }
     }
@@ -114,7 +132,8 @@ public enum UIManager
     /**
      * Open inventory.
      */
-    public void openInventory() {
+    public void openInventory()
+    {
         logger.debug("Opening inventory");
         closeAll();
         minecraft.displayGuiScreen(new GuiInventory(minecraft.player)); // displayGuiScreen
@@ -128,18 +147,27 @@ public enum UIManager
      * @param returnDisplay the return display
      * @return the t
      */
-    public <T extends JmUI> T open(Class<T> uiClass, JmUI returnDisplay) {
-        try {
+    public <T extends JmUI> T open(Class<T> uiClass, JmUI returnDisplay)
+    {
+        try
+        {
             // Try constructor with return display
             return open(uiClass.getConstructor(JmUI.class).newInstance(returnDisplay));
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
             return null;
-        } catch (Throwable e) {
-            try {
+        }
+        catch (Throwable e)
+        {
+            try
+            {
                 // Try constructor without return display
                 return open(uiClass.getConstructor().newInstance());
-            } catch (Throwable e2) {
+            }
+            catch (Throwable e2)
+            {
                 logger.log(Level.ERROR, "1st unexpected exception creating UI: " + LogFormatter.toString(e));
                 logger.log(Level.ERROR, "2nd unexpected exception creating UI: " + LogFormatter.toString(e2));
                 closeCurrent();
@@ -155,18 +183,25 @@ public enum UIManager
      * @param uiClass the ui class
      * @return the t
      */
-    public <T extends JmUI> T open(Class<T> uiClass) {
-        try {
-            if (MiniMap.uiState().active) {
+    public <T extends JmUI> T open(Class<T> uiClass)
+    {
+        try
+        {
+            if (MiniMap.uiState().active)
+            {
                 MiniMap.updateUIState(false);
             }
 
             T ui = uiClass.newInstance();
             return open(ui);
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
             return null;
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             logger.log(Level.ERROR, "Unexpected exception creating UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
             closeCurrent();
             return null;
@@ -180,16 +215,22 @@ public enum UIManager
      * @param ui  the ui
      * @return the t
      */
-    public <T extends GuiScreen> T open(T ui) {
+    public <T extends GuiScreen> T open(T ui)
+    {
         closeCurrent();
         logger.debug("Opening UI " + ui.getClass().getSimpleName());
-        try {
+        try
+        {
             minecraft.displayGuiScreen(ui);
             KeyBinding.unPressAllKeys();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
             return null;
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             logger.error(String.format("Unexpected exception opening UI %s: %s", ui.getClass(), LogFormatter.toString(t)));
         }
         return ui;
@@ -198,12 +239,18 @@ public enum UIManager
     /**
      * Toggle minimap.
      */
-    public void toggleMinimap() {
-        try {
+    public void toggleMinimap()
+    {
+        try
+        {
             setMiniMapEnabled(!isMiniMapEnabled());
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             logger.error(String.format("Unexpected exception in toggleMinimap: %s", LogFormatter.toString(t)));
         }
     }
@@ -213,12 +260,18 @@ public enum UIManager
      *
      * @return the boolean
      */
-    public boolean isMiniMapEnabled() {
-        try {
+    public boolean isMiniMapEnabled()
+    {
+        try
+        {
             return miniMap.getCurrentMinimapProperties().enabled.get();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             logger.error(String.format("Unexpected exception in isMiniMapEnabled: %s", LogFormatter.toString(t)));
         }
         return false;
@@ -229,13 +282,19 @@ public enum UIManager
      *
      * @param enable the enable
      */
-    public void setMiniMapEnabled(boolean enable) {
-        try {
+    public void setMiniMapEnabled(boolean enable)
+    {
+        try
+        {
             miniMap.getCurrentMinimapProperties().enabled.set(enable);
             miniMap.getCurrentMinimapProperties().save();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             logger.error(String.format("Unexpected exception in setMiniMapEnabled: %s", LogFormatter.toString(t)));
         }
     }
@@ -243,32 +302,47 @@ public enum UIManager
     /**
      * Draw mini map.
      */
-    public void drawMiniMap() {
+    public void drawMiniMap()
+    {
         minecraft.mcProfiler.startSection("journeymap");
-        try {
+        try
+        {
             boolean doDraw = false;
-            if (miniMap.getCurrentMinimapProperties().enabled.get()) {
+            if (miniMap.getCurrentMinimapProperties().enabled.get())
+            {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 doDraw = currentScreen == null || currentScreen instanceof GuiChat;
-                if (doDraw) {
-                    if (!MiniMap.uiState().active) {
-                        if (MiniMap.state().getLastMapTypeChange() == 0) {
+                if (doDraw)
+                {
+                    if (!MiniMap.uiState().active)
+                    {
+                        if (MiniMap.state().getLastMapTypeChange() == 0)
+                        {
                             miniMap.reset();
-                        } else {
+                        }
+                        else
+                        {
                             MiniMap.state().requireRefresh();
                         }
                     }
                     miniMap.drawMap();
                 }
             }
-            if (doDraw && !MiniMap.uiState().active) {
+            if (doDraw && !MiniMap.uiState().active)
+            {
                 MiniMap.updateUIState(true);
             }
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
-        } finally {
+        }
+        finally
+        {
             minecraft.mcProfiler.endSection(); // journeymap
         }
     }
@@ -278,15 +352,18 @@ public enum UIManager
      *
      * @return the mini map
      */
-    public MiniMap getMiniMap() {
+    public MiniMap getMiniMap()
+    {
         return miniMap;
     }
 
     /**
      * Open fullscreen map.
      */
-    public Fullscreen openFullscreenMap() {
-        if (minecraft.currentScreen instanceof Fullscreen) {
+    public Fullscreen openFullscreenMap()
+    {
+        if (minecraft.currentScreen instanceof Fullscreen)
+        {
             return (Fullscreen) minecraft.currentScreen;
         }
         KeyBinding.unPressAllKeys();
@@ -298,15 +375,22 @@ public enum UIManager
      *
      * @param waypoint the waypoint
      */
-    public void openFullscreenMap(Waypoint waypoint) {
-        try {
-            if (waypoint.isInPlayerDimension()) {
+    public void openFullscreenMap(Waypoint waypoint)
+    {
+        try
+        {
+            if (waypoint.isInPlayerDimension())
+            {
                 Fullscreen map = open(Fullscreen.class);
                 map.centerOn(waypoint);
             }
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
         }
     }
@@ -325,12 +409,18 @@ public enum UIManager
      * @param returnDisplay     the return display
      * @param initialCategories the initial categories
      */
-    public void openOptionsManager(JmUI returnDisplay, Category... initialCategories) {
-        try {
+    public void openOptionsManager(JmUI returnDisplay, Category... initialCategories)
+    {
+        try
+        {
             open(new OptionsManager(returnDisplay, initialCategories));
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             logger.log(Level.ERROR, "Unexpected exception creating MasterOptions with return class: " + LogFormatter.toString(e));
         }
     }
@@ -340,7 +430,8 @@ public enum UIManager
      *
      * @param returnDisplay the return display
      */
-    public void openSplash(JmUI returnDisplay) {
+    public void openSplash(JmUI returnDisplay)
+    {
         open(AboutDialog.class, returnDisplay);
     }
 
@@ -350,14 +441,21 @@ public enum UIManager
      * @param waypoint      the waypoint
      * @param returnDisplay the return display
      */
-    public void openWaypointManager(Waypoint waypoint, JmUI returnDisplay) {
-        if (WaypointsData.isManagerEnabled()) {
-            try {
+    public void openWaypointManager(Waypoint waypoint, JmUI returnDisplay)
+    {
+        if (WaypointsData.isManagerEnabled())
+        {
+            try
+            {
                 WaypointManager manager = new WaypointManager(waypoint, returnDisplay);
                 open(manager);
-            } catch (LinkageError e) {
+            }
+            catch (LinkageError e)
+            {
                 handleLinkageError(e);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 Journeymap.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
             }
         }
@@ -370,14 +468,21 @@ public enum UIManager
      * @param isNew         the is new
      * @param returnDisplay the return display
      */
-    public void openWaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay) {
-        if (WaypointsData.isManagerEnabled()) {
-            try {
+    public void openWaypointEditor(Waypoint waypoint, boolean isNew, JmUI returnDisplay)
+    {
+        if (WaypointsData.isManagerEnabled())
+        {
+            try
+            {
                 WaypointEditor editor = new WaypointEditor(waypoint, isNew, returnDisplay);
                 open(editor);
-            } catch (LinkageError e) {
+            }
+            catch (LinkageError e)
+            {
                 handleLinkageError(e);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 Journeymap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
             }
         }
@@ -388,27 +493,61 @@ public enum UIManager
      *
      * @param returnDisplay the return display
      */
-    public void openGridEditor(JmUI returnDisplay) {
-        try {
+    public void openGridEditor(JmUI returnDisplay)
+    {
+        try
+        {
             GridEditor editor = new GridEditor(returnDisplay);
             open(editor);
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
+        }
+    }
+
+    /**
+     * Open grid editor.
+     *
+     * @param returnDisplay the return display
+     */
+    public void openServerEditor(JmUI returnDisplay)
+    {
+        try
+        {
+            ServerOptionsManager editor = new ServerOptionsManager(returnDisplay);
+            open(editor);
+        }
+        catch (LinkageError e)
+        {
+            handleLinkageError(e);
+        }
+        catch (Throwable e)
+        {
+            Journeymap.getLogger().error("Error opening server manager: " + LogFormatter.toString(e));
         }
     }
 
     /**
      * Reset.
      */
-    public void reset() {
-        try {
+    public void reset()
+    {
+        try
+        {
             Fullscreen.state().requireRefresh();
             miniMap.reset();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error during reset: " + LogFormatter.toString(e));
         }
     }
@@ -416,13 +555,19 @@ public enum UIManager
     /**
      * Switch mini map preset.
      */
-    public void switchMiniMapPreset() {
-        try {
+    public void switchMiniMapPreset()
+    {
+        try
+        {
             int currentPreset = miniMap.getCurrentMinimapProperties().getId();
             switchMiniMapPreset(currentPreset == 1 ? 2 : 1);
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error during switchMiniMapPreset: " + LogFormatter.toString(e));
         }
     }
@@ -432,13 +577,19 @@ public enum UIManager
      *
      * @param which the which
      */
-    public void switchMiniMapPreset(int which) {
-        try {
+    public void switchMiniMapPreset(int which)
+    {
+        try
+        {
             miniMap.setMiniMapProperties(Journeymap.getClient().getMiniMapProperties(which));
             MiniMap.state().requireRefresh();
-        } catch (LinkageError e) {
+        }
+        catch (LinkageError e)
+        {
             handleLinkageError(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Journeymap.getLogger().error("Error during switchMiniMapPreset: " + LogFormatter.toString(e));
         }
 

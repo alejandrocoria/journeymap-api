@@ -26,11 +26,13 @@ public class NetworkHandler
     // this is only a listener now for bukkit servers.
     private static final SimpleNetworkWrapper WORLD_INFO_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(WorldIDPacket.CHANNEL_NAME);
 
-    public static void init(Side side)
+    public static void init()
     {
+        int d = 0;
         INSTANCE = new NetworkHandler();
-        JOURNEYMAP_NETWORK_CHANNEL.registerMessage(MessageListener.class, Message.class, 0, side);
-        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.Listener.class, WorldIDPacket.class, 0, side);
+        JOURNEYMAP_NETWORK_CHANNEL.registerMessage(MessageListener.class, Message.class, d++, Side.SERVER);
+        JOURNEYMAP_NETWORK_CHANNEL.registerMessage(MessageListener.class, Message.class, d++, Side.CLIENT);
+        WORLD_INFO_CHANNEL.registerMessage(WorldIDPacket.Listener.class, WorldIDPacket.class, d++, Side.CLIENT);
     }
 
     public static NetworkHandler getInstance()

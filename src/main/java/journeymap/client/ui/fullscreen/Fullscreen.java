@@ -241,6 +241,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
     ThemeButton buttonResetPalette;
     ThemeButton buttonBrowser;
     ThemeButton buttonAbout;
+    ThemeButton buttonServer;
 
     /**
      * The Map type toolbar.
@@ -663,6 +664,15 @@ public class Fullscreen extends JmUI implements ITabCompleter
                 return true;
             });
 
+            buttonServer = new ThemeButton(theme, "jm.common.use_browser", "server");
+            buttonServer.setTooltip("Adjust server settings.");
+            buttonServer.addToggleListener((button, toggled) -> {
+                UIManager.INSTANCE.openServerEditor(Fullscreen.this);
+                buttonServer.setValue(true);
+                return true;
+            });
+            buttonServer.visible = true;
+
             buttonKeys = new ThemeToggle(theme, "jm.common.show_keys", "keys", fullMapProperties.showKeys);
             buttonKeys.setTooltip(Constants.getString("jm.common.show_keys.tooltip"));
 
@@ -699,6 +709,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
                 FullscreenActions.launchLocalhost();
                 return true;
             });
+
 
             boolean automapRunning = Journeymap.getClient().isTaskManagerEnabled(MapRegionTask.Manager.class);
             String autoMapOn = Constants.getString("jm.common.automap_stop_title");
@@ -761,7 +772,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
             optionsToolbar.addAllButtons(this);
             optionsToolbar.visible = false; // Hide until laid out
 
-            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonAbout, buttonBrowser, buttonTheme, buttonResetPalette, buttonDeletemap, buttonSavemap, buttonAutomap, buttonDisable);
+            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonAbout, buttonBrowser, buttonTheme, buttonResetPalette, buttonDeletemap, buttonSavemap, buttonServer, buttonAutomap, buttonDisable);
             menuToolbar.addAllButtons(this);
             menuToolbar.visible = false; // Hide until laid out
 

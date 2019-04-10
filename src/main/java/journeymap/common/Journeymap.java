@@ -137,7 +137,7 @@ public class Journeymap
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
-        NetworkHandler.init(event.getSide());
+        NetworkHandler.init();
         proxy.initialize(event);
     }
 
