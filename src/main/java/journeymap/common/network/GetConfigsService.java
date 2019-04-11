@@ -69,7 +69,6 @@ public class GetConfigsService extends MessageProcessor
         DefaultDimensionProperties defaultDimensionProperties = PropertiesManager.getInstance().getDefaultDimensionProperties();
 
         // Global Properties.
-        globalConfig.addProperty(TELEPORT, globalProperties.teleportEnabled.get());
         if (!FMLCommonHandler.instance().getSide().isClient())
         {
             globalConfig.addProperty(USE_WORLD_ID, globalProperties.useWorldId.get());
@@ -86,7 +85,6 @@ public class GetConfigsService extends MessageProcessor
 
         // Default Dimension properties
         defaultDimConfig.addProperty(ENABLED, defaultDimensionProperties.enabled.get());
-        defaultDimConfig.addProperty(TELEPORT, defaultDimensionProperties.teleportEnabled.get());
         defaultDimConfig.addProperty(DIM_NAME, "default");
         getCommonProperties(defaultDimensionProperties, defaultDimConfig);
 
@@ -95,7 +93,6 @@ public class GetConfigsService extends MessageProcessor
             JsonObject dim = new JsonObject();
             DimensionProperties dimensionProperties = PropertiesManager.getInstance().getDimProperties(d);
             dim.addProperty(ENABLED, dimensionProperties.enabled.get());
-            dim.addProperty(TELEPORT, dimensionProperties.teleportEnabled.get());
             dim.addProperty(DIM_ID, d);
             dim.addProperty(DIM_NAME, DimensionManager.getProviderType(d).getName());
             getCommonProperties(dimensionProperties, dim);
@@ -109,6 +106,7 @@ public class GetConfigsService extends MessageProcessor
 
     private void getCommonProperties(PermissionProperties from, JsonObject to)
     {
+        to.addProperty(TELEPORT, from.teleportEnabled.get());
         to.addProperty(OP_SURFACE_MAP, from.opSurfaceMappingEnabled.get());
         to.addProperty(SURFACE_MAP, from.surfaceMappingEnabled.get());
         to.addProperty(OP_TOPO_MAP, from.opTopoMappingEnabled.get());

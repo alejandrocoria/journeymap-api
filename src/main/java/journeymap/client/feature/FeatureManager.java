@@ -89,8 +89,18 @@ public enum FeatureManager
 
         if (!properties.caveMappingEnabled.get())
         {
-            Journeymap.getLogger().info("Feature disabled in multiplayer: " + Feature.MapCaves);
-            policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, true, false));
+            Journeymap.getLogger().info("Feature disabled: " + Feature.MapCaves);
+            policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, false, false));
+        }
+        if (!properties.topoMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature disabled: " + Feature.MapTopo);
+            policyMap.put(Feature.MapTopo, new Policy(Feature.MapTopo, false, false));
+        }
+        if (!properties.surfaceMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature disabled: " + Feature.MapSurface);
+            policyMap.put(Feature.MapSurface, new Policy(Feature.MapSurface, false, false));
         }
 
         if (properties.radarEnabled.get())
@@ -113,7 +123,7 @@ public enum FeatureManager
     {
         if (!enable)
         {
-            Journeymap.getLogger().info("Feature disabled in multiplayer: " + feature);
+            Journeymap.getLogger().info("Feature disabled: " + feature);
         }
         policyMap.put(feature, new Policy(feature, true, enable));
     }

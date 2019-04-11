@@ -182,21 +182,12 @@ public class ServerOptionsManager extends JmUI
             initGui();
         }
 
-        if (global != null && !buttonList.isEmpty())
+        if (global != null && !buttonList.isEmpty() && (topButtons != null || !topButtons.isEmpty()))
         {
             // WorldId label
             labelWorldId.setX(centerX - (labelWorldId.getWidth() / 2));
             labelWorldId.setY(startY - 10);
 
-            if (topButtons == null)
-            {
-                System.out.println("top is null");
-            }
-
-            if (labelWorldId == null)
-            {
-                System.out.println("label is null");
-            }
             // Top Buttons
             topButtons.layoutCenteredHorizontal(centerX, labelWorldId.getBottomY(), true, hgap);
 
@@ -257,7 +248,8 @@ public class ServerOptionsManager extends JmUI
             dims.add(dim);
         }
         updatedProperties.add(DIMENSIONS, dims);
-
+        updatedProperties.add(DEFAULT_DIM, defaultDimension);
+        System.out.println("Saving");
         new UpdateConfigsService().send(updatedProperties);
         // send to server.
     }
