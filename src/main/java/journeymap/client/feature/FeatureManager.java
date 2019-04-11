@@ -5,6 +5,10 @@
 
 package journeymap.client.feature;
 
+import journeymap.client.data.DataCache;
+import journeymap.client.model.MapType;
+import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.client.ui.minimap.MiniMap;
 import journeymap.common.Journeymap;
 import journeymap.server.properties.PermissionProperties;
 
@@ -85,24 +89,59 @@ public enum FeatureManager
      */
     public void updateDimensionFeatures(PermissionProperties properties)
     {
-        reset();
+//        reset();
 
         if (!properties.caveMappingEnabled.get())
         {
             Journeymap.getLogger().info("Feature disabled: " + Feature.MapCaves);
+            nextMapType(Feature.MapCaves);
             policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, false, false));
+
         }
+        else if (!policyMap.get(Feature.MapCaves).isCurrentlyAllowed() && properties.caveMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature enabled: " + Feature.MapCaves);
+            policyMap.put(Feature.MapCaves, new Policy(Feature.MapCaves, true, true));
+            if (MapType.none().equals(Fullscreen.state().getMapType()))
+            {
+                setMapType(MapType.underground(DataCache.getPlayer()));
+            }
+        }
+
         if (!properties.topoMappingEnabled.get())
         {
             Journeymap.getLogger().info("Feature disabled: " + Feature.MapTopo);
+            nextMapType(Feature.MapTopo);
             policyMap.put(Feature.MapTopo, new Policy(Feature.MapTopo, false, false));
         }
+        else if (!policyMap.get(Feature.MapTopo).isCurrentlyAllowed() && properties.topoMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature enabled: " + Feature.MapTopo);
+            policyMap.put(Feature.MapTopo, new Policy(Feature.MapTopo, true, true));
+            if (MapType.none().equals(Fullscreen.state().getMapType()))
+            {
+                setMapType(MapType.topo(DataCache.getPlayer()));
+            }
+        }
+
         if (!properties.surfaceMappingEnabled.get())
         {
             Journeymap.getLogger().info("Feature disabled: " + Feature.MapSurface);
+            nextMapType(Feature.MapSurface);
             policyMap.put(Feature.MapSurface, new Policy(Feature.MapSurface, false, false));
         }
+        else if (!policyMap.get(Feature.MapSurface).isCurrentlyAllowed() && properties.surfaceMappingEnabled.get())
+        {
+            Journeymap.getLogger().info("Feature enabled: " + Feature.MapSurface);
+            policyMap.put(Feature.MapSurface, new Policy(Feature.MapSurface, true, true));
 
+            if (MapType.none().equals(Fullscreen.state().getMapType()))
+            {
+                final long time = DataCache.getPlayer().entityLivingRef.get().world.getWorldInfo().getWorldTime() % 24000L;
+                MapType mapType = (time < 13800) ? MapType.day(DataCache.getPlayer()) : MapType.night(DataCache.getPlayer());
+                setMapType(mapType);
+            }
+        }
         if (properties.radarEnabled.get())
         {
             setMultiplayerFeature(Feature.RadarAnimals, properties.animalRadarEnabled.get());
@@ -117,6 +156,35 @@ public enum FeatureManager
             setMultiplayerFeature(Feature.RadarPlayers, false);
             setMultiplayerFeature(Feature.RadarVillagers, false);
         }
+    }
+
+    private void nextMapType(Feature feature)
+    {
+        if (policyMap.get(feature).isCurrentlyAllowed() && Fullscreen.state() != null)
+        {
+            if (Fullscreen.state().isSurfaceMappingAllowed() && !Feature.MapSurface.equals(feature))
+            {
+                setMapType(MapType.day(DataCache.getPlayer()));
+                return;
+            }
+            else if (Fullscreen.state().isTopoMappingAllowed() && !Feature.MapTopo.equals(feature))
+            {
+                setMapType(MapType.topo(DataCache.getPlayer()));
+                return;
+            }
+            else if (Fullscreen.state().isCaveMappingAllowed() && !Feature.MapCaves.equals(feature))
+            {
+                setMapType(MapType.underground(DataCache.getPlayer()));
+                return;
+            }
+        }
+//        setMapType(MapType.none());
+    }
+
+    private void setMapType(MapType to)
+    {
+        Fullscreen.state().setMapType(to);
+        MiniMap.state().setMapType(to);
     }
 
     private void setMultiplayerFeature(Feature feature, boolean enable)

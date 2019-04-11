@@ -275,7 +275,7 @@ public class MapState
             }
             lastSlice.set(mapType.vSlice);
         }
-        else if (mapType.name != MapType.Name.none && lastMapProperties.preferredMapType.get() != mapType.name)
+        else if (lastMapProperties != null && mapType.name != MapType.Name.none && lastMapProperties.preferredMapType.get() != mapType.name)
         {
             lastMapProperties.preferredMapType.set(mapType.name);
             lastMapProperties.save();

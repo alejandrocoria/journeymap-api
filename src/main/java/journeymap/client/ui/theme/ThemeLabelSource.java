@@ -10,7 +10,6 @@ import journeymap.client.data.WorldData;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.option.KeyedEnum;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.DimensionManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -144,9 +143,7 @@ public enum ThemeLabelSource implements KeyedEnum
 
     private static String getDimension()
     {
-        int dimId = Minecraft.getMinecraft().player.dimension;
-        String dimName = DimensionManager.getProvider(dimId).getDimensionType().getName();
-        return dimName + " (" + dimId + ")";
+        return WorldData.getDimension();
     }
 
     private static String getLightLevel()

@@ -443,6 +443,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
     }
 
+    public static String getDimension()
+    {
+        int dimId = Minecraft.getMinecraft().player.dimension;
+        String dimName = getSafeDimensionName(new WorldData.WrappedProvider(FMLClientHandler.instance().getClient().player.world.provider));
+        return dimName + " (" + dimId + ")";
+    }
+
     @Override
     public WorldData load(Class aClass) throws Exception
     {

@@ -249,9 +249,7 @@ public class ServerOptionsManager extends JmUI
         }
         updatedProperties.add(DIMENSIONS, dims);
         updatedProperties.add(DEFAULT_DIM, defaultDimension);
-        System.out.println("Saving");
         new UpdateConfigsService().send(updatedProperties);
-        // send to server.
     }
 
     private void nextProperty()
