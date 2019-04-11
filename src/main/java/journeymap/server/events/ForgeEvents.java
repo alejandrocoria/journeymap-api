@@ -5,7 +5,7 @@
 
 package journeymap.server.events;
 
-import journeymap.common.network.Configuration;
+import journeymap.common.network.PlayerConfigRequestService;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -45,7 +45,7 @@ public class ForgeEvents
         if (event.player instanceof EntityPlayerMP)
         {
             // Send a quick ping to the player to notify the server has JM installed.
-            new Configuration().sendToPlayer(null, (EntityPlayerMP) event.player);
+            new PlayerConfigRequestService().sendToPlayer(null, (EntityPlayerMP) event.player);
         }
     }
 

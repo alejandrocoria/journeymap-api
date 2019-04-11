@@ -7,7 +7,6 @@ package journeymap.common.feature;
 
 import com.mojang.authlib.GameProfile;
 import journeymap.common.Journeymap;
-import journeymap.server.JourneymapServer;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.Entity;
@@ -78,7 +77,6 @@ public class JourneyMapTeleport
             }
 
             if (isTeleportAvailable(entity, location)
-                    || debugOverride(entity)
                     || creative
                     || cheatMode
                     || isOp((EntityPlayerMP) entity))
@@ -163,12 +161,5 @@ public class JourneyMapTeleport
         toWorldIn.spawnEntity(entity);
         toWorldIn.updateEntityWithOptionalForce(entity, false);
         entity.setWorld(toWorldIn);
-    }
-
-    private boolean debugOverride(Entity sender)
-    {
-        return (JourneymapServer.DEV_MODE)
-                && ("a4eb5569-bf38-3aef-bc21-2dbd73d30851".equalsIgnoreCase(sender.getUniqueID().toString())
-                || "a2039b6c-5a3d-407d-b49c-091405062b85".equalsIgnoreCase(sender.getUniqueID().toString()));
     }
 }

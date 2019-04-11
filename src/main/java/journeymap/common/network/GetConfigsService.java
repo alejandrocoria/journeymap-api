@@ -53,7 +53,7 @@ public class GetConfigsService extends MessageProcessor
         }
         else
         {
-            player.sendMessage(new TextComponentString("You do not have permission to adjust Journeymap's server settings!"));
+            player.sendMessage(new TextComponentString("You do not have permission to adjust Journeymap's server options!"));
         }
         return null;
     }

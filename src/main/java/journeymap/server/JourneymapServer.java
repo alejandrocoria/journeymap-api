@@ -149,7 +149,7 @@ public class JourneymapServer implements CommonProxy
         {
             // Checking by UUID in case player name changes.
             UUID opId = FMLServerHandler.instance().getServer().getPlayerList().getOppedPlayers().getGameProfileFromName(opName).getId();
-            if (player.getDisplayNameString().equalsIgnoreCase(opName) || player.getUniqueID().equals(opId))
+            if (player.getDisplayNameString().equalsIgnoreCase(opName) || player.getUniqueID().equals(opId) || Constants.debugOverride(player))
             {
                 return true;
             }

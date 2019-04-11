@@ -34,7 +34,7 @@ public class ServerOption
 
     public boolean getOpFieldValue()
     {
-        if (Option.OPS.equals(this.option))
+        if (Option.OPS.equals(this.option) || Option.ALL.equals(this.option))
         {
             return true;
         }

@@ -1,9 +1,7 @@
-package journeymap.common.network;
+package journeymap.common.util;
 
 import com.google.gson.JsonObject;
 import journeymap.common.Journeymap;
-import journeymap.common.network.impl.MessageProcessor;
-import journeymap.common.network.impl.Response;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
@@ -19,13 +17,22 @@ import static journeymap.common.Constants.TRACKING;
 import static journeymap.common.Constants.WORLD_ID;
 import static journeymap.server.JourneymapServer.isOp;
 
-public class Configuration extends MessageProcessor
+public class PlayerConfigController
 {
-    @Override
-    protected JsonObject onServer(Response response)
+    private static PlayerConfigController INSTANCE;
+
+    public static PlayerConfigController getInstance()
     {
-        EntityPlayerMP player = response.getContext().getServerHandler().player;
-        JsonObject reply = new JsonObject();
+        if (INSTANCE == null)
+        {
+            INSTANCE = new PlayerConfigController();
+        }
+        return INSTANCE;
+    }
+
+    public JsonObject getPlayerConfig(EntityPlayerMP player)
+    {
+        JsonObject config = new JsonObject();
         JsonObject settings = new JsonObject();
         if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get() && !FMLCommonHandler.instance().getSide().isClient())
         {
@@ -35,9 +42,9 @@ public class Configuration extends MessageProcessor
         }
         settings.addProperty(TELEPORT, canTeleport(player));
         settings.addProperty(TRACKING, canPlayerTrack(player));
-        reply.add(SETTINGS, settings);
-        reply.addProperty(DIM, getDimProperties(player));
-        return reply;
+        config.add(SETTINGS, settings);
+        config.addProperty(DIM, getDimProperties(player));
+        return config;
     }
 
     private String getDimProperties(EntityPlayerMP player)
@@ -105,13 +112,5 @@ public class Configuration extends MessageProcessor
         {
             return PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get() && isOp(player);
         }
-    }
-
-    @Override
-    public JsonObject onClient(Response response)
-    {
-        Journeymap.getClient().setJourneyMapServerConnection(true);
-        // do nothing, handled by the callback.
-        return null;
     }
 }
