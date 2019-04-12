@@ -1,6 +1,7 @@
 package journeymap.client.ui.serveroption;
 
 import com.google.gson.JsonObject;
+import journeymap.client.Constants;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.CheckBox;
@@ -41,21 +42,20 @@ public class RadarOptions implements Draw
     {
         ButtonList list = new ButtonList();
         // create label
-        String labelText = "Radar Options";
-        label = new Label(fontRenderer.getStringWidth(labelText) + 10, labelText);
+        label = new Label(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.radar.label")) + 10, "jm.server.edit.radar.label");
         label.setHAlign(DrawUtil.HAlign.Center);
         label.setWidth(label.getFitWidth(fontRenderer));
 
-        CheckBox playerChkBx = checkBox("Player", "", PLAYER_RADAR, properties);
-        CheckBox villagerChkBx = checkBox("Villager", "", VILLAGER_RADAR, properties);
-        CheckBox animalChkBx = checkBox("Animal", "", ANIMAL_RADAR, properties);
-        CheckBox mobChkBx = checkBox("Mob", "", MOB_RADAR, properties);
+        CheckBox playerChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.player"), Constants.getString("jm.server.edit.radar.chkbox.player.tooltip"), PLAYER_RADAR, properties);
+        CheckBox villagerChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.villager"), Constants.getString("jm.server.edit.radar.chkbox.villager.tooltip"), VILLAGER_RADAR, properties);
+        CheckBox animalChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.animal"), Constants.getString("jm.server.edit.radar.chkbox.animal.tooltip"), ANIMAL_RADAR, properties);
+        CheckBox mobChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.mob"), Constants.getString("jm.server.edit.radar.chkbox.mob.tooltip"), MOB_RADAR, properties);
         checkBoxList = new ButtonList(playerChkBx, villagerChkBx, animalChkBx, mobChkBx);
 
         ServerOption option = new ServerOption(RADAR, properties);
         radarPropertyButton = new ListPropertyButton<ServerOption.Option>(
                 EnumSet.allOf(ServerOption.Option.class),
-                "Radar:",
+                Constants.getString("jm.server.edit.radar.toggle.label"),
                 new EnumField<>(Category.Hidden, "", option.getOption()));
         radarPropertyButton.addClickListener(button -> {
             option.setOption(radarPropertyButton.getField().get());
@@ -64,6 +64,11 @@ public class RadarOptions implements Draw
             return true;
         });
         radarPropertyButton.setWidth(fontRenderer.getStringWidth(label.displayString) + 40);
+        radarPropertyButton.setTooltip(300,
+                getToggleTooltipBase(),
+                Constants.getString("jm.server.edit.radar.toggle.tooltip1"),
+                Constants.getString("jm.server.edit.radar.toggle.tooltip2")
+        );
         updateCheckBoxes(radarPropertyButton.getField().get());
         list.add(label);
         list.add(radarPropertyButton);

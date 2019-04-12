@@ -104,6 +104,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected Rectangle2D.Double bounds;
 
     protected ArrayList<Function<Button, Boolean>> clickListeners = new ArrayList<>(0);
+    private int tooltipSize = 200;
 
     /**
      * Instantiates a new Button.
@@ -395,7 +396,7 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         {
             for (String line : tooltip)
             {
-                list.addAll(fontRenderer.listFormattedStringToWidth(line, 200));
+                list.addAll(fontRenderer.listFormattedStringToWidth(line, this.tooltipSize));
             }
             return list;
         }
@@ -414,6 +415,17 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
      */
     public void setTooltip(String... tooltip)
     {
+        this.tooltip = tooltip;
+    }
+
+    /**
+     * Sets tooltip.
+     *
+     * @param tooltip the tooltip
+     */
+    public void setTooltip(int size, String... tooltip)
+    {
+        this.tooltipSize = size;
         this.tooltip = tooltip;
     }
 

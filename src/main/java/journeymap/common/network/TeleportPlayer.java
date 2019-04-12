@@ -11,7 +11,7 @@ import static journeymap.common.Constants.X;
 import static journeymap.common.Constants.Y;
 import static journeymap.common.Constants.Z;
 
-public class TeleportService extends MessageProcessor
+public class TeleportPlayer extends MessageProcessor
 {
     @Override
     protected JsonObject onServer(Response response)

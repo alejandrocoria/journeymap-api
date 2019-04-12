@@ -44,7 +44,7 @@ import static journeymap.common.Constants.VILLAGER_RADAR;
 import static journeymap.common.Constants.WORLD_ID;
 import static journeymap.server.JourneymapServer.isOp;
 
-public class UpdateConfigsService extends MessageProcessor
+public class UpdateAllConfigs extends MessageProcessor
 {
     @Override
     protected JsonObject onServer(Response response)

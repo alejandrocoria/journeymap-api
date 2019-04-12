@@ -19,7 +19,7 @@ import static journeymap.server.JourneymapServer.isOp;
 /**
  * Sends a list of players to the client for tracking on the map.
  */
-public class WorldPlayers extends MessageProcessor
+public class GetPlayerLocations extends MessageProcessor
 {
     // Does this action when the message is received on the server.
     @Override

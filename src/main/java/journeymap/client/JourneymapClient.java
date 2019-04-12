@@ -43,7 +43,7 @@ import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
-import journeymap.common.network.PlayerConfigRequestService;
+import journeymap.common.network.GetClientConfig;
 import journeymap.common.version.VersionCheck;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PermissionProperties;
@@ -538,7 +538,7 @@ public class JourneymapClient implements CommonProxy
             // request permissions
             if (isJourneyMapServerConnection() || FMLClientHandler.instance().getClient().isSingleplayer())
             {
-                new PlayerConfigRequestService().send(null, response -> {
+                new GetClientConfig().send(null, response -> {
                     if (response.getAsJson().get(SETTINGS) != null)
                     {
                         JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
@@ -611,7 +611,7 @@ public class JourneymapClient implements CommonProxy
     {
         if (!FMLClientHandler.instance().getClient().isSingleplayer() && currentWorldId == null)
         {
-            new PlayerConfigRequestService().send(null, response -> {
+            new GetClientConfig().send(null, response -> {
                 JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
                 if (settings.get(WORLD_ID) != null)
                 {

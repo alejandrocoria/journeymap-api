@@ -1,6 +1,7 @@
 package journeymap.client.ui.serveroption;
 
 import com.google.gson.JsonObject;
+import journeymap.client.Constants;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.CheckBox;
 
@@ -35,5 +36,13 @@ public interface Draw
         properties.remove(opNode);
         properties.addProperty(node, option.getFieldValue());
         properties.addProperty(opNode, option.getOpFieldValue());
+    }
+
+    default String getToggleTooltipBase() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Constants.getString("jm.server.edit.toggle.base.all")).append("\n");
+        sb.append(Constants.getString("jm.server.edit.toggle.base.op")).append("\n");
+        sb.append(Constants.getString("jm.server.edit.toggle.base.none")).append("\n");
+        return sb.toString();
     }
 }

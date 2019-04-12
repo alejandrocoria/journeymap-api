@@ -13,8 +13,8 @@ import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.Label;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.GetConfigsService;
-import journeymap.common.network.UpdateConfigsService;
+import journeymap.common.network.GetAllConfigs;
+import journeymap.common.network.UpdateAllConfigs;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
@@ -24,6 +24,8 @@ import java.util.Map;
 
 import static journeymap.common.Constants.DEFAULT_DIM;
 import static journeymap.common.Constants.DIMENSIONS;
+import static journeymap.common.Constants.DIM_ID;
+import static journeymap.common.Constants.DIM_NAME;
 import static journeymap.common.Constants.GLOBAL;
 import static journeymap.common.Constants.WORLD_ID;
 
@@ -58,7 +60,7 @@ public class ServerOptionsManager extends JmUI
 
     public ServerOptionsManager(JmUI returnDisplay)
     {
-        super("Server Admin", returnDisplay);
+        super(Constants.getString("jm.server.edit.label.admin.edit"), returnDisplay);
         this.dimIndexList = Lists.newArrayList();
         Keyboard.enableRepeatEvents(true);
         getData();
@@ -74,13 +76,13 @@ public class ServerOptionsManager extends JmUI
     {
         try
         {
-            new GetConfigsService().send(null, result -> {
+            new GetAllConfigs().send(null, result -> {
                 if (result.getAsJson().get(GLOBAL) != null)
                 {
                     this.dimIndexList.add(GLOBAL);
                     this.global = result.getAsJson().get(GLOBAL).getAsJsonObject();
                     this.activeProperty = global;
-                    this.labelSelector = new Label(150, "Global");
+                    this.labelSelector = new Label(150, "jm.server.edit.label.selection.global");
                     this.labelSelector.setHAlign(DrawUtil.HAlign.Center);
                 }
 
@@ -99,7 +101,7 @@ public class ServerOptionsManager extends JmUI
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("BLeh", e);
+            Journeymap.getLogger().error("Error getting data", e);
         }
     }
 
@@ -110,9 +112,9 @@ public class ServerOptionsManager extends JmUI
         for (JsonElement dim : dims)
         {
             JsonObject json = dim.getAsJsonObject();
-            if (json.get("dimId") != null)
+            if (json.get(DIM_ID) != null)
             {
-                int dimId = json.get("dimId").getAsInt();
+                int dimId = json.get(DIM_ID).getAsInt();
                 this.dimIndexList.add(String.valueOf(dimId));
                 dimMap.put(dimId, json);
             }
@@ -132,9 +134,11 @@ public class ServerOptionsManager extends JmUI
             if (global != null)
             {
                 buttonList.clear();
-                buttonNext = new Button(">>");
+                buttonNext = new Button(Constants.getString("jm.server.edit.label.button.next"));
+                buttonNext.setTooltip(Constants.getString("jm.server.edit.label.button.next.tooltip"));
                 buttonNext.setWidth(40);
-                buttonPrevious = new Button("<<");
+                buttonPrevious = new Button(Constants.getString("jm.server.edit.label.button.previous"));
+                buttonPrevious.setTooltip(Constants.getString("jm.server.edit.label.button.previous.tooltip"));
                 buttonPrevious.setWidth(buttonNext.getWidth());
 
                 topButtons = new ButtonList(buttonPrevious, labelSelector, buttonNext);
@@ -144,7 +148,7 @@ public class ServerOptionsManager extends JmUI
                 }
                 else
                 {
-                    labelWorldId = new Label(40, "SinglePlayer");
+                    labelWorldId = new Label(40, "jm.server.edit.label.worldId.singleplayer");
                 }
                 labelWorldId.setHAlign(DrawUtil.HAlign.Center);
                 labelWorldId.setWidth(labelWorldId.getFitWidth(getFontRenderer()));
@@ -249,7 +253,7 @@ public class ServerOptionsManager extends JmUI
         }
         updatedProperties.add(DIMENSIONS, dims);
         updatedProperties.add(DEFAULT_DIM, defaultDimension);
-        new UpdateConfigsService().send(updatedProperties);
+        new UpdateAllConfigs().send(updatedProperties);
     }
 
     private void nextProperty()
@@ -264,18 +268,21 @@ public class ServerOptionsManager extends JmUI
         }
         if (index == 0)
         {
-            labelSelector.displayString = "Global";
+            labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.global");
+            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.global.tooltip"));
             this.activeProperty = global;
         }
         else if (index == 1)
         {
-            labelSelector.displayString = "Default Dimension";
+            labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.default");
+            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.default.tooltip"));
             this.activeProperty = defaultDimension;
         }
         else
         {
-            String dimName = dimensionMap.get(Integer.valueOf(dimIndexList.get(index))).get("dimName").getAsString();
-            labelSelector.displayString = dimName + " id:" + dimIndexList.get(index);
+            String dimName = dimensionMap.get(Integer.valueOf(dimIndexList.get(index))).get(DIM_NAME).getAsString();
+            labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.dimension", dimName, dimIndexList.get(index));
+            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.dimension.tooltip"));
             this.activeProperty = dimensionMap.get(Integer.valueOf(dimIndexList.get(index)));
         }
 

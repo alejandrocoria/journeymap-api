@@ -7,7 +7,7 @@ import journeymap.common.network.impl.Response;
 import journeymap.common.util.PlayerConfigController;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-public class PlayerConfigRequestService extends MessageProcessor
+public class GetClientConfig extends MessageProcessor
 {
     @Override
     protected JsonObject onServer(Response response)

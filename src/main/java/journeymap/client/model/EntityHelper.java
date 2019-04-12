@@ -14,7 +14,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.WorldPlayers;
+import journeymap.common.network.GetPlayerLocations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -157,7 +157,7 @@ public class EntityHelper
 
         if (Journeymap.getClient().isJourneyMapServerConnection() && Journeymap.getClient().isPlayerTrackingEnabled())
         {
-            new WorldPlayers().send(null);
+            new GetPlayerLocations().send(null);
             allPlayers.addAll(getPlayersOnServer(allPlayers));
         }
 

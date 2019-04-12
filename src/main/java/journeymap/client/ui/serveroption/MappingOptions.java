@@ -1,6 +1,7 @@
 package journeymap.client.ui.serveroption;
 
 import com.google.gson.JsonObject;
+import journeymap.client.Constants;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.Label;
@@ -38,15 +39,15 @@ public class MappingOptions implements Draw
     {
         ButtonList list = new ButtonList();
         // create label
-        String labelText = "Mapping Options";
-        label = new Label(fontRenderer.getStringWidth(labelText) + 10, labelText);
+
+        label = new Label(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.mapping.label")) + 10, "jm.server.edit.mapping.label");
         label.setHAlign(DrawUtil.HAlign.Center);
         label.setWidth(label.getFitWidth(fontRenderer));
 
         ServerOption surfaceOption = new ServerOption(SURFACE_MAP, properties);
         ListPropertyButton<ServerOption.Option> surfaceOptionButton = new ListPropertyButton<ServerOption.Option>(
                 EnumSet.allOf(ServerOption.Option.class),
-                "Surface:",
+                Constants.getString("jm.server.edit.mapping.toggle.surface.label"),
                 new EnumField<>(Category.Hidden, "", surfaceOption.getOption()));
         surfaceOptionButton.addClickListener(button -> {
             surfaceOption.setOption(surfaceOptionButton.getField().get());
@@ -57,8 +58,8 @@ public class MappingOptions implements Draw
         ServerOption topoOption = new ServerOption(TOPO_MAP, properties);
         ListPropertyButton<ServerOption.Option> topoOptionButton = new ListPropertyButton<ServerOption.Option>(
                 EnumSet.allOf(ServerOption.Option.class),
-                "Topography:",
-                new EnumField(Category.Hidden, "", topoOption.getOption()));
+                Constants.getString("jm.server.edit.mapping.toggle.topo.label"),
+                new EnumField<>(Category.Hidden, "", topoOption.getOption()));
         topoOptionButton.addClickListener(button -> {
             topoOption.setOption(topoOptionButton.getField().get());
             updateToggleProperty(topoOption, this.properties, TOPO_MAP, OP_TOPO_MAP);
@@ -68,14 +69,25 @@ public class MappingOptions implements Draw
         ServerOption caveOption = new ServerOption(CAVE_MAP, properties);
         ListPropertyButton<ServerOption.Option> caveOptionButton = new ListPropertyButton<ServerOption.Option>(
                 EnumSet.allOf(ServerOption.Option.class),
-                "Cave:",
+                Constants.getString("jm.server.edit.mapping.toggle.cave.label"),
                 new EnumField<>(Category.Hidden, "", caveOption.getOption()));
         caveOptionButton.addClickListener(button -> {
             caveOption.setOption(caveOptionButton.getField().get());
             updateToggleProperty(caveOption, this.properties, CAVE_MAP, OP_CAVE_MAP);
             return true;
         });
-
+        surfaceOptionButton.setTooltip(300,
+                getToggleTooltipBase(),
+                Constants.getString("jm.server.edit.mapping.toggle.surface.tooltip")
+        );
+        topoOptionButton.setTooltip(300,
+                getToggleTooltipBase(),
+                Constants.getString("jm.server.edit.mapping.toggle.topo.tooltip")
+        );
+        caveOptionButton.setTooltip(300,
+                getToggleTooltipBase(),
+                Constants.getString("jm.server.edit.mapping.toggle.cave.tooltip")
+        );
         mappingToggleButtons = new ButtonList(surfaceOptionButton, topoOptionButton, caveOptionButton);
         mappingToggleButtons.setWidths(120);
         list.add(label);

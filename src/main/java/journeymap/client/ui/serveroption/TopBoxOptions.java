@@ -1,6 +1,7 @@
 package journeymap.client.ui.serveroption;
 
 import com.google.gson.JsonObject;
+import journeymap.client.Constants;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.IntSliderButton;
 import journeymap.client.ui.component.ListPropertyButton;
@@ -45,27 +46,28 @@ public class TopBoxOptions implements Draw
         // this is a check to see if we have a dim, or a global property. Global does not have an enable field.
         if (this.properties.get(ENABLED) != null)
         {
-            list.add(checkBox("Enable", "", ENABLED, properties));
-            list.add(checkBox("Teleport", "", TELEPORT, properties));
+            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.enable"), Constants.getString("jm.server.edit.chkbox.enable.tooltip"), ENABLED, properties));
+            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.teleport"), Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip2"), TELEPORT, properties));
         }
         else
         {
-            list.add(checkBox("Teleport", "", TELEPORT, properties));
+            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.teleport"), Constants.getString("jm.server.edit.chkbox.teleport.tooltip"), TELEPORT, properties));
             if (!FMLClientHandler.instance().getClient().isSingleplayer())
             {
-                list.add(checkBox("Use World ID", "", USE_WORLD_ID, properties));
+                list.add(checkBox(Constants.getString("jm.server.edit.chkbox.world.id"), Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"), USE_WORLD_ID, properties));
 
                 //add tracking slider
                 IntegerField sliderFieldValue = new IntegerField(Category.Hidden, "", 100, 20000, 1000);
                 sliderFieldValue.set(properties.get(TRACKING_TIME).getAsInt());
-                IntSliderButton trackingUpdateSlider = new IntSliderButton(sliderFieldValue, "Update Time: ", " ms");
+                IntSliderButton trackingUpdateSlider = new IntSliderButton(sliderFieldValue, Constants.getString("jm.server.edit.slider.update.pre"), Constants.getString("jm.server.edit.slider.update.post"));
+                trackingUpdateSlider.setTooltip(Constants.getString("jm.server.edit.slider.update.tooltip"));
                 trackingUpdateSlider.visible = false;
                 // Add tracking button
                 ServerOption option = new ServerOption(TRACKING, properties);
                 ListPropertyButton<ServerOption.Option> tracking;
                 tracking = new ListPropertyButton<ServerOption.Option>(
                         EnumSet.allOf(ServerOption.Option.class),
-                        "Server Radar:",
+                        Constants.getString("jm.server.edit.tracking.label"),
                         new EnumField<>(Category.Hidden, "", option.getOption()));
                 tracking.addClickListener(button -> {
                     option.setOption(tracking.getField().get());
@@ -73,7 +75,14 @@ public class TopBoxOptions implements Draw
                     resetTrackingSlider(tracking.getField().get(), tracking, trackingUpdateSlider);
                     return true;
                 });
-                trackingUpdateSlider.setWidth(fontRenderer.getStringWidth("Update Time 20000 ms") + 10);
+                tracking.setTooltip(300,
+                        getToggleTooltipBase(),
+                        Constants.getString("jm.server.edit.tracking.tooltip1"),
+                        Constants.getString("jm.server.edit.tracking.tooltip2"),
+                        Constants.getString("jm.server.edit.tracking.tooltip3")
+                );
+
+                trackingUpdateSlider.setWidth(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.slider.update.pre") + 20000 + Constants.getString("jm.server.edit.slider.update.post")) + 10);
                 resetTrackingSlider(tracking.getField().get(), tracking, trackingUpdateSlider);
                 list.add(tracking);
                 list.add(trackingUpdateSlider);
@@ -93,6 +102,7 @@ public class TopBoxOptions implements Draw
         {
             tracking.setWidth(120);
             trackingUpdateSlider.setVisible(true);
+            trackingUpdateSlider.setEnabled(false); // TODO: Delete this line when implemented.
         }
     }
 
