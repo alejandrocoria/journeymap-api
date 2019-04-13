@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenRealmsProxy;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.realms.RealmsScreen;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -37,7 +38,6 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.Level;
-import org.lwjgl.opengl.Display;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -469,7 +469,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
         mod_name = JourneymapClient.MOD_NAME;
         jm_version = Journeymap.JM_VERSION.toString();
         latest_journeymap_version = VersionCheck.getVersionAvailable();
-        mc_version = Display.getTitle().split("\\s(?=\\d)")[1];
+        // mc_version = mc.getCurrentServerData().gameVersion;
+        mc_version = ResourcePackRepository.getDownloadHeaders().get("X-Minecraft-Version");
         browser_poll = Math.max(1000, Journeymap.getClient().getCoreProperties().browserPoll.get());
 
         return this;
