@@ -17,32 +17,32 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import static journeymap.common.Constants.ANIMAL_RADAR;
-import static journeymap.common.Constants.CAVE_MAP;
-import static journeymap.common.Constants.DEFAULT_DIM;
-import static journeymap.common.Constants.DIM;
-import static journeymap.common.Constants.DIMENSIONS;
-import static journeymap.common.Constants.DIM_ID;
-import static journeymap.common.Constants.ENABLED;
-import static journeymap.common.Constants.GLOBAL;
-import static journeymap.common.Constants.MOB_RADAR;
-import static journeymap.common.Constants.OP_CAVE_MAP;
-import static journeymap.common.Constants.OP_RADAR;
-import static journeymap.common.Constants.OP_SURFACE_MAP;
-import static journeymap.common.Constants.OP_TOPO_MAP;
-import static journeymap.common.Constants.OP_TRACKING;
-import static journeymap.common.Constants.PLAYER_RADAR;
-import static journeymap.common.Constants.RADAR;
-import static journeymap.common.Constants.SETTINGS;
-import static journeymap.common.Constants.SURFACE_MAP;
-import static journeymap.common.Constants.TELEPORT;
-import static journeymap.common.Constants.TOPO_MAP;
-import static journeymap.common.Constants.TRACKING;
-import static journeymap.common.Constants.TRACKING_TIME;
-import static journeymap.common.Constants.USE_WORLD_ID;
-import static journeymap.common.Constants.VILLAGER_RADAR;
-import static journeymap.common.Constants.WORLD_ID;
-import static journeymap.server.JourneymapServer.isOp;
+import static journeymap.common.network.Constants.ANIMAL_RADAR;
+import static journeymap.common.network.Constants.CAVE_MAP;
+import static journeymap.common.network.Constants.DEFAULT_DIM;
+import static journeymap.common.network.Constants.DIM;
+import static journeymap.common.network.Constants.DIMENSIONS;
+import static journeymap.common.network.Constants.DIM_ID;
+import static journeymap.common.network.Constants.ENABLED;
+import static journeymap.common.network.Constants.GLOBAL;
+import static journeymap.common.network.Constants.MOB_RADAR;
+import static journeymap.common.network.Constants.OP_CAVE_MAP;
+import static journeymap.common.network.Constants.OP_RADAR;
+import static journeymap.common.network.Constants.OP_SURFACE_MAP;
+import static journeymap.common.network.Constants.OP_TOPO_MAP;
+import static journeymap.common.network.Constants.OP_TRACKING;
+import static journeymap.common.network.Constants.PLAYER_RADAR;
+import static journeymap.common.network.Constants.RADAR;
+import static journeymap.common.network.Constants.SERVER_ADMIN;
+import static journeymap.common.network.Constants.SETTINGS;
+import static journeymap.common.network.Constants.SURFACE_MAP;
+import static journeymap.common.network.Constants.TELEPORT;
+import static journeymap.common.network.Constants.TOPO_MAP;
+import static journeymap.common.network.Constants.TRACKING;
+import static journeymap.common.network.Constants.TRACKING_TIME;
+import static journeymap.common.network.Constants.USE_WORLD_ID;
+import static journeymap.common.network.Constants.VILLAGER_RADAR;
+import static journeymap.common.network.Constants.WORLD_ID;
 
 public class UpdateAllConfigs extends MessageProcessor
 {
@@ -50,8 +50,7 @@ public class UpdateAllConfigs extends MessageProcessor
     protected JsonObject onServer(Response response)
     {
         EntityPlayerMP player = response.getContext().getServerHandler().player;
-        // TODO: Find a better solution so not all ops can update the server options.
-        if (isOp(player) || FMLCommonHandler.instance().getSide().isClient())
+        if (PlayerConfigController.getInstance().canServerAdmin(player) || FMLCommonHandler.instance().getSide().isClient())
         {
             // Save the properties!
             JsonObject prop = response.getAsJson();
@@ -153,6 +152,10 @@ public class UpdateAllConfigs extends MessageProcessor
             if ((settings.get(TELEPORT) != null))
             {
                 Journeymap.getClient().setPlayerTrackingEnabled(settings.get(TELEPORT).getAsBoolean());
+            }
+            if ((settings.get(SERVER_ADMIN) != null))
+            {
+                Journeymap.getClient().setServerAdmin(settings.get(SERVER_ADMIN).getAsBoolean());
             }
             Journeymap.getClient().setJourneyMapServerConnection(true);
             String dimProperties = response.getAsJson().get(DIM).getAsString();

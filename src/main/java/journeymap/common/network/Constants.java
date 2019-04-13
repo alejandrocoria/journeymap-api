@@ -1,4 +1,4 @@
-package journeymap.common;
+package journeymap.common.network;
 
 public interface Constants
 {
@@ -22,6 +22,7 @@ public interface Constants
     String OP_TOPO_MAP = "op_topo";
     String CAVE_MAP = "cave";
     String OP_CAVE_MAP = "op_cave";
+    String SERVER_ADMIN = "server_admin";
     String GLOBAL = "global";
     String DIMENSIONS = "dimensions";
     String DEFAULT_DIM = "default_dimension";

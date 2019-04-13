@@ -184,7 +184,7 @@ public abstract class ServerPropertiesBase extends PropertiesBase implements Clo
     {
         if (sourceFile == null)
         {
-            sourceFile = new File(Constants.CONFIG_DIR, getFileName());
+            sourceFile = new File(Constants.SERVER_CONFIG_DIR, getFileName());
         }
         return sourceFile;
     }

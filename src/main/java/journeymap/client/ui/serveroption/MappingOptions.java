@@ -13,12 +13,12 @@ import net.minecraft.client.gui.FontRenderer;
 import java.awt.*;
 import java.util.EnumSet;
 
-import static journeymap.common.Constants.CAVE_MAP;
-import static journeymap.common.Constants.OP_CAVE_MAP;
-import static journeymap.common.Constants.OP_SURFACE_MAP;
-import static journeymap.common.Constants.OP_TOPO_MAP;
-import static journeymap.common.Constants.SURFACE_MAP;
-import static journeymap.common.Constants.TOPO_MAP;
+import static journeymap.common.network.Constants.CAVE_MAP;
+import static journeymap.common.network.Constants.OP_CAVE_MAP;
+import static journeymap.common.network.Constants.OP_SURFACE_MAP;
+import static journeymap.common.network.Constants.OP_TOPO_MAP;
+import static journeymap.common.network.Constants.SURFACE_MAP;
+import static journeymap.common.network.Constants.TOPO_MAP;
 
 public class MappingOptions implements Draw
 {

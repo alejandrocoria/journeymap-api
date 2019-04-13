@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static journeymap.common.Constants.DEFAULT_DIM;
-import static journeymap.common.Constants.DIMENSIONS;
-import static journeymap.common.Constants.DIM_ID;
-import static journeymap.common.Constants.DIM_NAME;
-import static journeymap.common.Constants.GLOBAL;
-import static journeymap.common.Constants.WORLD_ID;
+import static journeymap.common.network.Constants.DEFAULT_DIM;
+import static journeymap.common.network.Constants.DIMENSIONS;
+import static journeymap.common.network.Constants.DIM_ID;
+import static journeymap.common.network.Constants.DIM_NAME;
+import static journeymap.common.network.Constants.GLOBAL;
+import static journeymap.common.network.Constants.WORLD_ID;
 
 public class ServerOptionsManager extends JmUI
 {

@@ -25,7 +25,7 @@ public class Constants
     private static final String END = null;
     public static final File MC_DATA_DIR = SERVER.getDataDirectory();
     public static String JOURNEYMAP_DIR = "journeymap";
-    public static String CONFIG_DIR = path.join(MC_DATA_DIR, JOURNEYMAP_DIR, "server", Journeymap.JM_VERSION.toMajorMinorString(), END);
+    public static final String SERVER_CONFIG_DIR = path.join(MC_DATA_DIR, JOURNEYMAP_DIR, "server", Journeymap.JM_VERSION.toMajorMinorString(), END);
 
     public static boolean debugOverride(Entity sender)
     {

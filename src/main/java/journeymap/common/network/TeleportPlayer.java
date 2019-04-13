@@ -6,10 +6,10 @@ import journeymap.common.feature.Location;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
 
-import static journeymap.common.Constants.DIM;
-import static journeymap.common.Constants.X;
-import static journeymap.common.Constants.Y;
-import static journeymap.common.Constants.Z;
+import static journeymap.common.network.Constants.DIM;
+import static journeymap.common.network.Constants.X;
+import static journeymap.common.network.Constants.Y;
+import static journeymap.common.network.Constants.Z;
 
 public class TeleportPlayer extends MessageProcessor
 {

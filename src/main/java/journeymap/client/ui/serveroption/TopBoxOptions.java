@@ -14,12 +14,12 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.EnumSet;
 
 import static journeymap.client.ui.serveroption.ServerOption.Option.NONE;
-import static journeymap.common.Constants.ENABLED;
-import static journeymap.common.Constants.OP_TRACKING;
-import static journeymap.common.Constants.TELEPORT;
-import static journeymap.common.Constants.TRACKING;
-import static journeymap.common.Constants.TRACKING_TIME;
-import static journeymap.common.Constants.USE_WORLD_ID;
+import static journeymap.common.network.Constants.ENABLED;
+import static journeymap.common.network.Constants.OP_TRACKING;
+import static journeymap.common.network.Constants.TELEPORT;
+import static journeymap.common.network.Constants.TRACKING;
+import static journeymap.common.network.Constants.TRACKING_TIME;
+import static journeymap.common.network.Constants.USE_WORLD_ID;
 
 public class TopBoxOptions implements Draw
 {

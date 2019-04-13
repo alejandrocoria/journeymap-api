@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.version.Version;
+import journeymap.server.config.ForgeConfig;
 import journeymap.server.events.ForgeEvents;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,6 +58,7 @@ public class JourneymapServer implements CommonProxy
     @Mod.EventHandler
     public void preInitialize(FMLPreInitializationEvent event)
     {
+        MinecraftForge.EVENT_BUS.register(new ForgeConfig());
     }
 
     /**

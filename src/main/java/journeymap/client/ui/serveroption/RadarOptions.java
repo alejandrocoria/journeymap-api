@@ -15,12 +15,12 @@ import java.awt.*;
 import java.util.EnumSet;
 
 import static journeymap.client.ui.serveroption.ServerOption.Option.ALL;
-import static journeymap.common.Constants.ANIMAL_RADAR;
-import static journeymap.common.Constants.MOB_RADAR;
-import static journeymap.common.Constants.OP_RADAR;
-import static journeymap.common.Constants.PLAYER_RADAR;
-import static journeymap.common.Constants.RADAR;
-import static journeymap.common.Constants.VILLAGER_RADAR;
+import static journeymap.common.network.Constants.ANIMAL_RADAR;
+import static journeymap.common.network.Constants.MOB_RADAR;
+import static journeymap.common.network.Constants.OP_RADAR;
+import static journeymap.common.network.Constants.PLAYER_RADAR;
+import static journeymap.common.network.Constants.RADAR;
+import static journeymap.common.network.Constants.VILLAGER_RADAR;
 
 public class RadarOptions implements Draw
 {

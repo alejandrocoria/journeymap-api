@@ -2,6 +2,8 @@ package journeymap.common.util;
 
 import com.google.gson.JsonObject;
 import journeymap.common.Journeymap;
+import journeymap.server.Constants;
+import journeymap.server.config.ForgeConfig;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
@@ -10,11 +12,12 @@ import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import static journeymap.common.Constants.DIM;
-import static journeymap.common.Constants.SETTINGS;
-import static journeymap.common.Constants.TELEPORT;
-import static journeymap.common.Constants.TRACKING;
-import static journeymap.common.Constants.WORLD_ID;
+import static journeymap.common.network.Constants.DIM;
+import static journeymap.common.network.Constants.SERVER_ADMIN;
+import static journeymap.common.network.Constants.SETTINGS;
+import static journeymap.common.network.Constants.TELEPORT;
+import static journeymap.common.network.Constants.TRACKING;
+import static journeymap.common.network.Constants.WORLD_ID;
 import static journeymap.server.JourneymapServer.isOp;
 
 public class PlayerConfigController
@@ -42,9 +45,25 @@ public class PlayerConfigController
         }
         settings.addProperty(TELEPORT, canTeleport(player));
         settings.addProperty(TRACKING, canPlayerTrack(player));
+        settings.addProperty(SERVER_ADMIN, canServerAdmin(player));
         config.add(SETTINGS, settings);
         config.addProperty(DIM, getDimProperties(player));
         return config;
+    }
+
+    public boolean canServerAdmin(EntityPlayerMP player)
+    {
+        String[] admins = ForgeConfig.playerNames;
+        for (String admin : admins)
+        {
+            if (player.getUniqueID().toString().equals(admin)
+                    || player.getName().equalsIgnoreCase(admin)
+                    || Constants.debugOverride(player))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getDimProperties(EntityPlayerMP player)

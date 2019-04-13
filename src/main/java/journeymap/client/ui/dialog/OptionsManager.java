@@ -23,7 +23,13 @@ import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
 import journeymap.client.ui.UIManager;
-import journeymap.client.ui.component.*;
+import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.CheckBox;
+import journeymap.client.ui.component.IConfigFieldHolder;
+import journeymap.client.ui.component.IntSliderButton;
+import journeymap.client.ui.component.JmUI;
+import journeymap.client.ui.component.ScrollListPane;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.ui.option.CategorySlot;
@@ -42,7 +48,13 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Master options UI
@@ -79,6 +91,11 @@ public class OptionsManager extends JmUI
      * The Button about.
      */
     protected Button buttonAbout;
+
+    /**
+     * The Button server.
+     */
+    protected Button  buttonServer;
     /**
      * The Render stats button.
      */
@@ -305,7 +322,14 @@ public class OptionsManager extends JmUI
 
             buttonAbout = new Button(Constants.getString("jm.common.splash_about"));
 
-            ButtonList bottomRow = new ButtonList(buttonAbout, buttonClose);
+            buttonServer = new Button(Constants.getString("jm.server.edit.label.admin.edit"));
+            buttonServer.addClickListener(button -> {
+                UIManager.INSTANCE.openServerEditor(OptionsManager.this);
+                return true;
+            });
+            buttonServer.visible = Journeymap.getClient().isServerAdmin();
+
+            ButtonList bottomRow = new ButtonList(buttonAbout, buttonClose, buttonServer);
             bottomRow.equalizeWidths(getFontRenderer());
             bottomRow.setWidths(Math.max(150, buttonAbout.getWidth()));
             bottomRow.layoutCenteredHorizontal(width / 2, height - 25, true, 4);
