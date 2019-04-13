@@ -9,7 +9,7 @@ import journeymap.common.network.impl.Response;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.server.FMLServerHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +58,7 @@ public class GetPlayerLocations extends MessageProcessor
         JsonArray playerList = new JsonArray();
         List<EntityPlayerMP> serverPlayers = null;
         JsonObject players = new JsonObject();
-        serverPlayers = FMLServerHandler.instance().getServer().getPlayerList().getPlayers();
+        serverPlayers = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
         if (serverPlayers != null || serverPlayers.size() > 1)
         {
             for (EntityPlayerMP playerMp : serverPlayers)
