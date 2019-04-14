@@ -81,8 +81,12 @@ public class TopBoxOptions implements Draw
                 tracking.setTooltip(300,
                         getToggleTooltipBase(),
                         Constants.getString("jm.server.edit.tracking.tooltip1"),
+                        "",
                         Constants.getString("jm.server.edit.tracking.tooltip2"),
-                        Constants.getString("jm.server.edit.tracking.tooltip3")
+                        "",
+                        Constants.getString("jm.server.edit.tracking.tooltip3"),
+                        "",
+                        Constants.getString("jm.server.edit.tracking.tooltip4")
                 );
 
                 trackingUpdateSlider.addClickListener(button -> {
@@ -92,7 +96,7 @@ public class TopBoxOptions implements Draw
                 });
 
 
-                trackingUpdateSlider.setWidth(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.slider.update.pre") + 20000 + Constants.getString("jm.server.edit.slider.update.post")) + 10);
+                trackingUpdateSlider.setWidth(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.slider.update.pre") + TRACKING_MAX + Constants.getString("jm.server.edit.slider.update.post")) + 10);
                 resetTrackingSlider(tracking.getField().get(), tracking, trackingUpdateSlider);
                 list.add(tracking);
                 list.add(trackingUpdateSlider);
@@ -105,14 +109,13 @@ public class TopBoxOptions implements Draw
     {
         if (NONE.equals(options))
         {
-            tracking.setWidth(150);
             trackingUpdateSlider.setVisible(false);
         }
         else
         {
-            tracking.setWidth(120);
             trackingUpdateSlider.setVisible(true);
         }
+        tracking.setWidth(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.tracking.label") + " : * " + options.displayName() + " * ") + 10);
     }
 
     @Override
