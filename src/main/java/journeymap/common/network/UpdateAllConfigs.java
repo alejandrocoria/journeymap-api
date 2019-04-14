@@ -12,6 +12,7 @@ import journeymap.server.properties.DefaultDimensionProperties;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
+import journeymap.server.properties.Permissions;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
@@ -39,7 +40,7 @@ import static journeymap.common.network.Constants.SURFACE_MAP;
 import static journeymap.common.network.Constants.TELEPORT;
 import static journeymap.common.network.Constants.TOPO_MAP;
 import static journeymap.common.network.Constants.TRACKING;
-import static journeymap.common.network.Constants.TRACKING_TIME;
+import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.common.network.Constants.USE_WORLD_ID;
 import static journeymap.common.network.Constants.VILLAGER_RADAR;
 import static journeymap.common.network.Constants.WORLD_ID;
@@ -72,9 +73,9 @@ public class UpdateAllConfigs extends MessageProcessor
                     {
                         properties.playerTrackingEnabled.set(global.get(TRACKING).getAsBoolean());
                     }
-                    if (global.get(TRACKING_TIME) != null)
+                    if (global.get(TRACKING_UPDATE_TIME) != null)
                     {
-                        properties.playerTrackingUpdateTime.set(global.get(TRACKING_TIME).getAsInt());
+                        properties.playerTrackingUpdateTime.set(global.get(TRACKING_UPDATE_TIME).getAsInt());
                     }
                 }
                 updateCommonProperties(properties, global);
@@ -113,7 +114,7 @@ public class UpdateAllConfigs extends MessageProcessor
         }
         else
         {
-            player.sendMessage(new TextComponentString("You do not have access to update the server options!!"));
+            player.sendMessage(new TextComponentString("You do not have permission to modify Journeymap's server options!"));
         }
         return null;
     }
@@ -149,9 +150,9 @@ public class UpdateAllConfigs extends MessageProcessor
             {
                 Journeymap.getClient().setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
             }
-            if ((settings.get(TELEPORT) != null))
+            if ((settings.get(TRACKING) != null))
             {
-                Journeymap.getClient().setPlayerTrackingEnabled(settings.get(TELEPORT).getAsBoolean());
+                Journeymap.getClient().setPlayerTrackingEnabled(settings.get(TRACKING).getAsBoolean());
             }
             if ((settings.get(SERVER_ADMIN) != null))
             {
@@ -159,7 +160,7 @@ public class UpdateAllConfigs extends MessageProcessor
             }
             Journeymap.getClient().setJourneyMapServerConnection(true);
             String dimProperties = response.getAsJson().get(DIM).getAsString();
-            PermissionProperties prop = new DimensionProperties(0).load(dimProperties, false);
+            PermissionProperties prop = new Permissions().load(dimProperties, false);
             FeatureManager.INSTANCE.updateDimensionFeatures(prop);
         }
         return null;

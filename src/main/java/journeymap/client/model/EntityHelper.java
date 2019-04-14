@@ -6,19 +6,14 @@
 package journeymap.client.model;
 
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
 import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.GetPlayerLocations;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
@@ -39,13 +34,11 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class EntityHelper
 {
@@ -155,10 +148,8 @@ public class EntityHelper
         List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.world.playerEntities);
         allPlayers.remove(mc.player);
 
-        if (Journeymap.getClient().isJourneyMapServerConnection() && Journeymap.getClient().isPlayerTrackingEnabled())
-        {
-            new GetPlayerLocations().send(null);
-            allPlayers.addAll(getPlayersOnServer(allPlayers));
+        if(Journeymap.getClient().isPlayerTrackingEnabled()) {
+            allPlayers.addAll(Journeymap.getClient().playersOnServer);
         }
 
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();
@@ -179,35 +170,6 @@ public class EntityHelper
 
         timer.stop();
         return playerDTOs;
-    }
-
-    private static Collection<? extends EntityPlayer> getPlayersOnServer(List<EntityPlayer> allPlayers)
-    {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        List<EntityPlayer> playerList = Lists.<EntityPlayer>newArrayList();
-        for (NetworkPlayerInfo onlinePlayer : mc.getConnection().getPlayerInfoMap())
-        {
-            // If player is already in list, they are close enough for the client to see so ignore server tracking.
-            boolean playerInList = allPlayers.stream().anyMatch(p -> p.getUniqueID().equals(onlinePlayer.getGameProfile().getId()));
-            if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()) && !playerInList && Journeymap.getClient().playersOnServer.size() > 0)
-            {
-                JsonObject player = Journeymap.getClient().playersOnServer.get(onlinePlayer.getGameProfile().getId());
-                EntityPlayer playerMp = new EntityOtherPlayerMP(mc.world, onlinePlayer.getGameProfile());
-                playerMp.posX = player.get("posX").getAsInt();
-                playerMp.posY = player.get("posY").getAsInt();
-                playerMp.posZ = player.get("posZ").getAsInt();
-                playerMp.chunkCoordX = player.get("chunkX").getAsInt();
-                playerMp.chunkCoordY = player.get("chunkY").getAsInt();
-                playerMp.chunkCoordZ = player.get("chunkZ").getAsInt();
-                playerMp.rotationYawHead = player.get("rotation").getAsFloat();
-                playerMp.setSneaking(player.get("sneaking").getAsBoolean());
-                playerMp.setUniqueId(UUID.fromString(player.get("playerId").getAsString()));
-                playerMp.addedToChunk = true;
-                playerList.add(playerMp);
-            }
-        }
-        // add fake players
-        return playerList;
     }
 
     /**

@@ -145,9 +145,32 @@ public abstract class MessageProcessor
      * Sends the data package to the server.
      */
     @SideOnly(Side.CLIENT)
+    public void send()
+    {
+        send(new JsonObject());
+    }
+
+    /**
+     * Sends the data package to the server.
+     */
+    @SideOnly(Side.CLIENT)
     public void send(JsonObject requestData)
     {
         buildRequest(requestData);
+        JOURNEYMAP_NETWORK_CHANNEL.sendToServer(new Message(gson.toJson(data)));
+    }
+
+
+    /**
+     * Sends the data package to the server with callback.
+     *
+     * @param callback - The callback.
+     */
+    @SideOnly(Side.CLIENT)
+    public void send(AsyncCallback callback)
+    {
+        buildRequest(null);
+        CallbackService.getInstance().saveCallback(this.id, callback);
         JOURNEYMAP_NETWORK_CHANNEL.sendToServer(new Message(gson.toJson(data)));
     }
 

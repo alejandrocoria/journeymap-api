@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
+import journeymap.common.util.PlayerConfigController;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DefaultDimensionProperties;
 import journeymap.server.properties.DimensionProperties;
@@ -35,11 +36,10 @@ import static journeymap.common.network.Constants.SURFACE_MAP;
 import static journeymap.common.network.Constants.TELEPORT;
 import static journeymap.common.network.Constants.TOPO_MAP;
 import static journeymap.common.network.Constants.TRACKING;
-import static journeymap.common.network.Constants.TRACKING_TIME;
+import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.common.network.Constants.USE_WORLD_ID;
 import static journeymap.common.network.Constants.VILLAGER_RADAR;
 import static journeymap.common.network.Constants.WORLD_ID;
-import static journeymap.server.JourneymapServer.isOp;
 
 public class GetAllConfigs extends MessageProcessor
 {
@@ -47,13 +47,13 @@ public class GetAllConfigs extends MessageProcessor
     protected JsonObject onServer(Response response)
     {
         EntityPlayerMP player = response.getContext().getServerHandler().player;
-        if (isOp(player) || FMLCommonHandler.instance().getSide().isClient())
+        if (PlayerConfigController.getInstance().canServerAdmin(player) || FMLCommonHandler.instance().getSide().isClient())
         {
             return collectServerSettings();
         }
         else
         {
-            player.sendMessage(new TextComponentString("You do not have permission to adjust Journeymap's server options!"));
+            player.sendMessage(new TextComponentString("You do not have permission to modify Journeymap's server options!"));
         }
         return null;
     }
@@ -80,7 +80,7 @@ public class GetAllConfigs extends MessageProcessor
         }
         globalConfig.addProperty(OP_TRACKING, globalProperties.opPlayerTrackingEnabled.get());
         globalConfig.addProperty(TRACKING, globalProperties.playerTrackingEnabled.get());
-        globalConfig.addProperty(TRACKING_TIME, globalProperties.playerTrackingUpdateTime.get());
+        globalConfig.addProperty(TRACKING_UPDATE_TIME, globalProperties.playerTrackingUpdateTime.get());
         getCommonProperties(globalProperties, globalConfig);
 
         // Default Dimension properties

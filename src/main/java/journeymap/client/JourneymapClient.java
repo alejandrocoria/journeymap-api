@@ -35,6 +35,7 @@ import journeymap.client.task.main.MainTaskController;
 import journeymap.client.task.main.MappingMonitorTask;
 import journeymap.client.task.multi.ITaskManager;
 import journeymap.client.task.multi.TaskController;
+import journeymap.client.thread.GetAllPlayersThread;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
@@ -45,10 +46,11 @@ import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.network.GetClientConfig;
 import journeymap.common.version.VersionCheck;
-import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.PermissionProperties;
+import journeymap.server.properties.Permissions;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -63,14 +65,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static journeymap.common.network.Constants.DIM;
 import static journeymap.common.network.Constants.SERVER_ADMIN;
 import static journeymap.common.network.Constants.SETTINGS;
 import static journeymap.common.network.Constants.TELEPORT;
+import static journeymap.common.network.Constants.TRACKING;
 import static journeymap.common.network.Constants.WORLD_ID;
 
 /**
@@ -79,7 +82,7 @@ import static journeymap.common.network.Constants.WORLD_ID;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
-    public Map<UUID, JsonObject> playersOnServer = new HashMap<>();
+    public List<EntityPlayer> playersOnServer = new ArrayList<>();
 
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
@@ -552,9 +555,9 @@ public class JourneymapClient implements CommonProxy
                         {
                             setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
                         }
-                        if ((settings.get(TELEPORT) != null))
+                        if ((settings.get(TRACKING) != null))
                         {
-                            setPlayerTrackingEnabled(settings.get(TELEPORT).getAsBoolean());
+                            setPlayerTrackingEnabled(settings.get(TRACKING).getAsBoolean());
                         }
                         if ((settings.get(SERVER_ADMIN) != null))
                         {
@@ -562,8 +565,12 @@ public class JourneymapClient implements CommonProxy
                         }
                         setJourneyMapServerConnection(true);
                         String dimProperties = response.getAsJson().get(DIM).getAsString();
-                        PermissionProperties prop = new DimensionProperties(0).load(dimProperties, false);
+                        PermissionProperties prop = new Permissions().load(dimProperties, false);
                         FeatureManager.INSTANCE.updateDimensionFeatures(prop);
+                        if (!FMLClientHandler.instance().getClient().isSingleplayer())
+                        {
+                            GetAllPlayersThread.start();
+                        }
                     }
                 });
             }
@@ -832,7 +839,7 @@ public class JourneymapClient implements CommonProxy
 
     public void setTeleportEnabled(boolean teleportEnabled)
     {
-        Journeymap.getLogger().info("Server Teleport Enabled:" + teleportEnabled);
+        Journeymap.getLogger().info("Teleport Enabled:" + teleportEnabled);
         this.teleportEnabled = teleportEnabled;
     }
 
@@ -843,7 +850,8 @@ public class JourneymapClient implements CommonProxy
 
     public void setServerAdmin(boolean serverAdmin)
     {
-        if (serverAdmin) {
+        if (serverAdmin)
+        {
             Journeymap.getLogger().info("Server Admin Enabled:" + teleportEnabled);
         }
         this.serverAdmin = serverAdmin;

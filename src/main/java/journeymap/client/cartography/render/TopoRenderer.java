@@ -78,7 +78,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
             if (System.currentTimeMillis() - lastTopoFileUpdate > 5000 && lastTopoFileUpdate < topoProperties.lastModified())
             {
                 needUpdate = true;
-                Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
+//                Journeymap.getLogger().info("Loading " + topoProperties.getFileName());
                 topoProperties.load();
                 lastTopoFileUpdate = topoProperties.lastModified();
 

@@ -76,7 +76,7 @@ public class ServerOptionsManager extends JmUI
     {
         try
         {
-            new GetAllConfigs().send(null, result -> {
+            new GetAllConfigs().send(result -> {
                 if (result.getAsJson().get(GLOBAL) != null)
                 {
                     this.dimIndexList.add(GLOBAL);
@@ -214,6 +214,7 @@ public class ServerOptionsManager extends JmUI
             {
                 //save
                 save();
+                closeAndReturn();
                 return;
             }
             if (guibutton == buttonClose)

@@ -18,7 +18,10 @@ import static journeymap.common.network.Constants.ENABLED;
 import static journeymap.common.network.Constants.OP_TRACKING;
 import static journeymap.common.network.Constants.TELEPORT;
 import static journeymap.common.network.Constants.TRACKING;
-import static journeymap.common.network.Constants.TRACKING_TIME;
+import static journeymap.common.network.Constants.TRACKING_DEFUALT;
+import static journeymap.common.network.Constants.TRACKING_MAX;
+import static journeymap.common.network.Constants.TRACKING_MIN;
+import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.common.network.Constants.USE_WORLD_ID;
 
 public class TopBoxOptions implements Draw
@@ -57,8 +60,8 @@ public class TopBoxOptions implements Draw
                 list.add(checkBox(Constants.getString("jm.server.edit.chkbox.world.id"), Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"), USE_WORLD_ID, properties));
 
                 //add tracking slider
-                IntegerField sliderFieldValue = new IntegerField(Category.Hidden, "", 100, 20000, 1000);
-                sliderFieldValue.set(properties.get(TRACKING_TIME).getAsInt());
+                IntegerField sliderFieldValue = new IntegerField(Category.Hidden, "", TRACKING_MIN, TRACKING_MAX, TRACKING_DEFUALT);
+                sliderFieldValue.set(properties.get(TRACKING_UPDATE_TIME).getAsInt());
                 IntSliderButton trackingUpdateSlider = new IntSliderButton(sliderFieldValue, Constants.getString("jm.server.edit.slider.update.pre"), Constants.getString("jm.server.edit.slider.update.post"));
                 trackingUpdateSlider.setTooltip(Constants.getString("jm.server.edit.slider.update.tooltip"));
                 trackingUpdateSlider.visible = false;
@@ -82,6 +85,13 @@ public class TopBoxOptions implements Draw
                         Constants.getString("jm.server.edit.tracking.tooltip3")
                 );
 
+                trackingUpdateSlider.addClickListener(button -> {
+                    this.properties.remove(TRACKING_UPDATE_TIME);
+                    this.properties.addProperty(TRACKING_UPDATE_TIME, trackingUpdateSlider.getValue());
+                    return true;
+                });
+
+
                 trackingUpdateSlider.setWidth(fontRenderer.getStringWidth(Constants.getString("jm.server.edit.slider.update.pre") + 20000 + Constants.getString("jm.server.edit.slider.update.post")) + 10);
                 resetTrackingSlider(tracking.getField().get(), tracking, trackingUpdateSlider);
                 list.add(tracking);
@@ -102,7 +112,6 @@ public class TopBoxOptions implements Draw
         {
             tracking.setWidth(120);
             trackingUpdateSlider.setVisible(true);
-            trackingUpdateSlider.setEnabled(false); // TODO: Delete this line when implemented.
         }
     }
 

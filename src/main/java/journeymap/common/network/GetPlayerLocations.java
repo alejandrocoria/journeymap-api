@@ -1,9 +1,7 @@
 package journeymap.common.network;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import journeymap.common.Journeymap;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
 import journeymap.server.properties.GlobalProperties;
@@ -14,6 +12,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import java.util.List;
 import java.util.UUID;
 
+import static journeymap.common.network.Constants.TRACKING;
+import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.server.JourneymapServer.isOp;
 
 /**
@@ -41,13 +41,6 @@ public class GetPlayerLocations extends MessageProcessor
     @Override
     protected JsonObject onClient(Response response)
     {
-        JsonArray playerList = response.getAsJson().get("players").getAsJsonArray();
-        Journeymap.getClient().playersOnServer.clear();
-        for (JsonElement p : playerList)
-        {
-            JsonObject player = p.getAsJsonObject();
-            Journeymap.getClient().playersOnServer.put(UUID.fromString(player.get("playerId").getAsString()), player);
-        }
         return null;
     }
 
@@ -89,6 +82,12 @@ public class GetPlayerLocations extends MessageProcessor
                 }
             }
         }
+        int updateTime = PropertiesManager.getInstance().getGlobalProperties().playerTrackingUpdateTime.get();
+        boolean userTrack = PropertiesManager.getInstance().getGlobalProperties().playerTrackingEnabled.get();
+        boolean opTrack = PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get();
+
+        players.addProperty(TRACKING_UPDATE_TIME, updateTime);
+        players.addProperty(TRACKING, (userTrack || (receiverOp && opTrack)));
         players.add("players", playerList);
         return players;
     }

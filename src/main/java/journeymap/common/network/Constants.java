@@ -8,8 +8,11 @@ public interface Constants
     String WORLD_ID = "world_id";
     String ENABLED = "enabled";
     String TRACKING = "can_track";
-    String OP_TRACKING = "op_tracking";
-    String TRACKING_TIME = "tracking_time";
+    String OP_TRACKING = "op_can_track";
+    Integer TRACKING_MIN = 100;
+    Integer TRACKING_MAX = 2000;
+    Integer TRACKING_DEFUALT = 500;
+    String TRACKING_UPDATE_TIME = "tracking_time";
     String RADAR = "radar";
     String OP_RADAR = "op_radar";
     String PLAYER_RADAR = "playerRadar";
