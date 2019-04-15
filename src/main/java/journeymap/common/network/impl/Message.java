@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class Message implements IMessage
 {
-    public static final String CHANNEL_NAME = "jm_network_channel";
     private String message;
 
     // default constructor needed for forge's networking

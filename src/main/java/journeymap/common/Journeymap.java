@@ -7,7 +7,7 @@ package journeymap.common;
 
 import journeymap.client.JourneymapClient;
 import journeymap.common.command.CommandJTP;
-import journeymap.common.network.impl.NetworkHandler;
+import journeymap.common.network.PacketRegistry;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
 import journeymap.server.properties.PropertiesManager;
@@ -137,7 +137,7 @@ public class Journeymap
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
-        NetworkHandler.init();
+        PacketRegistry.init();
         proxy.initialize(event);
     }
 

@@ -611,6 +611,7 @@ public class JourneymapClient implements CommonProxy
 
             if (mc != null)
             {
+                GetAllPlayersThread.stop();
                 int dimension = mc.world != null ? mc.world.provider.getDimension() : 0;
                 ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
             }
@@ -852,7 +853,7 @@ public class JourneymapClient implements CommonProxy
     {
         if (serverAdmin)
         {
-            Journeymap.getLogger().info("Server Admin Enabled:" + teleportEnabled);
+            Journeymap.getLogger().info("Server Admin Enabled:" + serverAdmin);
         }
         this.serverAdmin = serverAdmin;
     }

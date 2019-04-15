@@ -1,9 +1,4 @@
 package journeymap.client.mod.impl;
-//
-//import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-//import com.pixelmonmod.pixelmon.client.gui.GuiResources;
-//import com.pixelmonmod.pixelmon.entities.pixelmon.EntityPixelmon;
-//import com.pixelmonmod.pixelmon.util.helpers.SpriteHelper;
 
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -32,7 +27,12 @@ public class Pixelmon
         {
             try
             {
-                return (ResourceLocation) entity.getClass().getMethod("getSprite").invoke(entity);
+                ResourceLocation pixelmonSprite = (ResourceLocation) entity.getClass().getMethod("getSprite").invoke(entity);
+                if (pixelmonSprite != null)
+                {
+                    return pixelmonSprite;
+                }
+                return null;
             }
             catch (Exception e)
             {

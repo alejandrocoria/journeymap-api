@@ -16,6 +16,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by Mysticdrew on 10/8/2014.
  */
+// TODO: REMOVE world id packet for the 1.13+ update if bukkit/spiggot does not migrate.
+@Deprecated
 public class WorldIDPacket implements IMessage
 {
     // Channel name

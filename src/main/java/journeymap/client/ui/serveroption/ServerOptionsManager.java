@@ -193,8 +193,12 @@ public class ServerOptionsManager extends JmUI
             labelWorldId.setY(startY - 10);
 
             // Top Buttons
-            topButtons.layoutCenteredHorizontal(centerX, labelWorldId.getBottomY(), true, hgap);
-
+            try
+            {
+                topButtons.layoutCenteredHorizontal(centerX, labelWorldId.getBottomY(), true, hgap);
+            } catch (Exception e) {
+                System.out.println(topButtons.size());
+            }
             // Draw config
             configDisplay.draw(centerX, topButtons.getBottomY(), hgap);
 

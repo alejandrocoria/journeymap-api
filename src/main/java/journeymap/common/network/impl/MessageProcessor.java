@@ -14,7 +14,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 
-import static journeymap.common.network.impl.NetworkHandler.JOURNEYMAP_NETWORK_CHANNEL;
 
 /**
  * Used primarily for JsonObject based network requests. Can and should be expanded for more data types.
@@ -157,7 +156,7 @@ public abstract class MessageProcessor
     public void send(JsonObject requestData)
     {
         buildRequest(requestData);
-        JOURNEYMAP_NETWORK_CHANNEL.sendToServer(new Message(gson.toJson(data)));
+        NetworkHandler.getInstance().sendToServer(new Message(gson.toJson(data)));
     }
 
 
@@ -171,7 +170,7 @@ public abstract class MessageProcessor
     {
         buildRequest(null);
         CallbackService.getInstance().saveCallback(this.id, callback);
-        JOURNEYMAP_NETWORK_CHANNEL.sendToServer(new Message(gson.toJson(data)));
+        NetworkHandler.getInstance().sendToServer(new Message(gson.toJson(data)));
     }
 
     /**
@@ -184,7 +183,7 @@ public abstract class MessageProcessor
     {
         buildRequest(requestData);
         CallbackService.getInstance().saveCallback(this.id, callback);
-        JOURNEYMAP_NETWORK_CHANNEL.sendToServer(new Message(gson.toJson(data)));
+        NetworkHandler.getInstance().sendToServer(new Message(gson.toJson(data)));
     }
 
     /**
@@ -198,7 +197,7 @@ public abstract class MessageProcessor
         // Verify the player has forge and can receive forge packets.
         if (player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get())
         {
-            JOURNEYMAP_NETWORK_CHANNEL.sendTo(new Message(gson.toJson(data)), player);
+            NetworkHandler.getInstance().sendTo(new Message(gson.toJson(data)), player);
         }
     }
 
@@ -215,7 +214,7 @@ public abstract class MessageProcessor
         // Verify the player has forge and can receive forge packets.
         if (player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get())
         {
-            JOURNEYMAP_NETWORK_CHANNEL.sendTo(new Message(gson.toJson(data)), player);
+            NetworkHandler.getInstance().sendTo(new Message(gson.toJson(data)), player);
         }
     }
 }

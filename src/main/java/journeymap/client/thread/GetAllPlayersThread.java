@@ -23,6 +23,7 @@ import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 
 public class GetAllPlayersThread implements Runnable
 {
+    private static ExecutorService es;
     private int updateTime = 1000;
     private static boolean alive = false;
 
@@ -33,7 +34,10 @@ public class GetAllPlayersThread implements Runnable
         {
             try
             {
-                if (Journeymap.getClient().isJourneyMapServerConnection() && Journeymap.getClient().isPlayerTrackingEnabled() && !Minecraft.getMinecraft().isSingleplayer())
+                if (Journeymap.getClient().isJourneyMapServerConnection()
+                        && Journeymap.getClient().isPlayerTrackingEnabled()
+                        && !Minecraft.getMinecraft().isSingleplayer()
+                        && Journeymap.getClient().isMapping())
                 {
                     new GetPlayerLocations().send(result -> {
                         JsonArray playerList = result.getAsJson().get("players").getAsJsonArray();
@@ -71,20 +75,24 @@ public class GetAllPlayersThread implements Runnable
     private void updatePlayerList(List<EntityPlayer> entityPlayerList)
     {
 
+        // Compare list on the server with the list on the client. Add that do not exist on the client.
         for (EntityPlayer player : entityPlayerList)
         {
             boolean inBothLists = Journeymap.getClient().playersOnServer.stream().anyMatch(p -> p.getUniqueID().equals(player.getUniqueID()));
             if (!inBothLists)
             {
+                // Add players from the list on the server to the list on the client.
                 Journeymap.getClient().playersOnServer.add(player);
             }
         }
 
+        // Compare list on the client with the list on the server. Update players that exist on both, remove players that are no longer on the server list.
         for (EntityPlayer player : Journeymap.getClient().playersOnServer)
         {
             boolean inBothLists = entityPlayerList.stream().anyMatch(p -> p.getUniqueID().equals(player.getUniqueID()));
             if (inBothLists)
             {
+
                 EntityPlayer playerMp = entityPlayerList.stream().filter((p -> p.getUniqueID().equals(player.getUniqueID()))).findFirst().orElse(null);
                 if (playerMp != null)
                 {
@@ -100,8 +108,10 @@ public class GetAllPlayersThread implements Runnable
             }
             else
             {
+                // Remove any users that are not on the server and that exist on the client .. Players get removed when they are too close, log off, or die.
                 Journeymap.getClient().playersOnServer.remove(player);
-                if(Journeymap.getClient().playersOnServer.size() < 1) {
+                if (Journeymap.getClient().playersOnServer.size() < 1)
+                {
                     // Breaking to prevent ConcurrentModificationException.
                     break;
                 }
@@ -109,6 +119,14 @@ public class GetAllPlayersThread implements Runnable
         }
     }
 
+    /**
+     * Create a list of fake players that are not in the client's entity list. The client's list only contains entities that
+     * are with in proximity of the player. Any entity that is not in the client list will be created. If they are in the client list, they will not be created.
+     * and this method will return null.
+     *
+     * @param player - The json representation of the player.
+     * @return - The EntityPlayer or null.
+     */
     private EntityPlayer buildEntityPlayer(JsonObject player)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
@@ -140,24 +158,27 @@ public class GetAllPlayersThread implements Runnable
         return null;
     }
 
+    public static void stop()
+    {
+        if (alive)
+        {
+            alive = false;
+            es.shutdown();
+        }
+    }
 
     public static void start()
     {
         if (!alive)
         {
             alive = true;
-            GetAllPlayersThread thread = new GetAllPlayersThread();
+            GetAllPlayersThread runnable = new GetAllPlayersThread();
             JMThreadFactory tf = new JMThreadFactory("player_track");
-            ExecutorService es = Executors.newSingleThreadExecutor(tf);
-            es.execute(thread);
-            Runtime.getRuntime().addShutdownHook(tf.newThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    alive = false;
-                    es.isShutdown();
-                }
+            es = Executors.newSingleThreadExecutor(tf);
+            es.execute(runnable);
+            Runtime.getRuntime().addShutdownHook(tf.newThread(() -> {
+                alive = false;
+                es.shutdown();
             }));
         }
     }
