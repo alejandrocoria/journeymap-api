@@ -23,7 +23,6 @@ public class Label extends Button
     public Label(int width, String key, Object... labelArgs)
     {
         super(Constants.getString(key, labelArgs));
-        setTooltip(Constants.getString(key + ".tooltip"));
         setDrawBackground(false);
         setDrawFrame(false);
         setEnabled(false);

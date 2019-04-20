@@ -5,18 +5,20 @@ import journeymap.client.Constants;
 import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.CheckBox;
 
+import static journeymap.client.ui.serveroption.ServerOptionsManager.formattedToolTipHeader;
+
 public interface Draw
 {
     void draw(int startX, int startY, int gap);
 
     ButtonList getButtons();
 
-    default CheckBox checkBox(String label, String tooltip, final String field, final JsonObject properties)
+    default CheckBox checkBox(String key, final String field, final JsonObject properties)
     {
         if (properties.get(field) != null)
         {
-            CheckBox checkBox = new CheckBox(label, properties.get(field).getAsBoolean());
-            checkBox.setTooltip(tooltip);
+            CheckBox checkBox = new CheckBox(Constants.getString(key), properties.get(field).getAsBoolean());
+            checkBox.setTooltip(formattedToolTipHeader(key) + Constants.getString(key + ".tooltip"));
             checkBox.addToggleListener((button, toggled) -> {
                 properties.remove(field);
                 properties.addProperty(field, toggled);
@@ -38,7 +40,8 @@ public interface Draw
         properties.addProperty(opNode, option.getOpFieldValue());
     }
 
-    default String getToggleTooltipBase() {
+    default String getToggleTooltipBase()
+    {
         StringBuilder sb = new StringBuilder();
         sb.append(Constants.getString("jm.server.edit.toggle.base.all")).append("\n");
         sb.append(Constants.getString("jm.server.edit.toggle.base.op")).append("\n");

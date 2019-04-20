@@ -13,6 +13,7 @@ import net.minecraft.client.gui.FontRenderer;
 import java.awt.*;
 import java.util.EnumSet;
 
+import static journeymap.client.ui.serveroption.ServerOptionsManager.formattedToolTipHeader;
 import static journeymap.common.network.Constants.CAVE_MAP;
 import static journeymap.common.network.Constants.OP_CAVE_MAP;
 import static journeymap.common.network.Constants.OP_SURFACE_MAP;
@@ -77,15 +78,18 @@ public class MappingOptions implements Draw
             return true;
         });
         surfaceOptionButton.setTooltip(300,
-                getToggleTooltipBase(),
+                formattedToolTipHeader("jm.server.edit.mapping.toggle.surface.label") +
+                        getToggleTooltipBase(),
                 Constants.getString("jm.server.edit.mapping.toggle.surface.tooltip")
         );
         topoOptionButton.setTooltip(300,
-                getToggleTooltipBase(),
+                formattedToolTipHeader("jm.server.edit.mapping.toggle.topo.label") +
+                        getToggleTooltipBase(),
                 Constants.getString("jm.server.edit.mapping.toggle.topo.tooltip")
         );
         caveOptionButton.setTooltip(300,
-                getToggleTooltipBase(),
+                formattedToolTipHeader("jm.server.edit.mapping.toggle.cave.label") +
+                        getToggleTooltipBase(),
                 Constants.getString("jm.server.edit.mapping.toggle.cave.tooltip")
         );
         mappingToggleButtons = new ButtonList(surfaceOptionButton, topoOptionButton, caveOptionButton);

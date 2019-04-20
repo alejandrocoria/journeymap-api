@@ -15,6 +15,7 @@ import java.awt.*;
 import java.util.EnumSet;
 
 import static journeymap.client.ui.serveroption.ServerOption.Option.ALL;
+import static journeymap.client.ui.serveroption.ServerOptionsManager.formattedToolTipHeader;
 import static journeymap.common.network.Constants.ANIMAL_RADAR;
 import static journeymap.common.network.Constants.MOB_RADAR;
 import static journeymap.common.network.Constants.OP_RADAR;
@@ -46,10 +47,10 @@ public class RadarOptions implements Draw
         label.setHAlign(DrawUtil.HAlign.Center);
         label.setWidth(label.getFitWidth(fontRenderer));
 
-        CheckBox playerChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.player"), Constants.getString("jm.server.edit.radar.chkbox.player.tooltip"), PLAYER_RADAR, properties);
-        CheckBox villagerChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.villager"), Constants.getString("jm.server.edit.radar.chkbox.villager.tooltip"), VILLAGER_RADAR, properties);
-        CheckBox animalChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.animal"), Constants.getString("jm.server.edit.radar.chkbox.animal.tooltip"), ANIMAL_RADAR, properties);
-        CheckBox mobChkBx = checkBox(Constants.getString("jm.server.edit.radar.chkbox.mob"), Constants.getString("jm.server.edit.radar.chkbox.mob.tooltip"), MOB_RADAR, properties);
+        CheckBox playerChkBx = checkBox("jm.server.edit.radar.chkbox.player", PLAYER_RADAR, properties);
+        CheckBox villagerChkBx = checkBox("jm.server.edit.radar.chkbox.villager", VILLAGER_RADAR, properties);
+        CheckBox animalChkBx = checkBox("jm.server.edit.radar.chkbox.animal", ANIMAL_RADAR, properties);
+        CheckBox mobChkBx = checkBox("jm.server.edit.radar.chkbox.mob", MOB_RADAR, properties);
         checkBoxList = new ButtonList(playerChkBx, villagerChkBx, animalChkBx, mobChkBx);
 
         ServerOption option = new ServerOption(RADAR, properties);
@@ -65,7 +66,8 @@ public class RadarOptions implements Draw
         });
         radarPropertyButton.setWidth(fontRenderer.getStringWidth(label.displayString) + 40);
         radarPropertyButton.setTooltip(300,
-                getToggleTooltipBase(),
+                formattedToolTipHeader("jm.server.edit.radar.toggle.label") +
+                        getToggleTooltipBase(),
                 Constants.getString("jm.server.edit.radar.toggle.tooltip1"),
                 Constants.getString("jm.server.edit.radar.toggle.tooltip2")
         );

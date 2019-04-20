@@ -83,6 +83,7 @@ public class ServerOptionsManager extends JmUI
                     this.global = result.getAsJson().get(GLOBAL).getAsJsonObject();
                     this.activeProperty = global;
                     this.labelSelector = new Label(150, "jm.server.edit.label.selection.global");
+                    labelSelector.setTooltip(formattedToolTipHeader("jm.server.edit.label.selection.global") + Constants.getString("jm.server.edit.label.selection.global.tooltip"));
                     this.labelSelector.setHAlign(DrawUtil.HAlign.Center);
                 }
 
@@ -135,29 +136,33 @@ public class ServerOptionsManager extends JmUI
             {
                 buttonList.clear();
                 buttonNext = new Button(Constants.getString("jm.server.edit.label.button.next"));
-                buttonNext.setTooltip(Constants.getString("jm.server.edit.label.button.next.tooltip"));
+                buttonNext.setTooltip(formattedToolTipHeader("jm.server.edit.label.button.next.tooltip") + Constants.getString("jm.server.edit.label.button.next.tooltip"));
                 buttonNext.setWidth(40);
                 buttonPrevious = new Button(Constants.getString("jm.server.edit.label.button.previous"));
-                buttonPrevious.setTooltip(Constants.getString("jm.server.edit.label.button.previous.tooltip"));
+                buttonPrevious.setTooltip(formattedToolTipHeader("jm.server.edit.label.button.previous.tooltip") + Constants.getString("jm.server.edit.label.button.previous.tooltip"));
                 buttonPrevious.setWidth(buttonNext.getWidth());
 
-                topButtons = new ButtonList(buttonPrevious, labelSelector, buttonNext);
                 if (global.get(WORLD_ID) != null)
                 {
                     labelWorldId = new Label(304, "jm.server.edit.label.worldId", global.get(WORLD_ID).getAsString());
+                    labelWorldId.setTooltip(formattedToolTipHeader("jm.server.edit.chkbox.world.id") + Constants.getString("jm.server.edit.label.worldId.tooltip"));
                 }
                 else
                 {
                     labelWorldId = new Label(40, "jm.server.edit.label.worldId.singleplayer");
+                    labelWorldId.setTooltip(formattedToolTipHeader("jm.server.edit.label.worldId.singleplayer") + Constants.getString("jm.server.edit.label.worldId.singleplayer.tooltip"));
                 }
                 labelWorldId.setHAlign(DrawUtil.HAlign.Center);
                 labelWorldId.setWidth(labelWorldId.getFitWidth(getFontRenderer()));
+
                 buttonSave = new Button(Constants.getString("jm.waypoint.save"));
                 buttonClose = new Button(Constants.getString("jm.server.edit.button.close"));
                 bottomButtons = new ButtonList(buttonClose, buttonSave);
                 bottomButtons.equalizeWidths(getFontRenderer());
 
                 configDisplay = new ConfigDisplay(activeProperty, fontRenderer);
+
+                topButtons = new ButtonList(buttonPrevious, labelSelector, buttonNext);
                 buttonList.add(labelWorldId);
                 buttonList.addAll(topButtons);
                 buttonList.addAll(configDisplay.getButtons());
@@ -186,7 +191,7 @@ public class ServerOptionsManager extends JmUI
             initGui();
         }
 
-        if (global != null && !buttonList.isEmpty() && (topButtons != null || !topButtons.isEmpty()))
+        if (global != null && !buttonList.isEmpty() && topButtons != null && !topButtons.isEmpty())
         {
             // WorldId label
             labelWorldId.setX(centerX - (labelWorldId.getWidth() / 2));
@@ -196,7 +201,9 @@ public class ServerOptionsManager extends JmUI
             try
             {
                 topButtons.layoutCenteredHorizontal(centerX, labelWorldId.getBottomY(), true, hgap);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.out.println(topButtons.size());
             }
             // Draw config
@@ -274,20 +281,20 @@ public class ServerOptionsManager extends JmUI
         if (index == 0)
         {
             labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.global");
-            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.global.tooltip"));
+            labelSelector.setTooltip(formattedToolTipHeader("jm.server.edit.label.selection.global") + Constants.getString("jm.server.edit.label.selection.global.tooltip"));
             this.activeProperty = global;
         }
         else if (index == 1)
         {
             labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.default");
-            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.default.tooltip"));
+            labelSelector.setTooltip(formattedToolTipHeader("jm.server.edit.label.selection.default") + Constants.getString("jm.server.edit.label.selection.default.tooltip"));
             this.activeProperty = defaultDimension;
         }
         else
         {
             String dimName = dimensionMap.get(Integer.valueOf(dimIndexList.get(index))).get(DIM_NAME).getAsString();
             labelSelector.displayString = Constants.getString("jm.server.edit.label.selection.dimension", dimName, dimIndexList.get(index));
-            labelSelector.setTooltip(Constants.getString("jm.server.edit.label.selection.dimension.tooltip"));
+            labelSelector.setTooltip(formattedToolTipHeader("jm.theme.labelsource.dimension") + Constants.getString("jm.server.edit.label.selection.dimension.tooltip"));
             this.activeProperty = dimensionMap.get(Integer.valueOf(dimIndexList.get(index)));
         }
 
@@ -310,6 +317,7 @@ public class ServerOptionsManager extends JmUI
     @Override
     protected void closeAndReturn()
     {
+        buttonList.clear();
         if (returnDisplay == null)
         {
             UIManager.INSTANCE.closeAll();
@@ -318,5 +326,10 @@ public class ServerOptionsManager extends JmUI
         {
             UIManager.INSTANCE.open(returnDisplay);
         }
+    }
+
+    static String formattedToolTipHeader(String key)
+    {
+        return "§b[" + Constants.getString(key) + "]§f" + "\n";
     }
 }

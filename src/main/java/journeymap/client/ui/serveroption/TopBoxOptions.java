@@ -3,6 +3,7 @@ package journeymap.client.ui.serveroption;
 import com.google.gson.JsonObject;
 import journeymap.client.Constants;
 import journeymap.client.ui.component.ButtonList;
+import journeymap.client.ui.component.CheckBox;
 import journeymap.client.ui.component.IntSliderButton;
 import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.common.properties.Category;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import java.util.EnumSet;
 
 import static journeymap.client.ui.serveroption.ServerOption.Option.NONE;
+import static journeymap.client.ui.serveroption.ServerOptionsManager.formattedToolTipHeader;
 import static journeymap.common.network.Constants.ENABLED;
 import static journeymap.common.network.Constants.OP_TRACKING;
 import static journeymap.common.network.Constants.TELEPORT;
@@ -49,21 +51,26 @@ public class TopBoxOptions implements Draw
         // this is a check to see if we have a dim, or a global property. Global does not have an enable field.
         if (this.properties.get(ENABLED) != null)
         {
-            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.enable"), Constants.getString("jm.server.edit.chkbox.enable.tooltip"), ENABLED, properties));
-            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.teleport"), Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip2"), TELEPORT, properties));
+            list.add(checkBox("jm.server.edit.chkbox.enable", ENABLED, properties));
+            CheckBox dimTeleportCheckBox = checkBox("jm.server.edit.chkbox.teleport", TELEPORT, properties);
+            dimTeleportCheckBox.setTooltip(formattedToolTipHeader("jm.server.edit.chkbox.teleport") + Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.teleport.dimension.tooltip2"));
+            list.add(dimTeleportCheckBox);
         }
         else
         {
-            list.add(checkBox(Constants.getString("jm.server.edit.chkbox.teleport"), Constants.getString("jm.server.edit.chkbox.teleport.tooltip"), TELEPORT, properties));
+            list.add(checkBox("jm.server.edit.chkbox.teleport", TELEPORT, properties));
             if (!FMLClientHandler.instance().getClient().isSingleplayer())
             {
-                list.add(checkBox(Constants.getString("jm.server.edit.chkbox.world.id"), Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"), USE_WORLD_ID, properties));
+                CheckBox worldIdCheckBox = checkBox("jm.server.edit.chkbox.world.id", USE_WORLD_ID, properties);
+                worldIdCheckBox.setTooltip(formattedToolTipHeader("jm.server.edit.chkbox.world.id") + Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"));
+                list.add(worldIdCheckBox);
+//                list.add(checkBox("jm.server.edit.chkbox.world.id" + "\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"), USE_WORLD_ID, properties));
 
                 //add tracking slider
                 IntegerField sliderFieldValue = new IntegerField(Category.Hidden, "", TRACKING_MIN, TRACKING_MAX, TRACKING_DEFUALT);
                 sliderFieldValue.set(properties.get(TRACKING_UPDATE_TIME).getAsInt());
                 IntSliderButton trackingUpdateSlider = new IntSliderButton(sliderFieldValue, Constants.getString("jm.server.edit.slider.update.pre"), Constants.getString("jm.server.edit.slider.update.post"));
-                trackingUpdateSlider.setTooltip(Constants.getString("jm.server.edit.slider.update.tooltip"));
+                trackingUpdateSlider.setTooltip(formattedToolTipHeader("jm.server.edit.tracking.update.label") + Constants.getString("jm.server.edit.slider.update.tooltip"));
                 trackingUpdateSlider.visible = false;
                 // Add tracking button
                 ServerOption option = new ServerOption(TRACKING, properties);
@@ -79,7 +86,8 @@ public class TopBoxOptions implements Draw
                     return true;
                 });
                 tracking.setTooltip(300,
-                        getToggleTooltipBase(),
+                        formattedToolTipHeader("jm.server.edit.tracking.label") +
+                                getToggleTooltipBase(),
                         Constants.getString("jm.server.edit.tracking.tooltip1"),
                         "",
                         Constants.getString("jm.server.edit.tracking.tooltip2"),
