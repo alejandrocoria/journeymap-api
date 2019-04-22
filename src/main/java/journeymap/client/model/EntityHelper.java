@@ -149,7 +149,7 @@ public class EntityHelper
         allPlayers.remove(mc.player);
 
         if(Journeymap.getClient().isPlayerTrackingEnabled()) {
-            allPlayers.addAll(Journeymap.getClient().playersOnServer);
+            allPlayers = Journeymap.getClient().playersOnServer;
         }
 
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();

@@ -130,16 +130,16 @@ public class GetAllPlayersThread implements Runnable
     private EntityPlayer buildEntityPlayer(JsonObject player)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        List<EntityPlayer> clientEntites = mc.world.playerEntities;
+        List<EntityPlayer> clientEntities = mc.world.playerEntities;
 
         EntityPlayer playerMp;
 
         for (NetworkPlayerInfo onlinePlayer : mc.getConnection().getPlayerInfoMap())
         {
             // If player is already in list, they are close enough for the client to see so ignore server tracking.
-            boolean playerInList = clientEntites.stream().anyMatch(p -> p.getUniqueID().equals(onlinePlayer.getGameProfile().getId()));
+            boolean playerInList = clientEntities.stream().anyMatch(p -> p.getUniqueID().equals(onlinePlayer.getGameProfile().getId()));
 
-            if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()) && !playerInList)
+            if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()) /*&& !playerInList*/)
             {
                 playerMp = new EntityOtherPlayerMP(mc.world, onlinePlayer.getGameProfile());
                 playerMp.posX = player.get("posX").getAsInt();
