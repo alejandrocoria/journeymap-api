@@ -50,7 +50,6 @@ import journeymap.server.properties.PermissionProperties;
 import journeymap.server.properties.Permissions;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -65,8 +64,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static journeymap.common.network.Constants.DIM;
@@ -82,8 +79,6 @@ import static journeymap.common.network.Constants.WORLD_ID;
 @SideOnly(Side.CLIENT)
 public class JourneymapClient implements CommonProxy
 {
-    public List<EntityPlayer> playersOnServer = new ArrayList<>();
-
     public static final String FULL_VERSION = Journeymap.MC_VERSION + "-" + Journeymap.JM_VERSION;
     public static final String MOD_NAME = Journeymap.SHORT_MOD_NAME + " " + FULL_VERSION;
     private boolean journeyMapServerConnection = false;

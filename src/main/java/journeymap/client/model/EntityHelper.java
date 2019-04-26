@@ -10,6 +10,7 @@ import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
+import journeymap.client.thread.PlayerRadarManager;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
@@ -149,7 +150,7 @@ public class EntityHelper
         allPlayers.remove(mc.player);
 
         if(Journeymap.getClient().isPlayerTrackingEnabled()) {
-            allPlayers = Journeymap.getClient().playersOnServer;
+            allPlayers = PlayerRadarManager.getInstance().getPlayers();
         }
 
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();

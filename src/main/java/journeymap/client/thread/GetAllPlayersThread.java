@@ -4,15 +4,16 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 import journeymap.common.Journeymap;
 import journeymap.common.network.GetPlayerLocations;
 import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -74,25 +75,24 @@ public class GetAllPlayersThread implements Runnable
 
     private void updatePlayerList(List<EntityPlayer> entityPlayerList)
     {
-
         // Compare list on the server with the list on the client. Add that do not exist on the client.
         for (EntityPlayer player : entityPlayerList)
         {
-            boolean inBothLists = Journeymap.getClient().playersOnServer.stream().anyMatch(p -> p.getUniqueID().equals(player.getUniqueID()));
+            boolean inBothLists = PlayerRadarManager.getInstance().getPlayers().stream().anyMatch(p -> p.getUniqueID().equals(player.getUniqueID()));
             if (!inBothLists)
             {
                 // Add players from the list on the server to the list on the client.
-                Journeymap.getClient().playersOnServer.add(player);
+                PlayerRadarManager.getInstance().addPlayer(player);
             }
         }
 
         // Compare list on the client with the list on the server. Update players that exist on both, remove players that are no longer on the server list.
-        for (EntityPlayer player : Journeymap.getClient().playersOnServer)
+        for (Iterator<EntityPlayer> iterator = PlayerRadarManager.getInstance().getPlayers().iterator(); iterator.hasNext();)
         {
+            EntityPlayer player = iterator.next();
             boolean inBothLists = entityPlayerList.stream().anyMatch(p -> p.getUniqueID().equals(player.getUniqueID()));
             if (inBothLists)
             {
-
                 EntityPlayer playerMp = entityPlayerList.stream().filter((p -> p.getUniqueID().equals(player.getUniqueID()))).findFirst().orElse(null);
                 if (playerMp != null)
                 {
@@ -108,13 +108,8 @@ public class GetAllPlayersThread implements Runnable
             }
             else
             {
-                // Remove any users that are not on the server and that exist on the client .. Players get removed when they are too close, log off, or die.
-                Journeymap.getClient().playersOnServer.remove(player);
-                if (Journeymap.getClient().playersOnServer.size() < 1)
-                {
-                    // Breaking to prevent ConcurrentModificationException.
-                    break;
-                }
+                // Remove any users that are not on the server and that exist on the client.
+                iterator.remove();
             }
         }
     }
@@ -130,31 +125,26 @@ public class GetAllPlayersThread implements Runnable
     private EntityPlayer buildEntityPlayer(JsonObject player)
     {
         Minecraft mc = FMLClientHandler.instance().getClient();
-        List<EntityPlayer> clientEntities = mc.world.playerEntities;
-
         EntityPlayer playerMp;
 
-        for (NetworkPlayerInfo onlinePlayer : mc.getConnection().getPlayerInfoMap())
+        UUID playerUUID = UUID.fromString(player.get("playerId").getAsString());
+        String playerName = player.get("name").getAsString();
+        if (!playerUUID.equals(mc.player.getUniqueID()))
         {
-            // If player is already in list, they are close enough for the client to see so ignore server tracking.
-            boolean playerInList = clientEntities.stream().anyMatch(p -> p.getUniqueID().equals(onlinePlayer.getGameProfile().getId()));
-
-            if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()) /*&& !playerInList*/)
-            {
-                playerMp = new EntityOtherPlayerMP(mc.world, onlinePlayer.getGameProfile());
-                playerMp.posX = player.get("posX").getAsInt();
-                playerMp.posY = player.get("posY").getAsInt();
-                playerMp.posZ = player.get("posZ").getAsInt();
-                playerMp.chunkCoordX = player.get("chunkX").getAsInt();
-                playerMp.chunkCoordY = player.get("chunkY").getAsInt();
-                playerMp.chunkCoordZ = player.get("chunkZ").getAsInt();
-                playerMp.rotationYawHead = player.get("rotation").getAsFloat();
-                playerMp.setSneaking(player.get("sneaking").getAsBoolean());
-                playerMp.setUniqueId(UUID.fromString(player.get("playerId").getAsString()));
-                playerMp.addedToChunk = true;
-                return playerMp;
-            }
+            playerMp = new EntityOtherPlayerMP(mc.world, new GameProfile(playerUUID, playerName));
+            playerMp.posX = player.get("posX").getAsInt();
+            playerMp.posY = player.get("posY").getAsInt();
+            playerMp.posZ = player.get("posZ").getAsInt();
+            playerMp.chunkCoordX = player.get("chunkX").getAsInt();
+            playerMp.chunkCoordY = player.get("chunkY").getAsInt();
+            playerMp.chunkCoordZ = player.get("chunkZ").getAsInt();
+            playerMp.rotationYawHead = player.get("rotation").getAsFloat();
+            playerMp.setSneaking(player.get("sneaking").getAsBoolean());
+            playerMp.setUniqueId(playerUUID);
+            playerMp.addedToChunk = true;
+            return playerMp;
         }
+
         return null;
     }
 
