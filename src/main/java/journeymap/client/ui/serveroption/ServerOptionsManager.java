@@ -330,6 +330,6 @@ public class ServerOptionsManager extends JmUI
 
     static String formattedToolTipHeader(String key)
     {
-        return "§b[" + Constants.getString(key) + "]§f" + "\n";
+        return "\u00A7b[" + Constants.getString(key) + "]\u00A7f" + "\n";
     }
 }

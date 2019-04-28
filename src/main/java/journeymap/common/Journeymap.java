@@ -10,6 +10,7 @@ import journeymap.common.command.CommandJTP;
 import journeymap.common.network.PacketRegistry;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
+import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -162,10 +163,7 @@ public class Journeymap
     @Mod.EventHandler
     public void serverStartingEvent(FMLServerStartingEvent event)
     {
-//        if (event.getServer().getEntityWorld().isRemote)
-//        {
         PropertiesManager.getInstance();
-//        }
         event.registerServerCommand(new CommandJTP());
     }
 
@@ -177,6 +175,11 @@ public class Journeymap
     @Mod.EventHandler
     public void serverStartedEvent(FMLServerStartedEvent event)
     {
+        // We call this just to create the world id. Sponge will blow up if it is not generated on the main server thread
+        if (event.getSide().isServer())
+        {
+            new WorldNbtIDSaveHandler().getWorldID();
+        }
     }
 
     /**
