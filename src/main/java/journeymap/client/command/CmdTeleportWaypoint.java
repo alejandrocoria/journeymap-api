@@ -108,7 +108,16 @@ public class CmdTeleportWaypoint
         }
         else
         {
-            mc.player.sendChatMessage(String.format("/tp %s %s %s %s", mc.player.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
+            String teleportCommand = Journeymap.getClient().getWaypointProperties().teleportCommand.get();
+
+            teleportCommand = teleportCommand
+                    .replace("{name}", mc.player.getName())
+                    .replace("{x}", String.valueOf(waypoint.getX()))
+                    .replace("{y}", String.valueOf(waypoint.getY()))
+                    .replace("{z}", String.valueOf(waypoint.getZ()))
+                    .replace("{dim}", String.valueOf(dim.first()));
+
+            mc.player.sendChatMessage(teleportCommand);
         }
     }
 }

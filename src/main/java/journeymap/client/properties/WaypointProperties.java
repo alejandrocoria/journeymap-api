@@ -4,8 +4,10 @@
  */
 package journeymap.client.properties;
 
+import journeymap.common.properties.Category;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 
 import static journeymap.client.properties.ClientCategory.Waypoint;
 import static journeymap.client.properties.ClientCategory.WaypointBeacon;
@@ -29,6 +31,7 @@ public class WaypointProperties extends ClientPropertiesBase implements Comparab
     public final IntegerField maxDistance = new IntegerField(Waypoint, "jm.waypoint.max_distance", 0, 10000, 0);
     public final IntegerField minDistance = new IntegerField(WaypointBeacon, "jm.waypoint.min_distance", 0, 64, 4);
     public final BooleanField createDeathpoints = new BooleanField(Waypoint, "jm.waypoint.create_deathpoints", true);
+    public final StringField teleportCommand = new StringField(Category.Hidden, "jm.advanced.teleport_command", null, "/tp {name} {x} {y} {z}");
 
     @Override
     public String getName()
