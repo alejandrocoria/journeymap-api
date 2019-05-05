@@ -50,7 +50,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     {
         try
         {
-            if (mc.gameSettings.showDebugInfo)
+            if (mc.gameSettings.showDebugInfo && !"off".equalsIgnoreCase(Journeymap.getClient().getCoreProperties().logLevel.get()))
             {
                 event.getLeft().add(null);
                 if (Journeymap.getClient().getCoreProperties().mappingEnabled.get())
