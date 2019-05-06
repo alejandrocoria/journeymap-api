@@ -6,7 +6,14 @@
 package journeymap.common.properties.config;
 
 import com.google.common.base.Joiner;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.model.GridSpec;
 import journeymap.common.Journeymap;
@@ -288,6 +295,29 @@ public abstract class GsonHelper<T extends ConfigField>
         public StringField deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
         {
             return deserializeAttributes(new StringField(), json, typeOfT, context);
+        }
+    }
+
+    /**
+     * Handles TextField instances.
+     */
+    public static class TextFieldSerializer extends GsonHelper<CustomField> implements JsonSerializer<CustomField>, JsonDeserializer<CustomField>
+    {
+        public TextFieldSerializer(boolean verbose)
+        {
+            super(verbose);
+        }
+
+        @Override
+        public JsonElement serialize(CustomField src, Type typeOfSrc, JsonSerializationContext context)
+        {
+            return serializeAttributes(src, typeOfSrc, context);
+        }
+
+        @Override
+        public CustomField deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+        {
+            return deserializeAttributes(new CustomField(), json, typeOfT, context);
         }
     }
 

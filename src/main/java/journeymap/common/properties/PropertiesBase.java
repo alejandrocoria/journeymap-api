@@ -16,13 +16,23 @@ import com.google.gson.GsonBuilder;
 import journeymap.client.model.GridSpec;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.properties.config.*;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.ConfigField;
+import journeymap.common.properties.config.CustomField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.GsonHelper;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 import journeymap.common.version.Version;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -104,6 +114,7 @@ public abstract class PropertiesBase
                 .registerTypeAdapter(BooleanField.class, new GsonHelper.BooleanFieldSerializer(verbose))
                 .registerTypeAdapter(IntegerField.class, new GsonHelper.IntegerFieldSerializer(verbose))
                 .registerTypeAdapter(StringField.class, new GsonHelper.StringFieldSerializer(verbose))
+                .registerTypeAdapter(CustomField.class, new GsonHelper.TextFieldSerializer(verbose))
                 .registerTypeAdapter(EnumField.class, new GsonHelper.EnumFieldSerializer(verbose))
                 .registerTypeAdapter(CategorySet.class, new GsonHelper.CategorySetSerializer(verbose))
                 .registerTypeAdapter(Version.class, new GsonHelper.VersionSerializer(verbose))
