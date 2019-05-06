@@ -974,6 +974,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
         }
     }
 
+    public String getDisplayString()
+    {
+        return this.displayString;
+    }
+
     /**
      * Refresh.
      */

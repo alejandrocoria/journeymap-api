@@ -13,7 +13,7 @@ import java.awt.*;
 /**
  * Extension of MC's text field
  */
-public class TextField extends GuiTextField
+public class TextBox extends GuiTextField
 {
 
     protected final String numericRegex;
@@ -23,12 +23,12 @@ public class TextField extends GuiTextField
     protected Integer clampMin;
     protected Integer clampMax;
 
-    public TextField(Object text, FontRenderer fontRenderer, int width, int height)
+    public TextBox(Object text, FontRenderer fontRenderer, int width, int height)
     {
         this(text, fontRenderer, width, height, false, false);
     }
 
-    public TextField(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
+    public TextBox(Object text, FontRenderer fontRenderer, int width, int height, boolean isNumeric, boolean negative)
     {
         // 1.7
         // super(0, fontRenderer, 0, 0, width, height);
@@ -246,6 +246,15 @@ public class TextField extends GuiTextField
 
         // 1.8
         return height;
+    }
+
+    public void setHeight(int h)
+    {
+        // 1.7
+        // return (Integer) ReflectionHelper.getPrivateValue(GuiTextField.class, this, INDEX_HEIGHT);
+
+        // 1.8
+        this.height = h;
     }
 
     public int getCenterX()

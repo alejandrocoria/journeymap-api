@@ -181,7 +181,7 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
     {
         if (drawString)
         {
-            displayString = prefix + field.get() + suffix;
+            this.displayString = prefix + field.get() + suffix;
         }
     }
 
@@ -255,6 +255,12 @@ public class IntSliderButton extends Button implements IConfigFieldHolder<Intege
             }
         }
         updateLabel();
+    }
+
+    @Override
+    public void refresh()
+    {
+        setValue(field.get());
     }
 
     @Override
