@@ -13,18 +13,35 @@ import journeymap.client.ui.component.CheckBox;
 import journeymap.client.ui.component.IntSliderButton;
 import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.client.ui.component.ScrollListPane;
+import journeymap.client.ui.component.TextFieldButton;
 import journeymap.common.Journeymap;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.PropertiesBase;
-import journeymap.common.properties.config.*;
+import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.ConfigField;
+import journeymap.common.properties.config.CustomField;
+import journeymap.common.properties.config.EnumField;
+import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static journeymap.client.properties.ClientCategory.*;
+import static journeymap.client.properties.ClientCategory.Advanced;
+import static journeymap.client.properties.ClientCategory.FullMap;
+import static journeymap.client.properties.ClientCategory.MiniMap1;
+import static journeymap.client.properties.ClientCategory.MiniMap2;
+import static journeymap.client.properties.ClientCategory.Waypoint;
+import static journeymap.client.properties.ClientCategory.WebMap;
 
 /**
  * Generates the UI slots in the Options Manager.
@@ -166,6 +183,10 @@ public class OptionSlotFactory
             {
                 slotMetadata = getEnumSlotMetadata((EnumField) configField);
             }
+            else if (configField instanceof CustomField)
+            {
+                slotMetadata = getTextSlotMetadata((CustomField) configField);
+            }
 
             if (slotMetadata != null)
             {
@@ -203,6 +224,7 @@ public class OptionSlotFactory
         return map;
     }
 
+
     static String getTooltip(ConfigField configField)
     {
         String tooltipKey = configField.getKey() + ".tooltip";
@@ -216,6 +238,7 @@ public class OptionSlotFactory
 
     /**
      * Create a slot for a boolean property
+     *
      * @param field
      * @return
      */
@@ -230,10 +253,10 @@ public class OptionSlotFactory
         SlotMetadata<Boolean> slotMetadata = new SlotMetadata<Boolean>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
         slotMetadata.setMasterPropertyForCategory(field.isCategoryMaster());
         if (field.isCategoryMaster())
-            {
-                button.setLabelColors(RGB.CYAN_RGB, null, null);
-            }
-            return slotMetadata;
+        {
+            button.setLabelColors(RGB.CYAN_RGB, null, null);
+        }
+        return slotMetadata;
     }
 
     /**
@@ -288,6 +311,33 @@ public class OptionSlotFactory
             button.setDrawBackground(false);
             SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
             slotMetadata.setValueList(field.getValidValues());
+            return slotMetadata;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static SlotMetadata getTextSlotMetadata(CustomField field)
+    {
+        try
+        {
+            String name = Constants.getString(field.getKey());
+            String tooltip = getTooltip(field);
+            boolean advanced = field.getCategory() == Advanced;
+
+            TextFieldButton button = null;
+            String defaultTip = null;
+
+            button = new TextFieldButton(field);
+            defaultTip = Constants.getString("jm.config.default", field.getDefaultValue());
+
+//            button.setDefaultStyle(false);
+//            button.setDrawBackground(false);
+            SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
+
             return slotMetadata;
         }
         catch (Exception e)

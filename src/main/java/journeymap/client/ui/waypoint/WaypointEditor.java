@@ -20,7 +20,7 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.component.ScrollPane;
-import journeymap.client.ui.component.TextField;
+import journeymap.client.ui.component.TextBox;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.option.LocationFormat;
 import journeymap.client.waypoint.WaypointStore;
@@ -68,14 +68,14 @@ public class WaypointEditor extends JmUI
     private Button buttonReset;
     private Button buttonSave;
     private Button buttonClose;
-    private TextField fieldName;
-    private TextField fieldR;
-    private TextField fieldG;
-    private TextField fieldB;
-    private TextField fieldX;
-    private TextField fieldY;
-    private TextField fieldZ;
-    private ArrayList<TextField> fieldList = new ArrayList<TextField>();
+    private TextBox fieldName;
+    private TextBox fieldR;
+    private TextBox fieldG;
+    private TextBox fieldB;
+    private TextBox fieldX;
+    private TextBox fieldY;
+    private TextBox fieldZ;
+    private ArrayList<TextBox> fieldList = new ArrayList<TextBox>();
     private ArrayList<DimensionButton> dimButtonList = new ArrayList<DimensionButton>();
     private ScrollPane dimScrollPane;
     private Integer currentColor;
@@ -132,7 +132,7 @@ public class WaypointEditor extends JmUI
             {
                 FontRenderer fr = getFontRenderer();
 
-                fieldName = new TextField(originalWaypoint.getName(), fr, 160, 20);
+                fieldName = new TextBox(originalWaypoint.getName(), fr, 160, 20);
                 //fieldName.setMinLength(1);
                 fieldName.setFocused(true);
                 if (isNew)
@@ -146,31 +146,31 @@ public class WaypointEditor extends JmUI
                 int width3chars = getFontRenderer().getStringWidth("255") + 10;
                 int h = 20;
 
-                fieldX = new TextField(originalWaypoint.getX(), fr, width9chars, h, true, true);
+                fieldX = new TextBox(originalWaypoint.getX(), fr, width9chars, h, true, true);
                 fieldX.setClamp(-30000000, 30000000);
                 fieldList.add(fieldX);
 
-                fieldZ = new TextField(originalWaypoint.getZ(), fr, width9chars, h, true, true);
+                fieldZ = new TextBox(originalWaypoint.getZ(), fr, width9chars, h, true, true);
                 fieldZ.setClamp(-30000000, 30000000);
                 fieldList.add(fieldZ);
 
                 int y = originalWaypoint.getY();
-                fieldY = new TextField(y < 0 ? "" : y, fr, width3chars, h, true, true);
+                fieldY = new TextBox(y < 0 ? "" : y, fr, width3chars, h, true, true);
                 fieldY.setClamp(0, mc.world.getHeight() - 1);
                 fieldY.setMinLength(1);
                 fieldList.add(fieldY);
 
-                fieldR = new TextField("", fr, width3chars, h, true, false);
+                fieldR = new TextBox("", fr, width3chars, h, true, false);
                 fieldR.setClamp(0, 255);
                 fieldR.setMaxStringLength(3);
                 fieldList.add(fieldR);
 
-                fieldG = new TextField("", fr, width3chars, h, true, false);
+                fieldG = new TextBox("", fr, width3chars, h, true, false);
                 fieldG.setClamp(0, 255);
                 fieldG.setMaxStringLength(3);
                 fieldList.add(fieldG);
 
-                fieldB = new TextField("", fr, width3chars, h, true, false);
+                fieldB = new TextBox("", fr, width3chars, h, true, false);
                 fieldB.setClamp(0, 255);
                 fieldB.setMaxStringLength(3);
                 fieldList.add(fieldB);
@@ -415,7 +415,7 @@ public class WaypointEditor extends JmUI
         //drawRect(x, y, x + sizeI, y + sizeI, -16777216);
     }
 
-    protected void drawLabelAndField(String label, TextField field, int x, int y)
+    protected void drawLabelAndField(String label, TextBox field, int x, int y)
     {
         field.setX(x);
         field.setY(y);
@@ -572,7 +572,7 @@ public class WaypointEditor extends JmUI
     {
         boolean focusNext = false;
         boolean foundFocus = false;
-        for (TextField field : fieldList)
+        for (TextBox field : fieldList)
         {
             if (focusNext)
             {
@@ -663,7 +663,7 @@ public class WaypointEditor extends JmUI
         editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.player.dimension);
     }
 
-    protected int getSafeColorInt(TextField field)
+    protected int getSafeColorInt(TextBox field)
     {
         field.clamp();
         String text = field.getText();
@@ -684,7 +684,7 @@ public class WaypointEditor extends JmUI
         return Math.max(0, Math.min(255, val));
     }
 
-    protected int getSafeCoordInt(TextField field)
+    protected int getSafeCoordInt(TextBox field)
     {
         String text = field.getText();
         if (text == null || text.isEmpty() || text.equals("-"))

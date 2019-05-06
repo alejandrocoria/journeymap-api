@@ -49,7 +49,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public SlotMetadata(Button button, boolean advanced)
     {
-        this(button, button.displayString, button.getUnformattedTooltip(), null, null, advanced);
+        this(button, button.getDisplayString(), button.getUnformattedTooltip(), null, null, advanced);
     }
 
     public SlotMetadata(Button button, String name, String tooltip, boolean advanced)
@@ -179,7 +179,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
     {
         if (button != null)
         {
-            name = button.displayString;
+            name = button.getDisplayString();
             tooltip = button.getUnformattedTooltip();
             tooltipLines = null;
         }
