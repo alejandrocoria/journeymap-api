@@ -1572,11 +1572,10 @@ var JourneyMap = (function () {
 
         zoom = Math.floor(zoom);
 
-        var bound = 360 * Math.pow(2, zoom);
-        var newX = (coord.x > bound / 2) ? coord.x - bound : coord.x;
+        coord = this.getNormalizedCoord(coord, zoom);
 
-        var tileUrl = "/tile?zoom=" + zoom + "&x=" + newX + "&z=" + coord.y;
-        var tileId = 'x_' + newX + '_y_' + coord.y + '_zoom_' + zoom;
+        var tileUrl = "/tile?zoom=" + zoom + "&x=" + coord.x + "&z=" + coord.y;
+        var tileId = 'x_' + coord.x + '_y_' + coord.y + '_zoom_' + zoom;
 
         var tile = ownerDocument.createElement('div');
         $(tile).css('width', this.tileSize.height + 'px')
@@ -1611,6 +1610,22 @@ var JourneyMap = (function () {
         }
 
         return tile;
+    };
+
+    // This still needs some work. Map stops displaying at roughly x96080 and -x46000
+    MCMapType.prototype.getNormalizedCoord = function (coord, zoom) {
+        var y = coord.y;
+        var x = coord.x;
+        var bound = 360 * Math.pow(2, zoom);
+
+        if (x > bound / 2) {
+            x = x - bound;
+        }
+
+        return {
+            x: x,
+            y: y
+        };
     };
 
     MCMapType.prototype.refreshTile = function (tile) {
@@ -1662,11 +1677,9 @@ var JourneyMap = (function () {
             var zoom = tileData.zoom;
             var scale = Math.pow(2, zoom);
             var coord = tileData.coord;
+            coord = this.getNormalizedCoord(coord, zoom);
 
-            var bound = 360 * Math.pow(2, zoom);
-            var newX = (coord.x > bound / 2) ? coord.x - bound : coord.x;
-
-            var tileRegion = [parseInt(newX / scale), parseInt(coord.y / scale)];
+            var tileRegion = [parseInt(coord.x / scale), parseInt(coord.y / scale)];
 
             JM.images.regions.forEach(function (region) {
                 if (tileRegion[0] == region[0] && tileRegion[1] == region[1]) {
