@@ -108,7 +108,7 @@ public class CmdTeleportWaypoint
         }
         else
         {
-            String teleportCommand = Journeymap.getClient().getWaypointProperties().teleportCommand.get();
+            String teleportCommand = Journeymap.getClient().getWaypointProperties().teleportCommand.getAsString();
 
             teleportCommand = teleportCommand
                     .replace("{name}", mc.player.getName())

@@ -11,23 +11,31 @@ public class TextFieldButton extends Button implements IConfigFieldHolder<Custom
 
     public TextFieldButton(CustomField field)
     {
-        super(field.get());
+        super(field.get().toString());
         this.field = field;
-        textBox = new TextBox(this.displayString, this.fontRenderer, this.width, this.height);
+        if (field.isNumber())
+        {
+            textBox = new TextBox(this.displayString, this.fontRenderer, this.width, this.height, field.isNumber(), field.allowNeg());
+            textBox.setClamp(field.getMinValue(), field.getMaxValue());
+        }
+        else
+        {
+            textBox = new TextBox(this.displayString, this.fontRenderer, this.width, this.height);
+        }
     }
 
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float partialTicks)
     {
         textBox.setMinLength(1);
-        textBox.setHeight(this.height + 2);
+        textBox.setHeight(this.getHeight() - 2);
         textBox.setWidth(this.getWidth());
         textBox.setX(this.getX());
-        textBox.setY(this.getY());
+        textBox.setY(this.getY() + 1);
         textBox.drawTextBox();
     }
 
-    public void setValue(String value)
+    public void setValue(Object value)
     {
         if (!field.get().equals(value))
         {

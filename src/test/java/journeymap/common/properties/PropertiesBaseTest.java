@@ -1,6 +1,7 @@
 package journeymap.common.properties;
 
 import journeymap.common.properties.config.BooleanField;
+import journeymap.common.properties.config.CustomField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
 import journeymap.common.properties.config.StringField;
@@ -8,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -150,6 +152,23 @@ public abstract class PropertiesBaseTest<P extends PropertiesBase>
     protected void randomize(BooleanField field)
     {
         field.set(rand.nextBoolean());
+    }
+
+    protected void randomizeCustomInteger(CustomField field)
+    {
+        int min = field.getMinValue();
+        int max = field.getMaxValue();
+        int range = max - min;
+
+        field.set(rand.nextInt(range) + min);
+    }
+
+    protected void randomizeCustomString(CustomField field)
+    {
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        field.set(generatedString);
     }
 
 }

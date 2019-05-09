@@ -41,7 +41,7 @@ public class WebServer
 
     private WebServer()
     {
-        port = Journeymap.getClient().getWebMapProperties().port.get();
+        port = Journeymap.getClient().getWebMapProperties().port.getAsInteger();
         validatePort();
     }
 

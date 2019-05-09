@@ -336,7 +336,7 @@ public class OptionSlotFactory
 
 //            button.setDefaultStyle(false);
 //            button.setDrawBackground(false);
-            SlotMetadata<String> slotMetadata = new SlotMetadata<String>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
+            SlotMetadata<Object> slotMetadata = new SlotMetadata<>(button, name, tooltip, defaultTip, field.getDefaultValue(), advanced);
 
             return slotMetadata;
         }

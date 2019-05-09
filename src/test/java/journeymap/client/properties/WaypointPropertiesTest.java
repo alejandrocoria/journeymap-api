@@ -30,6 +30,7 @@ public class WaypointPropertiesTest extends PropertiesBaseTest<WaypointPropertie
         randomize(p.textureSmall);
         randomize(p.maxDistance);
         randomize(p.createDeathpoints);
+        randomizeCustomString(p.teleportCommand);
         return p;
     }
 }
