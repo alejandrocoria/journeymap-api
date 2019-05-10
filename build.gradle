@@ -126,13 +126,6 @@ processResources() {
         exclude 'mcmod.info'
         exclude 'license.txt'
     }
-    
-    // this will replace the version in any of the resources, specifically webmap items that the replace in the minecraft block does not handle.
-    from(sourceSets.main.resources.srcDirs) {
-        filter { line -> line.replaceAll("@JMVERSION@", project.version) }
-        filter { line -> line.replaceAll("@MCVERSION@", project.minecraft_version) }
-        filter { line -> line.replaceAll("@FORGEVERSION@", project.forge_version) }
-    }
     // Process AT files
     rename '(.+_at.cfg)', 'META-INF/$1'
 }

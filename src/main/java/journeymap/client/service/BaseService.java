@@ -18,11 +18,20 @@ import se.rupy.http.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 
@@ -455,7 +464,7 @@ public abstract class BaseService extends Service
          */
         ResponseHeader noCache()
         {
-            setHeader("Cache-Control", "no-cache"); //HTTP 1.1 //$NON-NLS-1$ //$NON-NLS-2$
+            setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HTTP 1.1 //$NON-NLS-1$ //$NON-NLS-2$
             setHeader("Pragma", "no-cache"); //HTTP 1.0 //$NON-NLS-1$ //$NON-NLS-2$
             setHeader("Expires", "0"); //prevents caching by a proxy server  //$NON-NLS-1$ //$NON-NLS-2$
             return this;
