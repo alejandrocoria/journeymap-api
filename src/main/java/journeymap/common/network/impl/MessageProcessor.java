@@ -75,12 +75,13 @@ public abstract class MessageProcessor
         }
     }
 
-    static void start(JsonObject response, MessageContext ctx, Class requestObject) {
+    public static void process(JsonObject response, MessageContext ctx, Class clazz)
+    {
         MessageProcessor messageProcessor = null;
         try
         {
-            messageProcessor = (MessageProcessor) requestObject.newInstance();
-            messageProcessor.processResponse(response, ctx);
+            messageProcessor = (MessageProcessor) clazz.newInstance();
+            messageProcessor.handleResponse(response, ctx);
         }
         catch (InstantiationException | IllegalAccessException e)
         {
@@ -95,7 +96,7 @@ public abstract class MessageProcessor
      * @param message - The response message.
      * @param ctx     - The message context.
      */
-    void processResponse(JsonObject message, MessageContext ctx)
+    void handleResponse(JsonObject message, MessageContext ctx)
     {
         CallbackService callbackService = CallbackService.getInstance();
         JsonObject reply;

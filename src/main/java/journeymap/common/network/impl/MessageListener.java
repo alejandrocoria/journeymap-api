@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static journeymap.common.network.impl.MessageProcessor.OBJECT_KEY;
 
@@ -26,8 +27,8 @@ public class MessageListener implements IMessageHandler<Message, IMessage>
             JsonObject response = gson.fromJson(message.getMessage(), JsonObject.class);
             String clazz = response.get(OBJECT_KEY).getAsString();
             Class requestObject = Class.forName(clazz);
-            requestObject.getMethod("start", JsonObject.class, MessageContext.class, Class.class).invoke(null, response, ctx, requestObject);
-
+            Method method = requestObject.getMethod("process", JsonObject.class, MessageContext.class, Class.class);
+            method.invoke(null, response, ctx, requestObject);
         }
         catch (ClassNotFoundException e)
         {
@@ -43,7 +44,7 @@ public class MessageListener implements IMessageHandler<Message, IMessage>
         }
         catch (NoSuchMethodException | InvocationTargetException e)
         {
-            logger.warn("Unable to setData", e);
+            logger.warn("Unable to initiate message processing", e);
         }
         return null;
     }
