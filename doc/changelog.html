@@ -21,21 +21,11 @@
     <li>Implements <a href="https://bitbucket.org/TeamJM/journeymap-api">JourneyMap API v${apiversion}</a></li>
 </ul>
 <p><strong>CHANGELOG (${date}):</strong></p>
-<p>Beta 6</p>
+
 <ul>
     <li>Feature: Waypoint options allows custom server teleport command. Can handle {x}{y}{x}{name}{dim} fields.</li>
     <li>Feature: Setting log level to 'OFF' prevents Journeymap log info displaying in the [F3] Debug Screen.</li>
     <li>Feature: Webmap - Visual indication if following player.</li>
-    <li>Change: Webmap - Port selection is now a text box.</li>
-    <li>Bugfix: Webmap - Better handling of browser caching.</li>
-</ul>
-<p>Beta 5</p>
-<ul>
-    <li>Added better thread safety for SMP Player Radar</li>
-    <li>Bugfix: ConcurrentModificationException when players log off.</li>
-</ul>
-<p>Beta 4</p>
-<ul>
     <li>Feature: New Server Admin screen to modify Journeymap's server settings.</li>
     <li>Feature: With server installed player radar shows players outside of local range; Configurable for all players or ops/admins.</li>
     <li>Feature: Changed how configs are sent to the client to work with the new Panel. This means JM will be disabled when connecting to servers that have JM 5.5.4 or lower installed.</li>
@@ -45,6 +35,7 @@
     <li>Feature: Two new grid options via Grid Editor: Region, Chunk and Region.</li>
     <li>Server-Feature: Admins can now disable or enable teleporting for dimensions. Users cannot teleport to, from, or within if disabled.</li>
     <li>Integration: Pixelmon-Reforged icon retrieval optimizations(Thanks Reforged team!). Pixelmon-Reforged v7.0.6 or higher required.</li>
+    <li>Change: Webmap - Port selection is now a text box.</li>
     <li>Locale: Updated ru_RU.(Thanks Vlad Imangulov)</li>
     <li>Locale: Added ru_RU Splash text.(Thanks Vlad Imangulov)</li>
     <li>Locale: Updated fr_FR (Thanks Neerwan)</li>
@@ -57,4 +48,5 @@
     <li>Bugfix: Setting topo contour config to false causes NPE.</li>
     <li>Bugfix: Missing small arrow icon when set to small icons if entity has no icon.</li>
     <li>Bugfix: Surface mapping and Topography mapping respect the configs if disabled.</li>
+    <li>Bugfix: Webmap - Better handling of browser caching.</li>
 </ul>
