@@ -3,6 +3,7 @@ package journeymap.common.network.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import journeymap.common.Journeymap;
 import journeymap.common.network.impl.utils.AsyncCallback;
 import journeymap.common.network.impl.utils.CallbackService;
 import net.minecraft.entity.player.EntityPlayer;
@@ -72,6 +73,20 @@ public abstract class MessageProcessor
         {
             send(data);
         }
+    }
+
+    static void start(JsonObject response, MessageContext ctx, Class requestObject) {
+        MessageProcessor messageProcessor = null;
+        try
+        {
+            messageProcessor = (MessageProcessor) requestObject.newInstance();
+            messageProcessor.processResponse(response, ctx);
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            Journeymap.getLogger().warn("Unable to initialize message processor: ", e);
+        }
+
     }
 
     /**
