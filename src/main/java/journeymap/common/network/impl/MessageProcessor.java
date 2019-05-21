@@ -87,7 +87,6 @@ public abstract class MessageProcessor
         {
             Journeymap.getLogger().warn("Unable to initialize message processor: ", e);
         }
-
     }
 
     /**
