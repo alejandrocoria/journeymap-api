@@ -9,6 +9,8 @@ import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +30,21 @@ public class GetPlayerLocations extends MessageProcessor
         GlobalProperties prop = PropertiesManager.getInstance().getGlobalProperties();
         boolean sendToEveryone = prop.playerTrackingEnabled.get();
         boolean sendToOps = prop.opPlayerTrackingEnabled.get();
+
         EntityPlayerMP player = response.getContext().getServerHandler().player;
-        if (sendToEveryone || (sendToOps && isOp(player)))
+        boolean playerRadarEnabled = PropertiesManager.getInstance().getDimProperties(player.dimension).playerRadarEnabled.get();
+
+        if ((sendToEveryone && playerRadarEnabled) || (sendToOps && isOp(player)))
         {
-            return getPlayerList(player);
+            try
+            {
+                return getPlayerList(player);
+            }
+            catch (ConcurrentModificationException cme)
+            {
+                // do nothing.
+                return null;
+            }
         }
 
         return null;
@@ -44,14 +57,14 @@ public class GetPlayerLocations extends MessageProcessor
         return null;
     }
 
-    private JsonObject getPlayerList(EntityPlayerMP entityPlayerMP)
+    private synchronized JsonObject getPlayerList(EntityPlayerMP entityPlayerMP) throws ConcurrentModificationException
     {
         int receiverDimension = entityPlayerMP.dimension;
         boolean receiverOp = isOp(entityPlayerMP);
         JsonArray playerList = new JsonArray();
-        List<EntityPlayerMP> serverPlayers = null;
+        List<EntityPlayerMP> serverPlayers = new ArrayList<>(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers());
         JsonObject players = new JsonObject();
-        serverPlayers = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
+
         if (serverPlayers != null || serverPlayers.size() > 1)
         {
             for (EntityPlayerMP playerMp : serverPlayers)
