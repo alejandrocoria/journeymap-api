@@ -20,7 +20,7 @@ public class GlobalProperties extends PermissionProperties
     public final BooleanField useWorldId = new BooleanField(ServerCategory.General, "Use world id", false);
     public final BooleanField playerTrackingEnabled = new BooleanField(ServerCategory.General, "Enable player tracking", true);
     public final BooleanField opPlayerTrackingEnabled = new BooleanField(ServerCategory.General, "Enable player tracking by Ops and Admins", true);
-    public final IntegerField playerTrackingUpdateTime = new IntegerField(ServerCategory.General, "Player tracking update time in milliseconds", TRACKING_MIN, TRACKING_MAX, TRACKING_DEFUALT);
+    public final IntegerField playerTrackingUpdateTime = new IntegerField(ServerCategory.General, "Player tracking update time in ticks, 1-20", TRACKING_MIN, TRACKING_MAX, TRACKING_DEFUALT);
 
     /**
      * Constructor.

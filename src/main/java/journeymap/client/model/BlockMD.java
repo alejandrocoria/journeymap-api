@@ -32,6 +32,7 @@ import net.minecraftforge.registries.GameData;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -447,15 +448,19 @@ public class BlockMD implements Comparable<BlockMD>
      *
      * @return the color
      */
-    public int getTextureColor()
+    public int getTextureColor(@Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos)
     {
         if (color == null && !isError && blockColorProxy != null) {
-            this.color = blockColorProxy.deriveBlockColor(this);
+            this.color = blockColorProxy.deriveBlockColor(this, chunkMD, blockPos);
         }
         if (color == null) {
             this.color = RGB.BLACK_RGB;
         }
         return this.color;
+    }
+
+    public int getTextureColor() {
+        return getTextureColor(null, null);
     }
 
     /**

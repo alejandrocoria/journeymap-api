@@ -10,11 +10,12 @@ import journeymap.client.data.DataCache;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.mod.impl.Pixelmon;
-import journeymap.client.thread.PlayerRadarManager;
 import journeymap.common.Journeymap;
+import journeymap.common.feature.PlayerRadarManager;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderFacade;
 import net.minecraft.client.renderer.entity.RenderHorse;
@@ -146,11 +147,30 @@ public class EntityHelper
         timer.start();
 
         Minecraft mc = FMLClientHandler.instance().getClient();
-        List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>(mc.world.playerEntities);
-        allPlayers.remove(mc.player);
+        List<EntityPlayer> allPlayers = new ArrayList<EntityPlayer>();
 
-        if(Journeymap.getClient().isPlayerTrackingEnabled()) {
-            allPlayers = PlayerRadarManager.getInstance().getPlayers();
+
+        if (Journeymap.getClient().isPlayerTrackingEnabled() && !Minecraft.getMinecraft().isSingleplayer())
+        {
+            if (mc.getConnection().getPlayerInfoMap() != null && mc.getConnection().getPlayerInfoMap().size() > 1)
+            {
+                for (NetworkPlayerInfo onlinePlayer : mc.getConnection().getPlayerInfoMap())
+                {
+                    if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()))
+                    {
+                        EntityPlayer networkedPlayer = PlayerRadarManager.getInstance().getPlayers().get(onlinePlayer.getGameProfile().getId());
+                        if (networkedPlayer != null)
+                        {
+                            allPlayers.add(networkedPlayer);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            allPlayers.addAll(mc.world.playerEntities);
+            allPlayers.remove(mc.player);
         }
 
         int max = Journeymap.getClient().getCoreProperties().maxPlayersData.get();

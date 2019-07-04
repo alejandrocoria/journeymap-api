@@ -7,6 +7,8 @@ package journeymap.client.mod;
 
 import journeymap.client.cartography.color.ColoredSprite;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
+import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -16,5 +18,5 @@ import java.util.Collection;
  */
 public interface IBlockSpritesProxy {
     @Nullable
-    Collection<ColoredSprite> getSprites(BlockMD blockMD);
+    Collection<ColoredSprite> getSprites(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos);
 }

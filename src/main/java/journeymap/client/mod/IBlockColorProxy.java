@@ -14,7 +14,8 @@ import javax.annotation.Nullable;
 /**
  * Provides positional Blockstate color.
  */
-public interface IBlockColorProxy {
+public interface IBlockColorProxy
+{
     /**
      * Gets color for block based on its textures.
      *
@@ -22,7 +23,7 @@ public interface IBlockColorProxy {
      * @return the texture color
      */
     @Nullable
-    int deriveBlockColor(BlockMD blockMD);
+    int deriveBlockColor(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos);
 
     /**
      * Get color for block based on world position.

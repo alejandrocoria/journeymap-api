@@ -35,7 +35,6 @@ import journeymap.client.task.main.MainTaskController;
 import journeymap.client.task.main.MappingMonitorTask;
 import journeymap.client.task.multi.ITaskManager;
 import journeymap.client.task.multi.TaskController;
-import journeymap.client.thread.GetAllPlayersThread;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
@@ -562,10 +561,6 @@ public class JourneymapClient implements CommonProxy
                         String dimProperties = response.getAsJson().get(DIM).getAsString();
                         PermissionProperties prop = new Permissions().load(dimProperties, false);
                         FeatureManager.INSTANCE.updateDimensionFeatures(prop);
-                        if (!FMLClientHandler.instance().getClient().isSingleplayer())
-                        {
-                            GetAllPlayersThread.start();
-                        }
                     }
                 });
             }
@@ -606,7 +601,6 @@ public class JourneymapClient implements CommonProxy
 
             if (mc != null)
             {
-                GetAllPlayersThread.stop();
                 int dimension = mc.world != null ? mc.world.provider.getDimension() : 0;
                 ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(false, dimension);
             }

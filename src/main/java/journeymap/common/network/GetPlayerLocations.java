@@ -1,11 +1,14 @@
 package journeymap.common.network;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import journeymap.common.feature.PlayerRadarManager;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PropertiesManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -33,12 +36,21 @@ public class GetPlayerLocations extends MessageProcessor
 
         EntityPlayerMP player = response.getContext().getServerHandler().player;
         boolean playerRadarEnabled = PropertiesManager.getInstance().getDimProperties(player.dimension).playerRadarEnabled.get();
-
-        if ((sendToEveryone && playerRadarEnabled) || (sendToOps && isOp(player)))
+        boolean receiverOp = isOp(player);
+        if ((sendToEveryone && playerRadarEnabled) || (sendToOps && receiverOp))
         {
             try
             {
-                return getPlayerList(player);
+                JsonObject update = new JsonObject();
+                int updateTime = PropertiesManager.getInstance().getGlobalProperties().playerTrackingUpdateTime.get();
+                boolean userTrack = PropertiesManager.getInstance().getGlobalProperties().playerTrackingEnabled.get();
+                boolean opTrack = PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get();
+
+                update.addProperty(TRACKING, (userTrack || (receiverOp && opTrack)));
+                update.addProperty(TRACKING_UPDATE_TIME, updateTime);
+
+                sendPlayerTrackingData(player);
+                return update;
             }
             catch (ConcurrentModificationException cme)
             {
@@ -50,21 +62,12 @@ public class GetPlayerLocations extends MessageProcessor
         return null;
     }
 
-    // Does this action when the message is received on the client.
-    @Override
-    protected JsonObject onClient(Response response)
-    {
-        return null;
-    }
-
-    private synchronized JsonObject getPlayerList(EntityPlayerMP entityPlayerMP) throws ConcurrentModificationException
+    private void sendPlayerTrackingData(EntityPlayerMP entityPlayerMP)
     {
         int receiverDimension = entityPlayerMP.dimension;
         boolean receiverOp = isOp(entityPlayerMP);
-        JsonArray playerList = new JsonArray();
         List<EntityPlayerMP> serverPlayers = new ArrayList<>(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers());
-        JsonObject players = new JsonObject();
-
+        List<JsonObject> playerList = new ArrayList<>();
         if (serverPlayers != null || serverPlayers.size() > 1)
         {
             for (EntityPlayerMP playerMp : serverPlayers)
@@ -72,37 +75,74 @@ public class GetPlayerLocations extends MessageProcessor
                 boolean sneaking = playerMp.isSneaking();
                 int dimension = playerMp.dimension;
                 UUID playerId = playerMp.getUniqueID();
-                if (receiverOp)
-                {
-                    sneaking = false;
-                }
-                JsonObject player = new JsonObject();
-                player.addProperty("name", playerMp.getName());
-                player.addProperty("posX", playerMp.getPosition().getX());
-                player.addProperty("posY", playerMp.getPosition().getY());
-                player.addProperty("posZ", playerMp.getPosition().getZ());
-                player.addProperty("chunkX", playerMp.chunkCoordX);
-                player.addProperty("chunkY", playerMp.chunkCoordY);
-                player.addProperty("chunkZ", playerMp.chunkCoordZ);
-                player.addProperty("rotation", playerMp.rotationYawHead);
-                player.addProperty("sneaking", sneaking);
-                player.addProperty("playerId", playerId.toString());
 
-                // Don't send the player to them self and don't send sneaking players unless op is receiving.
                 if (!entityPlayerMP.getUniqueID().equals(playerId) && !sneaking && receiverDimension == dimension)
                 {
-                    playerList.add(player);
+                    playerList.add(buildJsonPlayer(playerMp, receiverOp));
                 }
             }
-        }
-        int updateTime = PropertiesManager.getInstance().getGlobalProperties().playerTrackingUpdateTime.get();
-        boolean userTrack = PropertiesManager.getInstance().getGlobalProperties().playerTrackingEnabled.get();
-        boolean opTrack = PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get();
 
-        players.addProperty(TRACKING_UPDATE_TIME, updateTime);
-        players.addProperty(TRACKING, (userTrack || (receiverOp && opTrack)));
-        players.add("players", playerList);
-        return players;
+            if (serverPlayers.size() < 10)
+            {
+                sendPlayerList(playerList);
+            }
+        }
     }
+
+    /**
+     * Sends 10 players at a time due to limitations in the packet size.
+     *
+     * @param allPlayers - The all players list.
+     */
+    private void sendPlayerList(List<JsonObject> allPlayers)
+    {
+        List<List<JsonObject>> partitionedPlayerList = Lists.partition(allPlayers, 10);
+        for (List<JsonObject> playerList : partitionedPlayerList)
+        {
+            JsonArray playerArray = new JsonArray();
+            for (JsonObject playerJsonObject : playerList)
+            {
+                playerArray.add(playerJsonObject);
+            }
+            JsonObject payload = new JsonObject();
+            payload.add("players", playerArray);
+            new GetPlayerLocations().sendToPlayer(payload, (EntityPlayerMP) player);
+        }
+    }
+
+    private JsonObject buildJsonPlayer(EntityPlayer playerMp, boolean receiverOp)
+    {
+        boolean sneaking = playerMp.isSneaking();
+        UUID playerId = playerMp.getUniqueID();
+        if (receiverOp)
+        {
+            sneaking = false;
+        }
+        JsonObject player = new JsonObject();
+        player.addProperty("name", playerMp.getName());
+        player.addProperty("posX", playerMp.getPosition().getX());
+        player.addProperty("posY", playerMp.getPosition().getY());
+        player.addProperty("posZ", playerMp.getPosition().getZ());
+        player.addProperty("chunkX", playerMp.chunkCoordX);
+        player.addProperty("chunkY", playerMp.chunkCoordY);
+        player.addProperty("chunkZ", playerMp.chunkCoordZ);
+        player.addProperty("rotation", playerMp.rotationYawHead);
+        player.addProperty("sneaking", sneaking);
+        player.addProperty("playerId", playerId.toString());
+        return player;
+    }
+
+    // Does this action when the message is received on the client.
+    @Override
+    protected JsonObject onClient(Response result)
+    {
+        if (result.getAsJson().get("players") != null)
+        {
+            JsonArray playerList = result.getAsJson().get("players").getAsJsonArray();
+            PlayerRadarManager.getInstance().updatePlayers(playerList);
+        }
+        return null;
+    }
+
 
 }

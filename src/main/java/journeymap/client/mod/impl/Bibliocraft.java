@@ -12,11 +12,13 @@ import journeymap.client.mod.IModBlockHandler;
 import journeymap.client.mod.ModBlockDelegate;
 import journeymap.client.mod.ModPropertyEnum;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import javax.annotation.Nullable;
@@ -43,7 +45,7 @@ public class Bibliocraft implements IModBlockHandler, IBlockSpritesProxy {
 
     @Nullable
     @Override
-    public Collection<ColoredSprite> getSprites(BlockMD blockMD) {
+    public Collection<ColoredSprite> getSprites(BlockMD blockMD, @Nullable ChunkMD chunkMD,  @Nullable BlockPos blockPos) {
         IBlockState blockState = blockMD.getBlockState();
         String textureString = ModPropertyEnum.getFirstValue(colorProperties, blockState);
         if (!Strings.isNullOrEmpty(textureString)) {
@@ -55,6 +57,6 @@ public class Bibliocraft implements IModBlockHandler, IBlockSpritesProxy {
                 Journeymap.getLogger().error(String.format("Error getting sprite from %s: %s", textureString, LogFormatter.toPartialString(e)));
             }
         }
-        return ModBlockDelegate.INSTANCE.getDefaultBlockSpritesProxy().getSprites(blockMD);
+        return ModBlockDelegate.INSTANCE.getDefaultBlockSpritesProxy().getSprites(blockMD, chunkMD, blockPos);
     }
 }

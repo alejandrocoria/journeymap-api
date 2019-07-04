@@ -30,7 +30,8 @@ import java.util.Collection;
 /**
  * Default color determination for mod blocks.
  */
-public class VanillaBlockColorProxy implements IBlockColorProxy {
+public class VanillaBlockColorProxy implements IBlockColorProxy
+{
     static Logger logger = Journeymap.getLogger();
 
     private final BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
@@ -38,7 +39,8 @@ public class VanillaBlockColorProxy implements IBlockColorProxy {
     private boolean blendGrass;
     private boolean blendWater;
 
-    public VanillaBlockColorProxy() {
+    public VanillaBlockColorProxy()
+    {
         CoreProperties coreProperties = Journeymap.getClient().getCoreProperties();
         blendFoliage = coreProperties.mapBlendFoliage.get();
         blendGrass = coreProperties.mapBlendGrass.get();
@@ -46,20 +48,26 @@ public class VanillaBlockColorProxy implements IBlockColorProxy {
     }
 
     @Override
-    public int deriveBlockColor(BlockMD blockMD) {
+    public int deriveBlockColor(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos)
+    {
         IBlockState blockState = blockMD.getBlockState();
-        try {
+        try
+        {
             // Fluid?
-            if (blockState.getBlock() instanceof IFluidBlock) {
-                return getSpriteColor(blockMD, 0xBCBCBC);
+            if (blockState.getBlock() instanceof IFluidBlock)
+            {
+                return getSpriteColor(blockMD, 0xBCBCBC, chunkMD,  blockPos);
             }
 
-            Integer color = getSpriteColor(blockMD, null);
-            if (color == null) {
+            Integer color = getSpriteColor(blockMD, null, chunkMD, blockPos);
+            if (color == null)
+            {
                 color = setBlockColorToMaterial(blockMD);
             }
             return color;
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             logger.error("Error deriving color for " + blockMD + ": " + LogFormatter.toPartialString(e));
             blockMD.addFlags(BlockFlag.Error);
             return setBlockColorToMaterial(blockMD);
@@ -75,13 +83,17 @@ public class VanillaBlockColorProxy implements IBlockColorProxy {
      * @return the color at the given position
      */
     @Override
-    public int getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos) {
-        int result = blockMD.getTextureColor();
+    public int getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
+    {
+        int result = blockMD.getTextureColor(chunkMD, blockPos);
 
-        if (blockMD.isFoliage()) {
+        if (blockMD.isFoliage())
+        {
             // Approximate the light opacity reduction by leaves
             result = RGB.adjustBrightness(result, .8f);
-        } else if (blockMD.isFluid()) {
+        }
+        else if (blockMD.isFluid())
+        {
             return RGB.multiply(result, ((IFluidBlock) blockMD.getBlock()).getFluid().getColor());
         }
 
@@ -97,16 +109,20 @@ public class VanillaBlockColorProxy implements IBlockColorProxy {
      * @param tintIndex tintIndex
      * @return the color multiplier
      */
-    public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos, int tintIndex) {
-        if (!blendGrass && blockMD.isGrass()) {
+    public int getColorMultiplier(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos, int tintIndex)
+    {
+        if (!blendGrass && blockMD.isGrass())
+        {
             return chunkMD.getBiome(blockPos).getGrassColorAtPos(blockPos);
         }
 
-        if (!blendFoliage && blockMD.isFoliage()) {
+        if (!blendFoliage && blockMD.isFoliage())
+        {
             return chunkMD.getBiome(blockPos).getFoliageColorAtPos(blockPos);
         }
 
-        if (!blendWater && blockMD.isWater()) {
+        if (!blendWater && blockMD.isWater())
+        {
             return chunkMD.getBiome(blockPos).getWaterColorMultiplier();
         }
 
@@ -120,28 +136,35 @@ public class VanillaBlockColorProxy implements IBlockColorProxy {
      * @param defaultColor optional default
      * @return result or defaultColor
      */
-    public static Integer getSpriteColor(@Nonnull BlockMD blockMD, @Nullable Integer defaultColor) {
-        Collection<ColoredSprite> sprites = blockMD.getBlockSpritesProxy().getSprites(blockMD);
+    public static Integer getSpriteColor(@Nonnull BlockMD blockMD, @Nullable Integer defaultColor, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos)
+    {
+        Collection<ColoredSprite> sprites = blockMD.getBlockSpritesProxy().getSprites(blockMD, chunkMD, blockPos);
         float[] rgba = ColorManager.INSTANCE.getAverageColor(sprites);
-        if (rgba != null) {
+        if (rgba != null)
+        {
             return RGB.toInteger(rgba);
         }
         return defaultColor;
     }
 
-    public static int setBlockColorToError(BlockMD blockMD) {
+    public static int setBlockColorToError(BlockMD blockMD)
+    {
         blockMD.setAlpha(0);
         blockMD.addFlags(BlockFlag.Ignore, BlockFlag.Error);
         blockMD.setColor(-1);
         return -1;
     }
 
-    public static int setBlockColorToMaterial(BlockMD blockMD) {
-        try {
+    public static int setBlockColorToMaterial(BlockMD blockMD)
+    {
+        try
+        {
             blockMD.setAlpha(1);
             blockMD.addFlags(BlockFlag.Ignore);
             return blockMD.setColor(blockMD.getBlockState().getMaterial().getMaterialMapColor().colorValue);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.warn(String.format("Failed to use MaterialMapColor, marking as error: %s", blockMD));
             return setBlockColorToError(blockMD);
         }

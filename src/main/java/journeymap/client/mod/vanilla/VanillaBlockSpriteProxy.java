@@ -8,6 +8,7 @@ package journeymap.client.mod.vanilla;
 import journeymap.client.cartography.color.ColoredSprite;
 import journeymap.client.mod.IBlockSpritesProxy;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import net.minecraft.block.Block;
@@ -21,6 +22,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -28,7 +30,12 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * IBlockSpritesProxy for problematic vanilla blocks.
@@ -56,8 +63,21 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
 
     @Nullable
     @Override
-    public Collection<ColoredSprite> getSprites(BlockMD blockMD) {
+    public Collection<ColoredSprite> getSprites(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos) {
         IBlockState blockState = blockMD.getBlockState();
+        if(blockPos != null) {
+            try
+            {
+                // gets the actual state.
+                blockState = blockMD.getBlock().getActualState(blockState, chunkMD.getWorld(), blockPos);
+                // gets the extended state from the actual state.
+                blockState = blockMD.getBlock().getExtendedState(blockState, chunkMD.getWorld(), blockPos);
+            }
+            catch (Exception ignore)
+            {
+                //do nothing
+            }
+        }
         Block block = blockState.getBlock();
 
         if (block instanceof IFluidBlock) {

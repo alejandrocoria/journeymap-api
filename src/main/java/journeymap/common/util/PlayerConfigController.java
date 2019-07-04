@@ -63,6 +63,9 @@ public class PlayerConfigController
                 return true;
             }
         }
+        if (isOp(player)) {
+            return ForgeConfig.opAccess;
+        }
         return false;
     }
 

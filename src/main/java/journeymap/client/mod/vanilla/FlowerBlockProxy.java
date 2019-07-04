@@ -21,6 +21,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
+import javax.annotation.Nullable;
+
 /**
  * Example of how BlockMD handling can be overridden to return a different BlockMD.
  * This allows the color of a flowerpot to be determined by what it contains.
@@ -32,14 +34,14 @@ public enum FlowerBlockProxy implements IBlockColorProxy {
     private final BlockColors blockColors = FMLClientHandler.instance().getClient().getBlockColors();
 
     @Override
-    public int deriveBlockColor(BlockMD blockMD) {
+    public int deriveBlockColor(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos) {
         if (blockMD.getBlock() instanceof BlockFlower) {
             Integer color = getFlowerColor(blockMD.getBlockState());
             if (color != null) {
                 return color;
             }
         }
-        return ModBlockDelegate.INSTANCE.getDefaultBlockColorProxy().deriveBlockColor(blockMD);
+        return ModBlockDelegate.INSTANCE.getDefaultBlockColorProxy().deriveBlockColor(blockMD, chunkMD, blockPos);
     }
 
     @Override

@@ -48,7 +48,6 @@ public enum ModBlockDelegate {
         defaultBlockSpritesProxy = new VanillaBlockSpriteProxy();
 
         //TODO:  Move modid to an annotation used to autoload these classes.
-
         handlerClasses.clear();
         handlerClasses.put("BiblioCraft", Bibliocraft.class);
         handlerClasses.put("BiomesOPlenty", BiomesOPlenty.class);

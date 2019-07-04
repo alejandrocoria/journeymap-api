@@ -16,26 +16,36 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBed;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
+
 /**
  * Example of how BlockMD handling can be customized.
  */
-public enum BedBlockProxy implements IBlockColorProxy {
+public enum BedBlockProxy implements IBlockColorProxy
+{
     INSTANCE;
 
     @Override
-    public int deriveBlockColor(BlockMD blockMD) {
-        return ModBlockDelegate.INSTANCE.getDefaultBlockColorProxy().deriveBlockColor(blockMD);
+    public int deriveBlockColor(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos)
+    {
+        return ModBlockDelegate.INSTANCE.getDefaultBlockColorProxy().deriveBlockColor(blockMD, chunkMD, blockPos);
     }
 
     @Override
-    public int getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos) {
-        if (blockMD.getBlock() instanceof BlockBed) {
+    public int getBlockColor(ChunkMD chunkMD, BlockMD blockMD, BlockPos blockPos)
+    {
+        if (blockMD.getBlock() instanceof BlockBed)
+        {
             TileEntity tileentity = JmBlockAccess.INSTANCE.getTileEntity(blockPos);
-            if (tileentity instanceof TileEntityBed) {
+            if (tileentity instanceof TileEntityBed)
+            {
                 int bedColor = ((TileEntityBed) tileentity).getColor().getColorValue();
-                if (blockMD.getBlockState().getValue(BlockBed.PART) == BlockBed.EnumPartType.FOOT) {
+                if (blockMD.getBlockState().getValue(BlockBed.PART) == BlockBed.EnumPartType.FOOT)
+                {
                     return RGB.multiply(0xcccccc, bedColor);
-                } else {
+                }
+                else
+                {
                     return RGB.multiply(0xffffff, bedColor);
                 }
             }
