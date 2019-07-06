@@ -138,8 +138,9 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             WaypointProperties waypointProperties = Journeymap.getClient().getWaypointProperties();
             boolean enabled = waypointProperties.managerEnabled.get() && waypointProperties.createDeathpoints.get();
             boolean cancelled = false;
-
-            BlockPos pos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
+            // do not create death waypoint below y:2
+            double playerY = MathHelper.floor(player.posY) > 2 ? MathHelper.floor(player.posY) : 2D;
+            BlockPos pos = new BlockPos(MathHelper.floor(player.posX), playerY, MathHelper.floor(player.posZ));
             if (enabled)
             {
                 int dim = FMLClientHandler.instance().getClient().player.world.provider.getDimension();
