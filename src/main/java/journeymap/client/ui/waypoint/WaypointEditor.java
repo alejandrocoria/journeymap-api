@@ -465,6 +465,7 @@ public class WaypointEditor extends JmUI
     public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
+        dimScrollPane.handleMouseInput();
     }
 
     @Override

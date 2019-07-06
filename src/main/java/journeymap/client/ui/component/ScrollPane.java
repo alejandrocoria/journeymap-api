@@ -269,6 +269,15 @@ public class ScrollPane extends GuiSlot
         }
     }
 
+    @Override
+    /**
+     * Handles mouse input.
+     */
+    public void handleMouseInput()
+    {
+        super.handleMouseInput();
+    }
+
     public int getFirstVisibleIndex()
     {
         return firstVisibleIndex;
