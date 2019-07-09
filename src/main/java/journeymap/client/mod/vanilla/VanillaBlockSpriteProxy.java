@@ -65,19 +65,6 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
     @Override
     public Collection<ColoredSprite> getSprites(BlockMD blockMD, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos) {
         IBlockState blockState = blockMD.getBlockState();
-        if(blockPos != null) {
-            try
-            {
-                // gets the actual state.
-                blockState = blockMD.getBlock().getActualState(blockState, chunkMD.getWorld(), blockPos);
-                // gets the extended state from the actual state.
-                blockState = blockMD.getBlock().getExtendedState(blockState, chunkMD.getWorld(), blockPos);
-            }
-            catch (Exception ignore)
-            {
-                //do nothing
-            }
-        }
         Block block = blockState.getBlock();
 
         if (block instanceof IFluidBlock) {
@@ -99,7 +86,7 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
             outer:
             for (IBlockState state : new IBlockState[]{blockState, null}) {
                 for (EnumFacing facing : new EnumFacing[]{EnumFacing.UP, null}) {
-                    if (getSprites(blockMD, model, state, facing, map)) {
+                    if (getSprites(blockMD, model, state, facing, map, chunkMD, blockPos)) {
                         break outer;
                     }
                 }
@@ -124,9 +111,25 @@ public class VanillaBlockSpriteProxy implements IBlockSpritesProxy {
     }
 
 
-    private boolean getSprites(BlockMD blockMD, IBakedModel model, @Nullable IBlockState blockState, @Nullable EnumFacing facing, HashMap<String, ColoredSprite> map) {
+    private boolean getSprites(BlockMD blockMD, IBakedModel model, @Nullable IBlockState blockState, @Nullable EnumFacing facing, HashMap<String, ColoredSprite> map, @Nullable ChunkMD chunkMD, @Nullable BlockPos blockPos) {
 
         BlockRenderLayer originalLayer = MinecraftForgeClient.getRenderLayer();
+
+        if(blockPos != null && chunkMD != null && chunkMD.getWorld() != null) {
+            try
+            {
+                // gets the actual state.
+                blockState = blockMD.getBlock().getActualState(blockState, chunkMD.getWorld(), blockPos);
+                // gets model from actual state.
+                model = bms.getModelForState(blockState);
+                // gets the extended state from the actual state.
+                blockState = blockMD.getBlock().getExtendedState(blockState, chunkMD.getWorld(), blockPos);
+            }
+            catch (Exception ignore)
+            {
+                //do nothing
+            }
+        }
 
         boolean success = false;
         try {

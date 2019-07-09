@@ -54,6 +54,8 @@ public enum ModBlockDelegate {
         handlerClasses.put("terrafirmacraft", TerraFirmaCraft.class);
         handlerClasses.put("tfc2", TerraFirmaCraft.class);
         handlerClasses.put("streams", Streams.class);
+//        handlerClasses.put("wirelessutils", CodeChickenLibMod.class);
+//        handlerClasses.put("thermalexpansion", CodeChickenLibMod.class);
 
         for (Map.Entry<String, Class<? extends IModBlockHandler>> entry : handlerClasses.entrySet()) {
             String modId = entry.getKey();
