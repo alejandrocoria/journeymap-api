@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -93,6 +94,10 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
     {
         try
         {
+            if (Loader.isModLoaded("labymod") && (event.isCancelable() == EVENT_PRE)) {
+                UIManager.INSTANCE.drawMiniMap();
+                return;
+            }
             if (event.getType() == EVENT_TYPE && (event.isCancelable() == EVENT_PRE))
             {
                 UIManager.INSTANCE.drawMiniMap();
