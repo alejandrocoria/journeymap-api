@@ -1010,13 +1010,15 @@ public class DrawUtil
         /**
          * Left h align.
          */
-        Left, /**
-     * Center h align.
-     */
-    Center, /**
-     * Right h align.
-     */
-    Right
+        Left,
+        /**
+         * Center h align.
+         */
+        Center,
+        /**
+         * Right h align.
+         */
+        Right
     }
 
     /**
@@ -1027,12 +1029,14 @@ public class DrawUtil
         /**
          * Above v align.
          */
-        Above, /**
-     * Middle v align.
-     */
-    Middle, /**
-     * Below v align.
-     */
-    Below
+        Above,
+        /**
+         * Middle v align.
+         */
+        Middle,
+        /**
+         * Below v align.
+         */
+        Below
     }
 }

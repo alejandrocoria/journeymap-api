@@ -139,7 +139,7 @@ public class DrawEntityStep implements DrawStep
         if (entityLiving instanceof EntityPlayer)
         {
             Team team = entityLiving.getTeam();
-            if(team!=null)
+            if(team!=null && showName)
             {
                 playerTeamName = ScorePlayerTeam.formatPlayerName(entityLiving.getTeam(), entityLiving.getName());
             }
@@ -242,11 +242,11 @@ public class DrawEntityStep implements DrawStep
             int labelOffset = entityTexture == null ? 0 : rotation == 0 ? -entityTexture.getHeight() / 2 : entityTexture.getHeight() / 2;
             Point2D labelPoint = gridRenderer.shiftWindowPosition((int) drawX, (int) drawY, 0, -labelOffset);
 
-            if(playerTeamName!=null)
+            if(playerTeamName!=null && showName)
             {
                 DrawUtil.drawLabel(playerTeamName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, RGB.WHITE_RGB, 1f, fontScale, false, rotation);
             }
-            else
+            else if (showName)
             {
                 DrawUtil.drawLabel(entityLiving.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, RGB.GREEN_RGB, 1f, fontScale, false, rotation);
             }
