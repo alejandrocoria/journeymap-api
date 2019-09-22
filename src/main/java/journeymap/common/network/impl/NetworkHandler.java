@@ -5,13 +5,14 @@
 
 package journeymap.common.network.impl;
 
-import journeymap.common.Journeymap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NetworkHandler
 {
@@ -46,9 +47,14 @@ public class NetworkHandler
         }
         else
         {
-            Journeymap.getLogger().error("Packet Handler not initialized before use.");
+            getLogger().error("Packet Handler not initialized before use.");
             throw new UnsupportedOperationException("Packet Handler not Initialized");
         }
+    }
+
+    public static Logger getLogger()
+    {
+        return LogManager.getLogger(INSTANCE.MOD_ID);
     }
 
     public void sendToServer(Message message)

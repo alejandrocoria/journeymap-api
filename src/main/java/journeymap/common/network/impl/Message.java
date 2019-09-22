@@ -1,7 +1,6 @@
 package journeymap.common.network.impl;
 
 import io.netty.buffer.ByteBuf;
-import journeymap.common.Journeymap;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -35,7 +34,7 @@ public class Message implements IMessage
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error(String.format("Failed to read message: %s", t));
+            NetworkHandler.getLogger().error(String.format("Failed to read message: %s", t));
         }
     }
 
@@ -51,7 +50,7 @@ public class Message implements IMessage
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("[toBytes]Failed to read message: " + t);
+            NetworkHandler.getLogger().error("[toBytes]Failed to read message: " + t);
         }
     }
 }

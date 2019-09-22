@@ -81,11 +81,7 @@ public class GetPlayerLocations extends MessageProcessor
                     playerList.add(buildJsonPlayer(playerMp, receiverOp));
                 }
             }
-
-            if (serverPlayers.size() < 10)
-            {
-                sendPlayerList(playerList);
-            }
+            sendPlayerList(playerList);
         }
     }
 
@@ -138,11 +134,10 @@ public class GetPlayerLocations extends MessageProcessor
     {
         if (result.getAsJson().get("players") != null)
         {
+
             JsonArray playerList = result.getAsJson().get("players").getAsJsonArray();
             PlayerRadarManager.getInstance().updatePlayers(playerList);
         }
         return null;
     }
-
-
 }

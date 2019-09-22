@@ -3,7 +3,6 @@ package journeymap.common.network.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import journeymap.common.Journeymap;
 import journeymap.common.network.impl.utils.AsyncCallback;
 import journeymap.common.network.impl.utils.CallbackService;
 import net.minecraft.entity.player.EntityPlayer;
@@ -85,7 +84,7 @@ public abstract class MessageProcessor
         }
         catch (InstantiationException | IllegalAccessException e)
         {
-            Journeymap.getLogger().warn("Unable to initialize message processor: ", e);
+            NetworkHandler.getLogger().warn("Unable to initialize message processor: " + response.get(OBJECT_KEY).getAsString() + " :", e);
         }
     }
 
@@ -98,7 +97,7 @@ public abstract class MessageProcessor
     void handleResponse(JsonObject message, MessageContext ctx)
     {
         CallbackService callbackService = CallbackService.getInstance();
-        JsonObject reply;
+        JsonObject reply = null;
         this.side = ctx.side;
         this.data = message.get(DATA_KEY).getAsJsonObject();
         this.id = UUID.fromString(message.get(MESSAGE_KEY).getAsString());
@@ -107,24 +106,52 @@ public abstract class MessageProcessor
         JsonResponse response = new JsonResponse(message, ctx);
         if (side.isServer())
         {
-            this.player = ctx.getServerHandler().player;
-            reply = onServer(response);
+            try
+            {
+                this.player = ctx.getServerHandler().player;
+                reply = onServer(response);
+            }
+            catch (Exception e)
+            {
+                NetworkHandler.getLogger().warn("Error handling response on server: " + this.clazz + " :", e);
+            }
         }
         else
         {
-            reply = onClient(response);
+            try
+            {
+                reply = onClient(response);
+            }
+            catch (Exception e)
+            {
+                NetworkHandler.getLogger().warn("Error handling response on client: " + this.clazz + " :", e);
+            }
         }
 
         if (reply != null)
         {
-            reply(reply);
+            try
+            {
+                reply(reply);
+            }
+            catch (Exception e)
+            {
+                NetworkHandler.getLogger().warn("Error handling reply on " + ctx.side.name() + ": " + this.clazz + " :", e);
+            }
             return;
         }
 
         if (callbackService.getCallback(id) != null)
         {
-            callbackService.getCallback(id).onSuccess(response);
-            callbackService.removeCallback(id);
+            try
+            {
+                callbackService.getCallback(id).onSuccess(response);
+                callbackService.removeCallback(id);
+            }
+            catch (Exception e)
+            {
+                NetworkHandler.getLogger().warn("Error handling callback on " + ctx.side.name() + ": " + this.clazz + " :", e);
+            }
         }
     }
 
