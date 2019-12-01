@@ -1,6 +1,7 @@
 package journeymap.client.ui.serveroption;
 
 import com.google.common.collect.Lists;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,9 +16,11 @@ import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.network.GetAllConfigs;
 import journeymap.common.network.UpdateAllConfigs;
+import journeymap.common.network.impl.utils.Compressor;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +96,23 @@ public class ServerOptionsManager extends JmUI
                     this.defaultDimension = result.getAsJson().get(DEFAULT_DIM).getAsJsonObject();
                 }
 
+                // Dimensions are compressed to handled large amount of dimensions. Here we decompress the dimensions.
                 if (result.getAsJson().get(DIMENSIONS) != null)
                 {
-                    this.dimensionMap = buildDimensionMap(result.getAsJson().getAsJsonArray(DIMENSIONS));
+                    String compressedDimArray = result.getAsJson().get(DIMENSIONS).getAsString();
+                    String decompressedDims;
+                    JsonArray dimArray;
+                    try
+                    {
+                        decompressedDims = Compressor.decompress(compressedDimArray);
+                        dimArray = new GsonBuilder().serializeNulls().create().fromJson(decompressedDims, JsonArray.class);
+                        this.dimensionMap = buildDimensionMap(dimArray);
+                    }
+                    catch (IOException e)
+                    {
+                        Journeymap.getLogger().error("ERROR: Unable to decompress server options dimension array");
+                    }
+
                 }
             });
 //        }
@@ -263,7 +280,17 @@ public class ServerOptionsManager extends JmUI
         {
             dims.add(dim);
         }
-        updatedProperties.add(DIMENSIONS, dims);
+
+        // Compress dimensions
+        try
+        {
+            updatedProperties.addProperty(DIMENSIONS, Compressor.compress(dims.toString()));
+        }
+        catch (IOException e)
+        {
+            Journeymap.getLogger().error("ERROR: Unable to compress server options dimension array");
+        }
+
         updatedProperties.add(DEFAULT_DIM, defaultDimension);
         new UpdateAllConfigs().send(updatedProperties);
     }

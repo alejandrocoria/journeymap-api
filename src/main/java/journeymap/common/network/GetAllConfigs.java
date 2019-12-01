@@ -2,8 +2,10 @@ package journeymap.common.network;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import journeymap.common.Journeymap;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
+import journeymap.common.network.impl.utils.Compressor;
 import journeymap.common.util.PlayerConfigController;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DefaultDimensionProperties;
@@ -15,6 +17,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+
+import java.io.IOException;
 
 import static journeymap.common.network.Constants.ANIMAL_RADAR;
 import static journeymap.common.network.Constants.CAVE_MAP;
@@ -98,9 +102,17 @@ public class GetAllConfigs extends MessageProcessor
             getCommonProperties(dimensionProperties, dim);
             dimensionConfigs.add(dim);
         }
+
         serverConfigs.add(GLOBAL, globalConfig);
         serverConfigs.add(DEFAULT_DIM, defaultDimConfig);
-        serverConfigs.add(DIMENSIONS, dimensionConfigs);
+        try
+        {
+            serverConfigs.addProperty(DIMENSIONS, Compressor.compress(dimensionConfigs.toString()));
+        }
+        catch (IOException e)
+        {
+            Journeymap.getLogger().error("ERROR: Unable to compress server options dimension array");
+        }
         return serverConfigs;
     }
 
