@@ -1,13 +1,16 @@
 package journeymap.common.util;
 
 import com.google.gson.JsonObject;
+import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
+import journeymap.common.network.impl.Response;
 import journeymap.server.Constants;
 import journeymap.server.config.ForgeConfig;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
+import journeymap.server.properties.Permissions;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -133,6 +136,32 @@ public class PlayerConfigController
         else
         {
             return PropertiesManager.getInstance().getGlobalProperties().opPlayerTrackingEnabled.get() && isOp(player);
+        }
+    }
+
+    public void updateClientConfigs(Response response) {
+        if (response.getAsJson().get(SETTINGS) != null)
+        {
+            JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
+            if (settings.get(WORLD_ID) != null)
+            {
+                Journeymap.getClient().setCurrentWorldId(settings.get(WORLD_ID).getAsString());
+            }
+            if ((settings.get(TELEPORT) != null))
+            {
+                Journeymap.getClient().setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
+            }
+            if ((settings.get(TRACKING) != null))
+            {
+                Journeymap.getClient().setPlayerTrackingEnabled(settings.get(TRACKING).getAsBoolean());
+            }
+            if ((settings.get(SERVER_ADMIN) != null))
+            {
+                Journeymap.getClient().setServerAdmin(settings.get(SERVER_ADMIN).getAsBoolean());
+            }
+            String dimProperties = response.getAsJson().get(DIM).getAsString();
+            PermissionProperties prop = new Permissions().load(dimProperties, false);
+            FeatureManager.INSTANCE.updateDimensionFeatures(prop);
         }
     }
 }

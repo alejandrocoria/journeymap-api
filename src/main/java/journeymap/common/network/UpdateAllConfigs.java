@@ -3,7 +3,6 @@ package journeymap.common.network;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import journeymap.client.feature.FeatureManager;
 import journeymap.common.Journeymap;
 import journeymap.common.network.impl.MessageProcessor;
 import journeymap.common.network.impl.Response;
@@ -12,7 +11,6 @@ import journeymap.server.properties.DefaultDimensionProperties;
 import journeymap.server.properties.DimensionProperties;
 import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
-import journeymap.server.properties.Permissions;
 import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
@@ -21,7 +19,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import static journeymap.common.network.Constants.ANIMAL_RADAR;
 import static journeymap.common.network.Constants.CAVE_MAP;
 import static journeymap.common.network.Constants.DEFAULT_DIM;
-import static journeymap.common.network.Constants.DIM;
 import static journeymap.common.network.Constants.DIMENSIONS;
 import static journeymap.common.network.Constants.DIM_ID;
 import static journeymap.common.network.Constants.ENABLED;
@@ -34,8 +31,6 @@ import static journeymap.common.network.Constants.OP_TOPO_MAP;
 import static journeymap.common.network.Constants.OP_TRACKING;
 import static journeymap.common.network.Constants.PLAYER_RADAR;
 import static journeymap.common.network.Constants.RADAR;
-import static journeymap.common.network.Constants.SERVER_ADMIN;
-import static journeymap.common.network.Constants.SETTINGS;
 import static journeymap.common.network.Constants.SURFACE_MAP;
 import static journeymap.common.network.Constants.TELEPORT;
 import static journeymap.common.network.Constants.TOPO_MAP;
@@ -43,7 +38,6 @@ import static journeymap.common.network.Constants.TRACKING;
 import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.common.network.Constants.USE_WORLD_ID;
 import static journeymap.common.network.Constants.VILLAGER_RADAR;
-import static journeymap.common.network.Constants.WORLD_ID;
 
 public class UpdateAllConfigs extends MessageProcessor
 {
@@ -139,30 +133,8 @@ public class UpdateAllConfigs extends MessageProcessor
     @Override
     protected JsonObject onClient(Response response)
     {
-        if (response.getAsJson().get(SETTINGS) != null)
-        {
-            JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
-            if (settings.get(WORLD_ID) != null)
-            {
-                Journeymap.getClient().setCurrentWorldId(settings.get(WORLD_ID).getAsString());
-            }
-            if ((settings.get(TELEPORT) != null))
-            {
-                Journeymap.getClient().setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
-            }
-            if ((settings.get(TRACKING) != null))
-            {
-                Journeymap.getClient().setPlayerTrackingEnabled(settings.get(TRACKING).getAsBoolean());
-            }
-            if ((settings.get(SERVER_ADMIN) != null))
-            {
-                Journeymap.getClient().setServerAdmin(settings.get(SERVER_ADMIN).getAsBoolean());
-            }
-            Journeymap.getClient().setJourneyMapServerConnection(true);
-            String dimProperties = response.getAsJson().get(DIM).getAsString();
-            PermissionProperties prop = new Permissions().load(dimProperties, false);
-            FeatureManager.INSTANCE.updateDimensionFeatures(prop);
-        }
+        Journeymap.getClient().setJourneyMapServerConnection(true);
+        PlayerConfigController.getInstance().updateClientConfigs(response);
         return null;
     }
 }

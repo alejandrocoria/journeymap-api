@@ -12,7 +12,6 @@ import journeymap.client.api.util.PluginHelper;
 import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.color.ColorPalette;
 import journeymap.client.data.DataCache;
-import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
@@ -45,8 +44,6 @@ import journeymap.common.log.LogFormatter;
 import journeymap.common.migrate.Migration;
 import journeymap.common.network.GetClientConfig;
 import journeymap.common.version.VersionCheck;
-import journeymap.server.properties.PermissionProperties;
-import journeymap.server.properties.Permissions;
 import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -65,11 +62,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.Map;
 
-import static journeymap.common.network.Constants.DIM;
-import static journeymap.common.network.Constants.SERVER_ADMIN;
 import static journeymap.common.network.Constants.SETTINGS;
-import static journeymap.common.network.Constants.TELEPORT;
-import static journeymap.common.network.Constants.TRACKING;
 import static journeymap.common.network.Constants.WORLD_ID;
 
 /**
@@ -537,32 +530,7 @@ public class JourneymapClient implements CommonProxy
             // request permissions
             if (isJourneyMapServerConnection() || FMLClientHandler.instance().getClient().isSingleplayer())
             {
-                new GetClientConfig().send(null, response -> {
-                    if (response.getAsJson().get(SETTINGS) != null)
-                    {
-                        JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();
-                        if (settings.get(WORLD_ID) != null)
-                        {
-                            setCurrentWorldId(settings.get(WORLD_ID).getAsString());
-                        }
-                        if ((settings.get(TELEPORT) != null))
-                        {
-                            setTeleportEnabled(settings.get(TELEPORT).getAsBoolean());
-                        }
-                        if ((settings.get(TRACKING) != null))
-                        {
-                            setPlayerTrackingEnabled(settings.get(TRACKING).getAsBoolean());
-                        }
-                        if ((settings.get(SERVER_ADMIN) != null))
-                        {
-                            setServerAdmin(settings.get(SERVER_ADMIN).getAsBoolean());
-                        }
-                        setJourneyMapServerConnection(true);
-                        String dimProperties = response.getAsJson().get(DIM).getAsString();
-                        PermissionProperties prop = new Permissions().load(dimProperties, false);
-                        FeatureManager.INSTANCE.updateDimensionFeatures(prop);
-                    }
-                });
+                new GetClientConfig().send();
             }
             ClientAPI.INSTANCE.getClientEventManager().fireMappingEvent(true, dimension);
             UIManager.INSTANCE.getMiniMap().reset();
@@ -804,6 +772,7 @@ public class JourneymapClient implements CommonProxy
 
     public void setJourneyMapServerConnection(boolean journeyMapServerConnection)
     {
+        Journeymap.getLogger().debug("Connection initiated with Journeymap Server: " + journeyMapServerConnection);
         this.journeyMapServerConnection = journeyMapServerConnection;
     }
 
@@ -817,7 +786,9 @@ public class JourneymapClient implements CommonProxy
         if (FMLClientHandler.instance().getClient().isSingleplayer())
         {
             this.playerTrackingEnabled = false;
+            return;
         }
+        Journeymap.getLogger().debug("Expanded Radar Enabled:" + playerTrackingEnabled);
         this.playerTrackingEnabled = playerTrackingEnabled;
     }
 
@@ -829,7 +800,7 @@ public class JourneymapClient implements CommonProxy
 
     public void setTeleportEnabled(boolean teleportEnabled)
     {
-        Journeymap.getLogger().info("Teleport Enabled:" + teleportEnabled);
+        Journeymap.getLogger().debug("Teleport Enabled:" + teleportEnabled);
         this.teleportEnabled = teleportEnabled;
     }
 
@@ -842,7 +813,7 @@ public class JourneymapClient implements CommonProxy
     {
         if (serverAdmin)
         {
-            Journeymap.getLogger().info("Server Admin Enabled:" + serverAdmin);
+            Journeymap.getLogger().debug("Server Admin Enabled:" + serverAdmin);
         }
         this.serverAdmin = serverAdmin;
     }

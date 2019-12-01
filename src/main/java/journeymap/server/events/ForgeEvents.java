@@ -5,7 +5,9 @@
 
 package journeymap.server.events;
 
+import com.google.gson.JsonObject;
 import journeymap.common.network.GetClientConfig;
+import journeymap.common.util.PlayerConfigController;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,7 +26,7 @@ public class ForgeEvents
     {
         if (event.getEntity() instanceof EntityPlayerMP)
         {
-            // Not needed currently but not quite ready to delete.
+            sendConfigsToPlayer((EntityPlayerMP) event.getEntity());
         }
     }
 
@@ -34,7 +36,7 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-            // Not needed currently but not quite ready to delete.
+            sendConfigsToPlayer((EntityPlayerMP) event.player);
         }
     }
 
@@ -44,9 +46,13 @@ public class ForgeEvents
     {
         if (event.player instanceof EntityPlayerMP)
         {
-            // Send a quick ping to the player to notify the server has JM installed.
-            new GetClientConfig().sendToPlayer(null, (EntityPlayerMP) event.player);
+            sendConfigsToPlayer((EntityPlayerMP) event.player);
         }
     }
 
+
+    private void sendConfigsToPlayer(EntityPlayerMP player) {
+        JsonObject config = PlayerConfigController.getInstance().getPlayerConfig(player);
+        new GetClientConfig().sendToPlayer(config, player);
+    }
 }

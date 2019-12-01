@@ -18,12 +18,11 @@ public class GetClientConfig extends MessageProcessor
     }
 
 
-
     @Override
     public JsonObject onClient(Response response)
     {
         Journeymap.getClient().setJourneyMapServerConnection(true);
-        // do nothing, handled by the callback.
+        PlayerConfigController.getInstance().updateClientConfigs(response);
         return null;
     }
 }
