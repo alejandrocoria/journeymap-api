@@ -5,7 +5,6 @@
 
 package journeymap.client.service;
 
-import journeymap.client.log.ChatLog;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
@@ -45,7 +44,7 @@ public class WebServer
         validatePort();
     }
 
-    public static void setEnabled(Boolean enable, boolean forceAnnounce)
+    public static void setEnabled(Boolean enable)
     {
         WebMapProperties webMapProperties = Journeymap.getClient().getWebMapProperties();
         webMapProperties.enabled.set(enable);
@@ -87,12 +86,6 @@ public class WebServer
                 Journeymap.getLogger().error("Unexpected error, JMServer couldn't be started.");
             }
         }
-
-        if (forceAnnounce)
-        {
-            ChatLog.enableAnnounceMod = true;
-        }
-        ChatLog.announceMod();
     }
 
     public static WebServer getInstance()

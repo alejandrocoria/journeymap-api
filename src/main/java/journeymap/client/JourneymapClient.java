@@ -315,7 +315,8 @@ public class JourneymapClient implements CommonProxy
             ThemeLoader.initialize(true);
 
             // Webserver
-            WebServer.setEnabled(webMapProperties.enabled.get(), false);
+            WebServer.setEnabled(webMapProperties.enabled.get());
+            ChatLog.announceMod(false);
             initialized = true;
 
             VersionCheck.getVersionAvailable();

@@ -125,11 +125,7 @@ public class ChatLog
         {
             // Announce mod?
             enableAnnounceMod = Journeymap.getClient().getCoreProperties().announceMod.get();
-            if (enableAnnounceMod)
-            {
-                announceMod();
-            }
-
+            announceMod(enableAnnounceMod);
             // Check for newer version online
             VersionCheck.getVersionIsCurrent();
             initialized = true;
@@ -162,9 +158,9 @@ public class ChatLog
      *
      * @param forced the forced
      */
-    public static void announceMod()
+    public static void announceMod(boolean forced)
     {
-        if (enableAnnounceMod)
+        if (enableAnnounceMod || forced)
         {
             String keyName = KeyEventHandler.INSTANCE.kbFullscreenToggle.getDisplayName();
             if (Journeymap.getClient().getWebMapProperties().enabled.get())
@@ -174,7 +170,7 @@ public class ChatLog
                     WebServer webServer = Journeymap.getClient().getJmServer();
                     String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort());
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port);
-                    ChatLog.announceURL(message, "http://localhost" + port); 
+                    ChatLog.announceURL(message, "http://localhost" + port);
                 }
                 catch (Throwable t)
                 {
@@ -183,7 +179,7 @@ public class ChatLog
             }
             else
             {
-                ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName); 
+                ChatLog.announceI18N("jm.common.mapgui_only_ready", keyName);
             }
 
             if (!Journeymap.getClient().getCoreProperties().mappingEnabled.get())

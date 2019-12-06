@@ -11,6 +11,7 @@ import journeymap.client.cartography.color.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeLoader;
+import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.mod.ModBlockDelegate;
 import journeymap.client.model.BlockMD;
@@ -767,7 +768,8 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.WebMap)
                 {
                     DataCache.INSTANCE.resetRadarCaches();
-                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), true);
+                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
+                    ChatLog.announceMod(true);
                     continue;
                 }
                 if (category == ClientCategory.Waypoint)
@@ -795,7 +797,8 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.Advanced)
                 {
                     SoftResetTask.queue();
-                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get(), false);
+                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
+                    ChatLog.announceMod(false);
                     continue;
                 }
             }
