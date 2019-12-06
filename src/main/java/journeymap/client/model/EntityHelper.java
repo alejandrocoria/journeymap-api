@@ -159,7 +159,7 @@ public class EntityHelper
                     if (!onlinePlayer.getGameProfile().getId().equals(mc.player.getUniqueID()))
                     {
                         EntityPlayer networkedPlayer = PlayerRadarManager.getInstance().getPlayers().get(onlinePlayer.getGameProfile().getId());
-                        if (networkedPlayer != null)
+                        if (networkedPlayer != null && networkedPlayer.dimension == Minecraft.getMinecraft().player.dimension)
                         {
                             allPlayers.add(networkedPlayer);
                         }

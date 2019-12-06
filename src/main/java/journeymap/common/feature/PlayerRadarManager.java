@@ -54,6 +54,14 @@ public class PlayerRadarManager
         }
     }
 
+    public void clearNetworkPlayers()
+    {
+        synchronized (lock)
+        {
+            this.playersOnServer.clear();
+        }
+    }
+
     private void updateClientPlayer(EntityPlayer player)
     {
 
@@ -69,6 +77,7 @@ public class PlayerRadarManager
             clientPlayer.chunkCoordZ = player.chunkCoordZ;
             clientPlayer.rotationYawHead = player.rotationYawHead;
             clientPlayer.setSneaking(player.isSneaking());
+            clientPlayer.dimension = player.dimension;
         }
         else
         {
@@ -119,9 +128,11 @@ public class PlayerRadarManager
             playerMp.rotationYawHead = player.get("rotation").getAsFloat();
             playerMp.setSneaking(player.get("sneaking").getAsBoolean());
             playerMp.setUniqueId(playerUUID);
+            playerMp.dimension = player.get("dim").getAsInt();
             playerMp.addedToChunk = true;
             return playerMp;
         }
         return null;
     }
+
 }

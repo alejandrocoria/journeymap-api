@@ -12,7 +12,6 @@ import journeymap.client.properties.WaypointProperties;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
-import journeymap.common.network.GetPlayerLocations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,9 +24,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static journeymap.common.network.Constants.TRACKING;
-import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
-
 /**
  * Tick handler for JourneyMap state
  */
@@ -38,7 +34,6 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
     Minecraft mc = FMLClientHandler.instance().getClient();
     int counter = 0;
     private boolean deathpointCreated;
-    private static int playerUpdateTicks = 5;
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent()
@@ -72,19 +67,6 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
 
         try
         {
-            if (mc.world != null
-                    && mc.world.getWorldTime() % playerUpdateTicks == 0
-                    && Journeymap.getClient().isJourneyMapServerConnection()
-                    && Journeymap.getClient().isPlayerTrackingEnabled()
-                    && !Minecraft.getMinecraft().isSingleplayer()
-                    && Journeymap.getClient().isMapping())
-            {
-                new GetPlayerLocations().send(result -> {
-                    playerUpdateTicks = result.getAsJson().get(TRACKING_UPDATE_TIME).getAsInt();
-                    Journeymap.getClient().setPlayerTrackingEnabled(result.getAsJson().get(TRACKING).getAsBoolean());
-                });
-            }
-
             if (counter == 20)
             {
                 mc.mcProfiler.startSection("mainTasks");
