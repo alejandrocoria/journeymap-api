@@ -166,7 +166,7 @@ jar {
                 "Implementation-Title"  : "JourneyMap",
                 "Implementation-Version": project.version,
                 "Implementation-URL"    : "http://journeymap.info",
-                //"FMLAT"                 : "journeymap_at.cfg"
+                "FMLAT"                 : "journeymap_at.cfg"
         ]
     }
 }

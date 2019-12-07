@@ -10,7 +10,12 @@ import com.google.common.base.Objects;
 import journeymap.client.cartography.color.RGB;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.StatTimer;
-import journeymap.client.model.*;
+import journeymap.client.model.GridSpec;
+import journeymap.client.model.ImageHolder;
+import journeymap.client.model.MapType;
+import journeymap.client.model.RegionCoord;
+import journeymap.client.model.RegionImageCache;
+import journeymap.client.model.RegionImageSet;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.RegionTextureImpl;
 import journeymap.client.render.texture.TextureCache;
@@ -159,10 +164,6 @@ public class TileDrawStep implements TextureImpl.Listener<RegionTextureImpl>
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, textureWrap);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, textureWrap);
             DrawUtil.drawBoundTexture(startU, startV, startX, startY, z, endU, endV, endX, endY);
-        }
-        else
-        {
-            int i = 2;
         }
 
         // Grid
