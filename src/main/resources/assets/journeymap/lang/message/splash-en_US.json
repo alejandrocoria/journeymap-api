@@ -3,12 +3,8 @@
 {
   "lines": [
     {
-      "label": "Bugfix: Player icons weren't fetched correctly",
-      "action": ""
-    },
-    {
-      "label": "Built for current Forge Recommended Build",
-      "action": ""
+      "label": "New Server Admin screen in the Journeymap Options screen for OPS(Admins) and SSP.",
+      "action": "serveroption.ServerOptionsManager"
     },
     {
       "label": "JourneyMap has a public Discord!",
