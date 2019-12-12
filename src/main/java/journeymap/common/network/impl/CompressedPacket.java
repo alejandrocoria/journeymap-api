@@ -28,7 +28,6 @@ public abstract class CompressedPacket extends MessageProcessor
                 String compressedData = CompressionUtils.compress(dataAsString);
                 requestData = new JsonObject();
                 requestData.addProperty(COMPRESSED_DATA, compressedData);
-                System.out.println("compressing packet");
             }
             catch (IOException e)
             {
@@ -50,7 +49,7 @@ public abstract class CompressedPacket extends MessageProcessor
                 String dataString = CompressionUtils.decompress(dataAsCompressedString);
                 JsonObject jsonObject = GSON.fromJson(dataString, JsonObject.class);
                 message.add(DATA_KEY, jsonObject);
-                System.out.println("decompressing packet");
+                message.remove(COMPRESSED_DATA);
             }
         }
         catch (IOException e)
