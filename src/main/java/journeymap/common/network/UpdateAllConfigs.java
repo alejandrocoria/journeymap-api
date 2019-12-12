@@ -1,13 +1,11 @@
 package journeymap.common.network;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import journeymap.common.Journeymap;
-import journeymap.common.network.impl.MessageProcessor;
+import journeymap.common.network.impl.CompressedPacket;
 import journeymap.common.network.impl.Response;
-import journeymap.common.network.impl.utils.Compressor;
 import journeymap.common.util.PlayerConfigController;
 import journeymap.server.properties.DefaultDimensionProperties;
 import journeymap.server.properties.DimensionProperties;
@@ -17,8 +15,6 @@ import journeymap.server.properties.PropertiesManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-
-import java.io.IOException;
 
 import static journeymap.common.network.Constants.ANIMAL_RADAR;
 import static journeymap.common.network.Constants.CAVE_MAP;
@@ -43,7 +39,7 @@ import static journeymap.common.network.Constants.TRACKING_UPDATE_TIME;
 import static journeymap.common.network.Constants.USE_WORLD_ID;
 import static journeymap.common.network.Constants.VILLAGER_RADAR;
 
-public class UpdateAllConfigs extends MessageProcessor
+public class UpdateAllConfigs extends CompressedPacket
 {
     @Override
     protected JsonObject onServer(Response response)
@@ -91,26 +87,14 @@ public class UpdateAllConfigs extends MessageProcessor
 
             if (prop.get(DIMENSIONS) != null)
             {
-                String compressedDimArray = prop.get(DIMENSIONS).getAsString();
-                String decompressedDims;
-                JsonArray dimArray;
-                try
+                JsonArray dimArray = prop.get(DIMENSIONS).getAsJsonArray();
+                for (JsonElement element : dimArray)
                 {
-                    decompressedDims = Compressor.decompress(compressedDimArray);
-                    dimArray = new GsonBuilder().serializeNulls().create().fromJson(decompressedDims, JsonArray.class);
-
-                    for (JsonElement element : dimArray)
-                    {
-                        JsonObject dimProp = element.getAsJsonObject();
-                        DimensionProperties properties = PropertiesManager.getInstance().getDimProperties(dimProp.get(DIM_ID).getAsInt());
-                        properties.enabled.set(dimProp.get(ENABLED).getAsBoolean());
-                        updateCommonProperties(properties, dimProp);
-                        properties.save();
-                    }
-                }
-                catch (IOException e)
-                {
-                    Journeymap.getLogger().error("ERROR: Unable to decompress server options dimension array");
+                    JsonObject dimProp = element.getAsJsonObject();
+                    DimensionProperties properties = PropertiesManager.getInstance().getDimProperties(dimProp.get(DIM_ID).getAsInt());
+                    properties.enabled.set(dimProp.get(ENABLED).getAsBoolean());
+                    updateCommonProperties(properties, dimProp);
+                    properties.save();
                 }
             }
 
