@@ -162,7 +162,6 @@ public abstract class MessageProcessor
      */
     protected void buildRequest(JsonObject requestData)
     {
-        System.out.println("wghat");
         if (requestData == null)
         {
             requestData = new JsonObject();
