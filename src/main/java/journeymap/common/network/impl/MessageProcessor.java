@@ -94,7 +94,7 @@ public abstract class MessageProcessor
      * @param message - The response message.
      * @param ctx     - The message context.
      */
-    void handleResponse(JsonObject message, MessageContext ctx)
+    protected void handleResponse(JsonObject message, MessageContext ctx)
     {
         CallbackService callbackService = CallbackService.getInstance();
         JsonObject reply = null;
@@ -160,7 +160,7 @@ public abstract class MessageProcessor
      *
      * @param requestData - The data.
      */
-    private void buildRequest(JsonObject requestData)
+    protected void buildRequest(JsonObject requestData)
     {
         if (requestData == null)
         {

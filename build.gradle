@@ -207,7 +207,7 @@ curseforge {
         changelogType = 'html'
         releaseType = curse_release_type
         relations {
-            embeddedLibrary 'journeymap-api'
+//            embeddedLibrary 'journeymap-api'
             tool 'journeymap-tools'
         }
 
