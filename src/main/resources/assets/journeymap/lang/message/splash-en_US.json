@@ -3,7 +3,7 @@
 {
   "lines": [
     {
-      "label": "New Server Admin screen in the Journeymap Options screen for OPS(Admins) and SSP.",
+      "label": "New Server Admin screen in the JourneyMap Options screen, for ops/admins and single-player.",
       "action": "serveroption.ServerOptionsManager"
     },
     {
