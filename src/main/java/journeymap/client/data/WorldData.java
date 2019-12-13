@@ -43,10 +43,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -55,7 +57,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 
 /**
@@ -496,34 +497,25 @@ public class WorldData extends CacheLoader<Class, WorldData>
         return "Region: x:" + regionCoord.regionX + " z:" + regionCoord.regionZ;
     }
 
-    // TODO: clean up!
-    // This is some pretty ugly code. Needs to be cleaned up!
-    public static String getTime(String format)
+    public static String getRealGameTime()
     {
-        long time = (FMLClientHandler.instance().getClient().world.getWorldTime() % 24000L);
-        final int ticksAtMidnight = 18000;
-        final int ticksPerDay = 24000;
-        final int ticksPerHour = 1000;
-        final double ticksPerMinute = 1000d / 60d;
-        final double ticksPerSecond = 1000d / 60d / 60d;
-        final int offset = 6000;
-        time = time - ticksAtMidnight + ticksPerDay + offset;
-        time -= (time / ticksPerDay) * ticksPerDay;
-        final long hours = (time / ticksPerHour);
-        time -= (time / ticksPerHour) * ticksPerHour;
-        final long minutes = (long) Math.floor(time / ticksPerMinute);
-        final double dticks = time - minutes * ticksPerMinute;
-        final long seconds = (long) Math.floor(dticks / ticksPerSecond);
-        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ENGLISH);
-        cal.setLenient(true);
-        cal.set(0, Calendar.JANUARY, 1, 0, 0, 0);
-        cal.add(Calendar.DAY_OF_YEAR, (int) (time / ticksPerDay));
-        cal.add(Calendar.HOUR_OF_DAY, (int) hours);
-        cal.add(Calendar.MINUTE, (int) minutes);
-        cal.add(Calendar.SECOND, (int) seconds);
-        Date date = cal.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
-        return sdf.format(date);
+        String format = Journeymap.getClient().getActiveMiniMapProperties().gameTimeRealFormat.get();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+        Minecraft minecraft = Minecraft.getMinecraft();
+        final long time = minecraft.world.getWorldTime();
+        long hour = (time / 1000 + 6) % 24;
+        final long minute = (time % 1000) * 60 / 1000;
+        final double ticks = time - Math.floor(time / (1000d / 60d)) * (1000d / 60d);
+        final long seconds = (long) Math.floor(ticks / (1000d / 60d / 60d));
+        String timeString = String.format(Locale.ENGLISH, "%02d:%02d:%02d", hour, minute, seconds);
+
+        return LocalTime.parse(timeString).format(dtf);
+    }
+
+    public static String getSystemTime()
+    {
+        DateFormat timeFormat = new SimpleDateFormat(Journeymap.getClient().getActiveMiniMapProperties().systemTimeRealFormat.get());
+        return timeFormat.format(new Date());
     }
 
     /**

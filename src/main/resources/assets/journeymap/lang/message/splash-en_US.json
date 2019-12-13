@@ -7,6 +7,10 @@
       "action": "serveroption.ServerOptionsManager"
     },
     {
+      "label": "InfoSlot time formats are now configurable!",
+      "action": "dialog.OptionsManager#MiniMap1"
+    },
+    {
       "label": "JourneyMap has a public Discord!",
       "action": "dialog.FullscreenActions#discord"
     }

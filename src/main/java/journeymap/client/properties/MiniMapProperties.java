@@ -9,11 +9,13 @@ import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
+import journeymap.client.ui.option.TimeFormat;
 import journeymap.client.ui.theme.ThemeLabelSource;
 import journeymap.common.properties.PropertiesBase;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import static journeymap.common.properties.Category.Inherit;
@@ -23,6 +25,11 @@ import static journeymap.common.properties.Category.Inherit;
  */
 public class MiniMapProperties extends InGameMapProperties
 {
+
+    public final StringField gameTimeRealFormat = new StringField(Inherit, "jm.common.time_format", TimeFormat.Provider.class);
+
+    public final StringField systemTimeRealFormat = new StringField(Inherit, "jm.common.system_time_format", TimeFormat.Provider.class);
+
     /**
      * The Enabled.
      */
