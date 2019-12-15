@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.cartography.color.RGB;
+import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.waypoint.WaypointGroupStore;
@@ -27,9 +28,13 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Generic waypoint data holder
@@ -175,7 +180,8 @@ public class Waypoint implements Serializable
      *
      * @param original the original
      */
-    public Waypoint(Waypoint original) {
+    public Waypoint(Waypoint original)
+    {
         this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
         this.x = original.x;
         this.y = original.y;
@@ -189,7 +195,7 @@ public class Waypoint implements Serializable
      */
     public Waypoint(journeymap.client.api.display.Waypoint modWaypoint)
     {
-        this(modWaypoint.getName(), modWaypoint.getPosition(), modWaypoint.getColor()==null ? Color.WHITE : new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
+        this(modWaypoint.getName(), modWaypoint.getPosition(), modWaypoint.getColor() == null ? Color.WHITE : new Color(modWaypoint.getColor()), Type.Normal, modWaypoint.getDimension());
 
         int[] prim = modWaypoint.getDisplayDimensions();
         ArrayList<Integer> dims = new ArrayList<Integer>(prim.length);
@@ -216,7 +222,8 @@ public class Waypoint implements Serializable
      * @param type             the type
      * @param currentDimension the current dimension
      */
-    public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension) {
+    public Waypoint(String name, BlockPos pos, Color color, Type type, Integer currentDimension)
+    {
         this(name, pos.getX(), pos.getY(), pos.getZ(), true, color.getRed(), color.getGreen(), color.getBlue(), type, Journeymap.MOD_ID, currentDimension, Arrays.asList(currentDimension));
     }
 
@@ -282,7 +289,8 @@ public class Waypoint implements Serializable
      * @param player the player
      * @return the waypoint
      */
-    public static Waypoint of(EntityPlayer player) {
+    public static Waypoint of(EntityPlayer player)
+    {
         BlockPos blockPos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
         return at(blockPos, Type.Normal, FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
@@ -295,14 +303,19 @@ public class Waypoint implements Serializable
      * @param dimension the dimension
      * @return the waypoint
      */
-    public static Waypoint at(BlockPos blockPos, Type type, int dimension) {
+    public static Waypoint at(BlockPos blockPos, Type type, int dimension)
+    {
         String name;
-        if (type == Type.Death) {
+        if (type == Type.Death)
+        {
             Date now = new Date();
-            name = String.format("%s %s %s", Constants.getString("jm.waypoint.deathpoint"),
-                    DateFormat.getTimeInstance().format(now),
-                    DateFormat.getDateInstance(DateFormat.SHORT).format(now));
-        } else {
+            WaypointProperties properties = Journeymap.getClient().getWaypointProperties();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(properties.timeFormat.get() + " " + properties.dateFormat.get());
+            String timeDate = simpleDateFormat.format(now);
+            name = String.format("%s %s", Constants.getString("jm.waypoint.deathpoint"), timeDate);
+        }
+        else
+        {
             name = createName(blockPos.getX(), blockPos.getZ());
         }
         Waypoint waypoint = new Waypoint(name, blockPos, Color.white, type, dimension);
@@ -321,7 +334,8 @@ public class Waypoint implements Serializable
      * @param json the json
      * @return the waypoint
      */
-    public static Waypoint fromString(String json) {
+    public static Waypoint fromString(String json)
+    {
         return GSON.fromJson(json, Waypoint.class);
     }
 
@@ -334,7 +348,8 @@ public class Waypoint implements Serializable
      * @param currentDimension the current dimension
      * @return the location
      */
-    public Waypoint setLocation(int x, int y, int z, int currentDimension) {
+    public Waypoint setLocation(int x, int y, int z, int currentDimension)
+    {
         this.x = (currentDimension == -1) ? x * 8 : x;
         this.y = y;
         this.z = (currentDimension == -1) ? z * 8 : z;
@@ -347,7 +362,8 @@ public class Waypoint implements Serializable
      *
      * @return the string
      */
-    public String updateId() {
+    public String updateId()
+    {
         String oldId = this.id;
         this.id = String.format("%s_%s,%s,%s", this.name, this.x, this.y, this.z);
         return oldId;
@@ -358,7 +374,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isDeathPoint() {
+    public boolean isDeathPoint()
+    {
         return this.type == Type.Death;
     }
 
@@ -367,7 +384,8 @@ public class Waypoint implements Serializable
      *
      * @return the texture
      */
-    public TextureImpl getTexture() {
+    public TextureImpl getTexture()
+    {
         return isDeathPoint() ? TextureCache.getTexture(TextureCache.Deathpoint) : TextureCache.getTexture(TextureCache.Waypoint);
     }
 
@@ -376,7 +394,8 @@ public class Waypoint implements Serializable
      *
      * @return the chunk coord int pair
      */
-    public ChunkPos getChunkCoordIntPair() {
+    public ChunkPos getChunkCoordIntPair()
+    {
         return new ChunkPos(x >> 4, z >> 4);
     }
 
@@ -386,7 +405,8 @@ public class Waypoint implements Serializable
      * @param group the group
      * @return the group
      */
-    public Waypoint setGroup(WaypointGroup group) {
+    public Waypoint setGroup(WaypointGroup group)
+    {
         setOrigin(group.getOrigin());
         this.groupName = group.getName();
         this.group = group;
@@ -399,7 +419,8 @@ public class Waypoint implements Serializable
      * @param groupName the group name
      * @return the group name
      */
-    public Waypoint setGroupName(String groupName) {
+    public Waypoint setGroupName(String groupName)
+    {
         WaypointGroup group = WaypointGroupStore.INSTANCE.get(origin, groupName);
         setGroup(group);
         return this;
@@ -410,11 +431,16 @@ public class Waypoint implements Serializable
      *
      * @return the group
      */
-    public WaypointGroup getGroup() {
-        if (group == null) {
-            if (Strings.isEmpty(origin) || Strings.isEmpty(groupName)) {
+    public WaypointGroup getGroup()
+    {
+        if (group == null)
+        {
+            if (Strings.isEmpty(origin) || Strings.isEmpty(groupName))
+            {
                 setGroup(WaypointGroup.DEFAULT);
-            } else {
+            }
+            else
+            {
                 setGroup(WaypointGroupStore.INSTANCE.get(origin, groupName));
             }
         }
@@ -427,7 +453,8 @@ public class Waypoint implements Serializable
      *
      * @return the random color
      */
-    public Waypoint setRandomColor() {
+    public Waypoint setRandomColor()
+    {
         return setColor(RGB.randomColor());
     }
 
@@ -436,7 +463,8 @@ public class Waypoint implements Serializable
      *
      * @return the color
      */
-    public Integer getColor() {
+    public Integer getColor()
+    {
         return RGB.toInteger(r, g, b);
     }
 
@@ -446,7 +474,8 @@ public class Waypoint implements Serializable
      * @param color the color
      * @return the color
      */
-    public Waypoint setColor(Integer color) {
+    public Waypoint setColor(Integer color)
+    {
         int c[] = RGB.ints(color);
         this.r = c[0];
         this.g = c[1];
@@ -459,8 +488,10 @@ public class Waypoint implements Serializable
      *
      * @return the safe color
      */
-    public Integer getSafeColor() {
-        if (r + g + b >= 100) {
+    public Integer getSafeColor()
+    {
+        if (r + g + b >= 100)
+        {
             return getColor();
         }
         return RGB.DARK_GRAY_RGB;
@@ -471,7 +502,8 @@ public class Waypoint implements Serializable
      *
      * @return the dimensions
      */
-    public Collection<Integer> getDimensions() {
+    public Collection<Integer> getDimensions()
+    {
         return this.dimensions;
     }
 
@@ -481,7 +513,8 @@ public class Waypoint implements Serializable
      * @param dims the dims
      * @return the dimensions
      */
-    public Waypoint setDimensions(Collection<Integer> dims) {
+    public Waypoint setDimensions(Collection<Integer> dims)
+    {
         this.dimensions = new TreeSet<Integer>(dims);
         return setDirty();
     }
@@ -491,7 +524,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isTeleportReady() {
+    public boolean isTeleportReady()
+    {
         return y >= 0 && this.isInPlayerDimension();
     }
 
@@ -500,7 +534,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isInPlayerDimension() {
+    public boolean isInPlayerDimension()
+    {
         return dimensions.contains(FMLClientHandler.instance().getClient().player.world.provider.getDimension());
     }
 
@@ -509,7 +544,8 @@ public class Waypoint implements Serializable
      *
      * @return the id
      */
-    public String getId() {
+    public String getId()
+    {
         return (displayId != null) ? getGuid() : id;
     }
 
@@ -518,7 +554,8 @@ public class Waypoint implements Serializable
      *
      * @return the guid
      */
-    public String getGuid() {
+    public String getGuid()
+    {
         return origin + ":" + displayId;
     }
 
@@ -527,7 +564,8 @@ public class Waypoint implements Serializable
      *
      * @return the name
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -537,7 +575,8 @@ public class Waypoint implements Serializable
      * @param name the name
      * @return the name
      */
-    public Waypoint setName(String name) {
+    public Waypoint setName(String name)
+    {
         this.name = name;
         return setDirty();
     }
@@ -547,7 +586,8 @@ public class Waypoint implements Serializable
      *
      * @return the icon
      */
-    public String getIcon() {
+    public String getIcon()
+    {
         return icon;
     }
 
@@ -557,7 +597,8 @@ public class Waypoint implements Serializable
      * @param icon the icon
      * @return the icon
      */
-    public Waypoint setIcon(String icon) {
+    public Waypoint setIcon(String icon)
+    {
         this.icon = icon;
         return setDirty();
     }
@@ -567,8 +608,10 @@ public class Waypoint implements Serializable
      *
      * @return the x
      */
-    public int getX() {
-        if (mc != null && mc.player != null && mc.player.dimension == -1) {
+    public int getX()
+    {
+        if (mc != null && mc.player != null && mc.player.dimension == -1)
+        {
             return x / 8;
         }
         return x;
@@ -579,7 +622,8 @@ public class Waypoint implements Serializable
      *
      * @return the block centered x
      */
-    public double getBlockCenteredX() {
+    public double getBlockCenteredX()
+    {
         return getX() + .5d;
     }
 
@@ -588,7 +632,8 @@ public class Waypoint implements Serializable
      *
      * @return the y
      */
-    public int getY() {
+    public int getY()
+    {
         return y;
     }
 
@@ -597,7 +642,8 @@ public class Waypoint implements Serializable
      *
      * @return the block centered y
      */
-    public double getBlockCenteredY() {
+    public double getBlockCenteredY()
+    {
         return getY() + .5d;
     }
 
@@ -606,8 +652,10 @@ public class Waypoint implements Serializable
      *
      * @return the z
      */
-    public int getZ() {
-        if (mc != null && mc.player != null && mc.player.dimension == -1) {
+    public int getZ()
+    {
+        if (mc != null && mc.player != null && mc.player.dimension == -1)
+        {
             return z / 8;
         }
         return z;
@@ -618,7 +666,8 @@ public class Waypoint implements Serializable
      *
      * @return the block centered z
      */
-    public double getBlockCenteredZ() {
+    public double getBlockCenteredZ()
+    {
         return getZ() + .5d;
     }
 
@@ -627,7 +676,8 @@ public class Waypoint implements Serializable
      *
      * @return the position
      */
-    public Vec3d getPosition() {
+    public Vec3d getPosition()
+    {
         return new Vec3d(getBlockCenteredX(), getBlockCenteredY(), getBlockCenteredZ());
     }
 
@@ -636,7 +686,8 @@ public class Waypoint implements Serializable
      *
      * @return the block pos
      */
-    public BlockPos getBlockPos() {
+    public BlockPos getBlockPos()
+    {
         return new BlockPos(getX(), getY(), getZ());
     }
 
@@ -645,7 +696,8 @@ public class Waypoint implements Serializable
      *
      * @return the r
      */
-    public int getR() {
+    public int getR()
+    {
         return r;
     }
 
@@ -655,7 +707,8 @@ public class Waypoint implements Serializable
      * @param r the r
      * @return the r
      */
-    public Waypoint setR(int r) {
+    public Waypoint setR(int r)
+    {
         this.r = r;
         return setDirty();
     }
@@ -665,7 +718,8 @@ public class Waypoint implements Serializable
      *
      * @return the g
      */
-    public int getG() {
+    public int getG()
+    {
         return g;
     }
 
@@ -675,7 +729,8 @@ public class Waypoint implements Serializable
      * @param g the g
      * @return the g
      */
-    public Waypoint setG(int g) {
+    public Waypoint setG(int g)
+    {
         this.g = g;
         return setDirty();
     }
@@ -685,7 +740,8 @@ public class Waypoint implements Serializable
      *
      * @return the b
      */
-    public int getB() {
+    public int getB()
+    {
         return b;
     }
 
@@ -695,7 +751,8 @@ public class Waypoint implements Serializable
      * @param b the b
      * @return the b
      */
-    public Waypoint setB(int b) {
+    public Waypoint setB(int b)
+    {
         this.b = b;
         return setDirty();
     }
@@ -705,7 +762,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isEnable() {
+    public boolean isEnable()
+    {
         return enable;
     }
 
@@ -715,8 +773,10 @@ public class Waypoint implements Serializable
      * @param enable the enable
      * @return the enable
      */
-    public Waypoint setEnable(boolean enable) {
-        if (enable != this.enable) {
+    public Waypoint setEnable(boolean enable)
+    {
+        if (enable != this.enable)
+        {
             this.enable = enable;
             setDirty();
         }
@@ -728,7 +788,8 @@ public class Waypoint implements Serializable
      *
      * @return the type
      */
-    public Type getType() {
+    public Type getType()
+    {
         return type;
     }
 
@@ -738,7 +799,8 @@ public class Waypoint implements Serializable
      * @param type the type
      * @return the type
      */
-    public Waypoint setType(Type type) {
+    public Waypoint setType(Type type)
+    {
         this.type = type;
         return setDirty();
     }
@@ -748,7 +810,8 @@ public class Waypoint implements Serializable
      *
      * @return the origin
      */
-    public String getOrigin() {
+    public String getOrigin()
+    {
         return origin;
     }
 
@@ -758,7 +821,8 @@ public class Waypoint implements Serializable
      * @param origin the origin
      * @return the origin
      */
-    public Waypoint setOrigin(String origin) {
+    public Waypoint setOrigin(String origin)
+    {
         this.origin = origin;
         return setDirty();
     }
@@ -768,9 +832,11 @@ public class Waypoint implements Serializable
      *
      * @return the file name
      */
-    public String getFileName() {
+    public String getFileName()
+    {
         String fileName = id.replaceAll("[\\\\/:\"*?<>|]", "_").concat(".json");
-        if (fileName.equals(WaypointGroupStore.FILENAME)) {
+        if (fileName.equals(WaypointGroupStore.FILENAME))
+        {
             fileName = "_" + fileName;
         }
         return fileName;
@@ -781,7 +847,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isDirty() {
+    public boolean isDirty()
+    {
         return dirty;
     }
 
@@ -790,7 +857,8 @@ public class Waypoint implements Serializable
      *
      * @return the dirty
      */
-    public Waypoint setDirty() {
+    public Waypoint setDirty()
+    {
         return setDirty(true);
     }
 
@@ -800,8 +868,10 @@ public class Waypoint implements Serializable
      * @param dirty the dirty
      * @return the dirty
      */
-    public Waypoint setDirty(boolean dirty) {
-        if (isPersistent()) {
+    public Waypoint setDirty(boolean dirty)
+    {
+        if (isPersistent())
+        {
             this.dirty = dirty;
         }
         return this;
@@ -812,7 +882,8 @@ public class Waypoint implements Serializable
      *
      * @return the boolean
      */
-    public boolean isPersistent() {
+    public boolean isPersistent()
+    {
         return persistent;
     }
 
@@ -822,7 +893,8 @@ public class Waypoint implements Serializable
      * @param persistent the persistent
      * @return the persistent
      */
-    public Waypoint setPersistent(boolean persistent) {
+    public Waypoint setPersistent(boolean persistent)
+    {
         this.persistent = persistent;
         this.dirty = persistent;
         return this;
@@ -833,7 +905,8 @@ public class Waypoint implements Serializable
      *
      * @return the string
      */
-    public String toChatString() {
+    public String toChatString()
+    {
         boolean useName = !(getName().equals(String.format("%s, %s", getX(), getZ())));
         return toChatString(useName);
     }
@@ -844,12 +917,14 @@ public class Waypoint implements Serializable
      * @param useName the use name
      * @return the string
      */
-    public String toChatString(boolean useName) {
+    public String toChatString(boolean useName)
+    {
         boolean useDim = dimensions.first() != 0;
 
         List<String> parts = new ArrayList<String>();
         List<Object> args = new ArrayList<Object>();
-        if (useName) {
+        if (useName)
+        {
             parts.add("name:\"%s\"");
             args.add(getName().replaceAll("\"", " "));
         }
@@ -859,16 +934,19 @@ public class Waypoint implements Serializable
         args.add(getY());
         args.add(getZ());
 
-        if (useDim) {
+        if (useDim)
+        {
             parts.add("dim:%s");
             args.add(dimensions.first());
         }
 
         String format = "[" + Joiner.on(", ").join(parts) + "]";
         String result = String.format(format, args.toArray());
-        if (WaypointParser.parse(result) == null) {
+        if (WaypointParser.parse(result) == null)
+        {
             Journeymap.getLogger().warn("Couldn't produce parsable chat string from Waypoint: " + this);
-            if (useName) {
+            if (useName)
+            {
                 return toChatString(false);
             }
         }
@@ -960,7 +1038,8 @@ public class Waypoint implements Serializable
     /**
      * The enum Type.
      */
-    public enum Type {
+    public enum Type
+    {
         /**
          * Normal type.
          */

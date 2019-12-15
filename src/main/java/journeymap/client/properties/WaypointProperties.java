@@ -4,9 +4,12 @@
  */
 package journeymap.client.properties;
 
+import journeymap.client.ui.option.DateFormat;
+import journeymap.client.ui.option.TimeFormat;
 import journeymap.common.properties.config.BooleanField;
 import journeymap.common.properties.config.CustomField;
 import journeymap.common.properties.config.IntegerField;
+import journeymap.common.properties.config.StringField;
 
 import static journeymap.client.properties.ClientCategory.Waypoint;
 import static journeymap.client.properties.ClientCategory.WaypointBeacon;
@@ -31,6 +34,8 @@ public class WaypointProperties extends ClientPropertiesBase implements Comparab
     public final IntegerField minDistance = new IntegerField(WaypointBeacon, "jm.waypoint.min_distance", 0, 64, 4);
     public final BooleanField createDeathpoints = new BooleanField(Waypoint, "jm.waypoint.create_deathpoints", true);
     public final CustomField teleportCommand = new CustomField(Waypoint, "jm.waypoint.teleport_command", "/tp {name} {x} {y} {z}");
+    public final StringField dateFormat = new StringField(Waypoint, "jm.waypoint.death_date_format", DateFormat.Provider.class);
+    public final StringField timeFormat = new StringField(Waypoint, "jm.waypoint.death_time_format", TimeFormat.Provider.class);
 
     @Override
     public String getName()

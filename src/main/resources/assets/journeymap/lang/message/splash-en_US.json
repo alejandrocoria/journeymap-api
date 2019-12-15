@@ -11,6 +11,10 @@
       "action": "dialog.OptionsManager#MiniMap1"
     },
     {
+      "label": "Time and Date formatting for death waypoints!",
+      "action": "dialog.OptionsManager#Waypoint"
+    },
+    {
       "label": "Fullscreen but to pan to specified coordinates.",
       "action": "dialog.FullscreenActions#open"
     },
