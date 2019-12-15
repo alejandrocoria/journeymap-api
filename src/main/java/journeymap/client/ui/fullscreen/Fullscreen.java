@@ -44,6 +44,7 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.IntSliderButton;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
+import journeymap.client.ui.component.TextBoxButton;
 import journeymap.client.ui.dialog.AutoMapConfirmation;
 import journeymap.client.ui.dialog.DeleteMapConfirmation;
 import journeymap.client.ui.dialog.FullscreenActions;
@@ -164,6 +165,16 @@ public class Fullscreen extends JmUI implements ITabCompleter
      * The ThemeButton button zoom out.
      */
     ThemeButton buttonZoomOut;
+    /**
+     * The ThemeButton button search.
+     */
+    ThemeButton buttonSearch;
+
+    TextBoxButton searchTextX;
+    TextBoxButton searchTextZ;
+    ThemeButton buttonExecuteSearch;
+    ThemeToolbar searchToolBar;
+
     /**
      * The ThemeButton button day.
      */
@@ -561,6 +572,23 @@ public class Fullscreen extends JmUI implements ITabCompleter
 
             buttonList.add(sliderCaveLayer);
 
+            // Search
+            buttonSearch = new ThemeButton(theme, "jm.fullscreen.search", "search");
+            buttonSearch.addToggleListener((button, toggled) -> {
+                toggleSearchBar(toggled);
+                return true;
+            });
+            searchTextX = new TextBoxButton("x:", fontRenderer, 40, 20, true, true);
+            searchTextZ = new TextBoxButton("z:", fontRenderer, 40, 20, true, true);
+
+            buttonExecuteSearch = new ThemeButton(theme, "jm.fullscreen.search_execute", "follow");
+            buttonExecuteSearch.addToggleListener((button, toggled) -> {
+                executeSearch();
+                return true;
+            });
+            searchTextX.setVisible(false);
+            searchTextZ.setVisible(false);
+            buttonExecuteSearch.setVisible(false);
 
             // Follow
             buttonFollow = new ThemeButton(theme, "jm.fullscreen.follow", "follow");
@@ -576,6 +604,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
                 zoomIn();
                 return true;
             });
+            buttonZoomIn.setDisplayClickToggle(false);
 
             // Zoom Out
             buttonZoomOut = new ThemeButton(theme, "jm.fullscreen.zoom_out", "zoomout");
@@ -584,6 +613,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
                 zoomOut();
                 return true;
             });
+            buttonZoomOut.setDisplayClickToggle(false);
 
             // Waypoints
             buttonWaypointManager = new ThemeButton(theme, "jm.waypoint.waypoints_button", "waypoints");
@@ -795,9 +825,14 @@ public class Fullscreen extends JmUI implements ITabCompleter
             menuToolbar.addAllButtons(this);
             menuToolbar.visible = false; // Hide until laid out
 
-            zoomToolbar = new ThemeToolbar(theme, buttonFollow, buttonZoomIn, buttonZoomOut);
+            zoomToolbar = new ThemeToolbar(theme, buttonSearch, buttonFollow, buttonZoomIn, buttonZoomOut);
             zoomToolbar.setLayout(ButtonList.Layout.Vertical, ButtonList.Direction.LeftToRight);
             zoomToolbar.addAllButtons(this);
+
+            searchToolBar = new ThemeToolbar(theme, searchTextX, searchTextZ, buttonExecuteSearch);
+            searchToolBar.setLayout(ButtonList.Layout.CenteredHorizontal, ButtonList.Direction.LeftToRight);
+            searchToolBar.addAllButtons(this);
+
 
             // Buttons not in toolbars
             buttonList.add(buttonAlert);
@@ -863,6 +898,11 @@ public class Fullscreen extends JmUI implements ITabCompleter
         // Update toolbar layouts
         int padding = mapTypeToolbar.getToolbarSpec().padding;
         zoomToolbar.layoutCenteredVertical(zoomToolbar.getHMargin(), height / 2, true, padding);
+
+        searchToolBar.layoutHorizontal(zoomToolbar.getRightX() + 2, zoomToolbar.getY() + 1, true, 7, true);
+        searchTextX.setX(searchTextX.getX() + 3);
+        searchTextZ.setX(searchTextZ.getX() + 2);
+        buttonExecuteSearch.setDisplayClickToggle(false);
 
         int topY = mapTypeToolbar.getVMargin();
 
@@ -1141,6 +1181,37 @@ public class Fullscreen extends JmUI implements ITabCompleter
     }
 
     /**
+     * Toggle searchBar.
+     */
+    void toggleSearchBar(boolean toggled)
+    {
+        searchToolBar.setEnabled(toggled);
+        searchToolBar.setVisible(toggled);
+        searchTextZ.setVisible(toggled);
+        searchTextX.setVisible(toggled);
+        buttonExecuteSearch.setVisible(toggled);
+    }
+
+    /**
+     * Toggle follow.
+     */
+    void executeSearch()
+    {
+        buttonExecuteSearch.setToggled(true, false);
+
+        try
+        {
+            int x = Integer.parseInt(searchTextX.getText());
+            int z = Integer.parseInt(searchTextZ.getText());
+            centerOn(x, z);
+        }
+        catch (Exception e)
+        {
+            // do nothing
+        }
+    }
+
+    /**
      * Toggle follow.
      */
     void toggleFollow()
@@ -1207,6 +1278,16 @@ public class Fullscreen extends JmUI implements ITabCompleter
     @Override
     public void keyTyped(char c, int key) throws IOException
     {
+        if (searchTextX.isMouseOver())
+        {
+            searchTextX.keyTyped(c, key);
+            return;
+        }
+        if (searchTextZ.isMouseOver())
+        {
+            searchTextZ.keyTyped(c, key);
+            return;
+        }
         if (isChatOpen())
         {
             chat.keyTyped(c, key);

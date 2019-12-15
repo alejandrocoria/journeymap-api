@@ -326,6 +326,8 @@ jm.minimap.compass.e=E
 jm.minimap.compass.n=N
 jm.minimap.compass.s=S
 jm.minimap.compass.w=W
+jm.fullscreen.search=Open location finder
+jm.fullscreen.search_execute=Pan to location
 jm.minimap.compass_font_scale=Compass Font Scale
 jm.minimap.compass_font_scale.tooltip=The font scale used for compass point labels
 jm.minimap.enable_minimap=Enable MiniMap
@@ -649,3 +651,4 @@ key.journeymap.fullscreen.east=Pan East (16 Blocks)
 key.journeymap.fullscreen.west=Pan West (16 Blocks)
 key.journeymap.fullscreen_create_waypoint=Create Waypoint (at cursor)
 key.journeymap.fullscreen_chat_position=Chat Position (at cursor)
+

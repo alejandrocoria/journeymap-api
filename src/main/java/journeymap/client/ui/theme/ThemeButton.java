@@ -66,6 +66,19 @@ public class ThemeButton extends BooleanPropertyButton
      */
     protected boolean staysOn;
 
+    // If false, the button will not display a toggle
+    private boolean displayClickToggle = true;
+
+    /**
+     * Sets whether it will change color when clicked.
+     *
+     * @param displayClickToggle
+     */
+    public void setDisplayClickToggle(boolean displayClickToggle)
+    {
+        this.displayClickToggle = displayClickToggle;
+    }
+
     /**
      * Instantiates a new Theme button.
      *
@@ -246,7 +259,7 @@ public class ThemeButton extends BooleanPropertyButton
             return toggled ? buttonSpec.iconHoverOn : buttonSpec.iconHoverOff;
         }
 
-        return toggled ? buttonSpec.iconOn : buttonSpec.iconOff;
+        return toggled ? (displayClickToggle ? buttonSpec.iconOn : buttonSpec.iconOff) : buttonSpec.iconOff;
     }
 
     /**
@@ -264,12 +277,12 @@ public class ThemeButton extends BooleanPropertyButton
 
         if (isMouseOver)
         {
-            return toggled ? buttonSpec.buttonHoverOn : buttonSpec.buttonHoverOff;
+            return toggled ? (displayClickToggle ? buttonSpec.buttonHoverOn : buttonSpec.buttonHoverOff) : buttonSpec.buttonHoverOff;
         }
 
-        return toggled ? buttonSpec.buttonOn : buttonSpec.buttonOff;
+        return toggled ? (displayClickToggle ? buttonSpec.buttonOn : buttonSpec.buttonOff) : buttonSpec.buttonOff;
     }
-    
+
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float ticks)
     {

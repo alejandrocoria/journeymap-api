@@ -11,6 +11,10 @@
       "action": "dialog.OptionsManager#MiniMap1"
     },
     {
+      "label": "Fullscreen but to pan to specified coordinates.",
+      "action": "dialog.FullscreenActions#open"
+    },
+    {
       "label": "JourneyMap has a public Discord!",
       "action": "dialog.FullscreenActions#discord"
     }
