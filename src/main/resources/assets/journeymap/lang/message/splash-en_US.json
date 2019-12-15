@@ -11,6 +11,10 @@
       "action": "dialog.OptionsManager#MiniMap1"
     },
     {
+      "label": "Configure Death Waypoint label and auto-removal",
+      "action": "dialog.OptionsManager#Waypoint"
+    },
+    {
       "label": "Time and Date formatting for death waypoints!",
       "action": "dialog.OptionsManager#Waypoint"
     },
