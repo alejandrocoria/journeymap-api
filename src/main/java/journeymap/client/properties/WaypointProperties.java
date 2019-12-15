@@ -33,6 +33,9 @@ public class WaypointProperties extends ClientPropertiesBase implements Comparab
     public final IntegerField maxDistance = new IntegerField(Waypoint, "jm.waypoint.max_distance", 0, 10000, 0);
     public final IntegerField minDistance = new IntegerField(WaypointBeacon, "jm.waypoint.min_distance", 0, 64, 4);
     public final BooleanField createDeathpoints = new BooleanField(Waypoint, "jm.waypoint.create_deathpoints", true);
+    public final BooleanField autoRemoveDeathpoints = new BooleanField(Waypoint, "jm.waypoint.auto_remove_deathpoints", false);
+    public final IntegerField autoRemoveDeathpointDistance = new IntegerField(Waypoint, "jm.waypoint.auto_deathpoint_remove_distance", 2, 64, 2);
+    public final BooleanField showDeathpointlabel = new BooleanField(Waypoint, "jm.waypoint.show_death_point_label_on_map", true);
     public final CustomField teleportCommand = new CustomField(Waypoint, "jm.waypoint.teleport_command", "/tp {name} {x} {y} {z}");
     public final StringField dateFormat = new StringField(Waypoint, "jm.waypoint.death_date_format", DateFormat.Provider.class);
     public final StringField timeFormat = new StringField(Waypoint, "jm.waypoint.death_time_format", TimeFormat.Provider.class);

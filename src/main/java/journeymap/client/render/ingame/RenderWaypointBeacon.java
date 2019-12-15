@@ -112,6 +112,10 @@ public class RenderWaypointBeacon
 
             float fadeAlpha = 1f;
             final int minDistance = waypointProperties.minDistance.get();
+            if (waypoint.isDeathPoint() && waypointProperties.autoRemoveDeathpoints.get() && actualDistance < waypointProperties.autoRemoveDeathpointDistance.get() && actualDistance > 1)
+            {
+                WaypointStore.INSTANCE.remove(waypoint);
+            }
             if (minDistance > 0)
             {
                 if ((int) actualDistance <= minDistance)
