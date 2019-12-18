@@ -11,9 +11,6 @@ import journeymap.client.ui.UIManager;
 import journeymap.client.ui.option.KeyedEnum;
 import net.minecraft.client.Minecraft;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.function.Supplier;
 
 /**
@@ -24,8 +21,7 @@ public enum ThemeLabelSource implements KeyedEnum
 {
     FPS("jm.theme.labelsource.fps", 100, 1, ThemeLabelSource::getFps),
     GameTime("jm.theme.labelsource.gametime", 0, 1000, ThemeLabelSource::getGameTime),
-    GameTime12("jm.theme.labelsource.gametime12", 0, 1000, ThemeLabelSource::getGameTime12h),
-    GameTime24("jm.theme.labelsource.gametime24", 0, 1000, ThemeLabelSource::getGameTime24h),
+    GameTimeReal("jm.theme.labelsource.gametime.real", 0, 1000, ThemeLabelSource::getGameTimeReal),
     RealTime("jm.theme.labelsource.realtime", 0, 1000, ThemeLabelSource::getRealTime),
     Location("jm.theme.labelsource.location", 1000, 1, ThemeLabelSource::getLocation),
     Biome("jm.theme.labelsource.biome", 1000, 1, ThemeLabelSource::getBiome),
@@ -33,8 +29,6 @@ public enum ThemeLabelSource implements KeyedEnum
     Region("jm.theme.labelsource.region", 1000, 1, ThemeLabelSource::getRegion),
     LightLevel("jm.theme.labelsource.lightlevel", 100, 100, ThemeLabelSource::getLightLevel),
     Blank("jm.theme.labelsource.blank", 0, 1, () -> "");
-
-    private static DateFormat timeFormat = new SimpleDateFormat("h:mm:ss a");
 
     private final String key;
     private final Supplier<String> supplier;
@@ -115,20 +109,14 @@ public enum ThemeLabelSource implements KeyedEnum
         return WorldData.getGameTime();
     }
 
-    private static String getGameTime12h()
+    private static String getGameTimeReal()
     {
-        return WorldData.getTime("h:mm:ss aa");
+        return WorldData.getRealGameTime();
     }
-
-    private static String getGameTime24h()
-    {
-        return WorldData.getTime("HH:mm:ss");
-    }
-
 
     private static String getRealTime()
     {
-        return timeFormat.format(new Date());
+        return WorldData.getSystemTime();
     }
 
     private static String getLocation()

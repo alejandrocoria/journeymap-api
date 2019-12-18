@@ -167,6 +167,18 @@ public class JourneymapClient implements CommonProxy
         }
     }
 
+    public MiniMapProperties getActiveMiniMapProperties()
+    {
+        if (miniMapProperties1.isActive())
+        {
+            return getMiniMapProperties1();
+        }
+        else
+        {
+            return getMiniMapProperties2();
+        }
+    }
+
     /**
      * Get the active minimap id.
      */

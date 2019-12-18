@@ -6,10 +6,11 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class Compressor
+public class CompressionUtils
 {
     public static String decompress(String zippedBase64Str) throws IOException
     {
@@ -20,7 +21,7 @@ public class Compressor
         try
         {
             zi = new GZIPInputStream(new ByteArrayInputStream(bytes));
-            result = IOUtils.toString(zi, "UTF-8");
+            result = IOUtils.toString(zi, StandardCharsets.UTF_8);
         }
         finally
         {

@@ -1,12 +1,9 @@
 package journeymap.client.ui.component;
 
 import journeymap.common.properties.config.CustomField;
-import net.minecraft.client.Minecraft;
 
-public class TextFieldButton extends Button implements IConfigFieldHolder<CustomField>
+public class TextFieldButton extends TextBoxButton implements IConfigFieldHolder<CustomField>
 {
-
-    protected TextBox textBox;
     protected final CustomField field;
 
     public TextFieldButton(CustomField field)
@@ -22,17 +19,8 @@ public class TextFieldButton extends Button implements IConfigFieldHolder<Custom
         {
             textBox = new TextBox(this.displayString, this.fontRenderer, this.width, this.height);
         }
-    }
-
-    @Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float partialTicks)
-    {
-        textBox.setMinLength(1);
-        textBox.setHeight(this.getHeight() - 2);
-        textBox.setWidth(this.getWidth());
-        textBox.setX(this.getX());
-        textBox.setY(this.getY() + 1);
-        textBox.drawTextBox();
+        textBox.setY(textBox.getY() - 1);
+        textBox.setHeight(textBox.getHeight() - 4);
     }
 
     public void setValue(Object value)
@@ -45,12 +33,6 @@ public class TextFieldButton extends Button implements IConfigFieldHolder<Custom
         textBox.setText(value);
     }
 
-    @Override
-    public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY)
-    {
-        textBox.setFocused(true);
-        return textBox.mouseClicked(mouseX, mouseY, 0);
-    }
 
     @Override
     public boolean keyTyped(char typedChar, int keyCode)
@@ -58,12 +40,6 @@ public class TextFieldButton extends Button implements IConfigFieldHolder<Custom
         boolean press = textBox.textboxKeyTyped(typedChar, keyCode);
         setValue(textBox.getText());
         return press;
-    }
-
-    @Override
-    public boolean isMouseOver()
-    {
-        return textBox.isFocused();
     }
 
     @Override

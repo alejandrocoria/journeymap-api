@@ -245,13 +245,13 @@ public class ImageHolder implements IThreadedFileIO
             else
             {
                 logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
-                return false; // do retry
+                return true; // do retry
             }
         }
         catch (InterruptedException e)
         {
             logger.warn("Timeout waiting for write lock  " + writeLock + " for " + this);
-            return false; // do retry
+            return true; // do retry
         }
     }
 

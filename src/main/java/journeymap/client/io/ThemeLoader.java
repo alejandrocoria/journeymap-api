@@ -282,6 +282,7 @@ public class ThemeLoader
                     Journeymap.getLogger().error("Theme file schema is obsolete, cannot be used: " + themeFile);
                     return null;
                 }
+                return theme;
             }
             else if (createIfMissing)
             {

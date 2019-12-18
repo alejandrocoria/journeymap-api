@@ -36,6 +36,7 @@ public class ButtonList extends ArrayList<Button>
     private Layout layout = Layout.Horizontal;
     private Direction direction = Direction.LeftToRight;
     private String label;
+    private int hgap = 0;
 
     /**
      * Instantiates a new Button list.
@@ -79,6 +80,11 @@ public class ButtonList extends ArrayList<Button>
     public ButtonList(Button... buttons)
     {
         super(Arrays.asList(buttons));
+    }
+
+    public int getWidth()
+    {
+        return getWidth(-1, this.hgap);
     }
 
     /**
@@ -340,6 +346,7 @@ public class ButtonList extends ArrayList<Button>
     {
         this.layout = Layout.Horizontal;
         this.direction = leftToRight ? Direction.LeftToRight : Direction.RightToLeft;
+        this.hgap = hgap;
 
         Button last = null;
         for (Button button : this)
@@ -532,6 +539,7 @@ public class ButtonList extends ArrayList<Button>
      */
     public ButtonList layoutFilledHorizontal(FontRenderer fr, final int leftX, final int y, final int rightX, final int hgap, final boolean leftToRight)
     {
+        this.hgap = hgap;
         this.layout = Layout.FilledHorizontal;
         if (this.size() == 0)
         {
@@ -741,6 +749,7 @@ public class ButtonList extends ArrayList<Button>
      */
     public void equalizeWidths(FontRenderer fr, int hgap, int maxTotalWidth)
     {
+        this.hgap = hgap;
         int maxWidth = 0;
         for (Button button : this)
         {

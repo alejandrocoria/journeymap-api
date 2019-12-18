@@ -50,6 +50,7 @@ public class MappingOptions implements Draw
                 EnumSet.allOf(ServerOption.Option.class),
                 Constants.getString("jm.server.edit.mapping.toggle.surface.label"),
                 new EnumField<>(Category.Hidden, "", surfaceOption.getOption()));
+
         surfaceOptionButton.addClickListener(button -> {
             surfaceOption.setOption(surfaceOptionButton.getField().get());
             updateToggleProperty(surfaceOption, this.properties, SURFACE_MAP, OP_SURFACE_MAP);
