@@ -74,9 +74,9 @@ public class DrawWayPointStep implements DrawStep
             if (showLabel && pass == Pass.Text)
             {
                 Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.getHeight() : texture.getHeight());
-                String waypointName = "";
-                if (waypoint.isDeathPoint() && Journeymap.getClient().getWaypointProperties().showDeathpointlabel.get()) {
-                    waypointName = waypoint.getName();
+                String waypointName = waypoint.getName();
+                if (waypoint.isDeathPoint() && !Journeymap.getClient().getWaypointProperties().showDeathpointlabel.get()) {
+                    waypointName = "";
                 }
                 DrawUtil.drawLabel(waypointName, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, .7f, fontColor, 1f, fontScale, false, rotation);
             }

@@ -12,6 +12,7 @@ import journeymap.server.properties.GlobalProperties;
 import journeymap.server.properties.PermissionProperties;
 import journeymap.server.properties.Permissions;
 import journeymap.server.properties.PropertiesManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -40,7 +41,7 @@ public class PlayerConfigController
     {
         JsonObject config = new JsonObject();
         JsonObject settings = new JsonObject();
-        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get() && !FMLCommonHandler.instance().getSide().isClient())
+        if (PropertiesManager.getInstance().getGlobalProperties().useWorldId.get() && (!FMLCommonHandler.instance().getSide().isClient() || (Minecraft.getMinecraft().getIntegratedServer() != null && Minecraft.getMinecraft().getIntegratedServer().getPublic())))
         {
             WorldNbtIDSaveHandler worldSaveHandler = new WorldNbtIDSaveHandler();
             String worldID = worldSaveHandler.getWorldID();
@@ -66,7 +67,8 @@ public class PlayerConfigController
                 return true;
             }
         }
-        if (isOp(player)) {
+        if (isOp(player))
+        {
             return ForgeConfig.opAccess;
         }
         return false;
@@ -139,7 +141,8 @@ public class PlayerConfigController
         }
     }
 
-    public void updateClientConfigs(Response response) {
+    public void updateClientConfigs(Response response)
+    {
         if (response.getAsJson().get(SETTINGS) != null)
         {
             JsonObject settings = response.getAsJson().get(SETTINGS).getAsJsonObject();

@@ -32,7 +32,7 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
      */
     public static boolean playerIsUnderground(Minecraft mc, EntityPlayer player)
     {
-        if(player.getEntityWorld().provider instanceof WorldProviderHell)
+        if (player.getEntityWorld().provider instanceof WorldProviderHell)
         {
             return true;
         }
@@ -42,13 +42,12 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
         final int posZ = MathHelper.floor(player.posZ);
         final int offset = 1;
 
-        boolean isUnderground = true;
+        boolean isUnderground = false;
 
         if (posY < 0)
         {
             return true;
         }
-
         check:
         {
             int y = posY;
@@ -66,11 +65,14 @@ public class PlayerData extends CacheLoader<Class, EntityDTO>
                             isUnderground = false;
                             break check;
                         }
+                        else
+                        {
+                            isUnderground = true;
+                        }
                     }
                 }
             }
         }
-
         return isUnderground;
     }
 
