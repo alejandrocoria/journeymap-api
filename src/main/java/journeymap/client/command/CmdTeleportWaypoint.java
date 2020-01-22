@@ -82,7 +82,7 @@ public class CmdTeleportWaypoint
         double x = waypoint.getBlockCenteredX();
         double z = waypoint.getBlockCenteredZ();
         TreeSet<Integer> dim = (TreeSet<Integer>) waypoint.getDimensions();
-
+        String teleportCommand;
         if (dim.first() == -1 && mc.player.dimension != -1)
         {
             x = x / 8;
@@ -104,11 +104,12 @@ public class CmdTeleportWaypoint
 //            new Teleport().send(object);
 
             // Remove in 1.13+ go to packet system.
-            mc.player.sendChatMessage(String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first()));
+            teleportCommand = String.format("/jtp %s %s %s %s", x, waypoint.getY(), z, dim.first());
+            Journeymap.getLogger().info("Attempting jtp teleport with command: " + teleportCommand);
         }
         else
         {
-            String teleportCommand = Journeymap.getClient().getWaypointProperties().teleportCommand.getAsString();
+            teleportCommand = Journeymap.getClient().getWaypointProperties().teleportCommand.getAsString();
 
             teleportCommand = teleportCommand
                     .replace("{name}", mc.player.getName())
@@ -116,8 +117,8 @@ public class CmdTeleportWaypoint
                     .replace("{y}", String.valueOf(waypoint.getY()))
                     .replace("{z}", String.valueOf(waypoint.getZ()))
                     .replace("{dim}", String.valueOf(dim.first()));
-
-            mc.player.sendChatMessage(teleportCommand);
+            Journeymap.getLogger().info("Attempting tp teleport with command: " + teleportCommand);
         }
+        mc.player.sendChatMessage(teleportCommand);
     }
 }

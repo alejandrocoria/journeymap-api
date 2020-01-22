@@ -9,6 +9,7 @@ import journeymap.client.ui.component.ListPropertyButton;
 import journeymap.common.properties.Category;
 import journeymap.common.properties.config.EnumField;
 import journeymap.common.properties.config.IntegerField;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
@@ -59,11 +60,14 @@ public class TopBoxOptions implements Draw
         else
         {
             list.add(checkBox("jm.server.edit.chkbox.teleport", TELEPORT, properties));
-            if (!FMLClientHandler.instance().getClient().isSingleplayer())
+            if (!FMLClientHandler.instance().getClient().isSingleplayer() || (Minecraft.getMinecraft().getIntegratedServer() != null && Minecraft.getMinecraft().getIntegratedServer().getPublic()))
             {
-                CheckBox worldIdCheckBox = checkBox("jm.server.edit.chkbox.world.id", USE_WORLD_ID, properties);
-                worldIdCheckBox.setTooltip(formattedToolTipHeader("jm.server.edit.chkbox.world.id") + Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"));
-                list.add(worldIdCheckBox);
+                if (!FMLClientHandler.instance().getClient().isSingleplayer())
+                {
+                    CheckBox worldIdCheckBox = checkBox("jm.server.edit.chkbox.world.id", USE_WORLD_ID, properties);
+                    worldIdCheckBox.setTooltip(formattedToolTipHeader("jm.server.edit.chkbox.world.id") + Constants.getString("jm.server.edit.chkbox.world.id.tooltip") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"));
+                    list.add(worldIdCheckBox);
+                }
 //                list.add(checkBox("jm.server.edit.chkbox.world.id" + "\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip2") + "\n\n" + Constants.getString("jm.server.edit.chkbox.world.id.tooltip3"), USE_WORLD_ID, properties));
 
                 //add tracking slider

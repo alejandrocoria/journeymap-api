@@ -23,7 +23,11 @@ import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Waypoint selection/creation.
@@ -39,11 +43,13 @@ public class WaypointLayer implements LayerDelegate.Layer
 
     DrawWayPointStep selectedWaypointStep = null;
     Waypoint selected = null;
+    private Fullscreen fullscreen;
 
-    public WaypointLayer()
+    public WaypointLayer(Fullscreen fullscreen)
     {
         drawStepList = new ArrayList<DrawStep>(1);
         clickDrawStep = new BlockOutlineDrawStep(new BlockPos(0, 0, 0));
+        this.fullscreen = fullscreen;
     }
 
     @Override
@@ -152,8 +158,13 @@ public class WaypointLayer implements LayerDelegate.Layer
             // Edit selected waypoint
             if (selected != null)
             {
-                UIManager.INSTANCE.openWaypointManager(selected, new Fullscreen()); // TODO: This could be a problem
+                UIManager.INSTANCE.openWaypointManager(selected, fullscreen);
                 return drawStepList;
+            }
+            else
+            {
+                Waypoint waypoint = Waypoint.at(blockCoord, Waypoint.Type.Normal, mc.player.dimension);
+                UIManager.INSTANCE.openWaypointEditor(waypoint, true, fullscreen);
             }
         }
 

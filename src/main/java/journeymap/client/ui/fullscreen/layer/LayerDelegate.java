@@ -44,7 +44,7 @@ public class LayerDelegate
     {
         layers.add(new ModOverlayLayer());
         layers.add(new BlockInfoLayer(fullscreen));
-        layers.add(new WaypointLayer());
+        layers.add(new WaypointLayer(fullscreen));
         layers.add(new KeybindingInfoLayer(fullscreen));
     }
 

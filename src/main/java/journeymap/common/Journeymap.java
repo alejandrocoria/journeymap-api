@@ -10,8 +10,10 @@ import journeymap.common.command.CommandJTP;
 import journeymap.common.network.PacketRegistry;
 import journeymap.common.version.Version;
 import journeymap.server.JourneymapServer;
+import journeymap.server.events.ForgeEvents;
 import journeymap.server.nbt.WorldNbtIDSaveHandler;
 import journeymap.server.properties.PropertiesManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -73,7 +75,7 @@ public class Journeymap
     /**
      * The constant VERSION_URL.
      */
-    public static final String VERSION_URL = "https://api.cfwidget.com/mc-mods/minecraft/journeymap";
+    public static final String VERSION_URL = "https://api.cfwidget.com/minecraft/mc-mods/journeymap";
 
     /**
      * The constant instance.
@@ -138,6 +140,7 @@ public class Journeymap
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) throws Throwable
     {
+        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
         PacketRegistry.init();
         proxy.initialize(event);
     }
