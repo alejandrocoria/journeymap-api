@@ -316,7 +316,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
         super(null);
         mc = FMLClientHandler.instance().getClient();
         layerDelegate = new LayerDelegate(this);
-        if (Journeymap.getClient().getFullMapProperties().showCaves.get() && DataCache.getPlayer().underground && state.follow.get())
+        if (Journeymap.getClient().getFullMapProperties().showCaves.get() && DataCache.getPlayer().underground && state.follow.get() && FeatureManager.isAllowed(Feature.MapCaves))
         {
             state.setMapType(MapType.underground(DataCache.getPlayer()));
         }
