@@ -3,6 +3,7 @@ package journeymap.common.network.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import io.netty.util.Attribute;
 import journeymap.common.network.impl.utils.AsyncCallback;
 import journeymap.common.network.impl.utils.CallbackService;
 import net.minecraft.entity.player.EntityPlayer;
@@ -237,7 +238,8 @@ public abstract class MessageProcessor
     {
         buildRequest(requestData);
         // Verify the player has forge and can receive forge packets.
-        if (player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER).get())
+        Attribute<Boolean> marker = player.connection.getNetworkManager().channel().attr(NetworkRegistry.FML_MARKER);
+        if (marker.get() != null && marker.get())
         {
             NetworkHandler.getInstance().sendTo(new Message(gson.toJson(data)), player);
         }

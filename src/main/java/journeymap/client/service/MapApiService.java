@@ -43,6 +43,9 @@ public class MapApiService extends FileService
     {
         String domain = Journeymap.getClient().getWebMapProperties().googleMapApiDomain.get();
         String apiUrl = String.format("http://maps.google%s/maps/api/js?key=%s&libraries=geometry&sensor=false", domain, API_KEY);
+        if(".cn".equalsIgnoreCase(domain)) {
+            apiUrl = String.format("https://maps.googleapis.com/maps/api/js?key=%s&region=CN&language=zh-CN&libraries=geometry&sensor=false", API_KEY);
+        }
 
         ResponseHeader.on(event).setHeader("Location", apiUrl).noCache();
         event.reply().code("303 See Other");

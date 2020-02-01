@@ -9,6 +9,8 @@ import journeymap.client.api.display.Context;
 import journeymap.client.api.impl.ClientAPI;
 import journeymap.client.api.util.UIState;
 import journeymap.client.data.DataCache;
+import journeymap.client.feature.Feature;
+import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
@@ -605,7 +607,7 @@ public class MiniMap
         {
             // Switch to caves/surface if needed
             boolean wasInCaves = false;
-            if (miniMapProperties.showCaves.get())
+            if (miniMapProperties.showCaves.get() && FeatureManager.isAllowed(Feature.MapCaves))
             {
                 EntityDTO player = DataCache.getPlayer();
                 boolean neverChecked = (lastPlayerUnderground == null);
