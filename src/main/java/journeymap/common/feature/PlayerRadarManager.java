@@ -62,26 +62,17 @@ public class PlayerRadarManager
         }
     }
 
-    private void updateClientPlayer(EntityPlayer player)
+    private void updateClientPlayer(JsonObject player)
     {
-
-        EntityPlayer clientPlayer = this.getPlayers().get(player.getUniqueID());
+        EntityPlayer clientPlayer = this.getPlayers().get(UUID.fromString(player.get("playerId").getAsString()));
 
         if (clientPlayer != null)
         {
-            clientPlayer.posX = player.posX;
-            clientPlayer.posY = player.posY;
-            clientPlayer.posZ = player.posZ;
-            clientPlayer.chunkCoordX = player.chunkCoordX;
-            clientPlayer.chunkCoordY = player.chunkCoordY;
-            clientPlayer.chunkCoordZ = player.chunkCoordZ;
-            clientPlayer.rotationYawHead = player.rotationYawHead;
-            clientPlayer.setSneaking(player.isSneaking());
-            clientPlayer.dimension = player.dimension;
+            updatePlayer(clientPlayer, player);
         }
         else
         {
-            this.addPlayer(player);
+            this.addPlayer(buildPlayerFromJson(player));
         }
     }
 
@@ -92,13 +83,22 @@ public class PlayerRadarManager
             for (JsonElement p : playerList)
             {
                 JsonObject player = p.getAsJsonObject();
-                EntityPlayer entityPlayer = buildPlayerFromJson(player);
-                if (entityPlayer != null)
-                {
-                    updateClientPlayer(entityPlayer);
-                }
+                updateClientPlayer(player);
             }
         }
+    }
+
+    private void updatePlayer(EntityPlayer player, JsonObject json)
+    {
+        player.posX = json.get("posX").getAsInt();
+        player.posY = json.get("posY").getAsInt();
+        player.posZ = json.get("posZ").getAsInt();
+        player.chunkCoordX = json.get("chunkX").getAsInt();
+        player.chunkCoordY = json.get("chunkY").getAsInt();
+        player.chunkCoordZ = json.get("chunkZ").getAsInt();
+        player.rotationYawHead = json.get("rotation").getAsFloat();
+        player.setSneaking(json.get("sneaking").getAsBoolean());
+        player.dimension = json.get("dim").getAsInt();
     }
 
     /**
@@ -119,16 +119,8 @@ public class PlayerRadarManager
         if (!playerUUID.equals(mc.player.getUniqueID()))
         {
             playerMp = new EntityOtherPlayerMP(mc.world, new GameProfile(playerUUID, playerName));
-            playerMp.posX = player.get("posX").getAsInt();
-            playerMp.posY = player.get("posY").getAsInt();
-            playerMp.posZ = player.get("posZ").getAsInt();
-            playerMp.chunkCoordX = player.get("chunkX").getAsInt();
-            playerMp.chunkCoordY = player.get("chunkY").getAsInt();
-            playerMp.chunkCoordZ = player.get("chunkZ").getAsInt();
-            playerMp.rotationYawHead = player.get("rotation").getAsFloat();
-            playerMp.setSneaking(player.get("sneaking").getAsBoolean());
+            updatePlayer(playerMp, player);
             playerMp.setUniqueId(playerUUID);
-            playerMp.dimension = player.get("dim").getAsInt();
             playerMp.addedToChunk = true;
             return playerMp;
         }
