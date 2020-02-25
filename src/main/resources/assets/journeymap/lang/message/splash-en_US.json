@@ -3,6 +3,10 @@
 {
   "lines": [
     {
+      "label": "Brand new Webmap!",
+      "action": "dialog.OptionsManager#Webmap"
+    },
+    {
       "label": "New Server Admin screen in the JourneyMap Options screen, for ops/admins and single-player.",
       "action": "serveroption.ServerOptionsManager"
     },
@@ -19,7 +23,7 @@
       "action": "dialog.OptionsManager#Waypoint"
     },
     {
-      "label": "Fullscreen but to pan to specified coordinates.",
+      "label": "Fullscreen button to pan to specified coordinates.",
       "action": "dialog.FullscreenActions#open"
     },
     {

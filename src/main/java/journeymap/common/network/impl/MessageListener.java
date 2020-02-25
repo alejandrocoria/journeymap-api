@@ -8,9 +8,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import static journeymap.common.network.impl.MessageProcessor.OBJECT_KEY;
 
 public class MessageListener implements IMessageHandler<Message, IMessage>
@@ -26,24 +23,24 @@ public class MessageListener implements IMessageHandler<Message, IMessage>
             JsonObject response = gson.fromJson(message.getMessage(), JsonObject.class);
             String clazz = response.get(OBJECT_KEY).getAsString();
             Class requestObject = Class.forName(clazz);
-            Method method = requestObject.getMethod("process", JsonObject.class, MessageContext.class, Class.class);
-            method.invoke(null, response, ctx, requestObject);
+            if (requestObject.getSuperclass() == MessageProcessor.class || requestObject.getSuperclass() == CompressedPacket.class)
+            {
+                MessageProcessor.process(response, ctx, requestObject);
+            }
+            else
+            {
+                String error = String.format("Bad Network request: %s attempted to send an unqualified packet request.",
+                        ctx.side.isClient() ? "THE SERVER" : ctx.getServerHandler().player.getName());
+                logger.error(error);
+            }
         }
         catch (ClassNotFoundException e)
         {
             logger.warn("Message processor not found: ", e);
         }
-        catch (IllegalAccessException e)
-        {
-            logger.warn("Cannot access message processor: ", e);
-        }
         catch (NullPointerException e)
         {
             logger.warn("Null Response: ", e);
-        }
-        catch (NoSuchMethodException | InvocationTargetException e)
-        {
-            logger.warn("Unable to initiate message processing", e);
         }
         return null;
     }

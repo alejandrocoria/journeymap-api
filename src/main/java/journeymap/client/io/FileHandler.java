@@ -57,6 +57,7 @@ public class FileHandler
     public static final String DEV_MINECRAFT_DIR = "run/";
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/ui";
+    public static final String ASSETS_WEBMAP = "/assets/journeymap/web";
     public static final Pattern PATTERN_WITH_UNICODE = Pattern.compile("[^\\w\\s\\p{L}]+", Pattern.UNICODE_CHARACTER_CLASS);
     public static final File MinecraftDirectory = getMinecraftDirectory();
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);

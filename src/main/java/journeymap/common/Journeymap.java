@@ -100,6 +100,17 @@ public class Journeymap
     }
 
     /**
+     * Get a named logger underneath JourneyMap's.
+     *
+     * @param name the logger name
+     * @return the logger
+     */
+    public static Logger getLogger(String name)
+    {
+        return LogManager.getLogger(MOD_ID + "/" + name);
+    }
+
+    /**
      * Whether this side will accept being connected to the other side.
      *
      * @param modList the mod list

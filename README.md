@@ -4,8 +4,8 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 ## Requirements
 
-* Java 1.8 JDK
 * IntelliJ IDEA
+* OpenJDK 1.8
 
 ## Environment Setup
 
@@ -13,7 +13,7 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
-```
+```sh
     git clone https://techbrew@bitbucket.org/TeamJM/journeymap.git
     cd journeymap
     git fetch && git checkout (branchname)
@@ -23,7 +23,7 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 
 * In a command window, go into the journeymap directory and invoke the Gradle build to setup the workspace:
 
-```
+```sh
     gradlew.bat setupDecompWorkspace
 ```
 
@@ -32,7 +32,7 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 * Close the Project when import is done.
 * In a command window, invoke this Gradle task to create the Run configuration:
 
-```
+```sh
     gradlew.bat genIntellijRuns
 ```
 * Open journeymap.ipr in IDEA

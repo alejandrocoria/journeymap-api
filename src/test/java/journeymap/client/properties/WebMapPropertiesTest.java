@@ -19,7 +19,6 @@ public class WebMapPropertiesTest extends ClientPropertiesBaseTest<WebMapPropert
 
         randomize(p.enabled);
         randomizeCustomInteger(p.port);
-        randomize(p.googleMapApiDomain);
 
         return p;
     }

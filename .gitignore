@@ -22,3 +22,6 @@ eclipse
 run
 logs/
 .shelf/
+
+# webmap
+src/main/resources/assets/journeymap/web/

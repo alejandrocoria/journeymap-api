@@ -17,7 +17,12 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Constants and Keybindings... and other stuff that are squatting here for some reason.
@@ -220,15 +225,22 @@ public class Constants
      *
      * @return the string
      */
-    public static String birthdayMessage() {
+    public static String birthdayMessage()
+    {
         Calendar today = Calendar.getInstance();
         int month = today.get(Calendar.MONTH);
         int date = today.get(Calendar.DATE);
-        if (month == Calendar.JULY && date == 2) {
+        if (month == Calendar.JULY && date == 2)
+        {
             return getString("jm.common.birthday", "techbrew");
         }
-        if (month == Calendar.SEPTEMBER && date == 21) {
+        if (month == Calendar.SEPTEMBER && date == 21)
+        {
             return getString("jm.common.birthday", "mysticdrew");
+        }
+        if (month == Calendar.SEPTEMBER && date == 27)
+        {
+            return getString("jm.common.birthday", "gdude2002");
         }
 
         return null;
@@ -237,11 +249,13 @@ public class Constants
     /**
      * The enum World type.
      */
-    public enum WorldType {
+    public enum WorldType
+    {
         /**
          * Mp world type.
          */
-        mp, /**
+        mp,
+        /**
          * Sp world type.
          */
         sp

@@ -42,7 +42,6 @@ public class ChunkLoader
                         if (!chunk.isLoaded())
                         {
                             chunk.markLoaded(true);
-                            //chunk.generateSkylightMap();
                         }
                         return new ChunkMD(chunk, forceRetain);
                     }

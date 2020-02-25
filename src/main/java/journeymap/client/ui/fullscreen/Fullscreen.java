@@ -33,6 +33,7 @@ import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
+import journeymap.client.render.map.RegionRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.main.EnsureCurrentColorsTask;
@@ -253,6 +254,8 @@ public class Fullscreen extends JmUI implements ITabCompleter
     ThemeButton buttonBrowser;
     ThemeButton buttonAbout;
 
+    ThemeButton overlayRenderButton;
+
     /**
      * The Map type toolbar.
      */
@@ -308,7 +311,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
     private Rectangle2D.Double optionsToolbarBounds;
     private Rectangle2D.Double menuToolbarBounds;
 
-    /**
+    /*
      * Default constructor
      */
     public Fullscreen()
@@ -730,6 +733,12 @@ public class Fullscreen extends JmUI implements ITabCompleter
                 return true;
             });
 
+            overlayRenderButton = new ThemeButton(theme, "jm.debug.region_info_toggle", "server");
+            overlayRenderButton.addToggleListener((button, toggled) -> {
+                RegionRenderer.render(toggled);
+                return true;
+            });
+
             buttonSavemap = new ThemeButton(theme, "jm.common.save_map", "savemap");
             buttonSavemap.addToggleListener((button, toggled) -> {
                 buttonSavemap.setEnabled(false);
@@ -821,7 +830,7 @@ public class Fullscreen extends JmUI implements ITabCompleter
             optionsToolbar.addAllButtons(this);
             optionsToolbar.visible = false; // Hide until laid out
 
-            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonAbout, buttonBrowser, buttonTheme, buttonResetPalette, buttonDeletemap, buttonSavemap, buttonAutomap, buttonDisable);
+            menuToolbar = new ThemeToolbar(theme, buttonWaypointManager, buttonOptions, buttonAbout, buttonBrowser, buttonTheme, buttonResetPalette, buttonDeletemap, buttonSavemap, buttonAutomap, buttonDisable, overlayRenderButton);
             menuToolbar.addAllButtons(this);
             menuToolbar.visible = false; // Hide until laid out
 
@@ -893,6 +902,8 @@ public class Fullscreen extends JmUI implements ITabCompleter
         buttonResetPalette.setEnabled(!mainThreadActive && mappingEnabled);
         buttonDeletemap.setEnabled(!mainThreadActive);
         buttonDisable.setEnabled(!mainThreadActive);
+
+        overlayRenderButton.setVisible(System.getProperty("journeymap.map_testing") != null);
 
 
         // Update toolbar layouts

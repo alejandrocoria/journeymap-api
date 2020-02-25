@@ -7,7 +7,7 @@ package journeymap.client.log;
 
 import journeymap.client.Constants;
 import journeymap.client.forge.event.KeyEventHandler;
-import journeymap.client.service.WebServer;
+import journeymap.client.service.webmap.Webmap;
 import journeymap.common.Journeymap;
 import journeymap.common.log.LogFormatter;
 import journeymap.common.version.VersionCheck;
@@ -48,7 +48,7 @@ public class ChatLog
      */
     public static void queueAnnouncement(ITextComponent chat)
     {
-        TextComponentTranslation wrap = new TextComponentTranslation("jm.common.chat_announcement", new Object[]{chat});
+        TextComponentTranslation wrap = new TextComponentTranslation("jm.common.chat_announcement", chat);
         announcements.add(wrap);
     }
 
@@ -167,8 +167,8 @@ public class ChatLog
             {
                 try
                 {
-                    WebServer webServer = Journeymap.getClient().getJmServer();
-                    String port = webServer.getPort() == 80 ? "" : ":" + Integer.toString(webServer.getPort());
+                    Webmap webServer = Journeymap.getClient().getJmServer();
+                    String port = webServer.getPort() == 80 ? "" : ":" + webServer.getPort();
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port);
                     ChatLog.announceURL(message, "http://localhost" + port);
                 }

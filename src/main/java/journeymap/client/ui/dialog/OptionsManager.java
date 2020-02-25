@@ -19,7 +19,7 @@ import journeymap.client.properties.ClientCategory;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.WebServer;
+import journeymap.client.service.webmap.Webmap;
 import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
@@ -96,7 +96,7 @@ public class OptionsManager extends JmUI
     /**
      * The Button server.
      */
-    protected Button  buttonServer;
+    protected Button buttonServer;
     /**
      * The Render stats button.
      */
@@ -768,7 +768,16 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.WebMap)
                 {
                     DataCache.INSTANCE.resetRadarCaches();
-                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
+
+                    if (Journeymap.getClient().getWebMapProperties().enabled.get())
+                    {
+                        Webmap.INSTANCE.start();
+                    }
+                    else
+                    {
+                        Webmap.INSTANCE.stop();
+                    }
+
                     ChatLog.announceMod(true);
                     continue;
                 }
@@ -797,7 +806,16 @@ public class OptionsManager extends JmUI
                 if (category == ClientCategory.Advanced)
                 {
                     SoftResetTask.queue();
-                    WebServer.setEnabled(Journeymap.getClient().getWebMapProperties().enabled.get());
+
+                    if (Journeymap.getClient().getWebMapProperties().enabled.get())
+                    {
+                        Webmap.INSTANCE.start();
+                    }
+                    else
+                    {
+                        Webmap.INSTANCE.stop();
+                    }
+
                     ChatLog.announceMod(false);
                     continue;
                 }

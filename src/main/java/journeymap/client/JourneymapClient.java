@@ -28,7 +28,7 @@ import journeymap.client.properties.TopoProperties;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.properties.WebMapProperties;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.WebServer;
+import journeymap.client.service.webmap.Webmap;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.client.task.main.MainTaskController;
 import journeymap.client.task.main.MappingMonitorTask;
@@ -327,7 +327,11 @@ public class JourneymapClient implements CommonProxy
             ThemeLoader.initialize(true);
 
             // Webserver
-            WebServer.setEnabled(webMapProperties.enabled.get());
+            if (webMapProperties.enabled.get())
+            {
+                Webmap.INSTANCE.start();
+            }
+
             ChatLog.announceMod(false);
             initialized = true;
 
@@ -420,9 +424,9 @@ public class JourneymapClient implements CommonProxy
      *
      * @return
      */
-    public WebServer getJmServer()
+    public Webmap getJmServer()
     {
-        return WebServer.getInstance();
+        return Webmap.INSTANCE;
     }
 
     /**

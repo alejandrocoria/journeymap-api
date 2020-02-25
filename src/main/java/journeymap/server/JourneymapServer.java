@@ -37,7 +37,7 @@ public class JourneymapServer implements CommonProxy
     private Logger logger;
     public static boolean DEV_MODE = false;
 
-    private static final Version MINIMUM_ACCEPTABLE_VERSION = new Version(5, 5, 6);
+    private static final Version MINIMUM_ACCEPTABLE_VERSION = new Version(5, 7, 0);
 
 
     /**

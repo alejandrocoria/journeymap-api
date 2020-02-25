@@ -54,34 +54,32 @@ public class JourneyMapTeleport
         }
         if (entity instanceof EntityPlayerMP)
         {
+
             creative = ((EntityPlayerMP) entity).capabilities.isCreativeMode;
             cheatMode = mcServer.getPlayerList().canSendCommands(new GameProfile(entity.getUniqueID(), entity.getName()));
-
-            if (mcServer == null)
-            {
-                entity.sendMessage(new TextComponentString("Cannot Find World"));
-                return false;
-            }
-
-            destinationWorld = mcServer.getWorld(location.getDim());
-            if (!entity.isEntityAlive())
-            {
-                entity.sendMessage(new TextComponentString("Cannot teleport when dead."));
-                return false;
-            }
-
-            if (destinationWorld == null)
-            {
-                entity.sendMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
-                return false;
-            }
-
             if (isTeleportAvailable(entity, location)
                     || creative
                     || cheatMode
                     || isOp((EntityPlayerMP) entity))
             {
+                if (mcServer == null)
+                {
+                    entity.sendMessage(new TextComponentString("Cannot Find World"));
+                    return false;
+                }
+                if (!entity.isEntityAlive())
+                {
+                    entity.sendMessage(new TextComponentString("Cannot teleport when dead."));
+                    return false;
+                }
+                destinationWorld = mcServer.getWorld(location.getDim());
+                if (destinationWorld == null)
+                {
+                    entity.sendMessage(new TextComponentString("Could not get world for Dimension " + location.getDim()));
+                    return false;
+                }
 
+                // Do teleport!
                 return teleportEntity(mcServer, destinationWorld, entity, location, entity.rotationYaw);
             }
             else

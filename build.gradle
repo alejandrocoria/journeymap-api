@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         jcenter()
+
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -12,15 +13,16 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.9'
-        classpath "com.eriwen:gradle-js-plugin:2.14.1"
-        classpath 'com.eriwen:gradle-css-plugin:2.14.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
+
 apply plugin: 'com.matthewprenger.cursegradle'
-apply plugin: 'com.eriwen.gradle.js'
-apply plugin: 'com.eriwen.gradle.css'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 
 ext {
     srcWebDir = "src/main/resources/assets/journeymap/ui/"
@@ -47,11 +49,16 @@ repositories {
         name = "chisel"
         url = "http://maven.tterrag.com/"
     }
+
+    maven {
+        name = "JourneyMap"
+        url = "https://jm.gserv.me/repository/maven-snapshots/"
+    }
 }
 
 configurations {
     // custom config of jars that will be included in the journeymap jar
-    includeInJar
+    shade
 }
 
 configurations.all {
@@ -60,13 +67,21 @@ configurations.all {
 }
 
 dependencies {
+    compile 'ar.com.hjg:pngj:2.1.0'
+    compile 'com.sparkjava:spark-kotlin:1.0.0-alpha'
+    compile group: 'info.journeymap', name: 'journeymap-api', version: project.journeymap_api_version, changing: true
+    compile group: 'info.journeymap', name: 'webmap-client', version: project.journeymap_webmap_version, changing: true
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
 
-    compile "ar.com.hjg:pngj:2.1.0"
-    compile group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, changing: true
-    //runtime group: "info.journeymap", name: "journeymap-api", version: project.journeymap_api_version, classifier: "examplemod", changing: true
-    testCompile "junit:junit:4.12"
-    includeInJar "info.journeymap:journeymap-api:" + project.journeymap_api_version
-    includeInJar "ar.com.hjg:pngj:2.1.0"
+    testCompile 'junit:junit:4.12'
+
+    shade 'ar.com.hjg:pngj:2.1.0'
+    shade 'com.sparkjava:spark-kotlin:1.0.0-alpha'
+    shade group: 'info.journeymap', name: 'journeymap-api', version: project.journeymap_api_version, changing: true
+    shade group: 'info.journeymap', name: 'webmap-client', version: project.journeymap_webmap_version, changing: true
+    shade group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    shade group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
 
     // Put other mods here as needed for debugging/testing
     compile fileTree(dir: 'lib', include: '*.jar')
@@ -87,25 +102,26 @@ minecraft {
     replace "@PATCH@", project.jm_patch
 }
 
-minifyJs {
-    source = file("${srcWebDir}/js/journeymap.js")
-    dest = ("${buildWebDir}/js/journeymap.js")
-    doFirst {
-        dest.parentFile.mkdirs()
-        dest.delete()
+reobf {
+    shadowJar {
+        mappingType = 'SEARGE'  // Warning in IDEA is erroneous, don't worry about it
     }
 }
 
-minifyCss {
-    source = file("${srcWebDir}/css/journeymap.css")
-    dest = file("${buildWebDir}/css/journeymap.css")
-    yuicompressor {
-        lineBreakPos = -1
-    }
-    doFirst {
-        dest.parentFile.mkdirs()
-        dest.delete()
-    }
+shadowJar {
+    minimize()
+
+    archiveName = "${baseName}-${version}.${extension}"
+
+    relocate "ar.com", "info.journeymap.shaded.ar.com"
+    relocate "com.sparkjava", "info.journeymap.shaded.com.sparkjava"
+    relocate "javax.servlet", "info.journeymap.shaded.org.javax.servlet"
+    relocate "org.intellij", "info.journeymap.shaded.org.intellij"
+    relocate "org.jetbrains", "info.journeymap.shaded.org.jetbrains"
+    relocate "org.slf4j", "info.journeymap.shaded.org.slf4j"
+
+    relocate "kotlin", "info.journeymap.shaded.kotlin.kotlin"
+    relocate "spark", "info.journeymap.shaded.kotlin.spark"
 }
 
 processResources() {
@@ -143,30 +159,25 @@ task processDocs(type: Copy) {
     into 'build/doc'
 }
 
-task includeJars(type: Copy) {
-    dependsOn configurations.includeInJar
-    from {
-        configurations.includeInJar.asFileTree.each {
-            from(zipTree(it))
-        }
-        // Exclude the jar itself
-        null
-    }
-    into file("${project.buildDir}/classes/main")
-    include "journeymap/**"
-    include "ar/**"
+tasks.build.dependsOn reobfShadowJar
+
+clean.doFirst {
+    // Remove the Webpack bundled assets as part of the clean task
+    delete "$projectDir/src/main/resources/assets/journeymap/web/"
 }
 
 /* Jar manifest */
 jar {
-    dependsOn 'processDocs', 'includeJars'
+    classifier = 'slim'
+    dependsOn 'processDocs'
+    
     manifest {
         attributes = [
-                "Manifest-Version"      : "1.0",
-                "Implementation-Title"  : "JourneyMap",
-                "Implementation-Version": project.version,
-                "Implementation-URL"    : "http://journeymap.info",
-                "FMLAT"                 : "journeymap_at.cfg"
+            "Manifest-Version"      : "1.0",
+            "Implementation-Title"  : "JourneyMap",
+            "Implementation-Version": project.version,
+            "Implementation-URL"    : "http://journeymap.info",
+            "FMLAT"                 : "journeymap_at.cfg"
         ]
     }
 }
@@ -175,18 +186,14 @@ task solderZip(type: Zip, dependsOn: 'jar') {
     baseName = "[solder]${archivesBaseName}"
     from("build/libs") {
         into("mods")
-        include("*.jar")
+        include("${archivesBaseName}-${version}.jar")
+        exclude("*-slim.jar")
     }
-
 }
 
 artifacts {
-    archives jar
+    archives shadowJar
     archives solderZip
-}
-
-reobf {
-    jar
 }
 
 def getDate() {
@@ -206,11 +213,12 @@ curseforge {
         apiKey = "${curseForgeApiKey}"
         changelogType = 'html'
         releaseType = curse_release_type
+
         relations {
             tool 'journeymap-tools'
         }
 
-        mainArtifact(jar) {
+        mainArtifact(shadowJar) {
             displayName = "${archivesBaseName}-${version}"
             changelog = file('/build/doc/changelog.html')
         }
