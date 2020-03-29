@@ -109,7 +109,10 @@ reobf {
 }
 
 shadowJar {
-    minimize()
+    minimize {
+        // API has utility classes that must be included
+        exclude(dependency("info.journeymap:.*:.*"))
+    }
 
     archiveName = "${baseName}-${version}.${extension}"
 
